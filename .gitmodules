@@ -1,0 +1,9 @@
+[submodule "deps/stivale"]
+	path = deps/stivale
+	url = https://github.com/stivale/stivale
+[submodule "deps/echfs"]
+	path = deps/echfs
+	url = https://github.com/echfs/echfs
+[submodule "deps/limine"]
+	path = deps/limine
+	url = https://github.com/limine-bootloader/limine
