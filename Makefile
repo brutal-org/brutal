@@ -48,7 +48,7 @@ include sources/sysroot/.build.mk
 all: $(SYSROOT_ISO)
 
 run: $(SYSROOT_ISO)
-	qemu-system-x86_64 -M q35 -m 2G -cdrom $(SYSROOT_ISO)
+	qemu-system-x86_64 -M q35 -m 2G -serial mon:stdio -cdrom $(SYSROOT_ISO)
 
 clean:
 	rm -rf build/
