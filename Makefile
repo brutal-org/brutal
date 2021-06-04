@@ -15,7 +15,7 @@ CFLAGS= \
 	-Wextra \
 	-Werror \
 	-O2 \
-	-Ideps \
+	-Ithirdparty \
 	-Isources/ \
 	-Isources/library
 

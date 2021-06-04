@@ -1,9 +1,9 @@
-LIMINE=deps/limine/limine-install
+LIMINE=thirdparty/limine/limine-install
 SYSROOT=build/sysroot
 SYSROOT_ISO=build/sysroot.iso
 
 $(LIMINE):
-	make -C deps/limine all
+	make -C thirdparty/limine all
 
 $(SYSROOT): sources/sysroot/limine.cfg $(KERNEL_BIN)
 	$(MKCWD)
@@ -11,9 +11,9 @@ $(SYSROOT): sources/sysroot/limine.cfg $(KERNEL_BIN)
 
 	cp sources/sysroot/limine.cfg           $(SYSROOT)/limine.cfg
 	cp $(KERNEL_BIN)                        $(SYSROOT)/kernel.elf
-	cp deps/limine/limine.sys               $(SYSROOT)/limine.sys
-	cp deps/limine/limine-cd.bin            $(SYSROOT)/limine-cd.bin
-	cp deps/limine/limine-eltorito-efi.bin  $(SYSROOT)/limine-eltorito-efi.bin
+	cp thirdparty/limine/limine.sys               $(SYSROOT)/limine.sys
+	cp thirdparty/limine/limine-cd.bin            $(SYSROOT)/limine-cd.bin
+	cp thirdparty/limine/limine-eltorito-efi.bin  $(SYSROOT)/limine-eltorito-efi.bin
 
 $(SYSROOT_ISO): $(SYSROOT) $(LIMINE)
 	$(MKCWD)

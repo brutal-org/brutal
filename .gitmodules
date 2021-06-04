@@ -1,10 +1,10 @@
-[submodule "deps/stivale"]
-	path = deps/stivale
+[submodule "thirdparty/stivale"]
+	path = thirdparty/stivale
 	url = https://github.com/stivale/stivale
-[submodule "deps/echfs"]
-	path = deps/echfs
+[submodule "thirdparty/echfs"]
+	path = thirdparty/echfs
 	url = https://github.com/echfs/echfs
-[submodule "deps/limine"]
-	path = deps/limine
+[submodule "thirdparty/limine"]
+	path = thirdparty/limine
 	url = https://github.com/limine-bootloader/limine
 	branch = latest-binary
