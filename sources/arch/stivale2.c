@@ -2,7 +2,7 @@
 
 #include "arch/stivale2.h"
 
-static uint8_t stack[4096];
+static uint8_t stack[4096 * 4];
 
 static struct stivale2_header_tag_framebuffer framebuffer_hdr_tag = {
     .tag = {

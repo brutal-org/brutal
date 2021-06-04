@@ -2,13 +2,14 @@
 #include <library/io.h>
 
 #include "arch.h"
+#include "arch/asm.h"
 #include "arch/com.h"
 #include "arch/gdt.h"
 #include "arch/stivale2.h"
 
-void _start(struct stivale2_struct *stivale2_struct)
+void _start(struct stivale2_struct *info)
 {
-    UNUSED(stivale2_struct);
+    UNUSED(info);
 
     com_initialize(COM1);
     gdt_initialize();
@@ -17,6 +18,7 @@ void _start(struct stivale2_struct *stivale2_struct)
 
     for (;;)
     {
-        asm("hlt");
+        cli();
+        hlt();
     }
 }
