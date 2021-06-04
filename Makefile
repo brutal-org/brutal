@@ -1,12 +1,13 @@
 .SUFFIXES:
 .DEFAULT_GOAL := all
 
+export PATH := $(shell toolchain/use-it.sh):$(PATH)
 export LC_ALL=C
 
 AS=nasm
 ASFLAGS=-f elf64
 
-CC=gcc
+CC=x86_64-elf-gcc
 
 CFLAGS= \
 	-std=gnu2x \
@@ -31,16 +32,13 @@ KCFLAGS= \
 	-mno-sse2 \
 	-mno-red-zone
 
+LD=x86_64-elf-ld
+
 KLDFLAGS= \
-	-fno-pic \
-	-fpie \
-	-Wl,-static,-pie,--no-dynamic-linker,-ztext \
-	-static-pie \
-	-nostdlib \
 	-Tsources/arch/link.ld \
 	-z max-page-size=0x1000
 
-AR=ar
+AR=x86_64-elf-ar
 ARFLAGS=rcsv
 
 MKCWD=mkdir -p $(@D)

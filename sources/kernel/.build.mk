@@ -13,4 +13,4 @@ build/kernel/%.c.o: sources/kernel/%.c
 
 $(KERNEL_BIN): $(KERNEL_OBJ)
 	$(MKCWD)
-	$(CC) $(KLDFLAGS) $^ -o $@
+	$(LD) $(KLDFLAGS) $^ -o $@
