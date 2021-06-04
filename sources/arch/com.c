@@ -37,7 +37,7 @@ char com_getc(enum com_port port)
     return in8(port);
 }
 
-size_t com_write(enum com_port port, const void *buffer, size_t size)
+size_t com_write_str(enum com_port port, const void *buffer, size_t size)
 {
     for (size_t i = 0; i < size; i++)
     {
