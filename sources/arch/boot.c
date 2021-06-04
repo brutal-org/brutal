@@ -5,6 +5,7 @@
 #include "arch/asm.h"
 #include "arch/com.h"
 #include "arch/gdt.h"
+#include "arch/idt.h"
 #include "arch/stivale2.h"
 
 void _start(struct stivale2_struct *info)
@@ -13,6 +14,7 @@ void _start(struct stivale2_struct *info)
 
     com_initialize(COM1);
     gdt_initialize();
+    idt_initialize();
 
     print(arch_log(), "Hello, {}!\n", "pomme");
 
