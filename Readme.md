@@ -1,17 +1,12 @@
-# brutal
+![](meta/brand/logo_bw.png)
 
-🏢 A brutalist operating system
+## Moderne C
 
-- [brutal](#brutal)
-  - [Acknowledgements](#acknowledgements)
-  - [Moderne C](#moderne-c)
+- [Modern C and What We Can Learn From It - Luca Sas](https://www.youtube.com/watch?v=QpAhX-gsHMs)
+- [Episode 414: Jens Gustedt on Modern C](https://www.youtube.com/watch?v=xioxhMOx9t4)
 
 ## Acknowledgements
 
 - <https://github.com/rxi/vec>
 - <https://github.com/rxi/map>
 
-## Moderne C
-
-- [Modern C and What We Can Learn From It - Luca Sas](https://www.youtube.com/watch?v=QpAhX-gsHMs)
-- [Episode 414: Jens Gustedt on Modern C](https://www.youtube.com/watch?v=xioxhMOx9t4)

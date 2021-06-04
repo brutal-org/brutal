@@ -2,6 +2,10 @@
 
 #define nullptr ((void *)0)
 
+#define PACKED __attribute__((packed))
+
+#define ALIGNED(__align) __attribute__((aligned(__align)))
+
 #define UNUSED(expr) ((void)expr)
 
 #define MIN(x, y) ((x) < (y) ? (x) : (y))

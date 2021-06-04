@@ -53,3 +53,7 @@ dkms.conf
 
 .vscode/
 build/
+
+toolchain/build-x86_64
+toolchain/local
+toolchain/tarballs

@@ -1,6 +1,11 @@
 .SUFFIXES:
 .DEFAULT_GOAL := all
 
+export LC_ALL=C
+
+AS=nasm
+ASFLAGS=-f elf64
+
 CC=gcc
 
 CFLAGS= \
