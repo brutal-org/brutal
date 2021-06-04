@@ -1,7 +1,6 @@
 #pragma once
 
-#include <base-macros.h>
-#include <base-std.h>
+#include <library/base.h>
 
 #define GDT_ENTRY_COUNT 5
 #define GDT_SEGMENT (0b00010000)

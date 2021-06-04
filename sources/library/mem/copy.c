@@ -1,4 +1,4 @@
-#include <mem.h>
+#include <library/mem.h>
 
 #if defined(__x86_64__) || defined(__x86_32__)
 
@@ -31,39 +31,4 @@ void *mem_cpy(void *s1, const void *s2, size_t n)
 #endif
 
     return s1;
-}
-
-void *mem_set(void *s, uint8_t c, size_t n)
-{
-    uint8_t *dest = (uint8_t *)s;
-
-    for (size_t i = 0; i < n; i++)
-    {
-        dest[i] = c;
-    }
-
-    return s;
-}
-
-void *mem_move(void *dest, const void *src, size_t n)
-{
-    const unsigned char *usrc = (const unsigned char *)src;
-    unsigned char *udest = (unsigned char *)dest;
-
-    if (udest < usrc)
-    {
-        for (size_t i = 0; i < n; i++)
-        {
-            udest[i] = usrc[i];
-        }
-    }
-    else if (udest > usrc)
-    {
-        for (size_t i = n; i > 0; i--)
-        {
-            udest[i - 1] = usrc[i - 1];
-        }
-    }
-
-    return dest;
 }

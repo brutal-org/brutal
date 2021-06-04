@@ -1,5 +1,6 @@
-#include <arch/stivale2.h>
-#include <base-macros.h>
+#include <library/base.h>
+
+#include "arch/stivale2.h"
 
 static uint8_t stack[4096];
 
@@ -24,13 +25,8 @@ void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id)
 {
     struct stivale2_tag *current_tag = (void *)stivale2_struct->tags;
 
-    for (;;)
+    while (current_tag)
     {
-        if (current_tag == nullptr)
-        {
-            return nullptr;
-        }
-
         if (current_tag->identifier == id)
         {
             return current_tag;
@@ -38,4 +34,6 @@ void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id)
 
         current_tag = (void *)current_tag->next;
     }
+
+    return nullptr;
 }

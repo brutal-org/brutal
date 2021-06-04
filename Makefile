@@ -4,27 +4,46 @@
 export PATH := $(shell toolchain/use-it.sh):$(PATH)
 export LC_ALL=C
 
-AS=nasm
-ASFLAGS=-f elf64
+STD = \
+	-std=gnu2x
 
-CC=x86_64-elf-gcc
+OPTIMISATIONS= \
+	-O2
 
-CFLAGS= \
-	-std=gnu2x \
+WARNINGS= \
 	-Wall \
 	-Wextra \
-	-Werror \
-	-O2 \
+	-Werror
+
+INCLUDES=\
 	-Ithirdparty \
 	-Isources/ \
 	-Isources/library
 
-KCFLAGS= \
-	$(CFLAGS) \
-	-ffreestanding \
-	-fno-stack-protector \
+HOST_CC=cc
+
+HOST_CFLAGS= \
+	$(STD) \
+	$(OPTIMISATIONS) \
+	$(WARNINGS) \
+	$(INCLUDES)
+
+CROSS_AS=nasm
+CROSS_ASFLAGS=-f elf64
+
+CROSS_CC=x86_64-elf-gcc
+CROSS_CFLAGS= \
+	$(STD) \
+	$(OPTIMISATIONS) \
+	$(WARNINGS) \
+	$(INCLUDES) \
+	-ffreestanding
+
+CROSS_KCFLAGS= \
+	$(CROSS_CFLAGS) \
 	-fno-pic \
 	-fpie \
+	-fno-stack-protector \
 	-mno-80387 \
 	-mno-mmx \
 	-mno-3dnow \
@@ -32,14 +51,13 @@ KCFLAGS= \
 	-mno-sse2 \
 	-mno-red-zone
 
-LD=x86_64-elf-ld
-
-KLDFLAGS= \
+CROSS_LD=x86_64-elf-ld
+CROSS_KLDFLAGS= \
 	-Tsources/arch/link.ld \
 	-z max-page-size=0x1000
 
-AR=x86_64-elf-ar
-ARFLAGS=rcsv
+CROSS_AR=x86_64-elf-ar
+CROSS_ARFLAGS=rcsv
 
 MKCWD=mkdir -p $(@D)
 
@@ -48,7 +66,7 @@ include sources/kernel/.build.mk
 include sources/library/.build.mk
 include sources/sysroot/.build.mk
 
-all: $(SYSROOT_ISO)
+all: $(TARGETS)
 
 run: $(SYSROOT_ISO)
 	qemu-system-x86_64 -M q35 -m 2G -serial mon:stdio -cdrom $(SYSROOT_ISO)

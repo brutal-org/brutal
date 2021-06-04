@@ -1,12 +1,12 @@
 #pragma once
 
-#include <base-std.h>
+#include <library/base.h>
 
-static inline void cli() { asm volatile("cli"); }
+static inline void cli(void) { asm volatile("cli"); }
 
-static inline void sti() { asm volatile("sti"); }
+static inline void sti(void) { asm volatile("sti"); }
 
-static inline void hlt() { asm volatile("hlt"); }
+static inline void hlt(void) { asm volatile("hlt"); }
 
 static inline uint8_t in8(uint16_t port)
 {

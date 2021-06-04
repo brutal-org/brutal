@@ -1,4 +1,10 @@
-KERNEL_C_SRC+=$(wildcard sources/kernel/*.c)
+KERNEL_C_SRC+=$(wildcard sources/kernel/*.c) \
+			  $(wildcard sources/kernel/*/*.c) \
+			  sources/library/io/print.c \
+			  sources/library/io/write.c \
+			  sources/library/io/fmt.c \
+			  sources/library/io/scan.c
+
 KERNEL_OBJ= \
 	$(patsubst sources/%.c, build/%.c.o, $(KERNEL_C_SRC)) \
 	$(patsubst sources/%.s, build/%.s.o, $(KERNEL_S_SRC))
@@ -9,8 +15,12 @@ TARGETS += $(KERNEL_BIN)
 
 build/kernel/%.c.o: sources/kernel/%.c
 	$(MKCWD)
-	$(CC) $(KCFLAGS) -c -o $@ $^
+	$(CROSS_CC) $(CROSS_KCFLAGS) -c -o $@ $^
+
+build/kernel/library/%.c.o: sources/library/%.c
+	$(MKCWD)
+	$(CROSS_CC) $(CROSS_KCFLAGS) -c -o $@ $^
 
 $(KERNEL_BIN): $(KERNEL_OBJ)
 	$(MKCWD)
-	$(LD) $(KLDFLAGS) $^ -o $@
+	$(CROSS_LD) $(CROSS_KLDFLAGS) $^ -o $@

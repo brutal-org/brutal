@@ -1,10 +1,9 @@
-#include <alloc.h>
-#include <lock.h>
-#include <sys-mem.h>
+#include <library/alloc/heap.h>
+#include <library/task/lock.h>
 
 static struct lock heap_lock;
 
-static struct alloc *heap()
+static struct alloc *heap(void)
 {
     static bool initialized = false;
     static struct alloc_heap memory;
@@ -37,7 +36,7 @@ void alloc_global_release(struct alloc *alloc, void *ptr)
     lock_release(&heap_lock);
 }
 
-struct alloc *alloc_global()
+struct alloc *alloc_global(void)
 {
     static struct alloc memory = {
         .acquire = alloc_global_acquire,

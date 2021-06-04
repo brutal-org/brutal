@@ -7,7 +7,7 @@ $(LIMINE):
 
 $(SYSROOT): sources/sysroot/limine.cfg $(KERNEL_BIN)
 	$(MKCWD)
-	mkdir $(SYSROOT)
+	mkdir -p $(SYSROOT)
 
 	cp sources/sysroot/limine.cfg           $(SYSROOT)/limine.cfg
 	cp $(KERNEL_BIN)                        $(SYSROOT)/kernel.elf

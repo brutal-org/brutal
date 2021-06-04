@@ -5,9 +5,9 @@
  * under the terms of the MIT license. See LICENSE for details.
  */
 
-#include <base-std.h>
-#include <ds-vec.h>
-#include <mem.h>
+#include <library/base/std.h>
+#include <library/ds/vec.h>
+#include <library/mem.h>
 
 bool vec_details_realloc(struct vec_details *details, int new_length)
 {

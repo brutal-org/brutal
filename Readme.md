@@ -1,7 +1,7 @@
 <br/>
 <br/>
 <p align="center">
-<img width="256" src="meta/brand/logo_bw.png">
+<img width="256" src="meta/brand/logo.png">
 </p>
 <br/>
 <p align="center">
@@ -9,7 +9,7 @@ A bold, unapologetic, and honest operating system written in modern C
 </p>
 <br/>
 
-## Moderne C
+## Modern C
 
 - [The modern C book](https://modernc.gforge.inria.fr/)
 - [Modern C and What We Can Learn From It - Luca Sas](https://www.youtube.com/watch?v=QpAhX-gsHMs)
@@ -19,3 +19,4 @@ A bold, unapologetic, and honest operating system written in modern C
 
 - <https://github.com/rxi/vec>
 - <https://github.com/rxi/map>
+- <https://github.com/nuta/resea>

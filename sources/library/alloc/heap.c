@@ -1,5 +1,5 @@
-#include <alloc.h>
-#include <sys-mem.h>
+#include <host/host.h>
+#include <library/alloc/heap.h>
 
 #define ALLOC_GLOBAL_MAGIC 0xc001c0de
 #define ALLOC_GLOBAL_DEAD 0xdeaddead
@@ -43,30 +43,30 @@ static struct alloc_major *major_block_create(size_t size)
     st += MINOR_BLOCK_HEADER_SIZE;
 
     // Perfect amount of space?
-    if ((st % SYS_MEM_PAGESIZE) == 0)
+    if ((st % HOST_MEM_PAGESIZE) == 0)
     {
-        st = st / (SYS_MEM_PAGESIZE);
+        st = st / (HOST_MEM_PAGESIZE);
     }
     else
     {
-        st = st / (SYS_MEM_PAGESIZE) + 1;
+        st = st / (HOST_MEM_PAGESIZE) + 1;
     }
 
     // Make sure it's >= the minimum size.
     st = MAX(st, 16); // The number of pages to request per chunk.
 
     struct alloc_major *maj;
-    if (sys_mem_acquire(st * SYS_MEM_PAGESIZE, (void **)&maj) != SYS_MEM_SUCCESS)
+    if (host_mem_acquire(st * HOST_MEM_PAGESIZE, (void **)&maj, HOST_MEM_NONE).kind != ERR_SUCCESS)
     {
         return nullptr;
     }
 
-    sys_mem_commit(maj, st * SYS_MEM_PAGESIZE);
+    host_mem_commit(maj, st * HOST_MEM_PAGESIZE);
 
     maj->prev = nullptr;
     maj->next = nullptr;
     maj->pages = st;
-    maj->size = st * SYS_MEM_PAGESIZE;
+    maj->size = st * HOST_MEM_PAGESIZE;
     maj->usage = MAJOR_BLOCK_HEADER_SIZE;
     maj->first = nullptr;
 
@@ -384,8 +384,8 @@ void alloc_heap_release(struct alloc_heap *alloc, void *ptr)
             maj->next->prev = maj->prev;
         }
 
-        sys_mem_decommit(maj, maj->pages * SYS_MEM_PAGESIZE);
-        sys_mem_release(maj, maj->pages * SYS_MEM_PAGESIZE);
+        host_mem_decommit(maj, maj->pages * HOST_MEM_PAGESIZE);
+        host_mem_release(maj, maj->pages * HOST_MEM_PAGESIZE);
     }
     else
     {

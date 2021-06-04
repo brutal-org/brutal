@@ -2,6 +2,8 @@
 
 #define nullptr ((void *)0)
 
+#define auto __auto_type
+
 #define PACKED __attribute__((packed))
 
 #define ALIGNED(__align) __attribute__((aligned(__align)))

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <alloc.h>
-#include <base-macros.h>
+#include <library/alloc.h>
+#include <library/base/macros.h>
 
 struct vec_details
 {
@@ -13,7 +13,7 @@ struct vec_details
     int *capacity;
 };
 
-bool vec_details_expand(struct vec_details* details);
+bool vec_details_expand(struct vec_details *details);
 
 bool vec_details_reserve(struct vec_details *details, int n);
 
@@ -23,14 +23,14 @@ bool vec_details_compact(struct vec_details *details);
 
 bool vec_details_insert(struct vec_details *details, int idx);
 
-void vec_details_splice(struct vec_details* details, int start, int count);
+void vec_details_splice(struct vec_details *details, int start, int count);
 
-void vec_details_swapsplice(struct vec_details* details, int start, int count);
+void vec_details_swapsplice(struct vec_details *details, int start, int count);
 
-void vec_details_swap(struct vec_details* details, int idx1, int idx2);
+void vec_details_swap(struct vec_details *details, int idx1, int idx2);
 
 #define vec_details_unpack(v) \
-    (char **)&(v)->data, &(v)->length, &(v)->capacity, sizeof(*(v)->data)
+    (struct vec_details) { (char **)&(v)->data, sizeof(*(v)->data), &(v)->alloc, &(v)->length, &(v)->capacity, }
 
 #define vec_t(T)             \
     struct                   \
@@ -149,5 +149,3 @@ typedef vec_t(void *) vec_void_t;
 typedef vec_t(char *) vec_str_t;
 typedef vec_t(int) vec_int_t;
 typedef vec_t(char) vec_char_t;
-typedef vec_t(float) vec_float_t;
-typedef vec_t(double) vec_double_t;
