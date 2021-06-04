@@ -46,6 +46,7 @@ bool scan_skip(struct scan *self, char c)
     if (scan_curr(self) == c)
     {
         scan_next(self);
+
         return true;
     }
     else

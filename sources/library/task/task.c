@@ -6,6 +6,13 @@ static struct task task;
 
 struct task *task_this(void)
 {
+    if (!task_initialized)
+    {
+        task.handle = host_task_this();
+        task_initialized = true;
+    }
+
+    return &task;
 }
 
 void task_fork(struct task *task)
@@ -36,7 +43,7 @@ void task_run(struct task *task)
 
 void task_exit(struct task *task, int result)
 {
-    task_exit(task->handle, result);
+    host_task_exit(task->handle, result);
 }
 
 void task_abort(struct task *task)
@@ -44,7 +51,9 @@ void task_abort(struct task *task)
     host_task_abort(task->handle);
 }
 
-task_result_t task_wait(struct task *task)
+struct task_wait_result task_wait(struct task *task)
 {
-    return host_task_wait(task->handle);
+    struct task_wait_result result;
+    result.result = host_task_wait(task->handle);
+    return result;
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <library/base/error.h>
 #include <library/base/str.h>
 
 #define TASK_THIS (-424242)
@@ -65,4 +66,10 @@ void task_exit(struct task *task, int result);
 
 void task_abort(struct task *task);
 
-task_result_t task_wait(struct task *task);
+struct task_wait_result
+{
+    struct error error;
+    task_result_t result;
+};
+
+struct task_wait_result task_wait(struct task *task);

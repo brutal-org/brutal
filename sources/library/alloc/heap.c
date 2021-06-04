@@ -1,4 +1,4 @@
-#include <host/host.h>
+#include <host/mem.h>
 #include <library/alloc/heap.h>
 
 #define ALLOC_GLOBAL_MAGIC 0xc001c0de

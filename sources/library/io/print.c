@@ -48,7 +48,7 @@ struct write_result print_details(struct writer *writer, str_t format, struct pr
     struct scan scan;
     scan_init(&scan, format);
 
-    while (scan_curr(&scan) != '\0' && !scan_end(&scan))
+    while (!scan_end(&scan))
     {
         if (scan_curr(&scan) == '{')
         {
