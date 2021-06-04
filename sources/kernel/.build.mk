@@ -1,5 +1,7 @@
 KERNEL_C_SRC+=$(wildcard sources/kernel/*.c) \
-			  $(wildcard sources/kernel/*/*.c) \
+			  $(wildcard sources/kernel/*/*.c)
+
+KENREL_LIB_SRC = \
 			  sources/library/io/print.c \
 			  sources/library/io/write.c \
 			  sources/library/io/fmt.c \
@@ -7,6 +9,7 @@ KERNEL_C_SRC+=$(wildcard sources/kernel/*.c) \
 
 KERNEL_OBJ= \
 	$(patsubst sources/%.c, build/%.c.o, $(KERNEL_C_SRC)) \
+	$(patsubst sources/%.c, build/kernel/%.c.o, $(KENREL_LIB_SRC)) \
 	$(patsubst sources/%.s, build/%.s.o, $(KERNEL_S_SRC))
 
 KERNEL_BIN=build/kernel.elf
