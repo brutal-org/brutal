@@ -17,7 +17,7 @@ CFLAGS= \
 	-O2 \
 	-Ideps \
 	-Isources/ \
-	-Isources/lib
+	-Isources/library
 
 KCFLAGS= \
 	$(CFLAGS) \
@@ -45,7 +45,7 @@ MKCWD=mkdir -p $(@D)
 
 include sources/arch/.build.mk
 include sources/kernel/.build.mk
-include sources/lib/.build.mk
+include sources/library/.build.mk
 include sources/sysroot/.build.mk
 
 all: $(SYSROOT_ISO)
