@@ -56,7 +56,7 @@ static struct alloc_major *major_block_create(size_t size)
     st = MAX(st, 16); // The number of pages to request per chunk.
 
     struct alloc_major *maj;
-    if (host_mem_acquire(st * HOST_MEM_PAGESIZE, (void **)&maj, HOST_MEM_NONE).kind != ERR_SUCCESS)
+    if (host_mem_acquire(st * HOST_MEM_PAGESIZE, (void **)&maj, HOST_MEM_NONE).kind != ERR_KIND_SUCCESS)
     {
         return nullptr;
     }

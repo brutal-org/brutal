@@ -16,7 +16,7 @@ void _start(struct stivale2_struct *info)
     gdt_initialize();
     idt_initialize();
 
-    print(arch_log(), "Hello, {}!\n", "pomme");
+    print(arch_log(), "Hello, {} {}!\n", "pomme", 42);
 
     for (;;)
     {

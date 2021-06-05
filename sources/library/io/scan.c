@@ -3,7 +3,7 @@
 void scan_init(struct scan *self, str_t str)
 {
     *self = (struct scan){
-        .buffer = str.str,
+        .buffer = str.buffer,
         .size = str.len,
         .head = 0,
     };

@@ -4,5 +4,4 @@
 #include <library/base/error.h>
 #include <library/base/macros.h>
 #include <library/base/std.h>
-#include <library/base/str.h>
 #include <library/base/types.h>

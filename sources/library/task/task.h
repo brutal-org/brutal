@@ -1,7 +1,7 @@
 #pragma once
 
 #include <library/base/error.h>
-#include <library/base/str.h>
+#include <library/text/str.h>
 
 #define TASK_THIS (-424242)
 
@@ -9,7 +9,7 @@
 #define TASK_EXIT_FAILURE (-1)
 
 typedef unsigned int task_handle_t;
-typedef int task_result_t;
+typedef int task_r;
 
 enum task_type
 {
@@ -68,8 +68,8 @@ void task_abort(struct task *task);
 
 struct task_wait_result
 {
-    struct error error;
-    task_result_t result;
+    error_t error;
+    task_r result;
 };
 
 struct task_wait_result task_wait(struct task *task);

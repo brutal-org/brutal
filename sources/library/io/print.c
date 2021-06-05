@@ -23,7 +23,7 @@ struct print_value print_val_string(str_t val)
     return (struct print_value){PRINT_STRING, {._string = val}};
 }
 
-struct write_result print_dispatch(struct writer *writer, struct fmt fmt, struct print_value value)
+write_r print_dispatch(struct writer *writer, struct fmt fmt, struct print_value value)
 {
     switch (value.type)
     {
@@ -37,10 +37,10 @@ struct write_result print_dispatch(struct writer *writer, struct fmt fmt, struct
         return fmt_string(fmt, writer, value._string);
     }
 
-    return write_ok(0);
+    return (write_r)OK(0);
 }
 
-struct write_result print_details(struct writer *writer, str_t format, struct print_value *values, size_t count)
+write_r print_details(struct writer *writer, str_t format, struct print_value *values, size_t count)
 {
     size_t current = 0;
     size_t written = 0;
@@ -55,30 +55,16 @@ struct write_result print_details(struct writer *writer, str_t format, struct pr
             if (current < count)
             {
                 auto fmt = fmt_parse(&scan);
-                auto result = print_dispatch(writer, fmt, values[current]);
-
-                if (is_write_err(result))
-                {
-                    return result;
-                }
-
-                written += result.written;
+                written += TRY(print_dispatch(writer, fmt, values[current]));
             }
 
             current++;
         }
         else
         {
-            auto result = io_put(writer, scan_next(&scan));
-
-            if (is_write_err(result))
-            {
-                return result;
-            }
-
-            written += result.written;
+            written += TRY(io_put(writer, scan_next(&scan)));
         }
     }
 
-    return write_ok(written);
+    return (write_r)OK(written);
 }

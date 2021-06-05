@@ -20,25 +20,31 @@ struct fmt fmt_parse(struct scan *scan)
     return fmt;
 }
 
-struct write_result fmt_signed(struct fmt self, struct writer *writer, long value)
+write_r fmt_signed(struct fmt self, struct writer *writer, long value)
+{
+    size_t written = 0;
+
+    if (value < 0)
+    {
+        written += TRY(io_put(writer, '-'));
+        value *= -1;
+    }
+
+    written += TRY(fmt_unsigned(self, writer, value));
+
+    return (write_r)OK(written);
+}
+
+write_r fmt_unsigned(struct fmt self, struct writer *writer, unsigned long value)
 {
     UNUSED(self);
     UNUSED(writer);
     UNUSED(value);
 
-    return write_ok(0);
+    return (write_r)OK(0);
 }
 
-struct write_result fmt_unsigned(struct fmt self, struct writer *writer, unsigned long value)
-{
-    UNUSED(self);
-    UNUSED(writer);
-    UNUSED(value);
-
-    return write_ok(0);
-}
-
-struct write_result fmt_string(struct fmt self, struct writer *writer, str_t value)
+write_r fmt_string(struct fmt self, struct writer *writer, str_t value)
 {
     UNUSED(self);
 

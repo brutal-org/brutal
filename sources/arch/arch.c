@@ -6,11 +6,12 @@
 static bool log_initialized = false;
 static struct writer log;
 
-static struct write_result arch_log_write(struct writer *writer, const char *data, size_t size)
+static write_r arch_log_write(struct writer *writer, const char *data, size_t size)
 {
     UNUSED(writer);
+
     com_write(COM1, data, size);
-    return write_ok(size);
+    return (write_r)OK(size);
 }
 
 struct writer *arch_log(void)

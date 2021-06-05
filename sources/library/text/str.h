@@ -4,22 +4,34 @@
 
 struct str
 {
-    const char *str;
+    const char *buffer;
     size_t len;
 };
 
 typedef struct str str_t;
 
-typedef char str16_t[16];
-typedef char str32_t[32];
-typedef char str64_t[64];
-typedef char str128_t[128];
+#define str_fix_t(n) \
+    struct           \
+    {                \
+        char buffer[8]; \
+        size_t len;  \
+    }
+
+typedef str_fix_t(8) str_fix8_t;
+typedef str_fix_t(16) str_fix16_t;
+typedef str_fix_t(32) str_fix32_t;
+typedef str_fix_t(64) str_fix64_t;
+typedef str_fix_t(128) str_fix128_t;
 
 static inline size_t cstr_len(const char *str)
 {
     size_t size = 0;
+
     while (str[size])
+    {
         size++;
+    }
+
     return size;
 }
 

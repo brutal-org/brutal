@@ -3,8 +3,8 @@
 #include <library/base/count.h>
 #include <library/base/map.h>
 #include <library/base/std.h>
-#include <library/base/str.h>
 #include <library/io/write.h>
+#include <library/text/str.h>
 
 enum print_type
 {
@@ -37,14 +37,21 @@ struct print_value print_val_cstring(const char *val);
 
 #define PRINT_MATCH(__value)                    \
     _Generic((__value),                         \
-        long: print_val_signed,                 \
+        signed char: print_val_signed,          \
+        signed int: print_val_signed,           \
+        signed long: print_val_signed,          \
+                                                \
+        unsigned char: print_val_unsigned,      \
+        unsigned int: print_val_unsigned,       \
         unsigned long: print_val_unsigned,      \
-        char*: print_val_cstring,         \
-        struct str: print_val_string)(__value),
+                                                \
+        char*: print_val_cstring,               \
+        struct str: print_val_string            \
+    )(__value),
 
 // clang-format on
 
-struct write_result print_details(struct writer *writer, str_t format, struct print_value *values, size_t count);
+write_r print_details(struct writer *writer, str_t format, struct print_value *values, size_t count);
 
 #define print(writer, fmt, args...) \
     print_details(writer, make_str(fmt), (struct print_value[]){MAP(PRINT_MATCH, args)}, COUNT(args))

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <library/base/std.h>
-#include <library/base/str.h>
+#include <library/text/str.h>
 
 struct scan
 {

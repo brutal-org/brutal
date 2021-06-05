@@ -1,8 +1,8 @@
 #pragma once
 
-#include <library/base/str.h>
 #include <library/io/scan.h>
 #include <library/io/write.h>
+#include <library/text/str.h>
 
 enum fmt_type
 {
@@ -21,8 +21,8 @@ struct fmt
 
 struct fmt fmt_parse(struct scan *scan);
 
-struct write_result fmt_signed(struct fmt self, struct writer *writer, long value);
+write_r fmt_signed(struct fmt self, struct writer *writer, long value);
 
-struct write_result fmt_unsigned(struct fmt self, struct writer *writer, unsigned long value);
+write_r fmt_unsigned(struct fmt self, struct writer *writer, unsigned long value);
 
-struct write_result fmt_string(struct fmt self, struct writer *writer, str_t string);
+write_r fmt_string(struct fmt self, struct writer *writer, str_t string);
