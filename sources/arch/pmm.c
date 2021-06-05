@@ -2,7 +2,7 @@
 #include "arch.h"
 #include "base/macros.h"
 #include "host/mem.h"
-#include <library/mem.h>
+#include "mem.h"
 
 #define PMM_DEBUG_PRINT
 
@@ -39,13 +39,13 @@ static void pmm_bitmap_find_addr(struct stivale2_struct_tag_memmap *memory_map)
     }
 }
 
-static void clear_pmm_bitmap()
+static void pmm_bitmap_clear()
 {
     bitmap_fill(&pmm_bitmap, true);
     last_free_bitmap_entry = 0;
 }
 
-void init_pmm_bitmap_memory_map(struct stivale2_struct_tag_memmap *memory_map)
+void pmm_initialize_memory_map(struct stivale2_struct_tag_memmap *memory_map)
 {
     for (size_t i = 0; i < memory_map->entries; i++)
     {
@@ -143,16 +143,16 @@ int pmm_bitmap_free(void *addr, size_t page_count)
     return 0;
 }
 
-void init_pmm_bitmap(struct stivale2_struct_tag_memmap *memory_map)
+void pmm_initialize(struct stivale2_struct_tag_memmap *memory_map)
 {
     bitmap_target_size = memory_map_get_highest_address(memory_map) /
                          HOST_MEM_PAGESIZE; // load bitmap size
 
     pmm_bitmap_find_addr(memory_map);
 
-    clear_pmm_bitmap();
+    pmm_bitmap_clear();
 
-    init_pmm_bitmap_memory_map(memory_map);
+    pmm_initialize_memory_map(memory_map);
 
     // we set the first page used, as the page 0 is NULL
     bitmap_set(&pmm_bitmap, 0, true);

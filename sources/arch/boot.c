@@ -17,7 +17,7 @@ void arch_entry(struct handover *handover)
     gdt_initialize();
     idt_initialize();
     pic_disable();
-    init_pmm_bitmap(stivale2_get_tag(handover->raw, STIVALE2_STRUCT_TAG_MEMMAP_ID));
+    pmm_initialize(stivale2_get_tag(handover->raw, STIVALE2_STRUCT_TAG_MEMMAP_ID));
 
     print(arch_debug(), "Hello, {} {x}!\n", "pomme", 10);
 }

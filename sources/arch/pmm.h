@@ -4,7 +4,7 @@
 #include "ds/bitmap.h"
 #include <library/base.h>
 
-void init_pmm_bitmap(struct stivale2_struct_tag_memmap *memory_map);
+void pmm_initialize(struct stivale2_struct_tag_memmap *memory_map);
 
 void *pmm_bitmap_alloc(size_t page_count);
 
