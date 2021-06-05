@@ -2,7 +2,7 @@
 
 #if defined(__x86_64__) || defined(__x86_32__)
 
-static inline void __movsb_copy(void *from, const void *to, size_t size)
+static inline void __movsb_copy(void *from, void const *to, size_t size)
 {
     asm volatile("rep movsb"
                  : "=D"(from),
@@ -16,7 +16,7 @@ static inline void __movsb_copy(void *from, const void *to, size_t size)
 
 #endif
 
-void *mem_cpy(void *s1, const void *s2, size_t n)
+void *mem_cpy(void *s1, void const *s2, size_t n)
 {
 #if defined(__x86_64__) || defined(__x86_32__)
     __movsb_copy(s1, s2, n);

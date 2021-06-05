@@ -8,19 +8,19 @@ KERNEL_LIB_SRC = \
 			  $(wildcard sources/library/ds/*.c) \
 
 KERNEL_OBJ= \
-	$(patsubst sources/%.c, build/%.c.o, $(KERNEL_C_SRC)) \
-	$(patsubst sources/%.c, build/kernel/%.c.o, $(KERNEL_LIB_SRC)) \
-	$(patsubst sources/%.s, build/%.s.o, $(KERNEL_S_SRC))
+	$(patsubst sources/%.c, $(CROSS_BUILDDIR)/%.c.o, $(KERNEL_C_SRC)) \
+	$(patsubst sources/%.c, $(CROSS_BUILDDIR)/kernel/%.c.o, $(KERNEL_LIB_SRC)) \
+	$(patsubst sources/%.s, $(CROSS_BUILDDIR)/%.s.o, $(KERNEL_S_SRC))
 
-KERNEL_BIN=build/kernel.elf
+KERNEL_BIN=$(CROSS_BUILDDIR)/kernel.elf
 
 TARGETS += $(KERNEL_BIN)
 
-build/kernel/%.c.o: sources/kernel/%.c
+$(CROSS_BUILDDIR)/kernel/%.c.o: sources/kernel/%.c
 	$(MKCWD)
 	$(CROSS_CC) $(CROSS_KCFLAGS) -c -o $@ $^
 
-build/kernel/library/%.c.o: sources/library/%.c
+$(CROSS_BUILDDIR)/kernel/library/%.c.o: sources/library/%.c
 	$(MKCWD)
 	$(CROSS_CC) $(CROSS_KCFLAGS) -c -o $@ $^
 

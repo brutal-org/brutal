@@ -4,7 +4,7 @@
 static bool log_initialized = false;
 static struct writer log;
 
-static write_r arch_debug_write(struct writer *writer, const char *data, size_t size)
+static write_r arch_debug_write(struct writer *writer, char const *data, size_t size)
 {
     UNUSED(writer);
 

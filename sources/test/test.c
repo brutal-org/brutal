@@ -1,20 +1,23 @@
+#include <library/log.h>
 #include <library/task.h>
 
 #include "test/test.h"
 
-static size_t test_count = 0;
+static size_t tests_count = 0;
 static struct test tests[1024] = {0};
 
 void test_register(struct test test)
 {
-    tests[test_count] = test;
-    test_count++;
+    tests[tests_count] = test;
+    tests_count++;
 }
 
 void test_run(struct test test)
 {
     struct task runner;
     task_fork(&runner);
+    log("Running {}...", test.name);
+    task_run(&runner);
 
     if (task_child(&runner))
     {
@@ -29,7 +32,9 @@ void test_run(struct test test)
 
 void test_run_all(void)
 {
-    for (size_t i = 0; i < test_count; i++)
+    log("Running {} tests...", tests_count);
+
+    for (size_t i = 0; i < tests_count; i++)
     {
         test_run(tests[i]);
     }
@@ -37,6 +42,9 @@ void test_run_all(void)
 
 int main(int argc, char const *argv[])
 {
+    UNUSED(argc);
+    UNUSED(argv);
+
     test_run_all();
     return 0;
 }

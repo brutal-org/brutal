@@ -29,5 +29,6 @@ void log_impl(enum log_level level, str_t fmt, struct print_args args)
     host_log_lock();
     print(host_log_writer(), "{}: ", log_prefix(level));
     print_impl(host_log_writer(), fmt, args);
+    io_put(host_log_writer(), '\n');
     host_log_unlock();
 }

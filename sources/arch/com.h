@@ -79,6 +79,6 @@ void com_putc(enum com_port port, char c);
 
 char com_getc(enum com_port port);
 
-size_t com_write(enum com_port port, const void *buffer, size_t size);
+size_t com_write(enum com_port port, void const *buffer, size_t size);
 
 void com_initialize(enum com_port port);
