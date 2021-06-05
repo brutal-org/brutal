@@ -42,12 +42,53 @@ void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id)
     return nullptr;
 }
 
+static enum handover_mmap_entry_type stivale_mmap_type_to_handover_type(int stivale_entry)
+{
+    switch (stivale_entry)
+    {
+
+    case STIVALE2_MMAP_USABLE:
+        return HANDOVER_MMAP_FREE;
+
+    case STIVALE2_MMAP_ACPI_NVS:
+    case STIVALE2_MMAP_RESERVED:
+    case STIVALE2_MMAP_BAD_MEMORY:
+        return HANDOVER_MMAP_RESERVED;
+
+    case STIVALE2_MMAP_BOOTLOADER_RECLAIMABLE:
+    case STIVALE2_MMAP_ACPI_RECLAIMABLE:
+        return HANDOVER_MMAP_RECLAIMABLE; // may be used after everything is loaded
+    
+    case STIVALE2_MMAP_FRAMEBUFFER:
+        return HANDOVER_MMAP_FRAMEBUFFER;
+    
+    default:
+        return HANDOVER_MMAP_RESERVED; // by default not detected entry are unused
+
+    }
+}
+
+static void fill_handover_mmap( struct handover* target, struct stivale2_struct_tag_memmap* memory_map)
+{
+    target->mmap.size = memory_map->entries;
+    for(size_t i = 0; i < memory_map->entries; i++)
+    {
+        target->mmap.mmap_table[i].length = memory_map->memmap[i].length;
+        target->mmap.mmap_table[i].base = memory_map->memmap[i].base;
+        target->mmap.mmap_table[i].type = stivale_mmap_type_to_handover_type(memory_map->memmap[i].type);
+
+    }
+}
+
 void stivale2_entry(struct stivale2_struct *info)
 {
     UNUSED(info);
 
-    struct handover handover = {};
+    struct handover handover = {
+        .raw = info,
+    };
 
+    fill_handover_mmap(&handover, stivale2_get_tag(info,STIVALE2_STRUCT_TAG_MEMMAP_ID));
     arch_entry(&handover);
 
     for (;;)

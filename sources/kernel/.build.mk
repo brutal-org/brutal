@@ -1,16 +1,15 @@
 KERNEL_C_SRC+=$(wildcard sources/kernel/*.c) \
 			  $(wildcard sources/kernel/*/*.c)
 
-KENREL_LIB_SRC = \
-			  sources/library/io/print.c \
-			  sources/library/io/write.c \
-			  sources/library/io/fmt.c \
-			  sources/library/io/scan.c \
-			  sources/library/text/str.c
+KERNEL_LIB_SRC = \
+			  $(wildcard sources/library/io/*.c) \
+			  $(wildcard sources/library/mem/*.c) \
+			  $(wildcard sources/library/text/*.c) \
+			  $(wildcard sources/library/ds/*.c) \
 
 KERNEL_OBJ= \
 	$(patsubst sources/%.c, $(CROSS_BUILDDIR)/%.c.o, $(KERNEL_C_SRC)) \
-	$(patsubst sources/%.c, $(CROSS_BUILDDIR)/kernel/%.c.o, $(KENREL_LIB_SRC)) \
+	$(patsubst sources/%.c, $(CROSS_BUILDDIR)/kernel/%.c.o, $(KERNEL_LIB_SRC)) \
 	$(patsubst sources/%.s, $(CROSS_BUILDDIR)/%.s.o, $(KERNEL_S_SRC))
 
 KERNEL_BIN=$(CROSS_BUILDDIR)/kernel.elf
