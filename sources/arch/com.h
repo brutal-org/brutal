@@ -63,9 +63,9 @@ enum com_line_status_bit
     COM_LINE_IMPENDING_ERROR = 1 << 7,
 };
 
-void com_write(enum com_port port, uint16_t reg, uint8_t value);
+void com_write_reg(enum com_port port, enum com_register reg, uint8_t value);
 
-uint8_t com_read(enum com_port port, uint16_t reg);
+uint8_t com_read_reg(enum com_port port, enum com_register reg);
 
 bool com_can_read(enum com_port port);
 
@@ -79,6 +79,6 @@ void com_putc(enum com_port port, char c);
 
 char com_getc(enum com_port port);
 
-size_t com_write_str(enum com_port port, const void *buffer, size_t size);
+size_t com_write(enum com_port port, const void *buffer, size_t size);
 
 void com_initialize(enum com_port port);
