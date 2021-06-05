@@ -9,7 +9,7 @@ struct writer;
 
 typedef result_t(size_t) write_r;
 
-typedef write_r write_t(struct writer *writer, const char *data, size_t size);
+typedef write_r write_t(struct writer *writer, char const *data, size_t size);
 
 struct writer
 {

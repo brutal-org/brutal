@@ -5,7 +5,7 @@
 
 struct scan
 {
-    const char *buffer;
+    char const *buffer;
     size_t size;
     size_t head;
 };

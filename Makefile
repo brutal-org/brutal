@@ -20,6 +20,10 @@ INCLUDES=\
 	-Isources/ \
 	-Isources/library
 
+# --- Hosted build ----------------------------------------------------------- #
+
+HOST_BUILDDIR=build/host
+
 HOST_CC=cc
 
 HOST_CFLAGS= \
@@ -27,6 +31,13 @@ HOST_CFLAGS= \
 	$(OPTIMISATIONS) \
 	$(WARNINGS) \
 	$(INCLUDES)
+
+HOST_LD=ld
+HOST_LDFLAGS=
+
+# --- Cress build ------------------------------------------------------------ #
+
+CROSS_BUILDDIR=build/cross
 
 CROSS_AS=nasm
 CROSS_ASFLAGS=-f elf64
@@ -65,6 +76,7 @@ include sources/arch/.build.mk
 include sources/kernel/.build.mk
 include sources/library/.build.mk
 include sources/sysroot/.build.mk
+include sources/test/.build.mk
 
 all: $(TARGETS)
 

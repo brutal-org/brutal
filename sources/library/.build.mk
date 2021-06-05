@@ -1,14 +1,14 @@
-LIB_BIN = build/libbrutal.a
+LIB_BIN = $(CROSS_BUILDDIR)/libbrutal.a
 
 LIB_SRC = \
 	$(wildcard sources/library/*.c) \
 	$(wildcard sources/library/*/*.c)
 
-LIB_OBJ = $(patsubst sources/%.c, build/%.c.o, $(LIB_SRC))
+LIB_OBJ = $(patsubst sources/%.c, $(CROSS_BUILDDIR)/%.c.o, $(LIB_SRC))
 
 TARGETS += $(LIB_BIN)
 
-build/library/%.c.o: sources/library/%.c
+$(CROSS_BUILDDIR)/library/%.c.o: sources/library/%.c
 	$(MKCWD)
 	$(CROSS_CC) $(CROSS_CFLAGS) -c -o $@ $^
 

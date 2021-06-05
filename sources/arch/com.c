@@ -47,11 +47,11 @@ char com_getc(enum com_port port)
     return com_read_reg(port, COM_DATA);
 }
 
-size_t com_write(enum com_port port, const void *buffer, size_t size)
+size_t com_write(enum com_port port, void const *buffer, size_t size)
 {
     for (size_t i = 0; i < size; i++)
     {
-        com_putc(port, ((const char *)buffer)[i]);
+        com_putc(port, ((char const *)buffer)[i]);
     }
 
     return size;

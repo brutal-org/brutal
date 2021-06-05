@@ -1,8 +1,8 @@
 #include <library/mem.h>
 
-void *mem_move(void *dest, const void *src, size_t n)
+void *mem_move(void *dest, void const *src, size_t n)
 {
-    const unsigned char *usrc = (const unsigned char *)src;
+    unsigned char const *usrc = (unsigned char const *)src;
     unsigned char *udest = (unsigned char *)dest;
 
     if (udest < usrc)
