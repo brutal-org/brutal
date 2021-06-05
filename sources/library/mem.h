@@ -1,5 +1,6 @@
 #pragma once
 
+#include <host/mem.h>
 #include <library/base/std.h>
 
 void *mem_cpy(void *s1, void const *s2, size_t n);

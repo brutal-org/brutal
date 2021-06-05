@@ -1,9 +1,9 @@
+#include <library/base/macros.h>
+#include <library/mem.h>
+
+#include "arch.h"
 #include "arch/mmap.h"
 #include "arch/pmm.h"
-#include "arch.h"
-#include "base/macros.h"
-#include "host/mem.h"
-#include "mem.h"
 
 #define PMM_DEBUG_PRINT
 
@@ -13,7 +13,7 @@ size_t last_free_bitmap_entry = 0;
 size_t available_memory = 0;
 size_t bitmap_target_size = 0;
 
-static uintptr_t memory_map_get_highest_address(const struct handover_mmap * memory_map)
+static uintptr_t memory_map_get_highest_address(const struct handover_mmap *memory_map)
 {
     size_t length = memory_map->mmap_table[memory_map->size - 1].length;
     size_t start = memory_map->mmap_table[memory_map->size - 1].base;
@@ -123,7 +123,7 @@ uintptr_t pmm_alloc_zero(size_t page_count)
 
     if (result)
     {
-        mem_set((void*)(result+MMAP_KERNEL_BASE), 0, page_count * HOST_MEM_PAGESIZE);
+        mem_set((void *)(result + MMAP_KERNEL_BASE), 0, page_count * HOST_MEM_PAGESIZE);
     }
 
     return result;

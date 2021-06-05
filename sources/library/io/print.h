@@ -57,10 +57,16 @@ struct print_value print_val_cstring(char *val);
 
 // clang-format on
 
-#define PRINT_ARGS(args...) \
-    (struct print_args) { COUNT(args), (struct print_value[]){MAP(PRINT_MATCH, args)}, }
+#define PRINT_ARGS_(...) \
+    (struct print_args) { 0, (struct print_value[]){}, }
+
+#define PRINT_ARGS_N(...) \
+    (struct print_args) { COUNT(__VA_ARGS__), (struct print_value[]){MAP(PRINT_MATCH, __VA_ARGS__)}, }
+
+#define PRINT_ARGS(...) \
+    PRINT_ARGS_##__VA_OPT__(N)(__VA_ARGS__)
 
 write_r print_impl(struct writer *writer, str_t format, struct print_args args);
 
-#define print(writer, fmt, args...) \
-    print_impl(writer, make_str(fmt), PRINT_ARGS(args))
+#define print(writer, fmt, ...) \
+    print_impl(writer, make_str(fmt), PRINT_ARGS(__VA_ARGS__))

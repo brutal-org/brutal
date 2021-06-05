@@ -1,5 +1,5 @@
 #include <library/base.h>
-#include <library/io.h>
+#include <library/log.h>
 
 #include "arch.h"
 #include "arch/com.h"
@@ -13,11 +13,11 @@ void arch_entry(struct handover *handover)
 {
     UNUSED(handover);
 
+    log("Initializing arch x86_64...");
+
     com_initialize(COM1);
     gdt_initialize();
     idt_initialize();
     pic_disable();
     pmm_initialize(&handover->mmap);
-
-    print(arch_debug(), "Hello, {} {x}!\n", "pomme", 10);
 }

@@ -1,4 +1,5 @@
 #include <library/base.h>
+#include <library/log.h>
 
 #include "arch/arch.h"
 #include "arch/asm.h"
@@ -58,25 +59,23 @@ static enum handover_mmap_entry_type stivale_mmap_type_to_handover_type(int stiv
     case STIVALE2_MMAP_BOOTLOADER_RECLAIMABLE:
     case STIVALE2_MMAP_ACPI_RECLAIMABLE:
         return HANDOVER_MMAP_RECLAIMABLE; // may be used after everything is loaded
-    
+
     case STIVALE2_MMAP_FRAMEBUFFER:
         return HANDOVER_MMAP_FRAMEBUFFER;
-    
+
     default:
         return HANDOVER_MMAP_RESERVED; // by default not detected entry are unused
-
     }
 }
 
-static void fill_handover_mmap( struct handover* target, struct stivale2_struct_tag_memmap* memory_map)
+static void fill_handover_mmap(struct handover *target, struct stivale2_struct_tag_memmap *memory_map)
 {
     target->mmap.size = memory_map->entries;
-    for(size_t i = 0; i < memory_map->entries; i++)
+    for (size_t i = 0; i < memory_map->entries; i++)
     {
         target->mmap.mmap_table[i].length = memory_map->memmap[i].length;
         target->mmap.mmap_table[i].base = memory_map->memmap[i].base;
         target->mmap.mmap_table[i].type = stivale_mmap_type_to_handover_type(memory_map->memmap[i].type);
-
     }
 }
 
@@ -84,11 +83,11 @@ void stivale2_entry(struct stivale2_struct *info)
 {
     UNUSED(info);
 
-    struct handover handover = {
-        .raw = info,
-    };
+    log("Booting from a stivale2 bootloader...");
 
-    fill_handover_mmap(&handover, stivale2_get_tag(info,STIVALE2_STRUCT_TAG_MEMMAP_ID));
+    struct handover handover = {};
+
+    fill_handover_mmap(&handover, stivale2_get_tag(info, STIVALE2_STRUCT_TAG_MEMMAP_ID));
     arch_entry(&handover);
 
     for (;;)

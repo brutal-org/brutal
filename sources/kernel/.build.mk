@@ -6,6 +6,8 @@ KERNEL_LIB_SRC = \
 			  $(wildcard sources/library/mem/*.c) \
 			  $(wildcard sources/library/text/*.c) \
 			  $(wildcard sources/library/ds/*.c) \
+			  $(wildcard sources/library/log/*.c) \
+			  $(wildcard sources/host/kernel/*.c) \
 
 KERNEL_OBJ= \
 	$(patsubst sources/%.c, $(CROSS_BUILDDIR)/%.c.o, $(KERNEL_C_SRC)) \
@@ -21,6 +23,10 @@ $(CROSS_BUILDDIR)/kernel/%.c.o: sources/kernel/%.c
 	$(CROSS_CC) $(CROSS_KCFLAGS) -c -o $@ $^
 
 $(CROSS_BUILDDIR)/kernel/library/%.c.o: sources/library/%.c
+	$(MKCWD)
+	$(CROSS_CC) $(CROSS_KCFLAGS) -c -o $@ $^
+
+$(CROSS_BUILDDIR)/kernel/host/%.c.o: sources/host/%.c
 	$(MKCWD)
 	$(CROSS_CC) $(CROSS_KCFLAGS) -c -o $@ $^
 
