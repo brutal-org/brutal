@@ -11,6 +11,13 @@ A bold, unapologetic, and honest operating system written in modern C
 
 ## Modern C
 
+- Avoid pointers
+- Prefer passing by value
+- The standard library is old and unsafe, **don't use it**
+- Don't be afraid of writing type generic code
+
+Here is more resources the subject:
+
 - [The modern C book](https://modernc.gforge.inria.fr/)
 - [Modern C and What We Can Learn From It - Luca Sas](https://www.youtube.com/watch?v=QpAhX-gsHMs)
 - [Episode 414: Jens Gustedt on Modern C](https://www.youtube.com/watch?v=xioxhMOx9t4)
