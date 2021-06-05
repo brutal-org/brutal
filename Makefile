@@ -17,8 +17,7 @@ WARNINGS= \
 
 INCLUDES=\
 	-Ithirdparty \
-	-Isources/ \
-	-Isources/library
+	-Isources/
 
 # --- Hosted build ----------------------------------------------------------- #
 

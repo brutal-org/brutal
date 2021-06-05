@@ -1,5 +1,6 @@
 #pragma once
-#include "base/std.h"
+
+#include <library/base/std.h>
 
 #define BITMAP_BYTE_INDEX(index) ((index) / 8)
 #define BITMAP_BIT_INDEX(index) ((index) % 8)
