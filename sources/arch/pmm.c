@@ -1,3 +1,4 @@
+#include "arch/mmap.h"
 #include "arch/pmm.h"
 #include "arch.h"
 #include "base/macros.h"
@@ -12,28 +13,28 @@ size_t last_free_bitmap_entry = 0;
 size_t available_memory = 0;
 size_t bitmap_target_size = 0;
 
-static uintptr_t memory_map_get_highest_address(struct stivale2_struct_tag_memmap *memory_map)
+static uintptr_t memory_map_get_highest_address(const struct handover_mmap * memory_map)
 {
-    size_t length = memory_map->memmap[memory_map->entries - 1].length;
-    size_t start = memory_map->memmap[memory_map->entries - 1].base;
+    size_t length = memory_map->mmap_table[memory_map->size - 1].length;
+    size_t start = memory_map->mmap_table[memory_map->size - 1].base;
 
     return length + start;
 }
 
-static void pmm_bitmap_find_addr(struct stivale2_struct_tag_memmap *memory_map)
+static void pmm_bitmap_find_addr(const struct handover_mmap *memory_map)
 {
-    for (size_t i = 0; i < memory_map->entries; i++)
+    for (size_t i = 0; i < memory_map->size; i++)
     {
-        if (memory_map->memmap[i].type != STIVALE2_MMAP_USABLE)
+        if (memory_map->mmap_table[i].type != HANDOVER_MMAP_FREE)
         {
             continue;
         }
 
         // + 2 PAGE FOR SECURITY
-        if (memory_map->memmap[i].length > ((bitmap_target_size / 8) + (HOST_MEM_PAGESIZE * 2)))
+        if (memory_map->mmap_table[i].length > ((bitmap_target_size / 8) + (HOST_MEM_PAGESIZE * 2)))
         {
             pmm_bitmap =
-                bitmap((void *)memory_map->memmap[i].base, bitmap_target_size);
+                bitmap((void *)memory_map->mmap_table[i].base, bitmap_target_size);
             return;
         }
     }
@@ -45,24 +46,24 @@ static void pmm_bitmap_clear()
     last_free_bitmap_entry = 0;
 }
 
-void pmm_initialize_memory_map(struct stivale2_struct_tag_memmap *memory_map)
+void pmm_initialize_memory_map(const struct handover_mmap *memory_map)
 {
-    for (size_t i = 0; i < memory_map->entries; i++)
+    for (size_t i = 0; i < memory_map->size; i++)
     {
-        size_t start = ALIGN_UP(memory_map->memmap[i].base, HOST_MEM_PAGESIZE);
-        size_t size = ALIGN_DOWN(memory_map->memmap[i].length, HOST_MEM_PAGESIZE);
+        size_t start = ALIGN_UP(memory_map->mmap_table[i].base, HOST_MEM_PAGESIZE);
+        size_t size = ALIGN_DOWN(memory_map->mmap_table[i].length, HOST_MEM_PAGESIZE);
 
 #ifdef PMM_DEBUG_PRINT
         print(arch_debug(), "memory map: type: {x} {x}-{x}\n",
-              memory_map->memmap[i].type, start, start + size);
+              memory_map->mmap_table[i].type, start, start + size);
 #endif
 
-        if (memory_map->memmap[i].type != STIVALE2_MMAP_USABLE)
+        if (memory_map->mmap_table[i].type != HANDOVER_MMAP_FREE)
         {
             continue;
         }
 
-        pmm_bitmap_free((void *)start, size / HOST_MEM_PAGESIZE);
+        pmm_free(start, size / HOST_MEM_PAGESIZE);
 
         available_memory += size / HOST_MEM_PAGESIZE;
     }
@@ -109,33 +110,33 @@ static size_t pmm_bitmap_find_free(size_t page_count)
     }
 }
 
-void *pmm_bitmap_alloc(size_t page_count)
+uintptr_t pmm_alloc(size_t page_count)
 {
     size_t page = pmm_bitmap_find_free(page_count);
     bitmap_set_range(&pmm_bitmap, page, page_count, true);
-    return (void *)(page * HOST_MEM_PAGESIZE);
+    return page * HOST_MEM_PAGESIZE;
 }
 
-void *pmm_bitmap_alloc_zero(size_t page_count)
+uintptr_t pmm_alloc_zero(size_t page_count)
 {
-    void *result = pmm_bitmap_alloc(page_count);
+    uintptr_t result = pmm_alloc(page_count);
 
     if (result)
     {
-        mem_set(result, 0, page_count * HOST_MEM_PAGESIZE);
+        mem_set((void*)(result+MMAP_KERNEL_BASE), 0, page_count * HOST_MEM_PAGESIZE);
     }
 
     return result;
 }
 
-int pmm_bitmap_free(void *addr, size_t page_count)
+int pmm_free(uintptr_t addr, size_t page_count)
 {
-    if (addr == NULL)
+    if (addr == 0)
     {
         return -1;
     }
 
-    size_t page_idx = (uintptr_t)addr / HOST_MEM_PAGESIZE;
+    size_t page_idx = addr / HOST_MEM_PAGESIZE;
 
     bitmap_set_range(&pmm_bitmap, page_idx, page_count, false);
 
@@ -143,7 +144,7 @@ int pmm_bitmap_free(void *addr, size_t page_count)
     return 0;
 }
 
-void pmm_initialize(struct stivale2_struct_tag_memmap *memory_map)
+void pmm_initialize(const struct handover_mmap *memory_map)
 {
     bitmap_target_size = memory_map_get_highest_address(memory_map) /
                          HOST_MEM_PAGESIZE; // load bitmap size
