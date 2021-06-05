@@ -2,25 +2,21 @@
 #include <library/io.h>
 
 #include "arch.h"
-#include "arch/asm.h"
 #include "arch/com.h"
 #include "arch/gdt.h"
 #include "arch/idt.h"
+#include "arch/pic.h"
 #include "arch/stivale2.h"
 
-void _start(struct stivale2_struct *info)
+void arch_entry(struct handover *handover)
 {
-    UNUSED(info);
+    UNUSED(handover);
 
     com_initialize(COM1);
     gdt_initialize();
     idt_initialize();
+    pic_disable();
+    pic_disable();
 
-    print(arch_log(), "Hello, {} {x}!\n", "pomme", 10);
-
-    for (;;)
-    {
-        cli();
-        hlt();
-    }
+    print(arch_debug(), "Hello, {} {x}!\n", "pomme", 10);
 }

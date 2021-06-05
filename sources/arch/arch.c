@@ -1,12 +1,10 @@
-#include <library/base.h>
-
 #include "arch/arch.h"
 #include "arch/com.h"
 
 static bool log_initialized = false;
 static struct writer log;
 
-static write_r arch_log_write(struct writer *writer, const char *data, size_t size)
+static write_r arch_debug_write(struct writer *writer, const char *data, size_t size)
 {
     UNUSED(writer);
 
@@ -14,11 +12,11 @@ static write_r arch_log_write(struct writer *writer, const char *data, size_t si
     return (write_r)OK(size);
 }
 
-struct writer *arch_log(void)
+struct writer *arch_debug(void)
 {
     if (!log_initialized)
     {
-        log.write = arch_log_write;
+        log.write = arch_debug_write;
         log_initialized = true;
     }
 

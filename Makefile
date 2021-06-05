@@ -69,7 +69,13 @@ include sources/sysroot/.build.mk
 all: $(TARGETS)
 
 run: $(SYSROOT_ISO)
-	qemu-system-x86_64 -M q35 -m 2G -serial mon:stdio -cdrom $(SYSROOT_ISO)
+	qemu-system-x86_64 \
+		-M q35 \
+		-m 2G \
+		-smp 8 \
+		-serial mon:stdio \
+		-display sdl \
+		-cdrom $(SYSROOT_ISO)
 
 clean:
 	rm -rf build/

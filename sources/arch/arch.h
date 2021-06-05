@@ -2,4 +2,8 @@
 
 #include <library/io.h>
 
-struct writer *arch_log(void);
+#include "kernel/handhover.h"
+
+struct writer *arch_debug(void);
+
+void arch_entry(struct handover *handover);

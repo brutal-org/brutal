@@ -47,6 +47,6 @@ void idt_initialize(void)
 
 void *interrupt_handler(struct interrupt_stackframe *stackframe)
 {
-    print(arch_log(), "interrupt {} !\n", (long)(stackframe->int_no));
+    print(arch_debug(), "interrupt {} !\n", stackframe->int_no);
     return stackframe;
 }

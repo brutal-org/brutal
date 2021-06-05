@@ -25,6 +25,12 @@ struct print_value
     };
 };
 
+struct print_args
+{
+    size_t count;
+    struct print_value *values;
+};
+
 struct print_value print_val_signed(long val);
 
 struct print_value print_val_unsigned(unsigned long val);
@@ -35,23 +41,26 @@ struct print_value print_val_cstring(char *val);
 
 // clang-format off
 
-#define PRINT_MATCH(__value)                    \
-    _Generic((__value),                         \
-        signed char: print_val_signed,          \
-        signed int: print_val_signed,           \
-        signed long: print_val_signed,          \
-                                                \
-        unsigned char: print_val_unsigned,      \
-        unsigned int: print_val_unsigned,       \
-        unsigned long: print_val_unsigned,      \
-                                                \
-        char*: print_val_cstring,               \
-        struct str: print_val_string            \
-    )(__value),
+#define PRINT_MATCH(value)                    \
+    _Generic((value),                         \
+        signed char: print_val_signed,        \
+        signed int: print_val_signed,         \
+        signed long: print_val_signed,        \
+                                              \
+        unsigned char: print_val_unsigned,    \
+        unsigned int: print_val_unsigned,     \
+        unsigned long: print_val_unsigned,    \
+                                              \
+        char*: print_val_cstring,             \
+        struct str: print_val_string          \
+    )(value),
 
 // clang-format on
 
-write_r print_details(struct writer *writer, str_t format, struct print_value *values, size_t count);
+#define PRINT_ARGS(args...) \
+    (struct print_args) { COUNT(args), (struct print_value[]){MAP(PRINT_MATCH, args)}, }
+
+write_r print_impl(struct writer *writer, str_t format, struct print_args args);
 
 #define print(writer, fmt, args...) \
-    print_details(writer, make_str(fmt), (struct print_value[]){MAP(PRINT_MATCH, args)}, COUNT(args))
+    print_impl(writer, make_str(fmt), PRINT_ARGS(args))

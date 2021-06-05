@@ -40,7 +40,7 @@ write_r print_dispatch(struct writer *writer, struct fmt fmt, struct print_value
     return (write_r)OK(0);
 }
 
-write_r print_details(struct writer *writer, str_t format, struct print_value *values, size_t count)
+write_r print_impl(struct writer *writer, str_t format, struct print_args args)
 {
     size_t current = 0;
     size_t written = 0;
@@ -52,10 +52,10 @@ write_r print_details(struct writer *writer, str_t format, struct print_value *v
     {
         if (scan_curr(&scan) == '{')
         {
-            if (current < count)
+            if (current < args.count)
             {
                 auto fmt = fmt_parse(&scan);
-                written += TRY(print_dispatch(writer, fmt, values[current]));
+                written += TRY(print_dispatch(writer, fmt, args.values[current]));
             }
 
             current++;

@@ -9,35 +9,35 @@
 #include <library/ds/vec.h>
 #include <library/mem.h>
 
-bool vec_details_realloc(struct vec_details *details, int new_length)
+bool vec_realloc_impl(struct vec_impl *impl, int new_length)
 {
-    void *ptr = alloc_acquire(details->alloc, new_length * details->data_size);
+    void *ptr = alloc_acquire(impl->alloc, new_length * impl->data_size);
 
     if (ptr == nullptr)
     {
         return false;
     }
 
-    alloc_commit(details->alloc, ptr);
+    alloc_commit(impl->alloc, ptr);
 
-    if (*details->data != nullptr)
+    if (*impl->data != nullptr)
     {
-        mem_cpy(ptr, *details->data, MIN((*details->length), new_length) * details->data_size);
-        alloc_release(details->alloc, *details->data);
+        mem_cpy(ptr, *impl->data, MIN((*impl->length), new_length) * impl->data_size);
+        alloc_release(impl->alloc, *impl->data);
     }
 
-    *details->data = ptr;
-    *details->capacity = new_length;
+    *impl->data = ptr;
+    *impl->capacity = new_length;
 
     return true;
 }
 
-bool vec_details_expand(struct vec_details *details)
+bool vec_expand_impl(struct vec_impl *impl)
 {
-    if (*details->length + 1 > *details->capacity)
+    if (*impl->length + 1 > *impl->capacity)
     {
-        int n = (*details->capacity == 0) ? 1 : *details->capacity << 1;
-        return vec_details_realloc(details, n);
+        int n = (*impl->capacity == 0) ? 1 : *impl->capacity << 1;
+        return vec_realloc_impl(impl, n);
     }
     else
     {
@@ -45,11 +45,11 @@ bool vec_details_expand(struct vec_details *details)
     }
 }
 
-bool vec_details_reserve(struct vec_details *details, int n)
+bool vec_reserve_impl(struct vec_impl *impl, int n)
 {
-    if (n > *details->capacity)
+    if (n > *impl->capacity)
     {
-        return vec_details_realloc(details, n);
+        return vec_realloc_impl(impl, n);
     }
     else
     {
@@ -57,7 +57,7 @@ bool vec_details_reserve(struct vec_details *details, int n)
     }
 }
 
-bool vec_details_reserve_po2(struct vec_details *details, int n)
+bool vec_reserve_po2_impl(struct vec_impl *impl, int n)
 {
     if (n == 0)
     {
@@ -70,65 +70,65 @@ bool vec_details_reserve_po2(struct vec_details *details, int n)
         n2 <<= 1;
     }
 
-    return vec_details_reserve(details, n2);
+    return vec_reserve_impl(impl, n2);
 }
 
-bool vec_details_compact(struct vec_details *details)
+bool vec_compact_impl(struct vec_impl *impl)
 {
-    if (*details->length == 0)
+    if (*impl->length == 0)
     {
-        alloc_release(details->alloc, details->data);
-        *details->data = NULL;
-        *details->capacity = 0;
+        alloc_release(impl->alloc, impl->data);
+        *impl->data = NULL;
+        *impl->capacity = 0;
 
         return true;
     }
     else
     {
-        int n = *details->length;
-        return vec_details_realloc(details, n);
+        int n = *impl->length;
+        return vec_realloc_impl(impl, n);
     }
 }
 
-bool vec_details_insert(struct vec_details *details, int idx)
+bool vec_insert_impl(struct vec_impl *impl, int idx)
 {
-    int err = vec_details_expand(details);
+    int err = vec_expand_impl(impl);
 
     if (err)
     {
         return err;
     }
 
-    mem_move(*details->data + (idx + 1) * details->data_size,
-             *details->data + idx * details->data_size,
-             (*details->length - idx) * details->data_size);
+    mem_move(*impl->data + (idx + 1) * impl->data_size,
+             *impl->data + idx * impl->data_size,
+             (*impl->length - idx) * impl->data_size);
 
     return 0;
 }
 
-void vec_details_splice(struct vec_details *details, int start, int count)
+void vec_splice_impl(struct vec_impl *impl, int start, int count)
 {
-    mem_move(*details->data + start * details->data_size, *details->data + (start + count) * details->data_size,
-             (*details->length - start - count) * details->data_size);
+    mem_move(*impl->data + start * impl->data_size, *impl->data + (start + count) * impl->data_size,
+             (*impl->length - start - count) * impl->data_size);
 }
 
-void vec_details_swapsplice(struct vec_details *details, int start, int count)
+void vec_swapsplice_impl(struct vec_impl *impl, int start, int count)
 {
-    mem_move(*details->data + start * details->data_size,
-             *details->data + (*details->length - count) * details->data_size,
-             count * details->data_size);
+    mem_move(*impl->data + start * impl->data_size,
+             *impl->data + (*impl->length - count) * impl->data_size,
+             count * impl->data_size);
 }
 
-void vec_details_swap(struct vec_details *details, int idx1, int idx2)
+void vec_swap_impl(struct vec_impl *impl, int idx1, int idx2)
 {
     if (idx1 == idx2)
     {
         return;
     }
 
-    unsigned char *a = (unsigned char *)*details->data + idx1 * details->data_size;
-    unsigned char *b = (unsigned char *)*details->data + idx2 * details->data_size;
-    int count = details->data_size;
+    unsigned char *a = (unsigned char *)*impl->data + idx1 * impl->data_size;
+    unsigned char *b = (unsigned char *)*impl->data + idx2 * impl->data_size;
+    int count = impl->data_size;
 
     while (count--)
     {

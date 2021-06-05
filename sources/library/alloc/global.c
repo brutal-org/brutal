@@ -1,7 +1,6 @@
-#include <library/alloc/heap.h>
-#include <library/task/lock.h>
+#include <host/mem.h>
 
-static struct lock heap_lock;
+#include <library/alloc/heap.h>
 
 static struct alloc *heap(void)
 {
@@ -20,9 +19,9 @@ void *alloc_global_acquire(struct alloc *alloc, size_t size)
 {
     UNUSED(alloc);
 
-    lock_acquire(&heap_lock);
+    host_mem_lock();
     void *result = alloc_acquire(heap(), size);
-    lock_release(&heap_lock);
+    host_mem_unlock();
 
     return result;
 }
@@ -31,9 +30,9 @@ void alloc_global_release(struct alloc *alloc, void *ptr)
 {
     UNUSED(alloc);
 
-    lock_acquire(&heap_lock);
+    host_mem_lock();
     alloc_release(heap(), ptr);
-    lock_release(&heap_lock);
+    host_mem_unlock();
 }
 
 struct alloc *alloc_global(void)

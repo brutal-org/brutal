@@ -10,6 +10,10 @@ enum host_mem_flag
     HOST_MEM_NONE,
 };
 
+void host_mem_lock(void);
+
+void host_mem_unlock(void);
+
 error_t host_mem_acquire(size_t size, void **out_result, enum host_mem_flag flags);
 
 error_t host_mem_commit(void *addr, size_t size);
