@@ -1,11 +1,10 @@
 #include <library/base/macros.h>
+#include <library/log.h>
 #include <library/mem.h>
 
 #include "arch.h"
 #include "arch/mmap.h"
 #include "arch/pmm.h"
-
-#define PMM_DEBUG_PRINT
 
 struct bitmap pmm_bitmap = {};
 
@@ -53,10 +52,7 @@ void pmm_initialize_memory_map(const struct handover_mmap *memory_map)
         size_t start = ALIGN_UP(memory_map->mmap_table[i].base, HOST_MEM_PAGESIZE);
         size_t size = ALIGN_DOWN(memory_map->mmap_table[i].length, HOST_MEM_PAGESIZE);
 
-#ifdef PMM_DEBUG_PRINT
-        print(arch_debug(), "memory map: type: {x} {x}-{x}\n",
-              memory_map->mmap_table[i].type, start, start + size);
-#endif
+        log("memory map: type: {x} {x}-{x}", memory_map->mmap_table[i].type, start, start + size);
 
         if (memory_map->mmap_table[i].type != HANDOVER_MMAP_FREE)
         {

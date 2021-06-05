@@ -1,4 +1,4 @@
-#include <library/io.h>
+#include <library/log.h>
 
 #include "arch.h"
 #include "arch/idt.h"
@@ -47,6 +47,6 @@ void idt_initialize(void)
 
 void *interrupt_handler(struct interrupt_stackframe *stackframe)
 {
-    print(arch_debug(), "interrupt {} !\n", stackframe->int_no);
+    log("Interrupt {} !", stackframe->int_no);
     return stackframe;
 }
