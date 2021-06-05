@@ -12,6 +12,7 @@ enum fmt_type
     FMT_OCTAL,
     FMT_DECIMAL,
     FMT_HEXADECIMAL,
+    FMT_POINTER,
 };
 
 struct fmt

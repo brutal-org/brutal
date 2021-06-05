@@ -31,7 +31,7 @@ struct print_value print_val_unsigned(unsigned long val);
 
 struct print_value print_val_string(str_t val);
 
-struct print_value print_val_cstring(const char *val);
+struct print_value print_val_cstring(char *val);
 
 // clang-format off
 

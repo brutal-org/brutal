@@ -5,7 +5,8 @@ KENREL_LIB_SRC = \
 			  sources/library/io/print.c \
 			  sources/library/io/write.c \
 			  sources/library/io/fmt.c \
-			  sources/library/io/scan.c
+			  sources/library/io/scan.c \
+			  sources/library/text/str.c
 
 KERNEL_OBJ= \
 	$(patsubst sources/%.c, build/%.c.o, $(KERNEL_C_SRC)) \
