@@ -4,6 +4,8 @@
 
 #define auto __auto_type
 
+#define static_assert _Static_assert
+
 #define PACKED __attribute__((packed))
 
 #define ALIGNED(__align) __attribute__((aligned(__align)))
