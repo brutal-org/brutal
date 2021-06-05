@@ -46,7 +46,9 @@ void stivale2_entry(struct stivale2_struct *info)
 {
     UNUSED(info);
 
-    struct handover handover = {};
+    struct handover handover = {
+        .raw = info,
+    };
 
     arch_entry(&handover);
 

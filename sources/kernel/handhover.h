@@ -2,4 +2,5 @@
 
 struct handover
 {
+    void *raw;
 };
