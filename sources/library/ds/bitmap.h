@@ -14,7 +14,7 @@ struct bitmap bitmap(void* data, size_t size);
 
 void bitmap_fill(struct bitmap* bitmap, bool value);
 
-static inline bool bitmap_get_bit(const struct bitmap* bitmap, size_t index)
+static inline bool bitmap_get(const struct bitmap* bitmap, size_t index)
 {
     const size_t byte_index = BITMAP_BYTE_INDEX(index);
     const size_t bit_index = BITMAP_BIT_INDEX(index);
