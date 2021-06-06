@@ -5,7 +5,7 @@
 
 typedef result_t(br_error_t, uintptr_t) page_or_alloc_result_t;
 
-static vmm_space_t kernel_memory_map = NULL;
+static struct pml *kernel_memory_map = NULL;
 
 static page_or_alloc_result_t get_page_or_alloc(struct pml *table, size_t idx, size_t flags)
 {
@@ -85,37 +85,6 @@ static void vmm_table_initialize_kernel(vmm_space_t target, struct handover_mmap
 {
     log("VMM: loading kernel map initial 32M");
 
-    // load first 32M
-    vmm_map(target,
-            (vmm_range_t){
-                .base = mmap_phys_to_kernel(0),
-                .size = 0x2000000},
-            (pmm_range_t){
-                .base = (0),
-                .size = 0x2000000},
-            BR_MEM_WRITABLE);
-
-    vmm_map(target,
-            (vmm_range_t){
-                .base = mmap_phys_to_io(0),
-                .size = 0x2000000},
-            (pmm_range_t){
-                .base = (0),
-                .size = 0x2000000},
-            BR_MEM_WRITABLE);
-
-    // load 4G
-    vmm_map(target,
-            (vmm_range_t){
-                .base = 0,
-                .size = 0x100000000},
-            (pmm_range_t){
-                .base = 0,
-                .size = 0x100000000},
-            BR_MEM_WRITABLE);
-
-    vmm_space_switch(target);
-
     log("VMM: loading kernel memory map");
 
     for (size_t i = 0; i < memory_map->size; i++)
@@ -130,11 +99,11 @@ static void vmm_table_initialize_kernel(vmm_space_t target, struct handover_mmap
         {
             vmm_map(target,
                     (vmm_range_t){
-                        .base = mmap_phys_to_kernel(memory_map->entries[i].base),
-                        .size = memory_map->entries[i].length},
+                        .base = mmap_phys_to_kernel(ALIGN_DOWN(memory_map->entries[i].base, HOST_MEM_PAGESIZE)),
+                        .size = ALIGN_UP(memory_map->entries[i].length, HOST_MEM_PAGESIZE) + HOST_MEM_PAGESIZE},
                     (pmm_range_t){
-                        .base = (memory_map->entries[i].base),
-                        .size = memory_map->entries[i].length},
+                        .base = ALIGN_DOWN(memory_map->entries[i].base, HOST_MEM_PAGESIZE),
+                        .size = ALIGN_UP(memory_map->entries[i].length, HOST_MEM_PAGESIZE) + HOST_MEM_PAGESIZE},
                     BR_MEM_WRITABLE);
         }
 
@@ -147,11 +116,13 @@ static void vmm_table_initialize_kernel(vmm_space_t target, struct handover_mmap
                     .size = memory_map->entries[i].length},
                 BR_MEM_WRITABLE);
     }
+
+    vmm_space_switch(target);
 }
 
-void vmm_initialize_kernel(struct handover const *handover)
+void vmm_initialize(struct handover const *handover)
 {
-    kernel_memory_map = (vmm_space_t)mmap_phys_to_io((pmm_alloc(HOST_MEM_PAGESIZE).ok).base);
+    kernel_memory_map = (struct pml *)mmap_phys_to_io((pmm_alloc(HOST_MEM_PAGESIZE).ok).base);
     mem_set(kernel_memory_map, 0, HOST_MEM_PAGESIZE);
 
     vmm_table_initialize_kernel(kernel_memory_map, &handover->mmap);
