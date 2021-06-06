@@ -21,7 +21,7 @@ static int fmt_base(struct fmt self)
 
 static char fmt_digit(struct fmt self, int d)
 {
-    return STR_UPPERCASE_XDIGITS[d % fmt_base(self)];
+    return STR_LOWERCASE_XDIGITS[d % fmt_base(self)];
 }
 
 struct fmt fmt_parse(struct scan *scan)
@@ -55,20 +55,35 @@ struct fmt fmt_parse(struct scan *scan)
         break;
 
     case 'p':
+        fmt.type = FMT_POINTER;
+        break;
     case 'x':
         fmt.type = FMT_HEXADECIMAL;
         break;
     }
-
     while (scan_curr(scan) != '}' &&
            !scan_end(scan))
     {
+        if (scan_curr(scan) == 'a')
+        {
+            fmt.aligned = true;
+        }
         scan_next(scan);
     }
 
     scan_skip(scan, '}');
 
     return fmt;
+}
+
+size_t fmt_write_length(struct fmt self, unsigned long value)
+{
+    size_t length = 0;
+    for (; value != 0; length++)
+    {
+        value /= fmt_base(self);
+    }
+    return length;
 }
 
 write_result_t fmt_signed(struct fmt self, struct writer *writer, long value)
@@ -88,19 +103,33 @@ write_result_t fmt_signed(struct fmt self, struct writer *writer, long value)
 
 write_result_t fmt_unsigned(struct fmt self, struct writer *writer, unsigned long value)
 {
-    if (value == 0)
-    {
-        return io_put(writer, '0');
-    }
 
-    size_t i = 0;
     char buffer[64] = {};
-
+    size_t i = 0;
     while (value != 0)
     {
         buffer[i] = fmt_digit(self, value % fmt_base(self));
         value /= fmt_base(self);
         i++;
+    }
+
+    if (self.aligned)
+    {
+        size_t offset = 0;
+        if (fmt_base(self) == 16)
+        {
+            offset = 16;
+        }
+        else
+        {
+            offset = 20;
+        }
+
+        while (i < offset)
+        {
+            buffer[i] = '0';
+            i++;
+        }
     }
 
     str_rvs(make_str(buffer));
