@@ -2,62 +2,13 @@
 #include "arch/x86_64/mmap.h"
 #include "arch/x86_64/paging.h"
 #include <library/log.h>
-#include <library/mem.h>
-
-#define PML4_GET_INDEX(addr) (((uint64_t)addr & ((uint64_t)0x1ff << 39)) >> 39)
-#define PDPT_GET_INDEX(addr) (((uint64_t)addr & ((uint64_t)0x1ff << 30)) >> 30)
-#define PAGE_DIR_GET_INDEX(addr) (((uint64_t)addr & ((uint64_t)0x1ff << 21)) >> 21)
-#define PAGE_TABLE_GET_INDEX(addr) (((uint64_t)addr & ((uint64_t)0x1ff << 12)) >> 12)
-
-static vmm_space_t kernel_memory_map = NULL;
-
-struct PACKED pml
-{
-    union
-    {
-        uint64_t _raw;
-
-        struct PACKED
-        {
-            bool present : 1;
-            bool read_write : 1;
-            bool user : 1;
-            bool caching : 1;
-            bool caching_disable : 1;
-            bool accessed : 1;
-            bool dirty : 1;
-            bool huge_page : 1;
-            bool global_page : 1;
-            uint8_t _available : 3;
-            uint64_t physical : 52;
-        };
-    };
-};
-
-static struct pml page(uintptr_t physical, size_t flags) // by default create a present page
-{
-    return (struct pml){
-        .physical = physical >> 12,
-        .user = (flags & BR_MEM_USER) != 0,
-        .read_write = (flags & BR_MEM_WRITABLE) != 0,
-        .present = true,
-        .caching = false,
-        .caching_disable = false,
-        .accessed = false,
-        .dirty = false,
-        .huge_page = false,
-        .global_page = false,
-        ._available = 0};
-}
-
-_Static_assert(sizeof(struct pml) == sizeof(uint64_t), "pml must be 64 bit");
 
 typedef result_t(br_error_t, uintptr_t) page_or_alloc_result_t;
 
+static vmm_space_t kernel_memory_map = NULL;
+
 static page_or_alloc_result_t get_page_or_alloc(struct pml *table, size_t idx, size_t flags)
 {
-
-    //log("VMM: get_page_or_alloc({x}, {x}, {x})", (uintptr_t)pml, (uintptr_t)idx, flags);
     if (table[idx].present)
     {
         return OK(page_or_alloc_result_t, mmap_phys_to_io(table[idx].physical << 12));
