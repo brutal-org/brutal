@@ -1,13 +1,13 @@
 #pragma once
 
-struct hj_memory_object
+struct br_memory_object
 {
 };
 
-struct hj_memory_mapping
+struct br_memory_mapping
 {
 };
 
-struct hj_memory_space
+struct br_memory_space
 {
 };

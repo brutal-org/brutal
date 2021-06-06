@@ -2,41 +2,41 @@
 
 typedef enum
 {
-    HJ_SYS_GROUP,
-    HJ_SYS_TASK,
-    HJ_SYS_KILL,
-    HJ_SYS_WAIT,
-    HJ_SYS_IPC,
-    HJ_SYS_MAP,
-    HJ_SYS_COMMIT,
-    HJ_SYS_DECOMMIT,
-    HJ_SYS_UNMAP,
-    HJ_SYS_DROP,
-} hj_syscall_t;
+    BR_SYS_GROUP,
+    BR_SYS_TASK,
+    BR_SYS_KILL,
+    BR_SYS_WAIT,
+    BR_SYS_IPC,
+    BR_SYS_MAP,
+    BR_SYS_COMMIT,
+    BR_SYS_DECOMMIT,
+    BR_SYS_UNMAP,
+    BR_SYS_DROP,
+} br_syscall_t;
 
-void hj_sys_group();
+void br_sys_group();
 
 // Create a new task task by fork or clone
-void hj_sys_task();
+void br_sys_task();
 
 // Kill an existing task
-void hj_sys_kill();
+void br_sys_kill();
 
 // Wait for a specific event
-void hj_sys_wait();
+void br_sys_wait();
 
 // Send a massage to another process
-void hj_sys_ipc();
+void br_sys_ipc();
 
 // Map a memory range
-void hj_sys_map();
+void br_sys_map();
 
-void hj_sys_commit();
+void br_sys_commit();
 
-void hj_sys_decommit();
+void br_sys_decommit();
 
 // Unmap a memory range
-void hj_sys_unmap();
+void br_sys_unmap();
 
 // Drop a capability
-void hj_sys_drop();
+void br_sys_drop();

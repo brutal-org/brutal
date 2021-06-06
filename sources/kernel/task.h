@@ -2,7 +2,7 @@
 
 #include <library/text/str.h>
 
-struct hj_task
+struct br_task
 {
     uint64_t id;
 };

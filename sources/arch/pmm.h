@@ -10,7 +10,7 @@
 
 typedef range_t(size_t) pmm_range_t;
 
-typedef result_t(hj_error_t, pmm_range_t) pmm_result_t;
+typedef result_t(br_error_t, pmm_range_t) pmm_result_t;
 
 void pmm_initialize(struct handover const *handover);
 

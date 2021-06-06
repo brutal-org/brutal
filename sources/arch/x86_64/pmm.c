@@ -105,7 +105,7 @@ pmm_result_t pmm_alloc(size_t size)
     }
     else
     {
-        return ERR(pmm_result_t, HJ_ERR_OUT_OF_MEMORY);
+        return ERR(pmm_result_t, BR_ERR_OUT_OF_MEMORY);
     }
 }
 
@@ -128,7 +128,7 @@ pmm_result_t pmm_free(pmm_range_t range)
 
     if (range.base == 0)
     {
-        return ERR(pmm_result_t, HJ_ERR_BAD_ADDRESS);
+        return ERR(pmm_result_t, BR_ERR_BAD_ADDRESS);
     }
 
     size_t page_base = range.base / HOST_MEM_PAGESIZE;
