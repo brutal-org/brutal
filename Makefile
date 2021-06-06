@@ -63,7 +63,7 @@ CROSS_KCFLAGS= \
 
 CROSS_LD=x86_64-elf-ld
 CROSS_KLDFLAGS= \
-	-Tsources/arch/link.ld \
+	-Tsources/arch/x86_64/link.ld \
 	-z max-page-size=0x1000
 
 CROSS_AR=x86_64-elf-ar

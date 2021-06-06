@@ -1,5 +1,5 @@
-#include "arch/com.h"
-#include "arch/asm.h"
+#include "arch/x86_64/com.h"
+#include "arch/x86_64/asm.h"
 
 void com_write_reg(enum com_port port, enum com_register reg, uint8_t value)
 {

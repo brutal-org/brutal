@@ -1,5 +1,5 @@
 #include "arch/arch.h"
-#include "arch/com.h"
+#include "arch/x86_64/com.h"
 
 static bool log_initialized = false;
 static struct writer log;

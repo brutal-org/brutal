@@ -1,7 +1,7 @@
 #include <library/log.h>
 
-#include "arch.h"
-#include "arch/idt.h"
+#include "arch/arch.h"
+#include "arch/x86_64/idt.h"
 
 extern uintptr_t __interrupt_vector[128];
 

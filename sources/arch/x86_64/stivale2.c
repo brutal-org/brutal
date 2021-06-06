@@ -2,8 +2,8 @@
 #include <library/log.h>
 
 #include "arch/arch.h"
-#include "arch/asm.h"
-#include "arch/stivale2.h"
+#include "arch/x86_64/asm.h"
+#include "arch/x86_64/stivale2.h"
 
 static uint8_t stack[4096 * 4];
 

@@ -1,5 +1,5 @@
-KERNEL_C_SRC+=$(wildcard sources/arch/*.c)
-KERNEL_S_SRC+=$(wildcard sources/arch/*.s)
+KERNEL_C_SRC+=$(wildcard sources/arch/x86_64/*.c)
+KERNEL_S_SRC+=$(wildcard sources/arch/x86_64/*.s)
 
 $(CROSS_BUILDDIR)/arch/%.c.o: sources/arch/%.c
 	$(MKCWD)

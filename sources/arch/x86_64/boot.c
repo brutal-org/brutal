@@ -1,13 +1,14 @@
 #include <library/base.h>
 #include <library/log.h>
 
-#include "arch.h"
-#include "arch/com.h"
-#include "arch/gdt.h"
-#include "arch/idt.h"
-#include "arch/pic.h"
+#include "arch/arch.h"
 #include "arch/pmm.h"
-#include "arch/stivale2.h"
+
+#include "arch/x86_64/com.h"
+#include "arch/x86_64/gdt.h"
+#include "arch/x86_64/idt.h"
+#include "arch/x86_64/pic.h"
+#include "arch/x86_64/stivale2.h"
 
 void arch_entry(struct handover *handover)
 {

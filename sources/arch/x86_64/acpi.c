@@ -1,4 +1,4 @@
-#include "arch/acpi.h"
+#include "arch/x86_64/acpi.h"
 
 /*
 

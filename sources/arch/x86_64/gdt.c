@@ -1,4 +1,4 @@
-#include "arch/gdt.h"
+#include "arch/x86_64/gdt.h"
 
 static struct tss tss = {
     .reserved = 0,

@@ -2,9 +2,9 @@
 #include <library/log.h>
 #include <library/mem.h>
 
-#include "arch.h"
-#include "arch/mmap.h"
+#include "arch/arch.h"
 #include "arch/pmm.h"
+#include "arch/x86_64/mmap.h"
 
 static struct bitmap pmm_bitmap = {};
 static size_t best_bet = 0;
