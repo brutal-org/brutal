@@ -1,4 +1,5 @@
 #include <library/base/macros.h>
+#include <library/ds/bitmap.h>
 #include <library/log.h>
 #include <library/mem.h>
 
@@ -76,7 +77,7 @@ void pmm_initialize(struct handover const *handover)
 
     // we set the first page used, as the page 0 is NULL
     bitmap_set(&pmm_bitmap, 0, PMM_USED);
-    pmm_used((pmm_range_t){(uintptr_t)pmm_bitmap.data, pmm_bitmap.size});
+    pmm_map((pmm_range_t){(uintptr_t)pmm_bitmap.data, pmm_bitmap.size});
 }
 
 pmm_result_t pmm_alloc(size_t size)
@@ -108,9 +109,9 @@ pmm_result_t pmm_alloc(size_t size)
     }
 }
 
-pmm_result_t pmm_used(pmm_range_t range)
+pmm_result_t pmm_map(pmm_range_t range)
 {
-    log("PMM: pmm_used(): {x}-{x}...", range.base, range_end(range));
+    log("PMM: pmm_map(): {x}-{x}...", range.base, range_end(range));
 
     size_t page_base = range.base / HOST_MEM_PAGESIZE;
     size_t page_size = range.size / HOST_MEM_PAGESIZE;
