@@ -34,25 +34,40 @@ struct PACKED pml
     };
 };
 
+static struct pml page(uintptr_t physical, size_t flags) // by default create a present page
+{
+    return (struct pml){
+        .physical = physical >> 12,
+        .user = (flags & BR_MEM_USER) != 0,
+        .read_write = (flags & BR_MEM_WRITABLE) != 0,
+        .present = true,
+        .caching = false,
+        .caching_disable = false,
+        .accessed = false,
+        .dirty = false,
+        .huge_page = false,
+        .global_page = false,
+        ._available = 0};
+}
+
 _Static_assert(sizeof(struct pml) == sizeof(uint64_t), "pml must be 64 bit");
 
 typedef result_t(br_error_t, uintptr_t) page_or_alloc_result_t;
 
-static page_or_alloc_result_t get_page_or_alloc(struct pml *pml, size_t idx, size_t flags)
+static page_or_alloc_result_t get_page_or_alloc(struct pml *table, size_t idx, size_t flags)
 {
 
     //log("VMM: get_page_or_alloc({x}, {x}, {x})", (uintptr_t)pml, (uintptr_t)idx, flags);
-    if (pml[idx].present)
+    if (table[idx].present)
     {
-        return OK(page_or_alloc_result_t, mmap_phys_to_io(pml[idx].physical << 12));
+        return OK(page_or_alloc_result_t, mmap_phys_to_io(table[idx].physical << 12));
     }
     else
     {
         uintptr_t target = (uintptr_t)(pmm_alloc(HOST_MEM_PAGESIZE)).ok.base;
 
         mem_set((void *)mmap_phys_to_io(target), 0, HOST_MEM_PAGESIZE);
-        pml[idx]._raw = (flags & 0xfff) | 1;
-        pml[idx].physical = target >> 12;
+        table[idx] = page(target, flags);
 
         return OK(page_or_alloc_result_t, mmap_phys_to_io(target));
     }
@@ -63,29 +78,28 @@ static page_or_alloc_result_t get_page_or_alloc(struct pml *pml, size_t idx, siz
 static size_t vmm_map_page(vmm_space_t space, uintptr_t virtual_page, uintptr_t physical_page, br_mem_flags_t flags)
 {
 
-    struct pml *pdpt = (struct pml *)(get_page_or_alloc((struct pml *)space, PML4_GET_INDEX(virtual_page), flags | 0b110).ok);
+    struct pml *pdpt = (struct pml *)(get_page_or_alloc((struct pml *)space, PML4_GET_INDEX(virtual_page), flags | BR_MEM_WRITABLE | BR_MEM_USER).ok);
 
     if (pdpt == NULL)
     {
         panic("VMM: vmm_map_page get_page_or_alloc return 0 (for pdpt) ");
     }
 
-    struct pml *pd = (struct pml *)(get_page_or_alloc(pdpt, PDPT_GET_INDEX(virtual_page), flags | 0b110).ok);
+    struct pml *pd = (struct pml *)(get_page_or_alloc(pdpt, PDPT_GET_INDEX(virtual_page), flags | BR_MEM_WRITABLE | BR_MEM_USER).ok);
 
     if (pd == NULL)
     {
         panic("VMM: vmm_map_page get_page_or_alloc return 0 (for pdpt) ");
     }
 
-    struct pml *pt = (struct pml *)(get_page_or_alloc(pd, PAGE_DIR_GET_INDEX(virtual_page), flags | 0b110).ok);
+    struct pml *pt = (struct pml *)(get_page_or_alloc(pd, PAGE_DIR_GET_INDEX(virtual_page), flags | BR_MEM_WRITABLE | BR_MEM_USER).ok);
 
     if (pt == NULL)
     {
         panic("VMM: vmm_map_page get_page_or_alloc return 0 (for pdpt) ");
     }
 
-    pt[PAGE_TABLE_GET_INDEX(virtual_page)]._raw = (flags & 0xfff) | 1;
-    pt[PAGE_TABLE_GET_INDEX(virtual_page)].physical = (physical_page >> 12);
+    pt[PAGE_TABLE_GET_INDEX(virtual_page)] = page(physical_page, flags);
 
     return 0;
 }
@@ -120,11 +134,11 @@ static void vmm_table_initialize_kernel(vmm_space_t target, struct handover_mmap
     vmm_map(target,
             (vmm_range_t){
                 .base = 0,
-                .size = 0x2000000},
+                .size = 0x100000000},
             (pmm_range_t){
                 .base = 0,
-                .size = 0x2000000},
-            0b111);
+                .size = 0x100000000},
+            BR_MEM_WRITABLE);
 
     vmm_map(target,
             (vmm_range_t){
@@ -133,7 +147,7 @@ static void vmm_table_initialize_kernel(vmm_space_t target, struct handover_mmap
             (pmm_range_t){
                 .base = (0),
                 .size = 0x2000000},
-            0b111);
+            BR_MEM_WRITABLE);
 
     vmm_map(target,
             (vmm_range_t){
@@ -142,7 +156,7 @@ static void vmm_table_initialize_kernel(vmm_space_t target, struct handover_mmap
             (pmm_range_t){
                 .base = (0),
                 .size = 0x2000000},
-            0b111);
+            BR_MEM_WRITABLE);
 
     vmm_space_switch(target);
 
@@ -164,7 +178,7 @@ static void vmm_table_initialize_kernel(vmm_space_t target, struct handover_mmap
                     (pmm_range_t){
                         .base = (memory_map->entries[i].base),
                         .size = memory_map->entries[i].length},
-                    0b111);
+                    BR_MEM_WRITABLE);
         }
 
         vmm_map(target,
@@ -174,7 +188,7 @@ static void vmm_table_initialize_kernel(vmm_space_t target, struct handover_mmap
                 (pmm_range_t){
                     .base = (memory_map->entries[i].base),
                     .size = memory_map->entries[i].length},
-                0b111);
+                BR_MEM_WRITABLE);
     }
 }
 
