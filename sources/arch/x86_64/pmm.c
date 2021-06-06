@@ -85,7 +85,7 @@ void pmm_initialize(struct handover const *handover)
 pmm_result_t pmm_alloc(size_t size)
 {
     used_memory += size;
-    log("PMM: pmm_alloc(): {} (total: {x})", size, used_memory);
+    // log("PMM: pmm_alloc(): {} (total: {x})", size, used_memory);
 
     auto page_size = size / HOST_MEM_PAGESIZE;
     auto page_range = bitmap_find_range(&pmm_bitmap, best_bet, page_size, false);

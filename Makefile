@@ -8,7 +8,7 @@ STD = \
 	-std=gnu2x
 
 OPTIMISATIONS= \
-	-O2
+	-g
 
 WARNINGS= \
 	-Wall \

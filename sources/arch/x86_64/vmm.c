@@ -88,31 +88,33 @@ static void vmm_table_initialize_kernel(vmm_space_t target, struct handover_mmap
 
     for (size_t i = 0; i < memory_map->size; i++)
     {
+        auto entry = memory_map->entries[i];
+
         log("VMM: loading kernel memory map {}/{} ({x} - {x})",
             i,
             memory_map->size,
-            memory_map->entries[i].base,
-            memory_map->entries[i].base + memory_map->entries[i].length);
+            entry.base,
+            entry.base + entry.length);
 
-        if (memory_map->entries[i].type == HANDOVER_MMAP_KERNEL_MODULE)
+        if (entry.type == HANDOVER_MMAP_KERNEL_MODULE)
         {
             vmm_map(target,
                     (vmm_range_t){
-                        .base = mmap_phys_to_kernel(ALIGN_DOWN(memory_map->entries[i].base, HOST_MEM_PAGESIZE)),
-                        .size = ALIGN_UP(memory_map->entries[i].length, HOST_MEM_PAGESIZE) + HOST_MEM_PAGESIZE},
+                        .base = mmap_phys_to_kernel(ALIGN_DOWN(entry.base, HOST_MEM_PAGESIZE)),
+                        .size = ALIGN_UP(entry.length, HOST_MEM_PAGESIZE) + HOST_MEM_PAGESIZE},
                     (pmm_range_t){
-                        .base = ALIGN_DOWN(memory_map->entries[i].base, HOST_MEM_PAGESIZE),
-                        .size = ALIGN_UP(memory_map->entries[i].length, HOST_MEM_PAGESIZE) + HOST_MEM_PAGESIZE},
+                        .base = ALIGN_DOWN(entry.base, HOST_MEM_PAGESIZE),
+                        .size = ALIGN_UP(entry.length, HOST_MEM_PAGESIZE) + HOST_MEM_PAGESIZE},
                     BR_MEM_WRITABLE);
         }
 
         vmm_map(target,
                 (vmm_range_t){
-                    .base = mmap_phys_to_io(memory_map->entries[i].base),
-                    .size = memory_map->entries[i].length},
+                    .base = mmap_phys_to_io(entry.base),
+                    .size = entry.length},
                 (pmm_range_t){
-                    .base = (memory_map->entries[i].base),
-                    .size = memory_map->entries[i].length},
+                    .base = (entry.base),
+                    .size = entry.length},
                 BR_MEM_WRITABLE);
     }
 

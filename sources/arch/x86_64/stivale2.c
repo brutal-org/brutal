@@ -3,6 +3,7 @@
 
 #include "arch/arch.h"
 #include "arch/x86_64/asm.h"
+#include "arch/x86_64/mmap.h"
 #include "arch/x86_64/stivale2.h"
 
 static uint8_t stack[4096 * 4];
@@ -86,7 +87,7 @@ static void fill_handover_mmap(struct handover *target, struct stivale2_struct_t
 
 static void fill_handover_rsdp(struct handover *target, struct stivale2_struct_tag_rsdp *rsdp)
 {
-    target->rsdp = rsdp->rsdp;
+    target->rsdp = mmap_io_to_phys(rsdp->rsdp);
 }
 
 void stivale2_entry(struct stivale2_struct *info)
