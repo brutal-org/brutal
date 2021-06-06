@@ -18,6 +18,7 @@ enum fmt_type
 struct fmt
 {
     enum fmt_type type;
+    bool aligned;
 };
 
 struct fmt fmt_parse(struct scan *scan);
