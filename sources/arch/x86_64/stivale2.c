@@ -51,6 +51,9 @@ static enum handover_mmap_entry_type stivale_mmap_type_to_handover_type(int stiv
     case STIVALE2_MMAP_USABLE:
         return HANDOVER_MMAP_FREE;
 
+    case STIVALE2_MMAP_KERNEL_AND_MODULES:
+        return HANDOVER_MMAP_KERNEL_MODULE;
+
     case STIVALE2_MMAP_ACPI_NVS:
     case STIVALE2_MMAP_RESERVED:
     case STIVALE2_MMAP_BAD_MEMORY:
