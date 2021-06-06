@@ -88,7 +88,7 @@ static void vmm_table_initialize_kernel(vmm_space_t target, struct handover_mmap
 
     for (size_t i = 0; i < memory_map->size; i++)
     {
-        log("VMM: loading kernel memory map {x}/{x} ({x} - {x})",
+        log("VMM: loading kernel memory map {}/{} ({x} - {x})",
             i,
             memory_map->size,
             memory_map->entries[i].base,

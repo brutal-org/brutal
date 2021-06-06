@@ -20,7 +20,7 @@ void arch_entry(struct handover *handover)
     idt_initialize();
     pic_disable();
     pmm_initialize(handover);
-    vmm_initialize_kernel(handover);
+    vmm_initialize(handover);
 
     auto lapic = acpi_find_lapic(handover->rsdp);
     auto ioapic = acpi_find_ioapic(handover->rsdp);
