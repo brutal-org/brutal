@@ -1,5 +1,4 @@
 #include <host/mem.h>
-
 #include <library/alloc/heap.h>
 
 static struct alloc *heap(void)

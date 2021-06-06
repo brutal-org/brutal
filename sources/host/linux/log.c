@@ -1,6 +1,5 @@
-#include <unistd.h>
-
 #include <host/log.h>
+#include <unistd.h>
 
 static bool log_initialized = false;
 static struct writer log;

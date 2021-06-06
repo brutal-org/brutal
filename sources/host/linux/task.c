@@ -1,8 +1,7 @@
+#include <host/task.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
-
-#include <host/task.h>
 
 task_handle_t host_task_this(void)
 {

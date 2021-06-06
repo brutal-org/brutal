@@ -1,5 +1,4 @@
 #include <host/log.h>
-
 #include <library/log.h>
 
 str_t log_prefix(enum log_level level)

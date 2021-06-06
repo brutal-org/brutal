@@ -15,5 +15,12 @@ BreakInheritanceList: AfterColon
 IndentPPDirectives: AfterHash
 ForEachMacros: ["__dummy_foreach"]
 SpaceBeforeParens: ControlStatementsExceptForEachMacros
-
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex:           '<([A-Za-z0-9.\/-_])+>'
+    Priority:        0
+    SortPriority:    0
+  - Regex:           '"([A-Za-z0-9.\/-_])+"'
+    Priority:        10
+    SortPriority:    10
 ...

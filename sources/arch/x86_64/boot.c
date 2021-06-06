@@ -3,7 +3,6 @@
 
 #include "arch/arch.h"
 #include "arch/pmm.h"
-
 #include "arch/vmm.h"
 #include "arch/x86_64/acpi.h"
 #include "arch/x86_64/com.h"
@@ -14,8 +13,6 @@
 
 void arch_entry(struct handover *handover)
 {
-    UNUSED(handover);
-
     log("Initializing arch x86_64...");
 
     com_initialize(COM1);

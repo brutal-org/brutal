@@ -1,7 +1,8 @@
+#include <library/log.h>
+
 #include "arch/vmm.h"
 #include "arch/x86_64/mmap.h"
 #include "arch/x86_64/paging.h"
-#include <library/log.h>
 
 typedef result_t(br_error_t, uintptr_t) page_or_alloc_result_t;
 
@@ -83,8 +84,6 @@ void vmm_space_switch(vmm_space_t space)
 // later we may use an other initializer that fork the higher kernel vmm entry
 static void vmm_table_initialize_kernel(vmm_space_t target, struct handover_mmap const *memory_map)
 {
-    log("VMM: loading kernel map initial 32M");
-
     log("VMM: loading kernel memory map");
 
     for (size_t i = 0; i < memory_map->size; i++)
