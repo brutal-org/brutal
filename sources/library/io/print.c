@@ -23,7 +23,7 @@ struct print_value print_val_string(str_t val)
     return (struct print_value){PRINT_STRING, {._string = val}};
 }
 
-write_r print_dispatch(struct writer *writer, struct fmt fmt, struct print_value value)
+write_result_t print_dispatch(struct writer *writer, struct fmt fmt, struct print_value value)
 {
     switch (value.type)
     {
@@ -37,10 +37,10 @@ write_r print_dispatch(struct writer *writer, struct fmt fmt, struct print_value
         return fmt_string(fmt, writer, value._string);
     }
 
-    return (write_r)OK(0);
+    return OK(write_result_t, 0);
 }
 
-write_r print_impl(struct writer *writer, str_t format, struct print_args args)
+write_result_t print_impl(struct writer *writer, str_t format, struct print_args args)
 {
     size_t current = 0;
     size_t written = 0;
@@ -66,5 +66,5 @@ write_r print_impl(struct writer *writer, str_t format, struct print_args args)
         }
     }
 
-    return (write_r)OK(written);
+    return OK(write_result_t, written);
 }

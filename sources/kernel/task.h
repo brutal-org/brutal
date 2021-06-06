@@ -2,7 +2,7 @@
 
 #include <library/text/str.h>
 
-struct kernel_task
+struct hj_task
 {
     uint64_t id;
 };

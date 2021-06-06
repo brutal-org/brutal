@@ -71,7 +71,7 @@ struct fmt fmt_parse(struct scan *scan)
     return fmt;
 }
 
-write_r fmt_signed(struct fmt self, struct writer *writer, long value)
+write_result_t fmt_signed(struct fmt self, struct writer *writer, long value)
 {
     size_t written = 0;
 
@@ -83,10 +83,10 @@ write_r fmt_signed(struct fmt self, struct writer *writer, long value)
 
     written += TRY(fmt_unsigned(self, writer, value));
 
-    return (write_r)OK(written);
+    return OK(write_result_t, written);
 }
 
-write_r fmt_unsigned(struct fmt self, struct writer *writer, unsigned long value)
+write_result_t fmt_unsigned(struct fmt self, struct writer *writer, unsigned long value)
 {
     if (value == 0)
     {
@@ -108,7 +108,7 @@ write_r fmt_unsigned(struct fmt self, struct writer *writer, unsigned long value
     return io_write(writer, buffer, i);
 }
 
-write_r fmt_string(struct fmt self, struct writer *writer, str_t value)
+write_result_t fmt_string(struct fmt self, struct writer *writer, str_t value)
 {
     UNUSED(self);
 

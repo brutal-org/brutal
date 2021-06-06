@@ -1,5 +1,5 @@
 #pragma once
 
-#include "kernel/handhover.h"
+#include "kernel/handover.h"
 
 void kernel_entry(struct handover *handover);

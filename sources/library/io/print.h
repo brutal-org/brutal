@@ -66,7 +66,7 @@ struct print_value print_val_cstring(char *val);
 #define PRINT_ARGS(...) \
     PRINT_ARGS_##__VA_OPT__(N)(__VA_ARGS__)
 
-write_r print_impl(struct writer *writer, str_t format, struct print_args args);
+write_result_t print_impl(struct writer *writer, str_t format, struct print_args args);
 
 #define print(writer, fmt, ...) \
     print_impl(writer, make_str(fmt), PRINT_ARGS(__VA_ARGS__))

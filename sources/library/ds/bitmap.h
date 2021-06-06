@@ -1,5 +1,6 @@
 #pragma once
 
+#include <library/base/range.h>
 #include <library/base/std.h>
 
 #define BITMAP_BYTE_INDEX(index) ((index) / 8)
@@ -11,9 +12,7 @@ struct bitmap
     size_t size;
 };
 
-struct bitmap bitmap(void *data, size_t size);
-
-void bitmap_fill(struct bitmap *bitmap, bool value);
+typedef range_t(size_t) bitmap_range_t;
 
 static inline bool bitmap_get(struct bitmap const *bitmap, size_t index)
 {
@@ -38,10 +37,10 @@ static inline void bitmap_set(struct bitmap *bitmap, size_t index, bool value)
     }
 }
 
-static inline void bitmap_set_range(struct bitmap *bitmap, size_t index, size_t count, bool value)
-{
-    for (size_t i = index; i < index + count; i++)
-    {
-        bitmap_set(bitmap, i, value);
-    }
-}
+void bitmap_init(struct bitmap *self, void *data, size_t size);
+
+void bitmap_set_range(struct bitmap *bitmap, bitmap_range_t range, bool value);
+
+void bitmap_fill(struct bitmap *bitmap, bool value);
+
+bitmap_range_t bitmap_find_range(struct bitmap const *bitmap, size_t start, size_t size, bool value);

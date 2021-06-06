@@ -66,5 +66,5 @@ void task_exit(struct task *task, int result);
 
 void task_abort(struct task *task);
 
-typedef result_t(int) task_wait_r;
-task_wait_r task_wait(struct task *task);
+typedef result_t(error_t, int) task_wait_result_t;
+task_wait_result_t task_wait(struct task *task);

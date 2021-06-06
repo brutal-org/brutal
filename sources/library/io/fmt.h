@@ -22,8 +22,8 @@ struct fmt
 
 struct fmt fmt_parse(struct scan *scan);
 
-write_r fmt_signed(struct fmt self, struct writer *writer, long value);
+write_result_t fmt_signed(struct fmt self, struct writer *writer, long value);
 
-write_r fmt_unsigned(struct fmt self, struct writer *writer, unsigned long value);
+write_result_t fmt_unsigned(struct fmt self, struct writer *writer, unsigned long value);
 
-write_r fmt_string(struct fmt self, struct writer *writer, str_t string);
+write_result_t fmt_string(struct fmt self, struct writer *writer, str_t string);

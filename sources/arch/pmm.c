@@ -6,154 +6,137 @@
 #include "arch/mmap.h"
 #include "arch/pmm.h"
 
-struct bitmap pmm_bitmap = {};
-
-size_t last_free_bitmap_entry = 0;
-size_t available_memory = 0;
-size_t bitmap_target_size = 0;
+static struct bitmap pmm_bitmap = {};
+static size_t best_bet = 0;
+static size_t available_memory = 0;
 
 static uintptr_t memory_map_get_highest_address(const struct handover_mmap *memory_map)
 {
-    size_t length = memory_map->mmap_table[memory_map->size - 1].length;
-    size_t start = memory_map->mmap_table[memory_map->size - 1].base;
+    size_t length = memory_map->entries[memory_map->size - 1].length;
+    size_t start = memory_map->entries[memory_map->size - 1].base;
 
-    return length + start;
+    return ALIGN_UP(length + start, HOST_MEM_PAGESIZE);
 }
 
-static void pmm_bitmap_find_addr(const struct handover_mmap *memory_map)
+static void pmm_bitmap_initialize(struct handover_mmap const *memory_map)
 {
+    log("PMM: Allocating memory bitmap...");
+
+    size_t bitmap_target_size = memory_map_get_highest_address(memory_map) / HOST_MEM_PAGESIZE / 8;
+
+    log("PMM: A bitmap {d}kib long is needed", bitmap_target_size / 1024);
+
     for (size_t i = 0; i < memory_map->size; i++)
     {
-        if (memory_map->mmap_table[i].type != HANDOVER_MMAP_FREE)
+        auto entry = &memory_map->entries[i];
+
+        if (entry->type != HANDOVER_MMAP_FREE)
         {
             continue;
         }
 
-        // + 2 PAGE FOR SECURITY
-        if (memory_map->mmap_table[i].length > ((bitmap_target_size / 8) + (HOST_MEM_PAGESIZE * 2)))
+        if (entry->length > bitmap_target_size)
         {
-            pmm_bitmap =
-                bitmap((void *)memory_map->mmap_table[i].base, bitmap_target_size);
+            log("PMM: Allocated memory bitmap at {x}-{x}", entry->base, entry->base + bitmap_target_size - 1);
+
+            bitmap_init(&pmm_bitmap, (void *)entry->base, bitmap_target_size);
             return;
         }
     }
+
+    bitmap_fill(&pmm_bitmap, PMM_USED);
 }
 
-static void pmm_bitmap_clear()
+static void pmm_load_memory_map(const struct handover_mmap *memory_map)
 {
-    bitmap_fill(&pmm_bitmap, true);
-    last_free_bitmap_entry = 0;
-}
+    log("PMM: Memory map:");
 
-void pmm_initialize_memory_map(const struct handover_mmap *memory_map)
-{
     for (size_t i = 0; i < memory_map->size; i++)
     {
-        size_t start = ALIGN_UP(memory_map->mmap_table[i].base, HOST_MEM_PAGESIZE);
-        size_t size = ALIGN_DOWN(memory_map->mmap_table[i].length, HOST_MEM_PAGESIZE);
+        size_t base = ALIGN_UP(memory_map->entries[i].base, HOST_MEM_PAGESIZE);
+        size_t size = ALIGN_DOWN(memory_map->entries[i].length, HOST_MEM_PAGESIZE);
 
-        log("memory map: type: {x} {x}-{x}", memory_map->mmap_table[i].type, start, start + size);
+        log("    type: {x} {x}-{x}", memory_map->entries[i].type, base, base + size - 1);
 
-        if (memory_map->mmap_table[i].type != HANDOVER_MMAP_FREE)
+        if (memory_map->entries[i].type != HANDOVER_MMAP_FREE)
         {
             continue;
         }
 
-        pmm_free(start, size / HOST_MEM_PAGESIZE);
+        pmm_free((pmm_range_t){base, size});
 
         available_memory += size / HOST_MEM_PAGESIZE;
     }
 }
 
-static size_t pmm_bitmap_find_free(size_t page_count)
+void pmm_initialize(struct handover const *handover)
 {
-    size_t free_entry_count_in_a_row = 0;
-    size_t free_entry_start = 0;
+    pmm_bitmap_initialize(&handover->mmap);
+    pmm_load_memory_map(&handover->mmap);
 
-    for (size_t i = last_free_bitmap_entry; i < pmm_bitmap.size; i++)
+    // we set the first page used, as the page 0 is NULL
+    bitmap_set(&pmm_bitmap, 0, PMM_USED);
+    pmm_used((pmm_range_t){(uintptr_t)pmm_bitmap.data, pmm_bitmap.size});
+}
+
+pmm_result_t pmm_alloc(size_t size)
+{
+    log("PMM: pmm_alloc(): {}", size);
+
+    auto page_size = size / HOST_MEM_PAGESIZE;
+    auto page_range = bitmap_find_range(&pmm_bitmap, best_bet, page_size, false);
+
+    if (range_empty(page_range))
     {
-        if (!bitmap_get(&pmm_bitmap, i))
-        {
-            if (free_entry_count_in_a_row == 0)
-            {
-                free_entry_start = i;
-            }
-
-            free_entry_count_in_a_row++;
-        }
-        else
-        {
-            free_entry_count_in_a_row = 0;
-            free_entry_start = 0;
-        }
-
-        if (page_count <= free_entry_count_in_a_row)
-        {
-            last_free_bitmap_entry = free_entry_start + page_count;
-            return free_entry_start;
-        }
+        best_bet = 0;
+        page_range = bitmap_find_range(&pmm_bitmap, 0, page_size, false);
     }
 
-    if (last_free_bitmap_entry == 0)
+    if (range_any(page_range))
     {
-        return 0;
+        bitmap_set_range(&pmm_bitmap, page_range, true);
+
+        auto pmm_range = range_cast(pmm_range_t, page_range);
+        pmm_range.base *= HOST_MEM_PAGESIZE;
+        pmm_range.size *= HOST_MEM_PAGESIZE;
+
+        return OK(pmm_result_t, pmm_range);
     }
     else
     {
-        // retry but from 0 instead of from the last free entry
-        last_free_bitmap_entry = 0;
-        return pmm_bitmap_find_free(page_count);
+        return ERR(pmm_result_t, HJ_ERR_OUT_OF_MEMORY);
     }
 }
 
-uintptr_t pmm_alloc(size_t page_count)
+pmm_result_t pmm_used(pmm_range_t range)
 {
-    size_t page = pmm_bitmap_find_free(page_count);
-    bitmap_set_range(&pmm_bitmap, page, page_count, true);
-    return page * HOST_MEM_PAGESIZE;
+    log("PMM: pmm_used(): {x}-{x}...", range.base, range_end(range));
+
+    size_t page_base = range.base / HOST_MEM_PAGESIZE;
+    size_t page_size = range.size / HOST_MEM_PAGESIZE;
+    auto page_range = (bitmap_range_t){page_base, page_size};
+
+    bitmap_set_range(&pmm_bitmap, page_range, PMM_USED);
+
+    return OK(pmm_result_t, range);
 }
 
-uintptr_t pmm_alloc_zero(size_t page_count)
+pmm_result_t pmm_free(pmm_range_t range)
 {
-    uintptr_t result = pmm_alloc(page_count);
+    log("PMM: pmm_free(): {x}-{x}...", range.base, range_end(range));
 
-    if (result)
+    if (range.base == 0)
     {
-        mem_set((void *)(result + MMAP_KERNEL_BASE), 0, page_count * HOST_MEM_PAGESIZE);
+        return ERR(pmm_result_t, HJ_ERR_BAD_ADDRESS);
     }
 
-    return result;
-}
+    size_t page_base = range.base / HOST_MEM_PAGESIZE;
+    size_t page_size = range.size / HOST_MEM_PAGESIZE;
+    auto page_range = (bitmap_range_t){page_base, page_size};
 
-int pmm_free(uintptr_t addr, size_t page_count)
-{
-    if (addr == 0)
-    {
-        return -1;
-    }
+    bitmap_set_range(&pmm_bitmap, page_range, PMM_FREE);
 
-    size_t page_idx = addr / HOST_MEM_PAGESIZE;
+    best_bet = range_end(page_range);
 
-    bitmap_set_range(&pmm_bitmap, page_idx, page_count, false);
-
-    last_free_bitmap_entry = page_idx;
-    return 0;
-}
-
-void pmm_initialize(const struct handover_mmap *memory_map)
-{
-    bitmap_target_size = memory_map_get_highest_address(memory_map) /
-                         HOST_MEM_PAGESIZE; // load bitmap size
-
-    pmm_bitmap_find_addr(memory_map);
-
-    pmm_bitmap_clear();
-
-    pmm_initialize_memory_map(memory_map);
-
-    // we set the first page used, as the page 0 is NULL
-    bitmap_set(&pmm_bitmap, 0, true);
-
-    // we set where the bitmap is located to used
-    bitmap_set_range(&pmm_bitmap, (uintptr_t)pmm_bitmap.data / HOST_MEM_PAGESIZE, (pmm_bitmap.size / HOST_MEM_PAGESIZE) / 8 + 2, true);
+    return OK(pmm_result_t, range);
 }

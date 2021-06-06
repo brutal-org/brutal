@@ -19,5 +19,7 @@ void arch_entry(struct handover *handover)
     gdt_initialize();
     idt_initialize();
     pic_disable();
-    pmm_initialize(&handover->mmap);
+    pmm_initialize(handover);
+
+    log("Arch x86_64 initialized!");
 }

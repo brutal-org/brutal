@@ -3,12 +3,20 @@
 #include <library/base.h>
 #include <library/ds/bitmap.h>
 
-#include "kernel/handhover.h"
+#include "kernel/handover.h"
+#include "syscalls/error.h"
 
-void pmm_initialize(struct handover_mmap const *memory_map);
+#define PMM_USED (true)
+#define PMM_FREE (false)
 
-uintptr_t pmm_alloc(size_t page_count);
+typedef range_t(size_t) pmm_range_t;
 
-uintptr_t pmm_alloc_zero(size_t page_count);
+typedef result_t(hj_error_t, pmm_range_t) pmm_result_t;
 
-int pmm_free(uintptr_t addr, size_t page_count);
+void pmm_initialize(struct handover const *handover);
+
+pmm_result_t pmm_alloc(size_t size);
+
+pmm_result_t pmm_used(pmm_range_t range);
+
+pmm_result_t pmm_free(pmm_range_t range);

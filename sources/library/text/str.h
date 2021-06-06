@@ -11,10 +11,10 @@ struct str
 
 typedef struct str str_t;
 
-#define str_fix_t(n)    \
+#define str_fix_t(N)    \
     struct              \
     {                   \
-        char buffer[8]; \
+        char buffer[N]; \
         size_t len;     \
     }
 

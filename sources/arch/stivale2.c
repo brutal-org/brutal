@@ -73,9 +73,11 @@ static void fill_handover_mmap(struct handover *target, struct stivale2_struct_t
     target->mmap.size = memory_map->entries;
     for (size_t i = 0; i < memory_map->entries; i++)
     {
-        target->mmap.mmap_table[i].length = memory_map->memmap[i].length;
-        target->mmap.mmap_table[i].base = memory_map->memmap[i].base;
-        target->mmap.mmap_table[i].type = stivale_mmap_type_to_handover_type(memory_map->memmap[i].type);
+        auto entry = &target->mmap.entries[i];
+
+        entry->length = memory_map->memmap[i].length;
+        entry->base = memory_map->memmap[i].base;
+        entry->type = stivale_mmap_type_to_handover_type(memory_map->memmap[i].type);
     }
 }
 
