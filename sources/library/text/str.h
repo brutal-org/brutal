@@ -24,7 +24,7 @@ typedef str_fix_t(32) str_fix32_t;
 typedef str_fix_t(64) str_fix64_t;
 typedef str_fix_t(128) str_fix128_t;
 
-static inline size_t cstr_len(char *str)
+static inline size_t cstr_len(char const *str)
 {
     size_t size = 0;
 
@@ -41,9 +41,9 @@ static inline str_t str_forward(str_t str)
     return str;
 }
 
-static inline str_t str_make_from_cstr(char *cstr)
+static inline str_t str_make_from_cstr(char const *cstr)
 {
-    return (str_t){cstr, cstr_len(cstr)};
+    return (str_t){(char *)cstr, cstr_len(cstr)};
 }
 
 // clang-format off
@@ -51,7 +51,8 @@ static inline str_t str_make_from_cstr(char *cstr)
 #define make_str(literal)                \
     _Generic((literal),                  \
         str_t: str_forward,              \
-        char*: str_make_from_cstr        \
+        char*: str_make_from_cstr,       \
+        char const*: str_make_from_cstr  \
     )(literal)
 
 #define make_str_n(str, n) \

@@ -44,4 +44,3 @@ void idt_initialize(void)
 
     idt_update(&idt_descriptor);
 }
-

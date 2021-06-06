@@ -34,21 +34,21 @@ static size_t vmm_map_page(vmm_space_t space, uintptr_t virtual_page, uintptr_t 
 
     if (pdpt == NULL)
     {
-        panic("VMM: vmm_map_page get_page_or_alloc return 0 (for pdpt) ");
+        panic("get_page_or_alloc return 0 (for pdpt) ");
     }
 
     struct pml *pd = (struct pml *)(get_page_or_alloc(pdpt, PDPT_GET_INDEX(virtual_page), flags | BR_MEM_WRITABLE | BR_MEM_USER).ok);
 
     if (pd == NULL)
     {
-        panic("VMM: vmm_map_page get_page_or_alloc return 0 (for pdpt) ");
+        panic("get_page_or_alloc return 0 (for pdpt) ");
     }
 
     struct pml *pt = (struct pml *)(get_page_or_alloc(pd, PAGE_DIR_GET_INDEX(virtual_page), flags | BR_MEM_WRITABLE | BR_MEM_USER).ok);
 
     if (pt == NULL)
     {
-        panic("VMM: vmm_map_page get_page_or_alloc return 0 (for pdpt) ");
+        panic("get_page_or_alloc return 0 (for pdpt) ");
     }
 
     pt[PAGE_TABLE_GET_INDEX(virtual_page)] = page(physical_page, flags);
@@ -61,7 +61,7 @@ vmm_result_t vmm_map(vmm_space_t space, vmm_range_t virtual_range, pmm_range_t p
     if (virtual_range.size != physical_range.size)
     {
 
-        panic("VMM: virtual_range.size must be equal to physical_range for the moment");
+        panic("virtual_range.size must be equal to physical_range for the moment");
         return ERR(vmm_result_t, -1);
     }
 
@@ -84,13 +84,13 @@ void vmm_space_switch(vmm_space_t space)
 // later we may use an other initializer that fork the higher kernel vmm entry
 static void vmm_table_initialize_kernel(vmm_space_t target, struct handover_mmap const *memory_map)
 {
-    log("VMM: loading kernel memory map");
+    log("Loading kernel memory map...");
 
     for (size_t i = 0; i < memory_map->size; i++)
     {
         auto entry = memory_map->entries[i];
 
-        log("VMM: loading kernel memory map {}/{} ({x} - {x})",
+        log("Loading kernel memory map {}/{} ({x} - {x})",
             i,
             memory_map->size,
             entry.base,
@@ -129,7 +129,7 @@ void vmm_initialize(struct handover const *handover)
     vmm_table_initialize_kernel(kernel_memory_map, &handover->mmap);
     vmm_space_switch(kernel_memory_map);
 
-    log("VMM: loaded kernel memory map");
+    log("Loaded kernel memory map!");
 }
 
 vmm_space_t vmm_space_create(void)

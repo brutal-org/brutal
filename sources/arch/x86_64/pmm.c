@@ -22,11 +22,11 @@ static uintptr_t memory_map_get_highest_address(const struct handover_mmap *memo
 
 static void pmm_bitmap_initialize(struct handover_mmap const *memory_map)
 {
-    log("PMM: Allocating memory bitmap...");
+    log("Allocating memory bitmap...");
 
     size_t bitmap_target_size = memory_map_get_highest_address(memory_map) / HOST_MEM_PAGESIZE / 8;
 
-    log("PMM: A bitmap {d}kib long is needed", bitmap_target_size / 1024);
+    log("A bitmap {d}kib long is needed", bitmap_target_size / 1024);
 
     for (size_t i = 0; i < memory_map->size; i++)
     {
@@ -39,7 +39,7 @@ static void pmm_bitmap_initialize(struct handover_mmap const *memory_map)
 
         if (entry->length > bitmap_target_size)
         {
-            log("PMM: Allocated memory bitmap at {x}-{x}", entry->base, entry->base + bitmap_target_size - 1);
+            log("Allocated memory bitmap at {x}-{x}", entry->base, entry->base + bitmap_target_size - 1);
 
             bitmap_init(&pmm_bitmap, (void *)entry->base, bitmap_target_size);
             break;
@@ -51,7 +51,7 @@ static void pmm_bitmap_initialize(struct handover_mmap const *memory_map)
 
 static void pmm_load_memory_map(const struct handover_mmap *memory_map)
 {
-    log("PMM: Memory map:");
+    log("Memory map:");
 
     for (size_t i = 0; i < memory_map->size; i++)
     {
@@ -85,7 +85,7 @@ void pmm_initialize(struct handover const *handover)
 pmm_result_t pmm_alloc(size_t size)
 {
     used_memory += size;
-    // log("PMM: pmm_alloc(): {} (total: {x})", size, used_memory);
+    // log("pmm_alloc(): {} (total: {x})", size, used_memory);
 
     auto page_size = size / HOST_MEM_PAGESIZE;
     auto page_range = bitmap_find_range(&pmm_bitmap, best_bet, page_size, false);
@@ -110,14 +110,14 @@ pmm_result_t pmm_alloc(size_t size)
     }
     else
     {
-        panic("PMM: pmm_alloc(): {} error out of memory", size);
+        panic("pmm_alloc(): {} error out of memory", size);
         return ERR(pmm_result_t, BR_ERR_OUT_OF_MEMORY);
     }
 }
 
 pmm_result_t pmm_map(pmm_range_t range)
 {
-    log("PMM: pmm_map(): {x}-{x}...", range.base, range_end(range));
+    log("pmm_map(): {x}-{x}...", range.base, range_end(range));
 
     size_t page_base = range.base / HOST_MEM_PAGESIZE;
     size_t page_size = range.size / HOST_MEM_PAGESIZE;
@@ -131,7 +131,7 @@ pmm_result_t pmm_map(pmm_range_t range)
 pmm_result_t pmm_free(pmm_range_t range)
 {
     used_memory -= range.size;
-    log("PMM: pmm_free(): {x}-{x}...", range.base, range_end(range));
+    log("pmm_free(): {x}-{x}...", range.base, range_end(range));
 
     if (range.base == 0)
     {

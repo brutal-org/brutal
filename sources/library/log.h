@@ -1,6 +1,7 @@
 #pragma once
 
 #include <library/io/print.h>
+#include <library/log/source_location.h>
 
 enum log_level
 {
@@ -11,19 +12,19 @@ enum log_level
     LOG_DEBUG,
 };
 
-void log_impl(enum log_level level, str_t fmt, struct print_args args);
+void log_impl(enum log_level level, struct source_location location, str_t fmt, struct print_args args);
 
 #define panic(fmt, ...) \
-    log_impl(LOG_PANIC, make_str(fmt), PRINT_ARGS(__VA_ARGS__))
+    log_impl(LOG_PANIC, source_location_current, make_str(fmt), PRINT_ARGS(__VA_ARGS__))
 
 #define todo(fmt, ...) \
-    log_impl(LOG_TODO, make_str(fmt), PRINT_ARGS(__VA_ARGS__))
+    log_impl(LOG_TODO, source_location_current, make_str(fmt), PRINT_ARGS(__VA_ARGS__))
 
 #define fixme(fmt, ...) \
-    log_impl(LOG_FIXME, make_str(fmt), PRINT_ARGS(__VA_ARGS__))
+    log_impl(LOG_FIXME, source_location_current, make_str(fmt), PRINT_ARGS(__VA_ARGS__))
 
 #define log(fmt, ...) \
-    log_impl(LOG_DEFAULT, make_str(fmt), PRINT_ARGS(__VA_ARGS__))
+    log_impl(LOG_DEFAULT, source_location_current, make_str(fmt), PRINT_ARGS(__VA_ARGS__))
 
 #define debug(fmt, ...) \
-    log_impl(LOG_DEBUG, make_str(fmt), PRINT_ARGS(__VA_ARGS__))
+    log_impl(LOG_DEBUG, source_location_current, make_str(fmt), PRINT_ARGS(__VA_ARGS__))
