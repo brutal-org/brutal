@@ -66,7 +66,10 @@ vmm_result_t vmm_map(vmm_space_t space, vmm_range_t virtual_range, pmm_range_t p
 
     for (size_t i = 0; i < (virtual_range.size / HOST_MEM_PAGESIZE); i++)
     {
-        vmm_map_page(space, i * HOST_MEM_PAGESIZE + ALIGN_DOWN(virtual_range.base, HOST_MEM_PAGESIZE), i * HOST_MEM_PAGESIZE + ALIGN_DOWN(physical_range.base, HOST_MEM_PAGESIZE), flags);
+        vmm_map_page(space,
+                     i * HOST_MEM_PAGESIZE + ALIGN_DOWN(virtual_range.base, HOST_MEM_PAGESIZE),
+                     i * HOST_MEM_PAGESIZE + ALIGN_DOWN(physical_range.base, HOST_MEM_PAGESIZE),
+                     flags);
     }
 
     return OK(vmm_result_t, virtual_range);
@@ -81,16 +84,8 @@ void vmm_space_switch(vmm_space_t space)
 static void vmm_table_initialize_kernel(vmm_space_t target, struct handover_mmap const *memory_map)
 {
     log("VMM: loading kernel map initial 32M");
-    // load first 32M
-    vmm_map(target,
-            (vmm_range_t){
-                .base = 0,
-                .size = 0x100000000},
-            (pmm_range_t){
-                .base = 0,
-                .size = 0x100000000},
-            BR_MEM_WRITABLE);
 
+    // load first 32M
     vmm_map(target,
             (vmm_range_t){
                 .base = mmap_phys_to_kernel(0),
@@ -109,19 +104,30 @@ static void vmm_table_initialize_kernel(vmm_space_t target, struct handover_mmap
                 .size = 0x2000000},
             BR_MEM_WRITABLE);
 
+    // load 4G
+    vmm_map(target,
+            (vmm_range_t){
+                .base = 0,
+                .size = 0x100000000},
+            (pmm_range_t){
+                .base = 0,
+                .size = 0x100000000},
+            BR_MEM_WRITABLE);
+
     vmm_space_switch(target);
 
     log("VMM: loading kernel memory map");
 
     for (size_t i = 0; i < memory_map->size; i++)
     {
-
-        log("VMM: loading kernel memory map {x}/{x} ({x} - {x})", i, memory_map->size, memory_map->entries[i].base, memory_map->entries[i].base + memory_map->entries[i].length);
-        //log("    {x}-{x}", (uintptr_t)memory_map->entries[i].base, (uintptr_t)(memory_map->entries[i].base + memory_map->entries[i].size - 1));
+        log("VMM: loading kernel memory map {x}/{x} ({x} - {x})",
+            i,
+            memory_map->size,
+            memory_map->entries[i].base,
+            memory_map->entries[i].base + memory_map->entries[i].length);
 
         if (memory_map->entries[i].type == HANDOVER_MMAP_KERNEL_MODULE)
         {
-
             vmm_map(target,
                     (vmm_range_t){
                         .base = mmap_phys_to_kernel(memory_map->entries[i].base),
