@@ -8,7 +8,7 @@ typedef result_t(br_error_t, uintptr_t) page_or_alloc_result_t;
 
 static struct pml *kernel_memory_map = NULL;
 
-static page_or_alloc_result_t get_page_or_alloc(struct pml *table, size_t idx, size_t flags)
+static page_or_alloc_result_t vmm_get_pml_or_alloc(struct pml *table, size_t idx, size_t flags)
 {
     if (table[idx].present)
     {
@@ -30,59 +30,34 @@ static page_or_alloc_result_t get_page_or_alloc(struct pml *table, size_t idx, s
 static size_t vmm_map_page(vmm_space_t space, uintptr_t virtual_page, uintptr_t physical_page, br_mem_flags_t flags)
 {
 
-    struct pml *pdpt = (struct pml *)(get_page_or_alloc((struct pml *)space, PML4_GET_INDEX(virtual_page), flags | BR_MEM_WRITABLE | BR_MEM_USER).ok);
+    struct pml *pml3 = (struct pml *)(vmm_get_pml_or_alloc((struct pml *)space, PML4_GET_INDEX(virtual_page), flags | BR_MEM_WRITABLE | BR_MEM_USER).ok);
 
-    if (pdpt == NULL)
+    if (pml3 == NULL)
     {
-        panic("get_page_or_alloc return 0 (for pdpt) ");
+        panic("vmm_get_pml_or_alloc return 0 (for pml3) ");
     }
 
-    struct pml *pd = (struct pml *)(get_page_or_alloc(pdpt, PDPT_GET_INDEX(virtual_page), flags | BR_MEM_WRITABLE | BR_MEM_USER).ok);
+    struct pml *pml2 = (struct pml *)(vmm_get_pml_or_alloc(pml3, PMLN_GET_INDEX(virtual_page), flags | BR_MEM_WRITABLE | BR_MEM_USER).ok);
 
-    if (pd == NULL)
+    if (pml2 == NULL)
     {
-        panic("get_page_or_alloc return 0 (for pdpt) ");
+        panic("vmm_get_pml_or_alloc return 0 (for pml2) ");
     }
 
-    struct pml *pt = (struct pml *)(get_page_or_alloc(pd, PAGE_DIR_GET_INDEX(virtual_page), flags | BR_MEM_WRITABLE | BR_MEM_USER).ok);
+    struct pml *pml1 = (struct pml *)(vmm_get_pml_or_alloc(pml2, PAGE_DIR_GET_INDEX(virtual_page), flags | BR_MEM_WRITABLE | BR_MEM_USER).ok);
 
-    if (pt == NULL)
+    if (pml1 == NULL)
     {
-        panic("get_page_or_alloc return 0 (for pdpt) ");
+        panic("vmm_get_pml_or_alloc return 0 (for pml1) ");
     }
 
-    pt[PAGE_TABLE_GET_INDEX(virtual_page)] = page(physical_page, flags);
+    pml1[PAGE_TABLE_GET_INDEX(virtual_page)] = page(physical_page, flags);
 
     return 0;
 }
 
-vmm_result_t vmm_map(vmm_space_t space, vmm_range_t virtual_range, pmm_range_t physical_range, br_mem_flags_t flags)
-{
-    if (virtual_range.size != physical_range.size)
-    {
-
-        panic("virtual_range.size must be equal to physical_range for the moment");
-        return ERR(vmm_result_t, -1);
-    }
-
-    for (size_t i = 0; i < (virtual_range.size / HOST_MEM_PAGESIZE); i++)
-    {
-        vmm_map_page(space,
-                     i * HOST_MEM_PAGESIZE + ALIGN_DOWN(virtual_range.base, HOST_MEM_PAGESIZE),
-                     i * HOST_MEM_PAGESIZE + ALIGN_DOWN(physical_range.base, HOST_MEM_PAGESIZE),
-                     flags);
-    }
-
-    return OK(vmm_result_t, virtual_range);
-}
-
-void vmm_space_switch(vmm_space_t space)
-{
-    asm volatile("mov %0, %%cr3" ::"a"(mmap_io_to_phys((uintptr_t)space)));
-}
-
 // later we may use an other initializer that fork the higher kernel vmm entry
-static void vmm_table_initialize_kernel(vmm_space_t target, struct handover_mmap const *memory_map)
+static void vmm_load_memory_map(vmm_space_t target, struct handover_mmap const *memory_map)
 {
     log("Loading kernel memory map...");
 
@@ -126,7 +101,7 @@ void vmm_initialize(struct handover const *handover)
     kernel_memory_map = (struct pml *)mmap_phys_to_io((pmm_alloc(HOST_MEM_PAGESIZE).ok).base);
     mem_set(kernel_memory_map, 0, HOST_MEM_PAGESIZE);
 
-    vmm_table_initialize_kernel(kernel_memory_map, &handover->mmap);
+    vmm_load_memory_map(kernel_memory_map, &handover->mmap);
     vmm_space_switch(kernel_memory_map);
 
     log("Loaded kernel memory map!");
@@ -149,4 +124,28 @@ vmm_space_t vmm_space_create(void)
     }
 
     return vmm_address_space;
+}
+
+void vmm_space_switch(vmm_space_t space)
+{
+    asm volatile("mov %0, %%cr3" ::"a"(mmap_io_to_phys((uintptr_t)space)));
+}
+
+vmm_result_t vmm_map(vmm_space_t space, vmm_range_t virtual_range, pmm_range_t physical_range, br_mem_flags_t flags)
+{
+    if (virtual_range.size != physical_range.size)
+    {
+        panic("virtual_range.size must be equal to physical_range for the moment");
+        return ERR(vmm_result_t, -1);
+    }
+
+    for (size_t i = 0; i < (virtual_range.size / HOST_MEM_PAGESIZE); i++)
+    {
+        vmm_map_page(space,
+                     i * HOST_MEM_PAGESIZE + ALIGN_DOWN(virtual_range.base, HOST_MEM_PAGESIZE),
+                     i * HOST_MEM_PAGESIZE + ALIGN_DOWN(physical_range.base, HOST_MEM_PAGESIZE),
+                     flags);
+    }
+
+    return OK(vmm_result_t, virtual_range);
 }

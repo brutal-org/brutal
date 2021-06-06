@@ -47,6 +47,6 @@ static inline struct pml page(uintptr_t physical, size_t flags)
 static_assert(sizeof(struct pml) == sizeof(uint64_t), "pml must be 64 bit");
 
 #define PML4_GET_INDEX(addr) (((uint64_t)addr & ((uint64_t)0x1ff << 39)) >> 39)
-#define PDPT_GET_INDEX(addr) (((uint64_t)addr & ((uint64_t)0x1ff << 30)) >> 30)
+#define PMLN_GET_INDEX(addr) (((uint64_t)addr & ((uint64_t)0x1ff << 30)) >> 30)
 #define PAGE_DIR_GET_INDEX(addr) (((uint64_t)addr & ((uint64_t)0x1ff << 21)) >> 21)
 #define PAGE_TABLE_GET_INDEX(addr) (((uint64_t)addr & ((uint64_t)0x1ff << 12)) >> 12)
