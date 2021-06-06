@@ -41,7 +41,7 @@ static void pmm_bitmap_initialize(struct handover_mmap const *memory_map)
             log("PMM: Allocated memory bitmap at {x}-{x}", entry->base, entry->base + bitmap_target_size - 1);
 
             bitmap_init(&pmm_bitmap, (void *)entry->base, bitmap_target_size);
-            return;
+            break;
         }
     }
 
@@ -93,6 +93,8 @@ pmm_result_t pmm_alloc(size_t size)
         page_range = bitmap_find_range(&pmm_bitmap, 0, page_size, false);
     }
 
+    best_bet = range_end(page_range);
+
     if (range_any(page_range))
     {
         bitmap_set_range(&pmm_bitmap, page_range, true);
@@ -105,6 +107,7 @@ pmm_result_t pmm_alloc(size_t size)
     }
     else
     {
+        panic("PMM: pmm_alloc(): {} error out of memory", size);
         return ERR(pmm_result_t, BR_ERR_OUT_OF_MEMORY);
     }
 }
@@ -137,7 +140,7 @@ pmm_result_t pmm_free(pmm_range_t range)
 
     bitmap_set_range(&pmm_bitmap, page_range, PMM_FREE);
 
-    best_bet = range_end(page_range);
+    best_bet = (page_range.base);
 
     return OK(pmm_result_t, range);
 }
