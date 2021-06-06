@@ -55,14 +55,14 @@ write_result_t print_impl(struct writer *writer, str_t format, struct print_args
             if (current < args.count)
             {
                 auto fmt = fmt_parse(&scan);
-                written += TRY(print_dispatch(writer, fmt, args.values[current]));
+                written += TRY(write_result_t, print_dispatch(writer, fmt, args.values[current]));
             }
 
             current++;
         }
         else
         {
-            written += TRY(io_put(writer, scan_next(&scan)));
+            written += TRY(write_result_t, io_put(writer, scan_next(&scan)));
         }
     }
 

@@ -15,16 +15,6 @@
         };                      \
     }
 
-#define TRY(expr)             \
-    ({                        \
-        auto result = (expr); \
-        if (!result.success)  \
-        {                     \
-            return result;    \
-        }                     \
-        result.ok;            \
-    })
-
 #define OK(T, value)     \
     (T)                  \
     {                    \
@@ -38,3 +28,13 @@
         .success = false, \
         .error = (value)  \
     }
+
+#define TRY(T, expr)                     \
+    ({                                   \
+        auto result = (expr);            \
+        if (!result.success)             \
+        {                                \
+            return ERR(T, result.error); \
+        }                                \
+        result.ok;                       \
+    })

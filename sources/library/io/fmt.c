@@ -77,11 +77,11 @@ write_result_t fmt_signed(struct fmt self, struct writer *writer, long value)
 
     if (value < 0)
     {
-        written += TRY(io_put(writer, '-'));
+        written += TRY(write_result_t, io_put(writer, '-'));
         value *= -1;
     }
 
-    written += TRY(fmt_unsigned(self, writer, value));
+    written += TRY(write_result_t, fmt_unsigned(self, writer, value));
 
     return OK(write_result_t, written);
 }
