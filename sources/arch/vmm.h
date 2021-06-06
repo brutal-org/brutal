@@ -33,4 +33,4 @@ vmm_result_t vmm_free(vmm_space_t space, vmm_range_t virtual_range);
 
 vmm_result_t vmm_get_physical(vmm_space_t space, vmm_range_t virtual_range);
 
-void vmm_initialize_kernel(struct handover const *handover);
+void vmm_initialize(struct handover const *handover);

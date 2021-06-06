@@ -3,6 +3,7 @@
 #include <library/base/macros.h>
 #include <library/base/std.h>
 #include <library/mem.h>
+
 struct PACKED pml
 {
     union
@@ -25,6 +26,7 @@ struct PACKED pml
         };
     };
 };
+
 // by default create a present page
 static inline struct pml page(uintptr_t physical, size_t flags)
 {
