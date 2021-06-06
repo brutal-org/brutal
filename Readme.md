@@ -16,7 +16,7 @@ A bold, unapologetic, and honest operating system written in modern C
 - The standard library is old and unsafe, **don't use it**
 - Don't be afraid of writing type generic code
 
-Here is more resources the subject:
+Here is more resources on the subject:
 
 - [The modern C book](https://modernc.gforge.inria.fr/)
 - [Modern C and What We Can Learn From It - Luca Sas](https://www.youtube.com/watch?v=QpAhX-gsHMs)

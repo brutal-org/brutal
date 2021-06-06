@@ -30,7 +30,7 @@ struct PACKED idt_entry
 
 struct PACKED idt
 {
-    struct idt_entry entries[IDT_ENTRY_COUNT]; 
+    struct idt_entry entries[IDT_ENTRY_COUNT];
 };
 
 struct PACKED interrupt_stackframe
@@ -65,4 +65,4 @@ struct idt_entry idt_entry(uintptr_t handler, uint8_t ist, uint8_t idt_flags);
 
 void idt_initialize(void);
 
-void idt_update(struct idt_descriptor* idt_descriptor);
+void idt_update(struct idt_descriptor *idt_descriptor);

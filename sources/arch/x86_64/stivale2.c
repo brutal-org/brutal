@@ -81,6 +81,11 @@ static void fill_handover_mmap(struct handover *target, struct stivale2_struct_t
     }
 }
 
+static void fill_handover_rsdp(struct handover *target, struct stivale2_struct_tag_rsdp *rsdp)
+{
+    target->rsdp = rsdp->rsdp;
+}
+
 void stivale2_entry(struct stivale2_struct *info)
 {
     UNUSED(info);
@@ -90,6 +95,8 @@ void stivale2_entry(struct stivale2_struct *info)
     struct handover handover = {};
 
     fill_handover_mmap(&handover, stivale2_get_tag(info, STIVALE2_STRUCT_TAG_MEMMAP_ID));
+    fill_handover_rsdp(&handover, stivale2_get_tag(info, STIVALE2_STRUCT_TAG_RSDP_ID));
+
     arch_entry(&handover);
 
     for (;;)

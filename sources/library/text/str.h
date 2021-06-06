@@ -54,6 +54,11 @@ static inline str_t str_make_from_cstr(char *cstr)
         char*: str_make_from_cstr        \
     )(literal)
 
+#define make_str_n(str, n) \
+    (str_t){str, n}
+
 // clang-format on
 
 void str_rvs(str_t str);
+
+bool str_eq(str_t lhs, str_t rhs);

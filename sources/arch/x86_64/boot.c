@@ -4,6 +4,7 @@
 #include "arch/arch.h"
 #include "arch/pmm.h"
 
+#include "arch/x86_64/acpi.h"
 #include "arch/x86_64/com.h"
 #include "arch/x86_64/gdt.h"
 #include "arch/x86_64/idt.h"
@@ -21,6 +22,12 @@ void arch_entry(struct handover *handover)
     idt_initialize();
     pic_disable();
     pmm_initialize(handover);
+
+    auto lapic = acpi_find_lapic(handover->rsdp);
+    auto ioapic = acpi_find_ioapic(handover->rsdp);
+
+    log("Lapic: {x}", lapic);
+    log("Iopic: {x}", ioapic);
 
     log("Arch x86_64 initialized!");
 }

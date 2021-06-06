@@ -1,8 +1,9 @@
 #pragma once
+
 #include <stddef.h>
 #include <stdint.h>
 
-// i don't think we will get over 64
+// I don't think we will get over 64
 #define HANDOVER_MMAP_MAX_SIZE 64
 
 enum handover_mmap_entry_type
@@ -30,4 +31,5 @@ struct handover_mmap
 struct handover
 {
     struct handover_mmap mmap;
+    uintptr_t rsdp;
 };

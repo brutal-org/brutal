@@ -31,7 +31,7 @@ struct PACKED acpi_rsdt
     uint32_t children[];
 };
 
-enum
+enum acpi_madt_record_type
 {
     ACPI_MADT_RECORD_LAPIC = 0,
     ACPI_MADT_RECORD_IOAPIC = 1,
@@ -72,6 +72,12 @@ struct PACKED acpi_madt
     struct acpi_madt_record records[];
 };
 
-uint32_t acpi_find_lapic(uintptr_t acpi_rsdp);
+struct acpi_sdth *acpi_rsdt_child(struct acpi_rsdt *rsdt, str_t signature);
 
-uint32_t acpi_find_ioapic(uintptr_t acpi_rsdp);
+struct acpi_madt_record *acpi_madt_record(struct acpi_madt *madt, enum acpi_madt_record_type type);
+
+struct acpi_madt *acpi_find_madt(uintptr_t rsdp_address);
+
+uint32_t acpi_find_lapic(uintptr_t rsdp_address);
+
+uint32_t acpi_find_ioapic(uintptr_t rsdp_address);
