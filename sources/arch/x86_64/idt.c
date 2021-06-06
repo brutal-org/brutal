@@ -47,6 +47,11 @@ void idt_initialize(void)
 
 void *interrupt_handler(struct interrupt_stackframe *stackframe)
 {
-    log("Interrupt {} !", stackframe->int_no);
+    log("Interrupt {} error: {} on {x} !", stackframe->int_no, stackframe->error_code, stackframe->rip);
+
+    while (true)
+    {
+    }
+
     return stackframe;
 }
