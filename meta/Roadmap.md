@@ -23,6 +23,7 @@
 
 ## Milestone 2
 
+- [ ] IDL
 - [ ] IRQ routing to usespace
 - [ ] Keyboard driver
 - [ ] Mouse driver

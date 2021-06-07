@@ -18,7 +18,7 @@ Striking modernist shapes and bold use of modern C are the hallmarks of **BRUTAL
 
 Right now the main goal of brutal is to run doom.
 
-See the [roadmap](meta/Roadmap.md) file for more information on how we plan to get there.
+See the [roadmap](meta/Roadmap.md) file for more information on how we plan to get there and where you can contribute.
 
 ## Modern C
 
