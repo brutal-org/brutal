@@ -9,6 +9,7 @@
 #include "arch/x86_64/gdt.h"
 #include "arch/x86_64/idt.h"
 #include "arch/x86_64/stivale2.h"
+#include "kernel/kernel.h"
 
 void arch_entry(struct handover *handover)
 {
@@ -22,4 +23,6 @@ void arch_entry(struct handover *handover)
     apic_initalize(handover);
 
     log("Arch x86_64 initialized!");
+
+    kernel_entry(handover);
 }
