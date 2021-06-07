@@ -21,6 +21,7 @@ struct fmt
     enum fmt_type type;
     size_t min_width;
     bool fill_with_zero;
+    bool prefix;
 };
 
 struct fmt fmt_parse(struct scan *scan);
