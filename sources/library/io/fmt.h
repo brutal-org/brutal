@@ -15,10 +15,12 @@ enum fmt_type
     FMT_POINTER,
 };
 
+
 struct fmt
 {
     enum fmt_type type;
-    bool aligned;
+    size_t min_width;
+    bool fill_with_zero;
 };
 
 struct fmt fmt_parse(struct scan *scan);
