@@ -69,3 +69,24 @@ URL: <https://github.com/skiftOS/skift>
 MIT
 Copyright © 2018-2021 N. Van Bossuyt & contributors
 ```
+
+## Supercip971/WingOS
+
+a little 64bit operating system written in c++ with smp support 
+
+URL: <https://github.com/Supercip971/WingOS>
+
+```
+BSD 2-Clause License
+
+Copyright (c) 2021, Supercip971
+All rights reserved.
+```
+
+## lyre-os/lyre
+
+URL: <https://github.com/lyre-os/lyre>
+
+```
+GNU General Public License v3.0
+```

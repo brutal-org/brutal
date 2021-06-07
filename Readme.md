@@ -9,12 +9,24 @@ A bold, unapologetic, and honest operating system written in modern C
 </p>
 <br/>
 
+## About
+
+Striking modernist shapes and bold use of modern C are the hallmarks of **BRUTAL**.<br>
+**BRUTAL** combine the desire of UNIX utopia from the 1970s with modern technology and engineering.
+
+## Roadmap
+
+Right now the main goal of brutal is to run doom.
+
+See the [roadmap](meta/Roadmap.md) file for more information on how we plan to get there.
+
 ## Modern C
 
-- Avoid pointers
-- Prefer passing by value
-- The standard library is old and unsafe, **don't use it**
-- Don't be afraid of writing type generic code
+Brutal is written in a dialect of C called modern C characterize by the following principle:
+
+- Avoid pointers and prefer passing by value.
+- The standard library is old and unsafe, **don't use it**.
+- Don't be afraid of writing type generic code.
 
 Here is more resources on the subject:
 
@@ -37,4 +49,3 @@ See [Acknowledgements.md](meta/Acknowledgements.md)
 The brutal operating system and its core components are licensed under the **MIT License**.
 
 The full text of the license can be accessed via [this link](https://opensource.org/licenses/MIT) and is also included in the [license](License) file of this software package.
-
