@@ -49,14 +49,14 @@ void dump_register(struct interrupt_stackframe const *stackframe)
     asm volatile("mov %%cr3, %0"
                  : "=r"(CR3));
 
-    log("rax: 0x{#016p} | rbx: 0x{#016p} | rcx: 0x{#016p}", stackframe->rax, stackframe->rbx, stackframe->rcx);
-    log("rdx: 0x{#016p} | rsi: 0x{#016p} | rdi: 0x{#016p}", stackframe->rdx, stackframe->rsi, stackframe->rdi);
-    log("r8 : 0x{#016p} | r9 : 0x{#016p} | r10: 0x{#016p}", stackframe->r8, stackframe->r9, stackframe->r10);
-    log("r11: 0x{#016p} | r12: 0x{#016p} | r13: 0x{#016p}", stackframe->r11, stackframe->r12, stackframe->r13);
-    log("r14: 0x{#016p} | r15: 0x{#016p}", stackframe->r14, stackframe->r15);
-    log("rip: 0x{#016p} | rsp: 0x{#016p} | rbp: 0x{#016p}", stackframe->rip, stackframe->rsp, stackframe->rbp);
-    log("cs : 0x{#016p} | ss : 0x{#016p} | rflags: 0x{#016p}", stackframe->cs, stackframe->ss, stackframe->rflags);
-    log("cr2: 0x{#016p} | cr3: 0x{#016p} ", CR2, CR3);
+    log("rax: {#016p} | rbx: {#016p} | rcx: {#016p}", stackframe->rax, stackframe->rbx, stackframe->rcx);
+    log("rdx: {#016p} | rsi: {#016p} | rdi: {#016p}", stackframe->rdx, stackframe->rsi, stackframe->rdi);
+    log("r8 : {#016p} | r9 : {#016p} | r10: {#016p}", stackframe->r8, stackframe->r9, stackframe->r10);
+    log("r11: {#016p} | r12: {#016p} | r13: {#016p}", stackframe->r11, stackframe->r12, stackframe->r13);
+    log("r14: {#016p} | r15: {#016p}", stackframe->r14, stackframe->r15);
+    log("rip: {#016p} | rsp: {#016p} | rbp: {#016p}", stackframe->rip, stackframe->rsp, stackframe->rbp);
+    log("cs : {#016p} | ss : {#016p} | rflags: {#016p}", stackframe->cs, stackframe->ss, stackframe->rflags);
+    log("cr2: {#016p} | cr3: {#016p} ", CR2, CR3);
 }
 
 void *interrupt_handler(struct interrupt_stackframe *stackframe)

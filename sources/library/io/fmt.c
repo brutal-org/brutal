@@ -24,6 +24,23 @@ static char fmt_digit(struct fmt self, int d)
     return STR_LOWERCASE_XDIGITS[d % fmt_base(self)];
 }
 
+static char fmt_prefix(struct fmt self)
+{
+    switch (self.type)
+    {
+    case FMT_BINARY:
+        return 'b';
+    case FMT_OCTAL:
+        return 'o';
+    default:
+    case FMT_DECIMAL:
+        return '0';
+    case FMT_POINTER:
+    case FMT_HEXADECIMAL:
+        return 'x';
+    }
+}
+
 static void fmt_parse_type(struct fmt *fmt, struct scan *scan)
 {
 
@@ -87,6 +104,10 @@ struct fmt fmt_parse(struct scan *scan)
         if (scan_curr(scan) == '#')
         {
             scan_next(scan);
+            fmt.prefix = true;
+        }
+        else if (scan_curr(scan) >= '0' && scan_curr(scan) <= '9')
+        {
             fmt_parse_min_width(&fmt, scan);
         }
         else
@@ -154,6 +175,12 @@ write_result_t fmt_unsigned(struct fmt self, struct writer *writer, unsigned lon
 
             i++;
         }
+    }
+
+    if (self.prefix)
+    {
+        buffer[i++] = fmt_prefix(self);
+        buffer[i++] = '0';
     }
 
     str_rvs(make_str(buffer));
