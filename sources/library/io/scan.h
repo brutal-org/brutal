@@ -20,4 +20,6 @@ char scan_curr(struct scan *self);
 
 char scan_next(struct scan *self);
 
+long scan_next_decimal(struct scan *self); // not binary nor hex
+
 bool scan_skip(struct scan *self, char c);

@@ -41,6 +41,44 @@ char scan_next(struct scan *self)
     return c;
 }
 
+long scan_next_decimal(struct scan *self)
+{
+    long result = 0;
+    bool is_negative = false;
+    char sign = scan_peek(self, 0);
+
+    if (sign == '-')
+    {
+        is_negative = true;
+        scan_next(self);
+    }
+
+    while (!scan_end(self))
+    {
+        char v = scan_peek(self, 0);
+        if (v >= '0' && v <= '9')
+        {
+            result *= 10;
+            result += v - '0';
+        }
+        else
+        {
+            if (is_negative)
+            {
+                result *= -1;
+            }
+            return result;
+        }
+        scan_next(self);
+    }
+
+    if (is_negative)
+    {
+        result *= -1;
+    }
+    return result;
+}
+
 bool scan_skip(struct scan *self, char c)
 {
     if (scan_curr(self) == c)
