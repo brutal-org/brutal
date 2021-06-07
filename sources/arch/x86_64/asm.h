@@ -55,3 +55,21 @@ static inline void out32(uint16_t port, uint32_t data)
                  :
                  : "a"(data), "d"(port));
 }
+
+static inline uint64_t CR2(void)
+{
+    uint64_t value = 0;
+
+    asm volatile("mov %%cr2, %0"
+                 : "=r"(value));
+    return value;
+}
+
+static inline uint64_t CR3(void)
+{
+    uint64_t value = 0;
+
+    asm volatile("mov %%cr3, %0"
+                 : "=r"(value));
+    return value;
+}
