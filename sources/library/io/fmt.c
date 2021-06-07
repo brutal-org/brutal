@@ -24,6 +24,55 @@ static char fmt_digit(struct fmt self, int d)
     return STR_LOWERCASE_XDIGITS[d % fmt_base(self)];
 }
 
+static void fmt_parse_type(struct fmt *fmt, struct scan *scan)
+{
+
+    switch (scan_curr(scan))
+    {
+    case 's':
+        fmt->type = FMT_STRING;
+        break;
+
+    case 'c':
+        fmt->type = FMT_CHAR;
+        break;
+
+    case 'b':
+        fmt->type = FMT_BINARY;
+        break;
+
+    case 'o':
+        fmt->type = FMT_OCTAL;
+        break;
+
+    case 'd':
+        fmt->type = FMT_DECIMAL;
+        break;
+
+    case 'p':
+        fmt->type = FMT_POINTER;
+        break;
+    case 'x':
+        fmt->type = FMT_HEXADECIMAL;
+        break;
+    }
+}
+
+static void fmt_parse_min_width(struct fmt *fmt, struct scan *scan)
+{
+    if (scan_curr(scan) == '0')
+    {
+        fmt->fill_with_zero = true;
+        scan_next(scan);
+    }
+    else
+    {
+        fmt->fill_with_zero = false;
+    }
+
+    fmt->min_width = scan_next_decimal(scan);
+}
+
 struct fmt fmt_parse(struct scan *scan)
 {
     UNUSED(scan);
@@ -32,56 +81,17 @@ struct fmt fmt_parse(struct scan *scan)
 
     scan_skip(scan, '{');
 
-    switch (scan_curr(scan))
-    {
-    case 's':
-        fmt.type = FMT_STRING;
-        break;
-
-    case 'c':
-        fmt.type = FMT_CHAR;
-        break;
-
-    case 'b':
-        fmt.type = FMT_BINARY;
-        break;
-
-    case 'o':
-        fmt.type = FMT_OCTAL;
-        break;
-
-    case 'd':
-        fmt.type = FMT_DECIMAL;
-        break;
-
-    case 'p':
-        fmt.type = FMT_POINTER;
-        break;
-    case 'x':
-        fmt.type = FMT_HEXADECIMAL;
-        break;
-    }
     while (scan_curr(scan) != '}' &&
            !scan_end(scan))
     {
         if (scan_curr(scan) == '#')
         {
             scan_next(scan);
-
-            if (scan_curr(scan) == '0')
-            {
-                fmt.fill_with_zero = true;
-                scan_next(scan);
-            }
-            else
-            {
-                fmt.fill_with_zero = false;
-            }
-
-            fmt.min_width = scan_next_decimal(scan);
+            fmt_parse_min_width(&fmt, scan);
         }
         else
         {
+            fmt_parse_type(&fmt, scan);
             scan_next(scan);
         }
     }
@@ -130,6 +140,7 @@ write_result_t fmt_unsigned(struct fmt self, struct writer *writer, unsigned lon
 
     if (self.min_width != 0)
     {
+
         while (i < self.min_width)
         {
             if (self.fill_with_zero)
