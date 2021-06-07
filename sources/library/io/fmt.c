@@ -64,11 +64,26 @@ struct fmt fmt_parse(struct scan *scan)
     while (scan_curr(scan) != '}' &&
            !scan_end(scan))
     {
-        if (scan_curr(scan) == 'a')
+        if (scan_curr(scan) == '#')
         {
-            fmt.aligned = true;
+            scan_next(scan);
+
+            if (scan_curr(scan) == '0')
+            {
+                fmt.fill_with_zero = true;
+                scan_next(scan);
+            }
+            else
+            {
+                fmt.fill_with_zero = false;
+            }
+
+            fmt.min_width = scan_next_decimal(scan);
         }
-        scan_next(scan);
+        else
+        {
+            scan_next(scan);
+        }
     }
 
     scan_skip(scan, '}');
@@ -113,21 +128,19 @@ write_result_t fmt_unsigned(struct fmt self, struct writer *writer, unsigned lon
         i++;
     }
 
-    if (self.aligned)
+    if (self.min_width != 0)
     {
-        size_t offset = 0;
-        if (fmt_base(self) == 16)
+        while (i < self.min_width)
         {
-            offset = 16;
-        }
-        else
-        {
-            offset = 20;
-        }
+            if (self.fill_with_zero)
+            {
+                buffer[i] = '0';
+            }
+            else
+            {
+                buffer[i] = ' ';
+            }
 
-        while (i < offset)
-        {
-            buffer[i] = '0';
             i++;
         }
     }
