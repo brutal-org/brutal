@@ -8,6 +8,7 @@
 #include "arch/x86_64/com.h"
 #include "arch/x86_64/gdt.h"
 #include "arch/x86_64/idt.h"
+#include "arch/x86_64/smid.h"
 #include "arch/x86_64/stivale2.h"
 #include "kernel/kernel.h"
 
@@ -18,6 +19,7 @@ void arch_entry(struct handover *handover)
     com_initialize(COM1);
     gdt_initialize();
     idt_initialize();
+    simd_initialize();
     pmm_initialize(handover);
     vmm_initialize(handover);
     apic_initalize(handover);

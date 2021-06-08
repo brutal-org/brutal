@@ -47,7 +47,7 @@ void dump_register(struct interrupt_stackframe const *stackframe)
     log("r14: {#016p} | r15: {#016p}", stackframe->r14, stackframe->r15);
     log("rip: {#016p} | rsp: {#016p} | rbp: {#016p}", stackframe->rip, stackframe->rsp, stackframe->rbp);
     log("cs : {#016p} | ss : {#016p} | rflags: {#016p}", stackframe->cs, stackframe->ss, stackframe->rflags);
-    log("cr2: {#016p} | cr3: {#016p} ", CR2(), CR3());
+    log("cr2: {#016p} | cr3: {#016p} ", asm_read_cr2(), asm_read_cr3());
 }
 
 void *interrupt_handler(struct interrupt_stackframe *stackframe)
@@ -60,8 +60,8 @@ void *interrupt_handler(struct interrupt_stackframe *stackframe)
 
         while (true)
         {
-            cli();
-            hlt();
+            asm_cli();
+            asm_hlt();
         }
     }
 

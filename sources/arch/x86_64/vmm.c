@@ -1,6 +1,7 @@
 #include <library/log.h>
 
 #include "arch/vmm.h"
+#include "arch/x86_64/asm.h"
 #include "arch/x86_64/mmap.h"
 #include "arch/x86_64/paging.h"
 
@@ -128,7 +129,7 @@ vmm_space_t vmm_space_create(void)
 
 void vmm_space_switch(vmm_space_t space)
 {
-    asm volatile("mov %0, %%cr3" ::"a"(mmap_io_to_phys((uintptr_t)space)));
+    asm_write_cr3(mmap_io_to_phys((uintptr_t)space));
 }
 
 vmm_result_t vmm_map(vmm_space_t space, vmm_range_t virtual_range, pmm_range_t physical_range, br_mem_flags_t flags)

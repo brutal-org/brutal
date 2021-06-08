@@ -105,7 +105,7 @@ void stivale2_entry(struct stivale2_struct *info)
 
     for (;;)
     {
-        cli();
-        hlt();
+        asm_cli();
+        asm_hlt();
     }
 }

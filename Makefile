@@ -84,6 +84,8 @@ run: $(SYSROOT_ISO)
 		-M q35 \
 		-m 2G \
 		-smp 8 \
+		-enable-kvm \
+		-cpu host \
 		-serial mon:stdio \
 		-display sdl \
 		-cdrom $(SYSROOT_ISO)

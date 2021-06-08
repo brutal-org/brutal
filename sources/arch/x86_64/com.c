@@ -4,12 +4,12 @@
 
 void com_write_reg(enum com_port port, enum com_register reg, uint8_t value)
 {
-    out8(port + reg, value);
+    asm_out8(port + reg, value);
 }
 
 uint8_t com_read_reg(enum com_port port, enum com_register reg)
 {
-    return in8(port + reg);
+    return asm_in8(port + reg);
 }
 
 bool com_can_read(enum com_port port)
