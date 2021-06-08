@@ -129,5 +129,5 @@ cpu_id_t apic_current_cpu(void)
 void apic_enable(void)
 {
     pic_disable();
-    wrmsr(MSR_APIC, (rdmsr(MSR_APIC) | LAPIC_ENABLE) & ~(1 << 10));
+    wrmsr(MSR_APIC, (rdmsr(MSR_APIC) | LAPIC_ENABLE));
 }

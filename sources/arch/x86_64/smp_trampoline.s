@@ -2,6 +2,10 @@
 [bits 16]
 
 TRAMPOLINE_BASE equ 0x1000
+SMP_INIT_PAGE_TABLE equ 0x500
+SMP_INIT_STACK equ 0x570
+SMP_INIT_GDT equ 0x580
+SMP_INIT_IDT equ 0x590
 
 ; --- 16 BIT ---
 extern smp_started_cpu_entry
@@ -19,7 +23,7 @@ trampoline_start:
     o32 lgdt [pm_gdtr - trampoline_start + TRAMPOLINE_BASE]
 
     mov eax, cr0
-    or al, 0x1
+    or al, 0x1      ; enable protected mode
     mov cr0, eax
 
     jmp 0x8:(trampoline32 - trampoline_start + TRAMPOLINE_BASE)
@@ -29,7 +33,9 @@ trampoline_start:
 
 
 section .text
+
 ; ---- 32 BITS ----
+
 trampoline32:
 
     mov bx, 0x10
@@ -38,7 +44,7 @@ trampoline32:
     mov ss, bx
 
 
-    mov eax, dword [0x500]
+    mov eax, dword [SMP_INIT_PAGE_TABLE]
 
     mov cr3, eax
 
@@ -49,15 +55,15 @@ trampoline32:
     mov cr4, eax
 
 
-    mov ecx, 0xc0000080
+    mov ecx, 0xc0000080 ; efet register 
     rdmsr
 
-    or eax,1 << 8  ; LME
+    or eax,1 << 8  ; long mode enable
     wrmsr
 
 
     mov eax, cr0
-    or eax, 1 << 31
+    or eax, 1 << 31 ; paging 
     mov cr0, eax
 
 
@@ -67,7 +73,9 @@ trampoline32:
 
 
 [bits 64]
+
 ; ---- 64 BITS ----
+
 trampoline64:
     mov ax, 0x10
     mov ds, ax
@@ -78,11 +86,10 @@ trampoline64:
     mov gs, ax
 
 
+    lgdt [SMP_INIT_GDT]
+    lidt [SMP_INIT_IDT]
 
-    lgdt [0x580]
-    lidt [0x590]
-
-    mov rsp, [0x570]
+    mov rsp, [SMP_INIT_STACK]
 
     mov rbp, 0x0 ; terminate stack traces here
     ; reset RFLAGS
@@ -91,7 +98,7 @@ trampoline64:
 
 
     mov rax, qword vcode64
-    jmp vcode64
+    jmp rax
 
 
 ; virtual memory
@@ -100,18 +107,19 @@ vcode64:
     ; set up sse as higher half use it
     mov rax, cr0
 
-    btr eax, 2
+
+    btr eax, 2 ; enable co processor + emulation
     bts eax, 1
     mov cr0, rax
 
-    mov rax, cr4
-    bts eax, 9
-    bts eax, 10
-    mov cr4, rax
-    mov rax, qword trampoline_ext
-    call rax
+    call smp_started_cpu_entry
+
+
+; ------ DATA ------
+
 
 ; ---- Protected MODE ----
+
 align 16
   pm_gdtr:
     dw pm_gdt_end - pm_gdt_start - 1
@@ -126,6 +134,15 @@ align 16
     ; ds selector
     dq 0x00CF92000000FFFF
   pm_gdt_end:
+
+
+; IDT
+align 16
+  pm_idtr:
+    dw 0
+    dd 0
+    dd 0
+    align 16
 
 ; ---- LONG MODE ----
 
@@ -144,19 +161,5 @@ align 16
     dq 0x00CF92000000FFFF
   lm_gdt_end:
 
-
-; IDT
-align 16
-  pm_idtr:
-    dw 0
-    dd 0
-    dd 0
-    align 16
-
 global trampoline_end
 trampoline_end:
-
-trampoline_ext:
-    call smp_started_cpu_entry
-
-
