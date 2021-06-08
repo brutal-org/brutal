@@ -2,6 +2,7 @@
 
 #include <library/alloc.h>
 #include <library/base/macros.h>
+#include <library/mem.h>
 
 struct vec_impl
 {
@@ -41,7 +42,7 @@ void vec_swap_impl(struct vec_impl *impl, int idx1, int idx2);
         int capacity;        \
     }
 
-#define vec_init(v, alloc) STMT(memset((v), 0, sizeof(*(v))); (v)->alloc = (alloc))
+#define vec_init(v, alloc_) STMT(mem_set((v), 0, sizeof(*(v))); (v)->alloc = (alloc_);)
 
 #define vec_deinit(v) (free((v)->data), vec_init(v))
 
@@ -90,15 +91,16 @@ void vec_swap_impl(struct vec_impl *impl, int idx1, int idx2);
 
 #define vec_extend(v, v2) vec_pusharr((v), (v2)->data, (v2)->length)
 
-#define vec_find(v, val, idx)                           \
-    STMT(                                               \
-        for ((idx) = 0; (idx) < (v)->length; (idx)++) { \
-            if ((v)->data[(idx)] == (val))              \
-                break;                                  \
-        }                                               \
-                                                        \
-        if ((idx) == (v)->length) {                     \
-            (idx) = -1;                                 \
+#define vec_find(v, val, idx)                         \
+    STMT(                                             \
+        for ((idx) = 0; (idx) < (v)->length; (idx)++) \
+        {                                             \
+            if ((v)->data[(idx)] == (val))            \
+                break;                                \
+        }                                             \
+                                                      \
+        if ((idx) == (v)->length) {                   \
+            (idx) = -1;                               \
         })
 
 #define vec_remove(v, val)           \
