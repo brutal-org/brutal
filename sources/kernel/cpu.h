@@ -11,3 +11,7 @@ struct cpu
 };
 
 void cpu_found(int id);
+
+void cpu_start(int id); // function called by the cpu
+
+size_t cpu_count(void);

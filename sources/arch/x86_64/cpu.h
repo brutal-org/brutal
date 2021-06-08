@@ -2,7 +2,6 @@
 
 #include <library/base/std.h>
 
-
 #define MAX_CPU_COUNT 255
 
 struct cpu_context
