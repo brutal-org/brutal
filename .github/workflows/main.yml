@@ -35,13 +35,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/toolchain/build-it.sh') }}
 
-
-      # Runs a single command using the runners shell
       - name: build toolchain
         run: |
           toolchain/build-it.sh
 
-      - name: unit-test
+      - name: unit test
         run: |
           make run-test
 
