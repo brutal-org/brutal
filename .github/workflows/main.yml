@@ -1,0 +1,55 @@
+name: check
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: install dependencies
+        run: |
+          sudo apt update
+          git submodule update --init --recursive
+
+          sudo apt install -y make build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo nasm
+          sudo apt install -y mtools wget unzip fuse libfuse-dev
+          sudo apt install -y uuid-dev
+          sudo apt install -y gcc binutils parted
+          
+      - name: cache-toolchain
+        uses: actions/cache@v2
+        env:
+          cache-name: cached-cross-compiler
+        with: 
+          path: |
+            **/toolchain/
+          key: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/toolchain/build-it.sh') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/toolchain/build-it.sh') }}
+
+
+      # Runs a single command using the runners shell
+      - name: build toolchain
+        run: |
+          toolchain/build-it.sh
+
+      - name: unit-test
+        run: |
+          make run-test
+
+      - name: kernel build
+        run: |
+          make all
+          
+      - uses: actions/upload-artifact@v2
+        with:
+          name: "iso"
+          path: "/build/cross/sysroot.iso"
