@@ -9,7 +9,6 @@
 
 static struct bitmap pmm_bitmap = {};
 static size_t best_bet = 0;
-static size_t available_memory = 0;
 static size_t used_memory = 0;
 
 static uintptr_t memory_map_get_highest_address(const struct handover_mmap *memory_map)
@@ -53,6 +52,8 @@ static void pmm_load_memory_map(const struct handover_mmap *memory_map)
 {
     log("Memory map:");
 
+    size_t available_memory = 0;
+
     for (size_t i = 0; i < memory_map->size; i++)
     {
         size_t base = ALIGN_UP(memory_map->entries[i].base, HOST_MEM_PAGESIZE);
@@ -67,8 +68,10 @@ static void pmm_load_memory_map(const struct handover_mmap *memory_map)
 
         pmm_unused((pmm_range_t){base, size});
 
-        available_memory += size / HOST_MEM_PAGESIZE;
+        available_memory += size;
     }
+
+    log("Available Memory: {}kib", available_memory / 1024);
 }
 
 void pmm_initialize(struct handover const *handover)
@@ -142,7 +145,7 @@ pmm_result_t pmm_unused(pmm_range_t range)
     size_t page_size = range.size / HOST_MEM_PAGESIZE;
     auto page_range = (bitmap_range_t){page_base, page_size};
 
-    bitmap_set_range(&pmm_bitmap, page_range, PMM_FREE);
+    bitmap_set_range(&pmm_bitmap, page_range, PMM_UNUSED);
 
     best_bet = (page_range.base);
 

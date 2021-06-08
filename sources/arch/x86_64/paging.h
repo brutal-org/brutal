@@ -4,7 +4,7 @@
 #include <library/base/std.h>
 #include <library/mem.h>
 
-struct PACKED pml
+struct PACKED pml_entry
 {
     union
     {
@@ -27,10 +27,15 @@ struct PACKED pml
     };
 };
 
-// by default create a present page
-static inline struct pml page(uintptr_t physical, size_t flags)
+struct PACKED pml
 {
-    return (struct pml){
+    struct pml_entry entries[512];
+};
+
+// by default create a present page
+static inline struct pml_entry pml_make_entry(uintptr_t physical, size_t flags)
+{
+    return (struct pml_entry){
         .physical = physical >> 12,
         .user = (flags & BR_MEM_USER) != 0,
         .read_write = (flags & BR_MEM_WRITABLE) != 0,
@@ -41,10 +46,16 @@ static inline struct pml page(uintptr_t physical, size_t flags)
         .dirty = false,
         .huge_page = false,
         .global_page = false,
-        ._available = 0};
+        ._available = 0,
+    };
 }
 
-static_assert(sizeof(struct pml) == sizeof(uint64_t), "pml must be 64 bit");
+static inline struct pml_entry pml_clean_entry(void)
+{
+    return (struct pml_entry){};
+}
+
+static_assert(sizeof(struct pml_entry) == sizeof(uint64_t), "pml must be 64 bit");
 
 #define PML4_GET_INDEX(addr) (((uint64_t)addr & ((uint64_t)0x1ff << 39)) >> 39)
 #define PML3_GET_INDEX(addr) (((uint64_t)addr & ((uint64_t)0x1ff << 30)) >> 30)

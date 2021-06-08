@@ -6,7 +6,7 @@
 #include "syscalls/error.h"
 
 #define PMM_USED (true)
-#define PMM_FREE (false)
+#define PMM_UNUSED (false)
 
 typedef range_t(size_t) pmm_range_t;
 
