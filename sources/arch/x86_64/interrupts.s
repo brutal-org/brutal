@@ -76,7 +76,6 @@ __interrupt_common:
     pop_all
     add rsp, 16 ; pop error code and interrupt number
 
-    sti
     iretq
 
 INTERRUPT_NOERR 0

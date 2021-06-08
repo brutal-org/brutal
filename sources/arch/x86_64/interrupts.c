@@ -2,6 +2,7 @@
 
 #include "arch/x86_64/asm.h"
 #include "arch/x86_64/interrupts.h"
+#include "arch/x86_64/pic.h"
 
 static char *_exception_messages[32] = {
     "division-by-zero",
@@ -64,6 +65,8 @@ void *interrupt_handler(struct interrupt_stackframe *stackframe)
             asm_hlt();
         }
     }
+
+    pic_eoi(stackframe->int_no);
 
     return stackframe;
 }
