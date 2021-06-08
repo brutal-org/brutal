@@ -123,7 +123,7 @@ void apic_start_processor(cpu_id_t cpu_id, uintptr_t entry)
 
 cpu_id_t apic_current_cpu(void)
 {
-    return lapic_read(LAPIC_CPU_ID);
+    return lapic_read(LAPIC_CPU_ID) >> 24;
 }
 
 void apic_enable(void)
