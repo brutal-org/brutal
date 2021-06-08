@@ -20,6 +20,8 @@ void vmm_space_destroy(vmm_space_t space);
 
 void vmm_space_switch(vmm_space_t space);
 
+vmm_space_t vmm_kernel_space(void);
+
 vmm_result_t vmm_alloc(
     vmm_space_t space,
     pmm_range_t range,
@@ -32,3 +34,5 @@ vmm_result_t vmm_map(
     br_mem_flags_t flags);
 
 vmm_result_t vmm_unmap(vmm_space_t space, vmm_range_t virtual_range);
+
+pmm_result_t vmm_virt2phys(vmm_space_t space, vmm_range_t virtual_range);

@@ -7,6 +7,25 @@
 
 static struct pml *kernel_pml = NULL;
 
+static vmm_result_t vmm_get_pml(struct pml *table, size_t idx)
+{
+    auto entry = table->entries[idx];
+
+    if (entry.present)
+    {
+        vmm_range_t range = {
+            mmap_phys_to_io(entry.physical << 12),
+            HOST_MEM_PAGESIZE,
+        };
+
+        return OK(vmm_result_t, range);
+    }
+    else
+    {
+        return ERR(vmm_result_t, BR_ERR_BAD_ADDRESS);
+    }
+}
+
 static vmm_result_t vmm_get_pml_or_alloc(struct pml *table, size_t idx, size_t flags)
 {
     auto entry = table->entries[idx];
@@ -150,4 +169,23 @@ vmm_result_t vmm_map(vmm_space_t space, vmm_range_t virtual_range, pmm_range_t p
     }
 
     return OK(vmm_result_t, virtual_range);
+}
+
+pmm_result_t vmm_virt2phys(vmm_space_t space, vmm_range_t virtual_range)
+{
+    struct pml *pml4 = space;
+
+    auto pml3_range = TRY(pmm_result_t, vmm_get_pml(pml4, PML4_GET_INDEX(virtual_range.base)));
+    struct pml *pml3 = (struct pml *)(pml3_range.base);
+
+    auto pml2_range = TRY(pmm_result_t, vmm_get_pml(pml3, PML3_GET_INDEX(virtual_range.base)));
+    struct pml *pml2 = (struct pml *)(pml2_range.base);
+
+    auto pml1_range = TRY(pmm_result_t, vmm_get_pml(pml2, PML2_GET_INDEX(virtual_range.base)));
+    struct pml *pml1 = (struct pml *)(pml1_range.base);
+
+    auto entry = pml1->entries[PML1_GET_INDEX(virtual_range.base)];
+    pmm_range_t range = {entry.physical << 12, 4096};
+
+    return OK(pmm_result_t, range);
 }
