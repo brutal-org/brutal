@@ -2,18 +2,21 @@
 #include <stddef.h>
 
 #include "arch/x86_64/apic.h"
+#include "arch/cpu.h"
+#include "kernel/cpu.h"
 
 #define MAX_CPU_COUNT 255
 
-struct local_cpu
+struct x86_64_cpu
 {
     void *syscall_stack_save;
     void *syscall_stack;
 
     size_t lapic_id;
-    size_t cpu_id;
+
+    struct cpu cpu;
+    
 };
 
-struct local_cpu *get_current_cpu_structure();
-
-struct local_cpu *get_cpu_structure(uint8_t cpu_id);
+struct x86_64_cpu *x86_64_cpu_this();
+struct x86_64_cpu *x86_64_cpu(cpuid_t id);

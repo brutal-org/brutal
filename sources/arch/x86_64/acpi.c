@@ -40,6 +40,7 @@ struct acpi_madt_record *acpi_madt_record(
 
     return nullptr;
 }
+
 struct acpi_madt_record_table acpi_madt_multiple_record(struct acpi_madt *madt, enum acpi_madt_record_type type)
 {
     struct acpi_madt_record_table result = {};
@@ -58,6 +59,7 @@ struct acpi_madt_record_table acpi_madt_multiple_record(struct acpi_madt *madt, 
 
     return result;
 }
+
 struct acpi_madt *acpi_find_madt(uintptr_t rsdp_address)
 {
     auto rsdp = mmap_io_ptr_from_phys(struct acpi_rsdp *, rsdp_address);
@@ -80,6 +82,7 @@ uint32_t acpi_find_ioapic(uintptr_t rsdp_address)
 
     return ioapic->address;
 }
+
 struct lapic_record_table acpi_find_lapic_table(uintptr_t rsdp_address)
 {
     auto madt = acpi_find_madt(rsdp_address);
@@ -89,6 +92,7 @@ struct lapic_record_table acpi_find_lapic_table(uintptr_t rsdp_address)
             .count = table.count,
 
         };
+
     for (size_t i = 0; i < table.count; i++)
     {
         final.table[i] = (struct acpi_madt_lapic_record *)table.table[i];
@@ -104,6 +108,7 @@ struct ioapic_record_table acpi_find_ioapic_table(uintptr_t rsdp_address)
         {
             .count = table.count,
         };
+
     for (size_t i = 0; i < table.count; i++)
     {
         final.table[i] = (struct acpi_madt_ioapic_record *)table.table[i];

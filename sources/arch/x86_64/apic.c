@@ -3,6 +3,7 @@
 
 #include "arch/x86_64/acpi.h"
 #include "arch/x86_64/apic.h"
+#include "arch/x86_64/cpu.h"
 #include "arch/x86_64/mmap.h"
 #include "arch/x86_64/msr.h"
 #include "arch/x86_64/pic.h"
@@ -44,8 +45,8 @@ void apic_initialize_cpu_structure()
 
         cpu_count++;
 
-        get_cpu_structure(i)->lapic_id = lapic_table.table[i]->apic_id;
-        get_cpu_structure(i)->cpu_id = i;
+        x86_64_cpu(i)->lapic_id = lapic_table.table[i]->apic_id;
+        x86_64_cpu(i)->cpu.id = i;
     }
 }
 
@@ -87,19 +88,19 @@ void apic_eoi(void)
     lapic_write(LAPIC_REG_EOI, 0);
 }
 
-void apic_send_interrupt(uint8_t cpu_id, uint32_t interrupt_id)
+void apic_send_ipit(cpuid_t cpu_id, uint32_t interrupt_id)
 {
     lapic_write(LAPIC_REG_ICR1, (uint64_t)cpu_id << LAPIC_ICR_CPUID_OFFSET);
     lapic_write(LAPIC_REG_ICR0, interrupt_id | LAPIC_ICR_CLEAR_INIT_LEVEL);
 }
 
-void apic_init_processor(uint32_t cpu_id)
+void apic_init_processor(cpuid_t cpu_id)
 {
     lapic_write(LAPIC_REG_ICR1, (uint64_t)cpu_id << LAPIC_ICR_CPUID_OFFSET);
     lapic_write(LAPIC_REG_ICR0, LAPIC_ICR_DEST_INIT);
 }
 
-void apic_start_processor(uint32_t cpu_id, uintptr_t entry)
+void apic_start_processor(cpuid_t cpu_id, uintptr_t entry)
 {
     lapic_write(LAPIC_REG_ICR1, (uint64_t)cpu_id << LAPIC_ICR_CPUID_OFFSET);
     lapic_write(LAPIC_REG_ICR0, LAPIC_ICR_DEST_SEND_IPI | (entry / 4096));
