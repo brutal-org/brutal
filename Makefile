@@ -77,7 +77,7 @@ include sources/library/.build.mk
 include sources/sysroot/.build.mk
 include sources/test/.build.mk
 
-all: $(TARGETS)
+all: $(TARGETS) $(SYSROOT_ISO)
 
 run: $(SYSROOT_ISO)
 	qemu-system-x86_64 \
