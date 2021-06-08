@@ -16,6 +16,6 @@ void pmm_initialize(struct handover const *handover);
 
 pmm_result_t pmm_alloc(size_t size);
 
-pmm_result_t pmm_map(pmm_range_t range);
+pmm_result_t pmm_used(pmm_range_t range);
 
-pmm_result_t pmm_free(pmm_range_t range);
+pmm_result_t pmm_unused(pmm_range_t range);

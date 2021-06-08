@@ -5,56 +5,44 @@
 #include "arch/x86_64/mmap.h"
 #include "arch/x86_64/paging.h"
 
-typedef result_t(br_error_t, uintptr_t) page_or_alloc_result_t;
-
 static struct pml *kernel_memory_map = NULL;
 
-static page_or_alloc_result_t vmm_get_pml_or_alloc(struct pml *table, size_t idx, size_t flags)
+static vmm_result_t vmm_get_pml_or_alloc(struct pml *table, size_t idx, size_t flags)
 {
     if (table[idx].present)
     {
-        return OK(page_or_alloc_result_t, mmap_phys_to_io(table[idx].physical << 12));
+        vmm_range_t range = {mmap_phys_to_io(table[idx].physical << 12),
+                             HOST_MEM_PAGESIZE};
+
+        return OK(vmm_result_t, range);
     }
     else
     {
-        uintptr_t target = (uintptr_t)(pmm_alloc(HOST_MEM_PAGESIZE)).ok.base;
+        uintptr_t target = TRY(vmm_result_t, pmm_alloc(HOST_MEM_PAGESIZE)).base;
 
         mem_set((void *)mmap_phys_to_io(target), 0, HOST_MEM_PAGESIZE);
         table[idx] = page(target, flags);
 
-        return OK(page_or_alloc_result_t, mmap_phys_to_io(target));
+        vmm_range_t range = {mmap_phys_to_io(target), HOST_MEM_PAGESIZE};
+        return OK(vmm_result_t, range);
     }
-
-    return ERR(page_or_alloc_result_t, 0);
 }
 
-static size_t vmm_map_page(vmm_space_t space, uintptr_t virtual_page, uintptr_t physical_page, br_mem_flags_t flags)
+static vmm_result_t vmm_map_page(struct pml *pml4, uintptr_t virtual_page, uintptr_t physical_page, br_mem_flags_t flags)
 {
+    auto pml3_range = TRY(vmm_result_t, vmm_get_pml_or_alloc(pml4, PML4_GET_INDEX(virtual_page), flags | BR_MEM_WRITABLE | BR_MEM_USER));
+    struct pml *pml3 = (struct pml *)(pml3_range.base);
 
-    struct pml *pml3 = (struct pml *)(vmm_get_pml_or_alloc((struct pml *)space, PML4_GET_INDEX(virtual_page), flags | BR_MEM_WRITABLE | BR_MEM_USER).ok);
+    auto pml2_range = TRY(vmm_result_t, vmm_get_pml_or_alloc(pml3, PML3_GET_INDEX(virtual_page), flags | BR_MEM_WRITABLE | BR_MEM_USER));
+    struct pml *pml2 = (struct pml *)(pml2_range.base);
 
-    if (pml3 == NULL)
-    {
-        panic("vmm_get_pml_or_alloc return 0 (for pml3) ");
-    }
+    auto pml1_range = TRY(vmm_result_t, vmm_get_pml_or_alloc(pml2, PML2_GET_INDEX(virtual_page), flags | BR_MEM_WRITABLE | BR_MEM_USER));
+    struct pml *pml1 = (struct pml *)(pml1_range.base);
 
-    struct pml *pml2 = (struct pml *)(vmm_get_pml_or_alloc(pml3, PMLN_GET_INDEX(virtual_page), flags | BR_MEM_WRITABLE | BR_MEM_USER).ok);
+    pml1[PML1_GET_INDEX(virtual_page)] = page(physical_page, flags);
 
-    if (pml2 == NULL)
-    {
-        panic("vmm_get_pml_or_alloc return 0 (for pml2) ");
-    }
-
-    struct pml *pml1 = (struct pml *)(vmm_get_pml_or_alloc(pml2, PAGE_DIR_GET_INDEX(virtual_page), flags | BR_MEM_WRITABLE | BR_MEM_USER).ok);
-
-    if (pml1 == NULL)
-    {
-        panic("vmm_get_pml_or_alloc return 0 (for pml1) ");
-    }
-
-    pml1[PAGE_TABLE_GET_INDEX(virtual_page)] = page(physical_page, flags);
-
-    return 0;
+    vmm_range_t range = {virtual_page, HOST_MEM_PAGESIZE};
+    return OK(vmm_result_t, range);
 }
 
 // later we may use an other initializer that fork the higher kernel vmm entry

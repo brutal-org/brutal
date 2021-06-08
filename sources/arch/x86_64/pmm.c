@@ -65,7 +65,7 @@ static void pmm_load_memory_map(const struct handover_mmap *memory_map)
             continue;
         }
 
-        pmm_free((pmm_range_t){base, size});
+        pmm_unused((pmm_range_t){base, size});
 
         available_memory += size / HOST_MEM_PAGESIZE;
     }
@@ -79,7 +79,7 @@ void pmm_initialize(struct handover const *handover)
     // we set the first page used, as the page 0 is NULL
     bitmap_set(&pmm_bitmap, 0, PMM_USED);
     used_memory = 0;
-    pmm_map((pmm_range_t){(uintptr_t)pmm_bitmap.data, pmm_bitmap.size});
+    pmm_used((pmm_range_t){(uintptr_t)pmm_bitmap.data, pmm_bitmap.size});
 }
 
 pmm_result_t pmm_alloc(size_t size)
@@ -110,14 +110,14 @@ pmm_result_t pmm_alloc(size_t size)
     }
     else
     {
-        panic("pmm_alloc(): {} error out of memory", size);
+        log("pmm_alloc(): {} error out of memory", size);
         return ERR(pmm_result_t, BR_ERR_OUT_OF_MEMORY);
     }
 }
 
-pmm_result_t pmm_map(pmm_range_t range)
+pmm_result_t pmm_used(pmm_range_t range)
 {
-    log("pmm_map(): {x}-{x}...", range.base, range_end(range));
+    log("pmm_used(): {x}-{x}...", range.base, range_end(range));
 
     size_t page_base = range.base / HOST_MEM_PAGESIZE;
     size_t page_size = range.size / HOST_MEM_PAGESIZE;
@@ -128,10 +128,10 @@ pmm_result_t pmm_map(pmm_range_t range)
     return OK(pmm_result_t, range);
 }
 
-pmm_result_t pmm_free(pmm_range_t range)
+pmm_result_t pmm_unused(pmm_range_t range)
 {
     used_memory -= range.size;
-    log("pmm_free(): {x}-{x}...", range.base, range_end(range));
+    log("pmm_unused(): {x}-{x}...", range.base, range_end(range));
 
     if (range.base == 0)
     {

@@ -152,6 +152,13 @@ write_result_t fmt_unsigned(struct fmt self, struct writer *writer, unsigned lon
 
     char buffer[64] = {};
     size_t i = 0;
+
+    if (value == 0)
+    {
+        buffer[0] = '0';
+        i++;
+    }
+
     while (value != 0)
     {
         buffer[i] = fmt_digit(self, value % fmt_base(self));

@@ -31,6 +31,4 @@ vmm_result_t vmm_map(
     pmm_range_t physical_range,
     br_mem_flags_t flags);
 
-vmm_result_t vmm_free(vmm_space_t space, vmm_range_t virtual_range);
-
-vmm_result_t vmm_get_physical(vmm_space_t space, vmm_range_t virtual_range);
+vmm_result_t vmm_unmap(vmm_space_t space, vmm_range_t virtual_range);
