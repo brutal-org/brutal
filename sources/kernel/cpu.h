@@ -1,5 +1,6 @@
 #pragma once
-#include <stdint.h>
+
+#include <library/base/std.h>
 
 typedef uint8_t cpuid_t;
 

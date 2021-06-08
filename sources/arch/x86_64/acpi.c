@@ -75,14 +75,6 @@ uint32_t acpi_find_lapic(uintptr_t rsdp_address)
     return madt->local_apic;
 }
 
-uint32_t acpi_find_ioapic(uintptr_t rsdp_address)
-{
-    auto madt = acpi_find_madt(rsdp_address);
-    auto ioapic = (struct acpi_madt_ioapic_record *)acpi_madt_record(madt, ACPI_MADT_RECORD_IOAPIC);
-
-    return ioapic->address;
-}
-
 struct lapic_record_table acpi_find_lapic_table(uintptr_t rsdp_address)
 {
     auto madt = acpi_find_madt(rsdp_address);

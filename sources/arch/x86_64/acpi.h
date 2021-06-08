@@ -104,8 +104,6 @@ struct acpi_madt *acpi_find_madt(uintptr_t rsdp_address);
 
 uint32_t acpi_find_lapic(uintptr_t rsdp_address);
 
-uint32_t acpi_find_ioapic(uintptr_t rsdp_address);
-
 struct lapic_record_table acpi_find_lapic_table(uintptr_t rsdp_address);
 
 struct ioapic_record_table acpi_find_ioapic_table(uintptr_t rsdp_address);
