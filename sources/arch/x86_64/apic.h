@@ -2,7 +2,7 @@
 
 #include <library/base.h>
 
-#include "arch/x86_64/local_cpu.h"
+#include "kernel/cpu.h"
 #include "kernel/handover.h"
 
 #define LAPIC_ENABLE (0x800)
@@ -47,11 +47,11 @@ void lapic_enable_spurious(void);
 
 void apic_eoi(void);
 
-void apic_send_interrupt(uint8_t cpu_id, uint32_t interrupt_id);
+void apic_send_ipit(cpuid_t cpu_id, uint32_t interrupt_id);
 
-void apic_init_processor(uint32_t cpu_id);
+void apic_init_processor(cpuid_t cpu_id);
 
-void apic_start_processor(uint32_t cpu_id, uintptr_t entry);
+void apic_start_processor(cpuid_t cpu_id, uintptr_t entry);
 
 uint32_t apic_get_current_cpu_id(void);
 
