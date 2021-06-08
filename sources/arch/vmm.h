@@ -16,6 +16,8 @@ void vmm_initialize(struct handover const *handover);
 
 vmm_space_t vmm_space_create(void);
 
+vmm_space_t vmm_kernel_space(void);
+
 void vmm_space_destroy(vmm_space_t space);
 
 void vmm_space_switch(vmm_space_t space);
