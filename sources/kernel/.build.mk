@@ -5,6 +5,7 @@ KERNEL_LIB_SRC = \
 			  $(wildcard sources/library/io/*.c) \
 			  $(wildcard sources/library/mem/*.c) \
 			  $(wildcard sources/library/text/*.c) \
+			  $(wildcard sources/library/task/*.c) \
 			  $(wildcard sources/library/ds/*.c) \
 			  $(wildcard sources/library/log/*.c) \
 			  $(wildcard sources/host/kernel/*.c) \
