@@ -3,6 +3,8 @@
 #include <library/base/macros.h>
 #include <library/base/std.h>
 
+#define MAX_MADT_RECORD_COUNT (64)
+
 struct PACKED acpi_rsdp
 {
     char signature[8];
@@ -35,6 +37,9 @@ enum acpi_madt_record_type
 {
     ACPI_MADT_RECORD_LAPIC = 0,
     ACPI_MADT_RECORD_IOAPIC = 1,
+    ACPI_MADT_RECORD_MADT_ISO = 2,
+    ACPI_MADT_RECORD_NMI = 4,
+    ACPI_MADT_RECORD_LAPIC_OVERRIDE = 5
 };
 
 struct PACKED acpi_madt_record
@@ -72,12 +77,35 @@ struct PACKED acpi_madt
     struct acpi_madt_record records[];
 };
 
+struct acpi_madt_record_table
+{
+    size_t count;
+    struct acpi_madt_record *table[MAX_MADT_RECORD_COUNT];
+};
+struct lapic_record_table
+{
+    size_t count;
+    struct acpi_madt_lapic_record *table[MAX_MADT_RECORD_COUNT];
+};
+
+struct ioapic_record_table
+{
+    size_t count;
+    struct acpi_madt_ioapic_record *table[MAX_MADT_RECORD_COUNT];
+};
+
 struct acpi_sdth *acpi_rsdt_child(struct acpi_rsdt *rsdt, str_t signature);
 
 struct acpi_madt_record *acpi_madt_record(struct acpi_madt *madt, enum acpi_madt_record_type type);
+
+struct acpi_madt_record_table acpi_madt_multiple_record(struct acpi_madt *madt, enum acpi_madt_record_type type);
 
 struct acpi_madt *acpi_find_madt(uintptr_t rsdp_address);
 
 uint32_t acpi_find_lapic(uintptr_t rsdp_address);
 
 uint32_t acpi_find_ioapic(uintptr_t rsdp_address);
+
+struct lapic_record_table acpi_find_lapic_table(uintptr_t rsdp_address);
+
+struct ioapic_record_table acpi_find_ioapic_table(uintptr_t rsdp_address);
