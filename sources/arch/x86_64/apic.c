@@ -46,7 +46,7 @@ void apic_initialize_cpu_structure()
         cpu_count++;
 
         x86_64_cpu(i)->lapic_id = lapic_table.table[i]->apic_id;
-        x86_64_cpu(i)->cpu.id = i;
+        x86_64_cpu(i)->base.id = i;
     }
 }
 
