@@ -10,12 +10,3 @@ void cpu_found(int id)
     arch_cpu(id)->id = id;
     arch_cpu(id)->present = true;
 }
-
-void cpu_start(int id)
-{
-    log("loaded CPU {}!", id);
-
-    while (true)
-    {
-    }
-}

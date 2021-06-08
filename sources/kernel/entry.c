@@ -21,3 +21,13 @@ void kernel_entry(struct handover *handover)
 
     kernel_splash();
 }
+
+void cpu_entry(int id)
+{
+    log("loaded CPU {}!", id);
+
+    while (true)
+    {
+        asm("hlt");
+    }
+}

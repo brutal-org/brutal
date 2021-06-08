@@ -3,7 +3,7 @@
 
 #include "arch/arch.h"
 
-struct lock logger_lock;
+static struct lock logger_lock;
 
 void host_log_lock(void)
 {

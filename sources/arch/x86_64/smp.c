@@ -11,18 +11,20 @@
 #include "kernel/mmio.h"
 
 typedef result_t(br_error_t, uint8_t) smp_init_result;
-extern uint32_t trampoline_start, trampoline_end, nstack;
-bool cpu_started = false;
-void smp_started_cpu_start()
+
+extern uint32_t trampoline_start, trampoline_end;
+static bool cpu_started = false;
+
+void smp_started_cpu_entry()
 {
     apic_enable();
     cpu_context_this()->base.present = true;
 
     cpu_started = false;
-    cpu_start(cpu_context_this()->base.id);
+    cpu_entry(cpu_context_this()->base.id);
 }
 
-smp_init_result smp_initialize_cpu_trampoline()
+static smp_init_result smp_initialize_cpu_trampoline(void)
 {
     uint64_t trampoline_len = (uintptr_t)&trampoline_end - (uintptr_t)&trampoline_start;
 
@@ -42,13 +44,16 @@ smp_init_result smp_initialize_cpu_trampoline()
     return OK(smp_init_result, 0);
 }
 
-smp_init_result smp_initialize_cpu_future_value()
+static smp_init_result smp_initialize_cpu_data(void)
 {
+    // load future cpu page table
+    smp_initialize_cpu_trampoline();
+    // load future cpu page table
     mmio_write64(SMP_INIT_PAGE_TABLE, asm_read_cr3());
 
+    // load future cpu stack
     uint8_t *cpu_stack = (uint8_t *)mmap_phys_to_io(TRY(smp_init_result, pmm_alloc(SMP_CPU_STACK_SIZE)).base);
-
-    mmio_write64(SMP_INIT_STACK_ADDR, (uint64_t)(cpu_stack + SMP_CPU_STACK_SIZE));
+    mmio_write64(SMP_INIT_STACK, (uint64_t)(cpu_stack + SMP_CPU_STACK_SIZE));
 
     // gdt at 0x580
     // idt at 0x590
@@ -56,22 +61,20 @@ smp_init_result smp_initialize_cpu_future_value()
                  "sgdt 0x580\n"
                  "sidt 0x590\n");
 
-    mmio_write64(SMP_INIT_START_ADDR, (uintptr_t)&smp_started_cpu_start);
+    mmio_write64(SMP_INIT_ENTRY, (uintptr_t)&smp_started_cpu_entry);
     return OK(smp_init_result, 0);
 }
 
-void smp_initialize_cpu(cpu_id_t cpu, uint32_t lapic_id)
+static void smp_initialize_cpu(uint32_t lapic_id)
 {
-    UNUSED(cpu);
     apic_init_processor(lapic_id);
 
-    smp_initialize_cpu_trampoline();
-    smp_initialize_cpu_future_value();
+    smp_initialize_cpu_data();
 
     apic_start_processor(lapic_id, 4096);
 }
 
-void wait_for_cpu()
+static void wait_for_cpu(void)
 {
     while (cpu_started)
     {
@@ -91,7 +94,7 @@ void smp_initialize(void)
         log("smp_initialize(): loading cpu {}", cpu);
 
         cpu_started = true;
-        smp_initialize_cpu(cpu, cpu_context(cpu)->lapic);
+        smp_initialize_cpu(cpu_context(cpu)->lapic);
         wait_for_cpu();
     }
 }
