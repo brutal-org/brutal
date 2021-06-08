@@ -1,33 +1,40 @@
+#include "arch/cpu.h"
+
+#include "arch/x86_64/apic.h"
 #include "arch/x86_64/cpu.h"
+#include "kernel/cpu.h"
 
-static struct x86_64_cpu cpu_array[MAX_CPU_COUNT];
+static struct cpu_context cpu_context_array[MAX_CPU_COUNT];
 
-struct x86_64_cpu *x86_64_cpu_this(void)
+struct cpu_context *cpu_context_this(void)
 {
-    return &cpu_array[arch_cpu_current_id()];
+    return &cpu_context_array[arch_cpu_current_id()];
 }
 
-struct x86_64_cpu *x86_64_cpu(cpuid_t id)
+struct cpu_context *cpu_context(cpu_id_t id)
 {
-    return &cpu_array[id];
+    return &cpu_context_array[id];
 }
 
-size_t arch_cpu_count(void)
+void cpu_context_found(cpu_id_t id, int lapic)
 {
-    return apic_get_processor_count();
+    cpu_found(id);
+    cpu_context(id)->lapic = lapic;
 }
 
-cpuid_t arch_cpu_current_id(void)
+/* --- Public API ----------------------------------------------------------- */
+
+cpu_id_t arch_cpu_current_id(void)
 {
-    return apic_get_current_cpu_id();
+    return apic_current_cpu();
 }
 
 struct cpu *arch_cpu_this(void)
 {
-    return &x86_64_cpu_this()->base;
+    return &cpu_context_this()->base;
 }
 
-struct cpu *arch_cpu(cpuid_t id)
+struct cpu *arch_cpu(cpu_id_t id)
 {
-    return &x86_64_cpu(id)->base;
+    return &cpu_context(id)->base;
 }

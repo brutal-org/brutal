@@ -2,7 +2,7 @@
 
 #include "arch/x86_64/cpuid.h"
 
-cpuid_t cpuid(uint32_t leaf, uint32_t subleaf)
+cpuid_result_t cpuid(uint32_t leaf, uint32_t subleaf)
 {
 
     uint32_t cpuid_max;
@@ -14,10 +14,10 @@ cpuid_t cpuid(uint32_t leaf, uint32_t subleaf)
     if (leaf > cpuid_max)
     {
         log("CPUID failled leaf:{} subleaf:{}", leaf, subleaf);
-        return (cpuid_t){.success = false};
+        return (cpuid_result_t){.success = false};
     }
 
-    cpuid_t result;
+    cpuid_result_t result;
     result.success = true;
 
     asm volatile("cpuid"

@@ -31,7 +31,7 @@ enum ioapic_reg
     IOAPIC_REG_VERSION = 0x1,
 };
 
-struct PACKED ioapic_version_reg
+struct PACKED ioapic_version
 {
     uint8_t version;
     uint8_t reserved;
@@ -47,14 +47,12 @@ void lapic_enable_spurious(void);
 
 void apic_eoi(void);
 
-void apic_send_ipit(cpuid_t cpu_id, uint32_t interrupt_id);
+void apic_send_ipit(cpu_id_t cpu_id, uint32_t interrupt_id);
 
-void apic_init_processor(cpuid_t cpu_id);
+void apic_init_processor(cpu_id_t cpu_id);
 
-void apic_start_processor(cpuid_t cpu_id, uintptr_t entry);
+void apic_start_processor(cpu_id_t cpu_id, uintptr_t entry);
 
-uint32_t apic_get_current_cpu_id(void);
+cpu_id_t apic_current_cpu(void);
 
-uint32_t apic_get_processor_count(void);
-
-struct ioapic_version_reg ioapic_get_version(int ioapic_id);
+struct ioapic_version ioapic_get_version(int ioapic_id);

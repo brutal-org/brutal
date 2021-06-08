@@ -2,21 +2,20 @@
 
 #include <library/base/std.h>
 
-#include "arch/cpu.h"
-#include "arch/x86_64/apic.h"
-#include "kernel/cpu.h"
 
 #define MAX_CPU_COUNT 255
 
-struct x86_64_cpu
+struct cpu_context
 {
     void *syscall_user_stack;
     void *syscall_kernel_stack;
 
-    size_t lapic_id;
-
+    uint8_t lapic;
     struct cpu base;
 };
 
-struct x86_64_cpu *x86_64_cpu_this(void);
-struct x86_64_cpu *x86_64_cpu(cpuid_t id);
+struct cpu_context *cpu_context_this(void);
+
+struct cpu_context *cpu_context(cpu_id_t id);
+
+void cpu_context_found(cpu_id_t id, int lapic);

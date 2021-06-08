@@ -53,7 +53,7 @@ struct PACKED acpi_madt_lapic_record
     struct acpi_madt_record base;
 
     uint8_t processor_id;
-    uint8_t apic_id;
+    uint8_t id;
     uint32_t flags;
 };
 

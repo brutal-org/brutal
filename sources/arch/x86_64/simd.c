@@ -35,14 +35,14 @@ void simd_initialize(void)
 {
     if (cpuid_has_xsave())
     {
-        log("XSAVE detected using it...");
+        log("XSAVE detected, using it...");
 
         simd_enable_xsave();
         simd_initialize_xcr0();
     }
     else
     {
-        log("XSAVE not found falling back on FPU...");
+        log("XSAVE not found, falling back on FPU...");
 
         asm_write_cr0(asm_read_cr0() | ASM_CR0_NATIVE_EXCEPTION);
         asm_write_cr4(asm_read_cr4() | ASM_CR4_FXSR);
