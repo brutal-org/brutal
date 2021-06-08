@@ -9,7 +9,7 @@
 - [x] Parse MADT
 - [ ] apic (ioapic/lapic)
 - [ ] multiboot support
-- [ ] pit
+- [x] pit
 - [ ] apic timer
 - [ ] SMP
 - [ ] Sheduling
@@ -17,7 +17,7 @@
 - [ ] Syscalls
 - [x] SIMD (avx, sse, fpu, xsave)
 - [ ] IPC
-- [ ] Boostraping
+- [ ] Userspace Bootstrapping
 - [ ] Ramdisk
 - [ ] VFS
 
