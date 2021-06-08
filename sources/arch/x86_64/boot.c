@@ -12,6 +12,7 @@
 #include "arch/x86_64/pic.h"
 #include "arch/x86_64/pit.h"
 #include "arch/x86_64/smid.h"
+#include "arch/x86_64/smp.h"
 #include "arch/x86_64/stivale2.h"
 #include "kernel/kernel.h"
 
@@ -25,9 +26,12 @@ void arch_entry(struct handover *handover)
     simd_initialize();
     pmm_initialize(handover);
     vmm_initialize(handover);
-    // apic_initalize(handover);
-    pic_initialize();
-    pit_initialize(1000);
+
+    apic_initalize(handover);
+    smp_initialize();
+
+    // pic_initialize();
+    // pit_initialize(1000);
 
     log("Arch x86_64 initialized!");
 
