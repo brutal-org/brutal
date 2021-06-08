@@ -15,7 +15,7 @@
 - [ ] Sheduling
 - [ ] Usespace
 - [ ] Syscalls
-- [ ] SIMD (avx, sse, fpu, xsave)
+- [x] SIMD (avx, sse, fpu, xsave)
 - [ ] IPC
 - [ ] Boostraping
 - [ ] Ramdisk
