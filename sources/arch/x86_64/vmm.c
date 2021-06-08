@@ -53,6 +53,14 @@ static vmm_result_t vmm_map_pml_make_entry(struct pml *pml4, uintptr_t virtual_p
 static void vmm_load_memory_map(vmm_space_t target, struct handover_mmap const *memory_map)
 {
     log("Loading kernel memory map...");
+    vmm_map(target,
+            (vmm_range_t){
+                .base = mmap_phys_to_io(0),
+                .size = 0xffffffff},
+            (pmm_range_t){
+                .base = 0,
+                .size = 0xffffffff},
+            BR_MEM_WRITABLE);
 
     for (size_t i = 0; i < memory_map->size; i++)
     {
