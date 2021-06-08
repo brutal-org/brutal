@@ -26,6 +26,11 @@ static vmm_result_t vmm_get_pml(struct pml *table, size_t idx)
     }
 }
 
+vmm_space_t vmm_kernel_space(void)
+{
+    return (vmm_space_t)kernel_pml;
+}
+
 static vmm_result_t vmm_get_pml_or_alloc(struct pml *table, size_t idx, size_t flags)
 {
     auto entry = table->entries[idx];
