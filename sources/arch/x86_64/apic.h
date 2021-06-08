@@ -1,6 +1,7 @@
 #pragma once
 
 #include <library/base.h>
+#include <library/log.h>
 
 #include "kernel/cpu.h"
 #include "kernel/handover.h"
