@@ -40,7 +40,7 @@ static void pmm_bitmap_initialize(struct handover_mmap const *memory_map)
         {
             log("Allocated memory bitmap at {x}-{x}", entry->base, entry->base + bitmap_target_size - 1);
 
-            bitmap_init(&pmm_bitmap, (void *)entry->base, bitmap_target_size);
+            bitmap_init(&pmm_bitmap, (void *)mmap_phys_to_io(entry->base), bitmap_target_size);
             break;
         }
     }
@@ -80,9 +80,9 @@ void pmm_initialize(struct handover const *handover)
     pmm_load_memory_map(&handover->mmap);
 
     // we set the first page used, as the page 0 is NULL
-    bitmap_set(&pmm_bitmap, 0, PMM_USED);
+    pmm_used((pmm_range_t){(uintptr_t)0, HOST_MEM_PAGESIZE * 32});
     used_memory = 0;
-    pmm_used((pmm_range_t){(uintptr_t)pmm_bitmap.data, pmm_bitmap.size});
+    pmm_used((pmm_range_t){mmap_io_to_phys((uintptr_t)pmm_bitmap.data), pmm_bitmap.size});
 }
 
 pmm_result_t pmm_alloc(size_t size)
