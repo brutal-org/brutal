@@ -67,6 +67,16 @@ struct PACKED acpi_madt_ioapic_record
     uint32_t interrupt_base;
 };
 
+struct PACKED acpi_madt_iso_record
+{
+    struct acpi_madt_record base;
+
+    uint8_t bus;
+    uint8_t irq;             // source
+    uint32_t interrupt_base; // gsi
+    uint16_t flags;
+};
+
 struct PACKED acpi_madt
 {
     struct acpi_sdth base;
@@ -77,22 +87,17 @@ struct PACKED acpi_madt
     struct acpi_madt_record records[];
 };
 
-struct acpi_madt_record_table
-{
-    size_t count;
-    struct acpi_madt_record *table[MAX_MADT_RECORD_COUNT];
-};
-struct lapic_record_table
-{
-    size_t count;
-    struct acpi_madt_lapic_record *table[MAX_MADT_RECORD_COUNT];
-};
+#define acpi_make_madt_record_table(name, record_type)    \
+    struct name                                           \
+    {                                                     \
+        size_t count;                                     \
+        struct record_type *table[MAX_MADT_RECORD_COUNT]; \
+    }
 
-struct ioapic_record_table
-{
-    size_t count;
-    struct acpi_madt_ioapic_record *table[MAX_MADT_RECORD_COUNT];
-};
+acpi_make_madt_record_table(acpi_madt_record_table, acpi_madt_record);
+acpi_make_madt_record_table(lapic_record_table, acpi_madt_lapic_record);
+acpi_make_madt_record_table(ioapic_record_table, acpi_madt_ioapic_record);
+acpi_make_madt_record_table(iso_record_table, acpi_madt_iso_record);
 
 struct acpi_sdth *acpi_rsdt_child(struct acpi_rsdt *rsdt, str_t signature);
 
@@ -107,3 +112,5 @@ uint32_t acpi_find_lapic(uintptr_t rsdp_address);
 struct lapic_record_table acpi_find_lapic_table(uintptr_t rsdp_address);
 
 struct ioapic_record_table acpi_find_ioapic_table(uintptr_t rsdp_address);
+
+struct iso_record_table acpi_find_iso_table(uintptr_t rsdp_address);
