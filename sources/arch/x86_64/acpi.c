@@ -106,3 +106,19 @@ struct ioapic_record_table acpi_find_ioapic_table(uintptr_t rsdp_address)
     }
     return final;
 }
+
+struct iso_record_table acpi_find_iso_table(uintptr_t rsdp_address)
+{
+    auto madt = acpi_find_madt(rsdp_address);
+    struct acpi_madt_record_table table = acpi_madt_multiple_record(madt, ACPI_MADT_RECORD_MADT_ISO);
+    struct iso_record_table final =
+        {
+            .count = table.count,
+        };
+
+    for (size_t i = 0; i < table.count; i++)
+    {
+        final.table[i] = (struct acpi_madt_iso_record *)table.table[i];
+    }
+    return final;
+}
