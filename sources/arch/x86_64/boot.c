@@ -32,9 +32,7 @@ void arch_entry_main(struct handover *handover)
 
     apic_initalize(handover);
 
-    smp_initialize();
-
-    apic_init_ipit_redirection(handover);
+    apic_init_interrupt_redirection(handover);
 
     log("Arch x86_64 initialized!");
 
