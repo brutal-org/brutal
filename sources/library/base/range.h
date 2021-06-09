@@ -21,3 +21,7 @@
 
 #define range_end(range) \
     ((range).base + (range).size - 1)
+
+#define range_contain(range, addr) \
+    (((range).base <= (addr)) && ((range).size + (range).base >= (addr)))
+    
