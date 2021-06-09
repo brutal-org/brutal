@@ -8,14 +8,19 @@ struct lock
     int locked;
 };
 
+bool lock_try_acquire(struct lock *lock);
+
 void lock_acquire(struct lock *lock);
 
 void lock_release(struct lock *lock);
 
 static inline void lock_retainer_release(struct lock **lock)
 {
-    lock_release(*lock);
-    *lock = nullptr;
+    if (lock != nullptr)
+    {
+        lock_release(*lock);
+        *lock = nullptr;
+    }
 }
 
 #define LOCK_RETAINER_(retainer, lock)                   \
@@ -24,3 +29,10 @@ static inline void lock_retainer_release(struct lock **lock)
 
 #define LOCK_RETAINER(lock) \
     LOCK_RETAINER_(retainer, lock)
+
+#define LOCK_RETAINER_TRY_(retainer, lock)               \
+    auto retainer CLEANUP(lock_retainer_release) = lock; \
+    if (lock_try_acquire(retainer) || (retainer = nullptr))
+
+#define LOCK_RETAINER_TRY(lock) \
+    LOCK_RETAINER_TRY_(retainer, lock)

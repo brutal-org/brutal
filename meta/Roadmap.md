@@ -7,11 +7,11 @@
 - [x] PMM
 - [x] VMM
 - [x] Parse MADT
-- [ ] apic (ioapic/lapic)
+- [x] apic (ioapic/lapic)
 - [ ] multiboot support
 - [x] pit
 - [ ] apic timer
-- [ ] SMP
+- [x] SMP
 - [ ] Sheduling
 - [ ] Usespace
 - [ ] Syscalls

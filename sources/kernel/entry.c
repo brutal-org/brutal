@@ -2,9 +2,8 @@
 #include <library/log.h>
 #include "arch/arch.h"
 #include "kernel/cpu.h"
-#include "kernel/kernel.h"
-#include "kernel/scheduler.h"
-#include "kernel/task.h"
+#include "kernel/entry.h"
+#include "kernel/tasking.h"
 
 static _Atomic size_t other_ready = 0;
 
@@ -37,18 +36,12 @@ void kernel_entry_main(struct handover *handover)
     log("Main CPU is entering kernel...");
 
     kernel_splash();
-
-    scheduler_initialize();
     tasking_initialize();
-
     kernel_boot_other();
 
     log("All CPU started, entering userspace...");
 
-    while (true)
-    {
-        asm("hlt");
-    }
+    arch_idle();
 }
 
 void kernel_entry_other(void)
@@ -57,8 +50,5 @@ void kernel_entry_other(void)
 
     other_ready++;
 
-    while (true)
-    {
-        asm("hlt");
-    }
+    arch_idle();
 }

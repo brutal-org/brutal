@@ -1,5 +1,4 @@
 #include <library/log.h>
-
 #include "arch/arch.h"
 #include "arch/x86_64/idt.h"
 
@@ -34,13 +33,7 @@ void idt_initialize(void)
         idt.entries[i] = idt_entry(__interrupt_vector[i], 0, IDT_GATE);
     }
 
-    // FIXME: Not used for the moment
-
-    // syscall interrupt
-    //idt[127] = idt_entry((void *)__interrupt_vector[48], 0, IDT_GATE | IDT_USER);
-
-    // multi processor signal interrupt
-    //idt[100] = idt_entry((void *)__interrupt_vector[49], 1, IDT_GATE | IDT_USER);
+    idt.entries[100] = idt_entry(__interrupt_vector[48], 1, IDT_GATE | IDT_USER);
 
     idt_update(&idt_descriptor);
 }

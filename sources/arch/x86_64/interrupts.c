@@ -3,7 +3,7 @@
 #include "arch/x86_64/asm.h"
 #include "arch/x86_64/interrupts.h"
 #include "arch/x86_64/pic.h"
-#include "kernel/scheduler.h"
+#include "kernel/tasking.h"
 
 static char *_exception_messages[32] = {
     "division-by-zero",
@@ -68,9 +68,13 @@ uint64_t interrupt_handler(uint64_t rsp)
             asm_hlt();
         }
     }
-    else
+    else if (stackframe->int_no == 32)
     {
-        rsp = scheduler_schedule(rsp);
+        rsp = tasking_schedule_and_switch(rsp);
+    }
+    else if (stackframe->int_no == IPIT_RESCHED)
+    {
+        rsp = tasking_switch(rsp);
     }
 
     apic_eoi();

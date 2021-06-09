@@ -1,12 +1,12 @@
 #include <library/base/std.h>
 #include <library/log.h>
+#include "arch/mmio.h"
 #include "arch/x86_64/acpi.h"
 #include "arch/x86_64/apic.h"
 #include "arch/x86_64/cpu.h"
 #include "arch/x86_64/memory/mmap.h"
 #include "arch/x86_64/msr.h"
 #include "arch/x86_64/pic.h"
-#include "kernel/mmio.h"
 
 /* --- Lapic ---------------------------------------------------------------- */
 

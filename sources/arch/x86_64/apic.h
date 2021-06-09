@@ -4,6 +4,8 @@
 #include "kernel/cpu.h"
 #include "kernel/handover.h"
 
+#define IPIT_RESCHED (100)
+
 #define LAPIC_ENABLE (0x800)
 
 #define LAPIC_SPURIOUS_ALL 0xff
