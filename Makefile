@@ -41,8 +41,9 @@ CROSS_BUILDDIR=build/cross
 CROSS_AS=nasm
 CROSS_ASFLAGS=-f elf64
 
-CROSS_CC=x86_64-elf-gcc
+CROSS_CC=clang
 CROSS_CFLAGS= \
+	-target x86_64-none-elf \
 	-MD \
 	$(STD) \
 	$(OPTIMISATIONS) \
@@ -62,12 +63,13 @@ CROSS_KCFLAGS= \
 	-mno-sse2 \
 	-mno-red-zone
 
-CROSS_LD=x86_64-elf-ld
+CROSS_LD=clang
 CROSS_KLDFLAGS= \
 	-Tsources/arch/x86_64/link.ld \
+	-nostdlib \
 	-z max-page-size=0x1000
 
-CROSS_AR=x86_64-elf-ar
+CROSS_AR=llvm-ar
 CROSS_ARFLAGS=rcsv
 
 MKCWD=mkdir -p $(@D)

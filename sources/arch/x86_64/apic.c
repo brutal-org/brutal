@@ -53,13 +53,13 @@ static inline uint32_t ioapic_read(int ioapic_id, uint32_t reg)
     return mmio_read32(base + 16);
 }
 
-static inline void ioapic_write(int ioapic_id, uint32_t reg, uint32_t value)
+/*static inline void ioapic_write(int ioapic_id, uint32_t reg, uint32_t value)
 {
     auto base = mmap_phys_to_io(ioapic_base[ioapic_id]);
 
     mmio_write32(base, reg);
     mmio_write32(base, value);
-}
+} CLANG FIXME*/
 
 struct ioapic_version ioapic_get_version(int ioapic_id)
 {
