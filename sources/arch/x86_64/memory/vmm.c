@@ -1,8 +1,7 @@
 #include <library/log.h>
-
 #include "arch/vmm.h"
 #include "arch/x86_64/asm.h"
-#include "arch/x86_64/mmap.h"
+#include "arch/x86_64/memory/mmap.h"
 #include "arch/x86_64/paging.h"
 
 static struct pml *kernel_pml = NULL;
@@ -123,7 +122,9 @@ static void vmm_load_memory_map(vmm_space_t target, struct handover_mmap const *
 
 void vmm_initialize(struct handover const *handover)
 {
-    kernel_pml = (struct pml *)mmap_phys_to_io((pmm_alloc(HOST_MEM_PAGESIZE).ok).base);
+    auto pmm_result = pmm_alloc(HOST_MEM_PAGESIZE);
+
+    kernel_pml = (struct pml *)mmap_phys_to_io(UNWRAP(pmm_result).base);
     mem_set(kernel_pml, 0, HOST_MEM_PAGESIZE);
 
     vmm_load_memory_map(kernel_pml, &handover->mmap);
@@ -134,7 +135,9 @@ void vmm_initialize(struct handover const *handover)
 
 vmm_space_t vmm_space_create(void)
 {
-    vmm_space_t vmm_address_space = (vmm_space_t)mmap_phys_to_io((pmm_alloc(HOST_MEM_PAGESIZE).ok).base);
+    auto pmm_result = pmm_alloc(HOST_MEM_PAGESIZE);
+
+    vmm_space_t vmm_address_space = (vmm_space_t)mmap_phys_to_io(UNWRAP(pmm_result).base);
     mem_set(vmm_address_space, 0, HOST_MEM_PAGESIZE);
 
     struct pml *pml_table = (struct pml *)vmm_address_space;

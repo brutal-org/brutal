@@ -9,6 +9,7 @@ KERNEL_LIB_SRC = \
 			  $(wildcard sources/library/ds/*.c) \
 			  $(wildcard sources/library/log/*.c) \
 			  $(wildcard sources/host/kernel/*.c) \
+			  $(wildcard sources/library/alloc/*.c)
 
 KERNEL_OBJ= \
 	$(patsubst sources/%.c, $(CROSS_BUILDDIR)/%.c.o, $(KERNEL_C_SRC)) \
