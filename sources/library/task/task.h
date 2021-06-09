@@ -46,7 +46,7 @@ struct task
     };
 };
 
-struct task *task_this(void);
+struct task *task_self(void);
 
 void task_fork(struct task *task);
 

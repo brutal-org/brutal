@@ -1,9 +1,12 @@
 #pragma once
 
 #include <library/io.h>
-
 #include "kernel/handover.h"
 
 struct writer *arch_debug(void);
 
-void arch_entry(struct handover *handover);
+void arch_entry_main(struct handover *handover);
+
+void arch_entry_other(void);
+
+void arch_boot_other(void);

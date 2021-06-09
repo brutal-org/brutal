@@ -2,7 +2,7 @@
 
 #include <library/task/task.h>
 
-task_handle_t host_task_this(void);
+task_handle_t host_task_self(void);
 
 task_handle_t host_task_fork(void);
 

@@ -8,7 +8,6 @@ SMP_INIT_GDT equ 0x580
 SMP_INIT_IDT equ 0x590
 
 ; --- 16 BIT ---
-extern smp_started_cpu_entry
 global trampoline_start
 trampoline_start:
 
@@ -49,21 +48,24 @@ trampoline32:
     mov cr3, eax
 
 
+    ; Set the PAE-bit, which is the 6th bit (bit 5).
     mov eax, cr4
-    or eax, 1 << 5               ; Set the PAE-bit, which is the 6th bit (bit 5).
+    or eax, 1 << 5
     or eax, 1 << 7
     mov cr4, eax
 
 
-    mov ecx, 0xc0000080 ; efet register 
+    ; efet register
+    mov ecx, 0xc0000080
     rdmsr
 
-    or eax,1 << 8  ; long mode enable
+    ; long mode enable
+    or eax,1 << 8
     wrmsr
 
 
     mov eax, cr0
-    or eax, 1 << 31 ; paging 
+    or eax, 1 << 31 ; paging
     mov cr0, eax
 
 
@@ -102,6 +104,7 @@ trampoline64:
 
 
 ; virtual memory
+extern arch_entry_other
 vcode64:
     push rbp
     ; set up sse as higher half use it
@@ -112,7 +115,7 @@ vcode64:
     bts eax, 1
     mov cr0, rax
 
-    call smp_started_cpu_entry
+    call arch_entry_other
 
 
 ; ------ DATA ------

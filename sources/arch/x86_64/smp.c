@@ -1,5 +1,6 @@
 #include <library/log.h>
 #include <library/mem.h>
+#include "arch/arch.h"
 #include "arch/heap.h"
 #include "arch/pmm.h"
 #include "arch/vmm.h"
@@ -14,17 +15,8 @@
 
 typedef result_t(br_error_t, uint8_t) smp_init_result;
 
-extern uint32_t trampoline_start, trampoline_end;
-static bool cpu_started = false;
-
-void smp_started_cpu_entry()
-{
-    apic_enable();
-    cpu_context_this()->base.present = true;
-
-    cpu_started = false;
-    cpu_entry(cpu_context_this()->base.id);
-}
+extern uint32_t trampoline_start;
+extern uint32_t trampoline_end;
 
 static smp_init_result smp_initialize_cpu_trampoline(void)
 {
@@ -57,13 +49,11 @@ static smp_init_result smp_initialize_cpu_data(void)
     uint8_t *cpu_stack = (uint8_t *)TRY(smp_init_result, heap_alloc(KERNEL_STACK_SIZE)).base;
     mmio_write64(SMP_INIT_STACK, (uint64_t)(cpu_stack + KERNEL_STACK_SIZE));
 
-    // gdt at 0x580
-    // idt at 0x590
-    asm volatile(" \n"
-                 "sgdt 0x580\n"
-                 "sidt 0x590\n");
+    asm volatile(
+        "sgdt 0x580\n"   // gdt at 0x580
+        "sidt 0x590\n"); // idt at 0x590
 
-    mmio_write64(SMP_INIT_ENTRY, (uintptr_t)&smp_started_cpu_entry);
+    mmio_write64(SMP_INIT_ENTRY, (uintptr_t)&arch_entry_other);
     return OK(smp_init_result, 0);
 }
 
@@ -76,16 +66,9 @@ static void smp_initialize_cpu(uint32_t lapic_id)
     apic_start_processor(lapic_id, 4096);
 }
 
-static void wait_for_cpu(void)
+void arch_boot_other(void)
 {
-    while (cpu_started)
-    {
-    }
-}
-
-void smp_initialize(void)
-{
-    log("smp_initialize...");
+    log("Booting other CPUs...");
     for (size_t cpu = 0; cpu < cpu_count(); cpu++)
     {
         if (cpu == apic_current_cpu())
@@ -93,10 +76,8 @@ void smp_initialize(void)
             continue; // don't init current cpu
         }
 
-        log("smp_initialize(): loading cpu {}", cpu);
+        log("Bootings CPU N°{}...", cpu);
 
-        cpu_started = true;
         smp_initialize_cpu(cpu_context(cpu)->lapic);
-        wait_for_cpu();
     }
 }

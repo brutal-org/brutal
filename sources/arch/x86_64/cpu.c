@@ -1,8 +1,8 @@
 #include "arch/cpu.h"
-
 #include "arch/x86_64/apic.h"
 #include "arch/x86_64/cpu.h"
 #include "kernel/cpu.h"
+
 static size_t current_cpu_count = 0;
 static struct cpu_context cpu_context_array[MAX_CPU_COUNT];
 

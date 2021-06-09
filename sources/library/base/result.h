@@ -10,8 +10,8 @@
         bool success;           \
         union                   \
         {                       \
-            ok_t ok;            \
-            error_t error;      \
+            ok_t _ok;           \
+            error_t _error;     \
         };                      \
     }
 
@@ -19,25 +19,25 @@
     (T)                  \
     {                    \
         .success = true, \
-        .ok = (value),   \
+        ._ok = (value),  \
     }
 
 #define ERR(T, value)     \
     (T)                   \
     {                     \
         .success = false, \
-        .error = (value)  \
+        ._error = (value) \
     }
 
-#define TRY(T, expr)                         \
-    (                                        \
-        {                                    \
-            auto result = (expr);            \
-            if (!result.success)             \
-            {                                \
-                return ERR(T, result.error); \
-            }                                \
-            result.ok;                       \
+#define TRY(T, expr)                          \
+    (                                         \
+        {                                     \
+            auto result = (expr);             \
+            if (!result.success)              \
+            {                                 \
+                return ERR(T, result._error); \
+            }                                 \
+            result._ok;                       \
         })
 
-#define UNWRAP(expr) ({ (expr).ok; })
+#define UNWRAP(expr) ({ (expr)._ok; })

@@ -1,6 +1,5 @@
 #include <library/base.h>
 #include <library/log.h>
-
 #include "arch/arch.h"
 #include "arch/pmm.h"
 #include "arch/vmm.h"
@@ -16,7 +15,7 @@
 #include "arch/x86_64/stivale2.h"
 #include "kernel/kernel.h"
 
-void arch_entry(struct handover *handover)
+void arch_entry_main(struct handover *handover)
 {
     log("Initializing arch x86_64...");
 
@@ -28,8 +27,8 @@ void arch_entry(struct handover *handover)
     vmm_initialize(handover);
 
     apic_initalize(handover);
-    smp_initialize();
 
+    // cpu_found(0);
     // pic_initialize();
     // pit_initialize(1000);
 
@@ -37,5 +36,12 @@ void arch_entry(struct handover *handover)
 
     asm_sti();
 
-    kernel_entry(handover);
+    kernel_entry_main(handover);
+}
+
+void arch_entry_other(void)
+{
+    apic_enable();
+    simd_initialize();
+    kernel_entry_other();
 }

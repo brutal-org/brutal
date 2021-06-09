@@ -25,7 +25,7 @@ $(SYSROOT_ISO): $(SYSROOT) $(LIMINE)
 		-as mkisofs \
 		-b limine-cd.bin \
 		-no-emul-boot \
-		-boot-load-size 4 \
+		-boot-load-size $(shell nproc --all) \
 		-boot-info-table \
 		--efi-boot limine-eltorito-efi.bin \
 		-efi-boot-part \

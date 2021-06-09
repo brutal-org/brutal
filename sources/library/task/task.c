@@ -4,11 +4,11 @@
 static bool task_initialized = false;
 static struct task task;
 
-struct task *task_this(void)
+struct task *task_self(void)
 {
     if (!task_initialized)
     {
-        task.handle = host_task_this();
+        task.handle = host_task_self();
         task_initialized = true;
     }
 

@@ -26,6 +26,14 @@ struct alloc
 #define alloc_commit(self, ptr) \
     ((self)->commit((self), ptr))
 
+#define alloc_make(self, T) (                    \
+    {                                            \
+        T *ptr = alloc_acquire(self, sizeof(T)); \
+        alloc_commit(self, ptr);                 \
+        mem_set(ptr, 0, sizeof(T));              \
+        ptr;                                     \
+    })
+
 #define alloc_decommit(self, ptr) \
     ((self)->decommit((self), ptr))
 

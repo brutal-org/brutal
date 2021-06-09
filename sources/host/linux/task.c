@@ -3,7 +3,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-task_handle_t host_task_this(void)
+task_handle_t host_task_self(void)
 {
     return getpid();
 }

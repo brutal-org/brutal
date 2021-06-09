@@ -1,8 +1,8 @@
 #include <library/log.h>
-
 #include "arch/x86_64/asm.h"
 #include "arch/x86_64/interrupts.h"
 #include "arch/x86_64/pic.h"
+#include "kernel/scheduler.h"
 
 static char *_exception_messages[32] = {
     "division-by-zero",
@@ -51,8 +51,10 @@ void dump_register(struct interrupt_stackframe const *stackframe)
     log("cr2: {#016p} | cr3: {#016p} ", asm_read_cr2(), asm_read_cr3());
 }
 
-void *interrupt_handler(struct interrupt_stackframe *stackframe)
+uint64_t interrupt_handler(uint64_t rsp)
 {
+    auto stackframe = (struct interrupt_stackframe *)rsp;
+
     if (stackframe->int_no < 32)
     {
         log("Interrupt {}: {}: error: {} on {x} !", stackframe->int_no, _exception_messages[stackframe->int_no], stackframe->error_code, stackframe->rip);
@@ -65,8 +67,12 @@ void *interrupt_handler(struct interrupt_stackframe *stackframe)
             asm_hlt();
         }
     }
+    else
+    {
+        rsp = scheduler_schedule(rsp);
+    }
 
     pic_eoi(stackframe->int_no);
 
-    return stackframe;
+    return rsp;
 }
