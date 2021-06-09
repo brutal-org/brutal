@@ -1,4 +1,5 @@
 #include <library/log.h>
+#include "arch/x86_64/apic.h"
 #include "arch/x86_64/asm.h"
 #include "arch/x86_64/interrupts.h"
 #include "arch/x86_64/pic.h"
@@ -72,7 +73,7 @@ uint64_t interrupt_handler(uint64_t rsp)
         rsp = scheduler_schedule(rsp);
     }
 
-    pic_eoi(stackframe->int_no);
+    apic_eoi();
 
     return rsp;
 }
