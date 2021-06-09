@@ -1,10 +1,12 @@
 #include <library/log.h>
+#include <library/task/lock.h>
 #include "arch/vmm.h"
 #include "arch/x86_64/asm.h"
 #include "arch/x86_64/memory/mmap.h"
 #include "arch/x86_64/paging.h"
 
 static struct pml *kernel_pml = NULL;
+static struct lock vmm_lock;
 
 static vmm_result_t vmm_get_pml(struct pml *table, size_t idx)
 {
@@ -23,11 +25,6 @@ static vmm_result_t vmm_get_pml(struct pml *table, size_t idx)
     {
         return ERR(vmm_result_t, BR_ERR_BAD_ADDRESS);
     }
-}
-
-vmm_space_t vmm_kernel_space(void)
-{
-    return (vmm_space_t)kernel_pml;
 }
 
 static vmm_result_t vmm_get_pml_or_alloc(struct pml *table, size_t idx, size_t flags)
@@ -135,6 +132,8 @@ void vmm_initialize(struct handover const *handover)
 
 vmm_space_t vmm_space_create(void)
 {
+    LOCK_RETAINER(&vmm_lock);
+
     auto pmm_result = pmm_alloc(HOST_MEM_PAGESIZE);
 
     vmm_space_t vmm_address_space = (vmm_space_t)mmap_phys_to_io(UNWRAP(pmm_result).base);
@@ -157,11 +156,15 @@ vmm_space_t vmm_space_create(void)
 
 void vmm_space_switch(vmm_space_t space)
 {
+    LOCK_RETAINER(&vmm_lock);
+
     asm_write_cr3(mmap_io_to_phys((uintptr_t)space));
 }
 
 vmm_result_t vmm_map(vmm_space_t space, vmm_range_t virtual_range, pmm_range_t physical_range, br_mem_flags_t flags)
 {
+    LOCK_RETAINER(&vmm_lock);
+
     if (virtual_range.size != physical_range.size)
     {
         panic("virtual_range.size must be equal to physical_range for the moment");
@@ -181,6 +184,8 @@ vmm_result_t vmm_map(vmm_space_t space, vmm_range_t virtual_range, pmm_range_t p
 
 pmm_result_t vmm_virt2phys(vmm_space_t space, vmm_range_t virtual_range)
 {
+    LOCK_RETAINER(&vmm_lock);
+
     struct pml *pml4 = space;
 
     auto pml3_range = TRY(pmm_result_t, vmm_get_pml(pml4, PML4_GET_INDEX(virtual_range.base)));
@@ -196,4 +201,9 @@ pmm_result_t vmm_virt2phys(vmm_space_t space, vmm_range_t virtual_range)
     pmm_range_t range = {entry.physical << 12, 4096};
 
     return OK(pmm_result_t, range);
+}
+
+vmm_space_t vmm_kernel_space(void)
+{
+    return (vmm_space_t)kernel_pml;
 }

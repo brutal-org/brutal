@@ -2,6 +2,7 @@
 #include <library/ds/bitmap.h>
 #include <library/log.h>
 #include <library/mem.h>
+#include <library/task/lock.h>
 #include "arch/arch.h"
 #include "arch/pmm.h"
 #include "arch/x86_64/memory/mmap.h"
@@ -9,6 +10,7 @@
 static struct bitmap pmm_bitmap = {};
 static size_t best_bet = 0;
 static size_t used_memory = 0;
+static struct lock pmm_lock;
 
 static uintptr_t memory_map_get_highest_address(const struct handover_mmap *memory_map)
 {
@@ -86,6 +88,8 @@ void pmm_initialize(struct handover const *handover)
 
 pmm_result_t pmm_alloc(size_t size)
 {
+    LOCK_RETAINER(&pmm_lock);
+
     used_memory += size;
     // log("pmm_alloc(): {} (total: {x})", size, used_memory);
 
@@ -119,6 +123,8 @@ pmm_result_t pmm_alloc(size_t size)
 
 pmm_result_t pmm_used(pmm_range_t range)
 {
+    LOCK_RETAINER(&pmm_lock);
+
     log("pmm_used(): {x}-{x}...", range.base, range_end(range));
 
     size_t page_base = range.base / HOST_MEM_PAGESIZE;
@@ -132,6 +138,8 @@ pmm_result_t pmm_used(pmm_range_t range)
 
 pmm_result_t pmm_unused(pmm_range_t range)
 {
+    LOCK_RETAINER(&pmm_lock);
+
     used_memory -= range.size;
     log("pmm_unused(): {x}-{x}...", range.base, range_end(range));
 

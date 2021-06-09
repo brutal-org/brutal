@@ -16,6 +16,11 @@
 
 #define MAX(x, y) ((x) > (y) ? (x) : (y))
 
+#define CLEANUP(func) __attribute__((__cleanup__(func)))
+
+#define CONCAT_(lhs, rhs) lhs##rhs
+#define CONCAT(lhs, rhs) CONCAT_(lhs, rhs)
+
 #define STMT(expr) \
     do             \
     {              \
