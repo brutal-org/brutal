@@ -49,16 +49,16 @@ static inline uint32_t ioapic_read(int ioapic_id, uint32_t reg)
 {
     auto base = mmap_phys_to_io(ioapic_table.table[ioapic_id]->address);
 
-    mmio_write32(base, reg);
-    return mmio_read32(base + 16);
+    mmio_write32(base + IOAPIC_REG_OFFSET, reg);
+    return mmio_read32(base + IOAPIC_VALUE_OFFSET);
 }
 
 static inline void ioapic_write(int ioapic_id, uint32_t reg, uint32_t value)
 {
     auto base = mmap_phys_to_io(ioapic_table.table[ioapic_id]->address);
 
-    mmio_write32(base, reg);
-    mmio_write32(base + 16, value);
+    mmio_write32(base + IOAPIC_REG_OFFSET, reg);
+    mmio_write32(base + IOAPIC_VALUE_OFFSET, value);
 }
 
 struct ioapic_version ioapic_get_version(int ioapic_id)
@@ -127,16 +127,14 @@ cpu_id_t apic_current_cpu(void)
 
 void apic_enable(void)
 {
-    pic_disable();
     wrmsr(MSR_APIC, (rdmsr(MSR_APIC) | LAPIC_ENABLE));
 }
 
-// APIC INTERRUPT REDIRECTION
+/* --- Ioapic interrupt redirection --------------------------------------------------------------- */
 
 typedef range_t(uint8_t) ioapic_range_t;
-typedef result_t(int, int) ioapic_ipit_result_t;
 
-static ioapic_ipit_result_t find_ioapic_for_interrupt_base(uint32_t interrupt_base)
+static ioapic_int_redirect_result_t find_ioapic_for_interrupt_base(uint32_t interrupt_base)
 {
 
     for (size_t i = 0; i < ioapic_table.count; i++)
@@ -148,17 +146,17 @@ static ioapic_ipit_result_t find_ioapic_for_interrupt_base(uint32_t interrupt_ba
 
         if (range_contain(interrupt_range, interrupt_base))
         {
-            return OK(ioapic_ipit_result_t, i);
+            return OK(ioapic_int_redirect_result_t, i);
         }
     }
 
-    panic("ioapic interrupt base not founded for base {}", interrupt_base);
-    return ERR(ioapic_ipit_result_t, 0);
+    log("warning: ioapic interrupt base not founded for base {}", interrupt_base);
+    return ERR(ioapic_int_redirect_result_t, 0);
 }
 
-static ioapic_ipit_result_t set_raw_redirect(uint8_t interrupt_id, uint32_t interrupt_base, uint16_t flags, int cpu, bool enable)
+static ioapic_int_redirect_result_t apic_create_interrupt_redirect(uint8_t interrupt_id, uint32_t interrupt_base, uint16_t flags, int cpu, bool enable)
 {
-    int ioapic_target = TRY(ioapic_ipit_result_t, find_ioapic_for_interrupt_base(interrupt_base));
+    int ioapic_target = TRY(ioapic_int_redirect_result_t, find_ioapic_for_interrupt_base(interrupt_base));
 
     struct ioapic_ipit_redirection_entry redirect = {};
 
@@ -196,10 +194,10 @@ static ioapic_ipit_result_t set_raw_redirect(uint8_t interrupt_id, uint32_t inte
     ioapic_write(ioapic_target, IOAPIC_REG_REDIRECT_BASE + target_io_offset, redirect._low_byte);
     ioapic_write(ioapic_target, IOAPIC_REG_REDIRECT_BASE + target_io_offset + 1, redirect._high_byte);
 
-    return OK(ioapic_ipit_result_t, 0);
+    return OK(ioapic_int_redirect_result_t, 0);
 }
 
-void apic_set_ipit_redirection_cpu(cpu_id_t id, uint8_t irq, bool enable, uintptr_t rsdp)
+ioapic_int_redirect_result_t apic_redirect_irq_to_cpu(cpu_id_t id, uint8_t irq, bool enable, uintptr_t rsdp)
 {
     struct iso_record_table iso_table = acpi_find_iso_table(rsdp);
 
@@ -211,20 +209,26 @@ void apic_set_ipit_redirection_cpu(cpu_id_t id, uint8_t irq, bool enable, uintpt
         {
             log("   - apic: using iso: {} with interrupt base: {}", i, iso_table.table[i]->interrupt_base);
 
-            set_raw_redirect(iso_table.table[i]->irq + 0x20, iso_table.table[i]->interrupt_base, iso_table.table[i]->flags, id, enable);
-            return;
+            TRY(ioapic_int_redirect_result_t,
+                apic_create_interrupt_redirect(iso_table.table[i]->irq + 0x20, iso_table.table[i]->interrupt_base, iso_table.table[i]->flags, id, enable));
+
+            return OK(ioapic_int_redirect_result_t, iso_table.table[i]->interrupt_base);
         }
     }
 
-    set_raw_redirect(irq + 0x20, irq, 0, id, enable);
+    TRY(ioapic_int_redirect_result_t, apic_create_interrupt_redirect(irq + 0x20, irq, 0, id, enable));
+
+    return OK(ioapic_int_redirect_result_t, irq);
 }
 
-void apic_init_ipit_redirection(struct handover const *handover)
+ioapic_int_redirect_result_t apic_init_interrupt_redirection(struct handover const *handover)
 {
     log("apic: loading ipit redirection");
 
     for (size_t i = 0; i < 16; i++) // set interrupt 32 to 48
     {
-        apic_set_ipit_redirection_cpu(apic_current_cpu(), i, true, handover->rsdp);
+        TRY(ioapic_int_redirect_result_t, apic_redirect_irq_to_cpu(apic_current_cpu(), i, true, handover->rsdp));
     }
+
+    return OK(ioapic_int_redirect_result_t, 0);
 }

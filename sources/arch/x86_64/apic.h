@@ -16,6 +16,11 @@
 #define LAPIC_ICR_DEST_INIT (5 << 8)
 #define LAPIC_ICR_DEST_SEND_IPI (6 << 8)
 
+#define IOAPIC_REG_OFFSET (0)
+#define IOAPIC_VALUE_OFFSET (16)
+
+typedef result_t(int, int) ioapic_int_redirect_result_t;
+
 enum lapic_reg
 {
     LAPIC_CPU_ID = 0x20,
@@ -90,6 +95,6 @@ cpu_id_t apic_current_cpu(void);
 
 struct ioapic_version ioapic_get_version(int ioapic_id);
 
-void apic_set_ipit_redirection_cpu(cpu_id_t id, uint8_t irq, bool enable, uintptr_t rsdp);
+ioapic_int_redirect_result_t apic_redirect_irq_to_cpu(cpu_id_t id, uint8_t irq, bool enable, uintptr_t rsdp);
 
-void apic_init_ipit_redirection(struct handover const *handover);
+ioapic_int_redirect_result_t apic_init_interrupt_redirection(struct handover const *handover);
