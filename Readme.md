@@ -12,7 +12,7 @@ Striking modernist shapes and bold use of modern C are the hallmarks of <b>BRUTA
 
 ## About
 
-**BRUTAL** is a micro-kernel base operating system targeting the x86_64 architecture and later ARM and Risc-V.
+**BRUTAL** is a micro-kernel base operating system targeting the x86_64 architecture. ARM and Risc-V support is planned.
 
 ## Roadmap
 
@@ -24,7 +24,7 @@ See the [roadmap](meta/Roadmap.md) file for more information on how we plan to g
 
 Brutal is written in a dialect of C called modern C characterize by the following principle:
 
-- Avoid pointers and prefer passing by value.
+- Avoid pointers and prefer value semantic.
 - The standard library is old and unsafe, **don't use it**.
 - Don't be afraid of writing type generic code.
 
