@@ -35,3 +35,5 @@
 #define ALIGN_UP(__addr, __align) (((__addr) + (__align)-1) & ~((__align)-1))
 
 #define ARRAY_LENGTH(__array) (sizeof(__array) / sizeof(__array[0]))
+
+#define __FILENAME__ (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)

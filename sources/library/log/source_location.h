@@ -10,4 +10,4 @@ struct source_location
 };
 
 #define source_location_current \
-    (struct source_location) { __LINE__, make_str(__func__), make_str(__FILE__), }
+    (struct source_location) { __LINE__, make_str(__func__), make_str(__FILENAME__), }
