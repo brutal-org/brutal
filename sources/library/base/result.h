@@ -29,12 +29,15 @@
         .error = (value)  \
     }
 
-#define TRY(T, expr)                     \
-    ({                                   \
-        auto result = (expr);            \
-        if (!result.success)             \
-        {                                \
-            return ERR(T, result.error); \
-        }                                \
-        result.ok;                       \
-    })
+#define TRY(T, expr)                         \
+    (                                        \
+        {                                    \
+            auto result = (expr);            \
+            if (!result.success)             \
+            {                                \
+                return ERR(T, result.error); \
+            }                                \
+            result.ok;                       \
+        })
+
+#define UNWRAP(expr) ({ (expr).ok; })

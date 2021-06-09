@@ -7,6 +7,7 @@ enum error_kind
     ERR_KIND_NOT_FOUND,
     ERR_KIND_EXHAUSTION,
     ERR_KIND_INVALID,
+    ERR_KIND_UNDEFINED,
 };
 
 typedef struct
@@ -20,3 +21,4 @@ typedef struct
 #define ERR_NOT_FOUND ((error_t){ERR_KIND_NOT_FOUND, "not-found"})
 #define ERR_OUT_OF_MEMORY ((error_t){ERR_KIND_EXHAUSTION, "out-of-memory"})
 #define ERR_BAD_ADDRESS ((error_t){ERR_KIND_INVALID, "bad-address"})
+#define ERR_UNDEFINED ((error_t){ERR_KIND_UNDEFINED, "undefined"})
