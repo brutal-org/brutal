@@ -31,7 +31,7 @@ void vec_swapsplice_impl(struct vec_impl *impl, int start, int count);
 void vec_swap_impl(struct vec_impl *impl, int idx1, int idx2);
 
 #define vec_unpack_impl(v) \
-    (struct vec_impl) { (char **)&(v)->data, sizeof(*(v)->data), &(v)->alloc, &(v)->length, &(v)->capacity, }
+    &(struct vec_impl) { (char **)&(v)->data, sizeof(*(v)->data), (v)->alloc, &(v)->length, &(v)->capacity, }
 
 #define vec_t(T)             \
     struct                   \
@@ -46,9 +46,8 @@ void vec_swap_impl(struct vec_impl *impl, int idx1, int idx2);
 
 #define vec_deinit(v) (free((v)->data), vec_init(v))
 
-#define vec_push(v, val)                                                               \
-    (vec_expand_impl(vec_unpack_impl(v)) ? -1 : ((v)->data[(v)->length++] = (val), 0), \
-     0)
+#define vec_push(v, val) \
+    (vec_expand_impl(vec_unpack_impl(v)) ? false : ((v)->data[(v)->length++] = (val), true))
 
 #define vec_pop(v) (v)->data[--(v)->length]
 
