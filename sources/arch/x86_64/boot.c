@@ -26,11 +26,15 @@ void arch_entry_main(struct handover *handover)
     pmm_initialize(handover);
     vmm_initialize(handover);
 
+    pic_initialize();
+    pic_disable();
+    pit_initialize(1000);
+
     apic_initalize(handover);
 
-    // cpu_found(0);
-    // pic_initialize();
-    // pit_initialize(1000);
+    smp_initialize();
+
+    apic_init_ipit_redirection(handover);
 
     log("Arch x86_64 initialized!");
 
