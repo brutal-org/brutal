@@ -5,14 +5,14 @@
 </p>
 <br/>
 <p align="center">
-A bold, unapologetic, and honest operating system written in modern C
+Striking modernist shapes and bold use of modern C are the hallmarks of <b>BRUTAL</b>.<br>
+<b>BRUTAL</b> combine the desire of UNIX utopia from the 1970s with modern technology and engineering.
 </p>
 <br/>
 
 ## About
 
-Striking modernist shapes and bold use of modern C are the hallmarks of **BRUTAL**.<br>
-**BRUTAL** combine the desire of UNIX utopia from the 1970s with modern technology and engineering.
+**BRUTAL** is a micro-kernel base operating system targeting the x86_64 architecture and later ARM and Risc-V.
 
 ## Roadmap
 
