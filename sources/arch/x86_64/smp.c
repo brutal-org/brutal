@@ -1,12 +1,11 @@
 #include <library/log.h>
 #include <library/mem.h>
-
 #include "arch/pmm.h"
 #include "arch/vmm.h"
 #include "arch/x86_64/apic.h"
 #include "arch/x86_64/asm.h"
 #include "arch/x86_64/cpu.h"
-#include "arch/x86_64/mmap.h"
+#include "arch/x86_64/memory/mmap.h"
 #include "arch/x86_64/smp.h"
 #include "host/mem.h"
 #include "kernel/mmio.h"

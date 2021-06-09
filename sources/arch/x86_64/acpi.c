@@ -1,9 +1,8 @@
 #include <library/base/cast.h>
 #include <library/log.h>
 #include <library/text/str.h>
-
 #include "arch/x86_64/acpi.h"
-#include "arch/x86_64/mmap.h"
+#include "arch/x86_64/memory/mmap.h"
 
 struct acpi_sdth *acpi_rsdt_child(struct acpi_rsdt *rsdt, str_t signature)
 {
