@@ -43,6 +43,7 @@ CROSS_ASFLAGS=-f elf64
 
 CROSS_CC=x86_64-elf-gcc
 CROSS_CFLAGS= \
+	-MD \
 	$(STD) \
 	$(OPTIMISATIONS) \
 	$(WARNINGS) \
@@ -77,7 +78,7 @@ include sources/library/.build.mk
 include sources/sysroot/.build.mk
 include sources/test/.build.mk
 
-all: $(TARGETS) $(SYSROOT_ISO)
+all: $(TARGETS)
 
 run: $(SYSROOT_ISO)
 	qemu-system-x86_64 \
@@ -92,3 +93,5 @@ run: $(SYSROOT_ISO)
 
 clean:
 	rm -rf build/
+
+-include $(DEPENDENCIES)

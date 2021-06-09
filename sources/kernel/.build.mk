@@ -19,18 +19,19 @@ KERNEL_OBJ= \
 KERNEL_BIN=$(CROSS_BUILDDIR)/kernel.elf
 
 TARGETS += $(KERNEL_BIN)
+DEPENDENCIES += $(KERNEL_OBJ:.o=.d)
 
 $(CROSS_BUILDDIR)/kernel/%.c.o: sources/kernel/%.c
 	$(MKCWD)
-	$(CROSS_CC) $(CROSS_KCFLAGS) -c -o $@ $^
+	$(CROSS_CC) $(CROSS_KCFLAGS) -c -o $@ $<
 
 $(CROSS_BUILDDIR)/kernel/library/%.c.o: sources/library/%.c
 	$(MKCWD)
-	$(CROSS_CC) $(CROSS_KCFLAGS) -c -o $@ $^
+	$(CROSS_CC) $(CROSS_KCFLAGS) -c -o $@ $<
 
 $(CROSS_BUILDDIR)/kernel/host/%.c.o: sources/host/%.c
 	$(MKCWD)
-	$(CROSS_CC) $(CROSS_KCFLAGS) -c -o $@ $^
+	$(CROSS_CC) $(CROSS_KCFLAGS) -c -o $@ $<
 
 $(KERNEL_BIN): $(KERNEL_OBJ)
 	$(MKCWD)
