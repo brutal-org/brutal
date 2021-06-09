@@ -1,5 +1,6 @@
 #include <library/log.h>
 #include <library/mem.h>
+#include "arch/heap.h"
 #include "arch/pmm.h"
 #include "arch/vmm.h"
 #include "arch/x86_64/apic.h"
@@ -8,6 +9,7 @@
 #include "arch/x86_64/memory/mmap.h"
 #include "arch/x86_64/smp.h"
 #include "host/mem.h"
+#include "kernel/constants.h"
 #include "kernel/mmio.h"
 
 typedef result_t(br_error_t, uint8_t) smp_init_result;
@@ -52,8 +54,8 @@ static smp_init_result smp_initialize_cpu_data(void)
     mmio_write64(SMP_INIT_PAGE_TABLE, asm_read_cr3());
 
     // load future cpu stack
-    uint8_t *cpu_stack = (uint8_t *)mmap_phys_to_io(TRY(smp_init_result, pmm_alloc(SMP_CPU_STACK_SIZE)).base);
-    mmio_write64(SMP_INIT_STACK, (uint64_t)(cpu_stack + SMP_CPU_STACK_SIZE));
+    uint8_t *cpu_stack = (uint8_t *)TRY(smp_init_result, heap_alloc(KERNEL_STACK_SIZE)).base;
+    mmio_write64(SMP_INIT_STACK, (uint64_t)(cpu_stack + KERNEL_STACK_SIZE));
 
     // gdt at 0x580
     // idt at 0x590

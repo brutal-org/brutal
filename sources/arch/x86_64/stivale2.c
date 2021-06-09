@@ -4,8 +4,9 @@
 #include "arch/x86_64/asm.h"
 #include "arch/x86_64/memory/mmap.h"
 #include "arch/x86_64/stivale2.h"
+#include "kernel/constants.h"
 
-static uint8_t stack[4096 * 4];
+static uint8_t stack[KERNEL_STACK_SIZE];
 
 static struct stivale2_header_tag_framebuffer framebuffer_hdr_tag = {
     .tag = {
