@@ -2,7 +2,7 @@
 
 #include <brutal/base.h>
 
-#define GDT_ENTRY_COUNT 5
+#define GDT_ENTRY_COUNT 6
 #define GDT_SEGMENT (0b00010000)
 #define GDT_PRESENT (0b10000000)
 #define GDT_USER (0b01100000)

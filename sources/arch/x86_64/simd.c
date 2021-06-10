@@ -1,7 +1,7 @@
 #include <brutal/log.h>
 #include "arch/x86_64/asm.h"
 #include "arch/x86_64/cpuid.h"
-#include "arch/x86_64/smid.h"
+#include "arch/x86_64/simd.h"
 
 void simd_enable_xsave(void)
 {

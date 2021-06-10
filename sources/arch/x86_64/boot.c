@@ -12,7 +12,7 @@
 #include "arch/x86_64/idt.h"
 #include "arch/x86_64/pic.h"
 #include "arch/x86_64/pit.h"
-#include "arch/x86_64/smid.h"
+#include "arch/x86_64/simd.h"
 #include "arch/x86_64/smp.h"
 #include "arch/x86_64/stivale2.h"
 #include "arch/x86_64/syscall.h"

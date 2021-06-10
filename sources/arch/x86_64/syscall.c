@@ -36,7 +36,7 @@ syscall_initialize_result_t syscall_initialize_for_current_cpu(void)
     todo("cpu -> temporary stack should be in the process [!]");
 
     uint8_t *cpu_stack = (uint8_t *)TRY(syscall_initialize_result_t, heap_alloc(KERNEL_STACK_SIZE)).base;
-    cpu_context_this()->syscall_kernel_stack = cpu_stack + KERNEL_STACK_SIZE;
+    cpu_impl_self()->syscall_kernel_stack = cpu_stack + KERNEL_STACK_SIZE;
 
     return OK(syscall_initialize_result_t, 0);
 }
