@@ -48,6 +48,9 @@ run: $(SYSROOT_ISO)
 		-display sdl \
 		-cdrom $(SYSROOT_ISO)
 
+bochs: 
+	bochs
+	
 clean:
 	rm -rf build/
 
