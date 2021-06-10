@@ -1,8 +1,11 @@
 #pragma once
 
 #define PIT_FREQUENCY 1193182
+#define PIT_MSEC 1000
 
 #include <stdint.h>
+
+extern uint32_t pit_read_counter(void);
 
 enum pit_reg
 {
