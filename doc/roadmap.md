@@ -12,14 +12,16 @@
 - [x] pit
 - [ ] apic timer
 - [x] SMP
+- [ ] Multi tasking
 - [ ] Sheduling
 - [ ] Usespace
-- [ ] Syscalls
+- [X] Syscalls
 - [x] SIMD (avx, sse, fpu, xsave)
 - [ ] IPC
 - [ ] Userspace Bootstrapping
 - [ ] Ramdisk
 - [ ] VFS
+
 
 ## Milestone 2
 
