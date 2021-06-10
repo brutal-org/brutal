@@ -52,8 +52,9 @@ Mkfile.old
 dkms.conf
 
 .vscode/
+
 build/
 
-toolchain/build-x86_64
-toolchain/local
-toolchain/tarballs
+meta/toolchain/gnu/build
+meta/toolchain/gnu/local
+meta/toolchain/gnu/tarballs

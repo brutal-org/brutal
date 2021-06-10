@@ -14,7 +14,7 @@ struct task *task_self(void)
     return nullptr;
 }
 
-void task_run(uintptr_t ip)
+struct task *task_spawn(uintptr_t ip)
 {
     LOCK_RETAINER(&task_lock);
 
@@ -25,6 +25,10 @@ void task_run(uintptr_t ip)
     task->sp = UNWRAP(heap_alloc(KERNEL_STACK_SIZE)).base + KERNEL_STACK_SIZE;
 
     vec_push(&tasks, task);
+
+    log("Task({}) created...", task->id);
+
+    return task;
 }
 
 void task_state(struct task *self, enum task_state new_state)

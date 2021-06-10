@@ -13,7 +13,7 @@ enum error_kind
 typedef struct
 {
     enum error_kind kind;
-    const char *message;
+    char const *message;
 } error_t;
 
 #define ERR_SUCCESS ((error_t){ERR_KIND_SUCCESS, "success"})

@@ -1,6 +1,6 @@
 LIMINE=thirdparty/limine/limine-install
-SYSROOT=$(CROSS_BUILDDIR)/sysroot
-SYSROOT_ISO=$(CROSS_BUILDDIR)/sysroot.iso
+SYSROOT=$(BUILDDIR_CROSS)/sysroot
+SYSROOT_ISO=$(BUILDDIR_CROSS)/sysroot.iso
 
 TARGETS += $(SYSROOT_ISO)
 

@@ -23,8 +23,8 @@ static inline void lock_retainer_release(struct lock **lock)
     }
 }
 
-#define LOCK_RETAINER_(retainer, lock)                   \
-    auto retainer CLEANUP(lock_retainer_release) = lock; \
+#define LOCK_RETAINER_(retainer, lock)                           \
+    typeof(lock) retainer CLEANUP(lock_retainer_release) = lock; \
     lock_acquire(retainer);
 
 #define LOCK_RETAINER(lock) \

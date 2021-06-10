@@ -8,10 +8,10 @@ BINUTILS_DIRECTORY="binutils-$BINUTILS_VERSION"
 BINUTILS_FILENAME="$BINUTILS_DIRECTORY.tar.gz"
 BINUTILS_URL="http://ftp.gnu.org/gnu/binutils/$BINUTILS_FILENAME"
 
-GCC_VERSION=11.1
-GCC_DIRECTORY="gcc-11.1.0-RC-20210423"
-GCC_FILENAME="gcc-11.1.0-RC-20210423.tar.gz"
-GCC_URL="https://gcc.gnu.org/pub/gcc/snapshots/11.1.0-RC-20210423/gcc-11.1.0-RC-20210423.tar.gz"
+GCC_VERSION=11.1.0
+GCC_DIRECTORY="gcc-$GCC_VERSION"
+GCC_FILENAME="gcc-$GCC_VERSION.tar.gz"
+GCC_URL="http://ftp.gnu.org/gnu/gcc/$GCC_DIRECTORY/$GCC_FILENAME"
 
 # ---------------------------------------------------------------------------- #
 
@@ -28,7 +28,7 @@ cd "$DIR"
 
 mkdir -p tarballs
 
-source "$DIR/use-it.sh"
+source "$DIR/use.sh"
 
 # Download and unpack GCC and binutils
 # ---------------------------------------------------------------------------- #
@@ -70,17 +70,17 @@ fi
 # Build GCC and binutils for the x86_64 target
 # ---------------------------------------------------------------------------- #
 
-TARGET64=x86_64-elf
+TARGET=x86_64-elf
 
-mkdir -p "$DIR/build-x86_64/binutils"
-mkdir -p "$DIR/build-x86_64/gcc"
+mkdir -p "$DIR/build/binutils"
+mkdir -p "$DIR/build/gcc"
 
-pushd "$DIR/build-x86_64/"
+pushd "$DIR/build/"
     unset PKG_CONFIG_LIBDIR # Just in case
 
     pushd binutils
         "$DIR/tarballs/$BINUTILS_DIRECTORY/configure" \
-            --target=$TARGET64 \
+            --target=$TARGET \
             --prefix=$PREFIX \
             --with-sysroot \
             --disable-werror || exit 1
@@ -91,7 +91,7 @@ pushd "$DIR/build-x86_64/"
 
     pushd gcc
         "$DIR/tarballs/$GCC_DIRECTORY/configure" \
-            --target=$TARGET64 \
+            --target=$TARGET \
             --prefix=$PREFIX \
             --disable-nls \
             --with-newlib \

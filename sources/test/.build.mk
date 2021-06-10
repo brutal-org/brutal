@@ -4,10 +4,10 @@ TEST_SRC=$(wildcard sources/test/*.c) \
 		 $(wildcard sources/library/*/*.c) \
 		 $(wildcard sources/host/linux/*.c)
 
-TEST_OBJ=$(patsubst sources/%.c, $(HOST_BUILDDIR)/%.c.o, $(TEST_SRC))
-TEST_BIN=$(HOST_BUILDDIR)/test.elf
+TEST_OBJ=$(patsubst sources/%.c, $(BUILDDIR_HOST)/%.c.o, $(TEST_SRC))
+TEST_BIN=$(BUILDDIR_HOST)/test.elf
 
-$(HOST_BUILDDIR)/%.c.o: sources/%.c
+$(BUILDDIR_HOST)/%.c.o: sources/%.c
 	$(MKCWD)
 	$(HOST_CC) $(HOST_CFLAGS) -c -o $@ $^
 

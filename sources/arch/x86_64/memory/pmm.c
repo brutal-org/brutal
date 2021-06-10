@@ -12,7 +12,7 @@ static size_t best_bet = 0;
 static size_t used_memory = 0;
 static struct lock pmm_lock;
 
-static uintptr_t memory_map_get_highest_address(const struct handover_mmap *memory_map)
+static uintptr_t memory_map_get_highest_address(struct handover_mmap const *memory_map)
 {
     size_t length = memory_map->entries[memory_map->size - 1].length;
     size_t start = memory_map->entries[memory_map->size - 1].base;
@@ -49,7 +49,7 @@ static void pmm_bitmap_initialize(struct handover_mmap const *memory_map)
     bitmap_fill(&pmm_bitmap, PMM_USED);
 }
 
-static void pmm_load_memory_map(const struct handover_mmap *memory_map)
+static void pmm_load_memory_map(struct handover_mmap const *memory_map)
 {
     log("Memory map:");
 
