@@ -1,6 +1,8 @@
 #include "arch/cpu.h"
 #include "arch/x86_64/apic.h"
 #include "arch/x86_64/cpu.h"
+#include "arch/x86_64/msr.h"
+#include "kernel/cpu.h"
 
 static size_t impl_count = 0;
 static struct cpu_impl impls[MAX_CPU_COUNT];
@@ -30,6 +32,13 @@ size_t cpu_count(void)
 {
     return impl_count;
 }
+
+void cpu_context_initialize(void)
+{
+    wrmsr(MSR_GS_BASE, (uintptr_t)cpu_context_this());
+    wrmsr(MSR_KERN_GS_BASE, (uintptr_t)cpu_context_this());
+}
+/* --- Public API ----------------------------------------------------------- */
 
 cpu_id_t cpu_self_id(void)
 {
