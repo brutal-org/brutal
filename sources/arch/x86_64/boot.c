@@ -14,6 +14,7 @@
 #include "arch/x86_64/smid.h"
 #include "arch/x86_64/smp.h"
 #include "arch/x86_64/stivale2.h"
+#include "arch/x86_64/syscall.h"
 #include "kernel/entry.h"
 
 void arch_entry_main(struct handover *handover)
@@ -36,8 +37,9 @@ void arch_entry_main(struct handover *handover)
     apic_init_interrupt_redirection(handover);
 
     cpu_context_initialize();
-    log("Arch x86_64 initialized!");
+    syscall_initialize_for_current_cpu();
 
+    log("Arch x86_64 initialized!");
     kernel_entry_main(handover);
 }
 
@@ -45,6 +47,8 @@ void arch_entry_other(void)
 {
     apic_enable();
     cpu_context_initialize();
+    syscall_initialize_for_current_cpu();
+
     simd_initialize();
     kernel_entry_other();
 }
