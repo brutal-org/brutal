@@ -1,6 +1,7 @@
 #pragma once
 
 #include <brutal/base.h>
+#include "syscalls/error.h"
 
 /* --- Task object ---------------------------------------------------------- */
 
@@ -11,18 +12,30 @@ enum task_state
     TASK_RUNNING,
 };
 
+enum task_level
+{
+    TASK_LEVEL_USER = 0,
+    TASK_LEVEL_MODULE = 1,
+    TASK_LEVEL_KERNEL = 2,
+};
+
 struct task
 {
     int id;
     enum task_state state;
 
+    int level;
+
     uintptr_t ip;
     uintptr_t sp;
+    uintptr_t kernel_sp;
 };
+
+typedef result_t(br_error_t, struct task *) task_return_result_t;
 
 struct task *task_self(void);
 
-struct task *task_spawn(uintptr_t ip);
+task_return_result_t task_spawn(uintptr_t ip);
 
 void task_go(struct task *self);
 

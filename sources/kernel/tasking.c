@@ -1,7 +1,9 @@
 #include <brutal/ds.h>
 #include <brutal/log.h>
 #include <brutal/sync.h>
+#include "arch/cpu.h"
 #include "arch/heap.h"
+#include "arch/task.h"
 #include "kernel/constants.h"
 #include "kernel/tasking.h"
 
@@ -11,24 +13,24 @@ static vec_t(struct task *) tasks = {};
 
 struct task *task_self(void)
 {
-    return nullptr;
+    return cpu_self()->schedule.current;
 }
 
-struct task *task_spawn(uintptr_t ip)
+task_return_result_t task_spawn(uintptr_t ip)
 {
     LOCK_RETAINER(&task_lock);
 
-    auto task = alloc_make(alloc_global(), struct task);
+    auto task = TRY(task_return_result_t, arch_task_create(ip, 0, 0, 0, 0));
 
     task->id = task_id++;
     task->ip = ip;
-    task->sp = UNWRAP(heap_alloc(KERNEL_STACK_SIZE)).base + KERNEL_STACK_SIZE;
+    task->level = TASK_LEVEL_USER; // not used for the moment
 
     vec_push(&tasks, task);
 
     log("Task({}) created...", task->id);
 
-    return task;
+    return OK(task_return_result_t, task);
 }
 
 void task_state(struct task *self, enum task_state new_state)
@@ -61,6 +63,16 @@ void tasking_initialize(void)
 
 void tasking_schedule(void)
 {
+    if (cpu_self()->schedule.next == NULL)
+    {
+        cpu_self()->schedule.current = cpu_self()->schedule.idle;
+        return;
+    }
+    else
+    {
+        cpu_self()->schedule.current = cpu_self()->schedule.next;
+        cpu_self()->schedule.next = NULL;
+    }
 }
 
 uintptr_t tasking_switch(uintptr_t sp)
@@ -75,6 +87,14 @@ uintptr_t tasking_schedule_and_switch(uintptr_t sp)
         return sp;
     }
 
+    task_self()->sp = sp; // save stack pointer
+    arch_task_save_context(cpu_self()->schedule.current);
+
     tasking_schedule();
+
+    sp = task_self()->sp; // load stack pointer
+
+    arch_task_load_context(cpu_self()->schedule.current);
+
     return tasking_switch(sp);
 }
