@@ -10,7 +10,7 @@
 - [x] apic (ioapic/lapic)
 - [ ] multiboot support
 - [x] pit
-- [ ] apic timer
+- [x] apic timer
 - [x] SMP
 - [ ] Sheduling
 - [ ] Usespace
