@@ -37,7 +37,7 @@ CROSS_KCFLAGS= \
 	-mno-sse2 \
 	-mno-red-zone
 
-CROSS_LD=ld
+CROSS_LD=ld.lld
 CROSS_KLDFLAGS= \
 	-Tsources/arch/$(CONFIG_ARCH)/link.ld \
 	-z max-page-size=0x1000
