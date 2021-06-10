@@ -18,7 +18,7 @@ Striking modernist shapes and bold use of modern C are the hallmarks of <b>BRUTA
 
 Right now the main goal of brutal is to run doom.
 
-See the [roadmap](doc/roadmap.md) file for more information on how we plan to get there and where you can contribute.
+See the [roadmap](book/roadmap.md) file for more information on how we plan to get there and where you can contribute.
 
 ## Modern C
 
@@ -45,7 +45,7 @@ Here is more resources on the subject:
 
 This project take inspirations and/or reuse code from the following projects.
 
-See [credits.md](doc/credits.md)
+See [credits.md](book/credits.md)
 
 ## License
 

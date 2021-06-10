@@ -14,7 +14,7 @@
 - [x] SMP
 - [ ] Multi tasking
 - [ ] Sheduling
-- [ ] Usespace
+- [ ] Userspace
 - [X] Syscalls
 - [x] SIMD (avx, sse, fpu, xsave)
 - [ ] IPC
