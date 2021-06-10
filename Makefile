@@ -86,7 +86,7 @@ run: $(SYSROOT_ISO)
 	qemu-system-x86_64 \
 		-M q35 \
 		-m 2G \
-		-smp 8 \
+		-smp 12 \
 		-enable-kvm \
 		-cpu host \
 		-serial mon:stdio \

@@ -13,7 +13,7 @@
 #include "arch/x86_64/smid.h"
 #include "arch/x86_64/smp.h"
 #include "arch/x86_64/stivale2.h"
-#include "kernel/kernel.h"
+#include "kernel/entry.h"
 
 void arch_entry_main(struct handover *handover)
 {
@@ -26,15 +26,15 @@ void arch_entry_main(struct handover *handover)
     pmm_initialize(handover);
     vmm_initialize(handover);
 
+    pic_initialize();
+    pic_disable();
+    pit_initialize(1000);
+
     apic_initalize(handover);
 
-    // cpu_found(0);
-    // pic_initialize();
-    // pit_initialize(1000);
+    apic_init_interrupt_redirection(handover);
 
     log("Arch x86_64 initialized!");
-
-    asm_sti();
 
     kernel_entry_main(handover);
 }

@@ -1,5 +1,8 @@
 #include "arch/arch.h"
+#include "arch/x86_64/apic.h"
+#include "arch/x86_64/asm.h"
 #include "arch/x86_64/com.h"
+#include "kernel/cpu.h"
 
 static bool log_initialized = false;
 static struct writer log;
@@ -21,4 +24,20 @@ struct writer *arch_debug(void)
     }
 
     return &log;
+}
+
+void arch_resched_other(void)
+{
+    for (size_t i = 1; i < cpu_count(); i++)
+    {
+        apic_send_ipit(i, IPIT_RESCHED);
+    }
+}
+
+void arch_idle(void)
+{
+    while (true)
+    {
+        asm_hlt();
+    }
 }

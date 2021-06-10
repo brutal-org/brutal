@@ -2,6 +2,7 @@
 #include <library/mem.h>
 #include "arch/arch.h"
 #include "arch/heap.h"
+#include "arch/mmio.h"
 #include "arch/pmm.h"
 #include "arch/vmm.h"
 #include "arch/x86_64/apic.h"
@@ -11,7 +12,6 @@
 #include "arch/x86_64/smp.h"
 #include "host/mem.h"
 #include "kernel/constants.h"
-#include "kernel/mmio.h"
 
 typedef result_t(br_error_t, uint8_t) smp_init_result;
 
