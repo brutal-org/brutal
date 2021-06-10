@@ -1,10 +1,19 @@
 #pragma once
 
 #include <brutal/base/std.h>
-#include "kernel/cpu.h"
 
-cpu_id_t arch_cpu_current_id(void);
+typedef uint8_t cpu_id_t;
 
-struct cpu *arch_cpu_this(void);
+struct cpu
+{
+    cpu_id_t id;
+    bool present;
+};
 
-struct cpu *arch_cpu(cpu_id_t id);
+struct cpu *cpu(cpu_id_t id);
+
+size_t cpu_count(void);
+
+struct cpu *cpu_self(void);
+
+cpu_id_t cpu_self_id(void);

@@ -78,6 +78,6 @@ void arch_boot_other(void)
 
         log("Bootings CPU N°{}...", cpu);
 
-        smp_initialize_cpu(cpu_context(cpu)->lapic);
+        smp_initialize_cpu(cpu_impl(cpu)->lapic);
     }
 }

@@ -37,7 +37,7 @@ void lapic_initialize(struct handover const *handover)
     for (size_t i = 0; i < lapics.count; i++)
     {
         auto lapic = lapics.table[i];
-        cpu_context_found(lapic->processor_id, lapic->id);
+        cpu_found(lapic->processor_id, lapic->id);
     }
 }
 
@@ -177,7 +177,7 @@ static ioapic_int_redirect_result_t apic_create_interrupt_redirect(uint8_t inter
         redirect.mask = 1;
     }
 
-    redirect.destination = cpu_context(cpu)->lapic;
+    redirect.destination = cpu_impl(cpu)->lapic;
 
     // for each apic redirection register we have:
     // [0x10] IOAPIC_REG_REDIRECT_BASE

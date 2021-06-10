@@ -1,7 +1,7 @@
 #include <brutal/base/macros.h>
 #include <brutal/log.h>
 #include "arch/arch.h"
-#include "kernel/cpu.h"
+#include "arch/cpu.h"
 #include "kernel/entry.h"
 #include "kernel/tasking.h"
 
@@ -16,6 +16,7 @@ void kernel_splash(void)
     log("  |_____|__|__|_____| |_| |__|__|_____|  ");
     log("");
     log("-----------------------------------------");
+    log("");
 }
 
 void kernel_boot_other(void)

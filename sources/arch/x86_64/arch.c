@@ -2,7 +2,7 @@
 #include "arch/x86_64/apic.h"
 #include "arch/x86_64/asm.h"
 #include "arch/x86_64/com.h"
-#include "kernel/cpu.h"
+#include "arch/cpu.h"
 
 static bool log_initialized = false;
 static struct writer log;

@@ -1,10 +1,11 @@
 #pragma once
 
+#include <arch/cpu.h>
 #include <brutal/base/std.h>
 
 #define MAX_CPU_COUNT 255
 
-struct cpu_context
+struct cpu_impl
 {
     void *syscall_user_stack;
     void *syscall_kernel_stack;
@@ -13,8 +14,8 @@ struct cpu_context
     struct cpu base;
 };
 
-struct cpu_context *cpu_context_this(void);
+struct cpu_impl *cpu_impl_self(void);
 
-struct cpu_context *cpu_context(cpu_id_t id);
+struct cpu_impl *cpu_impl(cpu_id_t id);
 
-void cpu_context_found(cpu_id_t id, int lapic);
+void cpu_found(cpu_id_t id, int lapic);

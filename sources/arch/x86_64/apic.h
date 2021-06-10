@@ -1,7 +1,8 @@
 #pragma once
 
 #include <brutal/base.h>
-#include "kernel/cpu.h"
+
+#include "arch/cpu.h"
 #include "kernel/handover.h"
 
 #define IPIT_RESCHED (100)
