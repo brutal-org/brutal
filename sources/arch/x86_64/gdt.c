@@ -55,7 +55,9 @@ void gdt_initialize(void)
     gdt.entries[0] = gdt_entry(0, 0, 0, 0); // null descriptor
     gdt.entries[1] = gdt_entry_simple(GDT_PRESENT | GDT_SEGMENT | GDT_READWRITE | GDT_EXECUTABLE, GDT_LONG_MODE_GRANULARITY);
     gdt.entries[2] = gdt_entry_simple(GDT_PRESENT | GDT_SEGMENT | GDT_READWRITE, 0);
-    gdt.entries[3] = gdt_entry_simple(GDT_PRESENT | GDT_SEGMENT | GDT_READWRITE | GDT_EXECUTABLE | GDT_USER, GDT_LONG_MODE_GRANULARITY);
+
+    gdt.entries[3] = gdt_entry(0, 0, 0, 0); // null descriptor (because syscall are evil)
+    gdt.entries[5] = gdt_entry_simple(GDT_PRESENT | GDT_SEGMENT | GDT_READWRITE | GDT_EXECUTABLE | GDT_USER, GDT_LONG_MODE_GRANULARITY);
     gdt.entries[4] = gdt_entry_simple(GDT_PRESENT | GDT_SEGMENT | GDT_READWRITE | GDT_USER, 0);
 
     gdt.tss = gdt_entry_tss((uintptr_t)&tss);
