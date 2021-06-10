@@ -12,12 +12,12 @@
 
 static uintptr_t lapic_base = 0;
 
-static inline uint32_t lapic_read(uint32_t reg)
+uint32_t lapic_read(uint32_t reg)
 {
     return mmio_read32((uintptr_t)lapic_base + reg);
 }
 
-static inline void lapic_write(uint32_t reg, uint32_t value)
+void lapic_write(uint32_t reg, uint32_t value)
 {
     mmio_write32(lapic_base + reg, value);
 }

@@ -23,6 +23,8 @@
 
 typedef result_t(int, int) ioapic_int_redirect_result_t;
 
+#define LAPIC_REGISTER_LVT_INT_MASKED 0x10000
+
 enum lapic_reg
 {
     LAPIC_CPU_ID = 0x20,
@@ -30,6 +32,10 @@ enum lapic_reg
     LAPIC_REG_SPURIOUS = 0x0f0,
     LAPIC_REG_ICR0 = 0x300,
     LAPIC_REG_ICR1 = 0x310,
+    LAPIC_REG_LVT_TIMER = 0x320,
+    LAPIC_REG_TIMER_INITCNT = 0x380,
+    LAPIC_REG_TIMER_CURRCNT = 0x390,
+    LAPIC_REG_TIMER_DIV = 0x3e0,
 };
 
 enum ioapic_reg
@@ -78,6 +84,10 @@ struct PACKED ioapic_ipit_redirection_entry
         };
     };
 };
+
+uint32_t lapic_read(uint32_t reg);
+
+void lapic_write(uint32_t reg, uint32_t value);
 
 void apic_enable(void);
 

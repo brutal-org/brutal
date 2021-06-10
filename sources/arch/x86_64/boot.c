@@ -4,6 +4,7 @@
 #include "arch/pmm.h"
 #include "arch/vmm.h"
 #include "arch/x86_64/apic.h"
+#include "arch/x86_64/apic_timer.h"
 #include "arch/x86_64/asm.h"
 #include "arch/x86_64/com.h"
 #include "arch/x86_64/gdt.h"
@@ -33,6 +34,7 @@ void arch_entry_main(struct handover *handover)
     apic_initalize(handover);
 
     apic_init_interrupt_redirection(handover);
+    apic_timer_initialize();
 
     log("Arch x86_64 initialized!");
 
