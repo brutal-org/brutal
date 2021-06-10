@@ -1,6 +1,6 @@
-#include <library/ds/vec.h>
-#include <library/log.h>
-#include <library/task/lock.h>
+#include <brutal/ds/vec.h>
+#include <brutal/log.h>
+#include <brutal/task/lock.h>
 #include "arch/heap.h"
 #include "kernel/constants.h"
 #include "kernel/tasking.h"

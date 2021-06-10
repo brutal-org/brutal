@@ -1,6 +1,6 @@
 #pragma once
-#include <library/base/macros.h>
-#include <library/base/std.h>
+#include <brutal/base/macros.h>
+#include <brutal/base/std.h>
 
 enum msr_registers
 {

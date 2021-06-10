@@ -1,6 +1,6 @@
 #pragma once
 
-#include <library/io/write.h>
+#include <brutal/io/write.h>
 
 void host_log_lock(void);
 

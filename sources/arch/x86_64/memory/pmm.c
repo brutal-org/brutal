@@ -1,8 +1,8 @@
-#include <library/base/macros.h>
-#include <library/ds/bitmap.h>
-#include <library/log.h>
-#include <library/mem.h>
-#include <library/task/lock.h>
+#include <brutal/base/macros.h>
+#include <brutal/ds/bitmap.h>
+#include <brutal/log.h>
+#include <brutal/mem.h>
+#include <brutal/task/lock.h>
 #include "arch/arch.h"
 #include "arch/pmm.h"
 #include "arch/x86_64/memory/mmap.h"

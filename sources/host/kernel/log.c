@@ -1,6 +1,5 @@
+#include <brutal/task/lock.h>
 #include <host/log.h>
-#include <library/task/lock.h>
-
 #include "arch/arch.h"
 
 static struct lock logger_lock;

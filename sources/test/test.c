@@ -1,6 +1,5 @@
-#include <library/log.h>
-#include <library/task.h>
-
+#include <brutal/log.h>
+#include <brutal/task.h>
 #include "test/test.h"
 
 static size_t tests_count = 0;

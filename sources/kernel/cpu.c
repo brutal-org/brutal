@@ -1,4 +1,4 @@
-#include <library/log.h>
+#include <brutal/log.h>
 #include "arch/cpu.h"
 #include "kernel/cpu.h"
 

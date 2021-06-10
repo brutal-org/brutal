@@ -16,6 +16,7 @@ CFLAGS_WARN ?= \
 CFLAGS_INC ?= \
 	-Isources/libc/ansi \
 	-Isources/libc/posix \
+	-Isources/libc/ \
 	-Isources/ \
 	-Ithirdparty
 
@@ -30,7 +31,7 @@ include meta/toolchain/$(CONFIG_TOOLCHAIN)/.build.mk
 
 include sources/arch/.build.mk
 include sources/kernel/.build.mk
-include sources/library/.build.mk
+include sources/libc/.build.mk
 include sources/sysroot/.build.mk
 include sources/test/.build.mk
 

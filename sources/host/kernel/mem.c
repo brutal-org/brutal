@@ -1,5 +1,5 @@
+#include <brutal/task/lock.h>
 #include <host/mem.h>
-#include <library/task/lock.h>
 #include "arch/heap.h"
 
 static struct lock mem_lock;

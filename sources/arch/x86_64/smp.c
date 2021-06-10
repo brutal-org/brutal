@@ -1,5 +1,5 @@
-#include <library/log.h>
-#include <library/mem.h>
+#include <brutal/log.h>
+#include <brutal/mem.h>
 #include "arch/arch.h"
 #include "arch/heap.h"
 #include "arch/mmio.h"

@@ -1,4 +1,4 @@
-#include <library/log.h>
+#include <brutal/log.h>
 #include "arch/x86_64/apic.h"
 #include "arch/x86_64/asm.h"
 #include "arch/x86_64/interrupts.h"

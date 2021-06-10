@@ -1,7 +1,7 @@
 #pragma once
 
-#include <library/base/error.h>
-#include <library/base/std.h>
+#include <brutal/base/error.h>
+#include <brutal/base/std.h>
 
 #define HOST_MEM_PAGESIZE 4096
 

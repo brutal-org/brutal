@@ -1,5 +1,5 @@
-#include <library/base/macros.h>
-#include <library/log.h>
+#include <brutal/base/macros.h>
+#include <brutal/log.h>
 #include "arch/arch.h"
 #include "kernel/cpu.h"
 #include "kernel/entry.h"

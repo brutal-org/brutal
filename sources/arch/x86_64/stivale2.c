@@ -1,5 +1,5 @@
-#include <library/base.h>
-#include <library/log.h>
+#include <brutal/base.h>
+#include <brutal/log.h>
 #include "arch/arch.h"
 #include "arch/x86_64/asm.h"
 #include "arch/x86_64/memory/mmap.h"

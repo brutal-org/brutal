@@ -1,7 +1,6 @@
 #pragma once
 
-#include <library/base/std.h>
-
+#include <brutal/base/std.h>
 #include "kernel/cpu.h"
 
 cpu_id_t arch_cpu_current_id(void);

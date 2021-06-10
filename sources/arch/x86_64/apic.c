@@ -1,5 +1,5 @@
-#include <library/base/std.h>
-#include <library/log.h>
+#include <brutal/base/std.h>
+#include <brutal/log.h>
 #include "arch/mmio.h"
 #include "arch/x86_64/acpi.h"
 #include "arch/x86_64/apic.h"
