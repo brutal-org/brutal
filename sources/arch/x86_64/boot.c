@@ -6,6 +6,7 @@
 #include "arch/x86_64/apic.h"
 #include "arch/x86_64/asm.h"
 #include "arch/x86_64/com.h"
+#include "arch/x86_64/cpu.h"
 #include "arch/x86_64/gdt.h"
 #include "arch/x86_64/idt.h"
 #include "arch/x86_64/pic.h"
@@ -34,6 +35,7 @@ void arch_entry_main(struct handover *handover)
 
     apic_init_interrupt_redirection(handover);
 
+    cpu_context_initialize();
     log("Arch x86_64 initialized!");
 
     kernel_entry_main(handover);
@@ -42,6 +44,7 @@ void arch_entry_main(struct handover *handover)
 void arch_entry_other(void)
 {
     apic_enable();
+    cpu_context_initialize();
     simd_initialize();
     kernel_entry_other();
 }
