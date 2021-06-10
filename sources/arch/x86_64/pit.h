@@ -1,7 +1,7 @@
 #pragma once
 
 #define PIT_FREQUENCY 1193182
-#define PIT_MSEC 1000
+#define PIT_USEC 1000
 
 #include <stdint.h>
 
