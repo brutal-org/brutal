@@ -42,5 +42,5 @@ CROSS_KLDFLAGS= \
 	-Tsources/arch/$(CONFIG_ARCH)/link.ld \
 	-z max-page-size=0x1000
 
-CROSS_AR=llvm-ar
+CROSS_AR=ar
 CROSS_ARFLAGS=rcsv
