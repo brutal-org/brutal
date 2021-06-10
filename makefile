@@ -20,7 +20,7 @@ CFLAGS_INC ?= \
 	-Isources/ \
 	-Ithirdparty
 
-BUILDDIR=build
+BUILDDIR=build/$(CONFIG_ARCH)-$(CONFIG_TOOLCHAIN)
 BUILDDIR_HOST=$(BUILDDIR)/host
 BUILDDIR_CROSS=$(BUILDDIR)/cross
 

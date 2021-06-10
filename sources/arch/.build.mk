@@ -1,8 +1,8 @@
 KERNEL_C_SRC+=\
-	$(wildcard sources/arch/x86_64/*.c) \
-	$(wildcard sources/arch/x86_64/*/*.c)
+	$(wildcard sources/arch/$(CONFIG_ARCH)/*.c) \
+	$(wildcard sources/arch/$(CONFIG_ARCH)/*/*.c)
 
-KERNEL_S_SRC+=$(wildcard sources/arch/x86_64/*.s)
+KERNEL_S_SRC+=$(wildcard sources/arch/$(CONFIG_ARCH)/*.s)
 
 $(BUILDDIR_CROSS)/arch/%.c.o: sources/arch/%.c
 	$(MKCWD)

@@ -56,6 +56,13 @@ pushd tarballs
     if [ ! -d "$GCC_DIRECTORY" ]; then
         echo "Extracting gcc..."
         tar -xf "$GCC_FILENAME"
+
+        # FIXME: What if this fail ?
+        echo "Download gcc prerequisites..."
+
+        pushd $GCC_DIRECTORY
+            ./contrib/download_prerequisites
+        popd
     else
         echo "Skipped extracting gcc"
     fi

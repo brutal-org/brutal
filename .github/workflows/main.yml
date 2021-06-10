@@ -10,20 +10,17 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        toolchain: [gnu, llvm]
+
     steps:
       - uses: actions/checkout@v2
 
-      - name: install dependencies
-        run: |
-          sudo apt update
-          git submodule update --init --recursive
+      - name: Install dependencies
+        run: .github/workflows/setup.sh
 
-          sudo apt install -y make build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo nasm
-          sudo apt install -y mtools wget unzip fuse libfuse-dev
-          sudo apt install -y uuid-dev
-          sudo apt install -y gcc binutils parted
-
-      - name: cache-toolchain
+      - name: Cache Toolchain (${{matrix.toolchain}})
         uses: actions/cache@v2
         env:
           cache-name: cached-cross-compiler
@@ -31,23 +28,19 @@ jobs:
           path: |
             **/toolchain/
           key: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/toolchain/build-it.sh') }}
+            ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/meta/toolchain/${{matrix.toolchain}}/build.sh') }}
           restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/toolchain/build-it.sh') }}
+            ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/meta/toolchain/${{matrix.toolchain}}/build.sh') }}
 
-      - name: build toolchain
+      - name: Build Toolchain
         run: |
-          toolchain/build-it.sh
+          meta/toolchain/${{matrix.toolchain}}/build.sh
 
-      - name: unit test
+      - name: Build Kernel
         run: |
-          make run-test
+          make CONFIG_TOOLCHAIN=${{matrix.toolchain}} all
 
-      - name: kernel build
+      - name: Run Tests
         run: |
-          make all
+          make CONFIG_TOOLCHAIN=${{matrix.toolchain}} run-test
 
-      - uses: actions/upload-artifact@v2
-        with:
-          name: "iso"
-          path: "/build/cross/sysroot.iso"

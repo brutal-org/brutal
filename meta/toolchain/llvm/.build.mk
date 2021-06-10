@@ -16,7 +16,7 @@ HOST_LDFLAGS=
 CROSS_AS=nasm
 CROSS_ASFLAGS=-f elf64
 
-CROSS_CC=clang -target x86_64-none-elf
+CROSS_CC=clang -target $(CONFIG_ARCH)-none-elf
 CROSS_CFLAGS= \
 	-MD \
 	$(CFLAGS_STD) \
@@ -39,7 +39,7 @@ CROSS_KCFLAGS= \
 
 CROSS_LD=ld.lld
 CROSS_KLDFLAGS= \
-	-Tsources/arch/x86_64/link.ld \
+	-Tsources/arch/$(CONFIG_ARCH)/link.ld \
 	-z max-page-size=0x1000
 
 CROSS_AR=llvm-ar
