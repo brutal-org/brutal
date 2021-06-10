@@ -2,6 +2,7 @@
 
 #include <brutal/base/macros.h>
 #include <brutal/base/std.h>
+#include <brutal/mem.h>
 
 struct alloc;
 
