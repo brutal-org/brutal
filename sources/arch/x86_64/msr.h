@@ -15,6 +15,22 @@ enum msr_registers
     MSR_KERN_GS_BASE = 0xc0000102,
 };
 
+enum msr_efer_reg
+{
+    EFER_ENABLE_SYSCALL = 1,
+};
+
+enum msr_star_reg
+{
+    STAR_KCODE_OFFSET = 32,
+    STAR_UCODE_OFFSET = 48,
+};
+
+enum msr_syscall_flag_reg
+{
+    SYSCALL_FLAG_TURN_OFF_INTERRUPT = (1 << 9)
+};
+
 static inline uint64_t rdmsr(enum msr_registers msr)
 {
 
