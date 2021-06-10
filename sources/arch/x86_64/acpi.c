@@ -74,51 +74,23 @@ uint32_t acpi_find_lapic(uintptr_t rsdp_address)
     return madt->local_apic;
 }
 
-struct lapic_record_table acpi_find_lapic_table(uintptr_t rsdp_address)
-{
-    auto madt = acpi_find_madt(rsdp_address);
-    struct acpi_madt_record_table table = acpi_madt_multiple_record(madt, ACPI_MADT_RECORD_LAPIC);
-    struct lapic_record_table final =
-        {
-            .count = table.count,
-
-        };
-
-    for (size_t i = 0; i < table.count; i++)
-    {
-        final.table[i] = (struct acpi_madt_lapic_record *)table.table[i];
+#define acpi_find_table_generator(table_type, record_type, madt_record, name)               \
+    struct table_type name(uintptr_t rsdp_address)                                          \
+    {                                                                                       \
+        auto madt = acpi_find_madt(rsdp_address);                                           \
+        struct acpi_madt_record_table table = acpi_madt_multiple_record(madt, madt_record); \
+        struct table_type final =                                                           \
+            {                                                                               \
+                .count = table.count,                                                       \
+            };                                                                              \
+                                                                                            \
+        for (size_t i = 0; i < table.count; i++)                                            \
+        {                                                                                   \
+            final.table[i] = (struct record_type *)table.table[i];                          \
+        }                                                                                   \
+        return final;                                                                       \
     }
-    return final;
-}
 
-struct ioapic_record_table acpi_find_ioapic_table(uintptr_t rsdp_address)
-{
-    auto madt = acpi_find_madt(rsdp_address);
-    struct acpi_madt_record_table table = acpi_madt_multiple_record(madt, ACPI_MADT_RECORD_IOAPIC);
-    struct ioapic_record_table final =
-        {
-            .count = table.count,
-        };
-
-    for (size_t i = 0; i < table.count; i++)
-    {
-        final.table[i] = (struct acpi_madt_ioapic_record *)table.table[i];
-    }
-    return final;
-}
-
-struct iso_record_table acpi_find_iso_table(uintptr_t rsdp_address)
-{
-    auto madt = acpi_find_madt(rsdp_address);
-    struct acpi_madt_record_table table = acpi_madt_multiple_record(madt, ACPI_MADT_RECORD_MADT_ISO);
-    struct iso_record_table final =
-        {
-            .count = table.count,
-        };
-
-    for (size_t i = 0; i < table.count; i++)
-    {
-        final.table[i] = (struct acpi_madt_iso_record *)table.table[i];
-    }
-    return final;
-}
+acpi_find_table_generator(lapic_record_table, acpi_madt_lapic_record, ACPI_MADT_RECORD_LAPIC, acpi_find_lapic_table);
+acpi_find_table_generator(ioapic_record_table, acpi_madt_ioapic_record, ACPI_MADT_RECORD_IOAPIC, acpi_find_ioapic_table);
+acpi_find_table_generator(iso_record_table, acpi_madt_iso_record, ACPI_MADT_RECORD_MADT_ISO, acpi_find_iso_table);
