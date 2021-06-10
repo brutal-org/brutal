@@ -11,6 +11,13 @@
 #define GDT_LONG_MODE_GRANULARITY 0b0010
 #define GDT_FLAGS 0b1100
 
+#define GDT_KERNEL_CODE (1)
+#define GDT_KERNEL_DATA (2)
+#define GDT_USER_DATA (4)
+#define GDT_USER_CODE (5)
+
+#define GDT_RING_3 (3)
+
 struct PACKED tss
 {
     uint32_t reserved;
