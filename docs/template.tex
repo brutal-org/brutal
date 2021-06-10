@@ -1,0 +1,47 @@
+\documentclass{book}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\PassOptionsToPackage{hyphens}{url}
+\usepackage{xcolor}
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+\PassOptionsToPackage{unicode=true}{hyperref}
+\PassOptionsToPackage{dvipsnames,svgnames*,table}{xcolor}
+
+\title{\bigskip \bigskip the brutal documentation}
+
+\date{}
+
+$for(header-includes)$
+$header-includes$
+$endfor$
+
+\begin{document}
+\begin{titlepage}
+    \centering
+    \includegraphics[scale=0.5]{../meta/brand/logo.png}
+    \vfill
+    {\bfseries\Large
+        The brutal documentation\\  
+    }
+    Striking modernist shapes and bold use of modern C are the hallmarks of BRUTAL.
+    BRUTAL combine the desire of UNIX utopia from the 1970s with modern technology and engineering.
+\end{titlepage}
+
+\tableofcontents
+
+\newpage
+
+$for(include-before)$
+$include-before$
+$endfor$
+
+$body$
+
+$for(include-after)$
+$include-after$
+$endfor$
+
+\end{document}
