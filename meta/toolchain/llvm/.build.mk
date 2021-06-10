@@ -1,6 +1,6 @@
 # --- Host compiler ---------------------------------------------------------- #
 
-HOST_CC=clang
+HOST_CC=clang-12
 
 HOST_CFLAGS= \
 	$(CFLAGS_STD) \
@@ -16,7 +16,7 @@ HOST_LDFLAGS=
 CROSS_AS=nasm
 CROSS_ASFLAGS=-f elf64
 
-CROSS_CC=clang -target $(CONFIG_ARCH)-none-elf
+CROSS_CC=clang-12 -target $(CONFIG_ARCH)-none-elf
 CROSS_CFLAGS= \
 	-MD \
 	$(CFLAGS_STD) \
@@ -37,7 +37,7 @@ CROSS_KCFLAGS= \
 	-mno-sse2 \
 	-mno-red-zone
 
-CROSS_LD=ld.lld
+CROSS_LD=ld
 CROSS_KLDFLAGS= \
 	-Tsources/arch/$(CONFIG_ARCH)/link.ld \
 	-z max-page-size=0x1000

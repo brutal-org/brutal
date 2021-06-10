@@ -1,4 +1,4 @@
-name: check
+name: Build, and test
 
 on:
   push:
@@ -26,7 +26,7 @@ jobs:
           cache-name: cached-cross-compiler
         with:
           path: |
-            **/toolchain/
+            **/meta/toolchain/${{matrix.toolchain}}
           key: |
             ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/meta/toolchain/${{matrix.toolchain}}/build.sh') }}
           restore-keys: |
