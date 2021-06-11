@@ -72,7 +72,8 @@ static inline void asm_out32(uint16_t port, uint32_t data)
         asm volatile("mov %0, %%cr" #N ::"a"(value));  \
     }
 
-#define ASM_CR0_NATIVE_EXCEPTION (1 << 5)
+#define ASM_CR0_MONITOR_CO_PROCESSOR (1 << 1)
+#define ASM_CR0_EMULATION (1 << 2)
 #define ASM_CR0_NATIVE_EXCEPTION (1 << 5)
 
 #define ASM_CR4_FXSR (1 << 9)

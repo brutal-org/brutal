@@ -3,6 +3,18 @@
 #include "arch/x86_64/cpuid.h"
 #include "arch/x86_64/simd.h"
 
+void simd_initialize_fpu(void)
+{
+    asm_write_cr0(asm_read_cr0() & ~ASM_CR0_EMULATION);
+    asm_write_cr0(asm_read_cr0() | ASM_CR0_NATIVE_EXCEPTION);
+    asm_write_cr0(asm_read_cr0() | ASM_CR0_MONITOR_CO_PROCESSOR);
+
+    asm_write_cr4(asm_read_cr4() | ASM_CR4_FXSR);
+    asm_write_cr4(asm_read_cr4() | ASM_CR4_UNMASKED_FPU_EXCEPTION);
+
+    asm_fninit();
+}
+
 void simd_enable_xsave(void)
 {
     asm_write_cr4(asm_read_cr4() | ASM_CR4_XSAVE);
@@ -32,20 +44,14 @@ void simd_initialize_xcr0(void)
 
 void simd_initialize(void)
 {
+    simd_initialize_fpu();
+
     if (cpuid_has_xsave())
     {
-        log("XSAVE detected, using it...");
+        log("XSAVE detected");
 
         simd_enable_xsave();
         simd_initialize_xcr0();
-    }
-    else
-    {
-        log("XSAVE not found, falling back on FPU...");
-
-        asm_write_cr0(asm_read_cr0() | ASM_CR0_NATIVE_EXCEPTION);
-        asm_write_cr4(asm_read_cr4() | ASM_CR4_FXSR);
-        asm_fninit();
     }
 }
 
