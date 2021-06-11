@@ -47,6 +47,7 @@ void arch_entry_main(struct handover *handover)
 
 void arch_entry_other(void)
 {
+    arch_disable_interrupt();
     apic_enable();
     cpu_context_initialize();
     syscall_initialize_for_current_cpu();

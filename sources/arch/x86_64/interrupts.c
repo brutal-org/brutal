@@ -8,40 +8,39 @@
 
 struct lock error_lock;
 
-static char *_exception_messages[32] =
-    {
-        "division-by-zero",
-        "debug",
-        "non-maskable-interrupt",
-        "breakpoint",
-        "detected-overflow",
-        "out-of-bounds",
-        "invalid-opcode",
-        "no-coprocessor",
-        "double-fault",
-        "coprocessor-segment-overrun",
-        "bad-tss",
-        "segment-not-present",
-        "stack-fault",
-        "general-protection-fault",
-        "page-fault",
-        "unknown-interrupt",
-        "coprocessor-fault",
-        "alignment-check",
-        "machine-check",
-        "reserved",
-        "reserved",
-        "reserved",
-        "reserved",
-        "reserved",
-        "reserved",
-        "reserved",
-        "reserved",
-        "reserved",
-        "reserved",
-        "reserved",
-        "reserved",
-        "reserved",
+static char *_exception_messages[32] = {
+    "division-by-zero",
+    "debug",
+    "non-maskable-interrupt",
+    "breakpoint",
+    "detected-overflow",
+    "out-of-bounds",
+    "invalid-opcode",
+    "no-coprocessor",
+    "double-fault",
+    "coprocessor-segment-overrun",
+    "bad-tss",
+    "segment-not-present",
+    "stack-fault",
+    "general-protection-fault",
+    "page-fault",
+    "unknown-interrupt",
+    "coprocessor-fault",
+    "alignment-check",
+    "machine-check",
+    "reserved",
+    "reserved",
+    "reserved",
+    "reserved",
+    "reserved",
+    "reserved",
+    "reserved",
+    "reserved",
+    "reserved",
+    "reserved",
+    "reserved",
+    "reserved",
+    "reserved",
 };
 
 void dump_register(struct interrupt_stackframe const *stackframe)
@@ -80,7 +79,7 @@ uint64_t interrupt_handler(uint64_t rsp)
     else if (stackframe->int_no == IPIT_RESCHED)
     {
         log("cpu resched");
-        rsp = tasking_schedule_and_switch(rsp);
+        rsp = tasking_switch(rsp);
     }
     else if (stackframe->int_no == 0xf0)
     {

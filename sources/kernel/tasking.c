@@ -10,8 +10,7 @@
 static struct lock task_lock = {};
 static task_id_t task_id = 0;
 static vec_t(struct task *) tasks = {};
-
-size_t switchable_process_count = 0; // number of process waiting and running
+size_t current_tick = 0;
 
 void task_idle(void)
 {
@@ -27,14 +26,20 @@ struct task *task_self(void)
     return cpu_self()->schedule.current;
 }
 
-static void scheduler_set_running_if_available(struct task *target)
+void scheduler_set_running_if_available(struct task *target)
 {
     for (size_t i = 0; i < cpu_count(); i++)
     {
         if (cpu(i)->schedule.current == NULL || cpu(i)->schedule.current == cpu(i)->schedule.idle)
         {
+            target->scheduler_state.tick_start = current_tick;
+            target->scheduler_state.tick_end = 0;
+
+            target->scheduler_state.is_currently_executed = true;
+
             cpu(i)->schedule.current = target;
             cpu(i)->schedule.next = target;
+
             return;
         }
     }
@@ -50,13 +55,15 @@ task_return_result_t task_spawn(uintptr_t ip, bool start_direct)
     task->id = task_id++;
     task->ip = ip;
     task->level = TASK_LEVEL_USER; // not used for the moment
-
+    task->scheduler_state.is_currently_executed = false;
+    task->scheduler_state.tick_start = 0;
+    task->scheduler_state.tick_end = 0;
     log("Task({}) created...", task->id);
 
     if (start_direct)
     {
         vec_push(&tasks, task);
-        scheduler_set_running_if_available(task);
+        task->state = TASK_RUNNING;
     }
 
     return OK(task_return_result_t, task);
@@ -85,189 +92,259 @@ void task_wait(struct task *self, uint64_t ms)
 void tasking_initialize(void)
 {
     log("Initializing tasking...");
-
+    current_tick = 0;
+    task_id = 0;
     vec_init(&tasks, alloc_global());
     for (size_t i = 0; i < cpu_count(); i++)
     {
         log("Initializing tasking for cpu: {}", i);
         cpu(i)->schedule.idle = task_spawn((uintptr_t)&task_idle, false)._ok;
         cpu(i)->schedule.current = NULL;
-        cpu(i)->schedule.next = NULL;
+        cpu(i)->schedule.next = cpu(i)->schedule.idle;
     }
 }
 
-void update_scheduler_time(void)
+static size_t running_process_count(void)
 {
-
-    switchable_process_count = 0;
-
-    LOCK_RETAINER(&task_lock);
+    size_t running_process_count = 0;
     for (int i = 0; i < tasks.length; i++)
     {
-        if (tasks.data[i]->state == TASK_WAITING)
+        if (tasks.data[i]->state == TASK_RUNNING)
         {
-            switchable_process_count++;
-            tasks.data[i]->scheduler_state.tick_running -= 1;
-        }
-        else if (tasks.data[i]->state == TASK_RUNNING)
-        {
-            switchable_process_count++;
-            tasks.data[i]->scheduler_state.tick_running += 1;
-        }
-        else
-        {
-            tasks.data[i]->scheduler_state.tick_running = 0;
+            running_process_count++;
         }
     }
+    return running_process_count;
 }
 
-struct task *task_get_most_active()
+static struct task *task_get_most_active(void)
 {
-    LOCK_RETAINER(&task_lock);
-    int most_running_count = 0;
+
+    size_t most_active_count = 0;
     struct task *curr = NULL;
     for (int i = 0; i < tasks.length; i++)
     {
-        if (tasks.data[i]->state == TASK_RUNNING && tasks.data[i]->scheduler_state.tick_running > most_running_count)
+        if (tasks.data[i]->state != TASK_RUNNING || tasks.data[i]->scheduler_state.is_currently_executed != true)
         {
-            most_running_count = tasks.data[i]->scheduler_state.tick_running;
+            continue;
+        }
+        if ((current_tick - tasks.data[i]->scheduler_state.tick_start) > most_active_count)
+        {
+            most_active_count = (current_tick - tasks.data[i]->scheduler_state.tick_start);
             curr = tasks.data[i];
         }
     }
     return curr;
 }
 
-struct task *task_get_most_waiting()
+static struct task *task_get_most_waiting()
 {
-    LOCK_RETAINER(&task_lock);
-    int most_waiting_count = 0;
+    size_t most_waiting_count = 0;
     struct task *curr = NULL;
     for (int i = 0; i < tasks.length; i++)
     {
-        if (tasks.data[i]->state == TASK_WAITING && tasks.data[i]->scheduler_state.tick_running < most_waiting_count)
+        if (tasks.data[i]->state != TASK_RUNNING || tasks.data[i]->scheduler_state.is_currently_executed != false)
         {
-            most_waiting_count = tasks.data[i]->scheduler_state.tick_running;
+            continue;
+        }
+        if ((current_tick - tasks.data[i]->scheduler_state.tick_end) > most_waiting_count)
+        {
+            most_waiting_count = (current_tick - tasks.data[i]->scheduler_state.tick_end);
             curr = tasks.data[i];
         }
     }
     return curr;
 }
 
-cpu_id_t scheduler_set_task_to_wait(struct task *target)
+static cpu_id_t scheduler_end_task_execution(struct task *target)
 {
-    LOCK_RETAINER(&task_lock);
 
-    // if this is the idle task we don't want to put it as waiting as it is a task that is not in the task list
-    if (cpu(target->scheduler_state.task_cpu)->schedule.idle != target)
-    {
-        target->state = TASK_WAITING;
-        target->scheduler_state.tick_running = 0;
-        cpu_id_t cur_cpu = target->scheduler_state.task_cpu;
-        target->scheduler_state.task_cpu = 0;
-        return cur_cpu;
-    }
+    target->scheduler_state.tick_end = current_tick;
+    target->scheduler_state.is_currently_executed = false;
+    cpu_id_t cur_cpu = target->scheduler_state.task_cpu;
+    target->scheduler_state.task_cpu = 0;
 
-    return target->scheduler_state.task_cpu;
+    return cur_cpu;
 }
 
-void scheduler_set_task_active(struct task *target, cpu_id_t target_cpu)
+static void scheduler_start_task_execution(struct task *target, cpu_id_t target_cpu)
 {
-    LOCK_RETAINER(&task_lock);
-    target->state = TASK_RUNNING;
-    target->scheduler_state.tick_running = 0;
+    target->scheduler_state.tick_start = current_tick;
+    target->scheduler_state.is_currently_executed = true;
     target->scheduler_state.task_cpu = target_cpu;
     cpu(target_cpu)->schedule.next = target;
 }
 
-void scheduler_continue_all_cpu(void)
+static bool scheduler_is_cpu_lazy(cpu_id_t id)
 {
+    struct task *idle = cpu(id)->schedule.idle;
+    return (cpu(id)->schedule.current == NULL && cpu(id)->schedule.next == NULL) || (cpu(id)->schedule.next == idle);
+}
+
+static size_t scheduler_get_lazy_cpu_count(void)
+{
+    size_t count = 0;
+
+    for (size_t i = 0; i < cpu_count(); i++)
+    {
+        if (scheduler_is_cpu_lazy(i))
+        {
+            count++;
+        }
+    }
+
+    return count;
+}
+
+static size_t scheduler_get_running_cpu_count(void)
+{
+    size_t count = 0;
+
+    for (size_t i = 0; i < cpu_count(); i++)
+    {
+        if (!scheduler_is_cpu_lazy(i))
+        {
+            count++;
+        }
+    }
+
+    return count;
+}
+
+static bool scheduler_add_process_to_a_lazy_cpu(struct task *target)
+{
+    for (size_t i = 0; i < cpu_count(); i++)
+    {
+        if (scheduler_is_cpu_lazy(i))
+        {
+            scheduler_start_task_execution(target, i);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+static void scheduler_continue_all_cpu(size_t running)
+{
+
+    size_t running_cpu = scheduler_get_running_cpu_count();
+    if (running_cpu >= running) // the case where for exemple we have 3 process and 4/3 cpu running, don't need to switch
+    {
+        for (size_t i = 0; i < cpu_count(); i++)
+        {
+            if (cpu(i)->schedule.current != NULL)
+            {
+                cpu(i)->schedule.next = cpu(i)->schedule.current;
+            }
+        }
+        return;
+    }
+
+    // here the case where we have 3 process and 1 waiting with 4 cpu
 
     for (size_t i = 0; i < cpu_count(); i++)
     {
 
-        cpu(i)->schedule.next = cpu(i)->schedule.current;
+        if (cpu(i)->schedule.current == NULL)
+        {
+            struct task *target = task_get_most_waiting();
+            scheduler_add_process_to_a_lazy_cpu(target);
+            running_cpu++;
+            if (running_cpu >= running)
+            {
+                return;
+            }
+        }
+        else
+        {
+            cpu(i)->schedule.next = cpu(i)->schedule.current; // don't switch
+        }
     }
 }
 
-void scheduler_update(void)
+static void scheduler_update(void)
 {
-    if (switchable_process_count < cpu_count()) // the case were we don't need to switch
+    size_t running = running_process_count();
+
+    if (running <= cpu_count()) // when we have a number of process under the number of cpu
     {
-        scheduler_continue_all_cpu();
+        scheduler_continue_all_cpu(running);
         return; // early return
     }
 
-    size_t schedule_count = MIN(cpu_count(), switchable_process_count - cpu_count());
+    size_t schedule_count = MIN(cpu_count(), running - cpu_count());
+
     for (size_t i = 0; i < schedule_count; i++)
     {
-        struct task *most_active = task_get_most_active();
         struct task *most_waiting = task_get_most_waiting();
 
-        cpu_id_t target_cpu = scheduler_set_task_to_wait(most_active);
-        scheduler_set_task_active(most_waiting, target_cpu);
+        if (scheduler_get_lazy_cpu_count() != 0) // if a cpu don't do anything (poor guy :^(   ) we give him a process
+        {
+            scheduler_add_process_to_a_lazy_cpu(most_waiting);
+            continue;
+        }
+
+        struct task *most_active = task_get_most_active();
+
+        cpu_id_t target_cpu = scheduler_end_task_execution(most_active);
+        scheduler_start_task_execution(most_waiting, target_cpu);
     }
 }
 
-void tasking_schedule(void)
+static void tasking_schedule(void)
 {
-    if (cpu_self_id() == CPU_SCHEDULER_MANAGER)
+    scheduler_update();
+
+    for (size_t i = 1; i < cpu_count(); i++)
     {
-        update_scheduler_time();
-        scheduler_update();
-
-        for (size_t i = 1; i < cpu_count(); i++)
+        if (cpu(i)->schedule.current != cpu(i)->schedule.next)
         {
-
-            if (cpu(i)->schedule.next != cpu(i)->schedule.current)
-            {
-                arch_task_switch_for_cpu(i); // send switch to cpu
-            }
-
-            /*if (cpu(i)->schedule.current != NULL)
-            {
-
-                log("cpu: {} using process: {}", i, cpu(i)->schedule.current->id);
-            }
-            else
-            {
-                log("cpu: {} idle", i);
-            }*/
+            arch_task_switch_for_cpu(i); // send switch to cpu
         }
     }
+}
+
+uintptr_t tasking_switch(uintptr_t sp)
+{
+    if (task_self() != NULL)
+    {
+        task_self()->sp = sp; // save stack pointer
+        arch_task_save_context(cpu_self()->schedule.current);
+    }
+
+#ifdef TASKING_LOGGING
     if (cpu_self()->schedule.current != NULL)
     {
-
         log("cpu: {} using process: {} to {}", cpu_self_id(), cpu_self()->schedule.current->id, cpu_self()->schedule.next->id);
+    }
+    else if (cpu_self()->schedule.next != NULL)
+    {
+        log("cpu: {} using process: idle to {}", cpu_self_id(), cpu_self()->schedule.next->id);
     }
     else
     {
         log("cpu: {} idle", cpu_self_id());
     }
-    cpu_self()->schedule.current = cpu_self()->schedule.next;
-}
+#endif
 
-uintptr_t tasking_switch(uintptr_t sp)
-{
+    cpu_self()->schedule.current = cpu_self()->schedule.next;
+    cpu_self()->schedule.next = NULL;
+
+    if (task_self() != NULL)
+    {
+        sp = task_self()->sp; // load stack pointer
+        arch_task_load_context(cpu_self()->schedule.current);
+    }
+
     return sp;
 }
 
 uintptr_t tasking_schedule_and_switch(uintptr_t sp)
 {
-    if (task_self() != NULL)
-    {
-        task_self()->sp = sp; // save stack pointer
-    }
-
-    arch_task_save_context(cpu_self()->schedule.current);
-
+    LOCK_RETAINER(&task_lock);
+    current_tick++;
     tasking_schedule();
-
-    if (task_self() != NULL)
-    {
-        sp = task_self()->sp; // load stack pointer
-    }
-
-    arch_task_load_context(cpu_self()->schedule.current);
 
     return tasking_switch(sp);
 }

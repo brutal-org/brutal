@@ -19,16 +19,18 @@ enum task_state
 
 enum task_level
 {
-    TASK_LEVEL_USER = 0,
-    TASK_LEVEL_MODULE = 1,
-    TASK_LEVEL_KERNEL = 2,
+    TASK_LEVEL_USER,
+    TASK_LEVEL_LOW,
+    TASK_LEVEL_KERNEL,
 };
 
 // see scheduler.md in the book for more information
 struct task_schedule_state
 {
     cpu_id_t task_cpu; // only valid if tick_in_cpu is >= 0
-    int tick_running;  // can be negative !!! when the task hasn't been scheduled in a long time
+    int tick_start;
+    int tick_end;
+    bool is_currently_executed;
 };
 
 struct task
@@ -69,8 +71,6 @@ struct schedule
     struct task *current;
     struct task *next;
 };
-
-void tasking_schedule(void);
 
 uintptr_t tasking_switch(uintptr_t sp);
 
