@@ -24,7 +24,7 @@ void lapic_write(uint32_t reg, uint32_t value)
 
 void lapic_enable_spurious(void)
 {
-    lapic_write(LAPIC_REG_SPURIOUS, LAPIC_SPURIOUS_ALL | LAPIC_SPURIOUS_ENABLE_APIC);
+    lapic_write(LAPIC_REG_SPURIOUS, lapic_read(LAPIC_REG_SPURIOUS) | (LAPIC_SPURIOUS_ALL | LAPIC_SPURIOUS_ENABLE_APIC));
 }
 
 void lapic_initialize(struct handover const *handover)
