@@ -3,10 +3,8 @@
 
 uint32_t pit_read_counter(void)
 {
-    uint32_t counter;
-
     asm_out8(PIT_MODE_COMMAND, 0);
-    counter = asm_in8(PIT_DATA_PORT0);
+    uint32_t counter = asm_in8(PIT_DATA_PORT0);
     counter |= asm_in8(PIT_DATA_PORT0) << 8;
 
     return counter;

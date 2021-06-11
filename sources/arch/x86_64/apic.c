@@ -1,4 +1,4 @@
-#include <brutal/base/std.h>
+#include <brutal/base.h>
 #include <brutal/log.h>
 #include "arch/mmio.h"
 #include "arch/x86_64/acpi.h"
@@ -65,7 +65,7 @@ struct ioapic_version ioapic_get_version(int ioapic_id)
 {
     uint32_t raw = ioapic_read(ioapic_id, IOAPIC_REG_VERSION);
 
-    return *((struct ioapic_version *)(&raw));
+    return union_cast(struct ioapic_version, raw);
 }
 
 void ioapic_initialize(struct handover const *handover)

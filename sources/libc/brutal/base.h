@@ -1,5 +1,6 @@
 #pragma once
 
+#include <brutal/base/cast.h>
 #include <brutal/base/count.h>
 #include <brutal/base/error.h>
 #include <brutal/base/macros.h>
