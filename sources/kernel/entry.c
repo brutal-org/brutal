@@ -100,6 +100,7 @@ void kernel_entry_main(struct handover *handover)
     task_spawn((uintptr_t)task6, true);
     task_spawn((uintptr_t)task7, true);
     task_spawn((uintptr_t)task8, true);
+    arch_enable_interrupt();
     log("All CPU started, entering userspace...");
     kernel_boot_other();
 }
@@ -109,6 +110,6 @@ void kernel_entry_other(void)
     log("CPU N°{} is entering kernel...", cpu_self()->id);
 
     other_ready++;
-
+    arch_enable_interrupt();
     arch_idle();
 }
