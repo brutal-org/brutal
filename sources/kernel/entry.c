@@ -24,83 +24,42 @@ void kernel_boot_other(void)
     arch_boot_other();
 
     other_ready++;
-
+    arch_enable_interrupt();
+    while (other_ready != cpu_count())
+    {
+    }
     arch_idle();
 }
 
-void task1(void)
+void task_test(void)
 {
     while (true)
     {
-        log("task 1");
-    }
-}
-void task2(void)
-{
-    while (true)
-    {
-        log("task 2");
-    }
-}
-void task3(void)
-{
-    while (true)
-    {
-        log("task 3");
-    }
-}
-void task4(void)
-{
-    while (true)
-    {
-        log("task 4");
-    }
-}
-void task5(void)
-{
-    while (true)
-    {
-        log("task 5");
-    }
-}
-void task6(void)
-{
-    while (true)
-    {
-        log("task 6");
-    }
-}
-void task7(void)
-{
-    while (true)
-    {
-        log("task 7");
-    }
-}
-void task8(void)
-{
-    while (true)
-    {
-        log("task 8");
+        if (task_self() == NULL)
+        {
+
+            log("task WTF", task_self()->id);
+        }
+        log("task {} {}", task_self()->id, cpu_self_id());
+        for (size_t i = 0; i < 10000; i++)
+        {
+
+            asm volatile("pause");
+        }
     }
 }
 
 void kernel_entry_main(struct handover *handover)
 {
     UNUSED(handover);
+    tasking_initialize();
     log("Main CPU is entering kernel...");
 
     kernel_splash();
-    tasking_initialize();
-    task_spawn((uintptr_t)task1, true);
-    task_spawn((uintptr_t)task2, true);
-    task_spawn((uintptr_t)task3, true);
-    task_spawn((uintptr_t)task4, true);
-    task_spawn((uintptr_t)task5, true);
-    task_spawn((uintptr_t)task6, true);
-    task_spawn((uintptr_t)task7, true);
-    task_spawn((uintptr_t)task8, true);
-    arch_enable_interrupt();
+    for (size_t i = 0; i < 5; i++)
+    {
+        task_spawn((uintptr_t)task_test, true);
+    }
     log("All CPU started, entering userspace...");
     kernel_boot_other();
 }
