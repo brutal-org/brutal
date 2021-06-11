@@ -94,7 +94,6 @@ void apic_initalize(struct handover const *handover)
     ioapic_initialize(handover);
 
     apic_enable();
-    lapic_enable_spurious();
 }
 
 void apic_eoi(void)
@@ -127,7 +126,8 @@ cpu_id_t apic_current_cpu(void)
 
 void apic_enable(void)
 {
-    wrmsr(MSR_APIC, (rdmsr(MSR_APIC) | LAPIC_ENABLE));
+    wrmsr(MSR_APIC, (rdmsr(MSR_APIC) | LAPIC_ENABLE) & ~((1 << 10)));
+    lapic_enable_spurious();
 }
 
 /* --- Ioapic interrupt redirection --------------------------------------------------------------- */
