@@ -107,12 +107,12 @@ static inline void asm_write_xcr(uint32_t i, uint64_t value)
 
 static inline void asm_xsave(void *region)
 {
-    asm volatile("xsave (%0)" ::"r"(region));
+    asm volatile("xsave (%0)" ::"a"(region));
 }
 
 static inline void asm_xrstor(void *region)
 {
-    asm volatile("xrstor (%0)" ::"r"(region));
+    asm volatile("xrstor (%0)" ::"a"(region));
 }
 
 static inline void asm_fninit(void)
@@ -122,10 +122,10 @@ static inline void asm_fninit(void)
 
 static inline void asm_fxsave(void *region)
 {
-    asm volatile("fxsave (%0)" ::"r"(region));
+    asm volatile("fxsave (%0)" ::"a"(region));
 }
 
 static inline void asm_fxrstor(void *region)
 {
-    asm volatile("fxrstor (%0)" ::"r"(region));
+    asm volatile("fxrstor (%0)" ::"a"(region));
 }
