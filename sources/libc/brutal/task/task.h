@@ -3,13 +3,12 @@
 #include <brutal/base/error.h>
 #include <brutal/base/result.h>
 #include <brutal/text/str.h>
+#include <brutal/types.h>
 
 #define TASK_THIS (-424242)
 
 #define TASK_EXIT_SUCCESS (0)
 #define TASK_EXIT_FAILURE (-1)
-
-typedef int task_handle_t;
 
 enum task_type
 {
@@ -35,7 +34,7 @@ struct task_exec
 
 struct task
 {
-    task_handle_t handle;
+    task_id_t handle;
     enum task_type type;
 
     union
