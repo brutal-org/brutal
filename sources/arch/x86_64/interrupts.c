@@ -1,43 +1,47 @@
 #include <brutal/log.h>
+#include <brutal/task/lock.h>
 #include "arch/x86_64/apic.h"
 #include "arch/x86_64/asm.h"
 #include "arch/x86_64/interrupts.h"
 #include "arch/x86_64/pic.h"
 #include "kernel/tasking.h"
 
-static char *_exception_messages[32] = {
-    "division-by-zero",
-    "debug",
-    "non-maskable-interrupt",
-    "breakpoint",
-    "detected-overflow",
-    "out-of-bounds",
-    "invalid-opcode",
-    "no-coprocessor",
-    "double-fault",
-    "coprocessor-segment-overrun",
-    "bad-tss",
-    "segment-not-present",
-    "stack-fault",
-    "general-protection-fault",
-    "page-fault",
-    "unknown-interrupt",
-    "coprocessor-fault",
-    "alignment-check",
-    "machine-check",
-    "reserved",
-    "reserved",
-    "reserved",
-    "reserved",
-    "reserved",
-    "reserved",
-    "reserved",
-    "reserved",
-    "reserved",
-    "reserved",
-    "reserved",
-    "reserved",
-    "reserved",
+struct lock error_lock;
+
+static char *_exception_messages[32] =
+    {
+        "division-by-zero",
+        "debug",
+        "non-maskable-interrupt",
+        "breakpoint",
+        "detected-overflow",
+        "out-of-bounds",
+        "invalid-opcode",
+        "no-coprocessor",
+        "double-fault",
+        "coprocessor-segment-overrun",
+        "bad-tss",
+        "segment-not-present",
+        "stack-fault",
+        "general-protection-fault",
+        "page-fault",
+        "unknown-interrupt",
+        "coprocessor-fault",
+        "alignment-check",
+        "machine-check",
+        "reserved",
+        "reserved",
+        "reserved",
+        "reserved",
+        "reserved",
+        "reserved",
+        "reserved",
+        "reserved",
+        "reserved",
+        "reserved",
+        "reserved",
+        "reserved",
+        "reserved",
 };
 
 void dump_register(struct interrupt_stackframe const *stackframe)
@@ -55,13 +59,14 @@ void dump_register(struct interrupt_stackframe const *stackframe)
 uint64_t interrupt_handler(uint64_t rsp)
 {
     auto stackframe = (struct interrupt_stackframe *)rsp;
-
     if (stackframe->int_no < 32)
     {
+        lock_acquire(&error_lock);
         log("Interrupt {}: {}: error: {} on {x} !", stackframe->int_no, _exception_messages[stackframe->int_no], stackframe->error_code, stackframe->rip);
 
         dump_register(stackframe);
 
+        lock_release(&error_lock);
         while (true)
         {
             asm_cli();
@@ -74,7 +79,12 @@ uint64_t interrupt_handler(uint64_t rsp)
     }
     else if (stackframe->int_no == IPIT_RESCHED)
     {
-        rsp = tasking_switch(rsp);
+        //   log("cpu resched");
+        rsp = tasking_schedule_and_switch(rsp);
+    }
+    else if (stackframe->int_no == 0xf0)
+    {
+        log("non maskable interrupt from apic: possible hardware error");
     }
 
     apic_eoi();
