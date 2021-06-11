@@ -1,8 +1,8 @@
 #include <stdint.h>
-#include "apic.h"
-#include "apic_timer.h"
 #include "arch/mmio.h"
-#include "pit.h"
+#include "arch/x86_64/apic.h"
+#include "arch/x86_64/apic/timer.h"
+#include "arch/x86_64/pit.h"
 
 void apic_timer_initialize(void)
 {

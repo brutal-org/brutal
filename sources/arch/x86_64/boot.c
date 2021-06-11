@@ -4,7 +4,7 @@
 #include "arch/pmm.h"
 #include "arch/vmm.h"
 #include "arch/x86_64/apic.h"
-#include "arch/x86_64/apic_timer.h"
+#include "arch/x86_64/apic/timer.h"
 #include "arch/x86_64/asm.h"
 #include "arch/x86_64/com.h"
 #include "arch/x86_64/cpu.h"
