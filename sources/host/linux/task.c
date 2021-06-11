@@ -22,7 +22,7 @@ int host_task_wait(task_id_t handle)
 
 void host_task_exit(task_id_t handle, int result)
 {
-    if (handle == TASK_THIS)
+    if (handle == (task_id_t)TASK_THIS)
     {
         _exit(result);
     }
@@ -30,7 +30,7 @@ void host_task_exit(task_id_t handle, int result)
 
 void host_task_abort(task_id_t handle)
 {
-    if (handle == TASK_THIS)
+    if (handle == (task_id_t)TASK_THIS)
     {
         _exit(TASK_EXIT_FAILURE);
     }
