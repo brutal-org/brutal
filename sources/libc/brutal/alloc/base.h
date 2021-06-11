@@ -35,6 +35,14 @@ struct alloc
         ptr;                                     \
     })
 
+#define alloc_make_array(self, T, count) (               \
+    {                                                    \
+        T *ptr = alloc_acquire(self, sizeof(T) * count); \
+        alloc_commit(self, ptr);                         \
+        mem_set(ptr, 0, sizeof(T) * count);              \
+        ptr;                                             \
+    })
+
 #define alloc_decommit(self, ptr) \
     ((self)->decommit((self), ptr))
 
