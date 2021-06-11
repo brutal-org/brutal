@@ -69,8 +69,9 @@ size_t simd_context_size(void)
     }
 }
 
-void simd_context_init(MAYBE_UNUSED void *ptr)
+void simd_context_init(void *ptr)
 {
+    simd_context_save(ptr);
 }
 
 void simd_context_save(void *ptr)
