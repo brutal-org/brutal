@@ -17,6 +17,7 @@ void task_idle(void)
 {
     while (true)
     {
+        log("idle");
         asm volatile("hlt");
     }
 }
@@ -30,9 +31,10 @@ static void scheduler_set_running_if_available(struct task *target)
 {
     for (size_t i = 0; i < cpu_count(); i++)
     {
-        if (cpu(i)->schedule.current == NULL)
+        if (cpu(i)->schedule.current == NULL || cpu(i)->schedule.current == cpu(i)->schedule.idle)
         {
             cpu(i)->schedule.current = target;
+            cpu(i)->schedule.next = target;
             return;
         }
     }
@@ -88,8 +90,9 @@ void tasking_initialize(void)
     for (size_t i = 0; i < cpu_count(); i++)
     {
         log("Initializing tasking for cpu: {}", i);
+        cpu(i)->schedule.idle = task_spawn((uintptr_t)&task_idle, false)._ok;
         cpu(i)->schedule.current = NULL;
-        cpu(i)->schedule.idle = task_spawn((uintptr_t)task_idle, false)._ok;
+        cpu(i)->schedule.next = NULL;
     }
 }
 
@@ -176,28 +179,21 @@ void scheduler_set_task_active(struct task *target, cpu_id_t target_cpu)
     cpu(target_cpu)->schedule.next = target;
 }
 
-void scheduler_continue_all_cpu()
+void scheduler_continue_all_cpu(void)
 {
+
     for (size_t i = 0; i < cpu_count(); i++)
     {
-        if (cpu(i)->schedule.current == NULL)
-        {
-            cpu(i)->schedule.next = cpu(i)->schedule.idle;
-        }
 
-        else
-        {
-            cpu(i)->schedule.next = cpu(i)->schedule.current;
-        }
+        cpu(i)->schedule.next = cpu(i)->schedule.current;
     }
 }
 
 void scheduler_update(void)
 {
-    update_scheduler_time();
-    if (switchable_process_count <= cpu_count()) // the case were we don't need to switch
+    if (switchable_process_count < cpu_count()) // the case were we don't need to switch
     {
-
+        scheduler_continue_all_cpu();
         return; // early return
     }
 
@@ -216,15 +212,36 @@ void tasking_schedule(void)
 {
     if (cpu_self_id() == CPU_SCHEDULER_MANAGER)
     {
+        update_scheduler_time();
         scheduler_update();
 
-        for (size_t i = 0; i < cpu_count(); i++)
+        for (size_t i = 1; i < cpu_count(); i++)
         {
-            if (i != CPU_SCHEDULER_MANAGER)
+
+            if (cpu(i)->schedule.next != cpu(i)->schedule.current)
             {
-                arch_task_switch_for_cpu(i); // send switch to all cpu
+                arch_task_switch_for_cpu(i); // send switch to cpu
             }
+
+            /*if (cpu(i)->schedule.current != NULL)
+            {
+
+                log("cpu: {} using process: {}", i, cpu(i)->schedule.current->id);
+            }
+            else
+            {
+                log("cpu: {} idle", i);
+            }*/
         }
+    }
+    if (cpu_self()->schedule.current != NULL)
+    {
+
+        log("cpu: {} using process: {} to {}", cpu_self_id(), cpu_self()->schedule.current->id, cpu_self()->schedule.next->id);
+    }
+    else
+    {
+        log("cpu: {} idle", cpu_self_id());
     }
     cpu_self()->schedule.current = cpu_self()->schedule.next;
 }
@@ -236,8 +253,6 @@ uintptr_t tasking_switch(uintptr_t sp)
 
 uintptr_t tasking_schedule_and_switch(uintptr_t sp)
 {
-    log("scheduling... {}", cpu_self_id());
-
     if (task_self() != NULL)
     {
         task_self()->sp = sp; // save stack pointer

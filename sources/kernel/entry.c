@@ -25,9 +25,63 @@ void kernel_boot_other(void)
 
     other_ready++;
 
-    while (!(other_ready == cpu_count()))
+    arch_idle();
+}
+
+void task1(void)
+{
+    while (true)
     {
-        task_wait(task_self(), 10);
+        log("task 1");
+    }
+}
+void task2(void)
+{
+    while (true)
+    {
+        log("task 2");
+    }
+}
+void task3(void)
+{
+    while (true)
+    {
+        log("task 3");
+    }
+}
+void task4(void)
+{
+    while (true)
+    {
+        log("task 4");
+    }
+}
+void task5(void)
+{
+    while (true)
+    {
+        log("task 5");
+    }
+}
+void task6(void)
+{
+    while (true)
+    {
+        log("task 6");
+    }
+}
+void task7(void)
+{
+    while (true)
+    {
+        log("task 7");
+    }
+}
+void task8(void)
+{
+    while (true)
+    {
+        log("task 8");
     }
 }
 
@@ -38,11 +92,16 @@ void kernel_entry_main(struct handover *handover)
 
     kernel_splash();
     tasking_initialize();
-    kernel_boot_other();
-
+    task_spawn((uintptr_t)task1, true);
+    task_spawn((uintptr_t)task2, true);
+    task_spawn((uintptr_t)task3, true);
+    task_spawn((uintptr_t)task4, true);
+    task_spawn((uintptr_t)task5, true);
+    task_spawn((uintptr_t)task6, true);
+    task_spawn((uintptr_t)task7, true);
+    task_spawn((uintptr_t)task8, true);
     log("All CPU started, entering userspace...");
-
-    arch_idle();
+    kernel_boot_other();
 }
 
 void kernel_entry_other(void)
