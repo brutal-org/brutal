@@ -34,5 +34,5 @@ static inline bool cpuid_has_avx512(void)
 
 static inline size_t cpuid_xsave_size(void)
 {
-    return cpuid(7, 0).ecx;
+    return cpuid(13, 0).ecx;
 }

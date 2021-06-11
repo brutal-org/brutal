@@ -16,7 +16,7 @@ cpuid_result_t cpuid(uint32_t leaf, uint32_t subleaf)
         return (cpuid_result_t){.success = false};
     }
 
-    cpuid_result_t result;
+    cpuid_result_t result = {};
     result.success = true;
 
     asm volatile("cpuid"

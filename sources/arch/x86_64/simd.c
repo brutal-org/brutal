@@ -53,6 +53,8 @@ void simd_initialize(void)
         simd_enable_xsave();
         simd_initialize_xcr0();
     }
+
+    log("SIMD save buffer size = {}", simd_context_size());
 }
 
 size_t simd_context_size(void)
