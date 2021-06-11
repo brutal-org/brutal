@@ -7,6 +7,8 @@ static struct lock heap_lock;
 
 heap_result_t heap_alloc(size_t size)
 {
+    size = ALIGN_UP(size, 4096);
+
     LOCK_RETAINER(&heap_lock)
 
     auto pmm_range = TRY(heap_result_t, pmm_alloc(size));
