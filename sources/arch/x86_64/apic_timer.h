@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #define LAPIC_IRQ 32
 #define LAPIC_LVT_TIMER_MODE_PERIODIC 0x20000

@@ -14,3 +14,11 @@ void arch_boot_other(void);
 void arch_resched_other(void);
 
 void arch_idle(void);
+
+struct task *arch_create_task(void);
+
+void arch_save_task_context(struct task *task);
+
+void arch_restore_task_context(struct task *task);
+
+void arch_destroy_task(struct task *task);

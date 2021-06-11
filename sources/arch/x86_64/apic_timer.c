@@ -7,7 +7,7 @@
 void apic_timer_initialize(void)
 {
     lapic_write(LAPIC_REG_TIMER_DIV, APIC_TIMER_DIVIDE_BY_16);
-    lapic_write(LAPIC_REG_TIMER_INITCNT, 0xFFFFFFFF);              /* Set the value to -1 */
+    lapic_write(LAPIC_REG_TIMER_INITCNT, 0xFFFFFFFF); /* Set the value to -1 */
 
     pit_sleep(10);
 

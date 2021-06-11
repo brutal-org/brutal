@@ -24,4 +24,3 @@
 
 #define range_contain(range, addr) \
     (((range).base <= (addr)) && ((range).size + (range).base >= (addr)))
-    

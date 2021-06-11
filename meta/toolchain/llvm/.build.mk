@@ -1,3 +1,6 @@
+CFLAGS_WARN += \
+	-Wnewline-eof
+
 # --- Host compiler ---------------------------------------------------------- #
 
 HOST_CC=clang-12
