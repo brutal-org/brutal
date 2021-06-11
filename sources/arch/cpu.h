@@ -1,6 +1,7 @@
 #pragma once
 
 #include <brutal/base.h>
+#include <brutal/types.h>
 #include "kernel/tasking.h"
 
 typedef uint8_t cpu_id_t;
