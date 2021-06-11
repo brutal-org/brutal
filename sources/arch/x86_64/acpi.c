@@ -74,7 +74,7 @@ uint32_t acpi_find_lapic(uintptr_t rsdp_address)
     return madt->local_apic;
 }
 
-#define acpi_find_table_generator(table_type, record_type, madt_record, name)               \
+#define ACPI_FIND_TABLE_GENERATOR(table_type, record_type, madt_record, name)               \
     struct table_type name(uintptr_t rsdp_address)                                          \
     {                                                                                       \
         auto madt = acpi_find_madt(rsdp_address);                                           \
@@ -91,6 +91,6 @@ uint32_t acpi_find_lapic(uintptr_t rsdp_address)
         return final;                                                                       \
     }
 
-acpi_find_table_generator(lapic_record_table, acpi_madt_lapic_record, ACPI_MADT_RECORD_LAPIC, acpi_find_lapic_table);
-acpi_find_table_generator(ioapic_record_table, acpi_madt_ioapic_record, ACPI_MADT_RECORD_IOAPIC, acpi_find_ioapic_table);
-acpi_find_table_generator(iso_record_table, acpi_madt_iso_record, ACPI_MADT_RECORD_MADT_ISO, acpi_find_iso_table);
+ACPI_FIND_TABLE_GENERATOR(lapic_record_table, acpi_madt_lapic_record, ACPI_MADT_RECORD_LAPIC, acpi_find_lapic_table);
+ACPI_FIND_TABLE_GENERATOR(ioapic_record_table, acpi_madt_ioapic_record, ACPI_MADT_RECORD_IOAPIC, acpi_find_ioapic_table);
+ACPI_FIND_TABLE_GENERATOR(iso_record_table, acpi_madt_iso_record, ACPI_MADT_RECORD_MADT_ISO, acpi_find_iso_table);
