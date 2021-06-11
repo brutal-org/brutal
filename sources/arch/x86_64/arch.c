@@ -34,9 +34,18 @@ void arch_resched_other(void)
 
 void arch_idle(void)
 {
-    asm_sti();
     while (true)
     {
         asm_hlt();
     }
+}
+
+void arch_enable_interrupt()
+{
+    asm_sti();
+}
+
+void arch_disable_interrupt()
+{
+    asm_cli();
 }

@@ -22,3 +22,7 @@ void arch_save_task_context(struct task *task);
 void arch_restore_task_context(struct task *task);
 
 void arch_destroy_task(struct task *task);
+
+void arch_enable_interrupt();
+
+void arch_disable_interrupt();
