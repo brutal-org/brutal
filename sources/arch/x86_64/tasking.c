@@ -14,13 +14,19 @@ void arch_task_save_context(struct task *target)
 {
 
     struct arch_task *task = (struct arch_task *)target;
-    simd_context_save(task->simd_context);
+    if (target != NULL)
+    {
+        simd_context_save(task->simd_context);
+    }
 }
 
 void arch_task_load_context(struct task *target)
 {
     struct arch_task *task = (struct arch_task *)target;
-    simd_context_load(task->simd_context);
+    if (target != NULL)
+    {
+        simd_context_load(task->simd_context);
+    }
 }
 
 task_return_result_t arch_task_create(uintptr_t ip, uintptr_t arg1, uintptr_t arg2, uintptr_t arg3, uintptr_t arg4)
