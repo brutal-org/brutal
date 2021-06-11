@@ -90,16 +90,15 @@ void vec_swap_impl(struct vec_impl *impl, int idx1, int idx2);
 
 #define vec_extend(v, v2) vec_pusharr((v), (v2)->data, (v2)->length)
 
-#define vec_find(v, val, idx)                         \
-    STMT(                                             \
-        for ((idx) = 0; (idx) < (v)->length; (idx)++) \
-        {                                             \
-            if ((v)->data[(idx)] == (val))            \
-                break;                                \
-        }                                             \
-                                                      \
-        if ((idx) == (v)->length) {                   \
-            (idx) = -1;                               \
+#define vec_find(v, val, idx)                           \
+    STMT(                                               \
+        for ((idx) = 0; (idx) < (v)->length; (idx)++) { \
+            if ((v)->data[(idx)] == (val))              \
+                break;                                  \
+        }                                               \
+                                                        \
+        if ((idx) == (v)->length) {                     \
+            (idx) = -1;                                 \
         })
 
 #define vec_remove(v, val)           \
