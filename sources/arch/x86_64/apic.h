@@ -1,7 +1,6 @@
 #pragma once
 
 #include <brutal/base.h>
-
 #include "arch/cpu.h"
 #include "kernel/handover.h"
 
