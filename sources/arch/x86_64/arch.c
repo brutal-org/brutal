@@ -34,6 +34,7 @@ void arch_resched_other(void)
 
 void arch_idle(void)
 {
+    asm_sti();
     while (true)
     {
         asm_hlt();

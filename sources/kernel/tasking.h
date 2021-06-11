@@ -1,7 +1,10 @@
 #pragma once
 
 #include <brutal/base.h>
+#include <brutal/types.h>
 #include "syscalls/error.h"
+
+#define CPU_SCHEDULER_MANAGER 0
 
 /* --- Task object ---------------------------------------------------------- */
 
@@ -10,6 +13,8 @@ enum task_state
     TASK_NONE,
     TASK_IDLE,
     TASK_RUNNING,
+    TASK_WAITING,
+    TASK_SLEEPING
 };
 
 enum task_level
@@ -19,12 +24,21 @@ enum task_level
     TASK_LEVEL_KERNEL = 2,
 };
 
+// see scheduler.md in the book for more information
+struct task_schedule_state
+{
+    cpu_id_t task_cpu; // only valid if tick_in_cpu is >= 0
+    int tick_running;  // can be negative !!! when the task hasn't been scheduled in a long time
+};
+
 struct task
 {
-    int id;
+    task_id_t id;
     enum task_state state;
 
     int level;
+
+    struct task_schedule_state scheduler_state;
 
     uintptr_t ip;
     uintptr_t sp;
@@ -35,7 +49,7 @@ typedef result_t(br_error_t, struct task *) task_return_result_t;
 
 struct task *task_self(void);
 
-task_return_result_t task_spawn(uintptr_t ip);
+task_return_result_t task_spawn(uintptr_t ip, bool start_direct);
 
 void task_go(struct task *self);
 
