@@ -24,10 +24,11 @@ void kernel_boot_other(void)
     arch_boot_other();
 
     other_ready++;
-    arch_enable_interrupt();
     while (other_ready != cpu_count())
     {
     }
+
+    arch_enable_interrupt();
     arch_idle();
 }
 

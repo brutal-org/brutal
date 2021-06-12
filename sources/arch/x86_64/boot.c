@@ -41,6 +41,7 @@ void arch_entry_main(struct handover *handover)
     cpu_context_initialize();
     syscall_initialize_for_current_cpu();
 
+    log("ints = {}", (asm_read_rflag() & RFLAGS_INTERRUPT_ENABLE) == RFLAGS_INTERRUPT_ENABLE);
     log("Arch x86_64 initialized!");
     kernel_entry_main(handover);
 }

@@ -78,7 +78,6 @@ uint64_t interrupt_handler(uint64_t rsp)
     }
     else if (stackframe->int_no == IPIT_RESCHED)
     {
-        log("cpu resched");
         rsp = tasking_switch(rsp);
     }
     else if (stackframe->int_no == 0xf0)
