@@ -155,3 +155,13 @@ enum rflags_bit
     RFLAGS_VIRTUAL_INTERRUPT_PENDING = 1 << 20, //
     RFLAGS_ID = 1 << 21,                        // support CPUID (i think if this bit is 0 you have a serious problem with your cpu)
 };
+
+static inline uint64_t asm_read_rflag(void)
+{
+    uint64_t value = 0;
+    asm volatile(
+        "pushf\n"
+        "pop %0\n"
+        : "=r"(value));
+    return value;
+}

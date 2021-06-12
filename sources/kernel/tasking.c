@@ -203,7 +203,6 @@ static bool scheduler_add_process_to_a_lazy_cpu(struct task *target)
 
 static void scheduler_continue_all_cpu(size_t running)
 {
-
     size_t running_cpu = scheduler_get_running_cpu_count();
     if (running_cpu >= running) // the case where for exemple we have 3 process and 4/3 cpu running, don't need to switch
     {
