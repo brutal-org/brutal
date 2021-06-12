@@ -129,3 +129,29 @@ static inline void asm_fxrstor(void *region)
 {
     asm volatile("fxrstor (%0)" ::"a"(region));
 }
+
+enum rflags_bit
+{
+    RFLAGS_CARRY = 1 << 0,
+    RFLAGS_RESERVED1_ONE = 1 << 1, // reserved, must be 1
+    RFLAGS_PARITY = 1 << 2,
+    RFLAGS_RESERVED2_ZERO = 1 << 3, // reserved, must be 0
+    RFLAGS_AUX_CARRY = 1 << 4,
+    RFLAGS_RESERVED3_ZERO = 1 << 5, // reserved, must be 0
+    RFLAGS_ZERRO = 1 << 6,
+    RFLAGS_SIGN = 1 << 7,
+    RFLAGS_TRAP = 1 << 8,             // create an interrupt for each instruction (used for debug)
+    RFLAGS_INTERRUPT_ENABLE = 1 << 9, // enable interrupt (like sti)
+    RFLAGS_DIRECTION = 1 << 10,
+    RFLAGS_OVERFLOW = 1 << 11,
+    RFLAGS_IO_PRIVILEGE = 3 << 12,
+    RFLAGS_NESTED_TASK = 1 << 14,
+    RFLAGS_RESERVED4_ZERO = 1 << 15, // reserved, must be 0
+    RFLAGS_RESUME = 1 << 16,
+    RFLAGS_VIRTUAL_8086 = 1 << 17,     // good ol' time
+    RFLAGS_ALIGNEMENT_CHECK = 1 << 18, // check each memory alignement
+    RFLAGS_ACCESS_CONTROL = 1 << 18,
+    RFLAGS_VIRTUAL_INTERRUPT = 1 << 19,         // same as INTERRUPT_ENABLE for virtual interrupts
+    RFLAGS_VIRTUAL_INTERRUPT_PENDING = 1 << 20, //
+    RFLAGS_ID = 1 << 21,                        // support CPUID (i think if this bit is 0 you have a serious problem with your cpu)
+};
