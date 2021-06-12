@@ -17,21 +17,29 @@
 - [ ] Userspace
 - [X] Syscalls
 - [x] SIMD (avx, sse, fpu, xsave)
-- [ ] IPC
-- [ ] Userspace Bootstrapping
-- [ ] Ramdisk
-- [ ] VFS
-
 
 ## Milestone 2
 
+- [ ] IPC
+- [ ] Userspace Bootstrapping
 - [ ] IDL
+- [ ] Shell
+- [ ] Ramdisk
+
+## Milestone 3
+
+- [ ] VFS
+- [ ] Disk driver (HCI? NVME? IDE (lol)?)
 - [ ] IRQ routing to usespace
+- [ ] ext2
+- [ ] FAT32
+
+## Milestone 4
+
 - [ ] Keyboard driver
 - [ ] Mouse driver
 - [ ] Framebuffer driver
-- [ ] Disk driver (HCI? NVME? IDE (lol)?)
-- [ ] Shell
+- [ ] Compositor
 
 ## Milestone 666
 
