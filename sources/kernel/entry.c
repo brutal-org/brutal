@@ -56,9 +56,9 @@ void kernel_entry_main(struct handover *handover)
     log("Main CPU is entering kernel...");
 
     kernel_splash();
-    for (size_t i = 0; i < 5; i++)
+    for (size_t i = 0; i < 20; i++)
     {
-        task_spawn((uintptr_t)task_test, true);
+        task_create((uintptr_t)task_test, TASK_CREATE_START_DIRECT);
     }
     log("All CPU started, entering userspace...");
     kernel_boot_other();

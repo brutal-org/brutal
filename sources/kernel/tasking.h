@@ -47,11 +47,17 @@ struct task
     uintptr_t kernel_sp;
 };
 
+enum task_create_flags
+{
+    TASK_CREATE_USER = 1 << 0,
+    TASK_CREATE_START_DIRECT = 1 << 1,
+};
+
 typedef result_t(br_error_t, struct task *) task_return_result_t;
 
 struct task *task_self(void);
 
-task_return_result_t task_spawn(uintptr_t ip, bool start_direct);
+task_return_result_t task_create(uintptr_t ip, enum task_create_flags flags);
 
 void task_go(struct task *self);
 

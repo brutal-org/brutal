@@ -16,7 +16,6 @@ void task_idle(void)
 {
     while (true)
     {
-        log("idle");
         asm volatile("hlt");
     }
 }
@@ -26,41 +25,19 @@ struct task *task_self(void)
     return cpu_self()->schedule.current;
 }
 
-void scheduler_set_running_if_available(struct task *target)
-{
-    for (size_t i = 0; i < cpu_count(); i++)
-    {
-        if (cpu(i)->schedule.current == NULL || cpu(i)->schedule.current == cpu(i)->schedule.idle)
-        {
-            target->scheduler_state.tick_start = current_tick;
-            target->scheduler_state.tick_end = 0;
-
-            target->scheduler_state.is_currently_executed = true;
-
-            cpu(i)->schedule.current = target;
-            cpu(i)->schedule.next = target;
-
-            return;
-        }
-    }
-}
-
-task_return_result_t task_spawn(uintptr_t ip, bool start_direct)
+task_return_result_t task_create(uintptr_t ip, enum task_create_flags flags)
 {
     log("Task creating...");
     LOCK_RETAINER(&task_lock);
 
-    auto task = TRY(task_return_result_t, arch_task_create(ip, 0, 0, 0, 0));
+    auto task = TRY(task_return_result_t, arch_task_create(ip, flags, 0, 0, 0, 0));
 
     task->id = task_id++;
     task->ip = ip;
-    task->level = TASK_LEVEL_USER; // not used for the moment
-    task->scheduler_state.is_currently_executed = false;
-    task->scheduler_state.tick_start = 0;
-    task->scheduler_state.tick_end = 0;
+
     log("Task({}) created...", task->id);
 
-    if (start_direct)
+    if (flags & TASK_CREATE_START_DIRECT)
     {
         vec_push(&tasks, task);
         task->state = TASK_RUNNING;
@@ -85,21 +62,19 @@ void task_wait(struct task *self, uint64_t ms)
 {
     UNUSED(self);
     UNUSED(ms);
-
     // TODO: task wait
 }
 
 void tasking_initialize(void)
 {
     log("Initializing tasking...");
-    current_tick = 0;
-    task_id = 0;
+
     vec_init(&tasks, alloc_global());
     for (size_t i = 0; i < cpu_count(); i++)
     {
         log("Initializing tasking for cpu: {}", i);
-        cpu(i)->schedule.idle = task_spawn((uintptr_t)&task_idle, false)._ok;
-        cpu(i)->schedule.current = NULL;
+        cpu(i)->schedule.idle = task_create((uintptr_t)&task_idle, 0)._ok;
+        cpu(i)->schedule.current = cpu(i)->schedule.idle;
         cpu(i)->schedule.next = cpu(i)->schedule.idle;
     }
 }
@@ -175,6 +150,7 @@ static void scheduler_start_task_execution(struct task *target, cpu_id_t target_
     cpu(target_cpu)->schedule.next = target;
 }
 
+// is the cpu current process NULL or idle
 static bool scheduler_is_cpu_lazy(cpu_id_t id)
 {
     struct task *idle = cpu(id)->schedule.idle;
@@ -246,7 +222,7 @@ static void scheduler_continue_all_cpu(size_t running)
     for (size_t i = 0; i < cpu_count(); i++)
     {
 
-        if (cpu(i)->schedule.current == NULL)
+        if (scheduler_is_cpu_lazy(i))
         {
             struct task *target = task_get_most_waiting();
             scheduler_add_process_to_a_lazy_cpu(target);
@@ -258,6 +234,7 @@ static void scheduler_continue_all_cpu(size_t running)
         }
         else
         {
+
             cpu(i)->schedule.next = cpu(i)->schedule.current; // don't switch
         }
     }
@@ -329,7 +306,6 @@ uintptr_t tasking_switch(uintptr_t sp)
 #endif
 
     cpu_self()->schedule.current = cpu_self()->schedule.next;
-    cpu_self()->schedule.next = NULL;
 
     if (task_self() != NULL)
     {
