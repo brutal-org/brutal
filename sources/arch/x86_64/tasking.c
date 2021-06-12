@@ -5,6 +5,7 @@
 #include "arch/heap.h"
 #include "arch/task.h"
 #include "arch/x86_64/apic.h"
+#include "arch/x86_64/asm.h"
 #include "arch/x86_64/gdt.h"
 #include "arch/x86_64/interrupts.h"
 #include "arch/x86_64/simd.h"
@@ -22,7 +23,7 @@ void arch_task_load_context(struct task *target)
     simd_context_load(task->simd_context);
 }
 
-task_return_result_t arch_task_create(uintptr_t ip, uintptr_t arg1, uintptr_t arg2, uintptr_t arg3, uintptr_t arg4)
+task_return_result_t arch_task_create(uintptr_t ip, enum task_create_flags flags, uintptr_t arg1, uintptr_t arg2, uintptr_t arg3, uintptr_t arg4)
 {
     struct arch_task *task = alloc_make(alloc_global(), struct arch_task);
 
@@ -39,13 +40,22 @@ task_return_result_t arch_task_create(uintptr_t ip, uintptr_t arg1, uintptr_t ar
     struct interrupt_stackframe *stackframe = (struct interrupt_stackframe *)task->base.sp;
 
     stackframe->rip = ip;
-    stackframe->rflags = 0x286;
+    stackframe->rflags = RFLAGS_INTERRUPT_ENABLE | RFLAGS_SIGN | RFLAGS_PARITY | RFLAGS_RESERVED1_ONE;
     stackframe->rdi = arg1;
     stackframe->rsi = arg2;
     stackframe->rdx = arg3;
     stackframe->rcx = arg4;
-    stackframe->cs = (GDT_KERNEL_CODE * 8);
-    stackframe->ss = (GDT_KERNEL_DATA * 8);
+
+    if (flags & TASK_CREATE_USER)
+    {
+        stackframe->cs = (GDT_USER_CODE * 8) | GDT_RING_3;
+        stackframe->ss = (GDT_USER_DATA * 8) | GDT_RING_3;
+    }
+    else
+    {
+        stackframe->cs = (GDT_KERNEL_CODE * 8);
+        stackframe->ss = (GDT_KERNEL_DATA * 8);
+    }
     stackframe->rsp = task->base.sp;
 
     return OK(task_return_result_t, (struct task *)task);

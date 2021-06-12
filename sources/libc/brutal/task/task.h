@@ -5,7 +5,7 @@
 #include <brutal/text/str.h>
 #include <brutal/types.h>
 
-#define TASK_THIS (-424242)
+#define TASK_THIS (0)
 
 #define TASK_EXIT_SUCCESS (0)
 #define TASK_EXIT_FAILURE (-1)
