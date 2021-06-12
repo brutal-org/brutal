@@ -58,25 +58,53 @@ this is way better, but here each process waits 1 tick and stays for 4 tick in t
 
 ### The implementation
 
-If you want you can see the python implementation in `meta/assets/scheduler_test.py`
-
 So in brutal we have (this may change over time) a scheduler state for each task:
 
 ```c
 struct task_schedule_state
 {
-    cpu_id_t task_cpu; // only valid if tick_in_cpu is >= 0
-    int tick_running; // can be negative !!! when the task hasn't been scheduled in a long time
+    cpu_id_t task_cpu; 
+    int tick_start; 
+    int tick_end; 
+    bool is_currently_executed;
+
 };
 ```
 
-**task_cpu** the cpu that the process use.
+- **task_cpu** the cpu that the process use.
+- **tick_start** the tick where the process started executing
+- **tick_end** the tick where the process stopped executing 
+- **is_currently_executed** if the process is executed or not
 
-**tick_running** is the time the process has spent running, or has spent waiting (if negative).
+But we have some problems: What happens if a process is now runnable ? or if we have 2 process and 4 cpu and 1 turning runnable ? 
 
-We do a context switch ONLY when the number of waiting process is higher than the number of cpu. 
+That's why we have 2 part of the scheduler:
 
-So we do a loop for each process, we need to count the number of switch we can do, if we have 6 process and 5 cpu, we can do 1 switch, but if we have 11 process and 5 cpu, we can only do 5. So the formula is: 
-̀`size_t needed_switch_count = min(cpu_count, process_valid_count - cpu_count);`. Where process_valid_count is the number of running process + the number of waiting process.
+- when the number of running processes is lower than the number of cpu
+- when the number of running processes is higher than the number of cpu
 
-Each time we try to switch, we take the most active process and the most waiting process. The most active is replaced with the most waiting. Then we send an ipi to the cpu that need to switch.
+### When the number of running processes is lower than the number of cpu
+
+If the number of processes is lower than the number of cpu we don't need to switch context. But if we have 1 process that started running and it does not execute code we need to assign him a cpu. That's why we have 'lazy cpu'. Lazy cpu are cpu that don't do anything for the moment. For exemple if we have 3 process and 5 core, we have 2 lazy cpu. So if a cpu is lazy and there is a process waiting to run, we give the process to the lazy cpu. For cpu that are already running a process we just put the same process as the next process.
+
+### When the number of running processes is higher than the number of cpu
+
+If the number of processes is higher than the number of cpu we need to switch X process. Were X is equal to: 
+
+```c
+size_t schedule_count = MIN(cpu_count(), running - cpu_count());
+```
+(where running is the number of running process)
+
+we can't switch higher than the cpu_count (we can't switch for 6 process using 5 cpu) and we can't switch more process than there is cpu (we can't switch for 1 process for 5 cpu). 
+
+For each `schedule_count` we get the process that has run the longest and replace it with the process that waited the longest. But we can still have the case where we have a lazy cpu. For exemple if a process is deleted or sleeping so when we get the most waiting process, we check if there is no lazy cpu. If there is one, put the most waiting process in the lazy cpu. If there is not replace the most running process with the most waiting process.
+
+### Cpu cache is important
+
+The problem of interrupt is that they are really heavy, they invalidate the cache, they can take a lot of cpu cycles... So we need to send them only when they are needed. That mean that if a cpu don't need to switch to another process we don't send him an interrupt (if a process next task is equal to the process current task) 
+
+### Task switch
+
+So for each cpu that need a switch the cpu 0 send him a IPI (inter process interrupt) number 100. The process set the current process to the next process, and do a context switch.
+

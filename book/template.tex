@@ -1,6 +1,19 @@
 \documentclass{book}
 \usepackage{hyperref}
 \usepackage{graphicx}
+\usepackage{pgfpages}
+\usepackage{beamerarticle} % needs to be loaded first
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{ifxetex,ifluatex}
+\usepackage{etoolbox}
+\usepackage{listings}
+\newcommand{\passthrough}[1]{#1}
+
+\usepackage{longtable,booktabs,array}
+\usepackage{multirow}
+\usepackage{mdframed}
+
 \PassOptionsToPackage{hyphens}{url}
 \PassOptionsToPackage{unicode=true}{hyperref}
 \PassOptionsToPackage{dvipsnames,svgnames*,table}{xcolor}
@@ -8,6 +21,7 @@
 
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
 
 \title{\bigskip \bigskip the brutal documentation}
 
@@ -19,7 +33,7 @@ $endfor$
 
     \begin{titlepage}
         \centering
-        \includegraphics[scale=0.5]{../meta/brand/logo.png}
+        \includegraphics[scale=0.5]{../meta/assets/logo.png}
 
         \vfill
 
