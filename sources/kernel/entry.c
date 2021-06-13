@@ -5,7 +5,7 @@
 #include "kernel/entry.h"
 #include "kernel/tasking.h"
 
-static atomic_int other_ready = 0;
+static atomic_size_t other_ready = 0;
 
 void kernel_splash(void)
 {
