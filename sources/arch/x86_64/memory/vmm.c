@@ -5,7 +5,7 @@
 #include "arch/x86_64/memory/mmap.h"
 #include "arch/x86_64/paging.h"
 
-static struct pml *kernel_pml = NULL;
+static struct pml *kernel_pml = nullptr;
 static struct lock vmm_lock;
 
 static vmm_result_t vmm_get_pml(struct pml *table, size_t idx)

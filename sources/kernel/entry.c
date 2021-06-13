@@ -36,7 +36,7 @@ void task_test(void)
 {
     while (true)
     {
-        if (task_self() == NULL)
+        if (task_self() == nullptr)
         {
 
             log("task WTF", task_self()->id);

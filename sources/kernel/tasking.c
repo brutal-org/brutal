@@ -70,11 +70,12 @@ void tasking_initialize(void)
     log("Initializing tasking...");
 
     vec_init(&tasks, alloc_global());
+
     for (size_t i = 0; i < cpu_count(); i++)
     {
         log("Initializing tasking for cpu: {}", i);
-        cpu(i)->schedule.idle = task_create((uintptr_t)&task_idle, 0)._ok;
-        cpu(i)->schedule.current = NULL;
+        cpu(i)->schedule.idle = UNWRAP(task_create((uintptr_t)&task_idle, 0));
+        cpu(i)->schedule.current = nullptr;
         cpu(i)->schedule.next = cpu(i)->schedule.idle;
     }
 }
@@ -96,7 +97,7 @@ static struct task *task_get_most_active(void)
 {
 
     size_t most_active_time = 0;
-    struct task *current_active = NULL;
+    struct task *current_active = nullptr;
     for (int i = 0; i < tasks.length; i++)
     {
         if (tasks.data[i]->state != TASK_RUNNING || !tasks.data[i]->scheduler_state.is_currently_executed)
@@ -115,7 +116,7 @@ static struct task *task_get_most_active(void)
 static struct task *task_get_most_waiting()
 {
     size_t most_waiting_time = 0;
-    struct task *current_waiting = NULL;
+    struct task *current_waiting = nullptr;
     for (int i = 0; i < tasks.length; i++)
     {
         if (tasks.data[i]->state != TASK_RUNNING || tasks.data[i]->scheduler_state.is_currently_executed)
@@ -150,11 +151,11 @@ static void scheduler_start_task_execution(struct task *target, cpu_id_t target_
     cpu(target_cpu)->schedule.next = target;
 }
 
-// is the cpu current process NULL or idle
+// is the cpu current process nullptr or idle
 static bool scheduler_is_cpu_lazy(cpu_id_t id)
 {
     struct task *idle = cpu(id)->schedule.idle;
-    return (cpu(id)->schedule.current == NULL && cpu(id)->schedule.next == NULL) || (cpu(id)->schedule.next == idle);
+    return (cpu(id)->schedule.current == nullptr && cpu(id)->schedule.next == nullptr) || (cpu(id)->schedule.next == idle);
 }
 
 static size_t scheduler_get_lazy_cpu_count(void)
@@ -208,7 +209,7 @@ static void scheduler_continue_all_cpu(size_t running_process_count)
     {
         for (size_t i = 0; i < cpu_count(); i++)
         {
-            if (cpu(i)->schedule.current != NULL)
+            if (cpu(i)->schedule.current != nullptr)
             {
                 cpu(i)->schedule.next = cpu(i)->schedule.current;
             }
@@ -283,18 +284,18 @@ static void tasking_schedule(void)
 
 uintptr_t tasking_switch(uintptr_t sp)
 {
-    if (task_self() != NULL)
+    if (task_self() != nullptr)
     {
         task_self()->sp = sp; // save stack pointer
         arch_task_save_context(cpu_self()->schedule.current);
     }
 
 #ifdef TASKING_LOGGING
-    if (cpu_self()->schedule.current != NULL)
+    if (cpu_self()->schedule.current != nullptr)
     {
         log("cpu: {} using process: {} to {}", cpu_self_id(), cpu_self()->schedule.current->id, cpu_self()->schedule.next->id);
     }
-    else if (cpu_self()->schedule.next != NULL)
+    else if (cpu_self()->schedule.next != nullptr)
     {
         log("cpu: {} using process: idle to {}", cpu_self_id(), cpu_self()->schedule.next->id);
     }
@@ -306,7 +307,7 @@ uintptr_t tasking_switch(uintptr_t sp)
 
     cpu_self()->schedule.current = cpu_self()->schedule.next;
 
-    if (task_self() != NULL)
+    if (task_self() != nullptr)
     {
         sp = task_self()->sp; // load stack pointer
         arch_task_load_context(cpu_self()->schedule.current);

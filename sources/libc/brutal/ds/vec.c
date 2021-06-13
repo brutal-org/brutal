@@ -78,7 +78,7 @@ bool vec_compact_impl(struct vec_impl *impl)
     if (*impl->length == 0)
     {
         alloc_release(impl->alloc, impl->data);
-        *impl->data = NULL;
+        *impl->data = nullptr;
         *impl->capacity = 0;
 
         return true;
