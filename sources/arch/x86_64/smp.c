@@ -15,6 +15,8 @@
 
 typedef result_t(br_error_t, uint8_t) smp_init_result;
 
+atomic_bool cpu_ready = false;
+
 extern uint32_t trampoline_start;
 extern uint32_t trampoline_end;
 
@@ -38,6 +40,12 @@ static smp_init_result smp_initialize_cpu_trampoline(void)
     return OK(smp_init_result, 0);
 }
 
+void smp_entry_other(void)
+{
+    cpu_ready = true;
+    arch_entry_other();
+}
+
 static smp_init_result smp_initialize_cpu_data(void)
 {
     // load future cpu page table
@@ -53,22 +61,21 @@ static smp_init_result smp_initialize_cpu_data(void)
         "sgdt 0x580\n"   // gdt at 0x580
         "sidt 0x590\n"); // idt at 0x590
 
-    mmio_write64(SMP_INIT_ENTRY, (uintptr_t)&arch_entry_other);
+    mmio_write64(SMP_INIT_ENTRY, (uintptr_t)smp_entry_other);
     return OK(smp_init_result, 0);
 }
 
 static void smp_initialize_cpu(uint32_t lapic_id)
 {
     apic_init_processor(lapic_id);
-
     smp_initialize_cpu_data();
-
     apic_start_processor(lapic_id, 4096);
 }
 
 void arch_boot_other(void)
 {
     log("Booting other CPUs...");
+
     for (size_t cpu = 0; cpu < cpu_count(); cpu++)
     {
         if (cpu == apic_current_cpu())
@@ -76,8 +83,13 @@ void arch_boot_other(void)
             continue; // don't init current cpu
         }
 
-        log("Bootings CPU N°{}...", cpu);
+        cpu_ready = false;
 
+        log("Bootings CPU N°{}...", cpu);
         smp_initialize_cpu(cpu_impl(cpu)->lapic);
+
+        while (!cpu_ready)
+        {
+        }
     }
 }

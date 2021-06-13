@@ -4,6 +4,7 @@
 TRAMPOLINE_BASE equ 0x1000
 SMP_INIT_PAGE_TABLE equ 0x500
 SMP_INIT_STACK equ 0x570
+SMP_INIT_ENTRY equ 0x520
 SMP_INIT_GDT equ 0x580
 SMP_INIT_IDT equ 0x590
 
@@ -115,7 +116,8 @@ vcode64:
     bts eax, 1
     mov cr0, rax
 
-    call arch_entry_other
+    mov rax, [SMP_INIT_ENTRY]
+    call rax
 
 
 ; ------ DATA ------
