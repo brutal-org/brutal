@@ -1,11 +1,11 @@
-#include <brutal/base/macros.h>
+#include <brutal/base.h>
 #include <brutal/log.h>
 #include "arch/arch.h"
 #include "arch/cpu.h"
 #include "kernel/entry.h"
 #include "kernel/tasking.h"
 
-static _Atomic size_t other_ready = 0;
+static atomic_int other_ready = 0;
 
 void kernel_splash(void)
 {

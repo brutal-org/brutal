@@ -12,13 +12,13 @@ struct test
 
 void test_register(struct test test);
 
-#define TEST(name)                                                                      \
-    void test_##name(void);                                                             \
-    __attribute__((constructor)) static inline void test_register_##name##_detail(void) \
-    {                                                                                   \
-        test_register((struct test){                                                    \
-            make_str(name),                                                             \
-            test_##name,                                                                \
-        });                                                                             \
-    }                                                                                   \
+#define TEST(name)                                                              \
+    void test_##name(void);                                                     \
+    [[gnu::constructor]] static inline void test_register_##name##_detail(void) \
+    {                                                                           \
+        test_register((struct test){                                            \
+            make_str(name),                                                     \
+            test_##name,                                                        \
+        });                                                                     \
+    }                                                                           \
     void test_##name(void)

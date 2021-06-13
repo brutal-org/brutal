@@ -1,16 +1,14 @@
 #include "arch/arch.h"
+#include "arch/cpu.h"
 #include "arch/x86_64/apic.h"
 #include "arch/x86_64/asm.h"
 #include "arch/x86_64/com.h"
-#include "arch/cpu.h"
 
 static bool log_initialized = false;
 static struct writer log;
 
-static write_result_t arch_debug_write(struct writer *writer, char const *data, size_t size)
+static write_result_t arch_debug_write(MAYBE_UNUSED struct writer *writer, char const *data, size_t size)
 {
-    UNUSED(writer);
-
     com_write(COM1, data, size);
     return OK(write_result_t, size);
 }

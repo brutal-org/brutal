@@ -5,7 +5,7 @@ KERNEL_LIBC_SRC = \
 			  $(wildcard sources/libc/brutal/io/*.c) \
 			  $(wildcard sources/libc/brutal/mem/*.c) \
 			  $(wildcard sources/libc/brutal/text/*.c) \
-			  $(wildcard sources/libc/brutal/task/lock.c) \
+			  $(wildcard sources/libc/brutal/sync/*.c) \
 			  $(wildcard sources/libc/brutal/ds/*.c) \
 			  $(wildcard sources/libc/brutal/log/*.c) \
 			  $(wildcard sources/libc/ansi/string.c) \

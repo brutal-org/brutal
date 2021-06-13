@@ -1,4 +1,4 @@
-#include <brutal/task/lock.h>
+#include <brutal/sync.h>
 #include <host/log.h>
 #include "arch/arch.h"
 

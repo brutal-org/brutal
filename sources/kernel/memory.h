@@ -1,13 +1,26 @@
 #pragma once
 
-struct memory_object
-{
-};
+#include <brutal/ds.h>
+#include <brutal/sync.h>
+#include "arch/heap.h"
+#include "arch/pmm.h"
+#include "arch/vmm.h"
 
-struct memory_mapping
+typedef struct
 {
-};
+    refcount_t refcount;
 
-struct memory_space
+    pmm_range_t range;
+} memory_object_t;
+
+typedef struct
 {
-};
+    memory_object_t *object;
+} memory_mapping_t;
+
+typedef struct
+{
+    refcount_t refcount;
+
+    vec_t(memory_mapping_t) mappings;
+} memory_space_t;

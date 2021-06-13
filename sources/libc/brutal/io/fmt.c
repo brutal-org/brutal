@@ -1,4 +1,5 @@
-#include <brutal/base/macros.h>
+#include <brutal/base/attributes.h>
+#include <brutal/base/keywords.h>
 #include <brutal/io/fmt.h>
 #include <brutal/text/vals.h>
 
@@ -92,8 +93,6 @@ static void fmt_parse_min_width(struct fmt *fmt, struct scan *scan)
 
 struct fmt fmt_parse(struct scan *scan)
 {
-    UNUSED(scan);
-
     struct fmt fmt = {};
 
     scan_skip(scan, '{');
@@ -195,9 +194,7 @@ write_result_t fmt_unsigned(struct fmt self, struct writer *writer, unsigned lon
     return io_write(writer, buffer, i);
 }
 
-write_result_t fmt_string(struct fmt self, struct writer *writer, str_t value)
+write_result_t fmt_string(MAYBE_UNUSED struct fmt self, struct writer *writer, str_t value)
 {
-    UNUSED(self);
-
     return print(writer, value);
 }

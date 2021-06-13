@@ -1,4 +1,4 @@
-#include <brutal/task/lock.h>
+#include <brutal/sync.h>
 #include "arch/heap.h"
 #include "arch/pmm.h"
 #include "arch/x86_64/memory/mmap.h"

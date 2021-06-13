@@ -58,4 +58,6 @@ char *strerror(int errnum);
 
 size_t strlen(char const *s);
 
-#include_next <string.h>
+#if __has_include_next(<string.h>)
+#    include_next <string.h>
+#endif

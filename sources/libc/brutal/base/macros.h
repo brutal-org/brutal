@@ -1,22 +1,10 @@
 #pragma once
 
-#define nullptr ((void *)0)
 
-#define auto __auto_type
-
-#define static_assert _Static_assert
-
-#define PACKED __attribute__((packed))
-
-#define ALIGNED(__align) __attribute__((aligned(__align)))
-
-#define UNUSED(expr) ((void)expr)
 
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
 
 #define MAX(x, y) ((x) > (y) ? (x) : (y))
-
-#define CLEANUP(func) __attribute__((__cleanup__(func)))
 
 #define CONCAT_(lhs, rhs) lhs##rhs
 #define CONCAT(lhs, rhs) CONCAT_(lhs, rhs)

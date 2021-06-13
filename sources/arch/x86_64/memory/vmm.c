@@ -1,5 +1,5 @@
 #include <brutal/log.h>
-#include <brutal/task/lock.h>
+#include <brutal/sync.h>
 #include "arch/vmm.h"
 #include "arch/x86_64/asm.h"
 #include "arch/x86_64/memory/mmap.h"

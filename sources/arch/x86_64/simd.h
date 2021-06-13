@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/base/std.h>
+#include <brutal/base.h>
 
 void simd_initialize(void);
 

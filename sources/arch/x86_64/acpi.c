@@ -1,6 +1,6 @@
-#include <brutal/base/cast.h>
+#include <brutal/base.h>
 #include <brutal/log.h>
-#include <brutal/text/str.h>
+#include <brutal/text.h>
 #include "arch/x86_64/acpi.h"
 #include "arch/x86_64/memory/mmap.h"
 

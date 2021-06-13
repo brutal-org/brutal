@@ -39,11 +39,8 @@ void test_run_all(void)
     }
 }
 
-int main(int argc, char const *argv[])
+int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char const *argv[])
 {
-    UNUSED(argc);
-    UNUSED(argv);
-
     test_run_all();
     return 0;
 }

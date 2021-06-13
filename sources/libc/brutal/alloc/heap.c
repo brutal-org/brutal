@@ -1,4 +1,5 @@
 #include <brutal/alloc/heap.h>
+#include <brutal/log.h>
 #include <host/mem.h>
 
 #define ALLOC_GLOBAL_MAGIC 0xc001c0de
@@ -85,22 +86,16 @@ static bool check_minor_magic(struct alloc_minor *min, void *ptr)
         ((min->magic & 0xFFFF) == (ALLOC_GLOBAL_MAGIC & 0xFFFF)) ||
         ((min->magic & 0xFF) == (ALLOC_GLOBAL_MAGIC & 0xFF)))
     {
-        UNUSED(ptr);
-        // logger_error("Possible 1-3 byte overrun for magic 0x%x != 0x%x from 0x%x.",
-        //              min->magic,
-        //              ALLOC_GLOBAL_MAGIC,
-        //              caller);
+        log("Possible 1-3 byte overrun for magic {p} != {p}.", min->magic, ALLOC_GLOBAL_MAGIC);
     }
 
     if (min->magic == ALLOC_GLOBAL_DEAD)
     {
-        // logger_error("Multiple free(0x%x) attempt from 0x%x.",
-        //              ptr,
-        //              caller);
+        log("Multiple free({p}).", ptr);
     }
     else
     {
-        // logger_error("Bad free(0x%x) from 0x%x", ptr, caller);
+        log("Bad free({p})", ptr);
     }
 
     return false;
@@ -115,7 +110,7 @@ void *alloc_heap_acquire(struct alloc_heap *alloc, size_t req_size)
 
     if (size == 0)
     {
-        // logger_warn("alloc(0) called from 0x%x");
+        log("alloc(0) called");
         return alloc_heap_acquire(alloc, 1);
     }
 
@@ -322,7 +317,7 @@ void *alloc_heap_acquire(struct alloc_heap *alloc, size_t req_size)
         maj = maj->next;
     } // while (maj != nullptr)
 
-    // logger_warn("All cases exhausted. No memory available.");
+    log("All cases exhausted. No memory available.");
 
     return nullptr;
 }
@@ -331,7 +326,7 @@ void alloc_heap_release(struct alloc_heap *alloc, void *ptr)
 {
     if (ptr == nullptr)
     {
-        // logger_warn("free( nullptr ) called from 0x%x");
+        log("free( nullptr )");
         return;
     }
 

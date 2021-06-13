@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/base/std.h>
+#include <brutal/base.h>
 #include "arch/cpu.h"
 
 #define MAX_CPU_COUNT 255

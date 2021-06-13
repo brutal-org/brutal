@@ -1,5 +1,7 @@
 CFLAGS_WARN += \
-	-Wnewline-eof
+	-Wnewline-eof \
+	-Wignored-attributes \
+	-Wunknown-attributes
 
 # --- Host compiler ---------------------------------------------------------- #
 

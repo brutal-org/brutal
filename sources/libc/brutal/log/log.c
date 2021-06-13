@@ -47,8 +47,6 @@ static str_t log_prefix(enum log_level level)
 
 void log_impl(enum log_level level, struct source_location location, str_t fmt, struct print_args args)
 {
-    UNUSED(location);
-
     host_log_lock();
     print(host_log_writer(), "{}{}:\e[m ", log_color(level), log_prefix(level));
     print(host_log_writer(), "\e[37;2m{}:{}:\e[m\e[37m ", location.filename, location.line);

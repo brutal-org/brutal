@@ -1,6 +1,6 @@
-#include <brutal/ds/vec.h>
+#include <brutal/ds.h>
 #include <brutal/log.h>
-#include <brutal/task/lock.h>
+#include <brutal/sync.h>
 #include "arch/heap.h"
 #include "kernel/constants.h"
 #include "kernel/tasking.h"

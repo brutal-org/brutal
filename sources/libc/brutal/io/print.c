@@ -1,4 +1,3 @@
-#include <brutal/base/macros.h>
 #include <brutal/io/fmt.h>
 #include <brutal/io/print.h>
 #include <brutal/io/scan.h>

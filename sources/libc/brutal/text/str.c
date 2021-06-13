@@ -1,3 +1,4 @@
+#include <brutal/base/keywords.h>
 #include <brutal/text/str.h>
 
 void str_rvs(str_t str)

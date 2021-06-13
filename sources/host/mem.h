@@ -1,7 +1,6 @@
 #pragma once
 
-#include <brutal/base/error.h>
-#include <brutal/base/std.h>
+#include <brutal/base.h>
 
 #define HOST_MEM_PAGESIZE 4096
 

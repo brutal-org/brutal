@@ -20,7 +20,7 @@ static struct stivale2_header_tag_framebuffer framebuffer_hdr_tag = {
 
 void stivale2_entry(struct stivale2_struct *info);
 
-__attribute__((section(".stivale2hdr"), used)) static struct stivale2_header stivale_hdr = {
+[[gnu::section(".stivale2hdr")]] [[gnu::used]] static struct stivale2_header stivale_hdr = {
     .entry_point = (uintptr_t)stivale2_entry,
     .stack = (uintptr_t)stack + sizeof(stack),
     .flags = (1 << 1),
@@ -92,8 +92,6 @@ static void fill_handover_rsdp(struct handover *target, struct stivale2_struct_t
 
 void stivale2_entry(struct stivale2_struct *info)
 {
-    UNUSED(info);
-
     log("Booting from a stivale2 bootloader...");
 
     struct handover handover = {};

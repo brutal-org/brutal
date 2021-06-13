@@ -1,7 +1,6 @@
 #pragma once
 
-#include <brutal/base/macros.h>
-#include <brutal/base/std.h>
+#include <brutal/base.h>
 #include <brutal/mem.h>
 
 struct PACKED pml_entry
