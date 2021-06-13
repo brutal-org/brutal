@@ -45,12 +45,17 @@ static str_t log_prefix(enum log_level level)
     }
 }
 
-void log_impl(enum log_level level, struct source_location location, str_t fmt, struct print_args args)
+void log_unlock_impl(enum log_level level, struct source_location location, str_t fmt, struct print_args args)
 {
-    host_log_lock();
     print(host_log_writer(), "{}{}:\e[m ", log_color(level), log_prefix(level));
     print(host_log_writer(), "\e[37;2m{}:{}:\e[m\e[37m ", location.filename, location.line);
     print_impl(host_log_writer(), fmt, args);
     print(host_log_writer(), "\n");
+}
+
+void log_impl(enum log_level level, struct source_location location, str_t fmt, struct print_args args)
+{
+    host_log_lock();
+    log_unlock_impl(level, location, fmt, args);
     host_log_unlock();
 }
