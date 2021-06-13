@@ -2,6 +2,7 @@
 
 #include <brutal/base/macros.h>
 #include <brutal/base/std.h>
+#include <brutal/mem.h>
 
 struct str
 {
@@ -56,6 +57,15 @@ static inline str_t str_make_from_cstr(char const *cstr)
         char*: str_make_from_cstr,       \
         char const*: str_make_from_cstr  \
     )(literal)
+
+#define make_str_fix(T, str)                                  \
+    ({                                                        \
+        T dst_str;                                            \
+        auto src_str = make_str(str);                         \
+        mem_cpy(dst_str.buffer, src_str.buffer, src_str.len); \
+        dst_str.len = src_str.len;                            \
+        dst_str;                                              \
+    })
 
 #define make_str_n(str, n) \
     (str_t){str, n}
