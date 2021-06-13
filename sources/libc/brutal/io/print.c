@@ -1,31 +1,30 @@
 #include <brutal/io/fmt.h>
 #include <brutal/io/print.h>
 #include <brutal/io/scan.h>
-#include <stdint.h>
 
 struct print_value print_val_signed(long val)
 {
-    return (struct print_value){PRINT_SIGNED, {._signed = val}};
+    return (struct print_value){nullstr, PRINT_SIGNED, {._signed = val}};
 }
 
 struct print_value print_val_unsigned(unsigned long val)
 {
-    return (struct print_value){PRINT_UNSIGNED, {._unsigned = val}};
+    return (struct print_value){nullstr, PRINT_UNSIGNED, {._unsigned = val}};
 }
 
 struct print_value print_val_cstring(char *val)
 {
-    return (struct print_value){PRINT_STRING, {._string = make_str(val)}};
+    return (struct print_value){nullstr, PRINT_STRING, {._string = make_str(val)}};
 }
 
 struct print_value print_val_string(str_t val)
 {
-    return (struct print_value){PRINT_STRING, {._string = val}};
+    return (struct print_value){nullstr, PRINT_STRING, {._string = val}};
 }
 
 struct print_value print_val_pointer(void *ptr)
 {
-    return (struct print_value){PRINT_POINTER, {._pointer = ptr}};
+    return (struct print_value){nullstr, PRINT_POINTER, {._pointer = ptr}};
 }
 
 write_result_t print_dispatch(struct writer *writer, struct fmt fmt, struct print_value value)

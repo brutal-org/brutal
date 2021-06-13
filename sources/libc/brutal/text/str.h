@@ -24,6 +24,8 @@ typedef str_fix_t(32) str_fix32_t;
 typedef str_fix_t(64) str_fix64_t;
 typedef str_fix_t(128) str_fix128_t;
 
+#define nullstr make_str("")
+
 static inline size_t cstr_len(char const *str)
 {
     size_t size = 0;

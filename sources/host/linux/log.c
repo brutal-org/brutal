@@ -1,3 +1,4 @@
+#include <brutal/base.h>
 #include <host/log.h>
 #include <unistd.h>
 

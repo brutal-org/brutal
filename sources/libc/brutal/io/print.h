@@ -16,6 +16,7 @@ enum print_type
 
 struct print_value
 {
+    str_t name;
     enum print_type type;
 
     union
@@ -45,8 +46,8 @@ struct print_value print_val_pointer(void *);
 
 // clang-format off
 
-#define PRINT_MATCH(value)                    \
-    _Generic((value),                         \
+#define PRINT_MATCH(VALUE)                    \
+    _Generic((VALUE),                         \
         signed char: print_val_signed,        \
         signed int: print_val_signed,         \
         signed long: print_val_signed,        \
@@ -58,7 +59,14 @@ struct print_value print_val_pointer(void *);
         char*: print_val_cstring,             \
         struct str: print_val_string,         \
         void*: print_val_pointer              \
-    )(value),
+    )(VALUE),
+
+#define PRINT_NAMED(NAME, VALUE)              \
+    ({                                        \
+       auto print_value = PRINT_MATCH(VALUE); \
+       print_value.name = make_str(NAME);     \
+       print_value;                           \
+    })
 
 // clang-format on
 
