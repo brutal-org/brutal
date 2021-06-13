@@ -86,7 +86,7 @@ static bool check_minor_magic(struct alloc_minor *min, void *ptr)
         ((min->magic & 0xFFFF) == (ALLOC_GLOBAL_MAGIC & 0xFFFF)) ||
         ((min->magic & 0xFF) == (ALLOC_GLOBAL_MAGIC & 0xFF)))
     {
-        log("Possible 1-3 byte overrun for magic {p} != {p}.", min->magic, ALLOC_GLOBAL_MAGIC);
+        log("Possible 1-3 byte overrun for magic {08x} != {08x}.", min->magic, ALLOC_GLOBAL_MAGIC);
     }
 
     if (min->magic == ALLOC_GLOBAL_DEAD)

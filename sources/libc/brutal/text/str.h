@@ -3,14 +3,20 @@
 #include <brutal/base/macros.h>
 #include <brutal/base/std.h>
 #include <brutal/mem.h>
+#include <stddef.h>
 
-struct str
+typedef struct
 {
     char *buffer;
     size_t len;
-};
+} str_t;
 
-typedef struct str str_t;
+typedef struct
+{
+    char *buffer;
+    size_t len;
+    size_t capacity;
+} str_buf_t;
 
 #define str_fix_t(N)    \
     struct              \
@@ -39,15 +45,13 @@ static inline size_t cstr_len(char const *str)
     return size;
 }
 
-static inline str_t str_forward(str_t str)
-{
-    return str;
-}
-
-static inline str_t str_make_from_cstr(char const *cstr)
-{
-    return (str_t){(char *)cstr, cstr_len(cstr)};
-}
+static inline str_t str_forward(str_t str) { return str; }
+static inline str_t str_make_from_cstr(char const *cstr) { return (str_t){(char *)cstr, cstr_len(cstr)}; }
+static inline str_t str_make_from_str_fix8(str_fix8_t *str_fix) { return (str_t){str_fix->buffer, str_fix->len}; }
+static inline str_t str_make_from_str_fix16(str_fix16_t *str_fix) { return (str_t){str_fix->buffer, str_fix->len}; }
+static inline str_t str_make_from_str_fix32(str_fix32_t *str_fix) { return (str_t){str_fix->buffer, str_fix->len}; }
+static inline str_t str_make_from_str_fix64(str_fix64_t *str_fix) { return (str_t){str_fix->buffer, str_fix->len}; }
+static inline str_t str_make_from_str_fix128(str_fix128_t *str_fix) { return (str_t){str_fix->buffer, str_fix->len}; }
 
 // clang-format off
 
@@ -55,7 +59,12 @@ static inline str_t str_make_from_cstr(char const *cstr)
     _Generic((literal),                  \
         str_t: str_forward,              \
         char*: str_make_from_cstr,       \
-        char const*: str_make_from_cstr  \
+        char const*: str_make_from_cstr,  \
+        str_fix8_t*: str_make_from_str_fix8, \
+        str_fix16_t*: str_make_from_str_fix16, \
+        str_fix32_t*: str_make_from_str_fix32, \
+        str_fix64_t*: str_make_from_str_fix64, \
+        str_fix128_t*: str_make_from_str_fix128 \
     )(literal)
 
 #define make_str_fix(T, str)                                  \

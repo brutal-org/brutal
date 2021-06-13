@@ -26,7 +26,7 @@ static void pmm_bitmap_initialize(struct handover_mmap const *memory_map)
 
     size_t bitmap_target_size = memory_map_get_highest_address(memory_map) / HOST_MEM_PAGESIZE / 8;
 
-    log("A bitmap {d}kib long is needed", bitmap_target_size / 1024);
+    log("A bitmap {}kib long is needed", bitmap_target_size / 1024);
 
     for (size_t i = 0; i < memory_map->size; i++)
     {
