@@ -1,5 +1,6 @@
 #pragma once
 
+#include <brutal/text.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -44,7 +45,7 @@ struct handover_module
 {
     size_t size;
     uint64_t addr;
-    char module_name[MAX_MODULE_NAME_LENGTH];
+    str_fix128_t module_name;
 };
 
 struct handover_modules_list
