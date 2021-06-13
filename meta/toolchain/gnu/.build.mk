@@ -30,14 +30,14 @@ CROSS_CFLAGS= \
 CROSS_KCFLAGS= \
 	$(CROSS_CFLAGS) \
 	-fno-pic \
-	-fpie \
 	-fno-stack-protector \
 	-mno-80387 \
 	-mno-mmx \
 	-mno-3dnow \
 	-mno-sse \
 	-mno-sse2 \
-	-mno-red-zone
+	-mno-red-zone \
+	-mcmodel=kernel
 
 CROSS_LD=$(CONFIG_ARCH)-elf-ld
 CROSS_KLDFLAGS= \
