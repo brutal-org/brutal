@@ -1,2 +1,2 @@
 -std=gnu2x
--Isources/
+-Isources/libc

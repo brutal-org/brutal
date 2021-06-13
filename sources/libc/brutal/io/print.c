@@ -1,6 +1,7 @@
 #include <brutal/io/fmt.h>
 #include <brutal/io/print.h>
 #include <brutal/io/scan.h>
+#include <stdint.h>
 
 struct print_value print_val_signed(long val)
 {
@@ -22,6 +23,11 @@ struct print_value print_val_string(str_t val)
     return (struct print_value){PRINT_STRING, {._string = val}};
 }
 
+struct print_value print_val_pointer(void *ptr)
+{
+    return (struct print_value){PRINT_POINTER, {._pointer = ptr}};
+}
+
 write_result_t print_dispatch(struct writer *writer, struct fmt fmt, struct print_value value)
 {
     switch (value.type)
@@ -34,6 +40,9 @@ write_result_t print_dispatch(struct writer *writer, struct fmt fmt, struct prin
 
     case PRINT_STRING:
         return fmt_string(fmt, writer, value._string);
+
+    case PRINT_POINTER:
+        return fmt_unsigned(fmt, writer, (uintptr_t)value._pointer);
     }
 
     return OK(write_result_t, 0);
