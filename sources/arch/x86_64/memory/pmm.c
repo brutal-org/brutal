@@ -94,21 +94,22 @@ pmm_result_t pmm_alloc(size_t size)
     // log("pmm_alloc(): {} (total: {x})", size, used_memory);
 
     auto page_size = size / HOST_MEM_PAGESIZE;
-    auto page_range = bitmap_find_range(&pmm_bitmap, best_bet, page_size, false);
+    auto page_range = bitmap_find_range(&pmm_bitmap, best_bet, page_size, PMM_UNUSED);
 
     if (range_empty(page_range))
     {
         best_bet = 0;
-        page_range = bitmap_find_range(&pmm_bitmap, 0, page_size, false);
+        page_range = bitmap_find_range(&pmm_bitmap, 0, page_size, PMM_UNUSED);
     }
-
-    best_bet = range_end(page_range);
 
     if (range_any(page_range))
     {
-        bitmap_set_range(&pmm_bitmap, page_range, true);
+        best_bet = range_end(page_range);
+
+        bitmap_set_range(&pmm_bitmap, page_range, PMM_USED);
 
         auto pmm_range = range_cast(pmm_range_t, page_range);
+
         pmm_range.base *= HOST_MEM_PAGESIZE;
         pmm_range.size *= HOST_MEM_PAGESIZE;
 
