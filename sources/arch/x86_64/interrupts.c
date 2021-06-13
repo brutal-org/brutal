@@ -45,14 +45,14 @@ static char *_exception_messages[32] = {
 
 void dump_register(struct interrupt_stackframe const *stackframe)
 {
-    log("rax: {#016p} | rbx: {#016p} | rcx: {#016p}", stackframe->rax, stackframe->rbx, stackframe->rcx);
-    log("rdx: {#016p} | rsi: {#016p} | rdi: {#016p}", stackframe->rdx, stackframe->rsi, stackframe->rdi);
-    log("r8 : {#016p} | r9 : {#016p} | r10: {#016p}", stackframe->r8, stackframe->r9, stackframe->r10);
-    log("r11: {#016p} | r12: {#016p} | r13: {#016p}", stackframe->r11, stackframe->r12, stackframe->r13);
-    log("r14: {#016p} | r15: {#016p}", stackframe->r14, stackframe->r15);
-    log("rip: {#016p} | rsp: {#016p} | rbp: {#016p}", stackframe->rip, stackframe->rsp, stackframe->rbp);
-    log("cs : {#016p} | ss : {#016p} | rflags: {#016p}", stackframe->cs, stackframe->ss, stackframe->rflags);
-    log("cr2: {#016p} | cr3: {#016p} ", asm_read_cr2(), asm_read_cr3());
+    log_unlock("rax: {#016p} | rbx: {#016p} | rcx: {#016p}", stackframe->rax, stackframe->rbx, stackframe->rcx);
+    log_unlock("rdx: {#016p} | rsi: {#016p} | rdi: {#016p}", stackframe->rdx, stackframe->rsi, stackframe->rdi);
+    log_unlock("r8 : {#016p} | r9 : {#016p} | r10: {#016p}", stackframe->r8, stackframe->r9, stackframe->r10);
+    log_unlock("r11: {#016p} | r12: {#016p} | r13: {#016p}", stackframe->r11, stackframe->r12, stackframe->r13);
+    log_unlock("r14: {#016p} | r15: {#016p}", stackframe->r14, stackframe->r15);
+    log_unlock("rip: {#016p} | rsp: {#016p} | rbp: {#016p}", stackframe->rip, stackframe->rsp, stackframe->rbp);
+    log_unlock("cs : {#016p} | ss : {#016p} | rflags: {#016p}", stackframe->cs, stackframe->ss, stackframe->rflags);
+    log_unlock("cr2: {#016p} | cr3: {#016p} ", asm_read_cr2(), asm_read_cr3());
 }
 
 uint64_t interrupt_handler(uint64_t rsp)
@@ -61,11 +61,13 @@ uint64_t interrupt_handler(uint64_t rsp)
     if (stackframe->int_no < 32)
     {
         lock_acquire(&error_lock);
-        log("Interrupt {}: {}: error: {} on {x} !", stackframe->int_no, _exception_messages[stackframe->int_no], stackframe->error_code, stackframe->rip);
+        log_unlock("CPU {} did an oopsy", cpu_self_id());
+        log_unlock("Interrupt {}: {}: error: {} on {x} !", stackframe->int_no, _exception_messages[stackframe->int_no], stackframe->error_code, stackframe->rip);
 
         dump_register(stackframe);
 
         lock_release(&error_lock);
+
         while (true)
         {
             asm_cli();
@@ -82,7 +84,7 @@ uint64_t interrupt_handler(uint64_t rsp)
     }
     else if (stackframe->int_no == 0xf0)
     {
-        log("non maskable interrupt from apic: possible hardware error");
+        log_unlock("non maskable interrupt from apic: possible hardware error");
     }
 
     apic_eoi();
