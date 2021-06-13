@@ -108,7 +108,8 @@ void fill_handover_modules(struct handover *target, struct stivale2_struct_tag_m
         target->modules.module[i].addr = modules->modules[i].begin;
         target->modules.module[i].size = modules->modules[i].end - modules->modules[i].begin;
 
-        mem_cpy(target->modules.module[i].module_name, modules->modules[i].string, MAX_MODULE_NAME_LENGTH);
+        mem_cpy(target->modules.module[i].module_name.buffer, modules->modules[i].string, MAX_MODULE_NAME_LENGTH);
+        target->modules.module[i].module_name.len = cstr_len(modules->modules[i].string);
     }
 }
 
