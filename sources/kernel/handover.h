@@ -28,8 +28,39 @@ struct handover_mmap
     struct handover_mmap_entry entries[HANDOVER_MMAP_MAX_SIZE];
 };
 
+struct handover_framebuffer
+{
+    bool has_framebuffer;
+    uint16_t framebuffer_width;
+    uint16_t framebuffer_height;
+    uint16_t bpp;
+    uint64_t framebuffer_physical_addr;
+};
+
+#define MAX_MODULE_COUNT 64
+#define MAX_MODULE_NAME_LENGTH 128
+
+struct handover_module
+{
+    size_t size;
+    uint64_t addr;
+    char module_name[MAX_MODULE_NAME_LENGTH];
+};
+
+struct handover_modules_list
+{
+    size_t module_count;
+    struct handover_module module[MAX_MODULE_COUNT];
+};
+
+#define HANDOVER_IDENTIFIER (0x42525554414C00) // equlivalent to brutal0 in ASCII
+
 struct handover
 {
+    int64_t identifier; // if one day we have a custom bootloader
+
     struct handover_mmap mmap;
+    struct handover_framebuffer framebuffer;
+    struct handover_modules_list modules;
     uintptr_t rsdp;
 };

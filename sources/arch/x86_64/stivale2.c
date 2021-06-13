@@ -1,5 +1,6 @@
 #include <brutal/base.h>
 #include <brutal/log.h>
+#include <brutal/mem.h>
 #include "arch/arch.h"
 #include "arch/x86_64/asm.h"
 #include "arch/x86_64/memory/mmap.h"
@@ -90,14 +91,40 @@ static void fill_handover_rsdp(struct handover *target, struct stivale2_struct_t
     target->rsdp = mmap_io_to_phys(rsdp->rsdp);
 }
 
+void fill_handover_framebuffer(struct handover *target, struct stivale2_struct_tag_framebuffer *framebuffer)
+{
+    target->framebuffer.has_framebuffer = true;
+    target->framebuffer.framebuffer_width = framebuffer->framebuffer_width;
+    target->framebuffer.framebuffer_height = framebuffer->framebuffer_height;
+    target->framebuffer.framebuffer_height = framebuffer->framebuffer_bpp;
+    target->framebuffer.framebuffer_physical_addr = framebuffer->framebuffer_addr;
+}
+
+void fill_handover_modules(struct handover *target, struct stivale2_struct_tag_modules *modules)
+{
+    target->modules.module_count = modules->module_count;
+    for (size_t i = 0; i < MIN(modules->module_count, MAX_MODULE_COUNT); i++)
+    {
+        target->modules.module[i].addr = modules->modules[i].begin;
+        target->modules.module[i].size = modules->modules[i].end - modules->modules[i].begin;
+
+        mem_cpy(target->modules.module[i].module_name, modules->modules[i].string, MAX_MODULE_NAME_LENGTH);
+    }
+}
+
 void stivale2_entry(struct stivale2_struct *info)
 {
     log("Booting from a stivale2 bootloader...");
 
-    struct handover handover = {};
+    static struct handover handover =
+        {
+            .identifier = HANDOVER_IDENTIFIER,
+        };
 
     fill_handover_mmap(&handover, stivale2_get_tag(info, STIVALE2_STRUCT_TAG_MEMMAP_ID));
     fill_handover_rsdp(&handover, stivale2_get_tag(info, STIVALE2_STRUCT_TAG_RSDP_ID));
+    fill_handover_framebuffer(&handover, stivale2_get_tag(info, STIVALE2_STRUCT_TAG_FRAMEBUFFER_ID));
+    fill_handover_modules(&handover, stivale2_get_tag(info, STIVALE2_STRUCT_TAG_MODULES_ID));
 
     arch_entry_main(&handover);
 
