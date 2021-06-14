@@ -1,6 +1,7 @@
 #pragma once
 
 #include <brutal/base.h>
+#include <brutal/text.h>
 #include <brutal/types.h>
 #include "syscalls/error.h"
 
@@ -27,7 +28,7 @@ enum task_level
 // see scheduler.md in the book for more information
 struct task_schedule_state
 {
-    cpu_id_t task_cpu; // only valid if tick_in_cpu is >= 0
+    cpu_id_t cpu; // only valid if tick_in_cpu is >= 0
     int tick_start;
     int tick_end;
     bool is_currently_executed;
@@ -36,6 +37,7 @@ struct task_schedule_state
 struct task
 {
     task_id_t id;
+    str_fix128_t name;
     enum task_state state;
 
     int level;
@@ -57,7 +59,7 @@ typedef result_t(br_error_t, struct task *) task_return_result_t;
 
 struct task *task_self(void);
 
-task_return_result_t task_create(uintptr_t ip, enum task_create_flags flags);
+task_return_result_t task_create(str_t name, uintptr_t ip, enum task_create_flags flags);
 
 void task_go(struct task *self);
 

@@ -33,13 +33,7 @@ void task_test(void)
 {
     while (true)
     {
-        if (task_self() == nullptr)
-        {
-            log("task WTF", task_self()->id);
-        }
-
         log("task {} {}", task_self()->id, cpu_self_id());
-
         for (size_t i = 0; i < 10000; i++)
         {
             asm volatile("pause");
@@ -57,7 +51,7 @@ void kernel_entry_main(struct handover *handover)
 
     for (size_t i = 0; i < 20; i++)
     {
-        task_create((uintptr_t)task_test, TASK_CREATE_START_DIRECT);
+        task_create(make_str("test-task"), (uintptr_t)task_test, TASK_CREATE_START_DIRECT);
     }
 
     log("All CPU started, entering userspace...");

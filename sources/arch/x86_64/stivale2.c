@@ -21,7 +21,7 @@ static struct stivale2_header_tag_framebuffer framebuffer_hdr_tag = {
 
 void stivale2_entry(struct stivale2_struct *info);
 
-[[gnu::section(".stivale2hdr")]] [[gnu::used]] static struct stivale2_header stivale_hdr = {
+[[gnu::section(".stivale2hdr"), gnu::used]] static struct stivale2_header stivale_hdr = {
     .entry_point = (uintptr_t)stivale2_entry,
     .stack = (uintptr_t)stack + sizeof(stack),
     .flags = (1 << 1),

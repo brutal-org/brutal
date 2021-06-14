@@ -28,7 +28,6 @@ but if we have 5 process with 4 cpu we may have:
 
 This is bad and ineffective, yes every process has runned 4 times but every process has a context switch. We want the least context switch possible. Here is the solution:
 
-
 | cpu    | 1   | 2   | 3   | 4   |
 | ------ | --- | --- | --- | --- |
 | tick 1 | E   | B   | C   | D   |
@@ -40,7 +39,6 @@ This is bad and ineffective, yes every process has runned 4 times but every proc
 Here every process is called 4 times. A B C and D have the least amount of context switch. Only process E change of cpu frequently. This is really good but not perfect. The fact that E change of cpu is bad. Certainly this method is effective but not equal between processes. The E process will have more switch than the others.
 
 Here is the solution:
-
 
 | cpu    | 1   | 2   | 3   | 4   |
 | ------ | --- | --- | --- | --- |
@@ -63,20 +61,20 @@ So in brutal we have (this may change over time) a scheduler state for each task
 ```c
 struct task_schedule_state
 {
-    cpu_id_t task_cpu; 
-    int tick_start; 
-    int tick_end; 
+    cpu_id_t cpu;
+    int tick_start;
+    int tick_end;
     bool is_currently_executed;
 
 };
 ```
 
-- **task_cpu** the cpu that the process use.
+- **cpu** the cpu that the process use.
 - **tick_start** the tick where the process started executing
-- **tick_end** the tick where the process stopped executing 
+- **tick_end** the tick where the process stopped executing
 - **is_currently_executed** if the process is executed or not
 
-But we have some problems: What happens if a process is now runnable ? or if we have 2 process and 4 cpu and 1 turning runnable ? 
+But we have some problems: What happens if a process is now runnable ? or if we have 2 process and 4 cpu and 1 turning runnable ?
 
 That's why we have 2 part of the scheduler:
 
@@ -89,11 +87,12 @@ If the number of processes is lower than the number of cpu we don't need to swit
 
 ### When the number of running processes is higher than the number of cpu
 
-If the number of processes is higher than the number of cpu we need to switch X process. Were X is equal to: 
+If the number of processes is higher than the number of cpu we need to switch X process. Were X is equal to:
 
 ```c
 size_t schedule_count = MIN(cpu_count(), running - cpu_count());
 ```
+
 (where running is the number of running process)
 
 we can't switch higher than the cpu_count (we can't switch for 6 process using 5 cpu) and we can't switch more process than there is cpu (we can't switch for 1 process for 5 cpu). 
@@ -102,9 +101,8 @@ For each `schedule_count` we get the process that has run the longest and replac
 
 ### Cpu cache is important
 
-The problem of interrupt is that they are really heavy, they invalidate the cache, they can take a lot of cpu cycles... So we need to send them only when they are needed. That mean that if a cpu don't need to switch to another process we don't send him an interrupt (if a process next task is equal to the process current task) 
+The problem of interrupt is that they are really heavy, they invalidate the cache, they can take a lot of cpu cycles... So we need to send them only when they are needed. That mean that if a cpu don't need to switch to another process we don't send him an interrupt (if a process next task is equal to the process current task)
 
 ### Task switch
 
 So for each cpu that need a switch the cpu 0 send him a IPI (inter process interrupt) number 100. The process set the current process to the next process, and do a context switch.
-

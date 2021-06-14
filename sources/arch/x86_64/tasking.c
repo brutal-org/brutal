@@ -31,7 +31,7 @@ task_return_result_t arch_task_create(uintptr_t ip, enum task_create_flags flags
     task->base.kernel_sp = TRY(task_return_result_t, heap_alloc(KERNEL_STACK_SIZE)).base + KERNEL_STACK_SIZE;
     task->base.sp = TRY(task_return_result_t, heap_alloc(KERNEL_STACK_SIZE)).base + KERNEL_STACK_SIZE;
 
-    task->simd_context = (void *)(TRY(task_return_result_t, heap_alloc(4096)).base);
+    task->simd_context = (void *)(TRY(task_return_result_t, heap_alloc(simd_context_size())).base);
 
     simd_context_init(task->simd_context);
 
@@ -40,7 +40,7 @@ task_return_result_t arch_task_create(uintptr_t ip, enum task_create_flags flags
     struct interrupt_stackframe *stackframe = (struct interrupt_stackframe *)task->base.sp;
 
     stackframe->rip = ip;
-    stackframe->rflags = RFLAGS_INTERRUPT_ENABLE | RFLAGS_SIGN | RFLAGS_PARITY | RFLAGS_RESERVED1_ONE;
+    stackframe->rflags = RFLAGS_INTERRUPT_ENABLE | RFLAGS_RESERVED1_ONE;
     stackframe->rdi = arg1;
     stackframe->rsi = arg2;
     stackframe->rdx = arg3;
@@ -56,6 +56,7 @@ task_return_result_t arch_task_create(uintptr_t ip, enum task_create_flags flags
         stackframe->cs = (GDT_KERNEL_CODE * 8);
         stackframe->ss = (GDT_KERNEL_DATA * 8);
     }
+
     stackframe->rsp = task->base.sp;
 
     return OK(task_return_result_t, (struct task *)task);

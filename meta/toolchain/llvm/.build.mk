@@ -33,7 +33,6 @@ CROSS_CFLAGS= \
 CROSS_KCFLAGS= \
 	$(CROSS_CFLAGS) \
 	-fno-pic \
-	-fpie \
 	-fno-stack-protector \
 	-mno-80387 \
 	-mno-mmx \
