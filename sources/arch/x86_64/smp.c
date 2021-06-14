@@ -1,5 +1,6 @@
 #include <brutal/log.h>
 #include <brutal/mem.h>
+#include <stddef.h>
 #include "arch/arch.h"
 #include "arch/heap.h"
 #include "arch/mmio.h"
@@ -9,6 +10,7 @@
 #include "arch/x86_64/asm.h"
 #include "arch/x86_64/cpu.h"
 #include "arch/x86_64/memory/mmap.h"
+#include "arch/x86_64/pit.h"
 #include "arch/x86_64/smp.h"
 #include "host/mem.h"
 #include "kernel/constants.h"
@@ -20,24 +22,48 @@ atomic_bool cpu_ready = false;
 extern uint32_t trampoline_start;
 extern uint32_t trampoline_end;
 
+static size_t smp_cpu_trampoline_size(void)
+{
+    uint64_t trampoline_len = (uintptr_t)&trampoline_end - (uintptr_t)&trampoline_start + HOST_MEM_PAGESIZE;
+    return ALIGN_UP(trampoline_len, HOST_MEM_PAGESIZE);
+}
+
 static smp_init_result smp_initialize_cpu_trampoline(void)
 {
-    uint64_t trampoline_len = (uintptr_t)&trampoline_end - (uintptr_t)&trampoline_start;
+    log("Initializing cpu trampoline");
+    log("trampoline is {x}", smp_cpu_trampoline_size());
+
+    // Map everything under the trampoline
+    uint64_t trampoline_len = (uintptr_t)&trampoline_end - (uintptr_t)&trampoline_start + HOST_MEM_PAGESIZE;
 
     vmm_map(vmm_kernel_space(),
             (vmm_range_t){
                 .base = (0x0),
-                .size = ALIGN_UP(trampoline_len, HOST_MEM_PAGESIZE) + HOST_MEM_PAGESIZE},
+                .size = smp_cpu_trampoline_size()},
             (pmm_range_t){
                 .base = (0x0),
-                .size = ALIGN_UP(trampoline_len, HOST_MEM_PAGESIZE) + HOST_MEM_PAGESIZE},
+                .size = smp_cpu_trampoline_size()},
             BR_MEM_WRITABLE);
 
     vmm_space_switch(vmm_kernel_space());
 
-    mem_cpy((void *)0x1000, (void *)&trampoline_start, trampoline_len);
+    mem_cpy((void *)0x1000, (void *)&trampoline_start, trampoline_len - 0x1000);
 
     return OK(smp_init_result, 0);
+}
+
+static void smp_cleanup_cpu_trampoline(void)
+{
+    log("Cleaning up cpu trampoline");
+    // Unmap everything under the trampoline
+
+    mem_set(0x0, 0x69, smp_cpu_trampoline_size());
+
+    vmm_unmap(vmm_kernel_space(),
+              (vmm_range_t){
+                  .base = (0x0),
+                  .size = smp_cpu_trampoline_size(),
+              });
 }
 
 void smp_entry_other(void)
@@ -48,8 +74,6 @@ void smp_entry_other(void)
 
 static smp_init_result smp_initialize_cpu_data(void)
 {
-    // load future cpu page table
-    smp_initialize_cpu_trampoline();
     // load future cpu page table
     mmio_write64(SMP_INIT_PAGE_TABLE, asm_read_cr3());
 
@@ -67,13 +91,17 @@ static smp_init_result smp_initialize_cpu_data(void)
 
 static void smp_initialize_cpu(uint32_t lapic_id)
 {
-    apic_init_processor(lapic_id);
     smp_initialize_cpu_data();
+    apic_init_processor(lapic_id);
+    pit_sleep(10);
     apic_start_processor(lapic_id, 4096);
 }
 
 void arch_boot_other(void)
 {
+    // load future cpu page table
+    smp_initialize_cpu_trampoline();
+
     log("Booting other CPUs...");
 
     for (size_t cpu = 0; cpu < cpu_count(); cpu++)
@@ -92,4 +120,6 @@ void arch_boot_other(void)
         {
         }
     }
+
+    smp_cleanup_cpu_trampoline();
 }

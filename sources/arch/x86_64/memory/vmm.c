@@ -52,7 +52,7 @@ static vmm_result_t vmm_get_pml_or_alloc(struct pml *table, size_t idx, size_t f
     }
 }
 
-static vmm_result_t vmm_map_pml_make_entry(struct pml *pml4, uintptr_t virtual_page, uintptr_t physical_page, br_mem_flags_t flags)
+static vmm_result_t vmm_map_page(struct pml *pml4, uintptr_t virtual_page, uintptr_t physical_page, br_mem_flags_t flags)
 {
     auto pml3_range = TRY(vmm_result_t, vmm_get_pml_or_alloc(pml4, PML4_GET_INDEX(virtual_page), flags | BR_MEM_WRITABLE | BR_MEM_USER));
     struct pml *pml3 = (struct pml *)(pml3_range.base);
@@ -64,6 +64,23 @@ static vmm_result_t vmm_map_pml_make_entry(struct pml *pml4, uintptr_t virtual_p
     struct pml *pml1 = (struct pml *)(pml1_range.base);
 
     pml1->entries[PML1_GET_INDEX(virtual_page)] = pml_make_entry(physical_page, flags);
+
+    vmm_range_t range = {virtual_page, HOST_MEM_PAGESIZE};
+    return OK(vmm_result_t, range);
+}
+
+static vmm_result_t vmm_unmap_page(struct pml *pml4, uintptr_t virtual_page)
+{
+    auto pml3_range = TRY(vmm_result_t, vmm_get_pml(pml4, PML4_GET_INDEX(virtual_page)));
+    struct pml *pml3 = (struct pml *)(pml3_range.base);
+
+    auto pml2_range = TRY(vmm_result_t, vmm_get_pml(pml3, PML3_GET_INDEX(virtual_page)));
+    struct pml *pml2 = (struct pml *)(pml2_range.base);
+
+    auto pml1_range = TRY(vmm_result_t, vmm_get_pml(pml2, PML2_GET_INDEX(virtual_page)));
+    struct pml *pml1 = (struct pml *)(pml1_range.base);
+
+    pml1->entries[PML1_GET_INDEX(virtual_page)] = pml_clean_entry();
 
     vmm_range_t range = {virtual_page, HOST_MEM_PAGESIZE};
     return OK(vmm_result_t, range);
@@ -173,10 +190,20 @@ vmm_result_t vmm_map(vmm_space_t space, vmm_range_t virtual_range, pmm_range_t p
 
     for (size_t i = 0; i < (virtual_range.size / HOST_MEM_PAGESIZE); i++)
     {
-        vmm_map_pml_make_entry(space,
+        vmm_map_page(space,
                                i * HOST_MEM_PAGESIZE + ALIGN_DOWN(virtual_range.base, HOST_MEM_PAGESIZE),
                                i * HOST_MEM_PAGESIZE + ALIGN_DOWN(physical_range.base, HOST_MEM_PAGESIZE),
                                flags);
+    }
+
+    return OK(vmm_result_t, virtual_range);
+}
+
+vmm_result_t vmm_unmap(vmm_space_t space, vmm_range_t virtual_range)
+{
+    for (size_t i = 0; i < (virtual_range.size / HOST_MEM_PAGESIZE); i++)
+    {
+        vmm_unmap_page(space, i * HOST_MEM_PAGESIZE + ALIGN_DOWN(virtual_range.base, HOST_MEM_PAGESIZE));
     }
 
     return OK(vmm_result_t, virtual_range);
