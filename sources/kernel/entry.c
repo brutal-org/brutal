@@ -41,9 +41,8 @@ void task_test(void)
     }
 }
 
-void kernel_entry_main(struct handover *handover)
+void kernel_entry_main(MAYBE_UNUSED struct handover *handover)
 {
-    UNUSED(handover);
     kernel_splash();
 
     tasking_initialize();

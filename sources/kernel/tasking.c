@@ -61,10 +61,8 @@ void task_state(struct task *self, enum task_state new_state)
     self->state = new_state;
 }
 
-void task_wait(struct task *self, uint64_t ms)
+void task_wait(MAYBE_UNUSED struct task *self, MAYBE_UNUSED uint64_t ms)
 {
-    UNUSED(self);
-    UNUSED(ms);
     // TODO: task wait
 }
 

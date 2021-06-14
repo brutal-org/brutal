@@ -14,10 +14,8 @@ static struct alloc *heap(void)
     return (struct alloc *)&memory;
 }
 
-void *alloc_global_acquire(struct alloc *alloc, size_t size)
+void *alloc_global_acquire(MAYBE_UNUSED struct alloc *alloc, size_t size)
 {
-    UNUSED(alloc);
-
     host_mem_lock();
     void *result = alloc_acquire(heap(), size);
     host_mem_unlock();
@@ -25,10 +23,8 @@ void *alloc_global_acquire(struct alloc *alloc, size_t size)
     return result;
 }
 
-void alloc_global_release(struct alloc *alloc, void *ptr)
+void alloc_global_release(MAYBE_UNUSED struct alloc *alloc, void *ptr)
 {
-    UNUSED(alloc);
-
     host_mem_lock();
     alloc_release(heap(), ptr);
     host_mem_unlock();

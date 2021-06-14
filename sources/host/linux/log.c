@@ -15,9 +15,8 @@ void host_log_unlock(void)
     // FIXME: no-op
 }
 
-static write_result_t host_log_write(struct writer *writer, char const *data, size_t size)
+static write_result_t host_log_write(MAYBE_UNUSED struct writer *writer, char const *data, size_t size)
 {
-    UNUSED(writer);
     write(2, data, size);
     return OK(write_result_t, size);
 }
