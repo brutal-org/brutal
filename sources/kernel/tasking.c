@@ -153,19 +153,19 @@ static void scheduler_start_task_execution(struct task *target, cpu_id_t target_
 }
 
 // is the cpu current process nullptr or idle
-static bool scheduler_is_cpu_lazy(cpu_id_t id)
+static bool scheduler_is_cpu_idle(cpu_id_t id)
 {
     struct task *idle = cpu(id)->schedule.idle;
     return (cpu(id)->schedule.current == nullptr && cpu(id)->schedule.next == nullptr) || (cpu(id)->schedule.next == idle);
 }
 
-static size_t scheduler_get_lazy_cpu_count(void)
+static size_t scheduler_get_idle_cpu_count(void)
 {
     size_t count = 0;
 
     for (size_t i = 0; i < cpu_count(); i++)
     {
-        if (scheduler_is_cpu_lazy(i))
+        if (scheduler_is_cpu_idle(i))
         {
             count++;
         }
@@ -180,7 +180,7 @@ static size_t scheduler_get_running_cpu_count(void)
 
     for (size_t i = 0; i < cpu_count(); i++)
     {
-        if (!scheduler_is_cpu_lazy(i))
+        if (!scheduler_is_cpu_idle(i))
         {
             count++;
         }
@@ -189,11 +189,11 @@ static size_t scheduler_get_running_cpu_count(void)
     return count;
 }
 
-static bool scheduler_add_process_to_a_lazy_cpu(struct task *target)
+static bool scheduler_add_process_to_a_idle_cpu(struct task *target)
 {
     for (size_t i = 0; i < cpu_count(); i++)
     {
-        if (scheduler_is_cpu_lazy(i))
+        if (scheduler_is_cpu_idle(i))
         {
             scheduler_start_task_execution(target, i);
             return true;
@@ -223,10 +223,10 @@ static void scheduler_continue_all_cpu(size_t running_process_count)
     for (size_t i = 0; i < cpu_count(); i++)
     {
 
-        if (scheduler_is_cpu_lazy(i))
+        if (scheduler_is_cpu_idle(i))
         {
             struct task *target = task_get_most_waiting();
-            scheduler_add_process_to_a_lazy_cpu(target);
+            scheduler_add_process_to_a_idle_cpu(target);
             running_cpu++;
             if (running_cpu >= running_process_count)
             {
@@ -235,7 +235,6 @@ static void scheduler_continue_all_cpu(size_t running_process_count)
         }
         else
         {
-
             cpu(i)->schedule.next = cpu(i)->schedule.current; // don't switch
         }
     }
@@ -257,9 +256,9 @@ static void scheduler_update(void)
     {
         struct task *most_waiting = task_get_most_waiting();
 
-        if (scheduler_get_lazy_cpu_count() != 0) // if a cpu don't do anything (poor guy :^(   ) we give him a process
+        if (scheduler_get_idle_cpu_count() != 0) // if a cpu don't do anything (poor guy :^(   ) we give him a process
         {
-            scheduler_add_process_to_a_lazy_cpu(most_waiting);
+            scheduler_add_process_to_a_idle_cpu(most_waiting);
             continue;
         }
 
