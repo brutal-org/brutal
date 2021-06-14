@@ -145,6 +145,19 @@ static struct task *task_get_most_active(void)
     return current_active;
 }
 
+static bool task_has_waiting_task()
+{
+    for (int i = 0; i < tasks.length; i++)
+    {
+        if (tasks.data[i]->state == TASK_STATE_RUNNING && !tasks.data[i]->scheduler_state.is_currently_executed)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 static struct task *task_get_most_waiting()
 {
     size_t most_waiting_time = 0;
@@ -187,7 +200,7 @@ static void scheduler_start_task_execution(struct task *target, cpu_id_t target_
     cpu(target_cpu)->schedule.next = target;
 }
 
-// is the cpu current process nullptr or idle
+// is the cpu current process idle
 static bool scheduler_is_cpu_idle(cpu_id_t id)
 {
     return cpu(id)->schedule.next == cpu(id)->schedule.idle;
@@ -221,15 +234,16 @@ static void scheduler_dispatch_to_idle_cpu(struct task *target)
 static void scheduler_dispatch_to_active_cpu(struct task *target)
 {
     struct task *most_active = task_get_most_active();
+
     cpu_id_t target_cpu = scheduler_end_task_execution(most_active);
     scheduler_start_task_execution(target, target_cpu);
 }
 
-static void scheduler_continue_all_cpu(void)
+static void scheduler_dispatch_all_waiting_task_to_a_cpu(void)
 {
-    for (size_t i = 0; i < cpu_count(); i++)
+    while (task_has_waiting_task())
     {
-        cpu(i)->schedule.next = cpu(i)->schedule.current;
+        scheduler_dispatch_to_idle_cpu(task_get_most_waiting());
     }
 }
 
@@ -237,10 +251,18 @@ static void scheduler_update(void)
 {
     size_t running = running_process_count();
 
-    // when we have a number of process under the number of cpu
+    // when we have a number of running process under the number of cpu
     if (running <= cpu_count())
     {
-        scheduler_continue_all_cpu();
+        // the rare case where we have 4 cpu and 2 task and 1 waiting, so we put all waiting task to an idle cpu
+        // waiting task: {C}
+        // running task: [A] [B] [ ] [ ]
+        // after:
+        // waiting task: none
+        // running task: [A] [B] [C] [ ]
+        scheduler_dispatch_all_waiting_task_to_a_cpu();
+
+        // note: don't need to update cpu scheduler.next value as they keep the same value as "current" on a context switch (see: scheduler_switch())
         return;
     }
 
