@@ -25,28 +25,53 @@ struct task *task_self(void)
     return cpu_self()->schedule.current;
 }
 
-task_return_result_t task_create(str_t name, uintptr_t ip, enum task_create_flags flags)
+task_return_result_t task_create(str_t name, enum task_flags flags)
 {
     LOCK_RETAINER(&task_lock);
 
     log("Creating task {}...", name);
 
-    auto task = TRY(task_return_result_t, arch_task_create(ip, flags, 0, 0, 0, 0));
+    auto task = TRY(task_return_result_t, arch_task_create());
 
     task->id = task_id++;
     task->name = make_str_fix(str_fix128_t, name);
-    task->ip = ip;
+    task->flags = flags;
 
     log("Task:{}({}) created...", make_str(&task->name), task->id);
 
     vec_push(&tasks, task);
 
-    if (flags & TASK_CREATE_START_DIRECT)
-    {
-        task->state = TASK_RUNNING;
-    }
-
     return OK(task_return_result_t, task);
+}
+
+void task_start(
+    struct task *self,
+    uintptr_t ip,
+    uintptr_t arg1,
+    uintptr_t arg2,
+    uintptr_t arg3,
+    uintptr_t arg4,
+    uintptr_t arg5)
+{
+    LOCK_RETAINER(&task_lock);
+
+    arch_task_start(self, ip, arg1, arg2, arg3, arg4, arg5);
+    self->state = TASK_STATE_RUNNING;
+}
+
+struct task *task_create_idle(void)
+{
+    auto task = UNWRAP(task_create(make_str("idle"), TASK_NONE));
+    arch_task_start(task, (uintptr_t)task_idle, 0, 0, 0, 0, 0);
+    task->state = TASK_STATE_IDLE;
+    return task;
+}
+
+struct task *task_create_boot(void)
+{
+    auto task = UNWRAP(task_create(make_str("bool"), TASK_NONE));
+    task_start(task, 0, 0, 0, 0, 0, 0);
+    return task;
 }
 
 void task_state(struct task *self, enum task_state new_state)
@@ -75,8 +100,8 @@ void tasking_initialize(void)
     for (size_t i = 0; i < cpu_count(); i++)
     {
         log("Initializing tasking for cpu: {}", i);
-        cpu(i)->schedule.idle = UNWRAP(task_create(make_str("idle"), (uintptr_t)&task_idle, 0));
-        cpu(i)->schedule.current = UNWRAP(task_create(make_str("boot"), 0, TASK_CREATE_START_DIRECT));
+        cpu(i)->schedule.idle = task_create_idle();
+        cpu(i)->schedule.current = task_create_boot();
         cpu(i)->schedule.next = cpu(i)->schedule.idle;
     }
 }
@@ -84,13 +109,15 @@ void tasking_initialize(void)
 static size_t running_process_count(void)
 {
     size_t running_process_count = 0;
+
     for (int i = 0; i < tasks.length; i++)
     {
-        if (tasks.data[i]->state == TASK_RUNNING)
+        if (tasks.data[i]->state == TASK_STATE_RUNNING)
         {
             running_process_count++;
         }
     }
+
     return running_process_count;
 }
 
@@ -101,7 +128,7 @@ static struct task *task_get_most_active(void)
 
     for (int i = 0; i < tasks.length; i++)
     {
-        if (tasks.data[i]->state != TASK_RUNNING || !tasks.data[i]->scheduler_state.is_currently_executed)
+        if (tasks.data[i]->state != TASK_STATE_RUNNING || !tasks.data[i]->scheduler_state.is_currently_executed)
         {
             continue;
         }
@@ -125,7 +152,7 @@ static struct task *task_get_most_waiting()
 
     for (int i = 0; i < tasks.length; i++)
     {
-        if (tasks.data[i]->state != TASK_RUNNING || tasks.data[i]->scheduler_state.is_currently_executed)
+        if (tasks.data[i]->state != TASK_STATE_RUNNING || tasks.data[i]->scheduler_state.is_currently_executed)
         {
             continue;
         }

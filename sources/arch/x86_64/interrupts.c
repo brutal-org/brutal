@@ -1,9 +1,11 @@
 #include <brutal/log.h>
 #include <brutal/sync.h>
+#include "arch/cpu.h"
 #include "arch/x86_64/apic.h"
 #include "arch/x86_64/asm.h"
 #include "arch/x86_64/interrupts.h"
 #include "arch/x86_64/pic.h"
+#include "brutal/types.h"
 #include "kernel/tasking.h"
 
 struct lock error_lock;
@@ -58,15 +60,22 @@ void dump_register(struct interrupt_stackframe const *stackframe)
 uint64_t interrupt_handler(uint64_t rsp)
 {
     auto stackframe = (struct interrupt_stackframe *)rsp;
+
     if (stackframe->int_no < 32)
     {
         lock_acquire(&error_lock);
+
+        for (cpu_id_t i = 0; i < cpu_count(); i++) {
+            if (i != cpu_self_id())
+            {
+                apic_send_ipit(i, IPIT_STOP);
+            }
+        }
+
         log_unlock("CPU {} PANIC RSP={p}", cpu_self_id(), rsp);
         log_unlock("Interrupt {}: {}: error: {} on {x} !", stackframe->int_no, _exception_messages[stackframe->int_no], stackframe->error_code, stackframe->rip);
 
         dump_register(stackframe);
-
-        lock_release(&error_lock);
 
         while (true)
         {
@@ -81,6 +90,14 @@ uint64_t interrupt_handler(uint64_t rsp)
     else if (stackframe->int_no == IPIT_RESCHED)
     {
         rsp = scheduler_switch(rsp);
+    }
+    else if (stackframe->int_no == IPIT_STOP)
+    {
+        while (true)
+        {
+            asm_cli();
+            asm_hlt();
+        }
     }
     else if (stackframe->int_no == 0xf0)
     {

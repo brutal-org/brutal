@@ -7,20 +7,24 @@
         T size;    \
     }
 
-#define range_cast(T, range)   \
-    (T)                        \
-    {                          \
-        range.base, range.size \
-    }
+#define range_cast(T, RANGE) (       \
+    {                                \
+        typeof(RANGE) range = RANGE; \
+                                     \
+        (T){                         \
+            range.base,              \
+            range.size,              \
+        };                           \
+    })
 
-#define range_empty(range) \
-    ((range).size == 0)
+#define range_empty(RANGE) \
+    ((RANGE).size == 0)
 
-#define range_any(range) \
-    ((range).size > 0)
+#define range_any(RANGE) \
+    ((RANGE).size > 0)
 
-#define range_end(range) \
-    ((range).base + (range).size - 1)
+#define range_end(RANGE) \
+    ((RANGE).base + (RANGE).size - 1)
 
-#define range_contain(range, addr) \
-    (((range).base <= (addr)) && ((range).size + (range).base >= (addr)))
+#define range_contain(RANGE, ADDR) \
+    (((RANGE).base <= (ADDR)) && ((RANGE).size + (RANGE).base >= (ADDR)))

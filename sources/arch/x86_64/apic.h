@@ -5,6 +5,7 @@
 #include "kernel/handover.h"
 
 #define IPIT_RESCHED (100)
+#define IPIT_STOP (101)
 
 #define LAPIC_ENABLE (0x800)
 

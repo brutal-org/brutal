@@ -34,6 +34,7 @@ void idt_initialize(void)
     }
 
     idt.entries[100] = idt_entry(__interrupt_vector[48], 0, IDT_GATE | IDT_USER);
+    idt.entries[101] = idt_entry(__interrupt_vector[49], 0, IDT_GATE | IDT_USER);
 
     idt_update(&idt_descriptor);
 }

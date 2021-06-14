@@ -11,18 +11,16 @@
 
 enum task_state
 {
-    TASK_NONE,
-    TASK_IDLE,
-    TASK_RUNNING,
-    TASK_WAITING,
-    TASK_SLEEPING
+    TASK_STATE_NONE,
+    TASK_STATE_IDLE,
+    TASK_STATE_RUNNING,
+    TASK_STATE_BLOCKED,
 };
 
-enum task_level
+enum task_flags
 {
-    TASK_LEVEL_USER,
-    TASK_LEVEL_LOW,
-    TASK_LEVEL_KERNEL,
+    TASK_NONE = 0,
+    TASK_USER = 1 << 0,
 };
 
 // see scheduler.md in the book for more information
@@ -34,34 +32,39 @@ struct task_schedule_state
     bool is_currently_executed;
 };
 
+struct stack
+{
+    uintptr_t base;
+    uintptr_t size;
+};
+
 struct task
 {
     task_id_t id;
     str_fix128_t name;
+    enum task_flags flags;
     enum task_state state;
-
-    int level;
 
     struct task_schedule_state scheduler_state;
 
-    uintptr_t ip;
     uintptr_t sp;
-    uintptr_t kernel_sp;
-};
-
-enum task_create_flags
-{
-    TASK_CREATE_USER = 1 << 0,
-    TASK_CREATE_START_DIRECT = 1 << 1,
+    struct stack kernel_stack;
 };
 
 typedef result_t(br_error_t, struct task *) task_return_result_t;
 
 struct task *task_self(void);
 
-task_return_result_t task_create(str_t name, uintptr_t ip, enum task_create_flags flags);
+task_return_result_t task_create(str_t name, enum task_flags flags);
 
-void task_go(struct task *self);
+void task_start(
+    struct task *self,
+    uintptr_t ip,
+    uintptr_t arg1,
+    uintptr_t arg2,
+    uintptr_t arg3,
+    uintptr_t arg4,
+    uintptr_t arg5);
 
 void task_state(struct task *self, enum task_state state);
 
