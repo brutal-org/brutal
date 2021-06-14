@@ -1,6 +1,6 @@
 #pragma once
 
-#define PIT_FREQUENCY 1193182
+#define PIT_FREQUENCY 11931820
 #define PIT_USEC 1000
 
 #include <stdint.h>
