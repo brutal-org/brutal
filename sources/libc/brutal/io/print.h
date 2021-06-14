@@ -57,7 +57,7 @@ struct print_value print_val_pointer(void *);
         unsigned long: print_val_unsigned,    \
                                               \
         char*: print_val_cstring,             \
-        str_t: print_val_string,         \
+        str_t: print_val_string,              \
         void*: print_val_pointer              \
     )(VALUE),
 

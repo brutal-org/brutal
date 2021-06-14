@@ -69,7 +69,7 @@ static inline str_t str_make_from_str_fix128(str_fix128_t *str_fix) { return (st
 
 #define make_str_fix(T, str)                                  \
     ({                                                        \
-        T dst_str;                                            \
+        T dst_str = {};                                            \
         auto src_str = make_str(str);                         \
         mem_cpy(dst_str.buffer, src_str.buffer, src_str.len); \
         dst_str.len = src_str.len;                            \

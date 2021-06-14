@@ -1,22 +1,14 @@
 
 /* --- 7.24 - String handling ----------------------------------------------- */
 
+#include <brutal/mem.h>
 #include <string.h>
 
 /* --- 7.24.2 - Copying functions ------------------------------------------- */
 
 void *memcpy(void *restrict s1, void const *restrict s2, size_t n)
 {
-    size_t i = 0;
-    char *dest = (char *)s1;
-    char const *src = (char const *)s2;
-
-    while (i++ < n)
-    {
-        dest[i] = src[i];
-    }
-
-    return dest;
+    return mem_cpy(s1, s2, n);
 }
 
 // void *memmove(void *s1,  void const *s2, size_t n) {}
@@ -79,17 +71,7 @@ char *strrchr(char const *s, int c)
 
 void *memset(void *s, int c, size_t n)
 {
-    if (n)
-    {
-        char *d = (char *)s;
-
-        for (size_t i = 0; i < n; i++)
-        {
-            d[i] = c;
-        }
-    }
-
-    return s;
+    return mem_set(s, c, n);
 }
 
 // char *strerror(int errnum) { }
