@@ -78,6 +78,6 @@ struct schedule
     struct task *next;
 };
 
-uintptr_t tasking_switch(uintptr_t sp);
+uintptr_t scheduler_switch(uintptr_t sp);
 
-uintptr_t tasking_schedule_and_switch(uintptr_t sp);
+uintptr_t scheduler_schedule_and_switch(uintptr_t sp);

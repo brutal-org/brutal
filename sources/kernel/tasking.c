@@ -28,6 +28,7 @@ struct task *task_self(void)
 task_return_result_t task_create(uintptr_t ip, enum task_create_flags flags)
 {
     log("Task creating...");
+
     LOCK_RETAINER(&task_lock);
 
     auto task = TRY(task_return_result_t, arch_task_create(ip, flags, 0, 0, 0, 0));
@@ -267,11 +268,6 @@ static void scheduler_update(void)
         cpu_id_t target_cpu = scheduler_end_task_execution(most_active);
         scheduler_start_task_execution(most_waiting, target_cpu);
     }
-}
-
-static void tasking_schedule(void)
-{
-    scheduler_update();
 
     for (size_t i = 1; i < cpu_count(); i++)
     {
@@ -282,28 +278,13 @@ static void tasking_schedule(void)
     }
 }
 
-uintptr_t tasking_switch(uintptr_t sp)
+uintptr_t scheduler_switch(uintptr_t sp)
 {
     if (task_self() != nullptr)
     {
         task_self()->sp = sp; // save stack pointer
         arch_task_save_context(cpu_self()->schedule.current);
     }
-
-#ifdef TASKING_LOGGING
-    if (cpu_self()->schedule.current != nullptr)
-    {
-        log("cpu: {} using process: {} to {}", cpu_self_id(), cpu_self()->schedule.current->id, cpu_self()->schedule.next->id);
-    }
-    else if (cpu_self()->schedule.next != nullptr)
-    {
-        log("cpu: {} using process: idle to {}", cpu_self_id(), cpu_self()->schedule.next->id);
-    }
-    else
-    {
-        log("cpu: {} idle", cpu_self_id());
-    }
-#endif
 
     cpu_self()->schedule.current = cpu_self()->schedule.next;
 
@@ -316,11 +297,17 @@ uintptr_t tasking_switch(uintptr_t sp)
     return sp;
 }
 
-uintptr_t tasking_schedule_and_switch(uintptr_t sp)
+uintptr_t scheduler_schedule_and_switch(uintptr_t sp)
 {
-    LOCK_RETAINER(&task_lock);
-    current_tick++;
-    tasking_schedule();
+    LOCK_RETAINER_TRY(&task_lock)
+    {
+        current_tick++;
+        scheduler_update();
 
-    return tasking_switch(sp);
+        return scheduler_switch(sp);
+    }
+    else
+    {
+        return sp;
+    }
 }

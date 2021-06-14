@@ -28,11 +28,11 @@ static inline void lock_retainer_release(struct lock **lock)
     lock_acquire(retainer);
 
 #define LOCK_RETAINER(lock) \
-    LOCK_RETAINER_(retainer, lock)
+    LOCK_RETAINER_(CONCAT(retainer, __COUNTER__), lock)
 
-#define LOCK_RETAINER_TRY_(retainer, lock)               \
-    auto retainer CLEANUP(lock_retainer_release) = lock; \
+#define LOCK_RETAINER_TRY_(retainer, lock)                       \
+    typeof(lock) retainer CLEANUP(lock_retainer_release) = lock; \
     if (lock_try_acquire(retainer) || (retainer = nullptr))
 
 #define LOCK_RETAINER_TRY(lock) \
-    LOCK_RETAINER_TRY_(retainer, lock)
+    LOCK_RETAINER_TRY_(CONCAT(retainer, __COUNTER__), lock)

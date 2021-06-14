@@ -27,9 +27,6 @@ void kernel_boot_other(void)
     while (other_ready != cpu_count())
     {
     }
-
-    arch_enable_interrupt();
-    arch_idle();
 }
 
 void task_test(void)
@@ -38,13 +35,13 @@ void task_test(void)
     {
         if (task_self() == nullptr)
         {
-
             log("task WTF", task_self()->id);
         }
+
         log("task {} {}", task_self()->id, cpu_self_id());
+
         for (size_t i = 0; i < 10000; i++)
         {
-
             asm volatile("pause");
         }
     }
@@ -53,16 +50,21 @@ void task_test(void)
 void kernel_entry_main(struct handover *handover)
 {
     UNUSED(handover);
+    kernel_splash();
+
     tasking_initialize();
     log("Main CPU is entering kernel...");
 
-    kernel_splash();
     for (size_t i = 0; i < 20; i++)
     {
         task_create((uintptr_t)task_test, TASK_CREATE_START_DIRECT);
     }
+
     log("All CPU started, entering userspace...");
     kernel_boot_other();
+
+    arch_enable_interrupt();
+    arch_idle();
 }
 
 void kernel_entry_other(void)

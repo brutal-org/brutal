@@ -61,7 +61,7 @@ uint64_t interrupt_handler(uint64_t rsp)
     if (stackframe->int_no < 32)
     {
         lock_acquire(&error_lock);
-        log_unlock("CPU {} did an oopsy", cpu_self_id());
+        log_unlock("CPU {} PANIC RSP={p}", cpu_self_id(), rsp);
         log_unlock("Interrupt {}: {}: error: {} on {x} !", stackframe->int_no, _exception_messages[stackframe->int_no], stackframe->error_code, stackframe->rip);
 
         dump_register(stackframe);
@@ -76,11 +76,11 @@ uint64_t interrupt_handler(uint64_t rsp)
     }
     else if (stackframe->int_no == 32)
     {
-        rsp = tasking_schedule_and_switch(rsp);
+        rsp = scheduler_schedule_and_switch(rsp);
     }
     else if (stackframe->int_no == IPIT_RESCHED)
     {
-        rsp = tasking_switch(rsp);
+        rsp = scheduler_switch(rsp);
     }
     else if (stackframe->int_no == 0xf0)
     {
