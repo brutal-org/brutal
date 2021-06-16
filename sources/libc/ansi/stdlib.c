@@ -1,6 +1,75 @@
 #include <stdlib.h>
 
-// --- environment communication ---
+/* --- 7.22 - General utilities --------------------------------------------- */
+
+/* --- 7.22.1 - Numeric conversion functions -------------------------------- */
+
+// double atof(char const *nptr);
+
+// int atoi(char const *nptr);
+
+// long atol(char const *nptr);
+
+// long long atoll(char const *nptr);
+
+// long int strtol(char const *restrict nptr,
+//                 char **restrict endptr,
+//                 int base);
+
+// long long int strtoll(char const *restrict nptr,
+//                       char **restrict endptr,
+//                       int base);
+
+// unsigned long int strtoul(char const *restrict nptr,
+//                           char **restrict endptr,
+//                           int base);
+
+// unsigned long long int strtoull(char *const restrict nptr,
+//                                 char **restrict endptr,
+//                                 int base);
+
+// double strtod(char const *restrict nptr,
+//               char **restrict endptr);
+
+// float strtof(char const *restrict nptr,
+//              char **restrict endptr);
+
+// long double strtold(char const *restrict nptr, char **restrict endptr);
+
+// int strfromd(char *restrict s,
+//              size_t n,
+//              char const *restrict format,
+//              double fp);
+
+// int strfromf(char *restrict s,
+//              size_t n,
+//              char const *restrict format,
+//              floatf p);
+
+// int strfroml(char *restricts,
+//              size_t n,
+//              char const *restrict format,
+//              long double fp);
+
+/* --- 7.22.2 - Pseudo-random sequence generation functions ----------------- */
+
+// int rand();
+
+// int srand(unsigned int seed);
+
+/* --- 7.22.3 - Memory management functions --------------------------------- */
+
+// void *aligned_alloc(size_t alignment, size_t size);
+
+// void *calloc(size_t nmemb, size_t size);
+
+// void free(void *ptr);
+
+// void *malloc(size_t size);
+
+// void *realloc(void *ptr, size_t size);
+
+/* --- 7.22.4 - Communication with the environment -------------------------- */
 
 // _Noreturn void abort(void);
 
@@ -18,7 +87,20 @@
 
 // int system(char const *string);
 
-// --- number / random function ---
+/* --- 7.22.5 - Searching and sorting utilities ----------------------------- */
+
+// void *bsearch(void const *key,
+//               void const *base,
+//               size_t nmemb,
+//               size_t size,
+//               int (*compar)(void const *, void const *));
+
+// void *qsort(void *base,
+//             size_t nmemb,
+//             size_t size,
+//             int (*compar)(void const *, void const *));
+
+/* --- 7.22.6 - Integer arithmetic functions -------------------------------- */
 
 // int abs(int j);
 
@@ -26,39 +108,13 @@
 
 // long long llabs(long long j);
 
-// int rand();
-
-// int srand(unsigned int seed);
-
 // div_t div(int number, int denom);
 
 // ldiv_t ldiv(long number, long denom);
 
 // lldiv_t lldiv(long long number, long long denom);
 
-// --- str utils function ---
-
-// double atof(char const *nptr);
-
-// int atoi(char const *nptr);
-
-// long atol(char const *nptr);
-
-// long long atoll(char const *nptr);
-
-// long int strtol(char const *restrictnptr, char **restrictendptr, int base);
-
-// long long int strtoll(char const *restrictnptr, char **restrictendptr, int base);
-
-// unsigned long int strtoul(char const *restrictnptr, char **restrictendptr, int base);
-
-// unsigned long long int strtoull(char *const restrictnptr, char **restrictendptr, int base);
-
-// double strtod(char const *restrictnptr, char **restrictendptr);
-
-// float strtof(char const *restrictnptr, char **restrictendptr);
-
-// long double strtold(char const *restrictnptr, char **restrictendptr);
+/* --- 7.22.7 - Multibyte/wide character conversion functions --------------- */
 
 // int mblen(char const *s, size_t n);
 
@@ -69,28 +125,3 @@
 // size_t mbstowcs(wchar_t *restrict pwcs, char const *restrict s, size_t n);
 
 // size_t mcstombs(char *restrict s, wchar_t const *restrict pwcs, size_t n);
-
-// --- array utils ---
-
-// void *bsearch(void const *key, void const *base, size_t nmemb, size_t size, int (*compar)(void const *, void const *));
-
-// void *qsort(void *base, size_t nmemb, size_t size, int (*compar)(void const *, void const *));
-
-// --- memory utils ---
-
-// void *aligned_alloc(size_t alignment, size_t size);
-
-// void *calloc(size_t nmemb, size_t size);
-
-// void free(void *ptr);
-
-// void *malloc(size_t size);
-
-// void *realloc(void *ptr, size_t size);
-// --- print utils ---
-
-// int strfromd(char *restricts, size_t n, char const *restrictformat, double fp);
-
-// int strfromf(char *restricts, size_t n, char const *restrictformat, floatf p);
-
-// int strfroml(char *restricts, size_t n, char const *restrictformat, long double fp);
