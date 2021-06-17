@@ -24,9 +24,8 @@ void kernel_boot_other(void)
     arch_boot_other();
 
     other_ready++;
-    while (other_ready != cpu_count())
-    {
-    }
+
+    WAIT_FOR(other_ready == cpu_count());
 }
 
 void task_test(void)

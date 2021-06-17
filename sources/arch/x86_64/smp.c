@@ -116,9 +116,7 @@ void arch_boot_other(void)
         log("Bootings CPU N°{}...", cpu);
         smp_initialize_cpu(cpu_impl(cpu)->lapic);
 
-        while (!cpu_ready)
-        {
-        }
+        WAIT_FOR(cpu_ready);
     }
 
     smp_cleanup_cpu_trampoline();

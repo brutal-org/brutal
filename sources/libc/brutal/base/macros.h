@@ -27,3 +27,8 @@
 #define ARRAY_LENGTH(__array) (sizeof(__array) / sizeof(__array[0]))
 
 #define __FILENAME__ (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
+
+#define WAIT_FOR(check) \
+    while (!(check))    \
+    {                   \
+    };

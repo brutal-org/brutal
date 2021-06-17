@@ -27,6 +27,5 @@ void pit_sleep(uint16_t ms)
     asm_out8(PIT_DATA_PORT0, wait_val & 0xFF);
     asm_out8(PIT_DATA_PORT0, (wait_val >> 8) & 0xFF);
 
-    while (pit_read_counter() != 0)
-        ;
+    WAIT_FOR(pit_read_counter() == 0);
 }
