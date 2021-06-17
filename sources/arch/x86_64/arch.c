@@ -49,3 +49,13 @@ void arch_disable_interrupt()
 {
     asm_cli();
 }
+
+void arch_cpu_pause()
+{
+    asm_pause();
+}
+
+void arch_cpu_halt()
+{
+    asm_hlt();
+}

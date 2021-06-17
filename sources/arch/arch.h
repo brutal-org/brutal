@@ -26,3 +26,7 @@ void arch_destroy_task(struct task *task);
 void arch_enable_interrupt();
 
 void arch_disable_interrupt();
+
+void arch_cpu_pause();
+
+void arch_cpu_halt();
