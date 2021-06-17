@@ -1,5 +1,7 @@
 export PATH := $(shell meta/toolchain/gnu/use.sh):$(PATH)
 
+CFLAGS_WARN += -fanalyzer
+
 # --- Host compiler ---------------------------------------------------------- #
 
 HOST_CC=cc

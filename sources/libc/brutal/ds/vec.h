@@ -14,6 +14,15 @@ struct vec_impl
     int *capacity;
 };
 
+#define vec_t(T)             \
+    struct                   \
+    {                        \
+        T *data;             \
+        struct alloc *alloc; \
+        int length;          \
+        int capacity;        \
+    }
+
 bool vec_expand_impl(struct vec_impl *impl);
 
 bool vec_reserve_impl(struct vec_impl *impl, int n);
@@ -32,15 +41,6 @@ void vec_swap_impl(struct vec_impl *impl, int idx1, int idx2);
 
 #define vec_unpack_impl(v) \
     &(struct vec_impl) { (char **)&(v)->data, sizeof(*(v)->data), (v)->alloc, &(v)->length, &(v)->capacity, }
-
-#define vec_t(T)             \
-    struct                   \
-    {                        \
-        T *data;             \
-        struct alloc *alloc; \
-        int length;          \
-        int capacity;        \
-    }
 
 #define vec_init(v, alloc_) STMT(mem_set((v), 0, sizeof(*(v))); (v)->alloc = (alloc_);)
 
@@ -123,28 +123,6 @@ void vec_swap_impl(struct vec_impl *impl, int idx1, int idx2);
             vec_swap((v), i__, (v)->length - (i__ + 1)); \
         }                                                \
     } while (0)
-
-#define vec_foreach(v, var, iter)                                      \
-    if ((v)->length > 0)                                               \
-        for ((iter) = 0;                                               \
-             (iter) < (v)->length && (((var) = (v)->data[(iter)]), 1); \
-             ++(iter))
-
-#define vec_foreach_rev(v, var, iter)  \
-    if ((v)->length > 0)               \
-        for ((iter) = (v)->length - 1; \
-             (iter) >= 0 && (((var) = (v)->data[(iter)]), 1); --(iter))
-
-#define vec_foreach_ptr(v, var, iter)                                   \
-    if ((v)->length > 0)                                                \
-        for ((iter) = 0;                                                \
-             (iter) < (v)->length && (((var) = &(v)->data[(iter)]), 1); \
-             ++(iter))
-
-#define vec_foreach_ptr_rev(v, var, iter) \
-    if ((v)->length > 0)                  \
-        for ((iter) = (v)->length - 1;    \
-             (iter) >= 0 && (((var) = &(v)->data[(iter)]), 1); --(iter))
 
 typedef vec_t(void *) vec_void_t;
 typedef vec_t(char *) vec_str_t;

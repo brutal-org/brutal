@@ -121,10 +121,33 @@ void stivale2_entry(struct stivale2_struct *info)
             .identifier = HANDOVER_IDENTIFIER,
         };
 
-    fill_handover_mmap(&handover, stivale2_get_tag(info, STIVALE2_STRUCT_TAG_MEMMAP_ID));
-    fill_handover_rsdp(&handover, stivale2_get_tag(info, STIVALE2_STRUCT_TAG_RSDP_ID));
-    fill_handover_framebuffer(&handover, stivale2_get_tag(info, STIVALE2_STRUCT_TAG_FRAMEBUFFER_ID));
-    fill_handover_modules(&handover, stivale2_get_tag(info, STIVALE2_STRUCT_TAG_MODULES_ID));
+    auto memory_map = stivale2_get_tag(info, STIVALE2_STRUCT_TAG_MEMMAP_ID);
+
+    if (memory_map)
+    {
+        fill_handover_mmap(&handover, memory_map);
+    }
+
+    auto rsdp = stivale2_get_tag(info, STIVALE2_STRUCT_TAG_MEMMAP_ID);
+
+    if (rsdp)
+    {
+        fill_handover_rsdp(&handover, rsdp);
+    }
+
+    auto framebuffer = stivale2_get_tag(info, STIVALE2_STRUCT_TAG_FRAMEBUFFER_ID);
+
+    if (framebuffer)
+    {
+        fill_handover_framebuffer(&handover, framebuffer);
+    }
+
+    auto modules = stivale2_get_tag(info, STIVALE2_STRUCT_TAG_MODULES_ID);
+
+    if (modules)
+    {
+        fill_handover_modules(&handover, modules);
+    }
 
     arch_entry_main(&handover);
 
