@@ -36,7 +36,7 @@ void task_test(void)
         log("task {} {}", task_self()->id, cpu_self_id());
         for (size_t i = 0; i < 10000; i++)
         {
-            asm volatile("pause");
+            arch_cpu_pause();
         }
     }
 }
