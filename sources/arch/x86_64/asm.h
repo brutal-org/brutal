@@ -8,6 +8,8 @@ static inline void asm_sti(void) { asm volatile("sti"); }
 
 static inline void asm_hlt(void) { asm volatile("hlt"); }
 
+static inline void asm_pause(void) { asm volatile("pause"); }
+
 static inline uint8_t asm_in8(uint16_t port)
 {
     uint8_t data;
