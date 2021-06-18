@@ -128,7 +128,7 @@ void stivale2_entry(struct stivale2_struct *info)
         fill_handover_mmap(&handover, memory_map);
     }
 
-    auto rsdp = stivale2_get_tag(info, STIVALE2_STRUCT_TAG_MEMMAP_ID);
+    auto rsdp = stivale2_get_tag(info, STIVALE2_STRUCT_TAG_RSDP_ID);
 
     if (rsdp)
     {
