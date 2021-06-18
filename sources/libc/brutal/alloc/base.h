@@ -35,13 +35,16 @@ struct alloc
         ptr;                                     \
     })
 
-#define alloc_make_array(self, T, count) (               \
-    {                                                    \
-        T *ptr = alloc_acquire(self, sizeof(T) * count); \
-        alloc_commit(self, ptr);                         \
-        mem_set(ptr, 0, sizeof(T) * count);              \
-        ptr;                                             \
+#define alloc_calloc(self, size, count) (              \
+    {                                                  \
+        void *ptr = alloc_acquire(self, size * count); \
+        alloc_commit(self, ptr);                       \
+        mem_set(ptr, 0, size *count);                  \
+        ptr;                                           \
     })
+
+#define alloc_make_array(self, T, count) \
+    ((T *)alloc_calloc(self, sizeof(T), count))
 
 #define alloc_decommit(self, ptr) \
     ((self)->decommit((self), ptr))
