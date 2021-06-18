@@ -1,6 +1,6 @@
 # Roadmap
 
-## Milestone 1
+## Milestone 1 - Baby Steps
 
 - [x] Baby steps (x86_64)
 - [x] GDT/IDT
@@ -18,7 +18,7 @@
 - [X] Syscalls
 - [x] SIMD (avx, sse, fpu, xsave)
 
-## Milestone 2
+## Milestone 2 - IPC And Userspace
 
 - [ ] IPC
 - [ ] Userspace Bootstrapping
@@ -26,7 +26,7 @@
 - [ ] Shell
 - [ ] Ramdisk
 
-## Milestone 3
+## Milestone 3 - Driver And File System
 
 - [ ] VFS
 - [ ] Disk driver (HCI? NVME? IDE (lol)?)
@@ -34,15 +34,19 @@
 - [ ] ext2
 - [ ] FAT32
 
-## Milestone 4
+## Milestone 4 - User Interfaces
 
 - [ ] Keyboard driver
 - [ ] Mouse driver
 - [ ] Framebuffer driver
 - [ ] Compositor
 
-## Milestone 666
+## Milestone 5 - DOOM!
 
 - [ ] DOOM :rage2:
 
-...
+## Milestone 6 - Networking
+
+- [ ] Implement E1000 driver
+- [ ] Implement TCP/IP
+- [ ] Send a message on IRC
