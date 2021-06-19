@@ -2,11 +2,9 @@
 
 /* --- 7.2 Diagnostics ----------------------------------------------- */ 
 
-NDEBUG
+void NDEBUG;
 
-#define assert(ignore) ((void)0)
-
-static_assert
+void static_assert;
 
 /* --- 7.2.1 Program diagnostics ----------------------------------------------- */ 
 
