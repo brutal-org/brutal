@@ -20,6 +20,40 @@ Right now the main goal of brutal is to run doom.
 
 See the [roadmap](book/roadmap.md) file for more information on how we plan to get there and where you can contribute.
 
+## Components
+
+### Kernel
+
+**BRUTAL** is based on a micro-kernel
+
+### Library
+
+**BRUTAL** 
+
+Type-safe printf:
+
+```c
+log("the answer to {} the {} and {} is... {}", "life", "universe", "everything", 42);
+
+> the answer to life the universe and everything is 42
+```
+
+Type-generic containers:
+
+```c
+typedef struct {int x; int y;} point_t;
+typedef vec_t(point_t) point_vec_t;
+
+point_vec_t v;
+vec_init(&v);
+vec_push(&v, (point_t){16, 32});
+
+point_t p;
+vec_pop(&v, &p);
+
+vec_deinit(&v);
+```
+
 ## Modern C
 
 Brutal is written in a dialect of C called modern C characterize by the following principle:
