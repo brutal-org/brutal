@@ -3,7 +3,7 @@
 #define PIT_FREQUENCY 11931820
 #define PIT_USEC 1000
 
-#include <stdint.h>
+#include <brutal/base.h>
 
 extern uint32_t pit_read_counter(void);
 

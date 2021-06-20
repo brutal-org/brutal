@@ -1,8 +1,6 @@
 #pragma once
 
 #include <brutal/text.h>
-#include <stddef.h>
-#include <stdint.h>
 
 // I don't think we will get over 64
 #define HANDOVER_MMAP_MAX_SIZE 64

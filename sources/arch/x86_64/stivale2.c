@@ -108,7 +108,7 @@ void fill_handover_modules(struct handover *target, struct stivale2_struct_tag_m
         target->modules.module[i].addr = modules->modules[i].begin;
         target->modules.module[i].size = modules->modules[i].end - modules->modules[i].begin;
 
-        target->modules.module[i].module_name = make_str_fix(str_fix128_t, modules->modules[i].string);
+        target->modules.module[i].module_name = str_cast_fix(str_fix128_t, modules->modules[i].string);
     }
 }
 

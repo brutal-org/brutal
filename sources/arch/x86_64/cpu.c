@@ -32,7 +32,7 @@ size_t cpu_count(void)
     return impl_count;
 }
 
-void cpu_context_initialize(void)
+void cpu_initialize(void)
 {
     wrmsr(MSR_GS_BASE, (uintptr_t)cpu_impl_self());
     wrmsr(MSR_KERN_GS_BASE, (uintptr_t)cpu_impl_self());

@@ -10,6 +10,6 @@
             typeof(x) a;   \
             T b;           \
         } u;               \
-        u.a = a;           \
+        u.a = x;           \
         u.b;               \
     })

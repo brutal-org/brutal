@@ -6,20 +6,20 @@ static str_t log_color(enum log_level level)
     switch (level)
     {
     case LOG_PANIC:
-        return make_str("");
+        return str_cast("");
 
     case LOG_TODO:
-        return make_str("");
+        return str_cast("");
 
     case LOG_FIXME:
-        return make_str("");
+        return str_cast("");
 
     case LOG_DEFAULT:
-        return make_str("\e[92m");
+        return str_cast("\e[92m");
 
     default:
     case LOG_DEBUG:
-        return make_str("");
+        return str_cast("");
     }
 }
 
@@ -28,20 +28,20 @@ static str_t log_prefix(enum log_level level)
     switch (level)
     {
     case LOG_PANIC:
-        return make_str("panic");
+        return str_cast("panic");
 
     case LOG_TODO:
-        return make_str("todo");
+        return str_cast("todo");
 
     case LOG_FIXME:
-        return make_str("fixme");
+        return str_cast("fixme");
 
     case LOG_DEFAULT:
-        return make_str("info");
+        return str_cast("info");
 
     default:
     case LOG_DEBUG:
-        return make_str("debug");
+        return str_cast("debug");
     }
 }
 

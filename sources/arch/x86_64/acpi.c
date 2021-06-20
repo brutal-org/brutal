@@ -12,7 +12,7 @@ struct acpi_sdth *acpi_rsdt_child(struct acpi_rsdt *rsdt, str_t signature)
     {
         auto sdth = mmap_io_ptr_from_phys(struct acpi_sdth *, rsdt->children[i]);
 
-        if (str_eq(signature, make_str_n(sdth->signature, 4)))
+        if (str_eq(signature, str_cast_n(sdth->signature, 4)))
         {
             return sdth;
         }
@@ -64,7 +64,7 @@ struct acpi_madt *acpi_find_madt(uintptr_t rsdp_address)
     auto rsdp = mmap_io_ptr_from_phys(struct acpi_rsdp *, rsdp_address);
     auto rsdt = mmap_io_ptr_from_phys(struct acpi_rsdt *, rsdp->rsdt_address);
 
-    return (struct acpi_madt *)acpi_rsdt_child(rsdt, make_str("APIC"));
+    return (struct acpi_madt *)acpi_rsdt_child(rsdt, str_cast("APIC"));
 }
 
 uint32_t acpi_find_lapic(uintptr_t rsdp_address)

@@ -49,7 +49,7 @@ void kernel_entry_main(MAYBE_UNUSED struct handover *handover)
 
     for (size_t i = 0; i < 20; i++)
     {
-        auto test_task = UNWRAP(task_create(make_str("test-task"), TASK_NONE));
+        auto test_task = UNWRAP(task_create(str_cast("test-task"), TASK_NONE));
         task_start(test_task, (uintptr_t)task_test, 0, 0, 0, 0, 0);
     }
 

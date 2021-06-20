@@ -3,7 +3,6 @@
 #include <brutal/base/macros.h>
 #include <brutal/base/std.h>
 #include <brutal/mem.h>
-#include <stddef.h>
 
 typedef struct
 {
@@ -31,7 +30,7 @@ typedef str_fix_t(32) str_fix32_t;
 typedef str_fix_t(64) str_fix64_t;
 typedef str_fix_t(128) str_fix128_t;
 
-#define nullstr make_str("")
+#define nullstr str_cast("")
 
 static inline size_t cstr_len(char const *str)
 {
@@ -55,7 +54,7 @@ static inline str_t str_make_from_str_fix128(str_fix128_t *str_fix) { return (st
 
 // clang-format off
 
-#define make_str(literal)                \
+#define str_cast(literal)                \
     _Generic((literal),                  \
         str_t: str_forward,              \
         char*: str_make_from_cstr,       \
@@ -67,16 +66,16 @@ static inline str_t str_make_from_str_fix128(str_fix128_t *str_fix) { return (st
         str_fix128_t*: str_make_from_str_fix128 \
     )(literal)
 
-#define make_str_fix(T, str)                                  \
+#define str_cast_fix(T, str)                                  \
     ({                                                        \
         T dst_str = {};                                            \
-        auto src_str = make_str(str);                         \
+        auto src_str = str_cast(str);                         \
         mem_cpy(dst_str.buffer, src_str.buffer, src_str.len); \
         dst_str.len = src_str.len;                            \
         dst_str;                                              \
     })
 
-#define make_str_n(str, n) \
+#define str_cast_n(str, n) \
     (str_t){str, n}
 
 // clang-format on

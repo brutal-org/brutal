@@ -3,6 +3,7 @@
 #include "arch/mmio.h"
 #include "arch/x86_64/acpi.h"
 #include "arch/x86_64/apic.h"
+#include "arch/x86_64/apic/timer.h"
 #include "arch/x86_64/cpu.h"
 #include "arch/x86_64/memory/mmap.h"
 #include "arch/x86_64/msr.h"
@@ -94,6 +95,9 @@ void apic_initalize(struct handover const *handover)
     ioapic_initialize(handover);
 
     apic_enable();
+
+    apic_init_interrupt_redirection(handover);
+    apic_timer_initialize();
 }
 
 void apic_eoi(void)

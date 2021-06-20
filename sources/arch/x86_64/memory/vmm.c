@@ -190,10 +190,11 @@ vmm_result_t vmm_map(vmm_space_t space, vmm_range_t virtual_range, pmm_range_t p
 
     for (size_t i = 0; i < (virtual_range.size / HOST_MEM_PAGESIZE); i++)
     {
-        vmm_map_page(space,
-                               i * HOST_MEM_PAGESIZE + ALIGN_DOWN(virtual_range.base, HOST_MEM_PAGESIZE),
-                               i * HOST_MEM_PAGESIZE + ALIGN_DOWN(physical_range.base, HOST_MEM_PAGESIZE),
-                               flags);
+        vmm_map_page(
+            space,
+            i * HOST_MEM_PAGESIZE + ALIGN_DOWN(virtual_range.base, HOST_MEM_PAGESIZE),
+            i * HOST_MEM_PAGESIZE + ALIGN_DOWN(physical_range.base, HOST_MEM_PAGESIZE),
+            flags);
     }
 
     return OK(vmm_result_t, virtual_range);

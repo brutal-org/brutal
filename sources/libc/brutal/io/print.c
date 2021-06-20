@@ -14,7 +14,7 @@ struct print_value print_val_unsigned(unsigned long val)
 
 struct print_value print_val_cstring(char *val)
 {
-    return (struct print_value){nullstr, PRINT_STRING, {._string = make_str(val)}};
+    return (struct print_value){nullstr, PRINT_STRING, {._string = str_cast(val)}};
 }
 
 struct print_value print_val_string(str_t val)

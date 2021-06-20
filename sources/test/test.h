@@ -17,7 +17,7 @@ void test_register(struct test test);
     [[gnu::constructor]] static inline void test_register_##name##_detail(void) \
     {                                                                           \
         test_register((struct test){                                            \
-            make_str(name),                                                     \
+            str_cast(name),                                                     \
             test_##name,                                                        \
         });                                                                     \
     }                                                                           \

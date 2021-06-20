@@ -20,4 +20,4 @@ struct cpu_impl *cpu_impl(cpu_id_t id);
 
 void cpu_found(cpu_id_t id, int lapic);
 
-void cpu_context_initialize(void); // init cpu_context for current cpu
+void cpu_initialize(void); // init cpu_context for current cpu

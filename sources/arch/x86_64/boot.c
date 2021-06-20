@@ -28,21 +28,14 @@ void arch_entry_main(struct handover *handover)
     simd_initialize();
     pmm_initialize(handover);
     vmm_initialize(handover);
-
     pic_initialize();
-    pic_disable();
     pit_initialize(1000);
-
     apic_initalize(handover);
+    cpu_initialize();
+    syscall_initialize();
 
-    apic_init_interrupt_redirection(handover);
-    apic_timer_initialize();
-
-    cpu_context_initialize();
-    syscall_initialize_for_current_cpu();
-
-    log("ints = {}", (asm_read_rflag() & RFLAGS_INTERRUPT_ENABLE) == RFLAGS_INTERRUPT_ENABLE);
     log("Arch x86_64 initialized!");
+
     kernel_entry_main(handover);
 }
 
@@ -50,9 +43,9 @@ void arch_entry_other(void)
 {
     arch_disable_interrupt();
     apic_enable();
-    cpu_context_initialize();
-    syscall_initialize_for_current_cpu();
-
+    cpu_initialize();
+    syscall_initialize();
     simd_initialize();
+
     kernel_entry_other();
 }

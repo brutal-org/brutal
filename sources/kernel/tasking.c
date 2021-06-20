@@ -34,10 +34,10 @@ task_return_result_t task_create(str_t name, enum task_flags flags)
     auto task = TRY(task_return_result_t, arch_task_create());
 
     task->id = task_id++;
-    task->name = make_str_fix(str_fix128_t, name);
+    task->name = str_cast_fix(str_fix128_t, name);
     task->flags = flags;
 
-    log("Task:{}({}) created...", make_str(&task->name), task->id);
+    log("Task:{}({}) created...", str_cast(&task->name), task->id);
 
     vec_push(&tasks, task);
 
@@ -61,7 +61,7 @@ void task_start(
 
 struct task *task_create_idle(void)
 {
-    auto task = UNWRAP(task_create(make_str("idle"), TASK_NONE));
+    auto task = UNWRAP(task_create(str_cast("idle"), TASK_NONE));
     arch_task_start(task, (uintptr_t)task_idle, 0, 0, 0, 0, 0);
     task->state = TASK_STATE_IDLE;
     return task;
@@ -69,7 +69,7 @@ struct task *task_create_idle(void)
 
 struct task *task_create_boot(void)
 {
-    auto task = UNWRAP(task_create(make_str("bool"), TASK_NONE));
+    auto task = UNWRAP(task_create(str_cast("bool"), TASK_NONE));
     task_start(task, 0, 0, 0, 0, 0, 0);
     return task;
 }
@@ -287,7 +287,7 @@ void scheduler_dump(void)
 {
     for (size_t i = 0; i < cpu_count(); i++)
     {
-        log_unlock("CPU {} will be running {}({})", i, make_str(&cpu(i)->schedule.next->name), cpu(i)->schedule.next->id);
+        log_unlock("CPU {} will be running {}({})", i, str_cast(&cpu(i)->schedule.next->name), cpu(i)->schedule.next->id);
     }
 }
 

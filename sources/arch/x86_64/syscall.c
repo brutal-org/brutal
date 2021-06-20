@@ -10,7 +10,7 @@
 
 extern void syscall_handle(void);
 
-syscall_initialize_result_t syscall_initialize_for_current_cpu(void)
+syscall_initialize_result_t syscall_initialize(void)
 {
     wrmsr(MSR_EFER, rdmsr(MSR_EFER) | EFER_ENABLE_SYSCALL);
 

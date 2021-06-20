@@ -39,6 +39,8 @@ void pic_initialize(void)
     pic_wait();
     asm_out8(PIC2_DATA, 0x00);
     pic_wait();
+
+    pic_disable();
 }
 
 void pic_eoi(int int_no)

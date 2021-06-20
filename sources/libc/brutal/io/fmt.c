@@ -189,7 +189,7 @@ write_result_t fmt_unsigned(struct fmt self, struct writer *writer, unsigned lon
         buffer[i++] = '0';
     }
 
-    str_rvs(make_str(buffer));
+    str_rvs(str_cast(buffer));
 
     return io_write(writer, buffer, i);
 }
