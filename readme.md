@@ -28,7 +28,7 @@ See the [roadmap](book/roadmap.md) file for more information on how we plan to g
 
 ### Library
 
-**BRUTAL** 
+**BRUTAL** feature a rich C library with custom allocators, data structures and algorithms.
 
 Type-safe printf:
 
