@@ -63,7 +63,7 @@ slot_index_t slot_find_impl(struct slot_impl *impl)
     return -1;
 }
 
-slot_index_t slot_acquire_impl(struct slot_impl *impl)
+slot_index_t slot_alloc_impl(struct slot_impl *impl)
 {
     slot_capacity_impl(impl, 16);
 
@@ -77,6 +77,11 @@ slot_index_t slot_acquire_impl(struct slot_impl *impl)
     slot_capacity_impl(impl, impl->capacity + impl->capacity / 4);
 
     return slot_find_impl(impl);
+}
+
+void slot_acquire_impl(struct slot_impl *impl, size_t index)
+{
+    impl->used[index] = true;
 }
 
 void slot_release_impl(struct slot_impl *impl, slot_index_t index)

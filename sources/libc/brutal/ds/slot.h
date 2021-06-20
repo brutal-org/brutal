@@ -25,7 +25,9 @@ void slot_init_impl(struct slot_impl *impl, int data_size, struct alloc *alloc);
 
 void slot_deinit_impl(struct slot_impl *impl);
 
-slot_index_t slot_acquire_impl(struct slot_impl *impl);
+slot_index_t slot_alloc_impl(struct slot_impl *impl);
+
+void slot_acquire_impl(struct slot_impl *impl, size_t index);
 
 void slot_release_impl(struct slot_impl *impl, slot_index_t index);
 
@@ -35,8 +37,11 @@ void slot_release_impl(struct slot_impl *impl, slot_index_t index);
 #define slot_deinit(self) \
     slot_deinit_impl(&(self)->_impl)
 
-#define slot_acquire(self) \
-    slot_acquire_impl(&(self)->_impl)
+#define slot_alloc(self) \
+    slot_alloc_impl(&(self)->impl)
+
+#define slot_acquire(self, index) \
+    slot_acquire_impl(&(self)->_impl, index)
 
 #define slot_release(self, index) \
     slot_release_impl(&(self)->_impl, index)
