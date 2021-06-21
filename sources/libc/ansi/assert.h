@@ -1,11 +1,16 @@
 #pragma once
 
-/* --- 7.2 Diagnostics ----------------------------------------------- */ 
+/* ---define assert in terms of NDEBUG ----------------------------------------------- */ 
 
-void NDEBUG;
+#ifdef NDEBUG
+#define asser(ignore) ((void)0)
+#else
+#define asser(cond) 
+#endif
 
-void static_assert;
 
-/* --- 7.2.1 Program diagnostics ----------------------------------------------- */ 
 
-void assert(scalar expression);
+/* --- static assert ----------------------------------------------- */ 
+
+
+#define static_assert _Static_assert
