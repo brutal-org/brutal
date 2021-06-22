@@ -3,9 +3,9 @@
 /* ---define assert in terms of NDEBUG ----------------------------------------------- */ 
 
 #ifdef NDEBUG
-#define asser(ignore) ((void)0)
+#define assert(ignore) ((void)0)
 #else
-#define asser(cond) 
+#define assert(cond) 
 #endif
 
 
