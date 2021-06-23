@@ -2,10 +2,10 @@
 
 /* --- 7.5 Errors <errno.h> ----------------------------------------------- */
 
-int EDOM;
+#define EDOM (x);
 
-int EILSEQ;
+#define EILSEQ;
 
-int ERANGE;
+#define ERANGE;
 
-int errno;
+int errno 0;
