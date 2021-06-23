@@ -48,3 +48,10 @@ void slot_release_impl(struct slot_impl *impl, slot_index_t index);
 
 #define slot_at(self, index) \
     ({ &self->data[index]; })
+
+#define slot_foreach(v, self)                                        \
+    if ((self)->impl.capacity > 0)                                   \
+        for (int i = 0, typeof((self)->data[0]) v = (self)->data[i]; \
+             i < (self)->impl.capacity;                              \
+             i++, v = (self)->data[i])                               \
+            if ((self)->impl.used[i])
