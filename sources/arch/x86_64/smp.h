@@ -10,3 +10,5 @@ enum smp_cpu_init_addr
 };
 
 void smp_initialize(void);
+
+void smp_stop_all(void);

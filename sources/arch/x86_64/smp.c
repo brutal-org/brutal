@@ -120,3 +120,14 @@ void arch_boot_other(void)
 
     smp_cleanup_cpu_trampoline();
 }
+
+void smp_stop_all(void)
+{
+    for (cpu_id_t i = 0; i < cpu_count(); i++)
+    {
+        if (i != cpu_self_id())
+        {
+            apic_send_ipit(i, IPIT_STOP);
+        }
+    }
+}

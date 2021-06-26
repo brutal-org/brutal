@@ -15,6 +15,8 @@ void arch_resched_other(void);
 
 void arch_idle(void);
 
+void arch_stop(void);
+
 struct task *arch_create_task(void);
 
 void arch_save_task_context(struct task *task);

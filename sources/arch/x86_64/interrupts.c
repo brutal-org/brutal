@@ -5,6 +5,7 @@
 #include "arch/x86_64/asm.h"
 #include "arch/x86_64/interrupts.h"
 #include "arch/x86_64/pic.h"
+#include "arch/x86_64/smp.h"
 #include "brutal/types.h"
 #include "kernel/tasking.h"
 
@@ -57,22 +58,11 @@ void dump_register(struct interrupt_stackframe const *stackframe)
     log_unlock("cr2: {#016p} | cr3: {#016p} ", asm_read_cr2(), asm_read_cr3());
 }
 
-void interrupt_error_stop_all_cpu()
-{
-    for (cpu_id_t i = 0; i < cpu_count(); i++)
-    {
-        if (i != cpu_self_id())
-        {
-            apic_send_ipit(i, IPIT_STOP);
-        }
-    }
-}
-
 void interrupt_error_handler(struct interrupt_stackframe *stackframe, uintptr_t rsp)
 {
     lock_acquire(&error_lock);
 
-    interrupt_error_stop_all_cpu();
+    smp_stop_all();
 
     log_unlock("CPU {} PANIC RSP={p}", cpu_self_id(), rsp);
     log_unlock("Interrupt {}: {}: error: {} on {x} !", stackframe->int_no, _exception_messages[stackframe->int_no], stackframe->error_code, stackframe->rip);

@@ -3,6 +3,7 @@
 #include "arch/x86_64/apic.h"
 #include "arch/x86_64/asm.h"
 #include "arch/x86_64/com.h"
+#include "arch/x86_64/smp.h"
 
 static bool log_initialized = false;
 static struct writer log;
@@ -36,6 +37,17 @@ void arch_idle(void)
 {
     while (true)
     {
+        asm_hlt();
+    }
+}
+
+void arch_stop(void)
+{
+    smp_stop_all();
+
+    while (true)
+    {
+        asm_cli();
         asm_hlt();
     }
 }

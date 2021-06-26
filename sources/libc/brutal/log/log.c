@@ -59,3 +59,12 @@ void log_impl(enum log_level level, struct source_location location, str_t fmt, 
     log_unlock_impl(level, location, fmt, args);
     host_log_unlock();
 }
+
+void panic_impl(enum log_level level, struct source_location location, str_t fmt, struct print_args args)
+{
+    host_log_lock();
+    log_unlock_impl(level, location, fmt, args);
+    host_log_unlock();
+
+    host_log_panic();
+}

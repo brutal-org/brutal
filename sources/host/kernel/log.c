@@ -18,3 +18,8 @@ void host_log_unlock(void)
 {
     lock_release(&logger_lock);
 }
+
+void host_log_panic(void)
+{
+    arch_stop();
+}
