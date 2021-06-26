@@ -38,6 +38,8 @@ task_return_Result task_create(Str name, enum task_flags flags)
     task->name = str_cast_fix(StrFix128, name);
     task->flags = flags;
 
+    arch_task_create_vmm(task, flags & TASK_USER);
+
     log("Task:{}({}) created...", str_cast(&task->name), task->id);
 
     vec_push(&tasks, task);

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <arch/vmm.h>
 #include <brutal/base.h>
 #include <brutal/text.h>
 #include <brutal/types.h>
@@ -44,6 +45,8 @@ struct task
     StrFix128 name;
     enum task_flags flags;
     enum task_state state;
+
+    vmm_space_t virtual_memory_space;
 
     struct task_schedule_state scheduler_state;
 
