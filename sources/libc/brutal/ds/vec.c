@@ -9,6 +9,20 @@
 #include <brutal/ds/vec.h>
 #include <brutal/mem.h>
 
+void vec_init_impl(struct vec_impl *impl, int data_size, struct alloc *alloc)
+{
+    *impl = (struct vec_impl){
+        .data_size = data_size,
+        .alloc = alloc,
+    };
+}
+
+void vec_deinit_impl(struct vec_impl *impl)
+{
+    alloc_release(impl->alloc, impl->data);
+    *impl = (struct vec_impl){};
+}
+
 bool vec_realloc_impl(struct vec_impl *impl, int new_length)
 {
     void *ptr = alloc_acquire(impl->alloc, new_length * impl->data_size);
@@ -20,23 +34,23 @@ bool vec_realloc_impl(struct vec_impl *impl, int new_length)
 
     alloc_commit(impl->alloc, ptr);
 
-    if (*impl->data != nullptr)
+    if (impl->data != nullptr)
     {
-        mem_cpy(ptr, *impl->data, MIN((*impl->length), new_length) * impl->data_size);
-        alloc_release(impl->alloc, *impl->data);
+        mem_cpy(ptr, impl->data, MIN((impl->length), new_length) * impl->data_size);
+        alloc_release(impl->alloc, impl->data);
     }
 
-    *impl->data = ptr;
-    *impl->capacity = new_length;
+    impl->data = ptr;
+    impl->capacity = new_length;
 
     return true;
 }
 
 bool vec_expand_impl(struct vec_impl *impl)
 {
-    if (*impl->length + 1 > *impl->capacity)
+    if (impl->length + 1 > impl->capacity)
     {
-        int n = (*impl->capacity == 0) ? 1 : *impl->capacity << 1;
+        int n = (impl->capacity == 0) ? 1 : impl->capacity << 1;
         return vec_realloc_impl(impl, n);
     }
     else
@@ -47,7 +61,7 @@ bool vec_expand_impl(struct vec_impl *impl)
 
 bool vec_reserve_impl(struct vec_impl *impl, int n)
 {
-    if (n > *impl->capacity)
+    if (n > impl->capacity)
     {
         return vec_realloc_impl(impl, n);
     }
@@ -75,17 +89,17 @@ bool vec_reserve_po2_impl(struct vec_impl *impl, int n)
 
 bool vec_compact_impl(struct vec_impl *impl)
 {
-    if (*impl->length == 0)
+    if (impl->length == 0)
     {
         alloc_release(impl->alloc, impl->data);
-        *impl->data = nullptr;
-        *impl->capacity = 0;
+        impl->data = nullptr;
+        impl->capacity = 0;
 
         return true;
     }
     else
     {
-        int n = *impl->length;
+        int n = impl->length;
         return vec_realloc_impl(impl, n);
     }
 }
@@ -99,23 +113,23 @@ bool vec_insert_impl(struct vec_impl *impl, int idx)
         return err;
     }
 
-    mem_move(*impl->data + (idx + 1) * impl->data_size,
-             *impl->data + idx * impl->data_size,
-             (*impl->length - idx) * impl->data_size);
+    mem_move(impl->data + (idx + 1) * impl->data_size,
+             impl->data + idx * impl->data_size,
+             (impl->length - idx) * impl->data_size);
 
     return 0;
 }
 
 void vec_splice_impl(struct vec_impl *impl, int start, int count)
 {
-    mem_move(*impl->data + start * impl->data_size, *impl->data + (start + count) * impl->data_size,
-             (*impl->length - start - count) * impl->data_size);
+    mem_move(impl->data + start * impl->data_size, impl->data + (start + count) * impl->data_size,
+             (impl->length - start - count) * impl->data_size);
 }
 
 void vec_swapsplice_impl(struct vec_impl *impl, int start, int count)
 {
-    mem_move(*impl->data + start * impl->data_size,
-             *impl->data + (*impl->length - count) * impl->data_size,
+    mem_move(impl->data + start * impl->data_size,
+             impl->data + (impl->length - count) * impl->data_size,
              count * impl->data_size);
 }
 
@@ -126,8 +140,8 @@ void vec_swap_impl(struct vec_impl *impl, int idx1, int idx2)
         return;
     }
 
-    unsigned char *a = (unsigned char *)*impl->data + idx1 * impl->data_size;
-    unsigned char *b = (unsigned char *)*impl->data + idx2 * impl->data_size;
+    unsigned char *a = (unsigned char *)impl->data + idx1 * impl->data_size;
+    unsigned char *b = (unsigned char *)impl->data + idx2 * impl->data_size;
     int count = impl->data_size;
 
     while (count--)

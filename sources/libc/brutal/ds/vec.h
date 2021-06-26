@@ -6,22 +6,28 @@
 
 struct vec_impl
 {
-    char **data;
-    int data_size;
+    char *data;
+    int length;
 
     struct alloc *alloc;
-    int *length;
-    int *capacity;
+    int data_size;
+    int capacity;
 };
 
-#define vec_t(T)             \
-    struct                   \
-    {                        \
-        T *data;             \
-        struct alloc *alloc; \
-        int length;          \
-        int capacity;        \
+#define vec_t(T)               \
+    union                      \
+    {                          \
+        struct                 \
+        {                      \
+            T *data;           \
+            int length;        \
+        };                     \
+        struct vec_impl _impl; \
     }
+
+void vec_init_impl(struct vec_impl *impl, int data_size, struct alloc *alloc);
+
+void vec_deinit_impl(struct vec_impl *impl);
 
 bool vec_expand_impl(struct vec_impl *impl);
 
@@ -39,31 +45,28 @@ void vec_swapsplice_impl(struct vec_impl *impl, int start, int count);
 
 void vec_swap_impl(struct vec_impl *impl, int idx1, int idx2);
 
-#define vec_unpack_impl(v) \
-    &(struct vec_impl) { (char **)&(v)->data, sizeof(*(v)->data), (v)->alloc, &(v)->length, &(v)->capacity, }
+#define vec_init(v, alloc_) vec_init_impl(&(v)->_impl, sizeof(*(v)->data), alloc_)
 
-#define vec_init(v, alloc_) STMT(mem_set((v), 0, sizeof(*(v))); (v)->alloc = (alloc_);)
-
-#define vec_deinit(v) (free((v)->data), vec_init(v))
+#define vec_deinit(v) vec_deinit_impl(&(v)->_impl)
 
 #define vec_push(v, val) \
-    (vec_expand_impl(vec_unpack_impl(v)) ? ((v)->data[(v)->length++] = (val), true) : false)
+    (vec_expand_impl(&(v)->_impl) ? ((v)->data[(v)->length++] = (val), true) : false)
 
 #define vec_pop(v) (v)->data[--(v)->length]
 
 #define vec_splice(v, start, count) \
-    (vec_splice_impl(vec_unpack_impl(v), start, count), (v)->length -= (count))
+    (vec_splice_impl(&(v)->_impl, start, count), (v)->length -= (count))
 
 #define vec_swapsplice(v, start, count) \
-    (vec_swapsplice_impl(vec_unpack_impl(v), start, count), (v)->length -= (count))
+    (vec_swapsplice_impl(&(v)->_impl, start, count), (v)->length -= (count))
 
-#define vec_insert(v, idx, val)                                                   \
-    (vec_insert_impl(vec_unpack_impl(v), idx) ? -1 : ((v)->data[idx] = (val), 0), \
+#define vec_insert(v, idx, val)                                            \
+    (vec_insert_impl(&(v)->_impl, idx) ? -1 : ((v)->data[idx] = (val), 0), \
      (v)->length++, 0)
 
 #define vec_sort(v, fn) qsort((v)->data, (v)->length, sizeof(*(v)->data), fn)
 
-#define vec_swap(v, idx1, idx2) vec_swap_impl(vec_unpack_impl(v), idx1, idx2)
+#define vec_swap(v, idx1, idx2) vec_swap_impl(&(v)->_impl, idx1, idx2)
 
 #define vec_truncate(v, len) \
     ((v)->length = (len) < (v)->length ? (len) : (v)->length)
@@ -74,21 +77,9 @@ void vec_swap_impl(struct vec_impl *impl, int idx1, int idx2);
 
 #define vec_last(v) (v)->data[(v)->length - 1]
 
-#define vec_reserve(v, n) vec_reserve_impl(vec_unpack_impl(v), n)
+#define vec_reserve(v, n) vec_reserve_impl(&(v)->_impl, n)
 
-#define vec_compact(v) vec_compact_impl(vec_unpack_impl(v))
-
-#define vec_pusharr(v, arr, count)                                                   \
-    STMT(                                                                            \
-        int i__, n__ = (count);                                                      \
-                                                                                     \
-        if (vec_reserve_po2_impl(vec_unpack_impl(v), (v)->length + n__) != 0) break; \
-                                                                                     \
-        for (i__ = 0; i__ < n__; i__++) {                                            \
-            (v)->data[(v)->length++] = (arr)[i__];                                   \
-        })
-
-#define vec_extend(v, v2) vec_pusharr((v), (v2)->data, (v2)->length)
+#define vec_compact(v) vec_compact_impl(&(v)->_impl)
 
 #define vec_find(v, val, idx)                         \
     STMT(                                             \
