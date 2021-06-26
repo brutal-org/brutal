@@ -21,6 +21,19 @@ void arch_task_load_context(struct task *target)
 {
     struct arch_task *task = (struct arch_task *)target;
     simd_context_load(task->simd_context);
+    vmm_space_switch(target->virtual_memory_space);
+}
+
+void arch_task_create_vmm(struct task* target, bool user)
+{
+    if(user)
+    {
+        target->virtual_memory_space = vmm_space_create();
+    }
+    else
+    {
+        target->virtual_memory_space = vmm_kernel_space();
+    }
 }
 
 task_return_Result arch_task_create(void)

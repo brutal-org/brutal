@@ -19,3 +19,5 @@ void arch_task_start(
     uintptr_t arg5);
 
 void arch_task_switch_for_cpu(CpuId cpu);
+
+void arch_task_create_vmm(struct task* target, bool user);
