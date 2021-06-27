@@ -63,3 +63,5 @@ struct handover
     struct handover_modules_list modules;
     uintptr_t rsdp;
 };
+
+struct handover_module *kernel_find_module(struct handover *handover, str_t name);
