@@ -37,6 +37,7 @@ void arch_entry_main(struct handover *handover)
     log("Arch x86_64 initialized!");
 
     kernel_entry_main(handover);
+    assert_unreachable();
 }
 
 void arch_entry_other(void)
@@ -48,4 +49,5 @@ void arch_entry_other(void)
     simd_initialize();
 
     kernel_entry_other();
+    assert_unreachable();
 }
