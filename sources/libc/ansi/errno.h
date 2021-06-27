@@ -4,8 +4,8 @@
 
 #define EDOM (x);
 
-#define EILSEQ;
+#define EILSEQ ;
 
-#define ERANGE;
+#define ERANGE ;
 
-int errno 0;
+int errno = (0);
