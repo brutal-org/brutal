@@ -40,12 +40,11 @@ all: $(TARGETS)
 run: $(SYSROOT_ISO)
 	qemu-system-x86_64 \
 		-M q35 \
-		-m 2G \
-		-smp 12 \
-		-enable-kvm \
 		-cpu host \
+		-smp $(shell nproc) \
+		-m 256M \
+		-enable-kvm \
 		-serial mon:stdio \
-		-display sdl \
 		-cdrom $(SYSROOT_ISO)
 
 bochs:
