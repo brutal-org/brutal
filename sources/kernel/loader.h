@@ -1,6 +1,7 @@
 #pragma once
 
 #include <brutal/base.h>
+#include <kernel/tasking.h>
 #include <stdint.h>
 #include "kernel/tasking.h"
 
@@ -18,6 +19,15 @@ enum elf_data_encoding
     ELF_ENCODING_INVALID = 0,
     ELF_ENCODING_LITTLE_ENDIAN = 1,
     ELF_ENCODING_BIG_ENDIAN = 2,
+};
+
+enum elf_type
+{
+    ELF_TYPE_NONE = 0,
+    ELF_TYPE_RELOCATABLE = 1,
+    ELF_TYPE_EXECUTABLE = 2,
+    ELF_TYPE_DYNAMIC = 3,
+    ELF_TYPE_CORE = 4,
 };
 
 enum elf_program_header_types
@@ -84,8 +94,8 @@ struct elf64_program_header
     uint64_t file_size;
     uint64_t memory_size;
 
-    uint64_t alignement;
+    uint64_t alignment;
 };
 
 // the task is not started [!]
-struct task* program_load(void* data, size_t size);
+task_return_result_t program_load(str_t name,void* data, size_t size);
