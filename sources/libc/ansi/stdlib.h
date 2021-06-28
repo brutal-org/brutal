@@ -43,44 +43,25 @@ long atol(char const *nptr);
 
 long long atoll(char const *nptr);
 
-long int strtol(char const *restrict nptr,
-                char **restrict endptr,
-                int base);
+long int strtol(char const *restrict nptr, char **restrict endptr, int base);
 
-long long int strtoll(char const *restrict nptr,
-                      char **restrict endptr,
-                      int base);
+long long int strtoll(char const *restrict nptr, char **restrict endptr, int base);
 
-unsigned long int strtoul(char const *restrict nptr,
-                          char **restrict endptr,
-                          int base);
+unsigned long int strtoul(char const *restrict nptr, char **restrict endptr, int base);
 
-unsigned long long int strtoull(char *const restrict nptr,
-                                char **restrict endptr,
-                                int base);
+unsigned long long int strtoull(char const *restrict nptr, char **restrict endptr, int base);
 
-double strtod(char const *restrict nptr,
-              char **restrict endptr);
+double strtod(char const *restrict nptr, char **restrict endptr);
 
-float strtof(char const *restrict nptr,
-             char **restrict endptr);
+float strtof(char const *restrict nptr, char **restrict endptr);
 
 long double strtold(char const *restrict nptr, char **restrict endptr);
 
-int strfromd(char *restrict s,
-             size_t n,
-             char const *restrict format,
-             double fp);
+int strfromd(char *restrict s, size_t n, char const *restrict format, double fp);
 
-int strfromf(char *restrict s,
-             size_t n,
-             char const *restrict format,
-             floatf p);
+int strfromf(char *restrict s, size_t n, char const *restrict format, float p);
 
-int strfroml(char *restricts,
-             size_t n,
-             char const *restrict format,
-             long double fp);
+int strfroml(char *restricts, size_t n, char const *restrict format, long double fp);
 
 /* --- 7.22.2 - Pseudo-random sequence generation functions ----------------- */
 

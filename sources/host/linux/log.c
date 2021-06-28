@@ -1,5 +1,6 @@
 #include <brutal/base.h>
 #include <host/log.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 static bool log_initialized = false;
@@ -30,4 +31,9 @@ struct writer *host_log_writer(void)
     }
 
     return &log;
+}
+
+void host_log_panic(void)
+{
+    abort();
 }
