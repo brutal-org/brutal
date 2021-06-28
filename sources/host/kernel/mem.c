@@ -1,3 +1,4 @@
+#include <brutal/log.h>
 #include <brutal/sync.h>
 #include <host/mem.h>
 #include "arch/heap.h"
