@@ -2,7 +2,7 @@
 
 /* --- 7.5 Errors <errno.h> ----------------------------------------------- */
 
-#define EDOM (x);
+#define EDOM (x)
 
 #define EILSEQ ;
 
