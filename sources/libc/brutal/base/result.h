@@ -40,4 +40,14 @@
             result._ok;                       \
         })
 
-#define UNWRAP(expr) ({ (expr)._ok; })
+#define UNWRAP(expr) (                          \
+    {                                           \
+        auto expr_value = (expr);               \
+                                                \
+        if (!expr_value.success)                \
+        {                                       \
+            panic("UNWRAP(" #expr ") failled"); \
+        }                                       \
+                                                \
+        expr_value._ok;                         \
+    })

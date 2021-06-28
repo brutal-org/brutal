@@ -9,8 +9,11 @@
 void log_impl(enum log_level level, struct source_location location, str_t fmt, struct print_args args);
 void panic_impl(enum log_level level, struct source_location location, str_t fmt, struct print_args args);
 
-#define panic(fmt, ...) \
-    panic_impl(LOG_PANIC, source_location_current, str_cast(fmt), PRINT_ARGS(__VA_ARGS__))
+#define panic(fmt, ...) (                                                                       \
+    {                                                                                           \
+        panic_impl(LOG_PANIC, source_location_current, str_cast(fmt), PRINT_ARGS(__VA_ARGS__)); \
+        __builtin_unreachable();                                                                \
+    })
 
 #define todo(fmt, ...) \
     log_impl(LOG_TODO, source_location_current, str_cast(fmt), PRINT_ARGS(__VA_ARGS__))

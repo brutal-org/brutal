@@ -60,7 +60,7 @@
         }                                                                                         \
     })
 
-#define assert_greater_equal_than(lhs_expr, rhs_expr) (                                                     \
+#define assert_greater_equal(lhs_expr, rhs_expr) (                                                     \
     {                                                                                                       \
         auto lhs_value = lhs_expr;                                                                          \
         auto rhs_value = rhs_expr;                                                                          \
