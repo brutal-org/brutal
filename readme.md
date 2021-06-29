@@ -1,5 +1,11 @@
 # **BRUTAL**
 
+[![Build, and Test](https://github.com/brutal-org/brutal/actions/workflows/main.yml/badge.svg)](https://github.com/brutal-org/brutal/actions/workflows/main.yml)
+[![GitHub issues](https://img.shields.io/github/issues/brutal-org/brutal)](https://github.com/brutal-org/brutal/issues)
+[![GitHub forks](https://img.shields.io/github/forks/brutal-org/brutal)](https://github.com/brutal-org/brutal/network)
+[![GitHub stars](https://img.shields.io/github/stars/brutal-org/brutal)](https://github.com/brutal-org/brutal/stargazers)
+[![GitHub license](https://img.shields.io/github/license/brutal-org/brutal)](https://github.com/brutal-org/brutal/blob/main/license)
+
 <br/>
 <br/>
 <p align="center">
