@@ -9,14 +9,8 @@ static atomic_size_t other_ready = 0;
 
 void kernel_splash(void)
 {
-    log("");
-    log("   _____ _____ _____ _____ _____ __      ");
-    log("  | __  | __  |  |  |_   _|  _  |  |     ");
-    log("  | __ -|    -|  |  | | | |     |  |__   ");
-    log("  |_____|__|__|_____| |_| |__|__|_____|  ");
-    log("");
-    log("-----------------------------------------");
-    log("");
+    log("BRUTAL - Milestone 1");
+    log("\"Long live to the UNIX utopia!\"");
 }
 
 void kernel_boot_other(void)
