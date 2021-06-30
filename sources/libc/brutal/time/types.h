@@ -2,47 +2,47 @@
 
 #include <brutal/base/std.h>
 
-typedef uint64_t br_tick_t;
-typedef uint64_t br_timestamp_t;
+typedef uint64_t Tick;
+typedef uint64_t TimeStamp;
 
-typedef uint64_t br_seconds_t;
-typedef uint64_t br_minutes_t;
-typedef uint64_t br_hours_t;
-
-typedef struct
-{
-    br_seconds_t seconds;
-    br_minutes_t minutes;
-    br_hours_t hours;
-} br_time_t;
-
-typedef uint64_t br_day_t;
-typedef uint64_t br_month_t;
-typedef uint64_t br_year_t;
+typedef uint64_t Seconds;
+typedef uint64_t Minutes;
+typedef uint64_t Hours;
 
 typedef struct
 {
-    br_day_t day;
-    br_month_t month;
-    br_year_t year;
-} br_date_t;
+    Seconds second;
+    Minutes minute;
+    Hours hour;
+} Time;
+
+typedef uint64_t Day;
+typedef uint64_t Mounth;
+typedef uint64_t Year;
+
+typedef struct
+{
+    Day day;
+    Mounth month;
+    Year year;
+} Date;
 
 typedef union
 {
     struct
     {
-        br_day_t day;
-        br_month_t month;
-        br_year_t year;
+        Day day;
+        Mounth month;
+        Year year;
 
-        br_seconds_t secondes;
-        br_minutes_t minutes;
-        br_hours_t hours;
+        Seconds second;
+        Minutes minute;
+        Hours hour;
     };
 
     struct
     {
-        br_date_t date;
-        br_time_t time;
+        Date date;
+        Time time;
     };
-} br_datetime_t;
+} DateTime;

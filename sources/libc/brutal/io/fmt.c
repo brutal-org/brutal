@@ -70,6 +70,7 @@ static void fmt_parse_type(struct fmt *fmt, struct scan *scan)
     case 'p':
         fmt->type = FMT_POINTER;
         break;
+    
     case 'x':
         fmt->type = FMT_HEXADECIMAL;
         break;
