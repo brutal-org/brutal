@@ -4,7 +4,7 @@
 #include "arch/x86_64/acpi.h"
 #include "arch/x86_64/memory/mmap.h"
 
-struct acpi_sdth *acpi_rsdt_child(struct acpi_rsdt *rsdt, str_t signature)
+struct acpi_sdth *acpi_rsdt_child(struct acpi_rsdt *rsdt, Str signature)
 {
     size_t child_count = (rsdt->base.length - sizeof(rsdt->base)) / 4;
 

@@ -3,10 +3,10 @@
 #include <brutal/base.h>
 #include "syscalls/error.h"
 
-typedef range_t(size_t) heap_range_t;
+typedef Range(size_t) HeapRange;
 
-typedef result_t(br_error_t, heap_range_t) heap_result_t;
+typedef Result(BrError, HeapRange) heap_Result;
 
-heap_result_t heap_alloc(size_t size);
+heap_Result heap_alloc(size_t size);
 
-heap_result_t heap_free(heap_range_t range);
+heap_Result heap_free(HeapRange range);

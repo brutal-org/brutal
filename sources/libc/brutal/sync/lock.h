@@ -3,18 +3,18 @@
 #include <brutal/base/keywords.h>
 #include <brutal/base/std.h>
 
-struct lock
+typedef struct
 {
     atomic_bool locked;
-};
+} Lock;
 
-bool lock_try_acquire(struct lock *lock);
+bool lock_try_acquire(Lock *lock);
 
-void lock_acquire(struct lock *lock);
+void lock_acquire(Lock *lock);
 
-void lock_release(struct lock *lock);
+void lock_release(Lock *lock);
 
-static inline void lock_retainer_release(struct lock **lock)
+static inline void lock_retainer_release(Lock **lock)
 {
     if (lock != nullptr)
     {

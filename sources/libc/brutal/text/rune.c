@@ -1,10 +1,10 @@
 #include <brutal/text/rune.h>
 
-str_fix8_t rune_to_utf8(rune_t rune)
+StrFix8 rune_to_utf8(Rune rune)
 {
     if (rune <= 0x7F)
     {
-        return (str_fix8_t){
+        return (StrFix8){
             .len = 1,
             .buffer = {
                 (uint8_t)rune,
@@ -13,7 +13,7 @@ str_fix8_t rune_to_utf8(rune_t rune)
     }
     else if (rune <= 0x07FF)
     {
-        return (str_fix8_t){
+        return (StrFix8){
             .len = 2,
             .buffer = {
                 (uint8_t)(((rune >> 6) & 0x1F) | 0xC0),
@@ -23,7 +23,7 @@ str_fix8_t rune_to_utf8(rune_t rune)
     }
     else if (rune <= 0xFFFF)
     {
-        return (str_fix8_t){
+        return (StrFix8){
             .len = 3,
             .buffer = {
                 (uint8_t)(((rune >> 12) & 0x0F) | 0xE0),
@@ -34,7 +34,7 @@ str_fix8_t rune_to_utf8(rune_t rune)
     }
     else if (rune <= 0x10FFFF)
     {
-        return (str_fix8_t){
+        return (StrFix8){
             .len = 4,
             .buffer = {
                 (uint8_t)(((rune >> 18) & 0x07) | 0xF0),
@@ -46,14 +46,14 @@ str_fix8_t rune_to_utf8(rune_t rune)
     }
     else
     {
-        return (str_fix8_t){
+        return (StrFix8){
             .len = 3,
             .buffer = {0xEF, 0xBF, 0xBD},
         };
     }
 }
 
-size_t rune_length_utf8(rune_t rune)
+size_t rune_length_utf8(Rune rune)
 {
     if (rune <= 0x7F)
     {
@@ -77,7 +77,7 @@ size_t rune_length_utf8(rune_t rune)
     }
 }
 
-rune_t utf8_to_rune(str_t str)
+Rune utf8_to_rune(Str str)
 {
     if (str.len == 0 ||
         utf8_length(str.buffer[0]) > str.len)

@@ -1,7 +1,7 @@
 #include <brutal/log.h>
 #include "arch/x86_64/cpuid.h"
 
-cpuid_result_t cpuid(uint32_t leaf, uint32_t subleaf)
+cpuid_Result cpuid(uint32_t leaf, uint32_t subleaf)
 {
 
     uint32_t cpuid_max;
@@ -13,10 +13,10 @@ cpuid_result_t cpuid(uint32_t leaf, uint32_t subleaf)
     if (leaf > cpuid_max)
     {
         log("CPUID failled leaf:{} subleaf:{}", leaf, subleaf);
-        return (cpuid_result_t){.success = false};
+        return (cpuid_Result){.success = false};
     }
 
-    cpuid_result_t result = {};
+    cpuid_Result result = {};
     result.success = true;
 
     asm volatile("cpuid"

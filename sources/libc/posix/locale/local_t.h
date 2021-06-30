@@ -1,7 +1,7 @@
 #pragma once
 
-struct __local_impl
+struct local_impl
 {
 };
 
-typedef struct __local_impl *locale_t;
+typedef struct local_impl *locale_t;

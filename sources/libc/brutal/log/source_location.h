@@ -2,12 +2,12 @@
 
 #include <brutal/text/str.h>
 
-struct source_location
+typedef struct
 {
     int line;
-    str_t function;
-    str_t filename;
-};
+    Str function;
+    Str filename;
+} SourceLocation;
 
 #define source_location_current \
-    (struct source_location) { __LINE__, str_cast(__func__), str_cast(__FILENAME__), }
+    (SourceLocation) { __LINE__, str_cast(__func__), str_cast(__FILENAME__), }

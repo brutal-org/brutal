@@ -22,7 +22,7 @@
 #define IOAPIC_REG_OFFSET (0)
 #define IOAPIC_VALUE_OFFSET (16)
 
-typedef result_t(int, int) ioapic_int_redirect_result_t;
+typedef Result(int, int) ioapic_int_redirect_Result;
 
 #define LAPIC_REGISTER_LVT_INT_MASKED 0x10000
 
@@ -98,16 +98,16 @@ void lapic_enable_spurious(void);
 
 void apic_eoi(void);
 
-void apic_send_ipit(cpu_id_t cpu_id, uint32_t interrupt_id);
+void apic_send_ipit(CpuId cpu_id, uint32_t interrupt_id);
 
-void apic_init_processor(cpu_id_t cpu_id);
+void apic_init_processor(CpuId cpu_id);
 
-void apic_start_processor(cpu_id_t cpu_id, uintptr_t entry);
+void apic_start_processor(CpuId cpu_id, uintptr_t entry);
 
-cpu_id_t apic_current_cpu(void);
+CpuId apic_current_cpu(void);
 
 struct ioapic_version ioapic_get_version(int ioapic_id);
 
-ioapic_int_redirect_result_t apic_redirect_irq_to_cpu(cpu_id_t id, uint8_t irq, bool enable, uintptr_t rsdp);
+ioapic_int_redirect_Result apic_redirect_irq_to_cpu(CpuId id, uint8_t irq, bool enable, uintptr_t rsdp);
 
-ioapic_int_redirect_result_t apic_init_interrupt_redirection(struct handover const *handover);
+ioapic_int_redirect_Result apic_init_interrupt_redirection(struct handover const *handover);

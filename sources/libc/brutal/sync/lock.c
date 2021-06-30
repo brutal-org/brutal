@@ -1,6 +1,6 @@
 #include <brutal/sync/lock.h>
 
-bool lock_try_acquire(struct lock *lock)
+bool lock_try_acquire(Lock *lock)
 {
     bool expected = false;
     auto result = atomic_compare_exchange_weak(&lock->locked, &expected, true);
@@ -8,7 +8,7 @@ bool lock_try_acquire(struct lock *lock)
     return result;
 }
 
-void lock_acquire(struct lock *lock)
+void lock_acquire(Lock *lock)
 {
     while (!lock_try_acquire(lock))
     {
@@ -18,7 +18,7 @@ void lock_acquire(struct lock *lock)
     atomic_thread_fence(memory_order_seq_cst);
 }
 
-void lock_release(struct lock *lock)
+void lock_release(Lock *lock)
 {
     atomic_thread_fence(memory_order_seq_cst);
     lock->locked = false;

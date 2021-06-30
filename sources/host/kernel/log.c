@@ -2,7 +2,7 @@
 #include <host/log.h>
 #include "arch/arch.h"
 
-static struct lock logger_lock;
+static Lock logger_lock;
 
 void host_log_lock(void)
 {

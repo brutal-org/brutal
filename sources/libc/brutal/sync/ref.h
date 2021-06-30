@@ -7,25 +7,25 @@ typedef enum
     REFCOUNT_REF,
     REFCOUNT_DEREF,
     REFCOUNT_0,
-} refcount_result_t;
+} RefCountResult;
 
 typedef struct
 {
     atomic_int refs;
-} refcount_t;
+} RefCount;
 
-static inline void refcount_init(refcount_t *refcount)
+static inline void refcount_init(RefCount *refcount)
 {
     atomic_init(&refcount->refs, 1);
 }
 
-static inline refcount_result_t refcount_ref(refcount_t *refcount)
+static inline RefCountResult refcount_ref(RefCount *refcount)
 {
     atomic_fetch_add(&refcount->refs, 1);
     return REFCOUNT_REF;
 }
 
-static inline refcount_result_t refcount_deref(refcount_t *refcount)
+static inline RefCountResult refcount_deref(RefCount *refcount)
 {
     if (atomic_fetch_sub(&refcount->refs, 1) == 1)
     {

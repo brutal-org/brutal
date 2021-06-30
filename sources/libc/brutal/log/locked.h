@@ -6,8 +6,8 @@
 
 /* --- Locked log functions ------------------------------------------------- */
 
-void log_impl(enum log_level level, struct source_location location, str_t fmt, struct print_args args);
-void panic_impl(enum log_level level, struct source_location location, str_t fmt, struct print_args args);
+void log_impl(enum log_level level, SourceLocation location, Str fmt, struct print_args args);
+void panic_impl(enum log_level level, SourceLocation location, Str fmt, struct print_args args);
 
 #define panic(fmt, ...) (                                                                       \
     {                                                                                           \

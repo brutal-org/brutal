@@ -43,7 +43,7 @@ struct handover_module
 {
     size_t size;
     uint64_t addr;
-    str_fix128_t module_name;
+    StrFix128 module_name;
 };
 
 struct handover_modules_list

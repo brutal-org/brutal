@@ -14,7 +14,7 @@
 #include "host/mem.h"
 #include "kernel/constants.h"
 
-typedef result_t(br_error_t, uint8_t) smp_init_result;
+typedef Result(BrError, uint8_t) smp_init_result;
 
 atomic_bool cpu_ready = false;
 
@@ -36,10 +36,10 @@ static smp_init_result smp_initialize_cpu_trampoline(void)
     uint64_t trampoline_len = (uintptr_t)&trampoline_end - (uintptr_t)&trampoline_start + HOST_MEM_PAGESIZE;
 
     vmm_map(vmm_kernel_space(),
-            (vmm_range_t){
+            (VmmRange){
                 .base = (0x0),
                 .size = smp_cpu_trampoline_size()},
-            (pmm_range_t){
+            (PmmRange){
                 .base = (0x0),
                 .size = smp_cpu_trampoline_size()},
             BR_MEM_WRITABLE);
@@ -59,7 +59,7 @@ static void smp_cleanup_cpu_trampoline(void)
     mem_set(0x0, 0x69, smp_cpu_trampoline_size());
 
     vmm_unmap(vmm_kernel_space(),
-              (vmm_range_t){
+              (VmmRange){
                   .base = (0x0),
                   .size = smp_cpu_trampoline_size(),
               });
@@ -123,7 +123,7 @@ void arch_boot_other(void)
 
 void smp_stop_all(void)
 {
-    for (cpu_id_t i = 0; i < cpu_count(); i++)
+    for (CpuId i = 0; i < cpu_count(); i++)
     {
         if (i != cpu_self_id())
         {

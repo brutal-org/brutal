@@ -2,7 +2,7 @@
 
 #define PACKED [[gnu::packed]]
 
-#define ALIGNED(__align) [[gnu::aligned(__align)]]
+#define ALIGNED(ALIGN) [[gnu::aligned(ALIGN)]]
 
 #define MAYBE_UNUSED [[maybe_unused]]
 

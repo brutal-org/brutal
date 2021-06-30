@@ -14,11 +14,11 @@ typedef struct
 {
     enum error_kind kind;
     char const *message;
-} error_t;
+} Error;
 
-#define ERR_SUCCESS ((error_t){ERR_KIND_SUCCESS, "success"})
-#define ERR_TIMEOUT ((error_t){ERR_KIND_TIMEOUT, "timeout"})
-#define ERR_NOT_FOUND ((error_t){ERR_KIND_NOT_FOUND, "not-found"})
-#define ERR_OUT_OF_MEMORY ((error_t){ERR_KIND_EXHAUSTION, "out-of-memory"})
-#define ERR_BAD_ADDRESS ((error_t){ERR_KIND_INVALID, "bad-address"})
-#define ERR_UNDEFINED ((error_t){ERR_KIND_UNDEFINED, "undefined"})
+#define ERR_SUCCESS ((Error){ERR_KIND_SUCCESS, "success"})
+#define ERR_TIMEOUT ((Error){ERR_KIND_TIMEOUT, "timeout"})
+#define ERR_NOT_FOUND ((Error){ERR_KIND_NOT_FOUND, "not-found"})
+#define ERR_OUT_OF_MEMORY ((Error){ERR_KIND_EXHAUSTION, "out-of-memory"})
+#define ERR_BAD_ADDRESS ((Error){ERR_KIND_INVALID, "bad-address"})
+#define ERR_UNDEFINED ((Error){ERR_KIND_UNDEFINED, "undefined"})

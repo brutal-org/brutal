@@ -7,9 +7,9 @@
 #include "kernel/constants.h"
 #include "kernel/tasking.h"
 
-static struct lock task_lock = {};
-static task_id_t task_id = 0;
-static vec_t(struct task *) tasks = {};
+static Lock task_lock = {};
+static TaskId task_id = 0;
+static Vec(struct task *) tasks = {};
 size_t current_tick = 0;
 
 void task_idle(void)
@@ -25,23 +25,23 @@ struct task *task_self(void)
     return cpu_self()->schedule.current;
 }
 
-task_return_result_t task_create(str_t name, enum task_flags flags)
+task_return_Result task_create(Str name, enum task_flags flags)
 {
     LOCK_RETAINER(&task_lock);
 
     log("Creating task {}...", name);
 
-    auto task = TRY(task_return_result_t, arch_task_create());
+    auto task = TRY(task_return_Result, arch_task_create());
 
     task->id = task_id++;
-    task->name = str_cast_fix(str_fix128_t, name);
+    task->name = str_cast_fix(StrFix128, name);
     task->flags = flags;
 
     log("Task:{}({}) created...", str_cast(&task->name), task->id);
 
     vec_push(&tasks, task);
 
-    return OK(task_return_result_t, task);
+    return OK(task_return_Result, task);
 }
 
 void task_start(
@@ -182,17 +182,17 @@ static struct task *task_get_most_waiting()
     return current_waiting;
 }
 
-static cpu_id_t scheduler_end_task_execution(struct task *target)
+static CpuId scheduler_end_task_execution(struct task *target)
 {
     target->scheduler_state.tick_end = current_tick;
     target->scheduler_state.is_currently_executed = false;
-    cpu_id_t cur_cpu = target->scheduler_state.cpu;
+    CpuId cur_cpu = target->scheduler_state.cpu;
     target->scheduler_state.cpu = 0;
 
     return cur_cpu;
 }
 
-static void scheduler_start_task_execution(struct task *target, cpu_id_t target_cpu)
+static void scheduler_start_task_execution(struct task *target, CpuId target_cpu)
 {
     target->scheduler_state.tick_start = current_tick;
     target->scheduler_state.is_currently_executed = true;
@@ -201,7 +201,7 @@ static void scheduler_start_task_execution(struct task *target, cpu_id_t target_
 }
 
 // is the cpu current process idle
-static bool scheduler_is_cpu_idle(cpu_id_t id)
+static bool scheduler_is_cpu_idle(CpuId id)
 {
     return cpu(id)->schedule.next == cpu(id)->schedule.idle;
 }
@@ -235,7 +235,7 @@ static void scheduler_dispatch_to_active_cpu(struct task *target)
 {
     struct task *most_active = task_get_most_active();
 
-    cpu_id_t target_cpu = scheduler_end_task_execution(most_active);
+    CpuId target_cpu = scheduler_end_task_execution(most_active);
     scheduler_start_task_execution(target, target_cpu);
 }
 

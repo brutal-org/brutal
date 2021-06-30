@@ -4,7 +4,7 @@
 #include <brutal/base/macros.h>
 #include <brutal/mem.h>
 
-struct vec_impl
+typedef struct
 {
     char *data;
     int length;
@@ -12,38 +12,38 @@ struct vec_impl
     struct alloc *alloc;
     int data_size;
     int capacity;
-};
+} VecImpl;
 
-#define vec_t(T)               \
-    union                      \
-    {                          \
-        struct                 \
-        {                      \
-            T *data;           \
-            int length;        \
-        };                     \
-        struct vec_impl _impl; \
+#define Vec(T)          \
+    union               \
+    {                   \
+        struct          \
+        {               \
+            T *data;    \
+            int length; \
+        };              \
+        VecImpl _impl;  \
     }
 
-void vec_init_impl(struct vec_impl *impl, int data_size, struct alloc *alloc);
+void vec_init_impl(VecImpl *impl, int data_size, struct alloc *alloc);
 
-void vec_deinit_impl(struct vec_impl *impl);
+void vec_deinit_impl(VecImpl *impl);
 
-bool vec_expand_impl(struct vec_impl *impl);
+bool vec_expand_impl(VecImpl *impl);
 
-bool vec_reserve_impl(struct vec_impl *impl, int n);
+bool vec_reserve_impl(VecImpl *impl, int n);
 
-bool vec_reserve_po2_impl(struct vec_impl *impl, int n);
+bool vec_reserve_po2_impl(VecImpl *impl, int n);
 
-bool vec_compact_impl(struct vec_impl *impl);
+bool vec_compact_impl(VecImpl *impl);
 
-bool vec_insert_impl(struct vec_impl *impl, int idx);
+bool vec_insert_impl(VecImpl *impl, int idx);
 
-void vec_splice_impl(struct vec_impl *impl, int start, int count);
+void vec_splice_impl(VecImpl *impl, int start, int count);
 
-void vec_swapsplice_impl(struct vec_impl *impl, int start, int count);
+void vec_swapsplice_impl(VecImpl *impl, int start, int count);
 
-void vec_swap_impl(struct vec_impl *impl, int idx1, int idx2);
+void vec_swap_impl(VecImpl *impl, int idx1, int idx2);
 
 #define vec_init(v, alloc_) vec_init_impl(&(v)->_impl, sizeof(*(v)->data), alloc_)
 
@@ -68,7 +68,7 @@ void vec_swap_impl(struct vec_impl *impl, int idx1, int idx2);
 
 #define vec_swap(v, idx1, idx2) vec_swap_impl(&(v)->_impl, idx1, idx2)
 
-#define vec_truncate(v, len) \
+#define Vecruncate(v, len) \
     ((v)->length = (len) < (v)->length ? (len) : (v)->length)
 
 #define vec_clear(v) ((v)->length = 0)
@@ -115,7 +115,6 @@ void vec_swap_impl(struct vec_impl *impl, int idx1, int idx2);
         }                                                \
     } while (0)
 
-typedef vec_t(void *) vec_void_t;
-typedef vec_t(char *) vec_str_t;
-typedef vec_t(int) vec_int_t;
-typedef vec_t(char) vec_char_t;
+typedef Vec(void *) VecPtr;
+typedef Vec(int) VecInt;
+typedef Vec(char) VecChar;

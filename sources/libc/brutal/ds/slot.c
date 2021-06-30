@@ -1,7 +1,7 @@
 #include <brutal/alloc/base.h>
 #include <brutal/ds/slot.h>
 
-void slot_capacity_impl(struct slot_impl *impl, int new_capacity)
+void slot_capacity_impl(SlotImpl *impl, int new_capacity)
 {
     if (impl->capacity >= new_capacity)
     {
@@ -26,15 +26,15 @@ void slot_capacity_impl(struct slot_impl *impl, int new_capacity)
     impl->capacity = new_capacity;
 }
 
-void slot_init_impl(struct slot_impl *impl, int data_size, struct alloc *alloc)
+void slot_init_impl(SlotImpl *impl, int data_size, struct alloc *alloc)
 {
-    *impl = (struct slot_impl){};
+    *impl = (SlotImpl){};
 
     impl->alloc = alloc;
     impl->data_size = data_size;
 }
 
-void slot_deinit_impl(struct slot_impl *impl)
+void slot_deinit_impl(SlotImpl *impl)
 {
     if (impl->data)
     {
@@ -46,10 +46,10 @@ void slot_deinit_impl(struct slot_impl *impl)
         alloc_release(impl->alloc, impl->used);
     }
 
-    *impl = (struct slot_impl){};
+    *impl = (SlotImpl){};
 }
 
-slot_index_t slot_find_impl(struct slot_impl *impl)
+SlotIndex slot_find_impl(SlotImpl *impl)
 {
     for (int i = 0; i < impl->capacity; i++)
     {
@@ -63,11 +63,11 @@ slot_index_t slot_find_impl(struct slot_impl *impl)
     return -1;
 }
 
-slot_index_t slot_alloc_impl(struct slot_impl *impl)
+SlotIndex slot_alloc_impl(SlotImpl *impl)
 {
     slot_capacity_impl(impl, 16);
 
-    slot_index_t found_index = slot_find_impl(impl);
+    SlotIndex found_index = slot_find_impl(impl);
 
     if (found_index < 0)
     {
@@ -79,12 +79,12 @@ slot_index_t slot_alloc_impl(struct slot_impl *impl)
     return slot_find_impl(impl);
 }
 
-void slot_acquire_impl(struct slot_impl *impl, size_t index)
+void slot_acquire_impl(SlotImpl *impl, size_t index)
 {
     impl->used[index] = true;
 }
 
-void slot_release_impl(struct slot_impl *impl, slot_index_t index)
+void slot_release_impl(SlotImpl *impl, SlotIndex index)
 {
     impl->used[index] = false;
 }

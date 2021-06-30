@@ -4,15 +4,15 @@
 #include <brutal/base/std.h>
 #include <brutal/base/types.h>
 
-#define result_t(error_t, ok_t) \
-    struct                      \
-    {                           \
-        bool success;           \
-        union                   \
-        {                       \
-            ok_t _ok;           \
-            error_t _error;     \
-        };                      \
+#define Result(Error, ok_t) \
+    struct                  \
+    {                       \
+        bool success;       \
+        union               \
+        {                   \
+            ok_t _ok;       \
+            Error _error;   \
+        };                  \
     }
 
 #define OK(T, value)     \

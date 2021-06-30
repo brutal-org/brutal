@@ -7,9 +7,9 @@
 
 typedef void *vmm_space_t;
 
-typedef range_t(size_t) vmm_range_t;
+typedef Range(size_t) VmmRange;
 
-typedef result_t(br_error_t, vmm_range_t) vmm_result_t;
+typedef Result(BrError, VmmRange) vmm_Result;
 
 void vmm_initialize(struct handover const *handover);
 
@@ -23,17 +23,17 @@ void vmm_space_switch(vmm_space_t space);
 
 vmm_space_t vmm_kernel_space(void);
 
-vmm_result_t vmm_alloc(
+vmm_Result vmm_alloc(
     vmm_space_t space,
-    pmm_range_t range,
-    br_mem_flags_t flags);
+    PmmRange range,
+    BrMemFlags flags);
 
-vmm_result_t vmm_map(
+vmm_Result vmm_map(
     vmm_space_t space,
-    vmm_range_t virtual_range,
-    pmm_range_t physical_range,
-    br_mem_flags_t flags);
+    VmmRange virtual_range,
+    PmmRange physical_range,
+    BrMemFlags flags);
 
-vmm_result_t vmm_unmap(vmm_space_t space, vmm_range_t virtual_range);
+vmm_Result vmm_unmap(vmm_space_t space, VmmRange virtual_range);
 
-pmm_result_t vmm_virt2phys(vmm_space_t space, vmm_range_t virtual_range);
+pmm_Result vmm_virt2phys(vmm_space_t space, VmmRange virtual_range);

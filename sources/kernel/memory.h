@@ -8,9 +8,9 @@
 
 struct memory_object
 {
-    refcount_t refcount;
+    RefCount refcount;
 
-    pmm_range_t range;
+    PmmRange range;
 };
 
 struct memory_mapping
@@ -20,7 +20,7 @@ struct memory_mapping
 
 struct memory_space
 {
-    refcount_t refcount;
+    RefCount refcount;
 
-    vec_t(struct memory_mapping) mappings;
+    Vec(struct memory_mapping) mappings;
 };

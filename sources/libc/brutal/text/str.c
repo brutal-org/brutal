@@ -1,7 +1,7 @@
 #include <brutal/base/keywords.h>
 #include <brutal/text/str.h>
 
-void str_rvs(str_t str)
+void str_rvs(Str str)
 {
     for (int i = 0, j = str.len - 1; i < j; i++, j--)
     {
@@ -11,7 +11,7 @@ void str_rvs(str_t str)
     }
 }
 
-bool str_eq(str_t lhs, str_t rhs)
+bool str_eq(Str lhs, Str rhs)
 {
     if (lhs.len != rhs.len)
     {

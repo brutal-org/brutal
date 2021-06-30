@@ -20,4 +20,4 @@ enum cmos_regs
 
 uint8_t cmos_read(enum cmos_regs reg);
 
-datetime_t cmos_read_rtc(void);
+DateTime cmos_read_rtc(void);

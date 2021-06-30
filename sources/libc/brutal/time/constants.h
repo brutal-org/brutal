@@ -15,5 +15,5 @@ static const int DAYS_PER_MONTH[2][MONTH_PER_YEAR] = {
 
 static const int DAYS_PER_YEAR[2] = {365, 366};
 
-#define IS_LEAP_YEAR(__year) \
-    ((!((__year) % 4) && (__year) % 100) || !((__year) % 400))
+#define is_leap_year(YEAR) \
+    ((!((YEAR) % 4) && (YEAR) % 100) || !((YEAR) % 400))

@@ -7,10 +7,10 @@
 #include "arch/pmm.h"
 #include "arch/x86_64/memory/mmap.h"
 
-static struct bitmap pmm_bitmap = {};
+static Bitmap pmm_bitmap = {};
 static size_t best_bet = 0;
 static size_t used_memory = 0;
-static struct lock pmm_lock;
+static Lock pmm_lock;
 
 static uintptr_t memory_map_get_highest_address(struct handover_mmap const *memory_map)
 {
@@ -67,7 +67,7 @@ static void pmm_load_memory_map(struct handover_mmap const *memory_map)
             continue;
         }
 
-        pmm_unused((pmm_range_t){base, size});
+        pmm_unused((PmmRange){base, size});
 
         available_memory += size;
     }
@@ -81,12 +81,12 @@ void pmm_initialize(struct handover const *handover)
     pmm_load_memory_map(&handover->mmap);
 
     // we set the first page used, as the page 0 is NULL
-    pmm_used((pmm_range_t){(uintptr_t)0, HOST_MEM_PAGESIZE * 32});
+    pmm_used((PmmRange){(uintptr_t)0, HOST_MEM_PAGESIZE * 32});
     used_memory = 0;
-    pmm_used((pmm_range_t){mmap_io_to_phys((uintptr_t)pmm_bitmap.data), pmm_bitmap.size});
+    pmm_used((PmmRange){mmap_io_to_phys((uintptr_t)pmm_bitmap.data), pmm_bitmap.size});
 }
 
-pmm_result_t pmm_alloc(size_t size)
+pmm_Result pmm_alloc(size_t size)
 {
     LOCK_RETAINER(&pmm_lock);
 
@@ -108,21 +108,21 @@ pmm_result_t pmm_alloc(size_t size)
 
         bitmap_set_range(&pmm_bitmap, page_range, PMM_USED);
 
-        auto pmm_range = range_cast(pmm_range_t, page_range);
+        auto pmm_range = range_cast(PmmRange, page_range);
 
         pmm_range.base *= HOST_MEM_PAGESIZE;
         pmm_range.size *= HOST_MEM_PAGESIZE;
 
-        return OK(pmm_result_t, pmm_range);
+        return OK(pmm_Result, pmm_range);
     }
     else
     {
         log("pmm_alloc(): {} error out of memory", size);
-        return ERR(pmm_result_t, BR_ERR_OUT_OF_MEMORY);
+        return ERR(pmm_Result, BR_ERR_OUT_OF_MEMORY);
     }
 }
 
-pmm_result_t pmm_used(pmm_range_t range)
+pmm_Result pmm_used(PmmRange range)
 {
     LOCK_RETAINER(&pmm_lock);
 
@@ -130,14 +130,14 @@ pmm_result_t pmm_used(pmm_range_t range)
 
     size_t page_base = range.base / HOST_MEM_PAGESIZE;
     size_t page_size = range.size / HOST_MEM_PAGESIZE;
-    auto page_range = (bitmap_range_t){page_base, page_size};
+    auto page_range = (BitmapRange){page_base, page_size};
 
     bitmap_set_range(&pmm_bitmap, page_range, PMM_USED);
 
-    return OK(pmm_result_t, range);
+    return OK(pmm_Result, range);
 }
 
-pmm_result_t pmm_unused(pmm_range_t range)
+pmm_Result pmm_unused(PmmRange range)
 {
     LOCK_RETAINER(&pmm_lock);
 
@@ -146,16 +146,16 @@ pmm_result_t pmm_unused(pmm_range_t range)
 
     if (range.base == 0)
     {
-        return ERR(pmm_result_t, BR_ERR_BAD_ADDRESS);
+        return ERR(pmm_Result, BR_ERR_BAD_ADDRESS);
     }
 
     size_t page_base = range.base / HOST_MEM_PAGESIZE;
     size_t page_size = range.size / HOST_MEM_PAGESIZE;
-    auto page_range = (bitmap_range_t){page_base, page_size};
+    auto page_range = (BitmapRange){page_base, page_size};
 
     bitmap_set_range(&pmm_bitmap, page_range, PMM_UNUSED);
 
     best_bet = (page_range.base);
 
-    return OK(pmm_result_t, range);
+    return OK(pmm_Result, range);
 }

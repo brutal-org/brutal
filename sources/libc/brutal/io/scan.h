@@ -10,7 +10,7 @@ struct scan
     size_t head;
 };
 
-void scan_init(struct scan *self, str_t str);
+void scan_init(struct scan *self, Str str);
 
 bool scan_end(struct scan *self);
 

@@ -2,9 +2,9 @@
 
 #include <brutal/base.h>
 
-typedef int slot_index_t;
+typedef int SlotIndex;
 
-struct slot_impl
+typedef struct
 {
     void *data;
     bool *used;
@@ -12,24 +12,24 @@ struct slot_impl
     struct alloc *alloc;
     int data_size;
     int capacity;
-};
+} SlotImpl;
 
-#define slot_t(T)               \
-    union                       \
-    {                           \
-        T *data;                \
-        struct slot_impl _impl; \
+#define Slot(T)         \
+    union               \
+    {                   \
+        T *data;        \
+        SlotImpl _impl; \
     }
 
-void slot_init_impl(struct slot_impl *impl, int data_size, struct alloc *alloc);
+void slot_init_impl(SlotImpl *impl, int data_size, struct alloc *alloc);
 
-void slot_deinit_impl(struct slot_impl *impl);
+void slot_deinit_impl(SlotImpl *impl);
 
-slot_index_t slot_alloc_impl(struct slot_impl *impl);
+SlotIndex slot_alloc_impl(SlotImpl *impl);
 
-void slot_acquire_impl(struct slot_impl *impl, size_t index);
+void slot_acquire_impl(SlotImpl *impl, size_t index);
 
-void slot_release_impl(struct slot_impl *impl, slot_index_t index);
+void slot_release_impl(SlotImpl *impl, SlotIndex index);
 
 #define slot_init(self, alloc) \
     slot_init_impl(&(self)->_impl, sizeof(&(self)->data), (alloc))

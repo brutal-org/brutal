@@ -8,10 +8,10 @@
 static bool log_initialized = false;
 static struct writer log;
 
-static write_result_t arch_debug_write(MAYBE_UNUSED struct writer *writer, char const *data, size_t size)
+static WriteResult arch_debug_write(MAYBE_UNUSED struct writer *writer, char const *data, size_t size)
 {
     com_write(COM1, data, size);
-    return OK(write_result_t, size);
+    return OK(WriteResult, size);
 }
 
 struct writer *arch_debug(void)

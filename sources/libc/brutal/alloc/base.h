@@ -21,33 +21,33 @@ struct alloc
     alloc_release_t *release;
 };
 
-#define alloc_acquire(self, size) \
-    ((self)->acquire((self), size))
+#define alloc_acquire(SELF, SIZE) \
+    ((SELF)->acquire((SELF), SIZE))
 
-#define alloc_commit(self, ptr) \
-    ((self)->commit((self), ptr))
+#define alloc_commit(SELF, PTR) \
+    ((SELF)->commit((SELF), PTR))
 
-#define alloc_make(self, T) (                    \
+#define alloc_make(SELF, T) (                    \
     {                                            \
-        T *ptr = alloc_acquire(self, sizeof(T)); \
-        alloc_commit(self, ptr);                 \
+        T *ptr = alloc_acquire(SELF, sizeof(T)); \
+        alloc_commit(SELF, ptr);                 \
         mem_set(ptr, 0, sizeof(T));              \
         ptr;                                     \
     })
 
-#define alloc_calloc(self, size, count) (              \
+#define alloc_calloc(SELF, SIZE, COUNT) (              \
     {                                                  \
-        void *ptr = alloc_acquire(self, size * count); \
-        alloc_commit(self, ptr);                       \
-        mem_set(ptr, 0, size *count);                  \
+        void *ptr = alloc_acquire(SELF, SIZE * COUNT); \
+        alloc_commit(SELF, ptr);                       \
+        mem_set(ptr, 0, SIZE *COUNT);                  \
         ptr;                                           \
     })
 
-#define alloc_make_array(self, T, count) \
-    ((T *)alloc_calloc(self, sizeof(T), count))
+#define alloc_make_array(SELF, T, COUNT) \
+    ((T *)alloc_calloc(SELF, sizeof(T), COUNT))
 
-#define alloc_decommit(self, ptr) \
-    ((self)->decommit((self), ptr))
+#define alloc_decommit(SELF, PTR) \
+    ((SELF)->decommit((SELF), PTR))
 
-#define alloc_release(self, ptr) \
-    ((self)->commit((self), ptr))
+#define alloc_release(SELF, PTR) \
+    ((SELF)->commit((SELF), PTR))

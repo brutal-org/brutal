@@ -1,3 +1,3 @@
 #pragma once
 
-typedef void *monostate_t;
+typedef void *MonoState;

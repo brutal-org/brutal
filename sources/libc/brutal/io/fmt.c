@@ -70,7 +70,7 @@ static void fmt_parse_type(struct fmt *fmt, struct scan *scan)
     case 'p':
         fmt->type = FMT_POINTER;
         break;
-    
+
     case 'x':
         fmt->type = FMT_HEXADECIMAL;
         break;
@@ -132,22 +132,22 @@ size_t fmt_write_length(struct fmt self, unsigned long value)
     return length;
 }
 
-write_result_t fmt_signed(struct fmt self, struct writer *writer, long value)
+WriteResult fmt_signed(struct fmt self, struct writer *writer, long value)
 {
     size_t written = 0;
 
     if (value < 0)
     {
-        written += TRY(write_result_t, io_put(writer, '-'));
+        written += TRY(WriteResult, io_put(writer, '-'));
         value *= -1;
     }
 
-    written += TRY(write_result_t, fmt_unsigned(self, writer, value));
+    written += TRY(WriteResult, fmt_unsigned(self, writer, value));
 
-    return OK(write_result_t, written);
+    return OK(WriteResult, written);
 }
 
-write_result_t fmt_unsigned(struct fmt self, struct writer *writer, unsigned long value)
+WriteResult fmt_unsigned(struct fmt self, struct writer *writer, unsigned long value)
 {
 
     char buffer[64] = {};
@@ -195,7 +195,7 @@ write_result_t fmt_unsigned(struct fmt self, struct writer *writer, unsigned lon
     return io_write(writer, buffer, i);
 }
 
-write_result_t fmt_string(MAYBE_UNUSED struct fmt self, struct writer *writer, str_t value)
+WriteResult fmt_string(MAYBE_UNUSED struct fmt self, struct writer *writer, Str value)
 {
     return print(writer, value);
 }

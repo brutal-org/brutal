@@ -12,7 +12,7 @@ typedef enum
     BR_SYS_DECOMMIT,
     BR_SYS_UNMAP,
     BR_SYS_DROP,
-} br_syscall_t;
+} BrSyscall;
 
 void br_sys_group();
 

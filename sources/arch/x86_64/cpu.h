@@ -16,8 +16,8 @@ struct cpu_impl
 
 struct cpu_impl *cpu_impl_self(void);
 
-struct cpu_impl *cpu_impl(cpu_id_t id);
+struct cpu_impl *cpu_impl(CpuId id);
 
-void cpu_found(cpu_id_t id, int lapic);
+void cpu_found(CpuId id, int lapic);
 
 void cpu_initialize(void); // init cpu_context for current cpu

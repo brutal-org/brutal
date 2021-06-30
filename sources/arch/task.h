@@ -7,7 +7,7 @@ void arch_task_save_context(struct task *target);
 
 void arch_task_load_context(struct task *target);
 
-task_return_result_t arch_task_create(void);
+task_return_Result arch_task_create(void);
 
 void arch_task_start(
     struct task *task,
@@ -18,4 +18,4 @@ void arch_task_start(
     uintptr_t arg4,
     uintptr_t arg5);
 
-void arch_task_switch_for_cpu(cpu_id_t cpu);
+void arch_task_switch_for_cpu(CpuId cpu);

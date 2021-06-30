@@ -1,10 +1,10 @@
 #pragma once
 
-#define range_t(T) \
-    struct         \
-    {              \
-        T base;    \
-        T size;    \
+#define Range(T) \
+    struct       \
+    {            \
+        T base;  \
+        T size;  \
     }
 
 #define range_cast(T, RANGE) (       \

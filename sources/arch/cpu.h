@@ -4,20 +4,20 @@
 #include <brutal/types.h>
 #include "kernel/tasking.h"
 
-typedef uint8_t cpu_id_t;
+typedef uint8_t CpuId;
 
 struct cpu
 {
-    cpu_id_t id;
+    CpuId id;
     bool present;
 
     struct schedule schedule;
 };
 
-struct cpu *cpu(cpu_id_t id);
+struct cpu *cpu(CpuId id);
 
 size_t cpu_count(void);
 
 struct cpu *cpu_self(void);
 
-cpu_id_t cpu_self_id(void);
+CpuId cpu_self_id(void);

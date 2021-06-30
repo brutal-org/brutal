@@ -9,17 +9,17 @@ Date timestamp_to_date(TimeStamp timestamp)
 
     date.year = EPOCH_YEAR;
 
-    while (days - DAYS_PER_YEAR[IS_LEAP_YEAR(date.year)] > 0)
+    while (days - DAYS_PER_YEAR[is_leap_year(date.year)] > 0)
     {
-        days -= DAYS_PER_YEAR[IS_LEAP_YEAR(date.year)];
+        days -= DAYS_PER_YEAR[is_leap_year(date.year)];
         date.year++;
     }
 
     date.month = 0;
 
-    while (days - DAYS_PER_MONTH[IS_LEAP_YEAR(date.year)][date.month] > 0)
+    while (days - DAYS_PER_MONTH[is_leap_year(date.year)][date.month] > 0)
     {
-        days -= DAYS_PER_MONTH[IS_LEAP_YEAR(date.year)][date.month];
+        days -= DAYS_PER_MONTH[is_leap_year(date.year)][date.month];
         date.month++;
     }
 
@@ -47,18 +47,18 @@ DateTime timestamp_to_datetime(TimeStamp timestamp)
     };
 }
 
-TimeStamp datetime_to_timestamp(DateTime datetime)
+TimeStamp DateTimeo_timestamp(DateTime datetime)
 {
     TimeStamp timestamp = 0;
 
     for (Year year = EPOCH_YEAR; year < datetime.year; year++)
     {
-        timestamp += DAYS_PER_YEAR[IS_LEAP_YEAR(year)] * SECONDS_PER_DAY;
+        timestamp += DAYS_PER_YEAR[is_leap_year(year)] * SECONDS_PER_DAY;
     }
 
     for (Mounth month = 0; month < datetime.month - 1; month++)
     {
-        timestamp += DAYS_PER_MONTH[IS_LEAP_YEAR(datetime.year)][month] * SECONDS_PER_DAY;
+        timestamp += DAYS_PER_MONTH[is_leap_year(datetime.year)][month] * SECONDS_PER_DAY;
     }
 
     timestamp += (datetime.day - 1) * SECONDS_PER_DAY;

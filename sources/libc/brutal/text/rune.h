@@ -3,12 +3,12 @@
 #include <brutal/base/std.h>
 #include <brutal/text/str.h>
 
-typedef uint32_t rune_t;
+typedef uint32_t Rune;
 
-str_fix8_t rune_to_utf8(rune_t rune);
+StrFix8 rune_to_utf8(Rune rune);
 
-size_t rune_length_utf8(rune_t rune);
+size_t rune_length_utf8(Rune rune);
 
-rune_t utf8_to_rune(str_t str);
+Rune utf8_to_rune(Str str);
 
 size_t utf8_length(uint8_t str);

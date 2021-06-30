@@ -34,7 +34,7 @@ struct task_exec
 
 struct task
 {
-    task_id_t handle;
+    TaskId handle;
     enum task_type type;
 
     union
@@ -65,5 +65,5 @@ void task_exit(struct task *task, int result);
 
 void task_abort(struct task *task);
 
-typedef result_t(error_t, int) task_wait_result_t;
-task_wait_result_t task_wait(struct task *task);
+typedef Result(Error, int) task_wait_Result;
+task_wait_Result task_wait(struct task *task);

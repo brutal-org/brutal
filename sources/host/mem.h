@@ -13,10 +13,10 @@ void host_mem_lock(void);
 
 void host_mem_unlock(void);
 
-error_t host_mem_acquire(size_t size, void **out_result, enum host_mem_flag flags);
+Error host_mem_acquire(size_t size, void **out_result, enum host_mem_flag flags);
 
-error_t host_mem_commit(void *addr, size_t size);
+Error host_mem_commit(void *addr, size_t size);
 
-error_t host_mem_decommit(void *addr, size_t size);
+Error host_mem_decommit(void *addr, size_t size);
 
-error_t host_mem_release(void *addr, size_t size);
+Error host_mem_release(void *addr, size_t size);

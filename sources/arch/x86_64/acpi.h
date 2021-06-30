@@ -86,11 +86,11 @@ struct PACKED acpi_madt
     struct acpi_madt_record records[];
 };
 
-#define acpi_make_madt_record_table(name, record_type)    \
-    struct name                                           \
+#define acpi_make_madt_record_table(NAME, RECORD_TYPE)    \
+    struct NAME                                           \
     {                                                     \
         size_t count;                                     \
-        struct record_type *table[MAX_MADT_RECORD_COUNT]; \
+        struct RECORD_TYPE *table[MAX_MADT_RECORD_COUNT]; \
     }
 
 acpi_make_madt_record_table(acpi_madt_record_table, acpi_madt_record);
@@ -98,7 +98,7 @@ acpi_make_madt_record_table(lapic_record_table, acpi_madt_lapic_record);
 acpi_make_madt_record_table(ioapic_record_table, acpi_madt_ioapic_record);
 acpi_make_madt_record_table(iso_record_table, acpi_madt_iso_record);
 
-struct acpi_sdth *acpi_rsdt_child(struct acpi_rsdt *rsdt, str_t signature);
+struct acpi_sdth *acpi_rsdt_child(struct acpi_rsdt *rsdt, Str signature);
 
 struct acpi_madt_record *acpi_madt_record(struct acpi_madt *madt, enum acpi_madt_record_type type);
 

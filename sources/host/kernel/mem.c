@@ -3,7 +3,7 @@
 #include <host/mem.h>
 #include "arch/heap.h"
 
-static struct lock mem_lock;
+static Lock mem_lock;
 
 void host_mem_lock(void)
 {
@@ -15,7 +15,7 @@ void host_mem_unlock(void)
     lock_release(&mem_lock);
 }
 
-error_t host_mem_acquire(size_t size, void **out_result, MAYBE_UNUSED enum host_mem_flag flags)
+Error host_mem_acquire(size_t size, void **out_result, MAYBE_UNUSED enum host_mem_flag flags)
 {
     auto alloc_result = heap_alloc(size);
 
@@ -29,19 +29,19 @@ error_t host_mem_acquire(size_t size, void **out_result, MAYBE_UNUSED enum host_
     return ERR_SUCCESS;
 }
 
-error_t host_mem_commit(MAYBE_UNUSED void *addr, MAYBE_UNUSED size_t size)
+Error host_mem_commit(MAYBE_UNUSED void *addr, MAYBE_UNUSED size_t size)
 {
     return ERR_SUCCESS;
 }
 
-error_t host_mem_decommit(MAYBE_UNUSED void *addr, MAYBE_UNUSED size_t size)
+Error host_mem_decommit(MAYBE_UNUSED void *addr, MAYBE_UNUSED size_t size)
 {
     return ERR_SUCCESS;
 }
 
-error_t host_mem_release(void *addr, size_t size)
+Error host_mem_release(void *addr, size_t size)
 {
     // We assumed that free succeed
-    heap_free((heap_range_t){(uintptr_t)addr, size});
+    heap_free((HeapRange){(uintptr_t)addr, size});
     return ERR_SUCCESS;
 }

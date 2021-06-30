@@ -2,7 +2,7 @@
 
 #include <brutal/base.h>
 
-typedef void test_func_t(void);
+typedef void TestFunc(void);
 
 enum test_flags
 {
@@ -19,13 +19,13 @@ enum test_result
 struct test
 {
     enum test_flags flags;
-    str_t name;
-    test_func_t *func;
+    Str name;
+    TestFunc *func;
 };
 
 void test_register(struct test test);
 
-#define TEST_FUNCTION_NAME(name) __test_##name
+#define TEST_FUNCTION_NAME(name) test_##name
 
 #define TEST_WITH_FLAGS(name, flags)                                            \
     void TEST_FUNCTION_NAME(name)(void);                                        \

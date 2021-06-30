@@ -9,7 +9,7 @@
 #include "brutal/types.h"
 #include "kernel/tasking.h"
 
-struct lock error_lock;
+Lock error_lock;
 
 static char *_exception_messages[32] = {
     "division-by-zero",

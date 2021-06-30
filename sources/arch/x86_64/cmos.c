@@ -17,13 +17,13 @@ bool cmos_is_update(void)
     return cmos_read(CMOS_STATUS_A) & 0x80;
 }
 
-datetime_t cmos_read_rtc(void)
+DateTime cmos_read_rtc(void)
 {
     asm_cli();
 
     WAIT_FOR(!cmos_is_update());
 
-    datetime_t datetime;
+    DateTime datetime;
 
     datetime.second = from_binary_coded_decimal(cmos_read(CMOS_RTC_SECOND));
     datetime.minute = from_binary_coded_decimal(cmos_read(CMOS_RTC_MINUTE));

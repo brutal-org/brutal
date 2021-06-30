@@ -6,7 +6,7 @@
 static size_t impl_count = 0;
 static struct cpu_impl impls[MAX_CPU_COUNT];
 
-struct cpu_impl *cpu_impl(cpu_id_t id)
+struct cpu_impl *cpu_impl(CpuId id)
 {
     return &impls[id];
 }
@@ -16,7 +16,7 @@ struct cpu_impl *cpu_impl_self(void)
     return &impls[cpu_self_id()];
 }
 
-void cpu_found(cpu_id_t id, int lapic)
+void cpu_found(CpuId id, int lapic)
 {
     impl_count++;
 
@@ -39,7 +39,7 @@ void cpu_initialize(void)
 }
 /* --- Public API ----------------------------------------------------------- */
 
-cpu_id_t cpu_self_id(void)
+CpuId cpu_self_id(void)
 {
     return apic_current_cpu();
 }
@@ -49,7 +49,7 @@ struct cpu *cpu_self(void)
     return &cpu_impl_self()->base;
 }
 
-struct cpu *cpu(cpu_id_t id)
+struct cpu *cpu(CpuId id)
 {
     return &cpu_impl(id)->base;
 }

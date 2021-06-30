@@ -10,7 +10,7 @@
 
 extern void syscall_handle(void);
 
-syscall_initialize_result_t syscall_initialize(void)
+syscall_initialize_Result syscall_initialize(void)
 {
     wrmsr(MSR_EFER, rdmsr(MSR_EFER) | EFER_ENABLE_SYSCALL);
 
@@ -35,10 +35,10 @@ syscall_initialize_result_t syscall_initialize(void)
 
     todo("cpu -> temporary stack should be in the process [!]");
 
-    uint8_t *cpu_stack = (uint8_t *)TRY(syscall_initialize_result_t, heap_alloc(KERNEL_STACK_SIZE)).base;
+    uint8_t *cpu_stack = (uint8_t *)TRY(syscall_initialize_Result, heap_alloc(KERNEL_STACK_SIZE)).base;
     cpu_impl_self()->syscall_kernel_stack = cpu_stack + KERNEL_STACK_SIZE;
 
-    return OK(syscall_initialize_result_t, 0);
+    return OK(syscall_initialize_Result, 0);
 }
 
 uint64_t arch_syscall_handler(struct interrupt_stackframe *stackframe)

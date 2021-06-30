@@ -56,9 +56,9 @@ static inline struct pml_entry pml_clean_entry(void)
 
 static_assert(sizeof(struct pml_entry) == sizeof(uint64_t), "pml must be 64 bit");
 
-#define PMLX_GET_INDEX(addr, level) (((uint64_t)addr & ((uint64_t)0x1ff << (12 + level * 9))) >> (12 + level * 9))
+#define PMLX_GET_INDEX(ADDR, LEVEL) (((uint64_t)ADDR & ((uint64_t)0x1ff << (12 + LEVEL * 9))) >> (12 + LEVEL * 9))
 
-#define PML4_GET_INDEX(addr) PMLX_GET_INDEX(addr, 3)
-#define PML3_GET_INDEX(addr) PMLX_GET_INDEX(addr, 2)
-#define PML2_GET_INDEX(addr) PMLX_GET_INDEX(addr, 1)
-#define PML1_GET_INDEX(addr) PMLX_GET_INDEX(addr, 0)
+#define PML4_GET_INDEX(ADDR) PMLX_GET_INDEX(ADDR, 3)
+#define PML3_GET_INDEX(ADDR) PMLX_GET_INDEX(ADDR, 2)
+#define PML2_GET_INDEX(ADDR) PMLX_GET_INDEX(ADDR, 1)
+#define PML1_GET_INDEX(ADDR) PMLX_GET_INDEX(ADDR, 0)

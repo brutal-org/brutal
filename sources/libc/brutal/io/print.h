@@ -16,14 +16,14 @@ enum print_type
 
 struct print_value
 {
-    str_t name;
+    Str name;
     enum print_type type;
 
     union
     {
         long _signed;
         unsigned long _unsigned;
-        str_t _string;
+        Str _string;
         void *_pointer;
     };
 };
@@ -38,7 +38,7 @@ struct print_value print_val_signed(long);
 
 struct print_value print_val_unsigned(unsigned long);
 
-struct print_value print_val_string(str_t);
+struct print_value print_val_string(Str);
 
 struct print_value print_val_cstring(char *);
 
@@ -57,7 +57,7 @@ struct print_value print_val_pointer(void *);
         unsigned long: print_val_unsigned,    \
                                               \
         char*: print_val_cstring,             \
-        str_t: print_val_string,              \
+        Str: print_val_string,              \
         void*: print_val_pointer              \
     )(VALUE),
 
@@ -79,7 +79,7 @@ struct print_value print_val_pointer(void *);
 #define PRINT_ARGS(...) \
     PRINT_ARGS_##__VA_OPT__(N)(__VA_ARGS__)
 
-write_result_t print_impl(struct writer *writer, str_t format, struct print_args args);
+WriteResult print_impl(struct writer *writer, Str format, struct print_args args);
 
 #define print(writer, fmt, ...) \
     print_impl(writer, str_cast(fmt), PRINT_ARGS(__VA_ARGS__))

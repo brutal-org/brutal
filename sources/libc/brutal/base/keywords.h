@@ -1,8 +1,8 @@
 #pragma once
 
-typedef void *nullptr_t;
+typedef void *NullPtr;
 
-#define nullptr ((nullptr_t)0)
+#define nullptr ((NullPtr)0)
 
 #define auto __auto_type
 

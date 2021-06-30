@@ -1,15 +1,15 @@
 #include <brutal/ds/bitmap.h>
 #include <brutal/mem.h>
 
-void bitmap_init(struct bitmap *self, void *data, size_t size)
+void bitmap_init(Bitmap *self, void *data, size_t size)
 {
-    *self = (struct bitmap){
+    *self = (Bitmap){
         .data = data,
         .size = size,
     };
 }
 
-void bitmap_set_range(struct bitmap *bitmap, bitmap_range_t range, bool value)
+void bitmap_set_range(Bitmap *bitmap, BitmapRange range, bool value)
 {
     for (size_t i = 0; i < range.size; i++)
     {
@@ -17,7 +17,7 @@ void bitmap_set_range(struct bitmap *bitmap, bitmap_range_t range, bool value)
     }
 }
 
-void bitmap_fill(struct bitmap *bitmap, bool value)
+void bitmap_fill(Bitmap *bitmap, bool value)
 {
     if (value)
     {
@@ -29,7 +29,7 @@ void bitmap_fill(struct bitmap *bitmap, bool value)
     }
 }
 
-bitmap_range_t bitmap_find_range(struct bitmap const *bitmap, size_t start, size_t size, bool value)
+BitmapRange bitmap_find_range(Bitmap const *bitmap, size_t start, size_t size, bool value)
 {
     size_t range_start = 0;
     size_t range_size = 0;
@@ -53,9 +53,9 @@ bitmap_range_t bitmap_find_range(struct bitmap const *bitmap, size_t start, size
 
         if (size <= range_size)
         {
-            return (bitmap_range_t){range_start, range_size};
+            return (BitmapRange){range_start, range_size};
         }
     }
 
-    return (bitmap_range_t){};
+    return (BitmapRange){};
 }

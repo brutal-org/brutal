@@ -58,14 +58,14 @@ log("the answer to {} the {} and {} is... {}", "life", "universe", "everything",
 Type-generic containers:
 
 ```c
-typedef struct {int x; int y;} point_t;
-typedef vec_t(point_t) point_vec_t;
+typedef struct {int x; int y;} Point;
+typedef Vec(Point) PointVec;
 
-point_vec_t v;
+PointVec v;
 vec_init(&v);
-vec_push(&v, (point_t){16, 32});
+vec_push(&v, (Point){16, 32});
 
-point_t p;
+Point p;
 vec_pop(&v, &p);
 
 vec_deinit(&v);

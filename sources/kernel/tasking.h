@@ -26,7 +26,7 @@ enum task_flags
 // see scheduler.md in the book for more information
 struct task_schedule_state
 {
-    cpu_id_t cpu; // only valid if tick_in_cpu is >= 0
+    CpuId cpu; // only valid if tick_in_cpu is >= 0
     int tick_start;
     int tick_end;
     bool is_currently_executed;
@@ -40,8 +40,8 @@ struct stack
 
 struct task
 {
-    task_id_t id;
-    str_fix128_t name;
+    TaskId id;
+    StrFix128 name;
     enum task_flags flags;
     enum task_state state;
 
@@ -51,11 +51,11 @@ struct task
     struct stack kernel_stack;
 };
 
-typedef result_t(br_error_t, struct task *) task_return_result_t;
+typedef Result(BrError, struct task *) task_return_Result;
 
 struct task *task_self(void);
 
-task_return_result_t task_create(str_t name, enum task_flags flags);
+task_return_Result task_create(Str name, enum task_flags flags);
 
 void task_start(
     struct task *self,

@@ -1,6 +1,6 @@
 #include <brutal/io/scan.h>
 
-void scan_init(struct scan *self, str_t str)
+void scan_init(struct scan *self, Str str)
 {
     *self = (struct scan){
         .buffer = str.buffer,

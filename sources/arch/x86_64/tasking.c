@@ -23,20 +23,20 @@ void arch_task_load_context(struct task *target)
     simd_context_load(task->simd_context);
 }
 
-task_return_result_t arch_task_create(void)
+task_return_Result arch_task_create(void)
 {
     struct arch_task *task = alloc_make(alloc_global(), struct arch_task);
 
-    auto stack_allocation_result = TRY(task_return_result_t, heap_alloc(KERNEL_STACK_SIZE));
+    auto stack_allocation_result = TRY(task_return_Result, heap_alloc(KERNEL_STACK_SIZE));
 
     task->base.kernel_stack = range_cast(struct stack, stack_allocation_result);
     task->base.sp = task->base.kernel_stack.base + KERNEL_STACK_SIZE;
 
-    task->simd_context = (void *)(TRY(task_return_result_t, heap_alloc(simd_context_size())).base);
+    task->simd_context = (void *)(TRY(task_return_Result, heap_alloc(simd_context_size())).base);
 
     simd_context_init(task->simd_context);
 
-    return OK(task_return_result_t, (struct task *)task);
+    return OK(task_return_Result, (struct task *)task);
 }
 
 void arch_task_start(struct task *task, uintptr_t ip, uintptr_t arg1, uintptr_t arg2, uintptr_t arg3, uintptr_t arg4, uintptr_t arg5)
@@ -67,7 +67,7 @@ void arch_task_start(struct task *task, uintptr_t ip, uintptr_t arg1, uintptr_t 
     stackframe->rsp = task->sp;
 }
 
-void arch_task_switch_for_cpu(cpu_id_t cpu)
+void arch_task_switch_for_cpu(CpuId cpu)
 {
     apic_send_ipit(cpu, IPIT_RESCHED);
 }

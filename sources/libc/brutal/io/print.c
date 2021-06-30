@@ -17,7 +17,7 @@ struct print_value print_val_cstring(char *val)
     return (struct print_value){nullstr, PRINT_STRING, {._string = str_cast(val)}};
 }
 
-struct print_value print_val_string(str_t val)
+struct print_value print_val_string(Str val)
 {
     return (struct print_value){nullstr, PRINT_STRING, {._string = val}};
 }
@@ -27,7 +27,7 @@ struct print_value print_val_pointer(void *ptr)
     return (struct print_value){nullstr, PRINT_POINTER, {._pointer = ptr}};
 }
 
-write_result_t print_dispatch(struct writer *writer, struct fmt fmt, struct print_value value)
+WriteResult print_dispatch(struct writer *writer, struct fmt fmt, struct print_value value)
 {
     switch (value.type)
     {
@@ -44,10 +44,10 @@ write_result_t print_dispatch(struct writer *writer, struct fmt fmt, struct prin
         return fmt_unsigned(fmt, writer, (uintptr_t)value._pointer);
     }
 
-    return OK(write_result_t, 0);
+    return OK(WriteResult, 0);
 }
 
-write_result_t print_impl(struct writer *writer, str_t format, struct print_args args)
+WriteResult print_impl(struct writer *writer, Str format, struct print_args args)
 {
     size_t current = 0;
     size_t written = 0;
@@ -62,16 +62,16 @@ write_result_t print_impl(struct writer *writer, str_t format, struct print_args
             if (current < args.count)
             {
                 auto fmt = fmt_parse(&scan);
-                written += TRY(write_result_t, print_dispatch(writer, fmt, args.values[current]));
+                written += TRY(WriteResult, print_dispatch(writer, fmt, args.values[current]));
             }
 
             current++;
         }
         else
         {
-            written += TRY(write_result_t, io_put(writer, scan_next(&scan)));
+            written += TRY(WriteResult, io_put(writer, scan_next(&scan)));
         }
     }
 
-    return OK(write_result_t, written);
+    return OK(WriteResult, written);
 }
