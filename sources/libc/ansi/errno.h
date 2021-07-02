@@ -8,4 +8,4 @@
 
 #define ERANGE (4)
 
-int errno = (0);
+extern int errno = (0);
