@@ -1,6 +1,6 @@
 #pragma once
 
-/* ---7.2 Diagnostics <assert.h> ----------------------------------------------- */ 
+/* --- 7.2 Diagnostics <assert.h> ----------------------------------------------- */ 
 
 void assert_failled_impl();
 
