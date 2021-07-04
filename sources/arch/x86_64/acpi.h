@@ -44,7 +44,7 @@ enum acpi_madt_record_type
 struct PACKED acpi_madt_record
 {
     uint8_t type;
-    uint8_t lenght;
+    uint8_t len;
 };
 
 struct PACKED acpi_madt_lapic_record

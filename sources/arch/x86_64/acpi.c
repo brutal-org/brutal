@@ -34,7 +34,7 @@ struct acpi_madt_record *acpi_madt_record(
             return current;
         }
 
-        current = (struct acpi_madt_record *)(((uintptr_t)current) + current->lenght);
+        current = (struct acpi_madt_record *)(((uintptr_t)current) + current->len);
     }
 
     return nullptr;
@@ -53,7 +53,7 @@ struct acpi_madt_record_table acpi_madt_multiple_record(struct acpi_madt *madt, 
             result.count++;
         }
 
-        current = (struct acpi_madt_record *)(((uintptr_t)current) + current->lenght);
+        current = (struct acpi_madt_record *)(((uintptr_t)current) + current->len);
     }
 
     return result;
