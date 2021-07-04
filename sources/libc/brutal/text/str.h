@@ -18,12 +18,20 @@ static inline size_t cstr_len(char const *str)
     return size;
 }
 
+/* --- Inline String Buffer ------------------------------------------------- */
+
+typedef struct
+{
+    size_t len;
+    char buffer[];
+} InlineStr;
+
 /* --- Non Owning Strings --------------------------------------------------- */
 
 typedef struct
 {
-    char *buffer;
     size_t len;
+    char *buffer;
 } Str;
 
 #define nullstr str_cast("")
@@ -37,8 +45,8 @@ bool str_eq(Str lhs, Str rhs);
 #define StrFix(N)       \
     struct              \
     {                   \
-        char buffer[N]; \
         size_t len;     \
+        char buffer[N]; \
     }
 
 typedef StrFix(8) StrFix8;
@@ -50,32 +58,34 @@ typedef StrFix(128) StrFix128;
 /* --- Cast Between String Types -------------------------------------------- */
 
 static inline Str str_forward(Str str) { return str; }
-static inline Str str_make_from_cstr(char const *cstr) { return (Str){(char *)cstr, cstr_len(cstr)}; }
-static inline Str str_make_from_str_fix8(StrFix8 *str_fix) { return (Str){str_fix->buffer, str_fix->len}; }
-static inline Str str_make_from_str_fix16(StrFix16 *str_fix) { return (Str){str_fix->buffer, str_fix->len}; }
-static inline Str str_make_from_str_fix32(StrFix32 *str_fix) { return (Str){str_fix->buffer, str_fix->len}; }
-static inline Str str_make_from_str_fix64(StrFix64 *str_fix) { return (Str){str_fix->buffer, str_fix->len}; }
-static inline Str str_make_from_str_fix128(StrFix128 *str_fix) { return (Str){str_fix->buffer, str_fix->len}; }
+static inline Str str_make_from_inline_str(InlineStr *str) { return (Str){str->len, str->buffer}; }
+static inline Str str_make_from_cstr(char const *cstr) { return (Str){cstr_len(cstr), (char *)cstr}; }
+static inline Str str_make_from_str_fix8(StrFix8 *str_fix) { return (Str){str_fix->len, str_fix->buffer}; }
+static inline Str str_make_from_str_fix16(StrFix16 *str_fix) { return (Str){str_fix->len, str_fix->buffer}; }
+static inline Str str_make_from_str_fix32(StrFix32 *str_fix) { return (Str){str_fix->len, str_fix->buffer}; }
+static inline Str str_make_from_str_fix64(StrFix64 *str_fix) { return (Str){str_fix->len, str_fix->buffer}; }
+static inline Str str_make_from_str_fix128(StrFix128 *str_fix) { return (Str){str_fix->len, str_fix->buffer}; }
 
 // clang-format off
 
 // Create a new instance of a non owning string.
-#define str_cast(literal)                         \
-    _Generic((literal),                           \
+#define str_cast(literal)                       \
+    _Generic((literal),                         \
         Str         : str_forward,              \
-        char*         : str_make_from_cstr,       \
-        char const*   : str_make_from_cstr,       \
-        StrFix8*   : str_make_from_str_fix8,   \
-        StrFix16*  : str_make_from_str_fix16,  \
-        StrFix32*  : str_make_from_str_fix32,  \
-        StrFix64*  : str_make_from_str_fix64,  \
-        StrFix128* : str_make_from_str_fix128  \
+        InlineStr * : str_make_from_inline_str, \
+        char*       : str_make_from_cstr,       \
+        char const* : str_make_from_cstr,       \
+        StrFix8*    : str_make_from_str_fix8,   \
+        StrFix16*   : str_make_from_str_fix16,  \
+        StrFix32*   : str_make_from_str_fix32,  \
+        StrFix64*   : str_make_from_str_fix64,  \
+        StrFix128*  : str_make_from_str_fix128  \
     )(literal)
 
 // clang-format on
 
-#define str_cast_n(str, n) \
-    (Str) { str, n }
+#define str_cast_n(n, str) \
+    (Str) { n, str }
 
 // Create a new instance of a fix size string.
 #define str_cast_fix(T, str) (                                \
