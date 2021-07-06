@@ -1,29 +1,42 @@
-# **BRUTAL**
-
-[![Build, and Test](https://github.com/brutal-org/brutal/actions/workflows/main.yml/badge.svg)](https://github.com/brutal-org/brutal/actions/workflows/main.yml)
-[![GitHub issues](https://img.shields.io/github/issues/brutal-org/brutal)](https://github.com/brutal-org/brutal/issues)
-[![GitHub forks](https://img.shields.io/github/forks/brutal-org/brutal)](https://github.com/brutal-org/brutal/network)
-[![GitHub stars](https://img.shields.io/github/stars/brutal-org/brutal)](https://github.com/brutal-org/brutal/stargazers)
-[![GitHub license](https://img.shields.io/github/license/brutal-org/brutal)](https://github.com/brutal-org/brutal/blob/main/license)
-
+<h1><b>
+  <p align="center">
+      BRUTAL
+    <br/>
+      <a href="https://github.com/brutal-org/brutal/actions/workflows/main.yml"> 
+        <img src="https://github.com/brutal-org/brutal/actions/workflows/main.yml/badge.svg">
+      </a>
+      <a href="https://github.com/brutal-org/brutal/issues"> 
+        <img src="https://img.shields.io/github/issues/brutal-org/brutal">
+      </a>
+      <a href="https://github.com/brutal-org/brutal/network"> 
+        <img src="https://img.shields.io/github/forks/brutal-org/brutal">
+      </a>
+      <a href="https://github.com/brutal-org/brutal/stargazers"> 
+        <img src="https://img.shields.io/github/stars/brutal-org/brutal">
+      </a>
+      <a href="https://github.com/brutal-org/brutal/blob/main/license"> 
+        <img src="https://img.shields.io/github/license/brutal-org/brutal">
+      </a>
+  </p>
+</h1></b>
 <br/>
 <br/>
 <p align="center">
-<img width="256" src="meta/assets/logo.png">
+  <img width="256" src="meta/assets/logo.png">
 </p>
 <br/>
 <br/>
 <p align="center">
-Striking modernist shapes and bold use of modern C are the hallmarks of <b>BRUTAL</b>.<br>
-<b>BRUTAL</b> combines the desire of UNIX utopia from the 1970s with modern technology and engineering.
+  Striking modernist shapes and bold use of modern C are the hallmarks of <b>BRUTAL</b>.<br>
+  <b>BRUTAL</b> combines the desire of UNIX utopia from the 1970s with modern technology and engineering.
 </p>
 <br/>
 <br/>
 
 <p align="center">
-<img src="meta/screenshots/2021-06-20.png">
-<br>
-<b>BRUTAL</b> serial boot logs.
+  <img src="meta/screenshots/2021-06-20.png">
+  <br>
+  <b>BRUTAL</b> serial boot logs.
 </p>
 
 
