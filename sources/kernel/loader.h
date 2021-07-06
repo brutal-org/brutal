@@ -98,4 +98,4 @@ struct elf64_program_header
 };
 
 // the task is not started [!]
-task_return_result_t program_load(str_t name,void* data, size_t size);
+task_return_Result program_load(Str name,void* data, size_t size);

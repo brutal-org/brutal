@@ -15,7 +15,7 @@ $(SYSROOT): sources/sysroot/limine.cfg $(KERNEL_BIN)
 
 	cp sources/sysroot/limine.cfg                 $(SYSROOT)/limine.cfg
 	cp $(KERNEL_BIN)                              $(SYSROOT)/kernel.elf
-	cp -r $(BUILDDIR_CROSS)/apps/                    $(SYSROOT)/
+	cp -r $(BUILDDIR_CROSS)/apps                 $(SYSROOT)/
 	cp thirdparty/limine/limine.sys               $(SYSROOT)/limine.sys
 	cp thirdparty/limine/limine-cd.bin            $(SYSROOT)/limine-cd.bin
 	cp thirdparty/limine/limine-eltorito-efi.bin  $(SYSROOT)/limine-eltorito-efi.bin

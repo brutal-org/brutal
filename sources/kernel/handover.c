@@ -1,8 +1,9 @@
 #include <brutal/base.h>
 #include <brutal/log.h>
 #include <kernel/handover.h>
+#include "brutal/text/str.h"
 
-struct handover_module *kernel_find_module(struct handover *handover, str_t name)
+struct handover_module *kernel_find_module(struct handover *handover, Str name)
 {
     for (size_t i = 0; i < handover->modules.module_count; i++)
     {
