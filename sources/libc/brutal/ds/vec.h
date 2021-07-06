@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/alloc.h>
+#include <brutal/alloc/base.h>
 #include <brutal/base/macros.h>
 #include <brutal/mem.h>
 

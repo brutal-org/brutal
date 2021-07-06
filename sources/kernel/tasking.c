@@ -1,3 +1,4 @@
+#include <brutal/alloc.h>
 #include <brutal/ds.h>
 #include <brutal/log.h>
 #include <brutal/sync.h>
