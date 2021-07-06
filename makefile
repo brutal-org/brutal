@@ -47,6 +47,7 @@ include sources/kernel/.build.mk
 include sources/libc/.build.mk
 include sources/sysroot/.build.mk
 include sources/test/.build.mk
+include sources/apps/.build.mk
 
 all: $(TARGETS)
 
