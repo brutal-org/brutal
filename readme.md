@@ -33,7 +33,7 @@ Striking modernist shapes and bold use of modern C are the hallmarks of <b>BRUTA
 
 ## Build Instructions
 
-You can find instructions about building BRUTAL [here](book/01-04-build.md)
+You can find instructions about building BRUTAL [here](book/01-04-build.md).
 
 ## Roadmap
 
