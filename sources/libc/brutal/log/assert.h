@@ -1,7 +1,7 @@
 #pragma once
 
 #include <brutal/io/print.h>
-#include <brutal/log.h>
+#include <brutal/log/locked.h>
 
 #define assert_not_null(expr) (                  \
     {                                            \
@@ -60,7 +60,7 @@
         }                                                                                         \
     })
 
-#define assert_greater_equal(lhs_expr, rhs_expr) (                                                     \
+#define assert_greater_equal(lhs_expr, rhs_expr) (                                                          \
     {                                                                                                       \
         auto lhs_value = lhs_expr;                                                                          \
         auto rhs_value = rhs_expr;                                                                          \

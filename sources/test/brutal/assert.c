@@ -1,4 +1,3 @@
-#include <brutal/log/assert.h>
 #include "test/test.h"
 
 TEST(assert_not_null_pass)

@@ -32,3 +32,7 @@
     while (!(check))    \
     {                   \
     };
+
+#define member_size(T, MEMBER) sizeof(((T *)0)->MEMBER)
+
+#define member_type(T, MEMBER) typeof(((T *)0)->MEMBER)
