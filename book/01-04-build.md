@@ -2,7 +2,7 @@
 
 BRUTAL can be built by using either LLVM or GNU toolchains.
 
-In both cases you will need ``xorriso`` and ``make``. On Arch Linux this can be done by doing ``pacman -S xorriso make``
+In both cases you will need ``xorriso`` and ``make``. On Arch Linux this can be done by doing ``pacman -S xorriso make``.
 
 ## With LLVM
 
