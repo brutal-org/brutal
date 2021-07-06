@@ -8,7 +8,7 @@ In both cases you will need ``xorriso`` and ``make``. On Arch Linux this can be 
 
 Before trying to build BRUTAL with LLVM you need to install ``lld`` and ``clang-12``. On Arch Linux this can be done by doing ``pacman -S lld clang``.
 
-Build BRUTAL via the LLVM toolchain
+Build BRUTAL via the LLVM toolchain:
 
 ``make run CONFIG_TOOLCHAIN=llvm``
 
@@ -16,6 +16,6 @@ Build BRUTAL via the LLVM toolchain
 
 In order to build BRUTAL with the GNU toolchain you will need to build the x86_64-elf binutils. This can be done by running the script in ``meta/toolchain/gnu/build.sh``.
 
-After building the binutils you can build BRUTAL by running
+After building the binutils you can build BRUTAL by running:
 
 ``make run CONFIG_TOOLCHAIN=gnu``
