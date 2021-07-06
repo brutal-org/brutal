@@ -44,6 +44,10 @@
 
 **BRUTAL** is a micro-kernel base operating system targeting the x86_64 architecture. ARM and Risc-V support is planned.
 
+## Build Instructions
+
+You can find instructions about building BRUTAL [here](book/01-04-build.md).
+
 ## Roadmap
 
 Right now the main goal of brutal is to run doom.
