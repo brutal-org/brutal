@@ -9,10 +9,10 @@ APP_SRC =\
 
 APP_LIB_SRC = 
 
-APP_TARGETS += MODULE_TEST_BIN
+TARGETS += $(MODULE_TEST_BIN)
 
 APP_OBJ= \
-	$(patsubst sources%.c, $(BUILDDIR_CROSS)/%.c.o, $(APP_SRC)) \
+	$(patsubst sources/%.c, $(BUILDDIR_CROSS)/%.c.o, $(APP_SRC)) \
 	$(patsubst sources/%.c, $(BUILDDIR_CROSS)/apps/module_test/%.c.o, $(APP_LIB_SRC)) \
 
 $(BUILDDIR_CROSS)/apps/module_test/%.c.o: $(APP_PATH)/%.c
