@@ -1,3 +1,7 @@
 -std=gnu2x
 -Isources/
+-Isources/libc/ansi
+-Isources/libc/posix
+-Isources/lic/gnu
+-Isources/lic/bsd
 -Isources/libc
