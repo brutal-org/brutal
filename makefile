@@ -36,16 +36,15 @@ CROSS_CFLAGS_INC ?= \
 BUILDDIR=build/$(CONFIG_ARCH)-$(CONFIG_TOOLCHAIN)
 BUILDDIR_HOST=$(BUILDDIR)/host
 BUILDDIR_CROSS=$(BUILDDIR)/cross
-APP_TARGETS=
 MKCWD=mkdir -p $(@D)
 
 include meta/config/default.mk
 include meta/toolchain/$(CONFIG_TOOLCHAIN)/.build.mk
 
-include sources/apps/.build.mk
 include sources/arch/.build.mk
 include sources/kernel/.build.mk
 include sources/libc/.build.mk
+include sources/apps/.build.mk
 include sources/sysroot/.build.mk
 include sources/test/.build.mk
 
@@ -55,7 +54,7 @@ run: $(SYSROOT_ISO)
 	qemu-system-x86_64 \
 		-M q35 \
 		-cpu host \
-		-smp 4 \
+		-smp 12 \
 		-m 256M \
 		-enable-kvm \
 		-serial mon:stdio \
