@@ -4,6 +4,19 @@
 #include <brutal/gfx/surface.h>
 #include <brutal/io/write.h>
 
+// using http://tfc.duke.free.fr/coding/tga_specs.pdf
+
+#define TGA_IMGDESC_ORIGIN_BITS 0b00110000
+#define TGA_IMGDESC_ALPHA_BITS 0b00001111
+
+enum tga_image_origin
+{
+    TGA_BOTTOM_LEFT = 0b00000000,
+    TGA_BOTTOM_RIGHT = 0b00010000,
+    TGA_TOP_LEFT = 0b00100000,
+    TGA_TOP_RIGHT = 0b00110000,
+};
+
 typedef struct
 {
     le_int8_t id_length;
