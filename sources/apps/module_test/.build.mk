@@ -1,13 +1,12 @@
 APP_NAME := module_test 
 APP_PATH := sources/apps/module_test
 
-MODULE_TEST_BIN := $(BUILDDIR_CROSS)/apps/module_test.elf
+MODULE_TEST_BIN = $(BUILDDIR_CROSS)/apps/module_test.elf
 
 APP_SRC =\
 	$(wildcard $(APP_PATH)/*.c) \
 	$(wildcard $(APP_PATH)/*/*.c)
 
-APP_LIB_SRC = 
 
 TARGETS += $(MODULE_TEST_BIN)
 
