@@ -1,6 +1,6 @@
+#include <brutal/host/time.h>
 #include <brutal/time/convert.h>
 #include <brutal/time/query.h>
-#include <host/time.h>
 
 Tick tick_now(void)
 {

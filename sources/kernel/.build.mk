@@ -9,7 +9,7 @@ KERNEL_LIBC_SRC = \
 			  $(wildcard sources/libc/brutal/ds/*.c) \
 			  $(wildcard sources/libc/brutal/log/*.c) \
 			  $(wildcard sources/libc/ansi/string.c) \
-			  $(wildcard sources/host/kernel/*.c) \
+			  $(wildcard sources/libc/brutal/host/kernel/*.c) \
 			  $(wildcard sources/libc/brutal/alloc/*.c)
 
 KERNEL_OBJ= \
@@ -31,10 +31,6 @@ $(BUILDDIR_CROSS)/kernel/libc/brutal/%.c.o: sources/libc/brutal/%.c
 	$(CROSS_CC) -c -o $@ $< $(CROSS_KCFLAGS)
 
 $(BUILDDIR_CROSS)/kernel/libc/%.c.o: sources/libc/%.c
-	$(MKCWD)
-	$(CROSS_CC) -c -o $@ $< $(CROSS_KCFLAGS)
-
-$(BUILDDIR_CROSS)/kernel/host/%.c.o: sources/host/%.c
 	$(MKCWD)
 	$(CROSS_CC) -c -o $@ $< $(CROSS_KCFLAGS)
 

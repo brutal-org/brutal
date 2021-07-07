@@ -1,6 +1,6 @@
 #include <brutal/alloc/heap.h>
+#include <brutal/host/mem.h>
 #include <brutal/log.h>
-#include <host/mem.h>
 
 #define ALLOC_GLOBAL_MAGIC 0xc001c0de
 #define ALLOC_GLOBAL_DEAD 0xdeaddead

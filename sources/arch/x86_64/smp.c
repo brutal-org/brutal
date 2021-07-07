@@ -1,3 +1,4 @@
+#include <brutal/host/mem.h>
 #include <brutal/log.h>
 #include <brutal/mem.h>
 #include "arch/arch.h"
@@ -11,7 +12,6 @@
 #include "arch/x86_64/memory/mmap.h"
 #include "arch/x86_64/pit.h"
 #include "arch/x86_64/smp.h"
-#include "host/mem.h"
 #include "kernel/constants.h"
 
 typedef Result(BrError, uint8_t) smp_init_result;

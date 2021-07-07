@@ -1,6 +1,6 @@
+#include <brutal/host/mem.h>
 #include <brutal/log.h>
 #include <brutal/sync.h>
-#include <host/mem.h>
 #include "arch/heap.h"
 
 static Lock mem_lock;

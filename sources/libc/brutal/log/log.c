@@ -1,5 +1,5 @@
+#include <brutal/host/log.h>
 #include <brutal/log.h>
-#include <host/log.h>
 
 static Str log_color(enum log_level level)
 {

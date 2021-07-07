@@ -1,5 +1,5 @@
 #include <brutal/base.h>
-#include <host/log.h>
+#include <brutal/host/log.h>
 #include <stdlib.h>
 #include <unistd.h>
 

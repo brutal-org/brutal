@@ -2,7 +2,7 @@ TEST_SRC=$(wildcard sources/test/*.c) \
 		 $(wildcard sources/test/*/*.c) \
 		 $(wildcard sources/libc/brutal/*.c) \
 		 $(wildcard sources/libc/brutal/*/*.c) \
-		 $(wildcard sources/host/linux/*.c)
+		 $(wildcard sources/libc/brutal/host/linux/*.c)
 
 TEST_OBJ=$(patsubst sources/%.c, $(BUILDDIR_HOST)/%.c.o, $(TEST_SRC))
 TEST_BIN=$(BUILDDIR_HOST)/test.elf

@@ -17,7 +17,7 @@ struct writer
 };
 
 #define io_write(writer, data, size) \
-    ((writer)->write((writer), (data), (size)))
+    ((writer)->write((writer), (char const *)(data), (size)))
 
 WriteResult io_put(struct writer *writer, char c);
 

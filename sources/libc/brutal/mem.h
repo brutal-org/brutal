@@ -1,7 +1,7 @@
 #pragma once
 
 #include <brutal/base/std.h>
-#include <host/mem.h>
+#include <brutal/host/mem.h>
 
 void *mem_cpy(void *s1, void const *s2, size_t n);
 void *mem_set(void *str, uint8_t c, size_t n);

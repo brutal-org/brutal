@@ -41,7 +41,7 @@ run: $(SYSROOT_ISO)
 	qemu-system-x86_64 \
 		-M q35 \
 		-cpu host \
-		-smp $(shell nproc) \
+		-smp 4 \
 		-m 256M \
 		-enable-kvm \
 		-serial mon:stdio \

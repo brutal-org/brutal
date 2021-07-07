@@ -1,5 +1,5 @@
+#include <brutal/host/log.h>
 #include <brutal/sync.h>
-#include <host/log.h>
 #include "arch/arch.h"
 
 static Lock logger_lock;

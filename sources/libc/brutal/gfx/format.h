@@ -12,19 +12,19 @@ typedef enum
     GFX_PIXEL_FORMAT_RGBA8888,
 } GfxPixelFormat;
 
-typedef PACKED struct
+typedef struct PACKED
 {
     uint8_t v;
 } GfxPixelGrayScale8;
 
-typedef PACKED struct
+typedef struct PACKED
 {
     uint8_t r;
     uint8_t g;
     uint8_t b;
 } GfxPixelRGB888;
 
-typedef PACKED struct
+typedef struct PACKED
 {
     uint8_t r;
     uint8_t g;
@@ -37,24 +37,30 @@ static inline void gfx_pixel_store(GfxColor color, void *dst, GfxPixelFormat for
     switch (format)
     {
     case GFX_PIXEL_FORMAT_GRAYSCALE_8:
+    {
         auto p = (GfxPixelGrayScale8 *)dst;
         p->v = 0.299 * color.r + 0.587 * color.g + 0.114 * color.b;
-        break;
+    }
+    break;
 
     case GFX_PIXEL_FORMAT_RGB888:
+    {
         auto p = (GfxPixelRGB888 *)dst;
         p->r = color.r;
         p->g = color.g;
         p->b = color.b;
-        break;
+    }
+    break;
 
     case GFX_PIXEL_FORMAT_RGBA8888:
+    {
         auto p = (GfxPixelRGBA8888 *)dst;
         p->r = color.r;
         p->g = color.g;
         p->b = color.b;
         p->a = color.a;
-        break;
+    }
+    break;
 
     default:
         assert_unreachable();
@@ -66,16 +72,22 @@ static inline GfxColor gfx_pixel_load(const void *src, GfxPixelFormat format)
     switch (format)
     {
     case GFX_PIXEL_FORMAT_GRAYSCALE_8:
-        auto p = *(const GfxPixelGrayScale8 *)src;
+    {
+        auto p = *((const GfxPixelGrayScale8 *)src);
         return (GfxColor){p.v, p.v, p.v, 0};
+    }
 
     case GFX_PIXEL_FORMAT_RGB888:
-        auto p = *(const GfxPixelRGB888 *)src;
+    {
+        auto p = *((const GfxPixelRGB888 *)src);
         return (GfxColor){p.r, p.g, p.b, 0};
+    }
 
     case GFX_PIXEL_FORMAT_RGBA8888:
-        auto p = *(const GfxPixelRGBA8888 *)src;
+    {
+        auto p = *((const GfxPixelRGBA8888 *)src);
         return (GfxColor){p.r, p.g, p.b, p.a};
+    }
 
     default:
         assert_unreachable();

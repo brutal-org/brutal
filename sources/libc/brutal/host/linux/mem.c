@@ -1,5 +1,5 @@
 #include <brutal/base.h>
-#include <host/mem.h>
+#include <brutal/host/mem.h>
 #include <sys/mman.h>
 
 void host_mem_lock(void)
