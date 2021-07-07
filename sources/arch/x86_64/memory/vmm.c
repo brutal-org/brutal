@@ -226,7 +226,7 @@ pmm_Result vmm_virt2phys(vmm_space_t space, VmmRange virtual_range)
     struct pml *pml1 = (struct pml *)(pml1_range.base);
 
     auto entry = pml1->entries[PML1_GET_INDEX(virtual_range.base)];
-    PmmRange range = {entry.physical << 12, 4096};
+    PmmRange range = {entry.physical << 12, virtual_range.size};
 
     return OK(pmm_Result, range);
 }
