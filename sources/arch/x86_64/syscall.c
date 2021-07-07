@@ -31,7 +31,7 @@ syscall_initialize_Result syscall_initialize(void)
                         ((uint64_t)(((GDT_USER_DATA - 1) * 8) | GDT_RING_3) << STAR_UCODE_OFFSET));
 
     wrmsr(MSR_LSTAR, (uint64_t)syscall_handle);
-    wrmsr(MSR_SYSCALL_FLAG_MASK, SYSCALL_FLAG_TURN_OFF_INTERRUPT);
+    wrmsr(MSR_SYSCALL_FLAG_MASK, 0);
 
     todo("cpu -> temporary stack should be in the process [!]");
 
