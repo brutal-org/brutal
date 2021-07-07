@@ -2,7 +2,6 @@
 
 /* --- 7.4 Character - handling ----------------------------------------------- */
 
-
 /* --- 7.4.1 Character classification - Copying functions ------------------------------------------- */
 
 int isalnum(int c);

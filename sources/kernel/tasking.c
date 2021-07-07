@@ -26,9 +26,9 @@ struct task *task_self(void)
     return cpu_self()->schedule.current;
 }
 
-void task_map_stack(struct task* task)
+void task_map_stack(struct task *task)
 {
-    const uintptr_t stack_physical_base = UNWRAP(vmm_virt2phys( vmm_kernel_space(), (VmmRange){task->kernel_stack.base, task->kernel_stack.size})).base;
+    const uintptr_t stack_physical_base = UNWRAP(vmm_virt2phys(vmm_kernel_space(), (VmmRange){task->kernel_stack.base, task->kernel_stack.size})).base;
 
     vmm_map(task->virtual_memory_space,
             (VmmRange){task->kernel_stack.base, task->kernel_stack.size},
@@ -54,7 +54,7 @@ task_return_Result task_create(Str name, enum task_flags flags)
 
     vec_push(&tasks, task);
 
-    if(flags & TASK_USER)
+    if (flags & TASK_USER)
     {
         task_map_stack(task);
     }

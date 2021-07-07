@@ -24,9 +24,9 @@ void arch_task_load_context(struct task *target)
     vmm_space_switch(target->virtual_memory_space);
 }
 
-void arch_task_create_vmm(struct task* target, bool user)
+void arch_task_create_vmm(struct task *target, bool user)
 {
-    if(user)
+    if (user)
     {
         target->virtual_memory_space = vmm_space_create();
     }
