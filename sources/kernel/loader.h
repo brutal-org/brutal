@@ -36,6 +36,7 @@ enum elf_program_header_types
     ELF_PROGRAM_HEADER_LOAD = 1,
     ELF_PROGRAM_HEADER_DYNAMIC = 2,
     ELF_PROGRAM_HEADER_INTERPRET = 3,
+    ELF_PROGRAM_HEADER_NOTE = 4,
 };
 
 enum elf_program_header_flags
@@ -84,7 +85,7 @@ struct elf64_header
 
 struct elf64_program_header
 {
-    uint32_t type; // elf_program_header_types
+    uint32_t type;  // elf_program_header_types
     uint32_t flags; // elf_program_header_flags
 
     uint64_t file_offset;
@@ -98,4 +99,4 @@ struct elf64_program_header
 };
 
 // the task is not started [!]
-task_return_Result program_load(Str name,void* data, size_t size);
+task_return_Result program_load(Str name, void *data, size_t size, uintptr_t *start_addr);
