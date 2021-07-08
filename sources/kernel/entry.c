@@ -39,6 +39,7 @@ void kernel_entry_main(MAYBE_UNUSED struct handover *handover)
     kernel_splash();
 
     tasking_initialize();
+
     log("Main CPU is entering kernel...");
 
     for (size_t i = 0; i < 20; i++)
