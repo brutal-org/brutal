@@ -4,14 +4,14 @@
 #include <brutal/base/std.h>
 #include <brutal/mem.h>
 
-struct alloc;
+typedef struct alloc Alloc;
 
-void alloc_no_op(struct alloc *self, void *ptr);
+void alloc_no_op(Alloc *self, void *ptr);
 
-typedef void *alloc_acquire_t(struct alloc *self, size_t size);
-typedef void alloc_commit_t(struct alloc *self, void *ptr);
-typedef void alloc_decommit_t(struct alloc *self, void *ptr);
-typedef void alloc_release_t(struct alloc *self, void *ptr);
+typedef void *alloc_acquire_t(Alloc *self, size_t size);
+typedef void alloc_commit_t(Alloc *self, void *ptr);
+typedef void alloc_decommit_t(Alloc *self, void *ptr);
+typedef void alloc_release_t(Alloc *self, void *ptr);
 
 struct alloc
 {

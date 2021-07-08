@@ -9,7 +9,7 @@
 #include <brutal/ds/vec.h>
 #include <brutal/mem.h>
 
-void vec_init_impl(VecImpl *impl, int data_size, struct alloc *alloc)
+void vec_init_impl(VecImpl *impl, int data_size, Alloc *alloc)
 {
     *impl = (VecImpl){
         .data_size = data_size,

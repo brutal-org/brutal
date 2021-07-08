@@ -9,7 +9,7 @@ typedef struct
     void *data;
     bool *used;
 
-    struct alloc *alloc;
+    Alloc *alloc;
     int data_size;
     int capacity;
 } SlotImpl;
@@ -21,7 +21,7 @@ typedef struct
         SlotImpl _impl; \
     }
 
-void slot_init_impl(SlotImpl *impl, int data_size, struct alloc *alloc);
+void slot_init_impl(SlotImpl *impl, int data_size, Alloc *alloc);
 
 void slot_deinit_impl(SlotImpl *impl);
 

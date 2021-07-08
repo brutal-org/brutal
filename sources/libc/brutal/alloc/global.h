@@ -2,4 +2,4 @@
 
 #include <brutal/alloc/base.h>
 
-struct alloc *alloc_global(void);
+Alloc *alloc_global(void);

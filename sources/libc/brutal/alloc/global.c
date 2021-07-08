@@ -1,7 +1,7 @@
 #include <brutal/alloc/heap.h>
 #include <brutal/host/mem.h>
 
-static struct alloc *heap(void)
+static Alloc *heap(void)
 {
     static bool initialized = false;
     static struct alloc_heap memory;
@@ -11,10 +11,10 @@ static struct alloc *heap(void)
         alloc_heap_init(&memory);
     }
 
-    return (struct alloc *)&memory;
+    return (Alloc *)&memory;
 }
 
-void *alloc_global_acquire(MAYBE_UNUSED struct alloc *alloc, size_t size)
+void *alloc_global_acquire(MAYBE_UNUSED Alloc *alloc, size_t size)
 {
     host_mem_lock();
     void *result = alloc_acquire(heap(), size);
@@ -23,21 +23,21 @@ void *alloc_global_acquire(MAYBE_UNUSED struct alloc *alloc, size_t size)
     return result;
 }
 
-void alloc_global_release(MAYBE_UNUSED struct alloc *alloc, void *ptr)
+void alloc_global_release(MAYBE_UNUSED Alloc *alloc, void *ptr)
 {
     host_mem_lock();
     alloc_release(heap(), ptr);
     host_mem_unlock();
 }
 
-struct alloc *alloc_global(void)
+Alloc *alloc_global(void)
 {
-    static struct alloc memory = {
+    static Alloc memory = {
         .acquire = alloc_global_acquire,
         .commit = alloc_no_op,
         .decommit = alloc_no_op,
         .release = alloc_global_release,
     };
 
-    return (struct alloc *)&memory;
+    return (Alloc *)&memory;
 }

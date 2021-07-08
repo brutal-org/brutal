@@ -14,7 +14,7 @@ typedef struct
     LinearBufferNodeImpl *tail;
 
     size_t allocated;
-    struct alloc *alloc;
+    Alloc *alloc;
 } LinearBufferImpl;
 
 #define LinearBufferNode(T)         \
@@ -39,7 +39,7 @@ typedef struct
         LinearBufferImpl _impl;         \
     }
 
-void linear_buffer_init_impl(LinearBufferImpl *impl, struct alloc *alloc);
+void linear_buffer_init_impl(LinearBufferImpl *impl, Alloc *alloc);
 
 void linear_buffer_deinit_impl(LinearBufferImpl *impl);
 

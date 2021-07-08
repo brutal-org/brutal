@@ -9,7 +9,7 @@ typedef struct
     char *data;
     int length;
 
-    struct alloc *alloc;
+    Alloc *alloc;
     int data_size;
     int capacity;
 } VecImpl;
@@ -25,7 +25,7 @@ typedef struct
         VecImpl _impl;  \
     }
 
-void vec_init_impl(VecImpl *impl, int data_size, struct alloc *alloc);
+void vec_init_impl(VecImpl *impl, int data_size, Alloc *alloc);
 
 void vec_deinit_impl(VecImpl *impl);
 

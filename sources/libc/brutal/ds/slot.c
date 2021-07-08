@@ -26,7 +26,7 @@ void slot_capacity_impl(SlotImpl *impl, int new_capacity)
     impl->capacity = new_capacity;
 }
 
-void slot_init_impl(SlotImpl *impl, int data_size, struct alloc *alloc)
+void slot_init_impl(SlotImpl *impl, int data_size, Alloc *alloc)
 {
     *impl = (SlotImpl){};
 
