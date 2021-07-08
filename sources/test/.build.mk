@@ -1,5 +1,6 @@
 TEST_SRC=$(wildcard sources/test/*.c) \
 		 $(wildcard sources/test/*/*.c) \
+		 $(wildcard sources/test/*/*/*.c) \
 		 $(wildcard sources/libc/brutal/*.c) \
 		 $(wildcard sources/libc/brutal/*/*.c) \
 		 $(wildcard sources/libc/brutal/host/linux/*.c)
