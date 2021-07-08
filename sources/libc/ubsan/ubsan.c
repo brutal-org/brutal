@@ -85,7 +85,7 @@ static void ubsan_print_location(char *message, struct ubsan_source_location loc
 void __ubsan_handle_add_overflow(struct ubsan_overflow_data *data)
 {
     ubsan_print_location("addition overflow", data->location);
-};
+}
 
 void __ubsan_handle_sub_overflow(struct ubsan_overflow_data *data)
 {
