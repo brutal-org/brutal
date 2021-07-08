@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/math/Vec2.h>
+#include <brutal/math/vec2.h>
 
 #define Edge(T)  \
     struct       \
