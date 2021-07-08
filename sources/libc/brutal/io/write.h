@@ -5,16 +5,16 @@
 #include <brutal/base/std.h>
 #include <brutal/text/str.h>
 
-struct writer;
+typedef struct io_writer IoWriter;
 
 typedef Result(Error, size_t) IoWriteResult;
 
-typedef IoWriteResult Write(struct writer *writer, char const *data, size_t size);
+typedef IoWriteResult IoWrite(IoWriter *writer, char const *data, size_t size);
 
-typedef struct writer
+struct io_writer
 {
-    Write *write;
-} IoWriter;
+    IoWrite *write;
+};
 
 #define io_write(writer, data, size) \
     ((writer)->write((writer), (char const *)(data), (size)))

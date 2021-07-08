@@ -4,16 +4,16 @@
 #include <brutal/base/result.h>
 #include <brutal/base/std.h>
 
-struct reader;
+typedef struct io_reader IoReader;
 
 typedef Result(Error, size_t) IoReadResult;
 
-typedef IoReadResult IORead(struct reader *reader, void *data, size_t size);
+typedef IoReadResult IoRead(IoReader *reader, char *data, size_t size);
 
-typedef struct reader
+struct io_reader
 {
-    IORead *read;
-} IOReader;
+    IoRead *read;
+};
 
 #define io_read(reader, data, size) \
     ((reader)->read((reader), (data), (size));
