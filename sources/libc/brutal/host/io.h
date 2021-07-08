@@ -10,6 +10,8 @@
 #    include <brutal/host/linux/io.h>
 #elif defined(__brutal__)
 #    include <brutal/host/brutal/io.h>
+#elif defined(__kernel__)
+#    include <brutal/host/kernel/io.h>
 #else
 #    error "Unsupported platform!"
 #endif

@@ -3,7 +3,10 @@ KERNEL_C_SRC+=$(wildcard sources/kernel/*.c) \
 
 KERNEL_LIBC_SRC = \
 			  $(wildcard sources/libc/ubsan/*.c) \
-			  $(wildcard sources/libc/brutal/io/*.c) \
+			  $(wildcard sources/libc/brutal/io/fmt.c) \
+			  $(wildcard sources/libc/brutal/io/print.c) \
+			  $(wildcard sources/libc/brutal/io/scan.c) \
+			  $(wildcard sources/libc/brutal/io/write.c) \
 			  $(wildcard sources/libc/brutal/mem/*.c) \
 			  $(wildcard sources/libc/brutal/text/*.c) \
 			  $(wildcard sources/libc/brutal/sync/*.c) \

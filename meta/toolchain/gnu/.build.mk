@@ -40,7 +40,8 @@ CROSS_KCFLAGS= \
 	-mno-sse \
 	-mno-sse2 \
 	-mno-red-zone \
-	-mcmodel=kernel
+	-mcmodel=kernel \
+	-D__kernel__=1
 
 CROSS_LD=$(CONFIG_ARCH)-elf-ld
 CROSS_KLDFLAGS= \
