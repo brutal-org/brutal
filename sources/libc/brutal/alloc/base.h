@@ -35,14 +35,6 @@ struct alloc
         ptr;                                     \
     })
 
-#define alloc_calloc(SELF, SIZE, COUNT) (              \
-    {                                                  \
-        void *ptr = alloc_acquire(SELF, SIZE * COUNT); \
-        alloc_commit(SELF, ptr);                       \
-        mem_set(ptr, 0, SIZE *COUNT);                  \
-        ptr;                                           \
-    })
-
 #define alloc_make_array(SELF, T, COUNT) \
     ((T *)alloc_calloc(SELF, sizeof(T), COUNT))
 
@@ -51,3 +43,24 @@ struct alloc
 
 #define alloc_release(SELF, PTR) \
     ((SELF)->commit((SELF), PTR))
+
+#define alloc_malloc(SELF, SIZE) (             \
+    {                                          \
+        void *ptr = alloc_acquire(SELF, SIZE); \
+        alloc_commit(SELF, ptr);               \
+        ptr;                                   \
+    })
+
+#define alloc_free(SELF, PTR) (    \
+    {                              \
+        alloc_decommit(SELF, PTR); \
+        alloc_release(SELF, PTR);  \
+    })
+
+#define alloc_calloc(SELF, SIZE, COUNT) (              \
+    {                                                  \
+        void *ptr = alloc_acquire(SELF, SIZE * COUNT); \
+        alloc_commit(SELF, ptr);                       \
+        mem_set(ptr, 0, SIZE *COUNT);                  \
+        ptr;                                           \
+    })
