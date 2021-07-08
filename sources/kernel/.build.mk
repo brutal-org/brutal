@@ -12,6 +12,7 @@ KERNEL_LIBC_SRC = \
 			  $(wildcard sources/libc/brutal/sync/*.c) \
 			  $(wildcard sources/libc/brutal/ds/*.c) \
 			  $(wildcard sources/libc/brutal/log/*.c) \
+			  $(wildcard sources/libc/elf/*.c) \
 			  $(wildcard sources/libc/ansi/string.c) \
 			  $(wildcard sources/libc/brutal/host/kernel/*.c) \
 			  $(wildcard sources/libc/brutal/alloc/*.c)
