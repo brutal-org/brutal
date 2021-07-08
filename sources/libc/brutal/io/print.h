@@ -79,7 +79,7 @@ struct print_value print_val_pointer(void *);
 #define PRINT_ARGS(...) \
     PRINT_ARGS_##__VA_OPT__(N)(__VA_ARGS__)
 
-WriteResult print_impl(struct writer *writer, Str format, struct print_args args);
+IoWriteResult print_impl(IoWriter *writer, Str format, struct print_args args);
 
 #define print(writer, fmt, ...) \
     print_impl(writer, str_cast(fmt), PRINT_ARGS(__VA_ARGS__))

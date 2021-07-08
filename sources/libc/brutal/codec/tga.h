@@ -35,4 +35,4 @@ typedef struct
     le_int8_t image_descriptor;
 } TgaHeader;
 
-WriteResult tga_encode(struct writer *writer, GfxSurface *surface);
+IoWriteResult tga_encode(IoWriter *writer, GfxSurface *surface);

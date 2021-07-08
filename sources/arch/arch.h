@@ -3,7 +3,7 @@
 #include <brutal/io.h>
 #include "kernel/handover.h"
 
-struct writer *arch_debug(void);
+IoWriter *arch_debug(void);
 
 void arch_entry_main(struct handover *handover);
 

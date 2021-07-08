@@ -1,7 +1,7 @@
 #include <brutal/codec/tga.h>
 #include "brutal/base/endian.h"
 
-WriteResult tga_encode(struct writer *writer, GfxSurface *surface)
+IoWriteResult tga_encode(IoWriter *writer, GfxSurface *surface)
 {
     TgaHeader header = (TgaHeader){
         .data_type_code = le_cast(le_int8_t, TGA_DATATYPE_UNCOMPRESSED_RGB),
@@ -18,8 +18,8 @@ WriteResult tga_encode(struct writer *writer, GfxSurface *surface)
 
     size_t written = 0;
 
-    written = TRY(WriteResult, io_write(writer, &header, sizeof(TgaHeader)));
-    written += TRY(WriteResult, io_write(writer, surface->buffer, surface->size));
+    written = TRY(IoWriteResult, io_write(writer, &header, sizeof(TgaHeader)));
+    written += TRY(IoWriteResult, io_write(writer, surface->buffer, surface->size));
 
-    return OK(WriteResult, written);
+    return OK(IoWriteResult, written);
 }

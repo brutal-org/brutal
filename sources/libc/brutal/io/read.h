@@ -6,14 +6,14 @@
 
 struct reader;
 
-typedef Result(Error, size_t) ReadResult;
+typedef Result(Error, size_t) IoReadResult;
 
-typedef ReadResult Read(struct reader *reader, void *data, size_t size);
+typedef IoReadResult IORead(struct reader *reader, void *data, size_t size);
 
-struct reader
+typedef struct reader
 {
-    Read *read;
-};
+    IORead *read;
+} IOReader;
 
 #define io_read(reader, data, size) \
     ((reader)->read((reader), (data), (size));

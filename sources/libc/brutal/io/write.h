@@ -7,18 +7,18 @@
 
 struct writer;
 
-typedef Result(Error, size_t) WriteResult;
+typedef Result(Error, size_t) IoWriteResult;
 
-typedef WriteResult Write(struct writer *writer, char const *data, size_t size);
+typedef IoWriteResult Write(struct writer *writer, char const *data, size_t size);
 
-struct writer
+typedef struct writer
 {
     Write *write;
-};
+} IoWriter;
 
 #define io_write(writer, data, size) \
     ((writer)->write((writer), (char const *)(data), (size)))
 
-WriteResult io_put(struct writer *writer, char c);
+IoWriteResult io_put(IoWriter *writer, char c);
 
-WriteResult print(struct writer *writer, Str str);
+IoWriteResult io_print(IoWriter *writer, Str str);

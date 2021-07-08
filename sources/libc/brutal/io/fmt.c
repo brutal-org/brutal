@@ -132,22 +132,22 @@ size_t fmt_write_length(struct fmt self, unsigned long value)
     return length;
 }
 
-WriteResult fmt_signed(struct fmt self, struct writer *writer, long value)
+IoWriteResult fmt_signed(struct fmt self, IoWriter *writer, long value)
 {
     size_t written = 0;
 
     if (value < 0)
     {
-        written += TRY(WriteResult, io_put(writer, '-'));
+        written += TRY(IoWriteResult, io_put(writer, '-'));
         value *= -1;
     }
 
-    written += TRY(WriteResult, fmt_unsigned(self, writer, value));
+    written += TRY(IoWriteResult, fmt_unsigned(self, writer, value));
 
-    return OK(WriteResult, written);
+    return OK(IoWriteResult, written);
 }
 
-WriteResult fmt_unsigned(struct fmt self, struct writer *writer, unsigned long value)
+IoWriteResult fmt_unsigned(struct fmt self, IoWriter *writer, unsigned long value)
 {
 
     char buffer[64] = {};
@@ -195,7 +195,7 @@ WriteResult fmt_unsigned(struct fmt self, struct writer *writer, unsigned long v
     return io_write(writer, buffer, i);
 }
 
-WriteResult fmt_string(MAYBE_UNUSED struct fmt self, struct writer *writer, Str value)
+IoWriteResult fmt_string(MAYBE_UNUSED struct fmt self, IoWriter *writer, Str value)
 {
-    return print(writer, value);
+    return io_print(writer, value);
 }

@@ -4,7 +4,7 @@
 #include <unistd.h>
 
 static bool log_initialized = false;
-static struct writer log;
+static IoWriter log;
 
 void host_log_lock(void)
 {
@@ -16,13 +16,13 @@ void host_log_unlock(void)
     // FIXME: no-op
 }
 
-static WriteResult host_log_write(MAYBE_UNUSED struct writer *writer, char const *data, size_t size)
+static IoWriteResult host_log_write(MAYBE_UNUSED IoWriter *writer, char const *data, size_t size)
 {
     write(2, data, size);
-    return OK(WriteResult, size);
+    return OK(IoWriteResult, size);
 }
 
-struct writer *host_log_writer(void)
+IoWriter *host_log_writer(void)
 {
     if (!log_initialized)
     {

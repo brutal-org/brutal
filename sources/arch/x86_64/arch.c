@@ -6,15 +6,15 @@
 #include "arch/x86_64/smp.h"
 
 static bool log_initialized = false;
-static struct writer log;
+static IoWriter log;
 
-static WriteResult arch_debug_write(MAYBE_UNUSED struct writer *writer, char const *data, size_t size)
+static IoWriteResult arch_debug_write(MAYBE_UNUSED IoWriter *writer, char const *data, size_t size)
 {
     com_write(COM1, data, size);
-    return OK(WriteResult, size);
+    return OK(IoWriteResult, size);
 }
 
-struct writer *arch_debug(void)
+IoWriter *arch_debug(void)
 {
     if (!log_initialized)
     {
