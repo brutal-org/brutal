@@ -1,3 +1,5 @@
 #pragma once
 
-typedef void *MonoState;
+typedef struct
+{
+} MonoState;

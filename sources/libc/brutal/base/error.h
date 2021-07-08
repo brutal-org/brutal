@@ -1,5 +1,7 @@
 #pragma once
 
+#include <brutal/base/result.h>
+
 enum error_kind
 {
     ERR_KIND_SUCCESS,
@@ -22,3 +24,11 @@ typedef struct
 #define ERR_OUT_OF_MEMORY ((Error){ERR_KIND_EXHAUSTION, "out-of-memory"})
 #define ERR_BAD_ADDRESS ((Error){ERR_KIND_INVALID, "bad-address"})
 #define ERR_UNDEFINED ((Error){ERR_KIND_UNDEFINED, "undefined"})
+
+typedef struct
+{
+} Success;
+
+#define SUCCESS OK(MaybeError, (Success){})
+
+typedef Result(Error, Success) MaybeError;
