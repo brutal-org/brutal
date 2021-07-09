@@ -12,7 +12,7 @@ int main(int argc, char **argv)
     const char *v = "hello world \n";
     asm volatile(
         "mov $0, %%rax \n"
-        "syscall \n" ::"rbx"(v)
+        "syscall \n" ::"b"(v)
         : "memory");
 
     while (1)
