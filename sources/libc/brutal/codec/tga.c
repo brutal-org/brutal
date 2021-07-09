@@ -11,7 +11,7 @@ IoWriteResult tga_encode(IoWriter *writer, GfxSurface surface)
         .image_descriptor = le_cast(le_int8_t, 0), // by default don't use an alpha channel
     };
 
-    if (surface->format == GFX_PIXEL_FORMAT_RGBA8888) // set the number of bit for the alpha channel
+    if (surface.format == GFX_PIXEL_FORMAT_RGBA8888) // set the number of bit for the alpha channel
     {
         header.image_descriptor = le_cast(le_int8_t, 8 & TGA_IMGDESC_ALPHA_BITS);
     }
