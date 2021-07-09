@@ -13,6 +13,7 @@ jobs:
     strategy:
       matrix:
         toolchain: [gnu, llvm]
+      fail-fast: false
 
     steps:
       - uses: actions/checkout@v2
