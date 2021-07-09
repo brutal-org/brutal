@@ -28,7 +28,8 @@ CROSS_CFLAGS= \
 	$(CFLAGS_OPT) \
 	$(CFLAGS_WARN) \
 	$(CFLAGS_INC) \
-	-ffreestanding
+	-ffreestanding \
+	-D__brutal__=1
 
 CROSS_KCFLAGS= \
 	$(CROSS_CFLAGS) \
