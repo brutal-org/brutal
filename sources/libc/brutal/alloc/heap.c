@@ -401,10 +401,10 @@ void alloc_heap_init(struct alloc_heap *alloc)
 {
     *alloc = (struct alloc_heap){
         .base = {
-            .acquire = (alloc_acquire_t *)alloc_heap_acquire,
+            .acquire = (AllocAcquire *)alloc_heap_acquire,
             .commit = alloc_no_op,
             .decommit = alloc_no_op,
-            .release = (alloc_release_t *)alloc_heap_release,
+            .release = (AllocRelease *)alloc_heap_release,
         },
         .best = nullptr,
         .root = nullptr,
