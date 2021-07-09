@@ -70,9 +70,9 @@ MIT
 Copyright © 2018-2021 N. Van Bossuyt & contributors
 ```
 
-## Supercip971/WingOS
+## **Supercip971/WingOS**
 
-a little 64bit operating system written in c++ with smp support 
+A little 64bit operating system written in c++ with smp support 
 
 URL: <https://github.com/Supercip971/WingOS>
 
@@ -83,10 +83,22 @@ Copyright (c) 2021, Supercip971
 All rights reserved.
 ```
 
-## lyre-os/lyre
+## **lyre-os/lyre**
+
+lyre is an x86 kernel and distribution powered by mlibc, GNU userland tools, and other common *nix software.
 
 URL: <https://github.com/lyre-os/lyre>
 
 ```
 GNU General Public License v3.0
+```
+
+## **haipome/fnv**
+
+fnv hash, reorganization base on http://www.isthe.com/chongo/tech/comp/fnv/
+
+URL: <https://github.com/haipome/fnv>
+
+```
+Public Domain
 ```
