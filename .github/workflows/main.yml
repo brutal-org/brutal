@@ -11,9 +11,9 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
         toolchain: [gnu, llvm]
-      fail-fast: false
 
     steps:
       - uses: actions/checkout@v2
@@ -27,11 +27,11 @@ jobs:
           cache-name: cached-cross-compiler
         with:
           path: |
-            **/meta/toolchain/${{matrix.toolchain}}
+            **/meta/toolchain/${{matrix.toolchain}}/local
           key: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/meta/toolchain/${{matrix.toolchain}}/build.sh') }}
+            v2-${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/meta/toolchain/${{matrix.toolchain}}/build.sh') }}
           restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/meta/toolchain/${{matrix.toolchain}}/build.sh') }}
+            v2-${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/meta/toolchain/${{matrix.toolchain}}/build.sh') }}
 
       - name: Build Toolchain
         run: |
