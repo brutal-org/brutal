@@ -21,6 +21,11 @@ void grid_deinit_impl(GridImpl *impl)
 
 void grid_resize_impl(GridImpl *impl, int width, int height)
 {
+    if (impl->width == width && impl->height == height)
+    {
+        return;
+    }
+
     impl->data = alloc_resize(impl->alloc, impl->data, width * height * impl->data_size);
     impl->width = width;
     impl->height = height;
