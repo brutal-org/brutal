@@ -13,10 +13,23 @@ CFLAGS_WARN ?= \
 	-Wextra \
 	-Werror
 
-CFLAGS_INC ?= \
+INC_LIBC= \
 	-Isources/libc/ansi \
 	-Isources/libc/posix \
-	-Isources/libc/ \
+	-Isources/libc/bsd \
+	-Isources/libc/gnu
+
+INC_LIBBRUTAL= \
+	-Isources/libc/
+
+HOST_CFLAGS_INC ?= \
+	$(INC_LIBBRUTAL) \
+	-Isources/ \
+	-Ithirdparty
+
+CROSS_CFLAGS_INC ?= \
+	$(INC_LIBC) \
+	$(INC_LIBBRUTAL) \
 	-Isources/ \
 	-Ithirdparty
 

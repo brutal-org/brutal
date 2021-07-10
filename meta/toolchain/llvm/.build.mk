@@ -11,7 +11,7 @@ HOST_CFLAGS= \
 	$(CFLAGS_STD) \
 	$(CFLAGS_OPT) \
 	$(CFLAGS_WARN) \
-	$(CFLAGS_INC)
+	$(HOST_CFLAGS_INC)
 
 HOST_LD=ld
 HOST_LDFLAGS=
@@ -27,7 +27,7 @@ CROSS_CFLAGS= \
 	$(CFLAGS_STD) \
 	$(CFLAGS_OPT) \
 	$(CFLAGS_WARN) \
-	$(CFLAGS_INC) \
+	$(CROSS_CFLAGS_INC) \
 	-ffreestanding \
 	-D__brutal__=1
 
