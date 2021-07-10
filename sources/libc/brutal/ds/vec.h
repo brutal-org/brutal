@@ -45,28 +45,28 @@ void vec_swapsplice_impl(VecImpl *impl, int start, int count);
 
 void vec_swap_impl(VecImpl *impl, int idx1, int idx2);
 
-#define vec_init(v, alloc_) vec_init_impl(&(v)->_impl, sizeof(*(v)->data), alloc_)
+#define vec_init(v, alloc_) vec_init_impl(impl_cast(v), sizeof(*(v)->data), alloc_)
 
-#define vec_deinit(v) vec_deinit_impl(&(v)->_impl)
+#define vec_deinit(v) vec_deinit_impl(impl_cast(v))
 
 #define vec_push(v, val) \
-    (vec_expand_impl(&(v)->_impl) ? ((v)->data[(v)->length++] = (val), true) : false)
+    (vec_expand_impl(impl_cast(v)) ? ((v)->data[(v)->length++] = (val), true) : false)
 
 #define vec_pop(v) (v)->data[--(v)->length]
 
 #define vec_splice(v, start, count) \
-    (vec_splice_impl(&(v)->_impl, start, count), (v)->length -= (count))
+    (vec_splice_impl(impl_cast(v), start, count), (v)->length -= (count))
 
 #define vec_swapsplice(v, start, count) \
-    (vec_swapsplice_impl(&(v)->_impl, start, count), (v)->length -= (count))
+    (vec_swapsplice_impl(impl_cast(v), start, count), (v)->length -= (count))
 
-#define vec_insert(v, idx, val)                                            \
-    (vec_insert_impl(&(v)->_impl, idx) ? -1 : ((v)->data[idx] = (val), 0), \
+#define vec_insert(v, idx, val)                                             \
+    (vec_insert_impl(impl_cast(v), idx) ? -1 : ((v)->data[idx] = (val), 0), \
      (v)->length++, 0)
 
 #define vec_sort(v, fn) qsort((v)->data, (v)->length, sizeof(*(v)->data), fn)
 
-#define vec_swap(v, idx1, idx2) vec_swap_impl(&(v)->_impl, idx1, idx2)
+#define vec_swap(v, idx1, idx2) vec_swap_impl(impl_cast(v), idx1, idx2)
 
 #define Vecruncate(v, len) \
     ((v)->length = (len) < (v)->length ? (len) : (v)->length)
@@ -77,9 +77,9 @@ void vec_swap_impl(VecImpl *impl, int idx1, int idx2);
 
 #define vec_last(v) (v)->data[(v)->length - 1]
 
-#define vec_reserve(v, n) vec_reserve_impl(&(v)->_impl, n)
+#define vec_reserve(v, n) vec_reserve_impl(impl_cast(v), n)
 
-#define vec_compact(v) vec_compact_impl(&(v)->_impl)
+#define vec_compact(v) vec_compact_impl(impl_cast(v))
 
 #define vec_find(v, val, idx)                         \
     STMT(                                             \
