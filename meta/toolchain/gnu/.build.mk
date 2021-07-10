@@ -53,7 +53,7 @@ CROSS_ACFLAGS= \
     	-mno-3dnow \
     	-mno-sse \
     	-mno-sse2 \
-    	-mno-red-zone -nostdlib -no-pie
+    	-mno-red-zone -nostdlib
 
 CROSS_LD=$(CONFIG_ARCH)-elf-ld
 CROSS_KLDFLAGS= \
