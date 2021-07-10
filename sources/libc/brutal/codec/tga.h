@@ -17,7 +17,7 @@ enum tga_image_origin
     TGA_TOP_RIGHT = 0b00110000,
 };
 
-typedef struct
+typedef struct PACKED
 {
     le_int8_t id_length;
     le_int8_t colour_map_type;
