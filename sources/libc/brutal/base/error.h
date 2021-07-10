@@ -1,6 +1,7 @@
 #pragma once
 
 #include <brutal/base/result.h>
+#include <brutal/text/str.h>
 
 enum error_kind
 {
@@ -15,15 +16,17 @@ enum error_kind
 typedef struct
 {
     enum error_kind kind;
-    char const *message;
+    Str message;
 } Error;
 
-#define ERR_SUCCESS ((Error){ERR_KIND_SUCCESS, "success"})
-#define ERR_TIMEOUT ((Error){ERR_KIND_TIMEOUT, "timeout"})
-#define ERR_NOT_FOUND ((Error){ERR_KIND_NOT_FOUND, "not-found"})
-#define ERR_OUT_OF_MEMORY ((Error){ERR_KIND_EXHAUSTION, "out-of-memory"})
-#define ERR_BAD_ADDRESS ((Error){ERR_KIND_INVALID, "bad-address"})
-#define ERR_UNDEFINED ((Error){ERR_KIND_UNDEFINED, "undefined"})
+#define make_error(KIND, MESSAGE) ((Error){(KIND), str_cast(MESSAGE)})
+
+#define ERR_SUCCESS make_error(ERR_KIND_SUCCESS, "success")
+#define ERR_TIMEOUT make_error(ERR_KIND_TIMEOUT, "timeout")
+#define ERR_NOT_FOUND make_error(ERR_KIND_NOT_FOUND, "not-found")
+#define ERR_OUT_OF_MEMORY make_error(ERR_KIND_EXHAUSTION, "out-of-memory")
+#define ERR_BAD_ADDRESS make_error(ERR_KIND_INVALID, "bad-address")
+#define ERR_UNDEFINED make_error(ERR_KIND_UNDEFINED, "undefined")
 
 typedef struct
 {

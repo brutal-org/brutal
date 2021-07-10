@@ -1,7 +1,10 @@
 #pragma once
 
-#define base_cast(instance) \
-    (&(instance)->base)
+#define base_cast(SELF) \
+    (&(SELF)->base)
+
+#define impl_cast(SELF) \
+    (&(SELF)->_impl)
 
 #define union_cast(T, x) ( \
     {                      \
