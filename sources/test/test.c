@@ -45,6 +45,17 @@ enum test_result test_run(struct test test)
     }
 }
 
+void test_run_by_name(Str name)
+{
+    for (size_t i = 0; i < tests_count; i++)
+    {
+        if (str_eq(tests[i].name, name))
+        {
+            tests[i].func();
+        }
+    }
+}
+
 int test_run_all(void)
 {
     int pass_count = 0;
@@ -87,5 +98,17 @@ int test_run_all(void)
 
 int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char const *argv[])
 {
-    return test_run_all();
+    for (int i = 0; i < argc; i++)
+    {
+        log("argc[{}]='{}'", i, str_cast(argv[i]));
+    }
+
+    if (argc == 3 && str_eq(str_cast(argv[1]), str_cast("-t")))
+    {
+        test_run_by_name(str_cast(argv[2]));
+    }
+    else
+    {
+        return test_run_all();
+    }
 }
