@@ -93,3 +93,21 @@ static inline GfxColor gfx_pixel_load(const void *src, GfxPixelFormat format)
         assert_unreachable();
     }
 }
+
+static inline size_t gfx_pixel_size(GfxPixelFormat format)
+{
+    switch (format)
+    {
+    case GFX_PIXEL_FORMAT_GRAYSCALE_8:
+        return sizeof(GfxPixelGrayScale8);
+
+    case GFX_PIXEL_FORMAT_RGB888:
+        return sizeof(GfxPixelRGB888);
+
+    case GFX_PIXEL_FORMAT_RGBA8888:
+        return sizeof(GfxPixelRGBA8888);
+
+    default:
+        assert_unreachable();
+    }
+}

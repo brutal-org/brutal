@@ -10,12 +10,10 @@ typedef struct
     GfxEdgeListBuffer stroke;
 } GfxRast;
 
-void gfx_rast_init(GfxRast *self);
+void gfx_rast_init(GfxRast *self, Alloc *alloc);
 
 void gfx_rast_deinit(GfxRast *self);
 
-void gfx_rast_fill(
-    GfxRast *self, GfxSurface surface, GfxEdgeList edges, GfxPaint paint);
+void gfx_rast_fill(GfxRast *self, GfxSurface surface, GfxEdgeList edges, GfxPaint paint);
 
-void gfx_rast_stroke(
-    GfxRast *self, GfxSurface surface, GfxEdgeList edges, GfxStroke stroke, GfxPaint paint);
+void gfx_rast_stroke(GfxRast *self, GfxSurface surface, GfxEdgeList edges, GfxStroke stroke, GfxPaint paint);

@@ -2,6 +2,12 @@
 
 typedef enum
 {
+    GFX_STROKE_NONE,
+    GFX_STROKE_LINE,
+} GfxStrokeType;
+
+typedef enum
+{
     GFX_LINE_CAP_BUTT,
     GFX_LINE_CAP_ROUND,
     GFX_LINE_CAP_SQUARE,
@@ -20,3 +26,6 @@ typedef struct
     GfxLineCap line_cap;
     GfxLineJoin line_join;
 } GfxStroke;
+
+#define gfx_stroke_none() \
+    (GfxStroke) {}

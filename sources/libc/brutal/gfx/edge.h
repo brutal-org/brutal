@@ -1,7 +1,8 @@
 #pragma once
 
-#include <brutal/ds.h>
-#include <brutal/math.h>
+#include <brutal/ds/vec.h>
+#include <brutal/math/edge.h>
+#include <brutal/math/vec2.h>
 
 typedef Vec(Edgef) GfxEdgeVec;
 
@@ -23,7 +24,7 @@ typedef struct
     Edgef *edges;
 } GfxEdgeList;
 
-void gfx_edge_list_init(GfxEdgeListBuffer *self, struct alloc *alloc);
+void gfx_edge_list_init(GfxEdgeListBuffer *self, Alloc *alloc);
 
 void gfx_edge_list_deinit(GfxEdgeListBuffer *self);
 

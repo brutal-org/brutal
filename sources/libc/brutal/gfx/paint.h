@@ -5,6 +5,8 @@
 
 typedef enum
 {
+    GFX_PAINT_NONE,
+
     GFX_PAINT_FILL,
     GFX_PAINT_GRADIANT,
     GFX_PAINT_IMAGE,
@@ -34,6 +36,12 @@ typedef struct
     };
 } GfxPaint;
 
+#define gfx_paint_none() \
+    ((GfxPaint){.type = GFX_PAINT_NONE})
+
+#define gfx_paint_fill(COLOR) \
+    ((GfxPaint){.type = GFX_PAINT_FILL, .fill = (COLOR)})
+
 static inline GfxColor gfx_paint_sample(GfxPaint *paint, MAYBE_UNUSED float x, MAYBE_UNUSED float y)
 {
     switch (paint->type)
@@ -42,6 +50,6 @@ static inline GfxColor gfx_paint_sample(GfxPaint *paint, MAYBE_UNUSED float x, M
         return paint->fill;
 
     default:
-        todo("Implement other paint types.");
+        panic_todo("Implement other paint types.");
     }
 }
