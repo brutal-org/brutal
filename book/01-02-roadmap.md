@@ -8,7 +8,6 @@
 - [x] VMM
 - [x] Parse MADT
 - [x] apic (ioapic/lapic)
-- [ ] multiboot support
 - [x] pit
 - [x] apic timer
 - [x] SMP
@@ -29,10 +28,9 @@
 ## Milestone 3 - Driver And File System
 
 - [ ] VFS
-- [ ] Disk driver (HCI? NVME? IDE (lol)?)
+- [ ] Disk driver (VIRT-IO? AHCI? NVME? IDE (lol)?)
 - [ ] IRQ routing to usespace
 - [ ] ext2
-- [ ] FAT32
 
 ## Milestone 4 - User Interfaces
 
@@ -47,6 +45,11 @@
 
 ## Milestone 6 - Networking
 
-- [ ] Implement E1000 driver
+- [ ] Implement virtio-net or E1000 driver
 - [ ] Implement TCP/IP
 - [ ] Send a message on IRC
+
+## Good to have
+
+- [ ] multiboot support
+- [ ] FAT32
