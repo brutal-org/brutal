@@ -76,6 +76,7 @@ static enum handover_mmap_entry_type stivale_mmap_type_to_handover_type(int stiv
 static void fill_handover_mmap(struct handover *target, struct stivale2_struct_tag_memmap *memory_map)
 {
     target->mmap.size = memory_map->entries;
+
     for (size_t i = 0; i < memory_map->entries; i++)
     {
         auto entry = &target->mmap.entries[i];
@@ -103,6 +104,7 @@ void fill_handover_framebuffer(struct handover *target, struct stivale2_struct_t
 void fill_handover_modules(struct handover *target, struct stivale2_struct_tag_modules *modules)
 {
     target->modules.module_count = modules->module_count;
+
     for (size_t i = 0; i < MIN(modules->module_count, MAX_MODULE_COUNT); i++)
     {
         target->modules.module[i].addr = modules->modules[i].begin;
