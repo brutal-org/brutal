@@ -25,7 +25,7 @@ HostIoOpenFileResult host_io_file_create(Str path)
     mem_cpy(cstr, path.buffer, path.len);
     cstr[path.len] = '\0';
 
-    HostIoFileHandle handle = open(cstr, O_CREAT | O_WRONLY);
+    HostIoFileHandle handle = open(cstr, O_CREAT | O_WRONLY, 0666);
 
     alloc_free(alloc_global(), cstr);
     return OK(HostIoOpenFileResult, handle);
