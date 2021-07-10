@@ -64,8 +64,8 @@ void interrupt_error_handler(struct interrupt_stackframe *stackframe, uintptr_t 
 
     smp_stop_all();
 
-    log_unlock("CPU {} PANIC RSP={p}", cpu_self_id(), rsp);
-    log_unlock("Interrupt {}: {}: error: {} on {x} !", stackframe->int_no, _exception_messages[stackframe->int_no], stackframe->error_code, stackframe->rip);
+    log_unlock("CPU {} PANIC RIP={p} RBP={p} RSP={p}", cpu_self_id(), stackframe->rip, stackframe->rbp, rsp);
+    log_unlock("Interrupt {}: {}: error: {} !", stackframe->int_no, _exception_messages[stackframe->int_no], stackframe->error_code);
 
     dump_register(stackframe);
 

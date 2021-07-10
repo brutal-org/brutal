@@ -52,7 +52,7 @@ CROSS_ACFLAGS= \
 	-mno-mmx \
 	-mno-3dnow \
 	-mno-sse \
-	-mno-sse2 -nostdlib -no-pie \
+	-mno-sse2 -nostdlib
 
 CROSS_LD=ld.lld
 CROSS_KLDFLAGS= \

@@ -1,41 +1,27 @@
+ENTRY(_start)
 
-ENTRY(__entry_point)
 SECTIONS
 {
-
 	. = 4M;
-	__start = .;
 
-
-
-	.text ALIGN(4K) :
+	.text : ALIGN(4K)
 	{
-		*(.text)    
-        *(.text*)
-		*(.init)
-		*(.fini)
-		*(.ctors)
-		*(.dtors)
+		*(.text)
 	}
 
-	.rodata ALIGN(4K) : 
+	.rodata : ALIGN(4K)
 	{
-        *(.ctors)
 		*(.rodata)
 	}
 
-	.data ALIGN(4K) : 
+	.data : ALIGN(4K)
 	{
 		*(.data)
 	}
 
-	.bss ALIGN(4K) : 
-    {
+	.bss : ALIGN(4K)
+	{
 		*(COMMON)
 		*(.bss)
 	}
-
-	__end = .;
 }
-
-

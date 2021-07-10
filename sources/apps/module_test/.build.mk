@@ -7,7 +7,6 @@ APP_SRC =\
 	$(wildcard $(APP_PATH)/*.c) \
 	$(wildcard $(APP_PATH)/*/*.c)
 
-
 TARGETS += $(MODULE_TEST_BIN)
 
 APP_OBJ= \
