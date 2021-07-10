@@ -23,6 +23,15 @@ void *alloc_global_acquire(MAYBE_UNUSED Alloc *alloc, size_t size)
     return result;
 }
 
+void *alloc_global_resize(MAYBE_UNUSED Alloc *alloc, void *ptr, size_t new_size)
+{
+    host_mem_lock();
+    void *result = alloc_resize(heap(), ptr, new_size);
+    host_mem_unlock();
+
+    return result;
+}
+
 void alloc_global_release(MAYBE_UNUSED Alloc *alloc, void *ptr)
 {
     host_mem_lock();
@@ -35,6 +44,7 @@ Alloc *alloc_global(void)
     static Alloc memory = {
         .acquire = alloc_global_acquire,
         .commit = alloc_no_op,
+        .resize = alloc_global_resize,
         .decommit = alloc_no_op,
         .release = alloc_global_release,
     };

@@ -59,7 +59,7 @@ static struct alloc_major *major_block_create(size_t size)
     struct alloc_major *maj;
     if (host_mem_acquire(st * HOST_MEM_PAGESIZE, (void **)&maj, HOST_MEM_NONE).kind != ERR_KIND_SUCCESS)
     {
-        return nullptr;
+        panic("Failled to allocate memory!");
     }
 
     host_mem_commit(maj, st * HOST_MEM_PAGESIZE);
@@ -86,16 +86,16 @@ static bool check_minor_magic(struct alloc_minor *min, void *ptr)
         ((min->magic & 0xFFFF) == (ALLOC_GLOBAL_MAGIC & 0xFFFF)) ||
         ((min->magic & 0xFF) == (ALLOC_GLOBAL_MAGIC & 0xFF)))
     {
-        log("Possible 1-3 byte overrun for magic {08x} != {08x}.", min->magic, ALLOC_GLOBAL_MAGIC);
+        panic("Possible 1-3 byte overrun for magic {08x} != {08x}.", min->magic, ALLOC_GLOBAL_MAGIC);
     }
 
     if (min->magic == ALLOC_GLOBAL_DEAD)
     {
-        log("Multiple free({p}).", ptr);
+        panic("Multiple free({p}).", ptr);
     }
     else
     {
-        log("Bad free({p})", ptr);
+        panic("Bad free({p})", ptr);
     }
 
     return false;
@@ -397,12 +397,48 @@ void alloc_heap_release(struct alloc_heap *alloc, void *ptr)
     }
 }
 
+void *alloc_heap_resize(struct alloc_heap *alloc, void *ptr, size_t size)
+{
+    size = ALIGN_UP(size, 16);
+
+    if (size == 0)
+    {
+        alloc_heap_release(alloc, ptr);
+        return nullptr;
+    }
+
+    if (ptr == nullptr)
+    {
+        return alloc_heap_acquire(alloc, size);
+    }
+
+    auto min = (struct alloc_minor *)((uintptr_t)ptr - MINOR_BLOCK_HEADER_SIZE);
+
+    if (!check_minor_magic(min, ptr))
+    {
+        return nullptr;
+    }
+
+    if (min->size >= size)
+    {
+        min->req_size = size;
+        return ptr;
+    }
+
+    void *new_ptr = alloc_heap_acquire(alloc, size);
+    mem_cpy(new_ptr, ptr, min->req_size);
+    alloc_heap_release(alloc, ptr);
+
+    return new_ptr;
+}
+
 void alloc_heap_init(struct alloc_heap *alloc)
 {
     *alloc = (struct alloc_heap){
         .base = {
             .acquire = (AllocAcquire *)alloc_heap_acquire,
             .commit = alloc_no_op,
+            .resize = (AllocResize *)alloc_heap_resize,
             .decommit = alloc_no_op,
             .release = (AllocRelease *)alloc_heap_release,
         },
