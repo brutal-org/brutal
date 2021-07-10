@@ -7,15 +7,14 @@ TARGETS += $(SYSROOT_ISO)
 $(LIMINE):
 	make -C thirdparty/limine all
 
-$(SYSROOT): sources/sysroot/limine.cfg $(KERNEL_BIN)
+$(SYSROOT): sources/sysroot/limine.cfg $(KERNEL_BIN) $(BOOTSTRAP_BIN)
 	$(MKCWD)
 	rm -rf $(SYSROOT)
 	mkdir -p $(SYSROOT)
-	mkdir -p $(SYSROOT)/apps
 
 	cp sources/sysroot/limine.cfg                 $(SYSROOT)/limine.cfg
 	cp $(KERNEL_BIN)                              $(SYSROOT)/kernel.elf
-	cp -r $(BUILDDIR_CROSS)/apps                 $(SYSROOT)/
+	cp $(BOOTSTRAP_BIN)                           $(SYSROOT)/bootstrap.elf
 	cp thirdparty/limine/limine.sys               $(SYSROOT)/limine.sys
 	cp thirdparty/limine/limine-cd.bin            $(SYSROOT)/limine-cd.bin
 	cp thirdparty/limine/limine-eltorito-efi.bin  $(SYSROOT)/limine-eltorito-efi.bin

@@ -44,7 +44,7 @@ include meta/toolchain/$(CONFIG_TOOLCHAIN)/.build.mk
 include sources/arch/.build.mk
 include sources/kernel/.build.mk
 include sources/libc/.build.mk
-include sources/apps/.build.mk
+include sources/bootstrap/.build.mk
 include sources/sysroot/.build.mk
 include sources/test/.build.mk
 
@@ -54,7 +54,7 @@ run: $(SYSROOT_ISO)
 	qemu-system-x86_64 \
 		-M q35 \
 		-cpu host \
-		-smp 12 \
+		-smp 4 \
 		-m 256M \
 		-enable-kvm \
 		-serial mon:stdio \
