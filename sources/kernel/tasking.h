@@ -54,7 +54,8 @@ struct task
     struct stack kernel_stack;
 };
 
-typedef Result(BrError, struct task *) task_return_Result;
+
+typedef Result(int, struct task *) task_return_Result;
 
 struct task *task_self(void);
 
