@@ -71,7 +71,7 @@ static programm_load_Result map_program_header_load(struct task *task, const str
     TRY(programm_load_Result, vmm_map(task->virtual_memory_space, segment_target_vmm_range,
                                       segment_copy_phys_range, BR_MEM_USER | BR_MEM_WRITABLE));
 
-    return OK(programm_load_Result, 0);
+    return OK(programm_load_Result, (MonoState){});
 }
 
 static programm_load_Result map_program_header_entry(struct task *task, const struct elf64_program_header *header, const void *data)
@@ -79,16 +79,16 @@ static programm_load_Result map_program_header_entry(struct task *task, const st
     if (header->type == ELF_PROGRAM_HEADER_LOAD)
     {
         TRY(programm_load_Result, map_program_header_load(task, header, data));
-        return OK(programm_load_Result, 0);
+        return OK(programm_load_Result, (MonoState){});
     }
     else if (header->type == ELF_PROGRAM_HEADER_NULL || header->type == ELF_PROGRAM_HEADER_NOTE)
     {
-        return OK(programm_load_Result, 0);
+        return OK(programm_load_Result, (MonoState){});
     }
     else
     {
         log("programm invalid header type: {}", header->type);
-        return OK(programm_load_Result, 0);
+        return OK(programm_load_Result, (MonoState){});
     }
 }
 
@@ -101,7 +101,7 @@ static programm_load_Result init_program_memory_space(struct task *task, struct 
         TRY(programm_load_Result, map_program_header_entry(task, program_header_entry, data));
         program_header_entry = (struct elf64_program_header *)((uintptr_t)program_header_entry + header->program_header_table_entry_size);
     }
-    return OK(programm_load_Result, 0);
+    return OK(programm_load_Result, (MonoState){});
 }
 
 task_return_Result program_load(Str name, void *data, size_t size, uintptr_t *start_addr)

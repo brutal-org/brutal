@@ -56,7 +56,6 @@ static void smp_cleanup_cpu_trampoline(void)
     log("Cleaning up cpu trampoline");
     // Unmap everything under the trampoline
 
-    mem_set(0x0, 0x69, smp_cpu_trampoline_size());
 
     vmm_unmap(vmm_kernel_space(),
               (VmmRange){
