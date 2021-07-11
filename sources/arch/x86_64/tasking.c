@@ -51,7 +51,7 @@ void arch_task_start(struct task *task, uintptr_t ip, uintptr_t arg1, uintptr_t 
     {
         regs.cs = (GDT_USER_CODE * 8) | GDT_RING_3;
         regs.ss = (GDT_USER_DATA * 8) | GDT_RING_3;
-        regs.rsp = 0xc0000000;
+        regs.rsp = USER_STACK_BASE;
     }
     else
     {

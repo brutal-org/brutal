@@ -51,7 +51,7 @@ TaskCreateResult task_create(Str name, enum task_flags flags)
     task->usp = range_end(task->user_stack);
 
     vmm_map(task->virtual_memory_space,
-            (VmmRange){0xc0000000 - KERNEL_STACK_SIZE, KERNEL_STACK_SIZE},
+            (VmmRange){USER_STACK_BASE - KERNEL_STACK_SIZE, KERNEL_STACK_SIZE},
             heap_to_pmm(user_stack),
             BR_MEM_WRITABLE | BR_MEM_USER);
 
