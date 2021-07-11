@@ -51,8 +51,10 @@ struct PACKED elf_identifier
     uint8_t version;
     uint8_t os;
     uint8_t abi_version;
-    uint8_t _padding;
+    uint8_t _padding[7];
 };
+
+static_assert(sizeof(struct elf_identifier) == 16, "");
 
 struct PACKED elf64_header
 {
@@ -62,10 +64,10 @@ struct PACKED elf64_header
     uint16_t machine_type;
     uint32_t object_version;
 
-    uintptr_t entry;
+    uint64_t entry;
 
-    uintptr_t program_header_table_file_offset;
-    uintptr_t section_header_table_file_offset;
+    uint64_t program_header_table_file_offset;
+    uint64_t section_header_table_file_offset;
 
     uint32_t flags;
 
