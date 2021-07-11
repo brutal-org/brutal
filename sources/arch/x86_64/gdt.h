@@ -2,7 +2,7 @@
 
 #include <brutal/base.h>
 
-#define GDT_ENTRY_COUNT 6
+#define GDT_ENTRY_COUNT 5
 #define GDT_SEGMENT (0b00010000)
 #define GDT_PRESENT (0b10000000)
 #define GDT_USER (0b01100000)
@@ -13,8 +13,8 @@
 
 #define GDT_KERNEL_CODE (1)
 #define GDT_KERNEL_DATA (2)
-#define GDT_USER_DATA (4)
-#define GDT_USER_CODE (5)
+#define GDT_USER_DATA (3)
+#define GDT_USER_CODE (4)
 
 #define GDT_RING_3 (3)
 
@@ -79,3 +79,7 @@ struct gdt_tss_entry gdt_entry_tss(uintptr_t tss);
 void gdt_update(uint64_t descriptor);
 
 void gdt_initialize(void);
+
+void gdt_load_tss(struct tss* tss);
+
+void tss_update(void);

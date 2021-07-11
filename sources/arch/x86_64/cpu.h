@@ -2,13 +2,16 @@
 
 #include <brutal/base.h>
 #include "arch/cpu.h"
+#include "arch/x86_64/gdt.h"
 
 #define MAX_CPU_COUNT 255
 
 struct cpu_impl
 {
-    void *syscall_kernel_stack;
-    void *syscall_user_stack;
+    uintptr_t syscall_kernel_stack;
+    uintptr_t syscall_user_stack;
+
+    struct tss tss;
 
     uint8_t lapic;
     struct cpu base;

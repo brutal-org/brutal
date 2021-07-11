@@ -8,9 +8,9 @@
 #include "kernel/constants.h"
 #include "kernel/syscall.h"
 
-extern void syscall_handle(void);
+extern void __syscall(void);
 
-syscall_initialize_Result syscall_initialize(void)
+void syscall_initialize(void)
 {
     wrmsr(MSR_EFER, rdmsr(MSR_EFER) | EFER_ENABLE_SYSCALL);
 
@@ -30,20 +30,17 @@ syscall_initialize_Result syscall_initialize(void)
     wrmsr(MSR_STAR, ((uint64_t)(GDT_KERNEL_CODE * 8) << STAR_KCODE_OFFSET) |
                         ((uint64_t)(((GDT_USER_DATA - 1) * 8) | GDT_RING_3) << STAR_UCODE_OFFSET));
 
-    wrmsr(MSR_LSTAR, (uint64_t)syscall_handle);
+    wrmsr(MSR_LSTAR, (uint64_t)__syscall);
     wrmsr(MSR_SYSCALL_FLAG_MASK, 0);
-
-    todo("cpu -> temporary stack should be in the process [!]");
-
-    uint8_t *cpu_stack = (uint8_t *)TRY(syscall_initialize_Result, heap_alloc(KERNEL_STACK_SIZE)).base;
-    cpu_impl_self()->syscall_kernel_stack = cpu_stack + KERNEL_STACK_SIZE;
-
-    return OK(syscall_initialize_Result, 0);
 }
 
-uint64_t arch_syscall_handler(struct interrupt_stackframe *stackframe)
+void syscall_set_stack(uintptr_t stack)
 {
+    cpu_impl_self()->syscall_kernel_stack = stack;
+}
 
+uint64_t syscall_handler(struct interrupt_stackframe *stackframe)
+{
     // NOTE: we can't use r11 and rcx because they are used for storing the ip (r11) and the stack (rcx)
     return kernel_syscall_handle(stackframe->rax, stackframe->rbx, stackframe->rdx, stackframe->rsi, stackframe->r8, stackframe->r9);
 }

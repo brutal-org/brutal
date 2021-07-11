@@ -22,7 +22,7 @@
 #define IOAPIC_REG_OFFSET (0)
 #define IOAPIC_VALUE_OFFSET (16)
 
-typedef Result(int, int) ioapic_int_redirect_Result;
+typedef Result(int, int) IoApicRedirectResult;
 
 #define LAPIC_REGISTER_LVT_INT_MASKED 0x10000
 
@@ -108,6 +108,6 @@ CpuId apic_current_cpu(void);
 
 struct ioapic_version ioapic_get_version(int ioapic_id);
 
-ioapic_int_redirect_Result apic_redirect_irq_to_cpu(CpuId id, uint8_t irq, bool enable, uintptr_t rsdp);
+IoApicRedirectResult apic_redirect_irq_to_cpu(CpuId id, uint8_t irq, bool enable, uintptr_t rsdp);
 
-ioapic_int_redirect_Result apic_init_interrupt_redirection(struct handover const *handover);
+IoApicRedirectResult apic_init_interrupt_redirection(struct handover const *handover);

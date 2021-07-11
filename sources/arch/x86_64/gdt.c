@@ -1,3 +1,4 @@
+#include <brutal/sync.h>
 #include "arch/x86_64/gdt.h"
 
 static struct tss tss = {
@@ -11,6 +12,7 @@ static struct tss tss = {
     .iopb_offset = 0,
 };
 
+static Lock gdt_lock;
 static struct gdt gdt = {};
 
 static struct gdt_descriptor gdt_descriptor = {
@@ -56,11 +58,19 @@ void gdt_initialize(void)
     gdt.entries[GDT_KERNEL_CODE] = gdt_entry_simple(GDT_PRESENT | GDT_SEGMENT | GDT_READWRITE | GDT_EXECUTABLE, GDT_LONG_MODE_GRANULARITY);
     gdt.entries[GDT_KERNEL_DATA] = gdt_entry_simple(GDT_PRESENT | GDT_SEGMENT | GDT_READWRITE, 0);
 
-    gdt.entries[3] = gdt_entry(0, 0, 0, 0); // null descriptor (because syscall are evil)
+    gdt.entries[3] = gdt_entry(0, 0, 0, 0);
     gdt.entries[GDT_USER_DATA] = gdt_entry_simple(GDT_PRESENT | GDT_SEGMENT | GDT_READWRITE | GDT_USER, 0);
     gdt.entries[GDT_USER_CODE] = gdt_entry_simple(GDT_PRESENT | GDT_SEGMENT | GDT_READWRITE | GDT_EXECUTABLE | GDT_USER, GDT_LONG_MODE_GRANULARITY);
 
     gdt.tss = gdt_entry_tss((uintptr_t)&tss);
 
     gdt_update((uintptr_t)&gdt_descriptor);
+}
+
+void gdt_load_tss(struct tss* tss)
+{
+    lock_acquire(&gdt_lock);
+    gdt.tss = gdt_entry_tss((uintptr_t)tss);
+    tss_update();
+    lock_release(&gdt_lock);
 }

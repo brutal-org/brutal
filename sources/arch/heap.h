@@ -1,12 +1,15 @@
 #pragma once
 
 #include <brutal/base.h>
+#include "arch/pmm.h"
 #include "syscalls/error.h"
 
 typedef Range(size_t) HeapRange;
 
-typedef Result(BrError, HeapRange) heap_Result;
+typedef Result(BrError, HeapRange) HeapResult;
 
-heap_Result heap_alloc(size_t size);
+HeapResult heap_alloc(size_t size);
 
-heap_Result heap_free(HeapRange range);
+HeapResult heap_free(HeapRange range);
+
+PmmRange heap_to_pmm(HeapRange range);

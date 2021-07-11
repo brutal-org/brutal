@@ -29,5 +29,3 @@ struct PACKED interrupt_stackframe
     uint64_t rsp;
     uint64_t ss;
 };
-
-void interrupt_stackframe_dump();

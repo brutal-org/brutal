@@ -22,7 +22,7 @@
 
 %endmacro
 
-%macro pop_all_syscall 0
+%macro pop_all 0
     pop r15
     pop r14
     pop r13
@@ -40,11 +40,8 @@
 %endmacro
 
 ALIGN	4096
-extern arch_syscall_handler
-
-global syscall_handle
-
-syscall_handle:
+global __syscall
+__syscall:
     swapgs      ; swap from USER gs to KERNEL gs
     mov [gs:0x8], rsp   ; save current stack to the local cpu structure
     mov rsp, [gs:0x0]   ; use the kernel syscall stack 
@@ -59,11 +56,12 @@ syscall_handle:
 
     mov rdi, rsp
     mov rbp, 0
-    call arch_syscall_handler
+    
+    extern syscall_handler
+    call syscall_handler
 
-    pop_all_syscall ; pop everything except rax because we use it for the return value
+    pop_all ; pop everything except rax because we use it for the return value
 
     mov rsp, [gs:0x8]   ; return to the user stack
     swapgs
-    sti
     o64 sysret

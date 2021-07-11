@@ -1,7 +1,7 @@
 #include <brutal/log.h>
 #include "arch/arch.h"
-#include "arch/x86_64/idt.h"
 #include "arch/x86_64/gdt.h"
+#include "arch/x86_64/idt.h"
 
 extern uintptr_t __interrupt_vector[128];
 
@@ -22,7 +22,7 @@ struct idt_entry idt_entry(uintptr_t handler, uint8_t ist, uint8_t idt_flags)
         .offset_16_32 = (handler >> 16),
         .offset_32_63 = (handler >> 32),
 
-        .code_segment = GDT_KERNEL_CODE*8,
+        .code_segment = GDT_KERNEL_CODE * 8,
         ._zero = 0,
     };
 }
@@ -33,6 +33,8 @@ void idt_initialize(void)
     {
         idt.entries[i] = idt_entry(__interrupt_vector[i], 0, IDT_GATE);
     }
+
+    idt.entries[32] = idt_entry(__interrupt_vector[32], 1, IDT_GATE);
 
     idt.entries[100] = idt_entry(__interrupt_vector[48], 0, IDT_GATE | IDT_USER);
     idt.entries[101] = idt_entry(__interrupt_vector[49], 0, IDT_GATE | IDT_USER);

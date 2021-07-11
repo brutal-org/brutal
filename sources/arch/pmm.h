@@ -9,12 +9,12 @@
 
 typedef Range(size_t) PmmRange;
 
-typedef Result(BrError, PmmRange) pmm_Result;
+typedef Result(BrError, PmmRange) PmmResult;
 
 void pmm_initialize(struct handover const *handover);
 
-pmm_Result pmm_alloc(size_t size);
+PmmResult pmm_alloc(size_t size);
 
-pmm_Result pmm_used(PmmRange range);
+PmmResult pmm_used(PmmRange range);
 
-pmm_Result pmm_unused(PmmRange range);
+PmmResult pmm_unused(PmmRange range);
