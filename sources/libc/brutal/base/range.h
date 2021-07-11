@@ -24,7 +24,7 @@
     ((RANGE).size > 0)
 
 #define range_end(RANGE) \
-    ((RANGE).base + (RANGE).size - 1)
+    ((RANGE).base + (RANGE).size)
 
 #define range_contain(RANGE, ADDR) \
     (((RANGE).base <= (ADDR)) && ((RANGE).size + (RANGE).base >= (ADDR)))

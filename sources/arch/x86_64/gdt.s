@@ -11,3 +11,9 @@ gdt_update:
   o64 retf
 .trampoline:
   ret
+
+global tss_update
+tss_update:
+  mov ax, 0x28
+  ltr ax
+  ret

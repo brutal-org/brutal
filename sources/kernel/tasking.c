@@ -26,23 +26,13 @@ struct task *task_self(void)
     return cpu_self()->schedule.current;
 }
 
-void task_map_stack(struct task *task)
-{
-    const uintptr_t stack_physical_base = UNWRAP(vmm_virt2phys(vmm_kernel_space(), (VmmRange){task->kernel_stack.base, task->kernel_stack.size})).base;
-
-    vmm_map(task->virtual_memory_space,
-            (VmmRange){task->kernel_stack.base, task->kernel_stack.size},
-            (PmmRange){stack_physical_base, task->kernel_stack.size},
-            BR_MEM_WRITABLE | BR_MEM_USER);
-}
-
-task_return_Result task_create(Str name, enum task_flags flags)
+TaskCreateResult task_create(Str name, enum task_flags flags)
 {
     LOCK_RETAINER(&task_lock);
 
     log("Creating task {}...", name);
 
-    auto task = TRY(task_return_Result, arch_task_create());
+    auto task = TRY(TaskCreateResult, arch_task_create());
 
     task->id = task_id++;
     task->name = str_cast_fix(StrFix128, name);
@@ -50,16 +40,26 @@ task_return_Result task_create(Str name, enum task_flags flags)
 
     arch_task_create_vmm(task, flags & TASK_USER);
 
+    // Create the kernel stack
+    auto kernel_stack = TRY(TaskCreateResult, heap_alloc(KERNEL_STACK_SIZE));
+    task->kernel_stack = range_cast(struct stack, kernel_stack);
+    task->ksp = range_end(task->kernel_stack);
+
+    // Create the user stack
+    auto user_stack = TRY(TaskCreateResult, heap_alloc(KERNEL_STACK_SIZE));
+    task->user_stack = range_cast(struct stack, kernel_stack);
+    task->usp = range_end(task->user_stack);
+
+    vmm_map(task->virtual_memory_space,
+            (VmmRange){0xc0000000 - KERNEL_STACK_SIZE, KERNEL_STACK_SIZE},
+            heap_to_pmm(user_stack),
+            BR_MEM_WRITABLE | BR_MEM_USER);
+
     log("Task:{}({}) created...", str_cast(&task->name), task->id);
 
     vec_push(&tasks, task);
 
-    if (flags & TASK_USER)
-    {
-        task_map_stack(task);
-    }
-
-    return OK(task_return_Result, task);
+    return OK(TaskCreateResult, task);
 }
 
 void task_start(
@@ -87,7 +87,7 @@ struct task *task_create_idle(void)
 
 struct task *task_create_boot(void)
 {
-    auto task = UNWRAP(task_create(str_cast("bool"), TASK_NONE));
+    auto task = UNWRAP(task_create(str_cast("boot"), TASK_NONE));
     task_start(task, 0, 0, 0, 0, 0, 0);
     return task;
 }
@@ -301,55 +301,31 @@ static void scheduler_update(void)
     }
 }
 
-void scheduler_dump(void)
-{
-    for (size_t i = 0; i < cpu_count(); i++)
-    {
-        log_unlock("CPU {} will be running {}({})", i, str_cast(&cpu(i)->schedule.next->name), cpu(i)->schedule.next->id);
-    }
-}
-
 void scheduler_switch_other(void)
 {
     for (size_t i = 1; i < cpu_count(); i++)
     {
         if (cpu(i)->schedule.current != cpu(i)->schedule.next)
         {
-            arch_task_switch_for_cpu(i);
+            cpu_resched_other(i);
         }
     }
 }
 
-uintptr_t scheduler_switch(uintptr_t sp)
+void scheduler_switch(void)
 {
     auto schedule = &cpu_self()->schedule;
-
-    schedule->current->sp = sp; // save stack pointer
-    arch_task_save_context(schedule->current);
-
     schedule->current = schedule->next;
-
-    sp = schedule->current->sp; // load stack pointer
-    arch_task_load_context(schedule->current);
-
-    return sp;
 }
 
-uintptr_t scheduler_schedule_and_switch(uintptr_t sp)
+void scheduler_schedule_and_switch(void)
 {
-    //log_unlock("Shed");
-
     LOCK_RETAINER_TRY(&task_lock)
     {
         current_tick++;
 
         scheduler_update();
-        //scheduler_dump();
         scheduler_switch_other();
-        return scheduler_switch(sp);
-    }
-    else
-    {
-        return sp;
+        scheduler_switch();
     }
 }

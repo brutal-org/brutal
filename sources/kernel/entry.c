@@ -12,7 +12,7 @@ static atomic_size_t other_ready = 0;
 void kernel_splash(void)
 {
     log("BRUTAL - Milestone 1");
-    log("\"Long live to the UNIX utopia!\"");
+    log("\"Long live the UNIX utopia!\"");
 }
 
 void kernel_boot_other(void)

@@ -58,7 +58,10 @@ run: $(SYSROOT_ISO)
 		-m 256M \
 		-enable-kvm \
 		-serial mon:stdio \
-		-cdrom $(SYSROOT_ISO)
+		-no-reboot \
+		-no-shutdown \
+		-cdrom $(SYSROOT_ISO) \
+		-d guest_errors
 
 bochs:
 	bochs

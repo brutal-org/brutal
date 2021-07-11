@@ -43,7 +43,7 @@ enum elf_program_header_flags
     ELF_PROGRAM_HEADER_READABLE = 1 << 2,
 };
 
-struct elf_identifier
+struct PACKED elf_identifier
 {
     uint8_t magics[4];
     uint8_t elf_class;
@@ -54,7 +54,7 @@ struct elf_identifier
     uint8_t _padding;
 };
 
-struct elf64_header
+struct PACKED elf64_header
 {
     struct elf_identifier identifier;
 
@@ -80,7 +80,7 @@ struct elf64_header
     uint16_t section_header_string_table_idx;
 };
 
-struct elf64_program_header
+struct PACKED elf64_program_header
 {
     uint32_t type;  // elf_program_header_types
     uint32_t flags; // elf_program_header_flags

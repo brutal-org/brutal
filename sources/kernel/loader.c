@@ -19,7 +19,7 @@ static bool is_elf_supported(const struct elf64_header *header, size_t data_size
         return false;
     }
 
-    if(!has_valid_elf_header(header))
+    if (!has_valid_elf_header(header))
     {
         log("not valid elf header");
     }
@@ -42,7 +42,7 @@ static bool is_elf_supported(const struct elf64_header *header, size_t data_size
     return true;
 }
 
-static uint8_t* elf_loader_copy_segment( const struct elf64_program_header *header, const void* data)
+static uint8_t *elf_loader_copy_segment(const struct elf64_program_header *header, const void *data)
 {
     const size_t max_size = MAX(header->memory_size, header->file_size);
     uint8_t *segment_copy = (uint8_t *)UNWRAP(heap_alloc(max_size)).base;
@@ -53,12 +53,12 @@ static uint8_t* elf_loader_copy_segment( const struct elf64_program_header *head
 
 static programm_load_Result map_program_header_load(struct task *task, const struct elf64_program_header *header, const void *data)
 {
-    uint8_t* segment_copy = elf_loader_copy_segment(header, data);
+    uint8_t *segment_copy = elf_loader_copy_segment(header, data);
 
     VmmRange segment_copy_vmm_range = (VmmRange){
         .base = (uintptr_t)segment_copy,
         .size = ALIGN_UP(header->memory_size, HOST_MEM_PAGESIZE),
-    };;
+    };
 
     PmmRange segment_copy_phys_range = TRY(programm_load_Result, vmm_virt2phys(vmm_kernel_space(), segment_copy_vmm_range));
 
@@ -66,7 +66,6 @@ static programm_load_Result map_program_header_load(struct task *task, const str
         .base = header->virtual_address,
         .size = ALIGN_UP(header->memory_size, HOST_MEM_PAGESIZE),
     };
-
 
     TRY(programm_load_Result, vmm_map(task->virtual_memory_space, segment_target_vmm_range,
                                       segment_copy_phys_range, BR_MEM_USER | BR_MEM_WRITABLE));
@@ -104,21 +103,21 @@ static programm_load_Result init_program_memory_space(struct task *task, struct 
     return OK(programm_load_Result, (MonoState){});
 }
 
-task_return_Result program_load(Str name, void *data, size_t size, uintptr_t *start_addr)
+TaskCreateResult program_load(Str name, void *data, size_t size, uintptr_t *start_addr)
 {
     struct elf64_header *elf = (struct elf64_header *)data;
 
     if (!is_elf_supported(elf, size))
     {
         log("invalid elf");
-        return ERR(task_return_Result, 0);
+        return ERR(TaskCreateResult, BR_ERR_BAD_EXE_FORMAT);
     }
 
-    struct task *task = TRY(task_return_Result, task_create(name, TASK_USER));
+    struct task *task = TRY(TaskCreateResult, task_create(name, TASK_USER));
 
-    TRY(task_return_Result, init_program_memory_space(task, elf, data));
+    TRY(TaskCreateResult, init_program_memory_space(task, elf, data));
 
     *start_addr = elf->entry;
 
-    return OK(task_return_Result, task);
+    return OK(TaskCreateResult, task);
 }

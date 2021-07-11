@@ -46,20 +46,22 @@ struct task
     enum task_flags flags;
     enum task_state state;
 
-    vmm_space_t virtual_memory_space;
+    VmmSpace virtual_memory_space;
 
     struct task_schedule_state scheduler_state;
 
-    uintptr_t sp;
+    uintptr_t ksp;
     struct stack kernel_stack;
+
+    uintptr_t usp;
+    struct stack user_stack;
 };
 
-
-typedef Result(int, struct task *) task_return_Result;
+typedef Result(BrError, struct task *) TaskCreateResult;
 
 struct task *task_self(void);
 
-task_return_Result task_create(Str name, enum task_flags flags);
+TaskCreateResult task_create(Str name, enum task_flags flags);
 
 void task_start(
     struct task *self,
@@ -87,6 +89,6 @@ struct schedule
     struct task *next;
 };
 
-uintptr_t scheduler_switch(uintptr_t sp);
+void scheduler_switch(void);
 
-uintptr_t scheduler_schedule_and_switch(uintptr_t sp);
+void scheduler_schedule_and_switch(void);

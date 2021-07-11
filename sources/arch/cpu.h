@@ -21,3 +21,5 @@ size_t cpu_count(void);
 struct cpu *cpu_self(void);
 
 CpuId cpu_self_id(void);
+
+void cpu_resched_other(CpuId cpu);
