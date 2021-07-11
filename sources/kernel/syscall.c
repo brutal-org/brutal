@@ -10,5 +10,7 @@ syscall_reg_t kernel_syscall_handle(
     syscall_reg_t arg5)
 {
     log("called syscall: {p} arg: {p} {p} {p} {p} {p}", id, arg1, arg2, arg3, arg4, arg5);
+    log("USERSPACE: {}", str_cast((char *)arg1));
+
     return 0;
 }
