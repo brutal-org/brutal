@@ -14,6 +14,7 @@ int main(int argc, char **argv)
         "mov $0, %%rax \n"
         "syscall \n" ::"b"(v)
         : "memory");
+
     while (1)
     {
     }

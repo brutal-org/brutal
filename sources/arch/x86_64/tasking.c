@@ -41,6 +41,7 @@ void arch_task_start(struct task *task, uintptr_t ip, uintptr_t arg1, uintptr_t 
 
     regs.rip = ip;
     regs.rflags = RFLAGS_INTERRUPT_ENABLE | RFLAGS_RESERVED1_ONE;
+
     regs.rdi = arg1;
     regs.rsi = arg2;
     regs.rdx = arg3;
@@ -52,12 +53,14 @@ void arch_task_start(struct task *task, uintptr_t ip, uintptr_t arg1, uintptr_t 
         regs.cs = (GDT_USER_CODE * 8) | GDT_RING_3;
         regs.ss = (GDT_USER_DATA * 8) | GDT_RING_3;
         regs.rsp = USER_STACK_BASE;
+        regs.rbp = 0;
     }
     else
     {
         regs.cs = (GDT_KERNEL_CODE * 8);
         regs.ss = (GDT_KERNEL_DATA * 8);
         regs.rsp = task->ksp;
+        regs.rbp = 0;
     }
 
     ((TaskImpl *)task)->regs = regs;

@@ -53,7 +53,7 @@ void dump_register(struct interrupt_stackframe const *stackframe)
 {
     log_unlock("RIP: {#016p} | RSP: {#016p}", stackframe->rip, stackframe->rsp);
     log_unlock("CR2: {#016p} | CR3: {#016p} ", asm_read_cr2(), asm_read_cr3());
-    log_unlock("CS : {#02p} | SS : {#02p} | RFlags: {#016p}", stackframe->cs, stackframe->ss, stackframe->rflags);
+    log_unlock("CS : {#02p} | SS : {#02p} | RFlags: {#p}", stackframe->cs, stackframe->ss, stackframe->rflags);
 
     log_unlock("");
 
@@ -75,21 +75,14 @@ struct stackframe
 
 void backtrace(uintptr_t rbp, uint64_t rip)
 {
-    bool empty = true;
     auto stackframe = (struct stackframe *)(rbp);
 
     log("Backtrace:");
     log("{016x}", rip);
     while (stackframe)
     {
-        empty = false;
         log("{016x}", stackframe->rip);
         stackframe = stackframe->rbp;
-    }
-
-    if (empty)
-    {
-        log("[EMPTY]");
     }
 }
 
