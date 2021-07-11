@@ -123,11 +123,11 @@ static void vmm_load_memory_map(VmmSpace target, struct handover_mmap const *mem
 
         vmm_map(target,
                 (VmmRange){
-                    .base = mmap_phys_to_io(entry.base),
-                    .size = entry.length},
+                    .base = mmap_phys_to_io(ALIGN_DOWN(entry.base, HOST_MEM_PAGESIZE)),
+                    .size = ALIGN_UP(entry.length, HOST_MEM_PAGESIZE) + HOST_MEM_PAGESIZE},
                 (PmmRange){
-                    .base = (entry.base),
-                    .size = entry.length},
+                    .base =ALIGN_DOWN(entry.base, HOST_MEM_PAGESIZE),
+                    .size = ALIGN_UP(entry.length, HOST_MEM_PAGESIZE) + HOST_MEM_PAGESIZE},
                 BR_MEM_WRITABLE);
     }
 
