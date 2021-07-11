@@ -67,6 +67,14 @@ struct acpi_madt *acpi_find_madt(uintptr_t rsdp_address)
     return (struct acpi_madt *)acpi_rsdt_child(rsdt, str_cast("APIC"));
 }
 
+struct acpi_hpet *acpi_find_hpet(uintptr_t rsdp_address)
+{
+    auto rsdp = mmap_io_ptr_from_phys(struct acpi_rsdp *, rsdp_address);
+    auto rsdt = mmap_io_ptr_from_phys(struct acpi_rsdt *, rsdp->rsdt_address);
+
+    return (struct acpi_hpet *)acpi_rsdt_child(rsdt, str_cast("HPET"));
+}
+
 uint32_t acpi_find_lapic(uintptr_t rsdp_address)
 {
     auto madt = acpi_find_madt(rsdp_address);

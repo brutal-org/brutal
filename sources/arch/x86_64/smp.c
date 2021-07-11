@@ -9,8 +9,8 @@
 #include "arch/x86_64/apic.h"
 #include "arch/x86_64/asm.h"
 #include "arch/x86_64/cpu.h"
+#include "arch/x86_64/hpet.h"
 #include "arch/x86_64/memory/mmap.h"
-#include "arch/x86_64/pit.h"
 #include "arch/x86_64/smp.h"
 #include "kernel/constants.h"
 
@@ -56,7 +56,6 @@ static void smp_cleanup_cpu_trampoline(void)
     log("Cleaning up cpu trampoline");
     // Unmap everything under the trampoline
 
-
     vmm_unmap(vmm_kernel_space(),
               (VmmRange){
                   .base = (0x0),
@@ -91,7 +90,7 @@ static void smp_initialize_cpu(uint32_t lapic_id)
 {
     smp_initialize_cpu_data();
     apic_init_processor(lapic_id);
-    pit_sleep(10);
+    hpet_sleep(10);
     apic_start_processor(lapic_id, 4096);
 }
 

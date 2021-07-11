@@ -86,6 +86,23 @@ struct PACKED acpi_madt
     struct acpi_madt_record records[];
 };
 
+struct PACKED acpi_hpet
+{
+    struct acpi_sdth base;
+
+    uint8_t hardware_rev_id;
+    uint8_t info;
+    uint16_t pci_vendor_id;
+    uint8_t address_space_id;
+    uint8_t register_bit_width;
+    uint8_t register_bit_offset;
+    uint8_t reserved1;
+    uint64_t address;
+    uint8_t hpet_number;
+    uint16_t minimum_tick;
+    uint8_t page_protection;
+};
+
 #define acpi_make_madt_record_table(NAME, RECORD_TYPE)    \
     struct NAME                                           \
     {                                                     \
@@ -105,6 +122,8 @@ struct acpi_madt_record *acpi_madt_record(struct acpi_madt *madt, enum acpi_madt
 struct acpi_madt_record_table acpi_madt_multiple_record(struct acpi_madt *madt, enum acpi_madt_record_type type);
 
 struct acpi_madt *acpi_find_madt(uintptr_t rsdp_address);
+
+struct acpi_hpet *acpi_find_hpet(uintptr_t rsdp_address);
 
 uint32_t acpi_find_lapic(uintptr_t rsdp_address);
 

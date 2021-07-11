@@ -1,14 +1,14 @@
 #include "arch/x86_64/apic/timer.h"
 #include "arch/mmio.h"
 #include "arch/x86_64/apic.h"
-#include "arch/x86_64/pit.h"
+#include "arch/x86_64/hpet.h"
 
 void apic_timer_initialize(void)
 {
     lapic_write(LAPIC_REG_TIMER_DIV, APIC_TIMER_DIVIDE_BY_16);
     lapic_write(LAPIC_REG_TIMER_INITCNT, 0xFFFFFFFF); /* Set the value to -1 */
 
-    pit_sleep(10);
+    hpet_sleep(10);
 
     lapic_write(LAPIC_REG_LVT_TIMER, LAPIC_REGISTER_LVT_INT_MASKED);
 
