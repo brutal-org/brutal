@@ -9,11 +9,11 @@
 
 #define range_cast(T, RANGE) (       \
     {                                \
-        typeof(RANGE) range = RANGE; \
+        typeof(RANGE) _range = RANGE; \
                                      \
         (T){                         \
-            range.base,              \
-            range.size,              \
+            _range.base,              \
+            _range.size,              \
         };                           \
     })
 
