@@ -77,6 +77,10 @@ void vec_swap_impl(VecImpl *impl, int idx1, int idx2);
 
 #define vec_last(v) (v)->data[(v)->length - 1]
 
+#define vec_begin(v) ((v)->data)
+
+#define vec_end(v) ((v)->data + (v)->length)
+
 #define vec_reserve(v, n) vec_reserve_impl(impl_cast(v), n)
 
 #define vec_compact(v) vec_compact_impl(impl_cast(v))
@@ -114,6 +118,10 @@ void vec_swap_impl(VecImpl *impl, int idx1, int idx2);
             vec_swap((v), i__, (v)->length - (i__ + 1)); \
         }                                                \
     } while (0)
+
+#define vec_foreach(VAR, SELF)                                                               \
+    for (typeof((SELF)->data) __once, __it = vec_begin(SELF); __it != vec_end(SELF); __it++) \
+        for (typeof(*(SELF)->data) VAR = *__it, __once = nullptr; __once == nullptr; __once++)
 
 typedef Vec(void *) VecPtr;
 typedef Vec(int) VecInt;
