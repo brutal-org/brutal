@@ -6,7 +6,7 @@ CFLAGS_STD ?= \
 	-std=gnu2x
 
 CFLAGS_OPT ?= \
-	-g
+	-g -Os
 
 CFLAGS_WARN ?= \
 	-Wall \
