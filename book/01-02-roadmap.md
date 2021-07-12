@@ -8,11 +8,11 @@
 - [x] VMM
 - [x] Parse MADT
 - [x] apic (ioapic/lapic)
-- [x] pit
-- [x] apic timer
+- [x] HPET
+- [x] APIC timer
 - [x] SMP
 - [X] Multi tasking
-- [X] Sheduling
+- [X] Scheduling
 - [x] Userspace
 - [X] Syscalls
 - [x] SIMD (avx, sse, fpu, xsave)
