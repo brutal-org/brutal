@@ -195,6 +195,15 @@ IoWriteResult fmt_unsigned(struct fmt self, IoWriter *writer, unsigned long valu
     return io_write(writer, buffer, i);
 }
 
+IoWriteResult fmt_char(MAYBE_UNUSED struct fmt self, IoWriter *writer, char character)
+{
+    size_t written = 0;
+
+    written += TRY(IoWriteResult, io_put(writer, character));
+
+    return OK(IoWriteResult, written);
+}
+
 IoWriteResult fmt_string(MAYBE_UNUSED struct fmt self, IoWriter *writer, Str value)
 {
     return io_print(writer, value);
