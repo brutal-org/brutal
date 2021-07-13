@@ -5,12 +5,13 @@ KERNEL_C_SRC+=$(wildcard sources/kernel/*.c) \
 KERNEL_S_SRC+=$(wildcard sources/kernel/$(CONFIG_ARCH)/*.s)
 
 KERNEL_LIBS_SRC = \
+			  $(wildcard sources/libraries/ansi/*.c) \
 			  $(wildcard sources/libraries/ubsan/*.c) \
 			  $(wildcard sources/libraries/brutal/io/fmt.c) \
 			  $(wildcard sources/libraries/brutal/io/print.c) \
 			  $(wildcard sources/libraries/brutal/io/scan.c) \
 			  $(wildcard sources/libraries/brutal/io/write.c) \
-			  $(wildcard sources/libraries/brutal/mem/*.c) \
+			  $(wildcard sources/libs/brutal/mem/*.c) \
 			  $(wildcard sources/libraries/brutal/text/*.c) \
 			  $(wildcard sources/libraries/brutal/sync/*.c) \
 			  $(wildcard sources/libraries/brutal/ds/*.c) \
