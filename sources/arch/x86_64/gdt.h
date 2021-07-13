@@ -80,6 +80,6 @@ void gdt_update(uint64_t descriptor);
 
 void gdt_initialize(void);
 
-void gdt_load_tss(struct tss* tss);
+void gdt_load_tss(struct tss *tss);
 
 void tss_update(void);

@@ -67,7 +67,7 @@ void gdt_initialize(void)
     gdt_update((uintptr_t)&gdt_descriptor);
 }
 
-void gdt_load_tss(struct tss* tss)
+void gdt_load_tss(struct tss *tss)
 {
     lock_acquire(&gdt_lock);
     gdt.tss = gdt_entry_tss((uintptr_t)tss);

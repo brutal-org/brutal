@@ -1,6 +1,6 @@
+#include <brutal/base/std.h>
 #include <brutal/log.h>
 #include <brutal/text.h>
-#include <brutal/base/std.h>
 
 struct ubsan_source_location
 {
