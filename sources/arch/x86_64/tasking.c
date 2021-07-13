@@ -12,18 +12,6 @@
 #include "arch/x86_64/tasking.h"
 #include "kernel/constants.h"
 
-void arch_task_create_vmm(struct task *target, bool user)
-{
-    if (user)
-    {
-        target->virtual_memory_space = vmm_space_create();
-    }
-    else
-    {
-        target->virtual_memory_space = vmm_kernel_space();
-    }
-}
-
 TaskCreateResult arch_task_create(void)
 {
     TaskImpl *task = alloc_make(alloc_global(), TaskImpl);

@@ -11,25 +11,24 @@
 - [x] HPET
 - [x] APIC timer
 - [x] SMP
-- [X] Multi tasking
-- [X] Scheduling
+- [x] Multi tasking
+- [x] Scheduling
 - [x] Userspace
-- [X] Syscalls
+- [x] Syscalls
 - [x] SIMD (avx, sse, fpu, xsave)
 
 ## Milestone 2 - IPC And Userspace
 
 - [ ] IPC
-- [ ] Userspace Bootstrapping
 - [ ] IDL
 - [ ] Shell
-- [ ] Ramdisk
+- [ ] TTY
 
 ## Milestone 3 - Driver And File System
 
+- [ ] IRQ routing to userspace
 - [ ] VFS
 - [ ] Disk driver (VIRT-IO? AHCI? NVME? IDE (lol)?)
-- [ ] IRQ routing to usespace
 - [ ] ext2
 
 ## Milestone 4 - User Interfaces
@@ -51,5 +50,5 @@
 
 ## Good to have
 
-- [ ] multiboot support
+- [ ] Multiboot support
 - [ ] FAT32

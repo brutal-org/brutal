@@ -12,8 +12,6 @@ typedef struct
     size_t size;
 } Bitmap;
 
-typedef Range(size_t) BitmapRange;
-
 static inline bool bitmap_get(Bitmap const *bitmap, size_t index)
 {
     size_t const byte_index = BITMAP_BYTE_INDEX(index);
@@ -39,8 +37,8 @@ static inline void bitmap_set(Bitmap *bitmap, size_t index, bool value)
 
 void bitmap_init(Bitmap *self, void *data, size_t size);
 
-void bitmap_set_range(Bitmap *bitmap, BitmapRange range, bool value);
+void bitmap_set_range(Bitmap *bitmap, USizeRange range, bool value);
 
 void bitmap_fill(Bitmap *bitmap, bool value);
 
-BitmapRange bitmap_find_range(Bitmap const *bitmap, size_t start, size_t size, bool value);
+USizeRange bitmap_find_range(Bitmap const *bitmap, size_t start, size_t size, bool value);

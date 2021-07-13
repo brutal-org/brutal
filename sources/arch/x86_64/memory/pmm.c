@@ -130,7 +130,7 @@ PmmResult pmm_used(PmmRange range)
 
     size_t page_base = range.base / HOST_MEM_PAGESIZE;
     size_t page_size = range.size / HOST_MEM_PAGESIZE;
-    auto page_range = (BitmapRange){page_base, page_size};
+    auto page_range = (USizeRange){page_base, page_size};
 
     bitmap_set_range(&pmm_bitmap, page_range, PMM_USED);
 
@@ -151,7 +151,7 @@ PmmResult pmm_unused(PmmRange range)
 
     size_t page_base = range.base / HOST_MEM_PAGESIZE;
     size_t page_size = range.size / HOST_MEM_PAGESIZE;
-    auto page_range = (BitmapRange){page_base, page_size};
+    auto page_range = (USizeRange){page_base, page_size};
 
     bitmap_set_range(&pmm_bitmap, page_range, PMM_UNUSED);
 

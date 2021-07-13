@@ -12,5 +12,6 @@ struct handover_module *kernel_find_module(struct handover *handover, Str name)
             return &handover->modules.module[i];
         }
     }
+
     return nullptr;
 }

@@ -129,7 +129,7 @@ void scheduler_load_context(struct interrupt_stackframe *regs)
     *regs = impl->regs;
     simd_context_load(impl->simd_context);
 
-    vmm_space_switch(task->virtual_memory_space);
+    memory_space_switch(task->space);
     syscall_set_stack(range_end(task->kernel_stack));
 }
 

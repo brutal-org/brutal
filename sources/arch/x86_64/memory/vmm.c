@@ -126,7 +126,7 @@ static void vmm_load_memory_map(VmmSpace target, struct handover_mmap const *mem
                     .base = mmap_phys_to_io(ALIGN_DOWN(entry.base, HOST_MEM_PAGESIZE)),
                     .size = ALIGN_UP(entry.length, HOST_MEM_PAGESIZE) + HOST_MEM_PAGESIZE},
                 (PmmRange){
-                    .base =ALIGN_DOWN(entry.base, HOST_MEM_PAGESIZE),
+                    .base = ALIGN_DOWN(entry.base, HOST_MEM_PAGESIZE),
                     .size = ALIGN_UP(entry.length, HOST_MEM_PAGESIZE) + HOST_MEM_PAGESIZE},
                 BR_MEM_WRITABLE);
     }
@@ -169,6 +169,11 @@ VmmSpace vmm_space_create(void)
     }
 
     return vmm_address_space;
+}
+
+void vmm_space_destroy(MAYBE_UNUSED VmmSpace space)
+{
+    todo("Implement vmm_space_destroy");
 }
 
 void vmm_space_switch(VmmSpace space)

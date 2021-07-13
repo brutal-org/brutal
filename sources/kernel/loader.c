@@ -8,11 +8,10 @@
 #include "brutal/base/types.h"
 #include "syscalls/error.h"
 
-typedef Result(BrError, MonoState) programm_load_Result;
+typedef Result(BrError, MonoState) ProgramloadResult;
 
 static bool is_elf_supported(const struct elf64_header *header, size_t data_size)
 {
-
     if (data_size < sizeof(struct elf64_header))
     {
         log("not valid elf size");
@@ -24,14 +23,12 @@ static bool is_elf_supported(const struct elf64_header *header, size_t data_size
         log("not valid elf header");
     }
 
-    // don't support 32bit for the moment
     if (header->identifier.elf_class != ELF_CLASS_64)
     {
         log("not 64bit ");
         return false;
     }
 
-    // only support little endian
     if (header->identifier.data_encoding != ELF_ENCODING_LITTLE_ENDIAN)
     {
         log("not little endian");
@@ -42,65 +39,61 @@ static bool is_elf_supported(const struct elf64_header *header, size_t data_size
     return true;
 }
 
-static uint8_t *elf_loader_copy_segment(const struct elf64_program_header *header, const void *data)
+static HeapRange elf_loader_copy_segment(const struct elf64_program_header *header, const void *data)
 {
-    const size_t max_size = MAX(header->memory_size, header->file_size);
-    uint8_t *segment_copy = (uint8_t *)UNWRAP(heap_alloc(max_size)).base;
-    mem_set(segment_copy, 0, max_size);
-    mem_cpy(segment_copy, data + header->file_offset, header->file_size);
-    return segment_copy;
+    auto size = MAX(header->memory_size, header->file_size);
+    auto range = UNWRAP(heap_alloc(size));
+    auto ptr = (uint8_t *)range.base;
+
+    mem_set(ptr, 0, size);
+    mem_cpy(ptr, data + header->file_offset, header->file_size);
+
+    return range;
 }
 
-static programm_load_Result map_program_header_load(struct task *task, const struct elf64_program_header *header, const void *data)
+static ProgramloadResult map_program_header_load(struct task *task, const struct elf64_program_header *header, const void *data)
 {
-    uint8_t *segment_copy = elf_loader_copy_segment(header, data);
+    auto range = elf_loader_copy_segment(header, data);
 
-    VmmRange segment_copy_vmm_range = (VmmRange){
-        .base = (uintptr_t)segment_copy,
-        .size = ALIGN_UP(header->memory_size, HOST_MEM_PAGESIZE),
-    };
-
-    PmmRange segment_copy_phys_range = TRY(programm_load_Result, vmm_virt2phys(vmm_kernel_space(), segment_copy_vmm_range));
-
-    VmmRange segment_target_vmm_range = (VmmRange){
+    VmmRange target = (VmmRange){
         .base = header->virtual_address,
         .size = ALIGN_UP(header->memory_size, HOST_MEM_PAGESIZE),
     };
 
-    TRY(programm_load_Result, vmm_map(task->virtual_memory_space, segment_target_vmm_range,
-                                      segment_copy_phys_range, BR_MEM_USER | BR_MEM_WRITABLE));
+    TRY(ProgramloadResult, memory_space_map_pmm(task->space, target, heap_to_pmm(range)));
 
-    return OK(programm_load_Result, (MonoState){});
+    return OK(ProgramloadResult, (MonoState){});
 }
 
-static programm_load_Result map_program_header_entry(struct task *task, const struct elf64_program_header *header, const void *data)
+static ProgramloadResult map_program_header_entry(struct task *task, const struct elf64_program_header *header, const void *data)
 {
     if (header->type == ELF_PROGRAM_HEADER_LOAD)
     {
-        TRY(programm_load_Result, map_program_header_load(task, header, data));
-        return OK(programm_load_Result, (MonoState){});
+        TRY(ProgramloadResult, map_program_header_load(task, header, data));
+        return OK(ProgramloadResult, (MonoState){});
     }
     else if (header->type == ELF_PROGRAM_HEADER_NULL || header->type == ELF_PROGRAM_HEADER_NOTE)
     {
-        return OK(programm_load_Result, (MonoState){});
+        return OK(ProgramloadResult, (MonoState){});
     }
     else
     {
         log("programm invalid header type: {}", header->type);
-        return OK(programm_load_Result, (MonoState){});
+        return OK(ProgramloadResult, (MonoState){});
     }
 }
 
-static programm_load_Result init_program_memory_space(struct task *task, struct elf64_header *header, void *data)
+static ProgramloadResult init_program_memory_space(struct task *task, struct elf64_header *header, void *data)
 {
     struct elf64_program_header *program_header_entry = (struct elf64_program_header *)(data + header->program_header_table_file_offset);
 
     for (size_t i = 0; i < header->program_header_table_entry_count; i++)
     {
-        TRY(programm_load_Result, map_program_header_entry(task, program_header_entry, data));
+        TRY(ProgramloadResult, map_program_header_entry(task, program_header_entry, data));
         program_header_entry = (struct elf64_program_header *)((uintptr_t)program_header_entry + header->program_header_table_entry_size);
     }
-    return OK(programm_load_Result, (MonoState){});
+
+    return OK(ProgramloadResult, (MonoState){});
 }
 
 TaskCreateResult program_load(Str name, void *data, size_t size, uintptr_t *start_addr)

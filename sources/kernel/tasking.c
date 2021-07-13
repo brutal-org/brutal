@@ -26,7 +26,7 @@ struct task *task_self(void)
     return cpu_self()->schedule.current;
 }
 
-TaskCreateResult task_create(Str name, enum task_flags flags)
+TaskCreateResult task_create(Str name, TaskFlags flags)
 {
     LOCK_RETAINER(&task_lock);
 
@@ -38,7 +38,7 @@ TaskCreateResult task_create(Str name, enum task_flags flags)
     task->name = str_cast_fix(StrFix128, name);
     task->flags = flags;
 
-    arch_task_create_vmm(task, flags & TASK_USER);
+    task->space = memory_space_create();
 
     // Create the kernel stack
     auto kernel_stack = TRY(TaskCreateResult, heap_alloc(KERNEL_STACK_SIZE));
@@ -50,10 +50,7 @@ TaskCreateResult task_create(Str name, enum task_flags flags)
     task->user_stack = range_cast(struct stack, kernel_stack);
     task->usp = range_end(task->user_stack);
 
-    vmm_map(task->virtual_memory_space,
-            (VmmRange){USER_STACK_BASE - KERNEL_STACK_SIZE, KERNEL_STACK_SIZE},
-            heap_to_pmm(user_stack),
-            BR_MEM_WRITABLE | BR_MEM_USER);
+    memory_space_map_pmm(task->space, (VmmRange){USER_STACK_BASE - KERNEL_STACK_SIZE, KERNEL_STACK_SIZE}, heap_to_pmm(user_stack));
 
     log("Task:{}({}) created...", str_cast(&task->name), task->id);
 
@@ -92,7 +89,7 @@ struct task *task_create_boot(void)
     return task;
 }
 
-void task_state(struct task *self, enum task_state new_state)
+void task_state(struct task *self, TaskState new_state)
 {
     LOCK_RETAINER(&task_lock);
 

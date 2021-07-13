@@ -9,7 +9,7 @@ void bitmap_init(Bitmap *self, void *data, size_t size)
     };
 }
 
-void bitmap_set_range(Bitmap *bitmap, BitmapRange range, bool value)
+void bitmap_set_range(Bitmap *bitmap, USizeRange range, bool value)
 {
     for (size_t i = 0; i < range.size; i++)
     {
@@ -29,7 +29,7 @@ void bitmap_fill(Bitmap *bitmap, bool value)
     }
 }
 
-BitmapRange bitmap_find_range(Bitmap const *bitmap, size_t start, size_t size, bool value)
+USizeRange bitmap_find_range(Bitmap const *bitmap, size_t start, size_t size, bool value)
 {
     size_t range_start = 0;
     size_t range_size = 0;
@@ -53,9 +53,9 @@ BitmapRange bitmap_find_range(Bitmap const *bitmap, size_t start, size_t size, b
 
         if (size <= range_size)
         {
-            return (BitmapRange){range_start, range_size};
+            return (USizeRange){range_start, range_size};
         }
     }
 
-    return (BitmapRange){};
+    return (USizeRange){};
 }

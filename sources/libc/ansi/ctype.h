@@ -1,8 +1,8 @@
 #pragma once
 
-/* --- 7.4 Character - handling ----------------------------------------------- */
+/* --- 7.4 Character - handling --------------------------------------------- */
 
-/* --- 7.4.1 Character classification - Copying functions ------------------------------------------- */
+/* --- 7.4.1 Character classification - Copying functions ------------------- */
 
 int isalnum(int c);
 

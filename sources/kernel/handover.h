@@ -2,9 +2,6 @@
 
 #include <brutal/text.h>
 
-// I don't think we will get over 64
-#define HANDOVER_MMAP_MAX_SIZE 64
-
 enum handover_mmap_entry_type
 {
     HANDOVER_MMAP_FREE,
@@ -24,6 +21,8 @@ struct handover_mmap_entry
 struct handover_mmap
 {
     size_t size;
+
+#define HANDOVER_MMAP_MAX_SIZE (64)
     struct handover_mmap_entry entries[HANDOVER_MMAP_MAX_SIZE];
 };
 
@@ -36,9 +35,6 @@ struct handover_framebuffer
     uint64_t framebuffer_physical_addr;
 };
 
-#define MAX_MODULE_COUNT 64
-#define MAX_MODULE_NAME_LENGTH 128
-
 struct handover_module
 {
     size_t size;
@@ -49,6 +45,7 @@ struct handover_module
 struct handover_modules_list
 {
     size_t module_count;
+#define MAX_MODULE_COUNT 64
     struct handover_module module[MAX_MODULE_COUNT];
 };
 
