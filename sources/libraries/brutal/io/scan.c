@@ -1,4 +1,6 @@
 #include <brutal/io/scan.h>
+#include <brutal/ds.h>
+#include <brutal/alloc.h>
 
 void scan_init(struct scan *self, Str str)
 {
@@ -12,6 +14,28 @@ void scan_init(struct scan *self, Str str)
 bool scan_end(struct scan *self)
 {
     return self->head + 1 > self->size;
+}
+
+void scan_skip_space(struct scan *self)
+{
+    while(isspace(scan_curr(self)) && !scan_end(self))
+    {
+        scan_next(self);
+    }
+
+}
+
+Str scan_skip_until(struct scan *self, int(*callback)(int))
+{
+    size_t start = self->head;
+    size_t length = 0;
+    while(callback(scan_curr(self)) && !scan_end(self))
+    {
+        length++;
+        scan_next(self);
+    }
+
+    return str_cast_n(length, (char*)self->buffer + start);
 }
 
 char scan_peek(struct scan *self, size_t offset)
