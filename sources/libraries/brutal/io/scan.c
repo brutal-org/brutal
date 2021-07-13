@@ -1,6 +1,7 @@
 #include <brutal/io/scan.h>
 #include <brutal/ds.h>
 #include <brutal/alloc.h>
+#include <ansi/ctypes.h>
 
 void scan_init(struct scan *self, Str str)
 {
