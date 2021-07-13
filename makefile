@@ -47,6 +47,7 @@ include sources/libs/.build.mk
 include sources/bins/.build.mk
 include sources/test/.build.mk
 include sysroot/.build.mk
+include sources/bid/.build.mk
 
 all: $(ISO)
 
