@@ -12,6 +12,7 @@ enum print_type
     PRINT_UNSIGNED,
     PRINT_STRING,
     PRINT_POINTER,
+    PRINT_CHAR,
 };
 
 struct print_value
@@ -25,6 +26,7 @@ struct print_value
         unsigned long _unsigned;
         Str _string;
         void *_pointer;
+        char _char;
     };
 };
 
@@ -42,6 +44,8 @@ struct print_value print_val_string(Str);
 
 struct print_value print_val_cstring(char *);
 
+struct print_value print_val_char(char);
+
 struct print_value print_val_pointer(void *);
 
 // clang-format off
@@ -57,6 +61,7 @@ struct print_value print_val_pointer(void *);
         unsigned long: print_val_unsigned,    \
                                               \
         char*: print_val_cstring,             \
+        char: print_val_char,             \
         Str: print_val_string,              \
         void*: print_val_pointer              \
     )(VALUE),
