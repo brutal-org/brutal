@@ -30,3 +30,5 @@ IoWriteResult fmt_signed(struct fmt self, IoWriter *writer, long value);
 IoWriteResult fmt_unsigned(struct fmt self, IoWriter *writer, unsigned long value);
 
 IoWriteResult fmt_string(struct fmt self, IoWriter *writer, Str string);
+
+IoWriteResult fmt_char(struct fmt self, IoWriter *writer, char character);

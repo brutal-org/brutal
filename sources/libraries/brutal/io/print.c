@@ -17,6 +17,11 @@ struct print_value print_val_cstring(char *val)
     return (struct print_value){nullstr, PRINT_STRING, {._string = str_cast(val)}};
 }
 
+struct print_value print_val_char(char val)
+{
+    return (struct print_value){nullstr, PRINT_CHAR, {._char = val}};
+}
+
 struct print_value print_val_string(Str val)
 {
     return (struct print_value){nullstr, PRINT_STRING, {._string = val}};
@@ -42,6 +47,9 @@ IoWriteResult print_dispatch(IoWriter *writer, struct fmt fmt, struct print_valu
 
     case PRINT_POINTER:
         return fmt_unsigned(fmt, writer, (uintptr_t)value._pointer);
+
+    case PRINT_CHAR:
+        return fmt_char(fmt, writer, value._char);
     }
 
     return OK(IoWriteResult, 0);
