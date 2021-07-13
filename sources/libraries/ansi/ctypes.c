@@ -35,7 +35,7 @@ int isalpha(int c)
 
 int isblank(int c)
 {
-    if(c == ' ' || c == '\t')
+    if (c == ' ' || c == '\t')
     {
         return 1;
     }
@@ -44,7 +44,7 @@ int isblank(int c)
 
 int iscntrl(int c)
 {
-    if(c < 0x1f || c == 0x7f)
+    if (c < 0x1f || c == 0x7f)
     {
         return 1;
     }
@@ -62,7 +62,7 @@ int isdigit(int c)
 
 int isgraph(int c)
 {
-    if(c >= 0x21 && c <= 0x7f)
+    if (c >= 0x21 && c <= 0x7f)
     {
         return 1;
     }
@@ -81,7 +81,7 @@ int islower(int c)
 
 int isprint(int c)
 {
-    if(c >= 0x20 && c <= 0x7f)
+    if (c >= 0x20 && c <= 0x7f)
     {
         return 1;
     }
@@ -90,11 +90,11 @@ int isprint(int c)
 
 int ispunct(int c)
 {
-    const char* punctuation =  "!\"#$%&'()*+,-./:;<=>?@ [\\]^_`{|}~";
+    const char *punctuation = "!\"#$%&'()*+,-./:;<=>?@ [\\]^_`{|}~";
 
-    for(size_t i = 0; i < sizeof(punctuation); i++)
+    for (size_t i = 0; i < sizeof(punctuation); i++)
     {
-        if(punctuation[i] == c)
+        if (punctuation[i] == c)
         {
             return 1;
         }
@@ -126,15 +126,15 @@ int isupper(int c)
 
 int isxdigit(int c)
 {
-    if(isdigit(c))
+    if (isdigit(c))
     {
         return 1;
     }
-    if(c <= 'F' && c >= 'A')
+    if (c <= 'F' && c >= 'A')
     {
         return 1;
     }
-    if(c <= 'f' && c >= 'a')
+    if (c <= 'f' && c >= 'a')
     {
         return 1;
     }
