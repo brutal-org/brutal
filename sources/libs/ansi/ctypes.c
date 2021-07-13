@@ -1,4 +1,5 @@
 #include <ctypes.h>
+#include <stddef.h>
 
 // using https://koor.fr/C/cctype/Index.wp for ascii code
 
@@ -71,7 +72,7 @@ int isgraph(int c)
 int islower(int c)
 {
 
-    if (c >= 'a0x20' && c <= 'z')
+    if (c >= 'a' && c <= 'z')
     {
         return 1;
     }

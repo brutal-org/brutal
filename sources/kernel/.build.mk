@@ -2,6 +2,7 @@ KERNEL_C_SRC+=$(wildcard sources/kernel/*.c) \
 			  $(wildcard sources/kernel/*/*.c)
 
 KERNEL_LIBS_SRC = \
+			  $(wildcard sources/libs/ansi/*.c) \
 			  $(wildcard sources/libs/ubsan/*.c) \
 			  $(wildcard sources/libs/brutal/io/fmt.c) \
 			  $(wildcard sources/libs/brutal/io/print.c) \
