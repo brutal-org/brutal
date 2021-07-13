@@ -60,9 +60,16 @@ void vec_swap_impl(VecImpl *impl, int idx1, int idx2);
 #define vec_swapsplice(v, start, count) \
     (vec_swapsplice_impl(impl_cast(v), start, count), (v)->length -= (count))
 
-#define vec_insert(v, idx, val)                                             \
-    (vec_insert_impl(impl_cast(v), idx) ? -1 : ((v)->data[idx] = (val), 0), \
-     (v)->length++, 0)
+#define vec_insert(v, idx, val) (                         \
+    {                                                     \
+        auto result = vec_insert_impl(impl_cast(v), idx); \
+        if (result)                                       \
+        {                                                 \
+            (v)->data[idx] = (val);                       \
+            (v)->length++;                                \
+        }                                                 \
+        result;                                           \
+    })
 
 #define vec_sort(v, fn) qsort((v)->data, (v)->length, sizeof(*(v)->data), fn)
 
