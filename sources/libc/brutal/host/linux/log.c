@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
+#include <errno.h>
 
 static bool log_initialized = false;
 static IoWriter log;
@@ -20,7 +22,11 @@ void host_log_unlock(void)
 
 static IoWriteResult host_log_write(MAYBE_UNUSED IoWriter *writer, char const *data, size_t size)
 {
-    write(2, data, size);
+    if (write(2, data, size) == -1)
+    {
+        return ERR(IoWriteResult, make_error(ERR_KIND_UNDEFINED, strerror(errno)));
+    }
+
     return OK(IoWriteResult, size);
 }
 

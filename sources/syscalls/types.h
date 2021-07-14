@@ -129,7 +129,6 @@ typedef struct PACKED
     BrTask sender;
     size_t size;
     BrVmo vmo;
-    uint8_t data[];
 } BrMessageHeader;
 
 typedef struct PACKED
