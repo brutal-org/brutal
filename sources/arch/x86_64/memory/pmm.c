@@ -118,7 +118,7 @@ PmmResult pmm_alloc(size_t size)
     else
     {
         log("pmm_alloc(): {} error out of memory", size);
-        return ERR(PmmResult, BR_ERR_OUT_OF_MEMORY);
+        return ERR(PmmResult, BR_OUT_OF_MEMORY);
     }
 }
 
@@ -146,7 +146,7 @@ PmmResult pmm_unused(PmmRange range)
 
     if (range.base == 0)
     {
-        return ERR(PmmResult, BR_ERR_BAD_ADDRESS);
+        return ERR(PmmResult, BR_BAD_ADDRESS);
     }
 
     size_t page_base = range.base / HOST_MEM_PAGESIZE;

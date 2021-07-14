@@ -47,7 +47,7 @@ void memory_space_deref(MemorySpace *self);
 
 void memory_space_switch(MemorySpace *self);
 
-typedef Result(BrError, VmmRange) MemorySpaceResult;
+typedef Result(BrResult, VmmRange) MemorySpaceResult;
 
 MemorySpaceResult memory_space_map(MemorySpace *self, VmmRange range);
 

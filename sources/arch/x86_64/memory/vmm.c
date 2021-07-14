@@ -23,7 +23,7 @@ static VmmResult vmm_get_pml(struct pml *table, size_t idx)
     }
     else
     {
-        return ERR(VmmResult, BR_ERR_BAD_ADDRESS);
+        return ERR(VmmResult, BR_BAD_ADDRESS);
     }
 }
 
@@ -190,7 +190,7 @@ VmmResult vmm_map(VmmSpace space, VmmRange virtual_range, PmmRange physical_rang
     if (virtual_range.size != physical_range.size)
     {
         panic("virtual_range.size must be equal to physical_range for the moment");
-        return ERR(VmmResult, BR_ERR_BAD_ARGUMENTS);
+        return ERR(VmmResult, BR_BAD_ARGUMENTS);
     }
 
     for (size_t i = 0; i < (virtual_range.size / HOST_MEM_PAGESIZE); i++)

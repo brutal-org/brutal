@@ -42,5 +42,5 @@ void syscall_set_stack(uintptr_t stack)
 uint64_t syscall_handler(struct interrupt_stackframe *stackframe)
 {
     // NOTE: we can't use r11 and rcx because they are used for storing the ip (r11) and the stack (rcx)
-    return kernel_syscall_handle(stackframe->rax, stackframe->rbx, stackframe->rdx, stackframe->rsi, stackframe->r8, stackframe->r9);
+    return syscall_dispatch(stackframe->rax, stackframe->rbx, stackframe->rdx, stackframe->rsi, stackframe->r8, stackframe->r9);
 }

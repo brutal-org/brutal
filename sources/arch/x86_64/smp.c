@@ -14,7 +14,7 @@
 #include "arch/x86_64/smp.h"
 #include "kernel/constants.h"
 
-typedef Result(BrError, uint8_t) smp_init_result;
+typedef Result(BrResult, uint8_t) smp_init_result;
 
 atomic_bool cpu_ready = false;
 

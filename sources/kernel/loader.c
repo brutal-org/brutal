@@ -6,9 +6,8 @@
 #include "arch/heap.h"
 #include "arch/pmm.h"
 #include "brutal/base/types.h"
-#include "syscalls/error.h"
 
-typedef Result(BrError, MonoState) ProgramloadResult;
+typedef Result(BrResult, MonoState) ProgramloadResult;
 
 static bool is_elf_supported(const struct elf64_header *header, size_t data_size)
 {
@@ -103,7 +102,7 @@ TaskCreateResult program_load(Str name, void *data, size_t size, uintptr_t *star
     if (!is_elf_supported(elf, size))
     {
         log("invalid elf");
-        return ERR(TaskCreateResult, BR_ERR_BAD_EXE_FORMAT);
+        return ERR(TaskCreateResult, BR_BAD_EXE_FORMAT);
     }
 
     struct task *task = TRY(TaskCreateResult, task_create(name, TASK_USER));

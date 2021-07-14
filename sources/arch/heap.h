@@ -2,11 +2,11 @@
 
 #include <brutal/base.h>
 #include "arch/pmm.h"
-#include "syscalls/error.h"
+#include "syscalls/types.h"
 
 typedef Range(size_t) HeapRange;
 
-typedef Result(BrError, HeapRange) HeapResult;
+typedef Result(BrResult, HeapRange) HeapResult;
 
 HeapResult heap_alloc(size_t size);
 

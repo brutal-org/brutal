@@ -1,4 +1,5 @@
 #pragma once
+
 #include <brutal/base.h>
 
 typedef uint8_t CpuId;

@@ -2,14 +2,13 @@
 
 #include <brutal/base.h>
 #include "arch/pmm.h"
-#include "syscalls/error.h"
-#include "syscalls/mem.h"
+#include "syscalls/types.h"
 
 typedef void *VmmSpace;
 
 typedef Range(size_t) VmmRange;
 
-typedef Result(BrError, VmmRange) VmmResult;
+typedef Result(BrResult, VmmRange) VmmResult;
 
 void vmm_initialize(struct handover const *handover);
 

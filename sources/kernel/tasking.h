@@ -4,7 +4,6 @@
 #include <brutal/text.h>
 #include <brutal/types.h>
 #include "kernel/memory.h"
-#include "syscalls/error.h"
 
 #define CPU_SCHEDULER_MANAGER 0
 
@@ -57,7 +56,7 @@ struct task
     struct stack user_stack;
 };
 
-typedef Result(BrError, struct task *) TaskCreateResult;
+typedef Result(BrResult, struct task *) TaskCreateResult;
 
 struct task *task_self(void);
 
