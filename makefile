@@ -13,14 +13,14 @@ CFLAGS_WARN ?= \
 	-Wextra \
 	-Werror
 
-INC_LIBC= \
-	-Isources/libc/ansi \
-	-Isources/libc/posix \
-	-Isources/libc/bsd \
-	-Isources/libc/gnu
+INC_LIBS= \
+	-Isources/libs/ansi \
+	-Isources/libs/posix \
+	-Isources/libs/bsd \
+	-Isources/libs/gnu
 
 INC_LIBBRUTAL= \
-	-Isources/libc/
+	-Isources/libs/
 
 HOST_CFLAGS_INC ?= \
 	$(INC_LIBBRUTAL) \
@@ -28,7 +28,7 @@ HOST_CFLAGS_INC ?= \
 	-Ithirdparty
 
 CROSS_CFLAGS_INC ?= \
-	$(INC_LIBC) \
+	$(INC_LIBS) \
 	$(INC_LIBBRUTAL) \
 	-Isources/ \
 	-Ithirdparty
@@ -43,7 +43,7 @@ include meta/toolchain/$(CONFIG_TOOLCHAIN)/.build.mk
 
 include sources/arch/.build.mk
 include sources/kernel/.build.mk
-include sources/libc/.build.mk
+include sources/libs/.build.mk
 include sources/bootstrap/.build.mk
 include sources/sysroot/.build.mk
 include sources/test/.build.mk

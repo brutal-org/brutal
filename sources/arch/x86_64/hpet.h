@@ -1,8 +1,8 @@
 #pragma once
 
 #include <brutal/base.h>
+#include <handover/handover.h>
 #include "arch/x86_64/acpi.h"
-#include "kernel/handover.h"
 
 enum hpet_registers
 {

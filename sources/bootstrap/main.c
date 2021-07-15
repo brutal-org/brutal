@@ -1,4 +1,4 @@
-#include "syscalls/syscalls.h"
+#include <syscalls/syscalls.h>
 
 int main(int argc, char const *argv[]);
 

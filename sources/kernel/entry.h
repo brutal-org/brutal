@@ -1,6 +1,6 @@
 #pragma once
 
-#include "kernel/handover.h"
+#include <handover/handover.h>
 
 void kernel_entry_main(struct handover *handover);
 

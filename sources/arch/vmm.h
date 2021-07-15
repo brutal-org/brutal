@@ -1,8 +1,8 @@
 #pragma once
 
 #include <brutal/base.h>
+#include <syscalls/types.h>
 #include "arch/pmm.h"
-#include "syscalls/types.h"
 
 typedef void *VmmSpace;
 

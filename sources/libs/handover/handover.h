@@ -61,4 +61,4 @@ struct handover
     uintptr_t rsdp;
 };
 
-struct handover_module *kernel_find_module(struct handover *handover, Str name);
+struct handover_module *handover_find_module(struct handover *handover, Str name);

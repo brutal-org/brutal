@@ -1,7 +1,7 @@
 #pragma once
 
 #include <brutal/io.h>
-#include "kernel/handover.h"
+#include <handover/handover.h>
 
 IoWriter *arch_debug(void);
 

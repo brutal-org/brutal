@@ -1,6 +1,6 @@
 #pragma once
 
-#include "syscalls/types.h"
+#include <syscalls/types.h>
 
 static inline BrResult br_syscall(BrSyscall syscall, BrArg arg1, BrArg arg2, BrArg arg3, BrArg arg4, BrArg arg5)
 {
