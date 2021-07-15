@@ -16,12 +16,7 @@ BrResult br_log(char const *message, size_t size)
     io_write(host_log_writer(), message, size);
     host_log_unlock();
 
-    return BR_NOT_IMPLEMENTED;
-}
-
-BrResult br_group(BrGroupe *groupe, BrCap caps, BrGroupeFlags flags)
-{
-    return BR_NOT_IMPLEMENTED;
+    return BR_SUCCESS;
 }
 
 BrResult br_space(BrSpace *space, BrSpaceFlags flags)
@@ -49,7 +44,7 @@ BrResult br_unmap(BrSpace space, uintptr_t vaddr, size_t size)
     return BR_NOT_IMPLEMENTED;
 }
 
-BrResult br_task(BrTask *task, BrSpace space, BrGroupe groupe, BrTaskFlags flags)
+BrResult br_task(BrTask *task, BrSpace space, BrTaskFlags flags)
 {
     return BR_NOT_IMPLEMENTED;
 }
@@ -65,16 +60,6 @@ BrResult br_exit(BrTask task, uintptr_t exit_value)
 }
 
 BrResult br_block(BrTask task, BrBlocker *blocker, BrTimeout timeout, BrBlockFlags flags)
-{
-    return BR_NOT_IMPLEMENTED;
-}
-
-BrResult br_bind(BrGroupe groupe, BrTask task, char const *name, size_t size)
-{
-    return BR_NOT_IMPLEMENTED;
-}
-
-BrResult br_locate(BrTask *task, char const *name, size_t size)
 {
     return BR_NOT_IMPLEMENTED;
 }
@@ -99,11 +84,6 @@ BrResult br_drop(BrTask task, BrCap cap)
     return BR_NOT_IMPLEMENTED;
 }
 
-BrResult br_grant(BrTask task, BrCap cap)
-{
-    return BR_NOT_IMPLEMENTED;
-}
-
 BrResult br_close(BrHandle handle)
 {
     return BR_NOT_IMPLEMENTED;
@@ -116,7 +96,6 @@ typedef BrResult BrSyscallFn();
 BrSyscallFn *syscalls[BR_SYSCALL_COUNT] = {
     [BR_SC_NOOP] = br_noop,
     [BR_SC_LOG] = br_log,
-    [BR_SC_GROUP] = br_group,
     [BR_SC_SPACE] = br_space,
     [BR_SC_MOBJ] = br_mobj,
     [BR_SC_MAP] = br_map,
@@ -125,8 +104,6 @@ BrSyscallFn *syscalls[BR_SYSCALL_COUNT] = {
     [BR_SC_TASK] = br_task,
     [BR_SC_START] = br_start,
     [BR_SC_EXIT] = br_exit,
-    [BR_SC_BIND] = br_bind,
-    [BR_SC_LOCATE] = br_locate,
     [BR_SC_SEND] = br_send,
     [BR_SC_RECV] = br_recv,
     [BR_SC_IRQ] = br_irq,

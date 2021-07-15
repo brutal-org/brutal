@@ -6,7 +6,6 @@
 #define FOREACH_SYSCALLS(SYSCALL) \
     SYSCALL(NOOP)                 \
     SYSCALL(LOG)                  \
-    SYSCALL(GROUP)                \
     SYSCALL(SPACE)                \
     SYSCALL(MOBJ)                 \
     SYSCALL(MAP)                  \
@@ -15,8 +14,6 @@
     SYSCALL(TASK)                 \
     SYSCALL(START)                \
     SYSCALL(EXIT)                 \
-    SYSCALL(BIND)                 \
-    SYSCALL(LOCATE)               \
     SYSCALL(SEND)                 \
     SYSCALL(RECV)                 \
     SYSCALL(IRQ)                  \
@@ -49,18 +46,6 @@ typedef enum
 typedef uint64_t BrArg;
 
 typedef uint64_t BrHandle;
-
-typedef BrHandle BrGroupe;
-
-#define BR_GROUPE_ERROR ((BrGroupe)-1)
-#define BR_GROUPE_SELF ((BrGroupe)-2)
-
-typedef enum
-{
-    BR_GROUP_NONE = 0,
-
-    BR_GROUP_PERMEABLE = 1 << 0,
-} BrGroupeFlags;
 
 typedef BrHandle BrSpace;
 
