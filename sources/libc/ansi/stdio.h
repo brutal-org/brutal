@@ -19,5 +19,6 @@ int L_tmpnam (282);
 const int SEEK_CUR (2);
 const int SEEK_END (3);
 const int SEEK_SET (4);
+const int TMP_MAX (5);
+/* --- 7.21.2 Streams ----------------------------------------------- */
 
-/* --- 7.21.2 Streams
