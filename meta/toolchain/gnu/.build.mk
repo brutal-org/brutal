@@ -1,7 +1,5 @@
 export PATH := $(shell meta/toolchain/gnu/use.sh):$(PATH)
 
-CFLAGS_WARN += -fanalyzer
-
 # --- Host compiler ---------------------------------------------------------- #
 
 HOST_CC=cc
@@ -22,7 +20,6 @@ CROSS_ASFLAGS=-f elf64
 
 CROSS_CC=$(CONFIG_ARCH)-elf-gcc
 CROSS_CFLAGS= \
-	-fsanitize=undefined \
 	-MD \
 	$(CFLAGS_STD) \
 	$(CFLAGS_OPT) \

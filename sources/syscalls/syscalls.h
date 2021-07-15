@@ -9,10 +9,10 @@ static inline BrResult br_syscall(BrSyscall syscall, BrArg arg1, BrArg arg2, BrA
     register uint64_t r8 asm("r8") = arg4;
     register uint64_t r9 asm("r9") = arg5;
 
-    asm("syscall"
-        : "=a"(result)
-        : "a"(syscall), "b"(arg1), "d"(arg2), "S"(arg3), "r"(r8), "r"(r9)
-        : "memory", "r11", "rcx");
+    asm volatile("syscall"
+                 : "=a"(result)
+                 : "a"(syscall), "b"(arg1), "d"(arg2), "S"(arg3), "r"(r8), "r"(r9)
+                 : "memory", "r11", "rcx");
 
     return result;
 }
@@ -67,8 +67,8 @@ static inline BrResult br_log(char const *message, size_t size)
 
     Parameters
     ----------
-    - groupe: The handle of the groupe if it was created successfully, or BR_GROUPE_ERROR (out BrGroupe).
-    - caps: The default pledge of the tasks in the groupe (BrCap).
+    - groupe: The handle of the groupe if created successfully, or BR_GROUPE_ERROR (out BrGroupe).
+    - caps: The default caps of the tasks in the groupe (BrCap).
     - flags: Flags to tweaks to beavio of the groupe (BrGroupeFlags).
 
     Flags
@@ -96,7 +96,7 @@ static inline BrResult br_group(BrGroupe *groupe, BrCap caps, BrGroupeFlags flag
 
     Parameters
     ----------
-    - space: Handle of the space if it was created successfully, or BR_SPACE_ERROR (out BrSpace).
+    - space: Handle of the space if created successfully, or BR_SPACE_ERROR (out BrSpace).
     - flags: Flags to tweaks to behavior of the space (BrSpaceFlags).
 
     Result
@@ -112,7 +112,7 @@ static inline BrResult br_space(BrSpace *space, BrSpaceFlags flags)
 }
 
 /*
-    br_vmo
+    br_mobj
 
     Description
     -----------
@@ -120,25 +120,25 @@ static inline BrResult br_space(BrSpace *space, BrSpaceFlags flags)
 
     Parameters
     ----------
-    - vmo: Handle to the VMO if it was created successfully, or BR_VMO_ERROR (out BrVmo).
-    - addr: Physical address pointed by the VMO, used if flags has BR_VMO_PMM (uintptr_t).
-    - size: Size of the VMO (size_t).
-    - flags: Flags to tweaks the behavior of the VMO.
+    - mobj: Handle to the MOBJ if created successfully, or BR_MOBJ_ERROR (out BrMObj).
+    - addr: Physical address pointed by the MOBJ, used if flags has BR_MOBJ_PMM (uintptr_t).
+    - size: Size of the MOBJ (size_t).
+    - flags: Flags to tweaks the behavior of the MOBJ (BrMObjFlags).
 
     FLags
     -----
-    - BR_VMO_PMM: This VMO point to a physical address (require BR_CAP_PMM).
+    - BR_MOBJ_PMM: This MOBJ point to a physical address (require BR_CAP_PMM).
 
     Result
     ------
-    - BR_SUCCESS: The vmo was created successfully.
-    - BR_BAD_ADDRESS: The address of the vmo was not located in user memory.
+    - BR_SUCCESS: The mobj was created successfully.
+    - BR_BAD_ADDRESS: The address of the mobj was not located in user memory.
     - BR_BAD_CAPABILITY: The task don't have the required capabilities.
     - BR_OUT_OF_MEMORY: There was not enoughs memory to complete the operation.
 */
-static inline BrResult br_vmo(BrVmo *vmo, uintptr_t addr, size_t size, BrMemFlags flags)
+static inline BrResult br_mobj(BrMObj *mobj, uintptr_t addr, size_t size, BrMObjFlags flags)
 {
-    return br_syscall(BR_SC_VMO, (BrArg)vmo, addr, size, flags, 0);
+    return br_syscall(BR_SC_MOBJ, (BrArg)mobj, addr, size, flags, 0);
 }
 
 /*
@@ -146,24 +146,24 @@ static inline BrResult br_vmo(BrVmo *vmo, uintptr_t addr, size_t size, BrMemFlag
 
     Description
     -----------
-    Map a vmo into an address space.
+    Map a mobj into an address space.
 
     Parameters
     ----------
-    space: Address where the vmo will be mapped (BrSpace).
-    vmo: VMO that will be mapped into the address space (BrVmo).
-    vaddr: Address where the VMO will be mapped (uintptr_t).
+    space: Address where the mobj will be mapped (BrSpace).
+    mobj: MOBJ that will be mapped into the address space (BrMObj).
+    vaddr: Address where the MOBJ will be mapped (uintptr_t).
     flags: Access flags (BrMemFlags).
 
     Result
     ------
     - BR_SUCCESS: The mapping was created successfully.
-    - BR_BAD_HANDLE: The handle to the space or the vmo is invalid.
+    - BR_BAD_HANDLE: The handle to the space or the mobj is invalid.
     - BR_OUT_OF_MEMORY: There was not enoughs memory to complete the operation.
 */
-static inline BrResult br_map(BrSpace space, BrVmo vmo, uintptr_t vaddr, BrMemFlags flags)
+static inline BrResult br_map(BrSpace space, BrMObj mobj, uintptr_t vaddr, BrMemFlags flags)
 {
-    return br_syscall(BR_SC_MAP, space, vmo, vaddr, flags, 0);
+    return br_syscall(BR_SC_MAP, space, mobj, vaddr, flags, 0);
 }
 
 /*
@@ -171,24 +171,24 @@ static inline BrResult br_map(BrSpace space, BrVmo vmo, uintptr_t vaddr, BrMemFl
 
     Description
     -----------
-    Find some space in the target address and map the vmo into .
+    Find some space in the target address and map the mobj into .
 
     Parameters
     ----------
-    space: Address space where the vmo will be mapped (BrSpace).
-    vmo: VMO that will be mapped into the address space (BrVmo).
-    vaddr: Address where the VMO was mapped(out uintptr_t).
+    space: Address space where the mobj will be mapped (BrSpace).
+    mobj: MOBJ that will be mapped into the address space (BrMObj).
+    vaddr: Address where the MOBJ was mapped(out uintptr_t).
     flags: Access flags (BrMemFlags).
 
     Result
     ------
     - BR_SUCCESS: The mapping was created successfully.
-    - BR_BAD_HANDLE: The handle to the space or the vmo is invalid.
+    - BR_BAD_HANDLE: The handle to the space or the mobj is invalid.
     - BR_OUT_OF_MEMORY: There was not enoughs memory to complete the operation.
 */
-static inline BrResult br_alloc(BrSpace space, BrVmo vmo, uintptr_t *vaddr, BrMemFlags flags)
+static inline BrResult br_alloc(BrSpace space, BrMObj mobj, uintptr_t *vaddr, BrMemFlags flags)
 {
-    return br_syscall(BR_SC_ALLOC, space, vmo, (BrArg)vaddr, flags, 0);
+    return br_syscall(BR_SC_ALLOC, space, mobj, (BrArg)vaddr, flags, 0);
 }
 
 /*
@@ -214,29 +214,57 @@ static inline BrResult br_unmap(BrSpace space, uintptr_t vaddr, size_t size)
     return br_syscall(BR_SC_UNMAP, space, vaddr, size, 0, 0);
 }
 
+/*
+    br_task
+
+    Description
+    -----------
+    Create a new task.
+
+    Parameters
+    ----------
+    - task: Handle to the task if created successfully, or BR_MOBJ_ERROR (out BrTask).
+    - space: Address space of the task (BrSpace).
+    - groupe: Parent groupe of the task.
+    - flags: Flags to tweaks the behavior of the task (BrTaskFlags).
+
+    Result
+    ------
+    - BR_SUCCESS: The task was created successfully.
+    - BR_BAD_HANDLE: The handle to the space or the groupe is invalid.
+    - BR_BAD_ADDRESS:  The address of the task was not located in user memory.
+*/
 static inline BrResult br_task(BrTask *task, BrSpace space, BrGroupe groupe, BrTaskFlags flags)
 {
     return br_syscall(BR_SC_TASK, (BrArg)task, space, groupe, flags, 0);
 }
 
-static inline BrResult br_start(BrTask task, uintptr_t entry)
+/*
+    br_start
+
+    Description
+    -----------
+    Begin the execution of a task.
+
+    Parameters
+    ----------
+    - task: Task to start (BrTask).
+    - ip: The instruction pointer of the task.
+    - sp: The stack pointer of the task.
+
+    Result
+    ------
+    - BR_SUCCESS: The task was started successfully.
+    - BR_BAD_HANDLE: The handle to the task is invalid.
+*/
+static inline BrResult br_start(BrTask task, uintptr_t ip, uintptr_t sp)
 {
-    return br_syscall(BR_SC_START, task, entry, 0, 0, 0);
+    return br_syscall(BR_SC_START, task, ip, sp, 0, 0);
 }
 
 static inline BrResult br_exit(BrTask task, uintptr_t exit_value)
 {
     return br_syscall(BR_SC_EXIT, task, exit_value, 0, 0, 0);
-}
-
-static inline BrResult br_block(BrTask task, BrBlocker *blocker, BrTimeout timeout, BrBlockFlags flags)
-{
-    return br_syscall(BR_SC_BLOCK, task, (BrArg)blocker, timeout, flags, 0);
-}
-
-static inline BrResult br_signal(BrTask task, BrSignal signal)
-{
-    return br_syscall(BR_SC_SIGNAL, task, signal, 0, 0, 0);
 }
 
 static inline BrResult br_bind(BrGroupe groupe, BrTask task, char const *name, size_t size)
@@ -269,7 +297,7 @@ static inline BrResult br_drop(BrTask task, BrCap cap)
     return br_syscall(BR_SC_DROP, task, cap, 0, 0, 0);
 }
 
-static inline BrResult br_pledge(BrTask task, BrCap cap)
+static inline BrResult br_close(BrHandle handle)
 {
-    return br_syscall(BR_SC_PLEDGE, task, cap, 0, 0, 0);
+    return br_syscall(BR_SC_CLOSE, handle, 0, 0, 0, 0);
 }

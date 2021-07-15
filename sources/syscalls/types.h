@@ -8,22 +8,20 @@
     SYSCALL(LOG)                  \
     SYSCALL(GROUP)                \
     SYSCALL(SPACE)                \
-    SYSCALL(VMO)                  \
+    SYSCALL(MOBJ)                 \
     SYSCALL(MAP)                  \
     SYSCALL(ALLOC)                \
     SYSCALL(UNMAP)                \
     SYSCALL(TASK)                 \
     SYSCALL(START)                \
     SYSCALL(EXIT)                 \
-    SYSCALL(BLOCK)                \
-    SYSCALL(SIGNAL)               \
     SYSCALL(BIND)                 \
     SYSCALL(LOCATE)               \
     SYSCALL(SEND)                 \
     SYSCALL(RECV)                 \
     SYSCALL(IRQ)                  \
     SYSCALL(DROP)                 \
-    SYSCALL(PLEDGE)
+    SYSCALL(CLOSE)
 
 typedef enum
 {
@@ -74,16 +72,16 @@ typedef enum
     BR_SPACE_NONE = 0,
 } BrSpaceFlags;
 
-typedef BrHandle BrVmo;
+typedef BrHandle BrMObj;
 
-#define BR_VMO_ERROR ((BrVmo)-1)
+#define BR_MOBJ_ERROR ((BrMObj)-1)
 
 typedef enum
 {
-    BR_VMO_NONE = 0,
+    BR_MOBJ_NONE = 0,
 
-    BR_VMO_PMM = 1 << 0,
-} BrVmoFlags;
+    BR_MOBJ_PMM = 1 << 0,
+} BrMObjFlags;
 
 typedef enum
 {
@@ -115,20 +113,11 @@ typedef enum
 
 typedef uint64_t BrTimeout;
 
-typedef enum
-{
-    BR_SIGNAL_NOOP = 0,
-
-    BR_SIGNAL_KILL,
-    BR_SIGNAL_PAUSE,
-    BR_SIGNAL_CONTINUE,
-} BrSignal;
-
 typedef struct PACKED
 {
     BrTask sender;
     size_t size;
-    BrVmo vmo;
+    BrMObj mobj;
 } BrMessageHeader;
 
 typedef struct PACKED

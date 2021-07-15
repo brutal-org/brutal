@@ -1,19 +1,15 @@
+#include "syscalls/syscalls.h"
 
-int main(int argc, char **argv);
-void __entry_point()
+int main(int argc, char const *argv[]);
+
+void _start()
 {
-    main(0, (char **)0);
+    main(0, (char const **)0);
 }
-int main(int argc, char **argv)
-{
-    (void)(argc);
-    (void)(argv);
 
-    const char *v = "hello world\n";
-    asm volatile(
-        "mov $0, %%rax \n"
-        "syscall \n" ::"b"(v)
-        : "memory");
+int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char const *argv[])
+{
+    br_log("Hello, world!", 13);
 
     while (1)
     {
