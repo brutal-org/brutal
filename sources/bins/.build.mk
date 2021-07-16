@@ -15,7 +15,7 @@ $(BUILDDIR_CROSS)/bins/$($(1)_NAME)/%.c.o: sources/bins/$($(1)_NAME)/%.c
 
 $$($(1)_BIN): $$($(1)_OBJ) $(LIBS_BIN) $(CRTS_BIN)
 	$$(MKCWD)
-	$(CROSS_LD) -o $$@ $$< $(LIBS_BIN) $(CRTS_BIN) $(CROSS_ULDFLAGS)
+	$(CROSS_LD) -o $$@ $$< $(CRTS_BIN) $(LIBS_BIN) $(CROSS_ULDFLAGS)
 endef
 
 -include sources/bins/*/.build.mk
