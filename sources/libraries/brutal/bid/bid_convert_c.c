@@ -7,16 +7,15 @@
 
 static void bid_write_header(IoWriter *writer)
 {
-    
-    print(writer, "#pragma once \n\n");
-    print(writer, "#include <brutal/base.h> \n\n");
-    print(writer, "// -- generated idl file -- \n\n");
+
+    print(writer, "#pragma once\n\n");
+    print(writer, "#include <brutal/base.h>\n\n");
+    print(writer, "// -- generated idl file --\n\n");
 }
 
-static void bid_write_interface(IoWriter *writer, struct bid_ast_node* interface)
+static void bid_write_interface(IoWriter *writer, struct bid_ast_node *interface)
 {
-    print(writer, "// interface: {} \n\n", interface->interface.name);
-
+    print(writer, "// interface: {}\n\n", interface->interface.name);
 }
 
 static void bid_write_node(IoWriter *writer, struct bid_ast_node *node)
@@ -32,7 +31,7 @@ static void bid_write_node(IoWriter *writer, struct bid_ast_node *node)
 
     for (int i = 0; i < node->children.length; i++)
     {
-        bid_write_node(writer, &node->children.data[i]);    
+        bid_write_node(writer, &node->children.data[i]);
     }
 }
 
@@ -42,5 +41,4 @@ void convert_bid_to_c(const struct bid *bid, IoWriter *writer)
     bid_write_header(writer);
 
     bid_write_node(writer, bid->root_ast);
-    
 }
