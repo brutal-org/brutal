@@ -130,7 +130,7 @@ void scheduler_load_context(Regs *regs)
     simd_context_load(impl->simd_context);
 
     memory_space_switch(task->space);
-    syscall_set_stack(range_end(task->kernel_stack));
+    syscall_set_stack(range_end(task->stack));
 }
 
 uint64_t interrupt_handler(uint64_t rsp)

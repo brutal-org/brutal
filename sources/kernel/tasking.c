@@ -41,16 +41,9 @@ TaskCreateResult task_create(Str name, TaskFlags flags)
     task->space = memory_space_create();
 
     // Create the kernel stack
-    auto kernel_stack = TRY(TaskCreateResult, heap_alloc(KERNEL_STACK_SIZE));
-    task->kernel_stack = range_cast(Stack, kernel_stack);
-    task->ksp = range_end(task->kernel_stack);
-
-    // Create the user stack
-    auto user_stack = TRY(TaskCreateResult, heap_alloc(KERNEL_STACK_SIZE));
-    task->user_stack = range_cast(Stack, kernel_stack);
-    task->usp = range_end(task->user_stack);
-
-    memory_space_map_pmm(task->space, (VmmRange){USER_STACK_BASE - KERNEL_STACK_SIZE, KERNEL_STACK_SIZE}, heap_to_pmm(user_stack));
+    auto stack = TRY(TaskCreateResult, heap_alloc(KERNEL_STACK_SIZE));
+    task->stack = range_cast(Stack, stack);
+    task->sp = range_end(task->stack);
 
     log("Task:{}({}) created...", str_cast(&task->name), task->id);
 
@@ -70,7 +63,7 @@ void task_start(Task *self, uintptr_t ip, uintptr_t sp, BrTaskArgs args)
 Task *task_create_idle(void)
 {
     auto task = UNWRAP(task_create(str_cast("idle"), TASK_NONE));
-    arch_task_start(task, (uintptr_t)task_idle, task->ksp, (BrTaskArgs){});
+    arch_task_start(task, (uintptr_t)task_idle, task->sp, (BrTaskArgs){});
     task->state = TASK_STATE_IDLE;
     return task;
 }

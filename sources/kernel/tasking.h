@@ -49,11 +49,8 @@ typedef struct
 
     MemorySpace *space;
 
-    uintptr_t ksp;
-    Stack kernel_stack;
-
-    uintptr_t usp;
-    Stack user_stack;
+    uintptr_t sp;
+    Stack stack;
 } Task;
 
 typedef Result(BrResult, Task *) TaskCreateResult;

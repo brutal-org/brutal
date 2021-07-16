@@ -36,6 +36,9 @@ void kernel_entry_main(struct handover *handover)
 
     uintptr_t start = 0;
     auto boostrap = UNWRAP(program_load(str_cast("bootstrap"), (void *)mod->addr, mod->size, &start));
+
+    // Create the user stack.
+    memory_space_map(boostrap->space, (VmmRange){USER_STACK_BASE - KERNEL_STACK_SIZE, KERNEL_STACK_SIZE});
     task_start(boostrap, start, USER_STACK_BASE, (BrTaskArgs){});
 
     arch_idle();
