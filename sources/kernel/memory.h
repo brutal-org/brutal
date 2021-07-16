@@ -4,12 +4,14 @@
 #include <brutal/sync.h>
 #include "arch/pmm.h"
 #include "arch/vmm.h"
+#include "kernel/domain.h"
 
 /* --- Memory Object -------------------------------------------------------- */
 
 typedef struct
 {
-    RefCount refcount;
+    Object base;
+
     PmmRange range;
 } MemoryObject;
 
@@ -31,28 +33,28 @@ typedef struct
 
 typedef struct
 {
-    RefCount refcount;
-    Lock lock;
+    Object base;
 
+    Lock lock;
     VmmSpace vmm;
     Vec(MemoryMapping *) mappings;
     RangeAlloc alloc;
-} MemorySpace;
+} Space;
 
-MemorySpace *memory_space_create(void);
+Space *space_create(void);
 
-void memory_space_ref(MemorySpace *self);
+void space_ref(Space *self);
 
-void memory_space_deref(MemorySpace *self);
+void space_deref(Space *self);
 
-void memory_space_switch(MemorySpace *self);
+void space_switch(Space *self);
 
-typedef Result(BrResult, VmmRange) MemorySpaceResult;
+typedef Result(BrResult, VmmRange) SpaceResult;
 
-MemorySpaceResult memory_space_map(MemorySpace *self, VmmRange range);
+SpaceResult space_map(Space *self, VmmRange range);
 
-MemorySpaceResult memory_space_map_pmm(MemorySpace *self, VmmRange range, PmmRange pmm_range);
+SpaceResult space_map_pmm(Space *self, VmmRange range, PmmRange pmm_range);
 
-MemorySpaceResult memory_space_alloc(MemorySpace *self, size_t size);
+SpaceResult space_alloc(Space *self, size_t size);
 
-void memory_space_unmap(MemorySpace *self, VmmRange range);
+void space_unmap(Space *self, VmmRange range);

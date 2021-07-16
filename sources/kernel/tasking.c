@@ -9,7 +9,6 @@
 #include "kernel/tasking.h"
 
 static Lock task_lock = {};
-static TaskId task_id = 0;
 static Vec(Task *) tasks = {};
 size_t current_tick = 0;
 
@@ -26,28 +25,40 @@ Task *task_self(void)
     return cpu_self()->schedule.current;
 }
 
+void task_destroy(Task *task)
+{
+    space_deref(task->space);
+    domain_deref(task->domain);
+
+    heap_free(task->stack);
+
+    arch_task_destroy(task);
+}
+
 TaskCreateResult task_create(Str name, TaskFlags flags)
 {
-    LOCK_RETAINER(&task_lock);
 
-    log("Creating task {}...", name);
+    log("Creating Task({})...", name);
 
     auto task = TRY(TaskCreateResult, arch_task_create());
 
-    task->id = task_id++;
     task->name = str_cast_fix(StrFix128, name);
     task->flags = flags;
 
-    task->space = memory_space_create();
+    task->space = space_create();
+    task->domain = domain_create();
 
     // Create the kernel stack
-    auto stack = TRY(TaskCreateResult, heap_alloc(KERNEL_STACK_SIZE));
-    task->stack = range_cast(Stack, stack);
+    task->stack = UNWRAP(heap_alloc(KERNEL_STACK_SIZE));
     task->sp = range_end(task->stack);
 
-    log("Task:{}({}) created...", str_cast(&task->name), task->id);
+    log("Task({}) created...", str_cast(&task->name));
 
+    object_init(base_cast(task), OBJECT_TASK, (ObjectDtor *)task_destroy);
+
+    lock_acquire(&task_lock);
     vec_push(&tasks, task);
+    lock_release(&task_lock);
 
     return OK(TaskCreateResult, task);
 }
@@ -146,7 +157,7 @@ static Task *task_get_most_active(void)
     return current_active;
 }
 
-static bool task_has_waiting_task()
+static bool task_has_waiting_task(void)
 {
     for (int i = 0; i < tasks.length; i++)
     {
@@ -159,7 +170,7 @@ static bool task_has_waiting_task()
     return false;
 }
 
-static Task *task_get_most_waiting()
+static Task *task_get_most_waiting(void)
 {
     size_t most_waiting_time = 0;
     Task *current_waiting = nullptr;

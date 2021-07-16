@@ -5,4 +5,6 @@
 
 TaskCreateResult arch_task_create(void);
 
+void arch_task_destroy(Task *task);
+
 void arch_task_start(Task *task, uintptr_t ip, uintptr_t sp, BrTaskArgs args);

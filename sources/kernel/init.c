@@ -58,7 +58,7 @@ static void elf_load_program(Task *task, Elf64Header const *elf, void const *dat
             .size = ALIGN_UP(header->memory_size, HOST_MEM_PAGESIZE),
         };
 
-        UNWRAP(memory_space_map_pmm(task->space, target, heap_to_pmm(range)));
+        UNWRAP(space_map_pmm(task->space, target, heap_to_pmm(range)));
 
         header = (Elf64ProgramHeader *)((uintptr_t)header + elf->program_header_table_entry_size);
     }
@@ -78,9 +78,9 @@ void init_start(struct handover *handover)
     elf_load_program(task, elf, (void const *)module->addr);
 
     // Create the user stack.
-    memory_space_map(task->space, (VmmRange){USER_STACK_BASE - KERNEL_STACK_SIZE, KERNEL_STACK_SIZE});
+    space_map(task->space, (VmmRange){USER_STACK_BASE - KERNEL_STACK_SIZE, KERNEL_STACK_SIZE});
 
-    init = task->id;
+    init = task->base.handle;
     task_start(task, elf->entry, USER_STACK_BASE, (BrTaskArgs){});
 }
 

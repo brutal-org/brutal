@@ -16,11 +16,18 @@ TaskCreateResult arch_task_create(void)
 {
     TaskImpl *task = alloc_make(alloc_global(), TaskImpl);
 
-    task->simd_context = (void *)(TRY(TaskCreateResult, heap_alloc(simd_context_size())).base);
+    task->simd = (void *)(TRY(TaskCreateResult, heap_alloc(simd_context_size())).base);
 
-    simd_context_init(task->simd_context);
+    simd_context_init(task->simd);
 
     return OK(TaskCreateResult, (Task *)task);
+}
+
+void arch_task_destroy(Task *task)
+{
+    TaskImpl *impl = (TaskImpl *)task;
+    alloc_free(alloc_global(), impl->simd);
+    alloc_free(alloc_global(), impl);
 }
 
 void arch_task_start(Task *task, uintptr_t ip, uintptr_t sp, BrTaskArgs args)

@@ -4,6 +4,12 @@
 
 /* --- Memory Object -------------------------------------------------------- */
 
+void memory_object_destroy(MemoryObject *self)
+{
+    pmm_unused(self->range);
+    alloc_free(alloc_global(), self);
+}
+
 MemoryObject *memory_object_create(size_t size)
 {
     return memory_object_create_pmm(UNWRAP(pmm_alloc(size)));
@@ -12,28 +18,25 @@ MemoryObject *memory_object_create(size_t size)
 MemoryObject *memory_object_create_pmm(PmmRange range)
 {
     auto self = alloc_make(alloc_global(), MemoryObject);
-    refcount_init(&self->refcount);
     self->range = range;
+    object_init(base_cast(self), OBJECT_MEMORY, (ObjectDtor *)memory_object_destroy);
+
     return self;
 }
 
 void memory_object_ref(MemoryObject *self)
 {
-    refcount_ref(&self->refcount);
+    object_ref(base_cast(self));
 }
 
 void memory_object_deref(MemoryObject *self)
 {
-    if (refcount_deref(&self->refcount) == REFCOUNT_0)
-    {
-        pmm_unused(self->range);
-        alloc_free(alloc_global(), self);
-    }
+    object_deref(base_cast(self));
 }
 
 /* --- Memory Mappings ------------------------------------------------------ */
 
-static void memory_mapping_create(MemorySpace *space, VmmRange range, MemoryObject *object)
+static void memory_mapping_create(Space *space, VmmRange range, MemoryObject *object)
 {
     auto mapping = alloc_make(alloc_global(), MemoryMapping);
     mapping->range = range;
@@ -42,7 +45,7 @@ static void memory_mapping_create(MemorySpace *space, VmmRange range, MemoryObje
     vmm_map(space->vmm, range, object->range, BR_MEM_USER | BR_MEM_WRITABLE);
 }
 
-static void memory_mapping_destroy(MemorySpace *space, MemoryMapping *mapping)
+static void memory_mapping_destroy(Space *space, MemoryMapping *mapping)
 {
     vmm_unmap(space->vmm, mapping->range);
     memory_object_deref(mapping->object);
@@ -52,45 +55,50 @@ static void memory_mapping_destroy(MemorySpace *space, MemoryMapping *mapping)
 
 /* --- Memory Space --------------------------------------------------------- */
 
-MemorySpace *memory_space_create(void)
+void space_destroy(Space *self)
 {
-    auto self = alloc_make(alloc_global(), MemorySpace);
-    refcount_init(&self->refcount);
+    for (int i = 0; i < self->mappings.length; i++)
+    {
+        memory_mapping_destroy(self, self->mappings.data[i]);
+    }
+
+    range_alloc_deinit(&self->alloc);
+    vec_deinit(&self->mappings);
+    vmm_space_destroy(self->vmm);
+
+    alloc_free(alloc_global(), self);
+}
+
+Space *space_create(void)
+{
+    auto self = alloc_make(alloc_global(), Space);
     self->vmm = vmm_space_create();
     vec_init(&self->mappings, alloc_global());
     range_alloc_init(&self->alloc, alloc_global());
 
     range_alloc_unused(&self->alloc, (USizeRange){0x400000, 0x7fffffffffff});
 
+    object_init(base_cast(self), OBJECT_SPACE, (ObjectDtor *)space_destroy);
+
     return self;
 }
 
-void memory_space_ref(MemorySpace *self)
+void space_ref(Space *self)
 {
-    refcount_ref(&self->refcount);
+    object_deref(base_cast(self));
 }
 
-void memory_space_deref(MemorySpace *self)
+void space_deref(Space *self)
 {
-    if (refcount_deref(&self->refcount) == REFCOUNT_0)
-    {
-        for (int i = 0; i < self->mappings.length; i++)
-        {
-            memory_mapping_destroy(self, self->mappings.data[i]);
-        }
-
-        range_alloc_deinit(&self->alloc);
-        vec_deinit(&self->mappings);
-        vmm_space_destroy(self->vmm);
-    }
+    object_deref(base_cast(self));
 }
 
-void memory_space_switch(MemorySpace *self)
+void space_switch(Space *self)
 {
     vmm_space_switch(self->vmm);
 }
 
-MemorySpaceResult memory_space_map(MemorySpace *self, VmmRange range)
+SpaceResult space_map(Space *self, VmmRange range)
 {
     LOCK_RETAINER(&self->lock);
 
@@ -98,10 +106,10 @@ MemorySpaceResult memory_space_map(MemorySpace *self, VmmRange range)
     auto object = memory_object_create(range.size);
     memory_mapping_create(self, range, object);
 
-    return OK(MemorySpaceResult, range);
+    return OK(SpaceResult, range);
 }
 
-MemorySpaceResult memory_space_map_pmm(MemorySpace *self, VmmRange range, PmmRange pmm_range)
+SpaceResult space_map_pmm(Space *self, VmmRange range, PmmRange pmm_range)
 {
     LOCK_RETAINER(&self->lock);
 
@@ -109,10 +117,10 @@ MemorySpaceResult memory_space_map_pmm(MemorySpace *self, VmmRange range, PmmRan
     auto object = memory_object_create_pmm(pmm_range);
     memory_mapping_create(self, range, object);
 
-    return OK(MemorySpaceResult, range);
+    return OK(SpaceResult, range);
 }
 
-MemorySpaceResult memory_space_alloc(MemorySpace *self, size_t size)
+SpaceResult space_alloc(Space *self, size_t size)
 {
     LOCK_RETAINER(&self->lock);
 
@@ -120,10 +128,10 @@ MemorySpaceResult memory_space_alloc(MemorySpace *self, size_t size)
     auto object = memory_object_create(range.size);
     memory_mapping_create(self, range, object);
 
-    return OK(MemorySpaceResult, range);
+    return OK(SpaceResult, range);
 }
 
-void memory_space_unmap(MemorySpace *self, VmmRange range)
+void space_unmap(Space *self, VmmRange range)
 {
     LOCK_RETAINER(&self->lock);
 

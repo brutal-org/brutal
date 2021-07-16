@@ -3,6 +3,8 @@
 #include <brutal/base.h>
 #include <brutal/text.h>
 #include <brutal/types.h>
+#include "arch/heap.h"
+#include "kernel/domain.h"
 #include "kernel/memory.h"
 
 #define CPU_SCHEDULER_MANAGER 0
@@ -34,23 +36,19 @@ typedef struct
 
 typedef struct
 {
-    uintptr_t base;
-    uintptr_t size;
-} Stack;
+    Object base;
 
-typedef struct
-{
-    TaskId id;
     StrFix128 name;
     TaskFlags flags;
     TaskState state;
 
     TaskSchedule schedule;
 
-    MemorySpace *space;
+    Space *space;
+    Domain *domain;
 
     uintptr_t sp;
-    Stack stack;
+    HeapRange stack;
 } Task;
 
 typedef Result(BrResult, Task *) TaskCreateResult;
@@ -62,8 +60,6 @@ TaskCreateResult task_create(Str name, TaskFlags flags);
 void task_start(Task *self, uintptr_t ip, uintptr_t sp, BrTaskArgs args);
 
 void task_state(Task *self, TaskState state);
-
-void task_wait(Task *self, uint64_t ms);
 
 /* --- Task Management ------------------------------------------------------ */
 

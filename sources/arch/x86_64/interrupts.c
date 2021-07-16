@@ -117,7 +117,7 @@ void scheduler_save_context(Regs const *regs)
 {
     TaskImpl *impl = (TaskImpl *)task_self();
 
-    simd_context_save(impl->simd_context);
+    simd_context_save(impl->simd);
     impl->regs = *regs;
 }
 
@@ -127,9 +127,9 @@ void scheduler_load_context(Regs *regs)
     auto impl = (TaskImpl *)task_self();
 
     *regs = impl->regs;
-    simd_context_load(impl->simd_context);
+    simd_context_load(impl->simd);
 
-    memory_space_switch(task->space);
+    space_switch(task->space);
     syscall_set_stack(range_end(task->stack));
 }
 

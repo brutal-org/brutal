@@ -7,6 +7,5 @@ typedef struct
 {
     Task base;
     Regs regs;
-
-    void *simd_context;
+    void *simd;
 } TaskImpl;
