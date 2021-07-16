@@ -1,7 +1,7 @@
 
 
 
-interface net{
+interface net {
 
     enum Error 
     {
@@ -16,7 +16,7 @@ interface net{
     struct block
     {
         var size : i8; 
-        var data : *;
+        var data : void;
     };
 
-}
+};
