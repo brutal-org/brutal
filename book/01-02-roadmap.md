@@ -21,28 +21,25 @@
 
 - [ ] IPC
 - [ ] IDL
-- [ ] Shell
 - [ ] TTY
-
-## Milestone 3 - Driver And File System
-
 - [ ] IRQ routing to userspace
 - [ ] VFS
 - [ ] Disk driver (VIRT-IO? AHCI? NVME? IDE (lol)?)
 - [ ] ext2
 
-## Milestone 4 - User Interfaces
+## Milestone 3 - User Interfaces
 
+- [ ] Shell
 - [ ] Keyboard driver
 - [ ] Mouse driver
 - [ ] Framebuffer driver
 - [ ] Compositor
 
-## Milestone 5 - DOOM!
+## Milestone 4 - DOOM!
 
 - [ ] DOOM :rage2:
 
-## Milestone 6 - Networking
+## Milestone 5 - Networking
 
 - [ ] Implement virtio-net or E1000 driver
 - [ ] Implement TCP/IP

@@ -35,8 +35,6 @@ typedef struct
     VecObject objects;
 } Domain;
 
-typedef Result(BrResult, Object *) ObjectLookupResult;
-
 Domain *domain_create(void);
 
 void domain_ref(Domain *domain);
@@ -47,7 +45,7 @@ void domain_add(Domain *self, Object *object);
 
 void domain_remove(Domain *self, BrHandle handle);
 
-ObjectLookupResult domain_resolve(Domain *self, BrHandle handle);
+Object *domain_lookup(Domain *self, BrHandle handle, ObjectType type);
 
 void object_init(Object *self, ObjectType type, ObjectDtor *dtor);
 
@@ -55,4 +53,4 @@ void object_ref(Object *self);
 
 void object_deref(Object *self);
 
-ObjectLookupResult global_lookup(BrHandle handle);
+Object *global_lookup(BrHandle handle);

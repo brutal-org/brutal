@@ -74,7 +74,10 @@ void init_start(struct handover *handover)
 
     assert_truth(elf_supported(elf, module->size));
 
-    Task *task = UNWRAP(task_create(name, TASK_USER));
+    auto space = space_create();
+    Task *task = UNWRAP(task_create(name, space, TASK_USER));
+    space_deref(space);
+
     elf_load_program(task, elf, (void const *)module->addr);
 
     // Create the user stack.

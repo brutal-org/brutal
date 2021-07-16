@@ -4,6 +4,7 @@
 #include <brutal/text.h>
 #include <brutal/types.h>
 #include "arch/heap.h"
+#include "kernel/channel.h"
 #include "kernel/domain.h"
 #include "kernel/memory.h"
 
@@ -44,8 +45,10 @@ typedef struct
 
     TaskSchedule schedule;
 
+    BrCap caps;
     Space *space;
     Domain *domain;
+    Channel *channel;
 
     uintptr_t sp;
     HeapRange stack;
@@ -55,7 +58,11 @@ typedef Result(BrResult, Task *) TaskCreateResult;
 
 Task *task_self(void);
 
-TaskCreateResult task_create(Str name, TaskFlags flags);
+TaskCreateResult task_create(Str name, Space *space, TaskFlags flags);
+
+void task_ref(Task *self);
+
+void task_deref(Task *self);
 
 void task_start(Task *self, uintptr_t ip, uintptr_t sp, BrTaskArgs args);
 

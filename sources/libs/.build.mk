@@ -1,6 +1,7 @@
 LIBS_BIN = $(BUILDDIR_CROSS)/libbrutal.a
 
 LIBS_SRC = \
+	$(wildcard sources/libs/syscalls/*.c) \
 	$(wildcard sources/libs/ansi/*.c) \
 	$(wildcard sources/libs/posix/*.c) \
 	$(wildcard sources/libs/gnu/*.c) \

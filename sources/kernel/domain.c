@@ -60,20 +60,20 @@ void domain_remove(Domain *self, BrHandle handle)
     }
 }
 
-ObjectLookupResult domain_lookup(Domain *self, BrHandle handle)
+Object *domain_lookup(Domain *self, BrHandle handle, ObjectType type)
 {
     LOCK_RETAINER(&self->lock);
 
     vec_foreach(object, &self->objects)
     {
-        if (object->handle == handle)
+        if (object->handle == handle && object->type == type)
         {
             refcount_ref(&object->refcount);
-            return OK(ObjectLookupResult, object);
+            return object;
         }
     }
 
-    return ERR(ObjectLookupResult, BR_BAD_HANDLE);
+    return nullptr;
 }
 
 static _Atomic BrHandle handles = 1;
@@ -119,13 +119,13 @@ void object_deref(Object *self)
     }
 }
 
-ObjectLookupResult global_lookup(BrHandle handle)
+Object *global_lookup(BrHandle handle)
 {
     LOCK_RETAINER(&lock);
 
     if (!initialized)
     {
-        return ERR(ObjectLookupResult, BR_BAD_HANDLE);
+        return nullptr;
     }
 
     vec_foreach(object, &global)
@@ -133,9 +133,9 @@ ObjectLookupResult global_lookup(BrHandle handle)
         if (object->handle == handle)
         {
             refcount_ref(&object->refcount);
-            return OK(ObjectLookupResult, object);
+            return object;
         }
     }
 
-    return ERR(ObjectLookupResult, BR_BAD_HANDLE);
+    return nullptr;
 }

@@ -53,8 +53,12 @@ typedef Result(BrResult, VmmRange) SpaceResult;
 
 SpaceResult space_map(Space *self, VmmRange range);
 
+SpaceResult space_map_obj(Space *self, VmmRange range, MemoryObject *mobj);
+
 SpaceResult space_map_pmm(Space *self, VmmRange range, PmmRange pmm_range);
 
 SpaceResult space_alloc(Space *self, size_t size);
+
+SpaceResult space_alloc_obj(Space *self, MemoryObject *mobj);
 
 void space_unmap(Space *self, VmmRange range);

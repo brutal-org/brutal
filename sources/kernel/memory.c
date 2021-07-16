@@ -85,7 +85,7 @@ Space *space_create(void)
 
 void space_ref(Space *self)
 {
-    object_deref(base_cast(self));
+    object_ref(base_cast(self));
 }
 
 void space_deref(Space *self)
@@ -109,6 +109,16 @@ SpaceResult space_map(Space *self, VmmRange range)
     return OK(SpaceResult, range);
 }
 
+SpaceResult space_map_obj(Space *self, VmmRange range, MemoryObject *mobj)
+{
+    LOCK_RETAINER(&self->lock);
+
+    range_alloc_used(&self->alloc, range_cast(USizeRange, range));
+    memory_mapping_create(self, range, mobj);
+
+    return OK(SpaceResult, range);
+}
+
 SpaceResult space_map_pmm(Space *self, VmmRange range, PmmRange pmm_range)
 {
     LOCK_RETAINER(&self->lock);
@@ -127,6 +137,16 @@ SpaceResult space_alloc(Space *self, size_t size)
     auto range = range_cast(VmmRange, range_alloc_alloc(&self->alloc, size));
     auto object = memory_object_create(range.size);
     memory_mapping_create(self, range, object);
+
+    return OK(SpaceResult, range);
+}
+
+SpaceResult space_alloc_obj(Space *self, MemoryObject *mobj)
+{
+    LOCK_RETAINER(&self->lock);
+
+    auto range = range_cast(VmmRange, range_alloc_alloc(&self->alloc, mobj->range.size));
+    memory_mapping_create(self, range, mobj);
 
     return OK(SpaceResult, range);
 }

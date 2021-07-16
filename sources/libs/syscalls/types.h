@@ -41,6 +41,8 @@ typedef enum
     BR_BAD_HANDLE,
     BR_NOT_IMPLEMENTED,
     BR_BAD_SYSCALL,
+    BR_CHANNEL_FULL,
+    BR_CHANNEL_EMPTY,
 } BrResult;
 
 typedef uint64_t BrArg;
@@ -87,23 +89,13 @@ typedef enum
     BR_TASK_NONE = 0,
 } BrTaskFlags;
 
-typedef struct PACKED
-{
-
-} BrBlocker;
-
-typedef enum
-{
-    BR_BLOCK_NONE = 0,
-} BrBlockFlags;
-
 typedef uint64_t BrTimeout;
 
 typedef struct PACKED
 {
     BrTask sender;
     size_t size;
-    BrMObj mobj;
+    BrHandle handle;
 } BrMessageHeader;
 
 typedef struct PACKED
@@ -117,6 +109,8 @@ _Static_assert(sizeof(BrMessage) == 512, "");
 typedef enum
 {
     BR_IPC_NONE = 0,
+
+    BR_IPC_BLOCK = 1 << 0,
 } BrIpcFlags;
 
 typedef uint64_t BrIrq;
@@ -136,6 +130,7 @@ typedef enum
     BR_CAP_IRQ = 1 << 0,
     BR_CAP_PMM = 1 << 1,
     BR_CAP_LOG = 1 << 2,
+    BR_CAP_TASK = 1 << 3,
 
     BR_CAP_ALL = 0xffffffff,
 } BrCap;

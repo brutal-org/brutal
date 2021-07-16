@@ -29,15 +29,15 @@ void task_destroy(Task *task)
 {
     space_deref(task->space);
     domain_deref(task->domain);
+    channel_destroy(task->channel);
 
     heap_free(task->stack);
 
     arch_task_destroy(task);
 }
 
-TaskCreateResult task_create(Str name, TaskFlags flags)
+TaskCreateResult task_create(Str name, Space *space, TaskFlags flags)
 {
-
     log("Creating Task({})...", name);
 
     auto task = TRY(TaskCreateResult, arch_task_create());
@@ -45,8 +45,10 @@ TaskCreateResult task_create(Str name, TaskFlags flags)
     task->name = str_cast_fix(StrFix128, name);
     task->flags = flags;
 
-    task->space = space_create();
+    space_ref(space);
+    task->space = space;
     task->domain = domain_create();
+    task->channel = channel_create();
 
     // Create the kernel stack
     task->stack = UNWRAP(heap_alloc(KERNEL_STACK_SIZE));
@@ -63,6 +65,16 @@ TaskCreateResult task_create(Str name, TaskFlags flags)
     return OK(TaskCreateResult, task);
 }
 
+void task_ref(Task *self)
+{
+    object_ref(base_cast(self));
+}
+
+void task_deref(Task *self)
+{
+    object_deref(base_cast(self));
+}
+
 void task_start(Task *self, uintptr_t ip, uintptr_t sp, BrTaskArgs args)
 {
     LOCK_RETAINER(&task_lock);
@@ -73,7 +85,8 @@ void task_start(Task *self, uintptr_t ip, uintptr_t sp, BrTaskArgs args)
 
 Task *task_create_idle(void)
 {
-    auto task = UNWRAP(task_create(str_cast("idle"), TASK_NONE));
+    auto space = space_create();
+    auto task = UNWRAP(task_create(str_cast("idle"), space, TASK_NONE));
     arch_task_start(task, (uintptr_t)task_idle, task->sp, (BrTaskArgs){});
     task->state = TASK_STATE_IDLE;
     return task;
@@ -81,7 +94,9 @@ Task *task_create_idle(void)
 
 Task *task_create_boot(void)
 {
-    auto task = UNWRAP(task_create(str_cast("boot"), TASK_NONE));
+    auto space = space_create();
+    auto task = UNWRAP(task_create(str_cast("boot"), space, TASK_NONE));
+    space_deref(space);
     task_start(task, 0, 0, (BrTaskArgs){});
     return task;
 }
