@@ -1,0 +1,3 @@
+INIT_NAME = init
+
+BINS += INIT

@@ -41,23 +41,18 @@ CROSS_KCFLAGS= \
 	-mcmodel=kernel \
 	-D__kernel__=1
 
-CROSS_ACFLAGS= \
+CROSS_UCFLAGS= \
 	$(CROSS_CFLAGS) \
-    	-fno-pic \
-    	-fno-stack-protector \
-    	-mno-80387 \
-    	-mno-mmx \
-    	-mno-3dnow \
-    	-mno-sse \
-    	-mno-sse2 \
-    	-mno-red-zone -nostdlib
+	-fno-pic \
+	-fno-stack-protector \
+	-nostdlib
 
 CROSS_LD=$(CONFIG_ARCH)-elf-ld
 CROSS_KLDFLAGS= \
 	-Tsources/arch/$(CONFIG_ARCH)/link.ld \
 	-z max-page-size=0x1000
 
-CROSS_ALDFLAGS= \
+CROSS_ULDFLAGS= \
 	-Tsources/arch/$(CONFIG_ARCH)/app_link.ld \
 	-z max-page-size=0x1000
 

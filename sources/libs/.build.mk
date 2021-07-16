@@ -6,7 +6,6 @@ LIBS_SRC = \
 
 LIBS_OBJ = $(patsubst sources/%.c, $(BUILDDIR_CROSS)/%.c.o, $(LIBS_SRC))
 
-TARGETS += $(LIBS_BIN)
 DEPENDENCIES += $(LIBS_OBJ:.o=.d)
 
 $(BUILDDIR_CROSS)/libs/brutal/%.c.o: sources/libs/brutal/%.c

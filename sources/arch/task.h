@@ -6,5 +6,3 @@
 TaskCreateResult arch_task_create(void);
 
 void arch_task_start(Task *task, uintptr_t ip, uintptr_t sp, BrTaskArgs args);
-
-void arch_task_create_vmm(Task *target, bool user);

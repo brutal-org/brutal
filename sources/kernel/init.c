@@ -64,9 +64,11 @@ static void elf_load_program(Task *task, Elf64Header const *elf, void const *dat
     }
 }
 
+static BrTask init = BR_TASK_ERROR;
+
 void init_start(struct handover *handover)
 {
-    auto name = str_cast("bootstrap");
+    auto name = str_cast("init");
     auto module = handover_find_module(handover, name);
     auto elf = (Elf64Header *)module->addr;
 
@@ -78,5 +80,12 @@ void init_start(struct handover *handover)
     // Create the user stack.
     memory_space_map(task->space, (VmmRange){USER_STACK_BASE - KERNEL_STACK_SIZE, KERNEL_STACK_SIZE});
 
+    init = task->id;
     task_start(task, elf->entry, USER_STACK_BASE, (BrTaskArgs){});
+}
+
+BrTask init_handle(void)
+{
+    assert_not_equal(init, BR_TASK_ERROR);
+    return init;
 }

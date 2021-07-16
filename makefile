@@ -44,13 +44,13 @@ include meta/toolchain/$(CONFIG_TOOLCHAIN)/.build.mk
 include sources/arch/.build.mk
 include sources/kernel/.build.mk
 include sources/libs/.build.mk
-include sources/bootstrap/.build.mk
-include sources/sysroot/.build.mk
+include sources/bins/.build.mk
 include sources/test/.build.mk
+include sysroot/.build.mk
 
-all: $(TARGETS)
+all: $(ISO)
 
-run: $(SYSROOT_ISO)
+run: $(ISO)
 	qemu-system-x86_64 \
 		-M q35 \
 		-cpu host \
@@ -60,7 +60,7 @@ run: $(SYSROOT_ISO)
 		-serial mon:stdio \
 		-no-reboot \
 		-no-shutdown \
-		-cdrom $(SYSROOT_ISO) \
+		-cdrom $(ISO) \
 		-d guest_errors
 
 bochs:

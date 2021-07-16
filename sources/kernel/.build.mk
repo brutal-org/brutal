@@ -23,9 +23,8 @@ KERNEL_OBJ= \
 	$(patsubst sources/%.c, $(BUILDDIR_CROSS)/kernel/%.c.o, $(KERNEL_LIBS_SRC)) \
 	$(patsubst sources/%.s, $(BUILDDIR_CROSS)/%.s.o, $(KERNEL_S_SRC))
 
-KERNEL_BIN=$(BUILDDIR_CROSS)/kernel.elf
+KERNEL=$(BUILDDIR_CROSS)/kernel.elf
 
-TARGETS += $(KERNEL_BIN)
 DEPENDENCIES += $(KERNEL_OBJ:.o=.d)
 
 $(BUILDDIR_CROSS)/kernel/%.c.o: sources/kernel/%.c
@@ -40,6 +39,6 @@ $(BUILDDIR_CROSS)/kernel/libs/%.c.o: sources/libs/%.c
 	$(MKCWD)
 	$(CROSS_CC) -c -o $@ $< $(CROSS_KCFLAGS)
 
-$(KERNEL_BIN): $(KERNEL_OBJ)
+$(KERNEL): $(KERNEL_OBJ)
 	$(MKCWD)
 	$(CROSS_LD) -o $@ $^ $(CROSS_KLDFLAGS)

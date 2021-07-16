@@ -4,3 +4,5 @@
 #include "kernel/tasking.h"
 
 void init_start(struct handover *handover);
+
+BrTask init_handle(void);

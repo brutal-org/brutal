@@ -1,0 +1,3 @@
+POSIX_NAME = posix
+
+BINS += POSIX
