@@ -3,10 +3,10 @@
 #include <brutal/bid/bid.h>
 #include <brutal/bid/bid_convert_c.h>
 #include <brutal/io.h>
+#include <brutal/io/buffer.h>
 #include <brutal/io/scan.h>
 #include <brutal/log.h>
 #include "brutal/alloc/global.h"
-#include "brutal/ds/buffer.h"
 #include "brutal/host/log.h"
 #include "brutal/text/str.h"
 
