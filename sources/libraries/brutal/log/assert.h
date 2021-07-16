@@ -53,6 +53,28 @@
         }                                                                                  \
     })
 
+#define assert_str_equal(lhs_expr, rhs_expr) (                                                 \
+    {                                                                                          \
+        auto lhs_value = lhs_expr;                                                             \
+        auto rhs_value = rhs_expr;                                                             \
+                                                                                               \
+        if (!str_eq(lhs_value, rhs_value))                                                     \
+        {                                                                                      \
+            panic(#lhs_expr " == " #rhs_expr ": {} is not equal to {}", lhs_value, rhs_value); \
+        }                                                                                      \
+    })
+
+#define assert_str_not_equal(lhs_expr, rhs_expr) (                                         \
+    {                                                                                      \
+        auto lhs_value = lhs_expr;                                                         \
+        auto rhs_value = rhs_expr;                                                         \
+                                                                                           \
+        if (str_eq(lhs_value, rhs_value))                                                  \
+        {                                                                                  \
+            panic(#lhs_expr " != " #rhs_expr ": {} is equal to {}", lhs_value, rhs_value); \
+        }                                                                                  \
+    })
+
 #define assert_greater_than(lhs_expr, rhs_expr) (                                                 \
     {                                                                                             \
         auto lhs_value = lhs_expr;                                                                \
