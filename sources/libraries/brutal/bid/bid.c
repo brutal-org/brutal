@@ -118,6 +118,13 @@ static struct bid_error bid_create_error(enum bid_error_type type, Str error_msg
         .type = type};
 }
 
+static struct bid_error bid_create_unexpected_token_error(Str expected_token, const struct bid *idl_in)
+{
+    struct bid_error err_res = bid_create_error(BID_ERROR_TYPE_UNEXPECTED_TOKEN, str_cast("unexpected token"), idl_in);
+    err_res.specific_information.expected_token.name = expected_token;
+    return err_res;
+}
+
 static BidParseResult scan_interface_block(struct bid *idl_in, struct bid_ast_node *interface_node)
 {
     (void)interface_node;
@@ -125,7 +132,7 @@ static BidParseResult scan_interface_block(struct bid *idl_in, struct bid_ast_no
     // interface name [{]}
     if (scan_curr(&idl_in->scanner) != '{')
     {
-        return ERR(BidParseResult, bid_create_error(BID_ERROR_TYPE_UNEXPECTED_TOKEN, str_cast("expected openning '{'"), idl_in));
+        return ERR(BidParseResult, bid_create_unexpected_token_error(BID_OPENNING_BRACKETS, idl_in));
     }
     scan_next(&idl_in->scanner);
     skip_comment_and_space(idl_in);
@@ -141,7 +148,7 @@ static BidParseResult scan_interface_block(struct bid *idl_in, struct bid_ast_no
     if (scan_curr(&idl_in->scanner) != '}')
     {
 
-        return ERR(BidParseResult, bid_create_error(BID_ERROR_TYPE_UNEXPECTED_TOKEN, str_cast("expected closing '}'"), idl_in));
+        return ERR(BidParseResult, bid_create_unexpected_token_error(BID_CLOSING_BRACKETS, idl_in));
     }
     skip_comment_and_space(idl_in);
 
@@ -168,7 +175,7 @@ static BidParseResult scan_interface_definition(struct bid *idl_in)
 
         if (interface_name.len == 0)
         {
-            return ERR(BidParseResult, bid_create_error(BID_ERROR_TYPE_UNEXPECTED_TOKEN, str_cast("expected name"), idl_in));
+            return ERR(BidParseResult, bid_create_unexpected_token_error(BID_ALNUM_STR, idl_in));
         }
 
         ast->interface.name = interface_name;
@@ -179,7 +186,7 @@ static BidParseResult scan_interface_definition(struct bid *idl_in)
     }
     else
     {
-        return ERR(BidParseResult, bid_create_error(BID_ERROR_TYPE_UNEXPECTED_TOKEN, str_cast("expected token: 'interface'"), idl_in));
+        return ERR(BidParseResult, bid_create_unexpected_token_error(BID_INTERFACE_STR, idl_in));
     }
 
     return OK(BidParseResult, (MonoState){});
@@ -199,11 +206,6 @@ BidResult init_bid(Str idl_in)
     TRY(BidResult, scan_bid(&mbid));
 
     return OK(BidResult, mbid);
-}
-
-Str bid_to_c(MAYBE_UNUSED struct bid from)
-{
-    return str_cast("love u");
 }
 
 void destroy_bid(struct bid *in)

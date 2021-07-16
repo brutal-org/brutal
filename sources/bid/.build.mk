@@ -18,3 +18,5 @@ $(BID_BIN): $(BID_OBJ)
 
 run-bid: $(BID_BIN)
 	$(BID_BIN) sources/bid/test.bid sources/bid/test.c
+
+bid: $(BID_BIN)

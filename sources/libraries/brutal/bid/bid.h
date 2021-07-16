@@ -3,7 +3,10 @@
 #include <brutal/ds.h>
 #include <brutal/io/scan.h>
 
-#define BID_INTERFACE_TOKEN (str_cast("interface"))
+#define BID_INTERFACE_STR (str_cast("interface"))
+#define BID_ALNUM_STR (str_cast("[a-Az-Z_] string"))
+#define BID_CLOSING_BRACKETS (str_cast("}"))
+#define BID_OPENNING_BRACKETS (str_cast("}"))
 
 enum bid_error_type
 {
@@ -21,6 +24,14 @@ struct bid_error
     enum bid_error_type type;
     struct bid_buffer_position pos;
     Str message;
+
+    union
+    {
+        struct
+        {
+            Str name;
+        } expected_token;
+    } specific_information;
 };
 
 enum bid_ast_node_type
@@ -40,7 +51,6 @@ struct bid_ast_node
         {
             Str name;
         } interface;
-
     };
 };
 
@@ -48,7 +58,7 @@ struct bid
 {
     Str in_data;
 
-    struct bid_ast_node* root_ast;
+    struct bid_ast_node *root_ast;
     struct scan scanner;
     int _current_scanned_token_cursor;
 };
@@ -58,13 +68,10 @@ typedef Result(struct bid_error, struct bid) BidResult;
 
 BidResult init_bid(Str idl_in);
 
-
 void destroy_bid(struct bid *in);
-
-Str bid_to_c(struct bid from);
 
 enum bid_token_type bid_token_from_char(char from);
 
 enum bid_keywords bid_keyword_from_string(Str from);
 
-void print_ast_node_recursive(struct bid_ast_node * from);
+void print_ast_node_recursive(struct bid_ast_node *from);
