@@ -1,22 +1,6 @@
 
-
+/* test comment uwu */
 
 interface net {
 
-    enum Error 
-    {
-        CONNECTION_LOST,
-    };
-
-    method send(data : Buffer) -> MaybeError<Error>;
-
-    method recv() -> Result<Error, Buffer>;
-
-    /* owo */
-    struct block
-    {
-        var size : i8; 
-        var data : void;
-    };
-
-};
+}

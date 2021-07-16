@@ -1,11 +1,13 @@
 
 #include <brutal/base.h>
 #include <brutal/bid/bid.h>
+#include <brutal/bid/bid_convert_c.h>
 #include <brutal/io.h>
 #include <brutal/io/scan.h>
 #include <brutal/log.h>
 #include "brutal/alloc/global.h"
 #include "brutal/ds/buffer.h"
+#include "brutal/host/log.h"
 #include "brutal/text/str.h"
 
 int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char const *argv[])
@@ -31,8 +33,15 @@ int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char const *argv[])
 
     if (!result.success)
     {
-   //     log("error: {} {} on {}", result._error.message, result._error.type, result._error.offset);
+        log("error: {} {} on {}", result._error.message, result._error.type, result._error.pos.offset);
+        return 1;
     }
+
+    print_ast_node_recursive((result._ok.root_ast));
+
+    convert_bid_to_c(&result._ok, host_log_writer());
+    destroy_bid(&(result._ok));
+
     // {keyword } {action} {;}
     // {keyword } {action} {;}
     // ...
