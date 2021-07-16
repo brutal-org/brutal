@@ -1,15 +1,9 @@
-#include <syscalls/syscalls.h>
-
-int main(int argc, char const *argv[]);
-
-void _start()
-{
-    main(0, (char const **)0);
-}
+#include <brutal/base.h>
+#include <brutal/log.h>
 
 int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char const *argv[])
 {
-    br_log("Hello, world!", 13);
+    log("Hello, world!");
 
     while (1)
     {

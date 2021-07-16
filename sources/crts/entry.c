@@ -1,0 +1,14 @@
+
+#include <syscalls/syscalls.h>
+
+__attribute__((weak)) int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char **argv, MAYBE_UNUSED char **envp) { return 0; }
+
+__attribute__((weak)) int server_main(long arg1, long arg2, long arg3, MAYBE_UNUSED long arg4, MAYBE_UNUSED long arg5)
+{
+    return main(arg1, (char **)arg2, (char **)arg3);
+}
+
+void _entry(long arg1, long arg2, long arg3, long arg4, long arg5)
+{
+    br_exit(BR_TASK_SELF, server_main(arg1, arg2, arg3, arg4, arg5));
+}

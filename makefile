@@ -44,6 +44,7 @@ include meta/toolchain/$(CONFIG_TOOLCHAIN)/.build.mk
 include sources/arch/.build.mk
 include sources/kernel/.build.mk
 include sources/libs/.build.mk
+include sources/crts/.build.mk
 include sources/bins/.build.mk
 include sources/test/.build.mk
 include sysroot/.build.mk
