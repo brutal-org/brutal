@@ -437,9 +437,7 @@ void alloc_heap_init(struct alloc_heap *alloc)
     *alloc = (struct alloc_heap){
         .base = {
             .acquire = (AllocAcquire *)alloc_heap_acquire,
-            .commit = alloc_no_op,
             .resize = (AllocResize *)alloc_heap_resize,
-            .decommit = alloc_no_op,
             .release = (AllocRelease *)alloc_heap_release,
         },
         .best = nullptr,

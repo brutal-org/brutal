@@ -43,9 +43,7 @@ Alloc *alloc_global(void)
 {
     static Alloc memory = {
         .acquire = alloc_global_acquire,
-        .commit = alloc_no_op,
         .resize = alloc_global_resize,
-        .decommit = alloc_no_op,
         .release = alloc_global_release,
     };
 
