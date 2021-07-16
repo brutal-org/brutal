@@ -11,6 +11,7 @@ KERNEL_LIBS_SRC = \
 			  $(wildcard sources/libraries/brutal/io/print.c) \
 			  $(wildcard sources/libraries/brutal/io/scan.c) \
 			  $(wildcard sources/libraries/brutal/io/write.c) \
+			  $(wildcard sources/libraries/brutal/io/buffer.c) \
 			  $(wildcard sources/libs/brutal/mem/*.c) \
 			  $(wildcard sources/libraries/brutal/text/*.c) \
 			  $(wildcard sources/libraries/brutal/sync/*.c) \
