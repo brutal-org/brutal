@@ -57,9 +57,9 @@ static inline BrResult br_task(BrTask *task, BrSpace space, BrTaskFlags flags)
     return br_syscall(BR_SC_TASK, (BrArg)task, space, flags, 0, 0);
 }
 
-static inline BrResult br_start(BrTask task, uintptr_t ip, uintptr_t sp)
+static inline BrResult br_start(BrTask task, uintptr_t ip, uintptr_t sp, BrTaskArgs *args)
 {
-    return br_syscall(BR_SC_START, task, ip, sp, 0, 0);
+    return br_syscall(BR_SC_START, task, ip, sp, (BrArg)args, 0);
 }
 
 static inline BrResult br_exit(BrTask task, uintptr_t exit_value)

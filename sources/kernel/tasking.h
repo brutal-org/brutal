@@ -24,56 +24,49 @@ typedef enum
 } TaskState;
 
 // See scheduler.md in the book for more information
-struct task_schedule_state
+typedef struct
 {
     CpuId cpu; // Only valid if tick_in_cpu is >= 0
     int tick_start;
     int tick_end;
     bool is_currently_executed;
-};
+} TaskSchedule;
 
-struct stack
+typedef struct
 {
     uintptr_t base;
     uintptr_t size;
-};
+} Stack;
 
-struct task
+typedef struct
 {
     TaskId id;
     StrFix128 name;
     TaskFlags flags;
     TaskState state;
 
-    struct task_schedule_state scheduler_state;
+    TaskSchedule schedule;
 
     MemorySpace *space;
 
     uintptr_t ksp;
-    struct stack kernel_stack;
+    Stack kernel_stack;
 
     uintptr_t usp;
-    struct stack user_stack;
-};
+    Stack user_stack;
+} Task;
 
-typedef Result(BrResult, struct task *) TaskCreateResult;
+typedef Result(BrResult, Task *) TaskCreateResult;
 
-struct task *task_self(void);
+Task *task_self(void);
 
 TaskCreateResult task_create(Str name, TaskFlags flags);
 
-void task_start(
-    struct task *self,
-    uintptr_t ip,
-    uintptr_t arg1,
-    uintptr_t arg2,
-    uintptr_t arg3,
-    uintptr_t arg4,
-    uintptr_t arg5);
+void task_start(Task *self, uintptr_t ip, uintptr_t sp, BrTaskArgs args);
 
-void task_state(struct task *self, TaskState state);
+void task_state(Task *self, TaskState state);
 
-void task_wait(struct task *self, uint64_t ms);
+void task_wait(Task *self, uint64_t ms);
 
 /* --- Task Management ------------------------------------------------------ */
 
@@ -83,9 +76,9 @@ void tasking_initialize(void);
 
 struct schedule
 {
-    struct task *idle;
-    struct task *current;
-    struct task *next;
+    Task *idle;
+    Task *current;
+    Task *next;
 };
 
 void scheduler_switch(void);

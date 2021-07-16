@@ -10,7 +10,7 @@
 
 static Lock task_lock = {};
 static TaskId task_id = 0;
-static Vec(struct task *) tasks = {};
+static Vec(Task *) tasks = {};
 size_t current_tick = 0;
 
 void task_idle(void)
@@ -21,7 +21,7 @@ void task_idle(void)
     }
 }
 
-struct task *task_self(void)
+Task *task_self(void)
 {
     return cpu_self()->schedule.current;
 }
@@ -42,12 +42,12 @@ TaskCreateResult task_create(Str name, TaskFlags flags)
 
     // Create the kernel stack
     auto kernel_stack = TRY(TaskCreateResult, heap_alloc(KERNEL_STACK_SIZE));
-    task->kernel_stack = range_cast(struct stack, kernel_stack);
+    task->kernel_stack = range_cast(Stack, kernel_stack);
     task->ksp = range_end(task->kernel_stack);
 
     // Create the user stack
     auto user_stack = TRY(TaskCreateResult, heap_alloc(KERNEL_STACK_SIZE));
-    task->user_stack = range_cast(struct stack, kernel_stack);
+    task->user_stack = range_cast(Stack, kernel_stack);
     task->usp = range_end(task->user_stack);
 
     memory_space_map_pmm(task->space, (VmmRange){USER_STACK_BASE - KERNEL_STACK_SIZE, KERNEL_STACK_SIZE}, heap_to_pmm(user_stack));
@@ -59,37 +59,30 @@ TaskCreateResult task_create(Str name, TaskFlags flags)
     return OK(TaskCreateResult, task);
 }
 
-void task_start(
-    struct task *self,
-    uintptr_t ip,
-    uintptr_t arg1,
-    uintptr_t arg2,
-    uintptr_t arg3,
-    uintptr_t arg4,
-    uintptr_t arg5)
+void task_start(Task *self, uintptr_t ip, uintptr_t sp, BrTaskArgs args)
 {
     LOCK_RETAINER(&task_lock);
 
-    arch_task_start(self, ip, arg1, arg2, arg3, arg4, arg5);
+    arch_task_start(self, ip, sp, args);
     self->state = TASK_STATE_RUNNING;
 }
 
-struct task *task_create_idle(void)
+Task *task_create_idle(void)
 {
     auto task = UNWRAP(task_create(str_cast("idle"), TASK_NONE));
-    arch_task_start(task, (uintptr_t)task_idle, 0, 0, 0, 0, 0);
+    arch_task_start(task, (uintptr_t)task_idle, task->ksp, (BrTaskArgs){});
     task->state = TASK_STATE_IDLE;
     return task;
 }
 
-struct task *task_create_boot(void)
+Task *task_create_boot(void)
 {
     auto task = UNWRAP(task_create(str_cast("boot"), TASK_NONE));
-    task_start(task, 0, 0, 0, 0, 0, 0);
+    task_start(task, 0, 0, (BrTaskArgs){});
     return task;
 }
 
-void task_state(struct task *self, TaskState new_state)
+void task_state(Task *self, TaskState new_state)
 {
     LOCK_RETAINER(&task_lock);
 
@@ -101,7 +94,7 @@ void task_state(struct task *self, TaskState new_state)
     self->state = new_state;
 }
 
-void task_wait(MAYBE_UNUSED struct task *self, MAYBE_UNUSED uint64_t ms)
+void task_wait(MAYBE_UNUSED Task *self, MAYBE_UNUSED uint64_t ms)
 {
     // TODO: task wait
 }
@@ -136,19 +129,19 @@ static size_t running_process_count(void)
     return running_process_count;
 }
 
-static struct task *task_get_most_active(void)
+static Task *task_get_most_active(void)
 {
     size_t most_active_time = 0;
-    struct task *current_active = nullptr;
+    Task *current_active = nullptr;
 
     for (int i = 0; i < tasks.length; i++)
     {
-        if (tasks.data[i]->state != TASK_STATE_RUNNING || !tasks.data[i]->scheduler_state.is_currently_executed)
+        if (tasks.data[i]->state != TASK_STATE_RUNNING || !tasks.data[i]->schedule.is_currently_executed)
         {
             continue;
         }
 
-        auto time_running = (current_tick - tasks.data[i]->scheduler_state.tick_start);
+        auto time_running = (current_tick - tasks.data[i]->schedule.tick_start);
 
         if (time_running > most_active_time)
         {
@@ -164,7 +157,7 @@ static bool task_has_waiting_task()
 {
     for (int i = 0; i < tasks.length; i++)
     {
-        if (tasks.data[i]->state == TASK_STATE_RUNNING && !tasks.data[i]->scheduler_state.is_currently_executed)
+        if (tasks.data[i]->state == TASK_STATE_RUNNING && !tasks.data[i]->schedule.is_currently_executed)
         {
             return true;
         }
@@ -173,19 +166,19 @@ static bool task_has_waiting_task()
     return false;
 }
 
-static struct task *task_get_most_waiting()
+static Task *task_get_most_waiting()
 {
     size_t most_waiting_time = 0;
-    struct task *current_waiting = nullptr;
+    Task *current_waiting = nullptr;
 
     for (int i = 0; i < tasks.length; i++)
     {
-        if (tasks.data[i]->state != TASK_STATE_RUNNING || tasks.data[i]->scheduler_state.is_currently_executed)
+        if (tasks.data[i]->state != TASK_STATE_RUNNING || tasks.data[i]->schedule.is_currently_executed)
         {
             continue;
         }
 
-        auto time_waiting = (current_tick - tasks.data[i]->scheduler_state.tick_end);
+        auto time_waiting = (current_tick - tasks.data[i]->schedule.tick_end);
 
         if (time_waiting > most_waiting_time)
         {
@@ -197,21 +190,21 @@ static struct task *task_get_most_waiting()
     return current_waiting;
 }
 
-static CpuId scheduler_end_task_execution(struct task *target)
+static CpuId scheduler_end_task_execution(Task *target)
 {
-    target->scheduler_state.tick_end = current_tick;
-    target->scheduler_state.is_currently_executed = false;
-    CpuId cur_cpu = target->scheduler_state.cpu;
-    target->scheduler_state.cpu = 0;
+    target->schedule.tick_end = current_tick;
+    target->schedule.is_currently_executed = false;
+    CpuId cur_cpu = target->schedule.cpu;
+    target->schedule.cpu = 0;
 
     return cur_cpu;
 }
 
-static void scheduler_start_task_execution(struct task *target, CpuId target_cpu)
+static void scheduler_start_task_execution(Task *target, CpuId target_cpu)
 {
-    target->scheduler_state.tick_start = current_tick;
-    target->scheduler_state.is_currently_executed = true;
-    target->scheduler_state.cpu = target_cpu;
+    target->schedule.tick_start = current_tick;
+    target->schedule.is_currently_executed = true;
+    target->schedule.cpu = target_cpu;
     cpu(target_cpu)->schedule.next = target;
 }
 
@@ -234,7 +227,7 @@ static bool scheduler_any_idle_cpu(void)
     return false;
 }
 
-static void scheduler_dispatch_to_idle_cpu(struct task *target)
+static void scheduler_dispatch_to_idle_cpu(Task *target)
 {
     for (size_t i = 0; i < cpu_count(); i++)
     {
@@ -246,9 +239,9 @@ static void scheduler_dispatch_to_idle_cpu(struct task *target)
     }
 }
 
-static void scheduler_dispatch_to_active_cpu(struct task *target)
+static void scheduler_dispatch_to_active_cpu(Task *target)
 {
-    struct task *most_active = task_get_most_active();
+    Task *most_active = task_get_most_active();
 
     CpuId target_cpu = scheduler_end_task_execution(most_active);
     scheduler_start_task_execution(target, target_cpu);
@@ -285,7 +278,7 @@ static void scheduler_update(void)
 
     for (size_t i = 0; i < schedule_count; i++)
     {
-        struct task *most_waiting = task_get_most_waiting();
+        Task *most_waiting = task_get_most_waiting();
 
         if (scheduler_any_idle_cpu())
         {

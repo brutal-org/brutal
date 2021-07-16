@@ -138,3 +138,12 @@ typedef enum
 
     BR_CAP_ALL = 0xffffffff,
 } BrCap;
+
+typedef struct
+{
+    uintptr_t arg1;
+    uintptr_t arg2;
+    uintptr_t arg3;
+    uintptr_t arg4;
+    uintptr_t arg5;
+} BrTaskArgs;

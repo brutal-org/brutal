@@ -2,6 +2,7 @@
 
 #include <brutal/io.h>
 #include <handover/handover.h>
+#include "kernel/tasking.h"
 
 IoWriter *arch_debug(void);
 
@@ -17,18 +18,14 @@ void arch_idle(void);
 
 void arch_stop(void);
 
-struct task *arch_create_task(void);
+Task *arch_create_task(void);
 
-void arch_save_task_context(struct task *task);
+void arch_destroy_task(Task *task);
 
-void arch_restore_task_context(struct task *task);
+void arch_enable_interrupt(void);
 
-void arch_destroy_task(struct task *task);
+void arch_disable_interrupt(void);
 
-void arch_enable_interrupt();
+void arch_cpu_pause(void);
 
-void arch_disable_interrupt();
-
-void arch_cpu_pause();
-
-void arch_cpu_halt();
+void arch_cpu_halt(void);

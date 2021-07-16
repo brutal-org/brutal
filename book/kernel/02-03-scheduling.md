@@ -59,7 +59,7 @@ this is way better, but here each process waits 1 tick and stays for 4 tick in t
 So in brutal we have (this may change over time) a scheduler state for each task:
 
 ```c
-struct task_schedule_state
+struct TaskSchedule
 {
     CpuId cpu;
     int tick_start;

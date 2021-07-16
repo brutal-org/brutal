@@ -6,7 +6,7 @@
 #include "arch/x86_64/interrupts.h"
 #include "arch/x86_64/msr.h"
 #include "kernel/constants.h"
-#include "kernel/syscall.h"
+#include "kernel/syscalls.h"
 
 extern void __syscall(void);
 
@@ -39,8 +39,8 @@ void syscall_set_stack(uintptr_t stack)
     cpu_impl_self()->syscall_kernel_stack = stack;
 }
 
-uint64_t syscall_handler(struct interrupt_stackframe *stackframe)
+uint64_t syscall_handler(Regs *regs)
 {
     // NOTE: we can't use r11 and rcx because they are used for storing the ip (r11) and the stack (rcx)
-    return syscall_dispatch(stackframe->rax, stackframe->rbx, stackframe->rdx, stackframe->rsi, stackframe->r8, stackframe->r9);
+    return syscall_dispatch(regs->rax, regs->rbx, regs->rdx, regs->rsi, regs->r8, regs->r9);
 }

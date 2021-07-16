@@ -1,6 +1,6 @@
 #include <brutal/host/log.h>
 #include <brutal/log.h>
-#include "kernel/syscall.h"
+#include "kernel/syscalls.h"
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -44,7 +44,7 @@ BrResult br_unmap(BrSpace space, uintptr_t vaddr, size_t size)
     return BR_NOT_IMPLEMENTED;
 }
 
-BrResult br_task(BrTask *task, BrSpace space, BrTaskFlags flags)
+BrResult br_task(BrTask *task, BrSpace space, BrTaskFlags flags, BrTaskArgs *args)
 {
     return BR_NOT_IMPLEMENTED;
 }

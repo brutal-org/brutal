@@ -20,36 +20,36 @@ TaskCreateResult arch_task_create(void)
 
     simd_context_init(task->simd_context);
 
-    return OK(TaskCreateResult, (struct task *)task);
+    return OK(TaskCreateResult, (Task *)task);
 }
 
-void arch_task_start(struct task *task, uintptr_t ip, uintptr_t arg1, uintptr_t arg2, uintptr_t arg3, uintptr_t arg4, uintptr_t arg5)
+void arch_task_start(Task *task, uintptr_t ip, uintptr_t sp, BrTaskArgs args)
 {
-    struct interrupt_stackframe regs;
+    Regs regs;
 
     regs.rip = ip;
     regs.rflags = RFLAGS_INTERRUPT_ENABLE | RFLAGS_RESERVED1_ONE;
 
-    regs.rdi = arg1;
-    regs.rsi = arg2;
-    regs.rdx = arg3;
-    regs.rcx = arg4;
-    regs.rdx = arg5;
+    regs.rdi = args.arg1;
+    regs.rsi = args.arg2;
+    regs.rdx = args.arg3;
+    regs.rcx = args.arg4;
+    regs.r8 = args.arg5;
 
     if (task->flags & TASK_USER)
     {
         regs.cs = (GDT_USER_CODE * 8) | GDT_RING_3;
         regs.ss = (GDT_USER_DATA * 8) | GDT_RING_3;
-        regs.rsp = USER_STACK_BASE;
         regs.rbp = 0;
     }
     else
     {
         regs.cs = (GDT_KERNEL_CODE * 8);
         regs.ss = (GDT_KERNEL_DATA * 8);
-        regs.rsp = task->ksp;
         regs.rbp = 0;
     }
+
+    regs.rsp = sp;
 
     ((TaskImpl *)task)->regs = regs;
 }

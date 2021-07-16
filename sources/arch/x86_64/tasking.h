@@ -5,8 +5,8 @@
 
 typedef struct
 {
-    struct task base;
-    struct interrupt_stackframe regs;
+    Task base;
+    Regs regs;
 
     void *simd_context;
 } TaskImpl;

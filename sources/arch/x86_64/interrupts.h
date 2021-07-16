@@ -2,7 +2,7 @@
 
 #include <brutal/base.h>
 
-struct PACKED interrupt_stackframe
+typedef struct PACKED
 {
     uint64_t r15;
     uint64_t r14;
@@ -28,4 +28,4 @@ struct PACKED interrupt_stackframe
     uint64_t rflags;
     uint64_t rsp;
     uint64_t ss;
-};
+} Regs;

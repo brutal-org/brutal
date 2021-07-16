@@ -3,6 +3,7 @@
 #include <handover/handover.h>
 #include "arch/arch.h"
 #include "arch/cpu.h"
+#include "kernel/constants.h"
 #include "kernel/entry.h"
 #include "kernel/loader.h"
 #include "kernel/tasking.h"
@@ -22,7 +23,7 @@ void kernel_boot_other(void)
     WAIT_FOR(other_ready == cpu_count());
 }
 
-void kernel_entry_main(MAYBE_UNUSED struct handover *handover)
+void kernel_entry_main(struct handover *handover)
 {
     kernel_splash();
     tasking_initialize();
@@ -31,11 +32,11 @@ void kernel_entry_main(MAYBE_UNUSED struct handover *handover)
 
     log("All CPU started, entering userspace...");
 
-    struct handover_module *mod = handover_find_module(handover, str_cast("bootstrap"));
+    auto mod = handover_find_module(handover, str_cast("bootstrap"));
 
     uintptr_t start = 0;
-    auto my_task = program_load(str_cast("bootstrap"), (void *)mod->addr, mod->size, &start);
-    task_start(UNWRAP(my_task), start, 0, 0, 0, 0, 0);
+    auto boostrap = UNWRAP(program_load(str_cast("bootstrap"), (void *)mod->addr, mod->size, &start));
+    task_start(boostrap, start, USER_STACK_BASE, (BrTaskArgs){});
 
     arch_idle();
 }

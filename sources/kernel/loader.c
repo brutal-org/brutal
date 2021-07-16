@@ -50,7 +50,7 @@ static HeapRange elf_loader_copy_segment(const struct elf64_program_header *head
     return range;
 }
 
-static ProgramloadResult map_program_header_load(struct task *task, const struct elf64_program_header *header, const void *data)
+static ProgramloadResult map_program_header_load(Task *task, const struct elf64_program_header *header, const void *data)
 {
     auto range = elf_loader_copy_segment(header, data);
 
@@ -64,7 +64,7 @@ static ProgramloadResult map_program_header_load(struct task *task, const struct
     return OK(ProgramloadResult, (MonoState){});
 }
 
-static ProgramloadResult map_program_header_entry(struct task *task, const struct elf64_program_header *header, const void *data)
+static ProgramloadResult map_program_header_entry(Task *task, const struct elf64_program_header *header, const void *data)
 {
     if (header->type == ELF_PROGRAM_HEADER_LOAD)
     {
@@ -82,7 +82,7 @@ static ProgramloadResult map_program_header_entry(struct task *task, const struc
     }
 }
 
-static ProgramloadResult init_program_memory_space(struct task *task, struct elf64_header *header, void *data)
+static ProgramloadResult init_program_memory_space(Task *task, struct elf64_header *header, void *data)
 {
     struct elf64_program_header *program_header_entry = (struct elf64_program_header *)(data + header->program_header_table_file_offset);
 
@@ -101,11 +101,10 @@ TaskCreateResult program_load(Str name, void *data, size_t size, uintptr_t *star
 
     if (!is_elf_supported(elf, size))
     {
-        log("invalid elf");
         return ERR(TaskCreateResult, BR_BAD_EXE_FORMAT);
     }
 
-    struct task *task = TRY(TaskCreateResult, task_create(name, TASK_USER));
+    Task *task = TRY(TaskCreateResult, task_create(name, TASK_USER));
 
     TRY(TaskCreateResult, init_program_memory_space(task, elf, data));
 

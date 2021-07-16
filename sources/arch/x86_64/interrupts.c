@@ -49,22 +49,22 @@ static char *_exception_messages[32] = {
     "Reserved",
 };
 
-void dump_register(struct interrupt_stackframe const *stackframe)
+void dump_register(Regs const *regs)
 {
-    log_unlock("RIP: {#016p} | RSP: {#016p}", stackframe->rip, stackframe->rsp);
+    log_unlock("RIP: {#016p} | RSP: {#016p}", regs->rip, regs->rsp);
     log_unlock("CR2: {#016p} | CR3: {#016p} ", asm_read_cr2(), asm_read_cr3());
-    log_unlock("CS : {#02p} | SS : {#02p} | RFlags: {#p}", stackframe->cs, stackframe->ss, stackframe->rflags);
+    log_unlock("CS : {#02p} | SS : {#02p} | RFlags: {#p}", regs->cs, regs->ss, regs->rflags);
 
     log_unlock("");
 
-    log_unlock("RAX: {#016p} | RBX: {#016p}", stackframe->rax, stackframe->rbx);
-    log_unlock("RCX: {#016p} | RDX: {#016p}", stackframe->rcx, stackframe->rdx);
-    log_unlock("RSI: {#016p} | RDI: {#016p}", stackframe->rsi, stackframe->rdi);
-    log_unlock("RBP: {#016p} | R8 : {#016p}", stackframe->rbp, stackframe->r8);
-    log_unlock("R9 : {#016p} | R10: {#016p}", stackframe->r9, stackframe->r10);
-    log_unlock("R11: {#016p} | R12: {#016p}", stackframe->r11, stackframe->r12);
-    log_unlock("R13: {#016p} | R14: {#016p}", stackframe->r13, stackframe->r14);
-    log_unlock("R15: {#016p}", stackframe->r15);
+    log_unlock("RAX: {#016p} | RBX: {#016p}", regs->rax, regs->rbx);
+    log_unlock("RCX: {#016p} | RDX: {#016p}", regs->rcx, regs->rdx);
+    log_unlock("RSI: {#016p} | RDI: {#016p}", regs->rsi, regs->rdi);
+    log_unlock("RBP: {#016p} | R8 : {#016p}", regs->rbp, regs->r8);
+    log_unlock("R9 : {#016p} | R10: {#016p}", regs->r9, regs->r10);
+    log_unlock("R11: {#016p} | R12: {#016p}", regs->r11, regs->r12);
+    log_unlock("R13: {#016p} | R14: {#016p}", regs->r13, regs->r14);
+    log_unlock("R15: {#016p}", regs->r15);
 }
 
 struct stackframe
@@ -86,7 +86,7 @@ void backtrace(uintptr_t rbp, uint64_t rip)
     }
 }
 
-void interrupt_error_handler(struct interrupt_stackframe *stackframe, uintptr_t rsp)
+void interrupt_error_handler(Regs *regs, uintptr_t rsp)
 {
     lock_acquire(&error_lock);
 
@@ -95,13 +95,13 @@ void interrupt_error_handler(struct interrupt_stackframe *stackframe, uintptr_t 
     log_unlock("");
     log_unlock("------------------------------------------------------------");
     log_unlock("");
-    log_unlock("KERNEL PANIC ON CPU N°{}", cpu_self_id(), stackframe->rip, stackframe->rbp, rsp);
+    log_unlock("KERNEL PANIC ON CPU N°{}", cpu_self_id(), regs->rip, regs->rbp, rsp);
     log_unlock("");
-    log_unlock("{}({}) with error_code={}!", _exception_messages[stackframe->int_no], stackframe->int_no, stackframe->error_code);
+    log_unlock("{}({}) with error_code={}!", _exception_messages[regs->int_no], regs->int_no, regs->error_code);
     log_unlock("");
-    dump_register(stackframe);
+    dump_register(regs);
     log_unlock("");
-    backtrace(stackframe->rbp, stackframe->rip);
+    backtrace(regs->rbp, regs->rip);
     log_unlock("");
     log_unlock("------------------------------------------------------------");
     log_unlock("");
@@ -113,7 +113,7 @@ void interrupt_error_handler(struct interrupt_stackframe *stackframe, uintptr_t 
     }
 }
 
-void scheduler_save_context(struct interrupt_stackframe const *regs)
+void scheduler_save_context(Regs const *regs)
 {
     TaskImpl *impl = (TaskImpl *)task_self();
 
@@ -121,7 +121,7 @@ void scheduler_save_context(struct interrupt_stackframe const *regs)
     impl->regs = *regs;
 }
 
-void scheduler_load_context(struct interrupt_stackframe *regs)
+void scheduler_load_context(Regs *regs)
 {
     auto task = task_self();
     auto impl = (TaskImpl *)task_self();
@@ -135,25 +135,25 @@ void scheduler_load_context(struct interrupt_stackframe *regs)
 
 uint64_t interrupt_handler(uint64_t rsp)
 {
-    auto stackframe = (struct interrupt_stackframe *)rsp;
+    auto regs = (Regs *)rsp;
 
-    if (stackframe->int_no < 32)
+    if (regs->int_no < 32)
     {
-        interrupt_error_handler(stackframe, rsp);
+        interrupt_error_handler(regs, rsp);
     }
-    else if (stackframe->int_no == 32)
+    else if (regs->int_no == 32)
     {
-        scheduler_save_context(stackframe);
+        scheduler_save_context(regs);
         scheduler_schedule_and_switch();
-        scheduler_load_context(stackframe);
+        scheduler_load_context(regs);
     }
-    else if (stackframe->int_no == IPIT_RESCHED)
+    else if (regs->int_no == IPIT_RESCHED)
     {
-        scheduler_save_context(stackframe);
+        scheduler_save_context(regs);
         scheduler_switch();
-        scheduler_load_context(stackframe);
+        scheduler_load_context(regs);
     }
-    else if (stackframe->int_no == IPIT_STOP)
+    else if (regs->int_no == IPIT_STOP)
     {
         while (true)
         {
@@ -161,7 +161,7 @@ uint64_t interrupt_handler(uint64_t rsp)
             asm_hlt();
         }
     }
-    else if (stackframe->int_no == 0xf0)
+    else if (regs->int_no == 0xf0)
     {
         log_unlock("Non maskable interrupt from APIC (Possible hardware error).");
     }
