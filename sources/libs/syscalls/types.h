@@ -80,6 +80,7 @@ typedef BrHandle BrTask;
 
 #define BR_TASK_ERROR ((BrTask)-1)
 #define BR_TASK_SELF ((BrTask)-2)
+#define BR_TASK_INIT ((BrTask)-3)
 
 typedef enum
 {

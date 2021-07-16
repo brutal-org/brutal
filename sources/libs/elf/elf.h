@@ -43,7 +43,7 @@ enum elf_program_header_flags
     ELF_PROGRAM_HEADER_READABLE = 1 << 2,
 };
 
-struct PACKED elf_identifier
+typedef struct PACKED
 {
     uint8_t magics[4];
     uint8_t elf_class;
@@ -52,13 +52,13 @@ struct PACKED elf_identifier
     uint8_t os;
     uint8_t abi_version;
     uint8_t _padding[7];
-};
+} Elf64Identifier;
 
-static_assert(sizeof(struct elf_identifier) == 16, "");
+static_assert(sizeof(Elf64Identifier) == 16, "");
 
-struct PACKED elf64_header
+typedef struct PACKED
 {
-    struct elf_identifier identifier;
+    Elf64Identifier identifier;
 
     uint16_t object_type;
     uint16_t machine_type;
@@ -80,9 +80,9 @@ struct PACKED elf64_header
     uint16_t section_header_table_entry_count;
 
     uint16_t section_header_string_table_idx;
-};
+} Elf64Header;
 
-struct PACKED elf64_program_header
+typedef struct PACKED
 {
     uint32_t type;  // elf_program_header_types
     uint32_t flags; // elf_program_header_flags
@@ -95,6 +95,6 @@ struct PACKED elf64_program_header
     uint64_t memory_size;
 
     uint64_t alignment;
-};
+} Elf64ProgramHeader;
 
-bool has_valid_elf_header(const struct elf64_header *header);
+bool elf_validate(const Elf64Header *header);

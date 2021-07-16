@@ -3,9 +3,8 @@
 #include <handover/handover.h>
 #include "arch/arch.h"
 #include "arch/cpu.h"
-#include "kernel/constants.h"
 #include "kernel/entry.h"
-#include "kernel/loader.h"
+#include "kernel/init.h"
 #include "kernel/tasking.h"
 
 static atomic_size_t other_ready = 0;
@@ -29,18 +28,7 @@ void kernel_entry_main(struct handover *handover)
     tasking_initialize();
     kernel_boot_other();
     arch_enable_interrupt();
-
-    log("All CPU started, entering userspace...");
-
-    auto mod = handover_find_module(handover, str_cast("bootstrap"));
-
-    uintptr_t start = 0;
-    auto boostrap = UNWRAP(program_load(str_cast("bootstrap"), (void *)mod->addr, mod->size, &start));
-
-    // Create the user stack.
-    memory_space_map(boostrap->space, (VmmRange){USER_STACK_BASE - KERNEL_STACK_SIZE, KERNEL_STACK_SIZE});
-    task_start(boostrap, start, USER_STACK_BASE, (BrTaskArgs){});
-
+    init_start(handover);
     arch_idle();
 }
 
