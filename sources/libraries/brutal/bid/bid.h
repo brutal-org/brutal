@@ -8,6 +8,7 @@
 enum bid_error_type
 {
     BID_ERROR_TYPE_INVALID,
+    BID_ERROR_TYPE_UNEXPECTED_TOKEN,
 };
 
 struct bid_buffer_position
@@ -47,17 +48,23 @@ struct bid
 {
     Str in_data;
 
-    struct bid_ast_node root_ast;
+    struct bid_ast_node* root_ast;
     struct scan scanner;
     int _current_scanned_token_cursor;
 };
+
 typedef Result(struct bid_error, MonoState) BidParseResult;
 typedef Result(struct bid_error, struct bid) BidResult;
 
 BidResult init_bid(Str idl_in);
+
+
+void destroy_bid(struct bid *in);
 
 Str bid_to_c(struct bid from);
 
 enum bid_token_type bid_token_from_char(char from);
 
 enum bid_keywords bid_keyword_from_string(Str from);
+
+void print_ast_node_recursive(struct bid_ast_node * from);
