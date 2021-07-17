@@ -16,4 +16,4 @@ struct io_reader
 };
 
 #define io_read(reader, data, size) \
-    ((reader)->read((reader), (data), (size));
+    ((reader)->read((reader), (data), (size)))
