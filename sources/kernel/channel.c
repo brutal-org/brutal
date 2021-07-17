@@ -1,6 +1,6 @@
 #include <brutal/alloc.h>
 #include "kernel/channel.h"
-#include "kernel/constants.h"
+#include "kernel/kernel.h"
 
 void message_init(Message *message, BrTask sender, Object *object, uint8_t *data, size_t size)
 {

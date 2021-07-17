@@ -2,9 +2,9 @@
 
 #include <brutal/ds.h>
 #include <brutal/sync.h>
-#include "arch/pmm.h"
-#include "arch/vmm.h"
 #include "kernel/domain.h"
+#include "kernel/pmm.h"
+#include "kernel/vmm.h"
 
 /* --- Memory Object -------------------------------------------------------- */
 

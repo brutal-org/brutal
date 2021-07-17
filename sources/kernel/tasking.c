@@ -2,10 +2,9 @@
 #include <brutal/ds.h>
 #include <brutal/log.h>
 #include <brutal/sync.h>
-#include "arch/cpu.h"
-#include "arch/heap.h"
-#include "arch/task.h"
-#include "kernel/constants.h"
+#include "kernel/cpu.h"
+#include "kernel/heap.h"
+#include "kernel/kernel.h"
 #include "kernel/tasking.h"
 
 static Lock task_lock = {};
@@ -27,24 +26,25 @@ Task *task_self(void)
 
 void task_destroy(Task *task)
 {
+    context_destroy(task->context);
     space_deref(task->space);
     domain_deref(task->domain);
     channel_destroy(task->channel);
-
     heap_free(task->stack);
 
-    arch_task_destroy(task);
+    alloc_free(alloc_global(), task);
 }
 
-TaskCreateResult task_create(Str name, Space *space, TaskFlags flags)
+TaskCreateResult task_create(Str name, Space *space, BrTaskFlags flags)
 {
     log("Creating Task({})...", name);
 
-    auto task = TRY(TaskCreateResult, arch_task_create());
+    auto task = alloc_make(alloc_global(), Task);
 
     task->name = str_cast_fix(StrFix128, name);
     task->flags = flags;
 
+    task->context = context_create();
     space_ref(space);
     task->space = space;
     task->domain = domain_create();
@@ -79,15 +79,15 @@ void task_start(Task *self, uintptr_t ip, uintptr_t sp, BrTaskArgs args)
 {
     LOCK_RETAINER(&task_lock);
 
-    arch_task_start(self, ip, sp, args);
+    context_start(self->context, ip, sp, args, self->flags);
     self->state = TASK_STATE_RUNNING;
 }
 
 Task *task_create_idle(void)
 {
     auto space = space_create();
-    auto task = UNWRAP(task_create(str_cast("idle"), space, TASK_NONE));
-    arch_task_start(task, (uintptr_t)task_idle, task->sp, (BrTaskArgs){});
+    auto task = UNWRAP(task_create(str_cast("idle"), space, BR_TASK_NONE));
+    context_start(task->context, (uintptr_t)task_idle, task->sp, (BrTaskArgs){}, task->flags);
     task->state = TASK_STATE_IDLE;
     return task;
 }
@@ -95,7 +95,7 @@ Task *task_create_idle(void)
 Task *task_create_boot(void)
 {
     auto space = space_create();
-    auto task = UNWRAP(task_create(str_cast("boot"), space, TASK_NONE));
+    auto task = UNWRAP(task_create(str_cast("boot"), space, BR_TASK_NONE));
     space_deref(space);
     task_start(task, 0, 0, (BrTaskArgs){});
     return task;

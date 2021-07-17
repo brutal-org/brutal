@@ -1,9 +1,9 @@
 
 #include <brutal/alloc.h>
 #include <brutal/log.h>
-#include "arch/heap.h"
-#include "kernel/constants.h"
+#include "kernel/heap.h"
 #include "kernel/init.h"
+#include "kernel/kernel.h"
 
 static bool elf_supported(Elf64Header const *header, size_t data_size)
 {
@@ -75,7 +75,7 @@ void init_start(struct handover *handover)
     assert_truth(elf_supported(elf, module->size));
 
     auto space = space_create();
-    Task *task = UNWRAP(task_create(name, space, TASK_USER));
+    Task *task = UNWRAP(task_create(name, space, BR_TASK_USER));
     space_deref(space);
 
     elf_load_program(task, elf, (void const *)module->addr);

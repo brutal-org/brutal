@@ -49,11 +49,11 @@ CROSS_UCFLAGS= \
 
 CROSS_LD=$(CONFIG_ARCH)-elf-ld
 CROSS_KLDFLAGS= \
-	-Tsources/arch/$(CONFIG_ARCH)/link.ld \
+	-Tsources/archs/$(CONFIG_ARCH)/kernel.ld \
 	-z max-page-size=0x1000
 
 CROSS_ULDFLAGS= \
-	-Tsources/arch/$(CONFIG_ARCH)/app_link.ld \
+	-Tsources/archs/$(CONFIG_ARCH)/userspace.ld \
 	-z max-page-size=0x1000
 
 CROSS_AR=$(CONFIG_ARCH)-elf-ar

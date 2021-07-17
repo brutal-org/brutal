@@ -3,20 +3,15 @@
 #include <brutal/base.h>
 #include <brutal/text.h>
 #include <brutal/types.h>
-#include "arch/heap.h"
 #include "kernel/channel.h"
+#include "kernel/context.h"
 #include "kernel/domain.h"
+#include "kernel/heap.h"
 #include "kernel/memory.h"
 
 #define CPU_SCHEDULER_MANAGER 0
 
 /* --- Task object ---------------------------------------------------------- */
-
-typedef enum
-{
-    TASK_NONE = 0,
-    TASK_USER = 1 << 0,
-} TaskFlags;
 
 typedef enum
 {
@@ -40,12 +35,13 @@ typedef struct
     Object base;
 
     StrFix128 name;
-    TaskFlags flags;
+    BrTaskFlags flags;
     TaskState state;
 
     TaskSchedule schedule;
 
     BrCap caps;
+    Context *context;
     Space *space;
     Domain *domain;
     Channel *channel;
@@ -58,7 +54,7 @@ typedef Result(BrResult, Task *) TaskCreateResult;
 
 Task *task_self(void);
 
-TaskCreateResult task_create(Str name, Space *space, TaskFlags flags);
+TaskCreateResult task_create(Str name, Space *space, BrTaskFlags flags);
 
 void task_ref(Task *self);
 

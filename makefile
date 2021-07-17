@@ -14,13 +14,13 @@ CFLAGS_WARN ?= \
 	-Werror
 
 INC_LIBS= \
-	-Isources/libs/ansi \
-	-Isources/libs/posix \
-	-Isources/libs/bsd \
-	-Isources/libs/gnu
+	-Isources/libraries/ansi \
+	-Isources/libraries/posix \
+	-Isources/libraries/bsd \
+	-Isources/libraries/gnu
 
 INC_LIBBRUTAL= \
-	-Isources/libs/
+	-Isources/libraries/
 
 HOST_CFLAGS_INC ?= \
 	$(INC_LIBBRUTAL) \
@@ -41,12 +41,11 @@ MKCWD=mkdir -p $(@D)
 include meta/config/default.mk
 include meta/toolchain/$(CONFIG_TOOLCHAIN)/.build.mk
 
-include sources/arch/.build.mk
 include sources/kernel/.build.mk
-include sources/libs/.build.mk
-include sources/crts/.build.mk
-include sources/bins/.build.mk
-include sources/test/.build.mk
+include sources/libraries/.build.mk
+include sources/archs/.build.mk
+include sources/userspace/.build.mk
+include sources/tests/.build.mk
 include sysroot/.build.mk
 
 all: $(ISO)

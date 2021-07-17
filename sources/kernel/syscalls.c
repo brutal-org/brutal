@@ -170,7 +170,7 @@ BrResult sys_task(BrTask *task_handle, BrSpace space_handle, BrTaskArgs const *a
         return BR_BAD_HANDLE;
     }
 
-    auto task = UNWRAP(task_create(str_cast("user-task"), space, TASK_USER));
+    auto task = UNWRAP(task_create(str_cast("user-task"), space, flags | BR_TASK_USER));
 
     domain_add(task_self()->domain, base_cast(task));
 
