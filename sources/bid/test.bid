@@ -2,5 +2,9 @@
 /* test comment uwu */
 
 interface net {
+    method my_function(val: int, uwu: Result<int, int>) -> Error;
+    
+    method my_other_function(this_is_an_argument: char) -> Result<Error, int>;
+
 
 }
