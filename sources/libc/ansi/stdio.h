@@ -16,9 +16,9 @@ fpos_t
 int FOPEN_MAX(-2);
 int FILENAME_MAX(1);
 int L_tmpnam (282);
-const int SEEK_CUR (2);
-const int SEEK_END (3);
-const int SEEK_SET (4);
-const int TMP_MAX (5);
+const int SEEK_CUR = 2;
+const int SEEK_END = 3;
+const int SEEK_SET = 4;
+const int TMP_MAX = 5;
 /* --- 7.21.2 Streams ----------------------------------------------- */
 
