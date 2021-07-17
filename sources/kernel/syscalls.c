@@ -153,7 +153,17 @@ BrResult sys_unmap(BrSpace space_handle, uintptr_t vaddr, size_t size)
 
 BrResult sys_task(BrTask *task_handle, BrSpace space_handle, BrTaskArgs const *args, BrTaskFlags flags)
 {
-    auto space = (Space *)domain_lookup(task_self()->domain, space_handle, OBJECT_SPACE);
+    Space *space = nullptr;
+
+    if (space_handle == BR_SPACE_SELF)
+    {
+        space_ref(task_self()->space);
+        space = task_self()->space;
+    }
+    else
+    {
+        space = (Space *)domain_lookup(task_self()->domain, space_handle, OBJECT_SPACE);
+    }
 
     if (space == nullptr)
     {
@@ -211,7 +221,34 @@ BrResult sys_irq(BrTask task_handle, BrIrq irq, BrIrqFlags flags)
 
 BrResult sys_drop(BrTask task_handle, BrCap cap)
 {
-    return BR_NOT_IMPLEMENTED;
+    Task *task = nullptr;
+
+    if (task_handle == BR_TASK_SELF)
+    {
+        task_ref(task_self());
+        task = task_self();
+    }
+    else
+    {
+        task = (Task *)domain_lookup(task_self()->domain, task_handle, OBJECT_TASK);
+    }
+
+    if (!task)
+    {
+        return BR_BAD_HANDLE;
+    }
+
+    if (task->caps & cap)
+    {
+        task_deref(task);
+        return BR_BAD_CAPABILITY;
+    }
+
+    task->caps = task->caps & ~cap;
+
+    task_deref(task);
+
+    return BR_SUCCESS;
 }
 
 BrResult sys_close(BrHandle handle)
