@@ -3,6 +3,7 @@
 BidParseResult scan_type(struct bid *idl_in, struct bid_ast_node *type_node)
 {
     // [type]
+
     skip_comment_and_space(idl_in);
     Str name = scan_skip_until((&idl_in->scanner), bid_is_keyword);
 
@@ -14,10 +15,13 @@ BidParseResult scan_type(struct bid *idl_in, struct bid_ast_node *type_node)
     skip_comment_and_space(idl_in);
 
     // type[<]
+
     if (scan_curr(&idl_in->scanner) == '<')
     {
         scan_next(&idl_in->scanner);
+
         // type<...>
+
         while (scan_curr(&idl_in->scanner) != '>' && !scan_end(&idl_in->scanner))
         {
 
@@ -25,14 +29,17 @@ BidParseResult scan_type(struct bid *idl_in, struct bid_ast_node *type_node)
             vec_push(&type_node->children, ast);
 
             // type<[type]>
+
             scan_type(idl_in, ast);
 
             // type<type[,]type>
+
             if (scan_curr(&idl_in->scanner) == ',')
             {
 
                 scan_next(&idl_in->scanner);
             }
+
             // type<type[>]
             else if (scan_curr(&idl_in->scanner) != '>')
             {
@@ -45,7 +52,9 @@ BidParseResult scan_type(struct bid *idl_in, struct bid_ast_node *type_node)
         {
             return ERR(BidParseResult, bid_create_unexpected_token_error(BID_GREATER_THAN, idl_in));
         }
+
         scan_next(&idl_in->scanner); // skip '>'
     }
-    return OK(BidParseResult, (MonoState){});
+
+    return BID_SUCCESS;
 }

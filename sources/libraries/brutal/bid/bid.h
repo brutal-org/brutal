@@ -29,6 +29,8 @@ struct bid_error
     } specific_information;
 };
 
+#define BID_SUCCESS (OK(BidParseResult, (MonoState){}))
+
 struct bid
 {
     Str in_data;

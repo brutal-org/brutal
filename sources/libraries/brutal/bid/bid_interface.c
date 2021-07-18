@@ -5,9 +5,8 @@
 
 BidParseResult scan_interface_block(struct bid *idl_in, struct bid_ast_node *interface_node)
 {
-    (void)interface_node;
-
     // interface name [{]}
+
     if (scan_curr(&idl_in->scanner) != '{')
     {
         return ERR(BidParseResult, bid_create_unexpected_token_error(BID_OPENNING_BRACKETS, idl_in));
@@ -16,6 +15,7 @@ BidParseResult scan_interface_block(struct bid *idl_in, struct bid_ast_node *int
     skip_comment_and_space(idl_in);
 
     // interface name  { [...] }
+
     while (scan_curr(&idl_in->scanner) != '}' && !scan_end(&idl_in->scanner))
     {
 
@@ -39,7 +39,7 @@ BidParseResult scan_interface_block(struct bid *idl_in, struct bid_ast_node *int
 
             TRY(BidParseResult, scan_method(idl_in, ast));
         }
-        else if (str_eq(result, str_cast("typedef")))
+        else if (str_eq(result, str_cast("type")))
         {
 
             auto ast = create_ast_node(BID_AST_NODE_TYPE_TYPEDEF);
@@ -49,11 +49,12 @@ BidParseResult scan_interface_block(struct bid *idl_in, struct bid_ast_node *int
         }
         else
         {
-            return ERR(BidParseResult, bid_create_unexpected_token_error(str_cast("method/struct/enum/typedef"), idl_in));
+            return ERR(BidParseResult, bid_create_unexpected_token_error(str_cast("method/struct/enum/type"), idl_in));
         }
     }
 
     // interface name  { [}]
+
     if (scan_curr(&idl_in->scanner) != '}')
     {
 
@@ -61,7 +62,7 @@ BidParseResult scan_interface_block(struct bid *idl_in, struct bid_ast_node *int
     }
     skip_comment_and_space(idl_in);
 
-    return OK(BidParseResult, (MonoState){});
+    return BID_SUCCESS;
 }
 
 BidParseResult scan_interface_definition(struct bid *idl_in)
@@ -72,6 +73,7 @@ BidParseResult scan_interface_definition(struct bid *idl_in)
     Str result = scan_skip_until((&idl_in->scanner), bid_is_keyword);
 
     // [interface] name { }
+
     if (str_eq(result, str_cast("interface")))
     {
         auto ast = create_ast_node(BID_AST_NODE_TYPE_INTERFACE);
@@ -80,6 +82,7 @@ BidParseResult scan_interface_definition(struct bid *idl_in)
         skip_comment_and_space(idl_in);
 
         // interface [name] { }
+
         Str interface_name = scan_skip_until((&idl_in->scanner), bid_is_keyword);
 
         if (interface_name.len == 0)
@@ -91,12 +94,12 @@ BidParseResult scan_interface_definition(struct bid *idl_in)
 
         skip_comment_and_space(idl_in);
         TRY(BidParseResult, scan_interface_block(idl_in, ast));
-        return OK(BidParseResult, (MonoState){});
+        return BID_SUCCESS;
     }
     else
     {
         return ERR(BidParseResult, bid_create_unexpected_token_error(BID_INTERFACE_STR, idl_in));
     }
 
-    return OK(BidParseResult, (MonoState){});
+    return BID_SUCCESS;
 }

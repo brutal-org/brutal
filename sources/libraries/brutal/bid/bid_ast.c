@@ -18,7 +18,9 @@ void destroy_ast_node_recursive(struct bid_ast_node *from)
         {
             destroy_ast_node_recursive(from->children.data[i]);
         }
-        vec_deinit(&from->children);
+        if (from->children.data != NULL)
+            vec_deinit(&from->children);
+
         alloc_free(alloc_global(), from);
     }
 }

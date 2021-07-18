@@ -110,7 +110,7 @@ static void bid_write_method(IoWriter *writer, struct bid_ast_node *method)
     print(writer, " {}(", method->method.name);
     for (int i = 0; i < method->children.length; i++)
     {
-        if (method->children.data[i]->type == BID_AST_NODE_TYPE_METHOD_ARGUMENT_TYPE)
+        if (method->children.data[i]->type == BID_AST_NODE_TYPE_VAR)
         {
             bid_write_argument(writer, method->children.data[i]);
             if (i + 1 < arg_count)

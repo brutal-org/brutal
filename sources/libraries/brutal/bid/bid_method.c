@@ -1,36 +1,7 @@
 #include <brutal/bid/bid_method.h>
 #include <brutal/bid/bid_type.h>
+#include <brutal/bid/bid_var.h>
 #include "brutal/base/types.h"
-
-BidParseResult scan_method_arg(struct bid *idl_in, struct bid_ast_node *arg_node)
-{
-    // [name] : type
-    skip_comment_and_space(idl_in);
-    Str name = scan_skip_until((&idl_in->scanner), bid_is_keyword);
-
-    if (name.len == 0)
-    {
-        return ERR(BidParseResult, bid_create_unexpected_token_error(BID_ALNUM_STR, idl_in));
-    }
-    arg_node->argument.name = name;
-
-    skip_comment_and_space(idl_in);
-
-    // name [:] type
-    if (scan_curr(&idl_in->scanner) != ':')
-    {
-        return ERR(BidParseResult, bid_create_unexpected_token_error(BID_DOUBLE_DOT, idl_in));
-    }
-    scan_next(&idl_in->scanner);
-    skip_comment_and_space(idl_in);
-
-    // name : [type]
-    auto ast = create_ast_node(BID_AST_NODE_TYPE);
-    vec_push(&arg_node->children, ast);
-
-    TRY(BidParseResult, scan_type(idl_in, ast));
-    return OK(BidParseResult, (MonoState){});
-}
 
 BidParseResult scan_method(struct bid *idl_in, struct bid_ast_node *method_node)
 {
@@ -56,10 +27,10 @@ BidParseResult scan_method(struct bid *idl_in, struct bid_ast_node *method_node)
     {
         // method name(arg)->...;
         skip_comment_and_space(idl_in);
-        auto ast = create_ast_node(BID_AST_NODE_TYPE_METHOD_ARGUMENT_TYPE);
+        auto ast = create_ast_node(BID_AST_NODE_TYPE_VAR);
         vec_push(&method_node->children, ast);
 
-        TRY(BidParseResult, scan_method_arg(idl_in, ast));
+        TRY(BidParseResult, scan_var(idl_in, ast));
 
         skip_comment_and_space(idl_in);
 
@@ -89,7 +60,7 @@ BidParseResult scan_method(struct bid *idl_in, struct bid_ast_node *method_node)
     if (scan_curr(&idl_in->scanner) == ';')
     {
         scan_next(&idl_in->scanner); // ;
-        return OK(BidParseResult, (MonoState){});
+        return BID_SUCCESS;
     }
 
     // method name() [->] type;
@@ -115,5 +86,6 @@ BidParseResult scan_method(struct bid *idl_in, struct bid_ast_node *method_node)
         return ERR(BidParseResult, bid_create_unexpected_token_error(BID_END_LINE, idl_in));
     }
     scan_next(&idl_in->scanner); // ;
-    return OK(BidParseResult, (MonoState){});
+
+    return BID_SUCCESS;
 }
