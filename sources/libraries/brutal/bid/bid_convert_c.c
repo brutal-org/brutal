@@ -14,9 +14,10 @@ static void bid_write_header(IoWriter *writer)
     print(writer, "// -- generated idl file --\n\n");
 }
 
-static void bid_write_interface(IoWriter *writer, struct bid_ast_node *interface)
+static Str bid_write_interface(IoWriter *writer, struct bid_ast_node *interface)
 {
     print(writer, "// interface: {}\n\n", interface->interface.name);
+    return interface->interface.name;
 }
 
 static void bid_write_type(IoWriter *writer, struct bid_ast_node *type)
@@ -84,9 +85,48 @@ void bid_write_argument(IoWriter *writer, struct bid_ast_node *arg)
 
     print(writer, " {}", arg->argument.name);
 }
-static void bid_write_method(IoWriter *writer, struct bid_ast_node *method)
+
+// NOT IMPLEMENTED RIGHT NOW
+
+void bid_write_method_received_structure(IoWriter *writer, struct bid_ast_node *method)
+{
+    print(writer, "struct {}_receive { \n", method->method.name);
+
+    for (int i = 0; i < method->children.length; i++)
+    {
+        if (method->children.data[i]->type == BID_AST_NODE_TYPE_METHOD_RETURN_TYPE)
+        {
+            log("writing bid_write_method_received_structure {}/{}", i, method->children.length);
+            bid_write_argument(writer, method->children.data[i]);
+            print(writer, "; \n");
+        }
+    }
+    print(writer, "}; \n\n");
+}
+
+static void bid_write_method_send_structure(IoWriter *writer, struct bid_ast_node *method, Str current_namespace)
+{
+    print(writer, "struct {}_{}_send\n\\{\n", current_namespace, method->method.name);
+
+    for (int i = 0; i < method->children.length; i++)
+    {
+        if (method->children.data[i]->type == BID_AST_NODE_TYPE_VAR)
+        {
+            print(writer, "\t");
+            bid_write_argument(writer, method->children.data[i]);
+            print(writer, "; \n");
+        }
+    }
+    print(writer, "}; \n\n");
+}
+
+static void bid_write_method(IoWriter *writer, struct bid_ast_node *method, Str current_namespace)
 {
 
+    print(writer, "// - {}.{} \n\n", current_namespace, method->method.name);
+
+    //  bid_write_method_received_structure(writer, method);
+    bid_write_method_send_structure(writer, method, current_namespace);
     struct bid_ast_node *return_value = NULL;
     int arg_count = method->children.length;
     for (int i = 0; i < method->children.length; i++)
@@ -107,7 +147,10 @@ static void bid_write_method(IoWriter *writer, struct bid_ast_node *method)
         print(writer, "void");
     }
 
-    print(writer, " {}(", method->method.name);
+    print(writer, " {}_{}(", current_namespace, method->method.name);
+
+    print(writer, "BrTask target, struct {}_{}_send* send", current_namespace, method->method.name);
+    /*
     for (int i = 0; i < method->children.length; i++)
     {
         if (method->children.data[i]->type == BID_AST_NODE_TYPE_VAR)
@@ -119,21 +162,23 @@ static void bid_write_method(IoWriter *writer, struct bid_ast_node *method)
             }
         }
     }
+    */
     print(writer, ");\n\n");
 }
-static void bid_write_node(IoWriter *writer, struct bid_ast_node *node)
+
+static void bid_write_node(IoWriter *writer, struct bid_ast_node *node, Str current_namespace)
 {
     switch (node->type)
     {
     case BID_AST_NODE_TYPE_INTERFACE:
-        bid_write_interface(writer, node);
+        current_namespace = bid_write_interface(writer, node);
         for (int i = 0; i < node->children.length; i++)
         {
-            bid_write_node(writer, node->children.data[i]);
+            bid_write_node(writer, node->children.data[i], current_namespace);
         }
         break;
     case BID_AST_NODE_TYPE_METHOD:
-        bid_write_method(writer, node);
+        bid_write_method(writer, node, current_namespace);
         break;
     case BID_AST_NODE_TYPE_TYPEDEF:
         bid_write_typedef(writer, node);
@@ -146,8 +191,7 @@ static void bid_write_node(IoWriter *writer, struct bid_ast_node *node)
 
 void convert_bid_to_c(const struct bid *bid, IoWriter *writer)
 {
-
     bid_write_header(writer);
 
-    bid_write_node(writer, bid->root_ast);
+    bid_write_node(writer, bid->root_ast, str_cast(""));
 }
