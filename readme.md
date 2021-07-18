@@ -53,7 +53,7 @@ See the [roadmap](book/01-02-roadmap.md) file for more information on how we pla
 
 This project take inspirations and/or reuse code from the following projects.
 
-See [credits.md](book/credits.md)
+See [credits.md](book/01-03-credits.md)
 
 ## License
 
