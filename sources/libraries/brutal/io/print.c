@@ -59,13 +59,13 @@ IoWriteResult print_impl(IoWriter *writer, Str format, struct print_args args)
 {
     size_t current = 0;
     size_t written = 0;
-
+    bool skip_fmt = false;
     struct scan scan;
     scan_init(&scan, format);
 
     while (!scan_end(&scan))
     {
-        if (scan_curr(&scan) == '{')
+        if (scan_curr(&scan) == '{' && !skip_fmt)
         {
             if (current < args.count)
             {
@@ -75,8 +75,14 @@ IoWriteResult print_impl(IoWriter *writer, Str format, struct print_args args)
 
             current++;
         }
+        else if (scan_curr(&scan) == '\\' && skip_fmt == false)
+        {
+            skip_fmt = true;
+            scan_next(&scan);
+        }
         else
         {
+            skip_fmt = false;
             written += TRY(IoWriteResult, io_put(writer, scan_next(&scan)));
         }
     }
