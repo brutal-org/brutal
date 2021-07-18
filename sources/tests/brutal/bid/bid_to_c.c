@@ -1,12 +1,11 @@
+#include <bid/bid.h>
+#include <bid/c_convert/bid_convert_c.h>
 #include <brutal/alloc.h>
-#include <brutal/bid/bid.h>
-#include <brutal/bid/bid_convert_c.h>
 #include <brutal/io/buffer.h>
-#include "brutal/bid/bid_convert_c.h"
 #include "brutal/host/io.h"
 #include "brutal/log/assert.h"
 #include "brutal/text/str.h"
-#include "test/test.h"
+#include "tests/test.h"
 
 TEST(bid_c_conversion_test)
 {

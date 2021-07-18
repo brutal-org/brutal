@@ -1,5 +1,5 @@
-#include <brutal/bid/bid_type.h>
-#include <brutal/bid/bid_var.h>
+#include <bid/parsing/bid_type.h>
+#include <bid/parsing/bid_var.h>
 
 BidParseResult scan_var(struct bid *idl_in, struct bid_ast_node *arg_node)
 {

@@ -1,6 +1,6 @@
-#include <brutal/bid/bid_method.h>
-#include <brutal/bid/bid_type.h>
-#include <brutal/bid/bid_var.h>
+#include <bid/parsing/bid_method.h>
+#include <bid/parsing/bid_type.h>
+#include <bid/parsing/bid_var.h>
 #include "brutal/base/types.h"
 
 BidParseResult scan_method(struct bid *idl_in, struct bid_ast_node *method_node)

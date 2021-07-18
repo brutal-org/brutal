@@ -1,4 +1,4 @@
-#include <brutal/bid/bid_type.h>
+#include <bid/parsing/bid_type.h>
 
 BidParseResult scan_type(struct bid *idl_in, struct bid_ast_node *type_node)
 {

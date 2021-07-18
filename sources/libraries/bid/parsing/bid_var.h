@@ -1,6 +1,6 @@
 #pragma once
 #include <brutal/base.h>
-#include <brutal/bid/bid_ast.h>
+#include <bid/parsing/bid_ast.h>
 
 // warn: don't check for ';' as we can use it for argument parsing:
 // foo(x : int[,] v : long);

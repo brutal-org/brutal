@@ -1,11 +1,8 @@
 
 /* test comment uwu */
 
-interface net {
-    method my_function(val: int, uwu: Result<int, int>) -> Error;
+interface gfx {
     
-    method my_other_function(this_is_an_argument: char) -> Result<Error, int>;
-
-    typedef uwu = Result<int,int> ;
+    method set_window_pos(x: int, y: int, handle: Handle) -> Result;
 
 }

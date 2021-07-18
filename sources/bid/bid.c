@@ -1,7 +1,7 @@
 
+#include <bid/bid.h>
+#include <bid/c_convert/bid_convert_c.h>
 #include <brutal/base.h>
-#include <brutal/bid/bid.h>
-#include <brutal/bid/bid_convert_c.h>
 #include <brutal/io.h>
 #include <brutal/io/buffer.h>
 #include <brutal/io/scan.h>

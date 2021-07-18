@@ -1,7 +1,7 @@
-#include <brutal/bid/bid.h>
-#include <brutal/bid/bid_interface.h>
-#include <brutal/bid/bid_method.h>
-#include <brutal/bid/bid_typedef.h>
+#include <bid/bid.h>
+#include <bid/parsing/bid_interface.h>
+#include <bid/parsing/bid_method.h>
+#include <bid/parsing/bid_typedef.h>
 
 BidParseResult scan_interface_block(struct bid *idl_in, struct bid_ast_node *interface_node)
 {

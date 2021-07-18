@@ -1,5 +1,5 @@
 #pragma once
-#include <brutal/bid/bid.h>
+#include <bid/bid.h>
 #include <brutal/ds/vec.h>
 
 #define BID_INTERFACE_STR (str_cast("interface"))
