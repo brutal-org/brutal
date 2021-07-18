@@ -1,7 +1,7 @@
+#include <bid/bid.h>
+#include <bid/parsing/bid_interface.h>
 #include <brutal/alloc.h>
 #include <brutal/base.h>
-#include <brutal/bid/bid.h>
-#include <brutal/bid/bid_interface.h>
 #include <brutal/log.h>
 #include <ctype.h>
 #include "brutal/alloc/base.h"

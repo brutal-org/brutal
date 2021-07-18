@@ -3,6 +3,8 @@ TEST_SRC=$(wildcard sources/tests/*.c) \
 		 $(wildcard sources/tests/*/*/*.c) \
 		 $(wildcard sources/libraries/brutal/*.c) \
 		 $(wildcard sources/libraries/brutal/*/*.c) \
+		 $(wildcard sources/libraries/bid/*/*.c) \
+		 $(wildcard sources/libraries/bid/*.c) \
 		 $(wildcard sources/libraries/brutal/host/linux/*.c)
 
 TEST_OBJ=$(patsubst sources/%.c, $(BUILDDIR_HOST)/%.c.o, $(TEST_SRC))

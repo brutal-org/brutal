@@ -1,6 +1,7 @@
-#include <brutal/bid/bid.h>
+#include <bid/bid.h>
+#include <bid/parsing/bid_ast.h>
 #include "brutal/log/assert.h"
-#include "test/test.h"
+#include "tests/test.h"
 
 TEST(bid_creation_destruction)
 {

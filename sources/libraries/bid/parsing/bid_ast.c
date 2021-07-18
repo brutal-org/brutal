@@ -1,5 +1,5 @@
 #include <brutal/alloc.h>
-#include <brutal/bid/bid_ast.h>
+#include <bid/parsing/bid_ast.h>
 
 struct bid_ast_node *create_ast_node(enum bid_ast_node_type type)
 {

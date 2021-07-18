@@ -1,7 +1,6 @@
-#include <brutal/bid/bid.h>
-#include <brutal/bid/bid_type.h>
-#include <brutal/bid/bid_typedef.h>
-#include "brutal/io/scan.h"
+#include <bid/bid.h>
+#include <bid/parsing/bid_type.h>
+#include <bid/parsing/bid_typedef.h>
 
 BidParseResult scan_typedef(struct bid *idl_in, struct bid_ast_node *typedef_node)
 {
