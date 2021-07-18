@@ -6,5 +6,6 @@ interface net {
     
     method my_other_function(this_is_an_argument: char) -> Result<Error, int>;
 
+    typedef uwu = Result<int,int> ;
 
 }
