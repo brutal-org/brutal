@@ -13,7 +13,9 @@
 
 #define assert_truth(expr) (          \
     {                                 \
-        if (!expr)                    \
+        auto value = (expr);          \
+                                      \
+        if (!value)                   \
         {                             \
             panic(#expr " is false"); \
         }                             \
@@ -21,7 +23,9 @@
 
 #define assert_falsity(expr) (       \
     {                                \
-        if (expr)                    \
+        auto value = (expr);         \
+                                     \
+        if (value)                   \
         {                            \
             panic(#expr " is true"); \
         }                            \
