@@ -43,6 +43,25 @@ static void bid_write_type(IoWriter *writer, struct bid_ast_node *type)
     }
 }
 
+static void bid_write_typedef(IoWriter *writer, struct bid_ast_node *typedef_node)
+{
+    if (typedef_node->children.length < 2)
+    {
+        return;
+    }
+
+    struct bid_ast_node *type_node = typedef_node->children.data[1];
+    struct bid_ast_node *name_node = typedef_node->children.data[0];
+
+    print(writer, "typedef ");
+    bid_write_type(writer, type_node);
+
+    print(writer, " ");
+    bid_write_type(writer, name_node);
+
+    print(writer, "; \n\n");
+}
+
 void bid_write_argument(IoWriter *writer, struct bid_ast_node *arg)
 {
     struct bid_ast_node *target_type = NULL;
@@ -116,6 +135,10 @@ static void bid_write_node(IoWriter *writer, struct bid_ast_node *node)
     case BID_AST_NODE_TYPE_METHOD:
         bid_write_method(writer, node);
         break;
+    case BID_AST_NODE_TYPE_TYPEDEF:
+        bid_write_typedef(writer, node);
+        break;
+
     default:
         break;
     }
