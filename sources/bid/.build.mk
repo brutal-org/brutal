@@ -1,9 +1,9 @@
 BID_SRC= $(wildcard sources/bid/*.c) \
 		 $(wildcard sources/bid/*/*.c) \
 		 $(wildcard sources/bid/*/*/*.c) \
-		 $(wildcard sources/libs/brutal/*.c) \
-		 $(wildcard sources/libs/brutal/*/*.c) \
-		 $(wildcard sources/libs/brutal/host/linux/*.c)
+		 $(wildcard sources/libraries/brutal/*.c) \
+		 $(wildcard sources/libraries/brutal/*/*.c) \
+		 $(wildcard sources/libraries/brutal/host/linux/*.c)
 
 BID_OBJ=$(patsubst sources/%.c, $(BUILDDIR_HOST)/%.c.o, $(BID_SRC))
 BID_BIN=$(BUILDDIR_HOST)/bid.elf

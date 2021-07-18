@@ -95,7 +95,7 @@ static BidParseResult scan_bid(struct bid *idl_in)
 {
     TRY(BidParseResult, scan_interface_definition(idl_in));
 
-    return OK(BidParseResult, (MonoState){});
+    return BID_SUCCESS;
 }
 
 BidResult init_bid(Str idl_in)
