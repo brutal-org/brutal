@@ -86,7 +86,6 @@ static VmmResult vmm_unmap_page(struct pml *pml4, uintptr_t virtual_page)
     return OK(VmmResult, range);
 }
 
-// later we may use an other initializer that fork the higher kernel vmm entry
 static void vmm_load_memory_map(VmmSpace target, struct handover_mmap const *memory_map)
 {
     log("Loading kernel memory map...");
@@ -104,7 +103,7 @@ static void vmm_load_memory_map(VmmSpace target, struct handover_mmap const *mem
         auto entry = memory_map->entries[i];
 
         log("Loading kernel memory map {}/{} ({x} - {x})",
-            i,
+            i + 1,
             memory_map->size,
             entry.base,
             entry.base + entry.length);
