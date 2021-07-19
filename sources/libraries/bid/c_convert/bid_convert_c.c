@@ -2,10 +2,13 @@
 #include <bid/c_convert/bid_convert_c.h>
 #include <bid/c_convert/bid_convert_errors.h>
 #include <bid/c_convert/bid_convert_header.h>
+#include <bid/c_convert/bid_convert_message_type.h>
 #include <bid/c_convert/bid_convert_method.h>
 #include <bid/c_convert/bid_convert_type.h>
 #include <bid/c_convert/bid_convert_typedef.h>
 #include <bid/parsing/bid_ast.h>
+#include <brutal/alloc.h>
+#include <brutal/base.h>
 #include <brutal/log.h>
 #include "brutal/text/str.h"
 
@@ -15,6 +18,7 @@ static void bid_write_node(IoWriter *writer, struct bid_ast_node *node, Str curr
     {
     case BID_AST_NODE_TYPE_INTERFACE:
         current_namespace = bid_write_interface(writer, node);
+        bid_convert_message_type(writer, node, current_namespace);
         for (int i = 0; i < node->children.length; i++)
         {
             bid_write_node(writer, node->children.data[i], current_namespace);
