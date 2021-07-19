@@ -28,12 +28,10 @@ CROSS_CFLAGS= \
 	$(CFLAGS_OPT) \
 	$(CFLAGS_WARN) \
 	$(CROSS_CFLAGS_INC) \
-	-ffreestanding \
-	-D__brutal__=1
+	-ffreestanding
 
 CROSS_KCFLAGS= \
 	$(CROSS_CFLAGS) \
-	-fno-pic \
 	-fno-stack-protector \
 	-mno-80387 \
 	-mno-mmx \
@@ -46,8 +44,8 @@ CROSS_KCFLAGS= \
 
 CROSS_UCFLAGS= \
 	$(CROSS_CFLAGS) \
-	-fno-pic \
-	-nostdlib
+	-nostdlib \
+	-D__brutal__=1
 
 CROSS_LD=ld.lld
 CROSS_KLDFLAGS= \

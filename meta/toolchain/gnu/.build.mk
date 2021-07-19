@@ -30,7 +30,6 @@ CROSS_CFLAGS= \
 
 CROSS_KCFLAGS= \
 	$(CROSS_CFLAGS) \
-	-fno-pic \
 	-fno-stack-protector \
 	-mno-80387 \
 	-mno-mmx \
@@ -43,8 +42,6 @@ CROSS_KCFLAGS= \
 
 CROSS_UCFLAGS= \
 	$(CROSS_CFLAGS) \
-	-fno-pic \
-	-fno-stack-protector \
 	-nostdlib
 
 CROSS_LD=$(CONFIG_ARCH)-elf-ld
