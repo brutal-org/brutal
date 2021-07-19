@@ -15,6 +15,7 @@
 #define BID_ARROW (str_cast("->"))
 #define BID_END_LINE (str_cast(";"))
 #define BID_EQUAL (str_cast("="))
+#define BID_MEMBERS_BLOCK (str_cast("} ,"))
 
 enum bid_ast_node_type
 {
@@ -24,6 +25,8 @@ enum bid_ast_node_type
     BID_AST_NODE_TYPE_TYPEDEF,
     BID_AST_NODE_TYPE_METHOD_RETURN_TYPE, // type
     BID_AST_NODE_TYPE_VAR,                // var
+    BID_AST_NODE_TYPE_ERROR,              // var
+    BID_AST_NODE_TYPE_ERROR_MEMBER,       // var
     BID_AST_NODE_TYPE
 };
 
@@ -62,6 +65,11 @@ struct bid_ast_node
         {
             Str name;
         } argument;
+
+        struct ast_node_error_member
+        {
+            Str name;
+        } errors;
     };
 };
 
