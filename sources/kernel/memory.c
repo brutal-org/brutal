@@ -114,6 +114,8 @@ SpaceResult space_map_obj(Space *self, VmmRange range, MemoryObject *mobj)
     LOCK_RETAINER(&self->lock);
 
     range_alloc_used(&self->alloc, range_cast(USizeRange, range));
+
+    memory_object_ref(mobj);
     memory_mapping_create(self, range, mobj);
 
     return OK(SpaceResult, range);
@@ -146,6 +148,8 @@ SpaceResult space_alloc_obj(Space *self, MemoryObject *mobj)
     LOCK_RETAINER(&self->lock);
 
     auto range = range_cast(VmmRange, range_alloc_alloc(&self->alloc, mobj->range.size));
+
+    memory_object_ref(mobj);
     memory_mapping_create(self, range, mobj);
 
     return OK(SpaceResult, range);
