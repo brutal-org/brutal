@@ -51,16 +51,16 @@ static void bid_write_method_send_structure(IoWriter *writer, struct bid_ast_nod
         {
             print(writer, "\t");
             bid_write_argument(writer, method->children.data[i]);
-            print(writer, "; \n");
+            print(writer, ";\n");
         }
     }
-    print(writer, "}; \n\n");
+    print(writer, "};\n\n");
 }
 
 void bid_write_method(IoWriter *writer, struct bid_ast_node *method, Str current_namespace)
 {
 
-    print(writer, "// - {}.{} \n\n", current_namespace, method->method.name);
+    print(writer, "// - {}.{}\n\n", current_namespace, method->method.name);
 
     //  bid_write_method_received_structure(writer, method);
     bid_write_method_send_structure(writer, method, current_namespace);
@@ -87,18 +87,6 @@ void bid_write_method(IoWriter *writer, struct bid_ast_node *method, Str current
     print(writer, " {}_{}(", current_namespace, method->method.name);
 
     print(writer, "BrTask target, struct {}_{}_send* send", current_namespace, method->method.name);
-    /*
-    for (int i = 0; i < method->children.length; i++)
-    {
-        if (method->children.data[i]->type == BID_AST_NODE_TYPE_VAR)
-        {
-            bid_write_argument(writer, method->children.data[i]);
-            if (i + 1 < arg_count)
-            {
-                print(writer, ", ");
-            }
-        }
-    }
-    */
+
     print(writer, ");\n\n");
 }
