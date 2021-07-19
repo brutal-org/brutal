@@ -18,10 +18,13 @@ static void bid_write_node(IoWriter *writer, struct bid_ast_node *node, Str curr
     {
     case BID_AST_NODE_TYPE_INTERFACE:
         current_namespace = bid_write_interface(writer, node);
-        bid_convert_message_type(writer, node, current_namespace);
-        for (int i = 0; i < node->children.length; i++)
+        if (node->children.length != 0)
         {
-            bid_write_node(writer, node->children.data[i], current_namespace);
+            bid_convert_message_type(writer, node, current_namespace);
+            for (int i = 0; i < node->children.length; i++)
+            {
+                bid_write_node(writer, node->children.data[i], current_namespace);
+            }
         }
         break;
     case BID_AST_NODE_TYPE_METHOD:

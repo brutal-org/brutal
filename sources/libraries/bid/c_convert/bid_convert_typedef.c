@@ -18,5 +18,5 @@ void bid_write_typedef(IoWriter *writer, struct bid_ast_node *typedef_node)
     print(writer, " ");
     bid_write_type(writer, name_node);
 
-    print(writer, "; \n\n");
+    print(writer, ";\n\n");
 }

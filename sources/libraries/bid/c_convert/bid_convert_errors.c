@@ -4,6 +4,7 @@ void bid_write_errors(IoWriter *writer, struct bid_ast_node *errors, Str namespa
 {
 
     print(writer, "enum {}_errors_type\n\\{\n", namespace);
+    print(writer, "\t{}_{},\n", namespace, "no_error");
 
     for (int i = 0; i < errors->children.length; i++)
     {
@@ -16,6 +17,5 @@ void bid_write_errors(IoWriter *writer, struct bid_ast_node *errors, Str namespa
 
     print(writer, "struct {}_errors\n\\{\n", namespace);
     print(writer, "\tenum {}_errors_type type;\n", namespace);
-    print(writer, "\tStr info;");
-    print(writer, "\n};\n\n");
+    print(writer, "};\n\n");
 }
