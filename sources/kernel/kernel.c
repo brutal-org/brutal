@@ -37,6 +37,7 @@ void kernel_entry_main(struct handover *handover)
     {
         arch_idle();
     }
+}
 
 void kernel_entry_other(void)
 {
