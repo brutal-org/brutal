@@ -2,20 +2,22 @@
 #include "kernel/cpu.h"
 #include "kernel/heap.h"
 #include "kernel/x86_64/apic.h"
+#include "kernel/x86_64/asm.h"
 #include "kernel/x86_64/cpu.h"
 #include "kernel/x86_64/msr.h"
 
 static size_t impl_count = 0;
-static struct cpu_impl impls[MAX_CPU_COUNT] = {};
+
+static struct cpu_impl cpus[MAX_CPU_COUNT] = {};
 
 struct cpu_impl *cpu_impl(CpuId id)
 {
-    return &impls[id];
+    return &cpus[id];
 }
 
 struct cpu_impl *cpu_impl_self(void)
 {
-    return &impls[cpu_self_id()];
+    return &cpus[cpu_self_id()];
 }
 
 void cpu_found(CpuId id, int lapic)
@@ -24,6 +26,7 @@ void cpu_found(CpuId id, int lapic)
 
     cpu(id)->id = id;
     cpu(id)->present = true;
+
     cpu_impl(id)->lapic = lapic;
 
     // Irq and Isr stack
@@ -49,7 +52,6 @@ void cpu_initialize(void)
     // Setup tss
     gdt_load_tss(&cpu_impl_self()->tss);
 }
-/* --- Public API ----------------------------------------------------------- */
 
 CpuId cpu_self_id(void)
 {
@@ -69,4 +71,14 @@ struct cpu *cpu(CpuId id)
 void cpu_resched_other(CpuId cpu)
 {
     apic_send_ipit(cpu, IPIT_RESCHED);
+}
+
+void cpu_enable_interrupts(void)
+{
+    asm_sti();
+}
+
+void cpu_disable_interrupts(void)
+{
+    asm_cli();
 }

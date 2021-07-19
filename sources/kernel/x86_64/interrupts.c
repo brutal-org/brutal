@@ -99,6 +99,11 @@ void interrupt_error_handler(Regs *regs, uintptr_t rsp)
     log_unlock("");
     log_unlock("{}({}) with error_code={}!", _exception_messages[regs->int_no], regs->int_no, regs->error_code);
     log_unlock("");
+    if (task_self() != nullptr)
+    {
+        log_unlock("Running task is {}({})", str_cast(&task_self()->name), task_self()->base.handle);
+        log_unlock("");
+    }
     dump_register(regs);
     log_unlock("");
     backtrace(regs->rbp, regs->rip);
@@ -137,6 +142,8 @@ uint64_t interrupt_handler(uint64_t rsp)
 {
     auto regs = (Regs *)rsp;
 
+    cpu_begin_interrupt();
+
     if (regs->int_no < 32)
     {
         interrupt_error_handler(regs, rsp);
@@ -165,6 +172,8 @@ uint64_t interrupt_handler(uint64_t rsp)
     {
         log_unlock("Non maskable interrupt from APIC (Possible hardware error).");
     }
+
+    cpu_end_interrupt();
 
     apic_eoi();
 

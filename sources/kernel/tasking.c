@@ -15,7 +15,10 @@ void task_idle(void)
 {
     while (true)
     {
-        asm volatile("hlt");
+        arch_idle();
+    }
+}
+
     }
 }
 

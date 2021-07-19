@@ -20,6 +20,9 @@
 
 void arch_entry_main(struct handover *handover)
 {
+    cpu_disable_interrupts();
+    cpu_retain_disable();
+
     log("Initializing arch x86_64...");
 
     com_initialize(COM1);
@@ -42,7 +45,8 @@ void arch_entry_main(struct handover *handover)
 
 void arch_entry_other(void)
 {
-    asm_cli();
+    cpu_disable_interrupts();
+    cpu_retain_disable();
 
     apic_enable();
     simd_initialize();

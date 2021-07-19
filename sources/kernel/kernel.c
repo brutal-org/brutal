@@ -27,16 +27,28 @@ void kernel_entry_main(struct handover *handover)
     kernel_splash();
     tasking_initialize();
     kernel_boot_other();
-    arch_enable_interrupt();
+
+    cpu_retain_enable();
+    cpu_enable_interrupts();
+
     init_start(handover);
-    arch_idle();
-}
+
+    while (true)
+    {
+        arch_idle();
+    }
 
 void kernel_entry_other(void)
 {
     log("CPU N°{} is entering kernel...", cpu_self()->id);
 
     other_ready++;
-    arch_enable_interrupt();
-    arch_idle();
+
+    cpu_retain_enable();
+    cpu_enable_interrupts();
+
+    while (true)
+    {
+        arch_idle();
+    }
 }

@@ -15,5 +15,3 @@ void arch_boot_other(void);
 void arch_idle(void);
 
 void arch_stop(void);
-
-void arch_enable_interrupt(void);

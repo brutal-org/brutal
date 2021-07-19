@@ -27,10 +27,7 @@ IoWriter *arch_debug(void)
 
 void arch_idle(void)
 {
-    while (true)
-    {
-        asm_hlt();
-    }
+    asm_hlt();
 }
 
 void arch_stop(void)
@@ -42,9 +39,4 @@ void arch_stop(void)
         asm_cli();
         asm_hlt();
     }
-}
-
-void arch_enable_interrupt()
-{
-    asm_sti();
 }
