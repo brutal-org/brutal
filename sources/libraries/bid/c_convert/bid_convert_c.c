@@ -1,7 +1,6 @@
-#include <brutal/alloc.h>
-#include <brutal/base.h>
 #include <bid/bid.h>
 #include <bid/c_convert/bid_convert_c.h>
+#include <bid/c_convert/bid_convert_errors.h>
 #include <bid/c_convert/bid_convert_header.h>
 #include <bid/c_convert/bid_convert_method.h>
 #include <bid/c_convert/bid_convert_type.h>
@@ -26,6 +25,9 @@ static void bid_write_node(IoWriter *writer, struct bid_ast_node *node, Str curr
         break;
     case BID_AST_NODE_TYPE_TYPEDEF:
         bid_write_typedef(writer, node);
+        break;
+    case BID_AST_NODE_TYPE_ERROR:
+        bid_write_errors(writer, node, current_namespace);
         break;
 
     default:

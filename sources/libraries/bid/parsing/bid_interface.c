@@ -1,4 +1,5 @@
 #include <bid/bid.h>
+#include <bid/parsing/bid_error.h>
 #include <bid/parsing/bid_interface.h>
 #include <bid/parsing/bid_method.h>
 #include <bid/parsing/bid_typedef.h>
@@ -38,6 +39,14 @@ BidParseResult scan_interface_block(struct bid *idl_in, struct bid_ast_node *int
             vec_push(&interface_node->children, ast);
 
             TRY(BidParseResult, scan_method(idl_in, ast));
+        }
+        else if (str_eq(result, str_cast("errors")))
+        {
+
+            auto ast = create_ast_node(BID_AST_NODE_TYPE_ERROR);
+            vec_push(&interface_node->children, ast);
+
+            TRY(BidParseResult, scan_error(idl_in, ast));
         }
         else if (str_eq(result, str_cast("type")))
         {
