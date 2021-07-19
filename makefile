@@ -63,7 +63,7 @@ run: $(ISO)
 		-cdrom $(ISO) \
 		-d guest_errors
 
-bochs:
+bochs: $(ISO)
 	bochs
 
 clean:

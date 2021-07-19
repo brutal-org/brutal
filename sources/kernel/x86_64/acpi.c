@@ -96,6 +96,7 @@ uint32_t acpi_find_lapic(uintptr_t rsdp_address)
         {                                                                                   \
             final.table[i] = (struct record_type *)table.table[i];                          \
         }                                                                                   \
+                                                                                            \
         return final;                                                                       \
     }
 

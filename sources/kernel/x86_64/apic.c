@@ -46,25 +46,25 @@ void lapic_initialize(struct handover const *handover)
 
 struct ioapic_record_table ioapic_table = {};
 
-static inline uint32_t ioapic_read(int ioapic_id, uint32_t reg)
+static inline uint32_t ioapic_read(int index, uint32_t reg)
 {
-    auto base = mmap_phys_to_io(ioapic_table.table[ioapic_id]->address);
+    auto base = mmap_phys_to_io(ioapic_table.table[index]->address);
 
     mmio_write32(base + IOAPIC_REG_OFFSET, reg);
     return mmio_read32(base + IOAPIC_VALUE_OFFSET);
 }
 
-static inline void ioapic_write(int ioapic_id, uint32_t reg, uint32_t value)
+static inline void ioapic_write(int index, uint32_t reg, uint32_t value)
 {
-    auto base = mmap_phys_to_io(ioapic_table.table[ioapic_id]->address);
+    auto base = mmap_phys_to_io(ioapic_table.table[index]->address);
 
     mmio_write32(base + IOAPIC_REG_OFFSET, reg);
     mmio_write32(base + IOAPIC_VALUE_OFFSET, value);
 }
 
-struct ioapic_version ioapic_get_version(int ioapic_id)
+struct ioapic_version ioapic_get_version(int index)
 {
-    uint32_t raw = ioapic_read(ioapic_id, IOAPIC_REG_VERSION);
+    uint32_t raw = ioapic_read(index, IOAPIC_REG_VERSION);
 
     return union_cast(struct ioapic_version, raw);
 }
@@ -77,7 +77,7 @@ void ioapic_initialize(struct handover const *handover)
     {
         auto ioapic = ioapic_table.table[i];
 
-        auto version = ioapic_get_version(ioapic->id);
+        auto version = ioapic_get_version(i);
 
         log("Ioapic {} found:", i);
         log(" - Address: {#p}", ioapic->address);
@@ -125,7 +125,14 @@ void apic_start_processor(CpuId cpu_id, uintptr_t entry)
 
 CpuId apic_current_cpu(void)
 {
-    return lapic_read(LAPIC_CPU_ID) >> 24;
+    if (lapic_base == 0)
+    {
+        return 0;
+    }
+    else
+    {
+        return lapic_read(LAPIC_CPU_ID) >> 24;
+    }
 }
 
 void apic_enable(void)
