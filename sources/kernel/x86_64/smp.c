@@ -14,52 +14,44 @@
 #include "kernel/x86_64/memory/mmap.h"
 #include "kernel/x86_64/smp.h"
 
-typedef Result(BrResult, uint8_t) smp_init_result;
-
 atomic_bool cpu_ready = false;
 
 extern uint32_t trampoline_start;
 extern uint32_t trampoline_end;
 
-static size_t smp_cpu_trampoline_size(void)
+static size_t smp_trampoline_size(void)
 {
     uint64_t trampoline_len = (uintptr_t)&trampoline_end - (uintptr_t)&trampoline_start + HOST_MEM_PAGESIZE;
     return ALIGN_UP(trampoline_len, HOST_MEM_PAGESIZE);
 }
 
-static smp_init_result smp_initialize_cpu_trampoline(void)
+static void smp_trampoline_map(void)
 {
     log("Initializing cpu trampoline");
-    log("trampoline is {x}", smp_cpu_trampoline_size());
+    log("trampoline is {x} bytes in size", smp_trampoline_size());
 
-    // Map everything under the trampoline
     uint64_t trampoline_len = (uintptr_t)&trampoline_end - (uintptr_t)&trampoline_start + HOST_MEM_PAGESIZE;
 
     vmm_map(vmm_kernel_space(),
             (VmmRange){
                 .base = (0x0),
-                .size = smp_cpu_trampoline_size()},
+                .size = smp_trampoline_size()},
             (PmmRange){
                 .base = (0x0),
-                .size = smp_cpu_trampoline_size()},
+                .size = smp_trampoline_size()},
             BR_MEM_WRITABLE);
 
-    vmm_space_switch(vmm_kernel_space());
-
     mem_cpy((void *)0x1000, (void *)&trampoline_start, trampoline_len - 0x1000);
-
-    return OK(smp_init_result, 0);
 }
 
-static void smp_cleanup_cpu_trampoline(void)
+static void smp_trampoline_unmap(void)
 {
     log("Cleaning up cpu trampoline");
-    // Unmap everything under the trampoline
 
     vmm_unmap(vmm_kernel_space(),
               (VmmRange){
                   .base = (0x0),
-                  .size = smp_cpu_trampoline_size(),
+                  .size = smp_trampoline_size(),
               });
 }
 
@@ -69,13 +61,13 @@ void smp_entry_other(void)
     arch_entry_other();
 }
 
-static smp_init_result smp_initialize_cpu_data(void)
+static void smp_trampoline_setup(void)
 {
-    // load future cpu page table
+    // Load future cpu page table
     mmio_write64(SMP_INIT_PAGE_TABLE, asm_read_cr3());
 
-    // load future cpu stack
-    uint8_t *cpu_stack = (uint8_t *)TRY(smp_init_result, heap_alloc(KERNEL_STACK_SIZE)).base;
+    // Load future cpu stack
+    uint8_t *cpu_stack = (uint8_t *)UNWRAP(heap_alloc(KERNEL_STACK_SIZE)).base;
     mmio_write64(SMP_INIT_STACK, (uint64_t)(cpu_stack + KERNEL_STACK_SIZE));
 
     asm volatile(
@@ -83,12 +75,10 @@ static smp_init_result smp_initialize_cpu_data(void)
         "sidt 0x540\n");
 
     mmio_write64(SMP_INIT_ENTRY, (uintptr_t)smp_entry_other);
-    return OK(smp_init_result, 0);
 }
 
 static void smp_initialize_cpu(uint32_t lapic_id)
 {
-    smp_initialize_cpu_data();
     apic_init_processor(lapic_id);
     hpet_sleep(10);
     apic_start_processor(lapic_id, 4096);
@@ -96,8 +86,7 @@ static void smp_initialize_cpu(uint32_t lapic_id)
 
 void arch_boot_other(void)
 {
-    // load future cpu page table
-    smp_initialize_cpu_trampoline();
+    smp_trampoline_map();
 
     log("Booting other CPUs...");
 
@@ -108,15 +97,17 @@ void arch_boot_other(void)
             continue; // don't init current cpu
         }
 
+        log("Bootings CPU N°{}...", cpu);
+
         cpu_ready = false;
 
-        log("Bootings CPU N°{}...", cpu);
+        smp_trampoline_setup();
         smp_initialize_cpu(cpu_impl(cpu)->lapic);
 
         WAIT_FOR(cpu_ready);
     }
 
-    smp_cleanup_cpu_trampoline();
+    smp_trampoline_unmap();
 }
 
 void smp_stop_all(void)
