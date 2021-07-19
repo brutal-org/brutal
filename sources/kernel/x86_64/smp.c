@@ -79,8 +79,8 @@ static smp_init_result smp_initialize_cpu_data(void)
     mmio_write64(SMP_INIT_STACK, (uint64_t)(cpu_stack + KERNEL_STACK_SIZE));
 
     asm volatile(
-        "sgdt 0x580\n"   // gdt at 0x580
-        "sidt 0x590\n"); // idt at 0x590
+        "sgdt 0x530\n"
+        "sidt 0x540\n");
 
     mmio_write64(SMP_INIT_ENTRY, (uintptr_t)smp_entry_other);
     return OK(smp_init_result, 0);
