@@ -4,7 +4,6 @@
 #include "kernel/x86_64/apic.h"
 #include "kernel/x86_64/asm.h"
 #include "kernel/x86_64/cpu.h"
-#include "kernel/x86_64/msr.h"
 
 static size_t impl_count = 0;
 
@@ -46,8 +45,8 @@ size_t cpu_count(void)
 void cpu_initialize(void)
 {
     // Setup swapgs
-    wrmsr(MSR_GS_BASE, (uintptr_t)cpu_impl_self());
-    wrmsr(MSR_KERN_GS_BASE, (uintptr_t)cpu_impl_self());
+    asm_write_msr(MSR_GS_BASE, (uintptr_t)cpu_impl_self());
+    asm_write_msr(MSR_KERN_GS_BASE, (uintptr_t)cpu_impl_self());
 
     // Setup tss
     gdt_load_tss(&cpu_impl_self()->tss);

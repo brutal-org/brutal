@@ -1,18 +1,18 @@
-#include "kernel/x86_64/syscall.h"
 #include <brutal/log.h>
 #include "kernel/heap.h"
 #include "kernel/kernel.h"
 #include "kernel/syscalls.h"
+#include "kernel/x86_64/asm.h"
 #include "kernel/x86_64/cpu.h"
 #include "kernel/x86_64/gdt.h"
 #include "kernel/x86_64/interrupts.h"
-#include "kernel/x86_64/msr.h"
+#include "kernel/x86_64/syscall.h"
 
 extern void __syscall(void);
 
 void syscall_initialize(void)
 {
-    wrmsr(MSR_EFER, rdmsr(MSR_EFER) | EFER_ENABLE_SYSCALL);
+    asm_write_msr(MSR_EFER, asm_read_msr(MSR_EFER) | EFER_ENABLE_SYSCALL);
 
     // when starting the syscall:
     // CS = kcode
@@ -27,11 +27,11 @@ void syscall_initialize(void)
     // ucode + 8 : user data
     // ucode + 16 : user code
 
-    wrmsr(MSR_STAR, ((uint64_t)(GDT_KERNEL_CODE * 8) << STAR_KCODE_OFFSET) |
-                        ((uint64_t)(((GDT_USER_DATA - 1) * 8) | GDT_RING_3) << STAR_UCODE_OFFSET));
+    asm_write_msr(MSR_STAR, ((uint64_t)(GDT_KERNEL_CODE * 8) << STAR_KCODE_OFFSET) |
+                                ((uint64_t)(((GDT_USER_DATA - 1) * 8) | GDT_RING_3) << STAR_UCODE_OFFSET));
 
-    wrmsr(MSR_LSTAR, (uint64_t)__syscall);
-    wrmsr(MSR_SYSCALL_FLAG_MASK, 0);
+    asm_write_msr(MSR_LSTAR, (uint64_t)__syscall);
+    asm_write_msr(MSR_SYSCALL_FLAG_MASK, 0);
 }
 
 void syscall_set_stack(uintptr_t stack)

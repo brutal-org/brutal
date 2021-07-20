@@ -4,9 +4,9 @@
 #include "kernel/x86_64/acpi.h"
 #include "kernel/x86_64/apic.h"
 #include "kernel/x86_64/apic/timer.h"
+#include "kernel/x86_64/asm.h"
 #include "kernel/x86_64/cpu.h"
 #include "kernel/x86_64/memory/mmap.h"
-#include "kernel/x86_64/msr.h"
 #include "kernel/x86_64/pic.h"
 
 /* --- Lapic ---------------------------------------------------------------- */
@@ -137,7 +137,7 @@ CpuId apic_current_cpu(void)
 
 void apic_enable(void)
 {
-    wrmsr(MSR_APIC, (rdmsr(MSR_APIC) | LAPIC_ENABLE) & ~((1 << 10)));
+    asm_write_msr(MSR_APIC, (asm_read_msr(MSR_APIC) | LAPIC_ENABLE) & ~((1 << 10)));
     lapic_enable_spurious();
 }
 
