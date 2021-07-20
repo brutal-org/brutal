@@ -37,7 +37,13 @@ typedef struct
 
 void str_rvs(Str str);
 
-bool str_eq(Str lhs, Str rhs);
+bool str_eq(const Str lhs, const Str rhs);
+
+int str_cnt(const Str lStr, const Str rStr);
+
+int str_last(const Str lStr, const Str rStr);
+
+int str_first(const Str lStr, const Str rStr);
 
 /* --- Fix Size Strings ----------------------------------------------------- */
 
@@ -48,6 +54,7 @@ bool str_eq(Str lhs, Str rhs);
         char buffer[N]; \
     }
 
+typedef StrFix(1) StrFix1;
 typedef StrFix(8) StrFix8;
 typedef StrFix(16) StrFix16;
 typedef StrFix(32) StrFix32;
@@ -59,6 +66,7 @@ typedef StrFix(128) StrFix128;
 static inline Str str_forward(Str str) { return str; }
 static inline Str str_make_from_inline_str(InlineStr *str) { return (Str){str->len, str->buffer}; }
 static inline Str str_make_from_cstr(char const *cstr) { return (Str){cstr_len(cstr), (char *)cstr}; }
+static inline Str str_make_from_str_fix1(StrFix1 *str_fix) { return (Str){str_fix->len, str_fix->buffer}; }
 static inline Str str_make_from_str_fix8(StrFix8 *str_fix) { return (Str){str_fix->len, str_fix->buffer}; }
 static inline Str str_make_from_str_fix16(StrFix16 *str_fix) { return (Str){str_fix->len, str_fix->buffer}; }
 static inline Str str_make_from_str_fix32(StrFix32 *str_fix) { return (Str){str_fix->len, str_fix->buffer}; }
@@ -74,6 +82,7 @@ static inline Str str_make_from_str_fix128(StrFix128 *str_fix) { return (Str){st
         InlineStr * : str_make_from_inline_str, \
         char*       : str_make_from_cstr,       \
         char const* : str_make_from_cstr,       \
+        StrFix1*    : str_make_from_str_fix1,   \
         StrFix8*    : str_make_from_str_fix8,   \
         StrFix16*   : str_make_from_str_fix16,  \
         StrFix32*   : str_make_from_str_fix32,  \
@@ -95,3 +104,6 @@ static inline Str str_make_from_str_fix128(StrFix128 *str_fix) { return (Str){st
         dst_str.len = src_str.len;                            \
         dst_str;                                              \
     })
+
+#define str_sub(str, start, end) \
+    str_cast_n(end - start, (char *)str.buffer + start)
