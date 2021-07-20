@@ -10,23 +10,17 @@
 
 static Lock task_lock = {};
 static Vec(Task *) tasks = {};
-size_t current_tick = 0;
-
-void task_idle(void)
-{
-    while (true)
-    {
-        arch_idle();
-    }
-}
+static atomic_uint_least64_t tick = 0;
 
 Task *task_self(void)
 {
-    return cpu_self()->schedule.current;
+    return cpu_self()->current;
 }
 
 void task_destroy(Task *task)
 {
+    log("Destroying task({}) {}", task->base.handle, str_cast(&task->name));
+
     context_destroy(task->context);
     space_deref(task->space);
     domain_deref(task->domain);
@@ -55,13 +49,9 @@ TaskCreateResult task_create(Str name, Space *space, BrTaskFlags flags)
     task->stack = UNWRAP(heap_alloc(KERNEL_STACK_SIZE));
     task->sp = range_end(task->stack);
 
-    log("Task({}) created...", str_cast(&task->name));
-
     object_init(base_cast(task), OBJECT_TASK, (ObjectDtor *)task_destroy);
 
-    lock_acquire(&task_lock);
-    vec_push(&tasks, task);
-    lock_release(&task_lock);
+    log("Task {}({}) created...", str_cast(&task->name), task->base.handle);
 
     return OK(TaskCreateResult, task);
 }
@@ -80,43 +70,179 @@ void task_start(Task *self, uintptr_t ip, uintptr_t sp, BrTaskArgs args)
 {
     LOCK_RETAINER(&task_lock);
 
+    assert_truth(self->state == TASK_STATE_NONE);
+
     context_start(self->context, ip, sp, args, self->flags);
     self->state = TASK_STATE_RUNNING;
+
+    task_ref(self);
+    vec_push(&tasks, self);
 }
 
-Task *task_create_idle(void)
+void task_cancel(Task *self, uintptr_t result)
+{
+    log("Canceling task {}...", str_cast(&self->name));
+
+    lock_acquire(&task_lock);
+
+    if (self->is_canceled)
+    {
+        lock_release(&task_lock);
+        return;
+    }
+
+    self->is_canceled = true;
+    self->result = result;
+
+    lock_release(&task_lock);
+
+    log("Task marked as canceled, killing it...");
+
+    task_cancel_if_needed(self);
+}
+
+void task_cancel_if_needed(Task *self)
+{
+    lock_acquire(&task_lock);
+
+    if (self->in_syscall)
+    {
+        lock_release(&task_lock);
+        return;
+    }
+
+    if (!self->is_canceled)
+    {
+        lock_release(&task_lock);
+        return;
+    }
+
+    self->state = TASK_STATE_CANCELING;
+
+    lock_release(&task_lock);
+
+    log("Task canceled, yielding to other task now.");
+
+    if (self == task_self())
+    {
+        scheduler_yield();
+        assert_unreachable();
+    }
+}
+
+void task_begin_syscall(Task *self)
+{
+    assert_truth(task_self() == self);
+
+    lock_acquire(&task_lock);
+
+    if (self->is_canceled)
+    {
+        lock_release(&task_lock);
+
+        scheduler_yield();
+        assert_unreachable();
+    }
+    else
+    {
+
+        self->in_syscall = true;
+        lock_release(&task_lock);
+    }
+}
+
+void task_end_syscall(Task *self)
+{
+    assert_truth(task_self() == self);
+
+    lock_acquire(&task_lock);
+    self->in_syscall = false;
+    lock_release(&task_lock);
+
+    task_cancel_if_needed(self);
+}
+
+void task_block(Task *self, Blocker blocker)
+{
+    lock_acquire(&task_lock);
+
+    self->blocker = blocker;
+    self->state = TASK_STATE_BLOCKED;
+
+    lock_release(&task_lock);
+
+    scheduler_yield();
+}
+
+void task_sleep(Task *self, BrTimeout timeout)
+{
+    task_block(self, (Blocker){.type = BLOCKER_TIME, .deadline = tick + timeout});
+}
+
+void idle(void)
+{
+    while (true)
+        arch_idle();
+}
+
+Task *tasking_create_idle(void)
 {
     auto space = space_create();
     auto task = UNWRAP(task_create(str_cast("idle"), space, BR_TASK_NONE));
-    context_start(task->context, (uintptr_t)task_idle, task->sp, (BrTaskArgs){}, task->flags);
+
+    context_start(task->context, (uintptr_t)idle, task->sp, (BrTaskArgs){}, task->flags);
     task->state = TASK_STATE_IDLE;
+
     return task;
 }
 
-Task *task_create_boot(void)
+Task *tasking_create_boot(void)
 {
     auto space = space_create();
     auto task = UNWRAP(task_create(str_cast("boot"), space, BR_TASK_NONE));
     space_deref(space);
     task_start(task, 0, 0, (BrTaskArgs){});
+    task->is_running = true;
+
+    task_deref(task);
+
     return task;
 }
 
-void task_state(Task *self, TaskState new_state)
+static inline void finalizer(void)
 {
-    LOCK_RETAINER(&task_lock);
-
-    if (self->state == new_state)
+    while (true)
     {
-        return;
-    }
+        log("Finalizing tasks...");
 
-    self->state = new_state;
+        lock_acquire(&task_lock);
+
+        for (int i = 0; i < tasks.length; i++)
+        {
+            auto task = tasks.data[i];
+
+            if (task->state == TASK_STATE_CANCELED)
+            {
+                log("Finalizing task({}) {}", task->base.handle, str_cast(&task->name));
+                vec_remove(&tasks, task);
+                task_deref(task);
+                i--;
+            }
+        }
+
+        lock_release(&task_lock);
+
+        task_sleep(task_self(), 250);
+    }
 }
 
-void task_wait(MAYBE_UNUSED Task *self, MAYBE_UNUSED uint64_t ms)
+void tasking_create_finalizer(void)
 {
-    // TODO: task wait
+    auto space = space_create();
+    auto task = UNWRAP(task_create(str_cast("finalizer"), space, BR_TASK_NONE));
+    space_deref(space);
+    task_start(task, (uintptr_t)finalizer, task->sp, (BrTaskArgs){});
+    task_deref(task);
 }
 
 void tasking_initialize(void)
@@ -128,186 +254,66 @@ void tasking_initialize(void)
     for (size_t i = 0; i < cpu_count(); i++)
     {
         log("Initializing tasking for cpu: {}", i);
-        cpu(i)->schedule.idle = task_create_idle();
-        cpu(i)->schedule.current = task_create_boot();
-        cpu(i)->schedule.next = cpu(i)->schedule.idle;
+        cpu(i)->idle = tasking_create_idle();
+        cpu(i)->current = tasking_create_boot();
+        cpu(i)->next = cpu(i)->idle;
     }
+
+    tasking_create_finalizer();
 }
 
-static size_t running_process_count(void)
+void scheduler_yield(void)
 {
-    size_t running_process_count = 0;
+    task_self()->yield = true;
 
-    for (int i = 0; i < tasks.length; i++)
+    while (task_self()->yield)
     {
-        if (tasks.data[i]->state == TASK_STATE_RUNNING)
-        {
-            running_process_count++;
-        }
+        arch_idle();
     }
-
-    return running_process_count;
 }
 
-static Task *task_get_most_active(void)
+void scheduler_unblock(void)
 {
-    size_t most_active_time = 0;
-    Task *current_active = nullptr;
-
-    for (int i = 0; i < tasks.length; i++)
+    vec_foreach(task, &tasks)
     {
-        if (tasks.data[i]->state != TASK_STATE_RUNNING || !tasks.data[i]->schedule.is_currently_executed)
+        if (task->state == TASK_STATE_BLOCKED)
         {
-            continue;
-        }
-
-        auto time_running = (current_tick - tasks.data[i]->schedule.tick_start);
-
-        if (time_running > most_active_time)
-        {
-            most_active_time = time_running;
-            current_active = tasks.data[i];
+            if (task->blocker.deadline < tick)
+            {
+                task->state = TASK_STATE_RUNNING;
+            }
         }
     }
-
-    return current_active;
 }
 
-static bool task_has_waiting_task(void)
-{
-    for (int i = 0; i < tasks.length; i++)
-    {
-        if (tasks.data[i]->state == TASK_STATE_RUNNING && !tasks.data[i]->schedule.is_currently_executed)
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-static Task *task_get_most_waiting(void)
-{
-    size_t most_waiting_time = 0;
-    Task *current_waiting = nullptr;
-
-    for (int i = 0; i < tasks.length; i++)
-    {
-        if (tasks.data[i]->state != TASK_STATE_RUNNING || tasks.data[i]->schedule.is_currently_executed)
-        {
-            continue;
-        }
-
-        auto time_waiting = (current_tick - tasks.data[i]->schedule.tick_end);
-
-        if (time_waiting > most_waiting_time)
-        {
-            most_waiting_time = time_waiting;
-            current_waiting = tasks.data[i];
-        }
-    }
-
-    return current_waiting;
-}
-
-static CpuId scheduler_end_task_execution(Task *target)
-{
-    target->schedule.tick_end = current_tick;
-    target->schedule.is_currently_executed = false;
-    CpuId cur_cpu = target->schedule.cpu;
-    target->schedule.cpu = 0;
-
-    return cur_cpu;
-}
-
-static void scheduler_start_task_execution(Task *target, CpuId target_cpu)
-{
-    target->schedule.tick_start = current_tick;
-    target->schedule.is_currently_executed = true;
-    target->schedule.cpu = target_cpu;
-    cpu(target_cpu)->schedule.next = target;
-}
-
-// is the cpu current process idle
-static bool scheduler_is_cpu_idle(CpuId id)
-{
-    return cpu(id)->schedule.next == cpu(id)->schedule.idle;
-}
-
-static bool scheduler_any_idle_cpu(void)
+void scheduler_update(void)
 {
     for (size_t i = 0; i < cpu_count(); i++)
     {
-        if (scheduler_is_cpu_idle(i))
+        Task *current = cpu(i)->current;
+        Task *next = nullptr;
+
+        current->is_running = false;
+
+        vec_foreach(task, &tasks)
         {
-            return true;
+            if (task->state == TASK_STATE_RUNNING &&
+                !task->is_running &&
+                (next == nullptr || task->last_tick < next->last_tick))
+            {
+                next = task;
+            }
         }
-    }
 
-    return false;
-}
-
-static void scheduler_dispatch_to_idle_cpu(Task *target)
-{
-    for (size_t i = 0; i < cpu_count(); i++)
-    {
-        if (scheduler_is_cpu_idle(i))
+        if (next == nullptr)
         {
-            scheduler_start_task_execution(target, i);
-            break;
+            next = cpu(i)->idle;
         }
-    }
-}
 
-static void scheduler_dispatch_to_active_cpu(Task *target)
-{
-    Task *most_active = task_get_most_active();
+        next->last_tick = tick;
+        next->is_running = true;
 
-    CpuId target_cpu = scheduler_end_task_execution(most_active);
-    scheduler_start_task_execution(target, target_cpu);
-}
-
-static void scheduler_dispatch_all_waiting_task_to_a_cpu(void)
-{
-    while (task_has_waiting_task())
-    {
-        scheduler_dispatch_to_idle_cpu(task_get_most_waiting());
-    }
-}
-
-static void scheduler_update(void)
-{
-    size_t running = running_process_count();
-
-    // when we have a number of running process under the number of cpu
-    if (running <= cpu_count())
-    {
-        // the rare case where we have 4 cpu and 2 task and 1 waiting, so we put all waiting task to an idle cpu
-        // waiting task: {C}
-        // running task: [A] [B] [ ] [ ]
-        // after:
-        // waiting task: none
-        // running task: [A] [B] [C] [ ]
-        scheduler_dispatch_all_waiting_task_to_a_cpu();
-
-        // note: don't need to update cpu scheduler.next value as they keep the same value as "current" on a context switch (see: scheduler_switch())
-        return;
-    }
-
-    size_t schedule_count = MIN(cpu_count(), running - cpu_count());
-
-    for (size_t i = 0; i < schedule_count; i++)
-    {
-        Task *most_waiting = task_get_most_waiting();
-
-        if (scheduler_any_idle_cpu())
-        {
-            scheduler_dispatch_to_idle_cpu(most_waiting);
-        }
-        else
-        {
-            scheduler_dispatch_to_active_cpu(most_waiting);
-        }
+        cpu(i)->next = next;
     }
 }
 
@@ -315,7 +321,7 @@ void scheduler_switch_other(void)
 {
     for (size_t i = 1; i < cpu_count(); i++)
     {
-        if (cpu(i)->schedule.current != cpu(i)->schedule.next)
+        if (cpu(i)->current != cpu(i)->next)
         {
             cpu_resched_other(i);
         }
@@ -324,18 +330,32 @@ void scheduler_switch_other(void)
 
 void scheduler_switch(void)
 {
-    auto schedule = &cpu_self()->schedule;
-    schedule->current = schedule->next;
+    if (task_self()->state == TASK_STATE_CANCELING)
+    {
+        task_self()->state = TASK_STATE_CANCELED;
+    }
+
+    cpu_self()->current->yield = false;
+    cpu_self()->current = cpu_self()->next;
 }
 
 void scheduler_schedule_and_switch(void)
 {
-    LOCK_RETAINER_TRY(&task_lock)
-    {
-        current_tick++;
+    tick++;
 
-        scheduler_update();
-        scheduler_switch_other();
+    if (!lock_try_acquire(&task_lock))
+    {
+        return;
+    }
+
+    scheduler_unblock();
+    scheduler_update();
+    scheduler_switch_other();
+
+    if (cpu_self()->current != cpu_self()->next)
+    {
         scheduler_switch();
     }
+
+    lock_release(&task_lock);
 }

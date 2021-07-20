@@ -2,6 +2,7 @@
 
 #include <brutal/base.h>
 #include <brutal/text.h>
+#include <brutal/time.h>
 #include <brutal/types.h>
 #include "kernel/channel.h"
 #include "kernel/context.h"
@@ -15,20 +16,27 @@
 
 typedef enum
 {
+    BLOCKER_NONE,
+
+    BLOCKER_IPC,
+    BLOCKER_TIME,
+} BlockerType;
+
+typedef struct
+{
+    BlockerType type;
+    Tick deadline;
+} Blocker;
+typedef enum
+{
     TASK_STATE_NONE,
+
     TASK_STATE_IDLE,
     TASK_STATE_RUNNING,
     TASK_STATE_BLOCKED,
+    TASK_STATE_CANCELING,
+    TASK_STATE_CANCELED,
 } TaskState;
-
-// See scheduler.md in the book for more information
-typedef struct
-{
-    CpuId cpu; // Only valid if tick_in_cpu is >= 0
-    int tick_start;
-    int tick_end;
-    bool is_currently_executed;
-} TaskSchedule;
 
 typedef struct
 {
@@ -36,9 +44,15 @@ typedef struct
 
     StrFix128 name;
     BrTaskFlags flags;
-    TaskState state;
 
-    TaskSchedule schedule;
+    TaskState state;
+    Blocker blocker;
+
+    bool in_syscall;
+    bool is_canceled;
+    bool is_running;
+    size_t last_tick;
+    atomic_bool yield;
 
     BrCap caps;
     Context *context;
@@ -48,6 +62,8 @@ typedef struct
 
     uintptr_t sp;
     HeapRange stack;
+
+    uintptr_t result;
 } Task;
 
 typedef Result(BrResult, Task *) TaskCreateResult;
@@ -62,7 +78,17 @@ void task_deref(Task *self);
 
 void task_start(Task *self, uintptr_t ip, uintptr_t sp, BrTaskArgs args);
 
-void task_state(Task *self, TaskState state);
+void task_cancel(Task *self, uintptr_t result);
+
+void task_cancel_if_needed(Task *self);
+
+void task_begin_syscall(Task *self);
+
+void task_end_syscall(Task *self);
+
+void task_block(Task *self, Blocker blocker);
+
+void task_sleep(Task *self, BrTimeout timeout);
 
 /* --- Task Management ------------------------------------------------------ */
 
@@ -70,12 +96,7 @@ void tasking_initialize(void);
 
 /* --- Task Scheduling ------------------------------------------------------ */
 
-struct schedule
-{
-    Task *idle;
-    Task *current;
-    Task *next;
-};
+void scheduler_yield(void);
 
 void scheduler_switch(void);
 

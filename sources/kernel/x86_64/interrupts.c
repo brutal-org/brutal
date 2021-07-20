@@ -77,11 +77,11 @@ void backtrace(uintptr_t rbp, uint64_t rip)
 {
     auto stackframe = (struct stackframe *)(rbp);
 
-    log("Backtrace:");
-    log("{016x}", rip);
+    log_unlock("Backtrace:");
+    log_unlock("{016x}", rip);
     while (stackframe)
     {
-        log("{016x}", stackframe->rip);
+        log_unlock("{016x}", stackframe->rip);
         stackframe = stackframe->rbp;
     }
 }
@@ -99,11 +99,13 @@ void interrupt_error_handler(Regs *regs, uintptr_t rsp)
     log_unlock("");
     log_unlock("{}({}) with error_code={}!", _exception_messages[regs->int_no], regs->int_no, regs->error_code);
     log_unlock("");
+
     if (task_self() != nullptr)
     {
         log_unlock("Running task is {}({})", str_cast(&task_self()->name), task_self()->base.handle);
         log_unlock("");
     }
+
     dump_register(regs);
     log_unlock("");
     backtrace(regs->rbp, regs->rip);

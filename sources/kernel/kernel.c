@@ -33,10 +33,8 @@ void kernel_entry_main(struct handover *handover)
 
     init_start(handover);
 
-    while (true)
-    {
-        arch_idle();
-    }
+    task_cancel(task_self(), 0);
+    assert_unreachable();
 }
 
 void kernel_entry_other(void)
@@ -48,8 +46,6 @@ void kernel_entry_other(void)
     cpu_retain_enable();
     cpu_enable_interrupts();
 
-    while (true)
-    {
-        arch_idle();
-    }
+    task_cancel(task_self(), 0);
+    assert_unreachable();
 }

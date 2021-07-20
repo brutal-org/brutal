@@ -201,6 +201,27 @@ BrResult sys_start(BrTask task_handle, uintptr_t ip, uintptr_t sp, BrTaskArgs *a
 
 BrResult sys_exit(BrTask task_handle, uintptr_t exit_value)
 {
+    Task *task = nullptr;
+
+    if (task_handle == BR_TASK_SELF)
+    {
+        task = task_self();
+        task_ref(task);
+    }
+    else
+    {
+        task = (Task *)domain_lookup(task_self()->domain, task_handle, OBJECT_TASK);
+    }
+
+    if (!task)
+    {
+        return BR_BAD_HANDLE;
+    }
+
+    task_cancel(task, exit_value);
+
+    task_deref(task);
+
     return BR_NOT_IMPLEMENTED;
 }
 
@@ -304,5 +325,11 @@ BrResult syscall_dispatch(BrSyscall syscall, BrArg arg1, BrArg arg2, BrArg arg3,
         return BR_BAD_SYSCALL;
     }
 
-    return syscalls[syscall](arg1, arg2, arg3, arg4, arg5);
+    task_begin_syscall(task_self());
+
+    auto result = syscalls[syscall](arg1, arg2, arg3, arg4, arg5);
+
+    task_end_syscall(task_self());
+
+    return result;
 }

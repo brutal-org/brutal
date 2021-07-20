@@ -14,7 +14,9 @@ struct cpu
     bool retain_enable;
     int retain_depth;
 
-    struct schedule schedule;
+    Task *idle;
+    Task *current;
+    Task *next;
 };
 
 struct cpu *cpu(CpuId id);
