@@ -18,7 +18,7 @@
 #include "kernel/x86_64/stivale2.h"
 #include "kernel/x86_64/syscall.h"
 
-void arch_entry_main(struct handover *handover)
+void arch_entry_main(Handover *handover)
 {
     cpu_disable_interrupts();
     cpu_retain_disable();

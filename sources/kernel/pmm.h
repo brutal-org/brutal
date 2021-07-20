@@ -11,7 +11,7 @@ typedef Range(size_t) PmmRange;
 
 typedef Result(BrResult, PmmRange) PmmResult;
 
-void pmm_initialize(struct handover const *handover);
+void pmm_initialize(Handover const *handover);
 
 PmmResult pmm_alloc(size_t size);
 

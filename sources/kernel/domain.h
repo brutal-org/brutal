@@ -53,4 +53,4 @@ void object_ref(Object *self);
 
 void object_deref(Object *self);
 
-Object *global_lookup(BrHandle handle);
+Object *global_lookup(BrHandle handle, ObjectType type);

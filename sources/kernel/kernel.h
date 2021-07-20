@@ -6,6 +6,6 @@
 #define USER_STACK_BASE (0xc0000000)
 #define IPC_CHANNEL_SIZE (256)
 
-void kernel_entry_main(struct handover *handover);
+void kernel_entry_main(Handover *handover);
 
 void kernel_entry_other(void);

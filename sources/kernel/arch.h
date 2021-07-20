@@ -6,7 +6,7 @@
 
 IoWriter *arch_debug(void);
 
-void arch_entry_main(struct handover *handover);
+void arch_entry_main(Handover *handover);
 
 void arch_entry_other(void);
 

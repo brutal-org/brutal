@@ -5,7 +5,7 @@
 static uintptr_t hpet_base = 0;
 static uint64_t hpet_clock = 0;
 
-void hpet_initialize(struct handover *handover)
+void hpet_initialize(Handover *handover)
 {
     struct acpi_hpet *hpet_table = acpi_find_hpet(handover->rsdp);
     hpet_base = mmap_phys_to_io(hpet_table->address);

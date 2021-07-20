@@ -11,6 +11,6 @@ enum hpet_registers
     HPET_MAIN_COUNTER_VALUE = 240,
 };
 
-void hpet_initialize(struct handover *handover);
+void hpet_initialize(Handover *handover);
 
 void hpet_sleep(int ms);

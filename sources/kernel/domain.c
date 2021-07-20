@@ -119,7 +119,7 @@ void object_deref(Object *self)
     }
 }
 
-Object *global_lookup(BrHandle handle)
+Object *global_lookup(BrHandle handle, ObjectType type)
 {
     LOCK_RETAINER(&lock);
 
@@ -130,7 +130,7 @@ Object *global_lookup(BrHandle handle)
 
     vec_foreach(object, &global)
     {
-        if (object->handle == handle)
+        if (object->handle == handle && object->type == type)
         {
             refcount_ref(&object->refcount);
             return object;

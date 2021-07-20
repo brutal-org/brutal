@@ -12,7 +12,7 @@ static size_t best_bet = 0;
 static size_t used_memory = 0;
 static Lock pmm_lock;
 
-static uintptr_t memory_map_get_highest_address(struct handover_mmap const *memory_map)
+static uintptr_t memory_map_get_highest_address(HandoverMmap const *memory_map)
 {
     size_t length = memory_map->entries[memory_map->size - 1].length;
     size_t start = memory_map->entries[memory_map->size - 1].base;
@@ -20,7 +20,7 @@ static uintptr_t memory_map_get_highest_address(struct handover_mmap const *memo
     return ALIGN_UP(length + start, HOST_MEM_PAGESIZE);
 }
 
-static void pmm_bitmap_initialize(struct handover_mmap const *memory_map)
+static void pmm_bitmap_initialize(HandoverMmap const *memory_map)
 {
     log("Allocating memory bitmap...");
 
@@ -49,7 +49,7 @@ static void pmm_bitmap_initialize(struct handover_mmap const *memory_map)
     bitmap_fill(&pmm_bitmap, PMM_USED);
 }
 
-static void pmm_load_memory_map(struct handover_mmap const *memory_map)
+static void pmm_load_memory_map(HandoverMmap const *memory_map)
 {
     log("Memory map:");
 
@@ -75,7 +75,7 @@ static void pmm_load_memory_map(struct handover_mmap const *memory_map)
     log("Available Memory: {}kib", available_memory / 1024);
 }
 
-void pmm_initialize(struct handover const *handover)
+void pmm_initialize(Handover const *handover)
 {
     pmm_bitmap_initialize(&handover->mmap);
     pmm_load_memory_map(&handover->mmap);

@@ -2,63 +2,60 @@
 
 #include <brutal/text.h>
 
-enum handover_mmap_entry_type
+typedef enum
 {
     HANDOVER_MMAP_FREE,
     HANDOVER_MMAP_KERNEL_MODULE,
     HANDOVER_MMAP_RESERVED,
     HANDOVER_MMAP_RECLAIMABLE,
     HANDOVER_MMAP_FRAMEBUFFER,
-};
+} HandoverMmapType;
 
-struct handover_mmap_entry
+typedef struct
 {
-    enum handover_mmap_entry_type type;
-    uintptr_t base;
-    uintptr_t length;
-};
+    HandoverMmapType type;
 
-struct handover_mmap
+    uintptr_t base;
+    size_t length;
+} HandoverMmapEntry;
+
+typedef struct
 {
     size_t size;
 
 #define HANDOVER_MMAP_MAX_SIZE (64)
-    struct handover_mmap_entry entries[HANDOVER_MMAP_MAX_SIZE];
-};
+    HandoverMmapEntry entries[HANDOVER_MMAP_MAX_SIZE];
+} HandoverMmap;
 
-struct handover_framebuffer
+typedef struct
 {
     bool has_framebuffer;
-    uint16_t framebuffer_width;
-    uint16_t framebuffer_height;
+    uint16_t width;
+    uint16_t height;
     uint16_t bpp;
-    uint64_t framebuffer_physical_addr;
-};
+    uintptr_t addr;
+} HandoverFramebuffer;
 
-struct handover_module
+typedef struct
 {
     size_t size;
-    uint64_t addr;
+    uintptr_t addr;
     StrFix128 module_name;
-};
+} HandoverModule;
 
-struct handover_modules_list
+typedef struct
 {
     size_t module_count;
-#define MAX_MODULE_COUNT 64
-    struct handover_module module[MAX_MODULE_COUNT];
-};
+#define MAX_MODULE_COUNT 16
+    HandoverModule module[MAX_MODULE_COUNT];
+} HandoverModules;
 
-#define HANDOVER_IDENTIFIER (0x42525554414C00) // equlivalent to brutal0 in ASCII
-
-struct handover
+typedef struct
 {
-    int64_t identifier; // if one day we have a custom bootloader
-
-    struct handover_mmap mmap;
-    struct handover_framebuffer framebuffer;
-    struct handover_modules_list modules;
+    HandoverMmap mmap;
+    HandoverFramebuffer framebuffer;
+    HandoverModules modules;
     uintptr_t rsdp;
-};
+} Handover;
 
-struct handover_module *handover_find_module(struct handover *handover, Str name);
+HandoverModule *handover_find_module(Handover *handover, Str name);

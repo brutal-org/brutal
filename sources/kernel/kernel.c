@@ -22,7 +22,7 @@ void kernel_boot_other(void)
     WAIT_FOR(other_ready == cpu_count());
 }
 
-void kernel_entry_main(struct handover *handover)
+void kernel_entry_main(Handover *handover)
 {
     kernel_splash();
     tasking_initialize();

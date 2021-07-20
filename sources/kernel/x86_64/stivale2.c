@@ -45,7 +45,7 @@ void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id)
     return nullptr;
 }
 
-static enum handover_mmap_entry_type stivale_mmap_type_to_handover_type(int stivale_entry)
+static HandoverMmapType stivale_mmap_type_to_handover_type(int stivale_entry)
 {
     switch (stivale_entry)
     {
@@ -73,7 +73,7 @@ static enum handover_mmap_entry_type stivale_mmap_type_to_handover_type(int stiv
     }
 }
 
-static void fill_handover_mmap(struct handover *target, struct stivale2_struct_tag_memmap *memory_map)
+static void fill_handover_mmap(Handover *target, struct stivale2_struct_tag_memmap *memory_map)
 {
     target->mmap.size = memory_map->entries;
 
@@ -87,21 +87,21 @@ static void fill_handover_mmap(struct handover *target, struct stivale2_struct_t
     }
 }
 
-static void fill_handover_rsdp(struct handover *target, struct stivale2_struct_tag_rsdp *rsdp)
+static void fill_handover_rsdp(Handover *target, struct stivale2_struct_tag_rsdp *rsdp)
 {
     target->rsdp = mmap_io_to_phys(rsdp->rsdp);
 }
 
-void fill_handover_framebuffer(struct handover *target, struct stivale2_struct_tag_framebuffer *framebuffer)
+void fill_handover_framebuffer(Handover *target, struct stivale2_struct_tag_framebuffer *framebuffer)
 {
     target->framebuffer.has_framebuffer = true;
-    target->framebuffer.framebuffer_width = framebuffer->framebuffer_width;
-    target->framebuffer.framebuffer_height = framebuffer->framebuffer_height;
-    target->framebuffer.framebuffer_height = framebuffer->framebuffer_bpp;
-    target->framebuffer.framebuffer_physical_addr = framebuffer->framebuffer_addr;
+    target->framebuffer.width = framebuffer->framebuffer_width;
+    target->framebuffer.height = framebuffer->framebuffer_height;
+    target->framebuffer.height = framebuffer->framebuffer_bpp;
+    target->framebuffer.addr = framebuffer->framebuffer_addr;
 }
 
-void fill_handover_modules(struct handover *target, struct stivale2_struct_tag_modules *modules)
+void fill_handover_modules(Handover *target, struct stivale2_struct_tag_modules *modules)
 {
     target->modules.module_count = modules->module_count;
 
@@ -118,10 +118,7 @@ void stivale2_entry(struct stivale2_struct *info)
 {
     log("Booting from a stivale2 bootloader...");
 
-    static struct handover handover =
-        {
-            .identifier = HANDOVER_IDENTIFIER,
-        };
+    static Handover handover = {};
 
     auto memory_map = stivale2_get_tag(info, STIVALE2_STRUCT_TAG_MEMMAP_ID);
 

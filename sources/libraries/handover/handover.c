@@ -2,7 +2,7 @@
 #include <brutal/log.h>
 #include <handover/handover.h>
 
-struct handover_module *handover_find_module(struct handover *handover, Str name)
+HandoverModule *handover_find_module(Handover *handover, Str name)
 {
     for (size_t i = 0; i < handover->modules.module_count; i++)
     {

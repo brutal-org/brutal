@@ -28,7 +28,7 @@ void lapic_enable_spurious(void)
     lapic_write(LAPIC_REG_SPURIOUS, lapic_read(LAPIC_REG_SPURIOUS) | (LAPIC_SPURIOUS_ALL | LAPIC_SPURIOUS_ENABLE_APIC));
 }
 
-void lapic_initialize(struct handover const *handover)
+void lapic_initialize(Handover const *handover)
 {
     lapic_base = mmap_phys_to_io(acpi_find_lapic(handover->rsdp));
     log("Lapic found at {p}", lapic_base);
@@ -69,7 +69,7 @@ struct ioapic_version ioapic_get_version(int index)
     return union_cast(struct ioapic_version, raw);
 }
 
-void ioapic_initialize(struct handover const *handover)
+void ioapic_initialize(Handover const *handover)
 {
     ioapic_table = acpi_find_ioapic_table(handover->rsdp);
 
@@ -89,7 +89,7 @@ void ioapic_initialize(struct handover const *handover)
 
 /* --- Apic ----------------------------------------------------------------- */
 
-void apic_initalize(struct handover const *handover)
+void apic_initalize(Handover const *handover)
 {
     lapic_initialize(handover);
     ioapic_initialize(handover);
@@ -231,7 +231,7 @@ IoApicRedirectResult apic_redirect_irq_to_cpu(CpuId id, uint8_t irq, bool enable
     return OK(IoApicRedirectResult, irq);
 }
 
-IoApicRedirectResult apic_init_interrupt_redirection(struct handover const *handover)
+IoApicRedirectResult apic_init_interrupt_redirection(Handover const *handover)
 {
     log("apic: loading ipit redirection");
 

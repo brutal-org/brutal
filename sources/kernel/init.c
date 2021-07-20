@@ -66,7 +66,7 @@ static void elf_load_program(Task *task, Elf64Header const *elf, void const *dat
 
 static BrTask init = BR_TASK_ERROR;
 
-void init_start(struct handover *handover)
+void init_start(Handover *handover)
 {
     auto name = str_cast("init");
     auto module = handover_find_module(handover, name);

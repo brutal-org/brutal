@@ -92,7 +92,7 @@ void lapic_write(uint32_t reg, uint32_t value);
 
 void apic_enable(void);
 
-void apic_initalize(struct handover const *handover);
+void apic_initalize(Handover const *handover);
 
 void lapic_enable_spurious(void);
 
@@ -110,4 +110,4 @@ struct ioapic_version ioapic_get_version(int ioapic_id);
 
 IoApicRedirectResult apic_redirect_irq_to_cpu(CpuId id, uint8_t irq, bool enable, uintptr_t rsdp);
 
-IoApicRedirectResult apic_init_interrupt_redirection(struct handover const *handover);
+IoApicRedirectResult apic_init_interrupt_redirection(Handover const *handover);

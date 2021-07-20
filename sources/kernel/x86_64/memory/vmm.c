@@ -86,7 +86,7 @@ static VmmResult vmm_unmap_page(struct pml *pml4, uintptr_t virtual_page)
     return OK(VmmResult, range);
 }
 
-static void vmm_load_memory_map(VmmSpace target, struct handover_mmap const *memory_map)
+static void vmm_load_memory_map(VmmSpace target, HandoverMmap const *memory_map)
 {
     log("Loading kernel memory map...");
     vmm_map(target,
@@ -133,7 +133,7 @@ static void vmm_load_memory_map(VmmSpace target, struct handover_mmap const *mem
     vmm_space_switch(target);
 }
 
-void vmm_initialize(struct handover const *handover)
+void vmm_initialize(Handover const *handover)
 {
     auto PmmResult = pmm_alloc(HOST_MEM_PAGESIZE);
 

@@ -10,7 +10,7 @@ typedef Range(size_t) VmmRange;
 
 typedef Result(BrResult, VmmRange) VmmResult;
 
-void vmm_initialize(struct handover const *handover);
+void vmm_initialize(Handover const *handover);
 
 VmmSpace vmm_space_create(void);
 
