@@ -1,10 +1,8 @@
 #include <bid/bid.h>
-#include <bid/c_convert/bid_convert_c.h>
 #include <brutal/alloc.h>
 #include <brutal/io/buffer.h>
-#include "brutal/host/io.h"
-#include "brutal/log/assert.h"
-#include "brutal/text/str.h"
+#include <brutal/log.h>
+#include <bid/generator-c.h>
 #include "tests/test.h"
 
 TEST(bid_c_conversion_test)
@@ -21,13 +19,13 @@ TEST(bid_c_conversion_test)
     buffer_init(&target, expected.len + 2, alloc_global());
     auto writer = io_buffer_write(&target);
 
-    auto bid = UNWRAP(init_bid(str_cast(" interface net { }")));
+    auto bid = UNWRAP(bid_init(str_cast(" interface net { }")));
     convert_bid_to_c(&bid, &writer.base);
 
     assert_str_equal(str_cast_n(target.used, (char *)target.data), expected);
 
     buffer_deinit(&target);
-    destroy_bid(&bid);
+    bid_deinit(&bid);
 };
 
 TEST(bid_c_conversion_test_method)
@@ -58,13 +56,13 @@ TEST(bid_c_conversion_test_method)
     buffer_init(&target, expected.len + 2, alloc_global());
     auto writer = io_buffer_write(&target);
 
-    auto bid = UNWRAP(init_bid(str_cast(" interface net { method uwu(x: int) -> int;}")));
+    auto bid = UNWRAP(bid_init(str_cast(" interface net { method uwu(x: int) -> int;}")));
     convert_bid_to_c(&bid, &writer.base);
 
     assert_str_equal(str_cast_n(target.used, (char *)target.data), expected);
 
     buffer_deinit(&target);
-    destroy_bid(&bid);
+    bid_deinit(&bid);
 };
 
 TEST(bid_c_conversion_test_errors)
@@ -98,13 +96,13 @@ TEST(bid_c_conversion_test_errors)
     buffer_init(&target, expected.len + 2, alloc_global());
     auto writer = io_buffer_write(&target);
 
-    auto bid = UNWRAP(init_bid(str_cast(" interface net { errors {OWO, devse_is_life};}")));
+    auto bid = UNWRAP(bid_init(str_cast(" interface net { errors {OWO, devse_is_life};}")));
     convert_bid_to_c(&bid, &writer.base);
 
     assert_str_equal(str_cast_n(target.used, (char *)target.data), expected);
 
     buffer_deinit(&target);
-    destroy_bid(&bid);
+    bid_deinit(&bid);
 };
 
 TEST(bid_c_conversion_type)
@@ -127,11 +125,11 @@ TEST(bid_c_conversion_type)
     buffer_init(&target, expected.len + 2, alloc_global());
     auto writer = io_buffer_write(&target);
 
-    auto bid = UNWRAP(init_bid(str_cast(" interface net { type Handle: int;}")));
+    auto bid = UNWRAP(bid_init(str_cast(" interface net { type Handle: int;}")));
     convert_bid_to_c(&bid, &writer.base);
 
     assert_str_equal(str_cast_n(target.used, (char *)target.data), expected);
 
     buffer_deinit(&target);
-    destroy_bid(&bid);
+    bid_deinit(&bid);
 };

@@ -1,5 +1,5 @@
+#include <bid/ast.h>
 #include <brutal/alloc.h>
-#include <bid/parsing/bid_ast.h>
 
 struct bid_ast_node *create_ast_node(enum bid_ast_node_type type)
 {
@@ -18,8 +18,11 @@ void destroy_ast_node_recursive(struct bid_ast_node *from)
         {
             destroy_ast_node_recursive(from->children.data[i]);
         }
+
         if (from->children.data != NULL)
+        {
             vec_deinit(&from->children);
+        }
 
         alloc_free(alloc_global(), from);
     }
