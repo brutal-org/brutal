@@ -1,15 +1,9 @@
+#include <ansi/ctypes.h>
 #include <bid/bid.h>
-#include <bid/parsing/bid_interface.h>
+#include <bid/parser.h>
 #include <brutal/alloc.h>
 #include <brutal/base.h>
 #include <brutal/log.h>
-#include <ctype.h>
-#include "brutal/alloc/base.h"
-#include "brutal/base/attributes.h"
-#include "brutal/base/types.h"
-#include "brutal/ds/vec.h"
-#include "brutal/io/scan.h"
-#include "brutal/text/str.h"
 
 static BidResult create_bid(Str data_in)
 {
@@ -39,58 +33,6 @@ struct bid_error bid_create_unexpected_token_error(Str expected_token, const str
     return err_res;
 }
 
-int bid_is_keyword(int chr)
-{
-    if (isalnum(chr))
-    {
-        return true;
-    }
-    return (chr == '_');
-}
-
-static bool skip_comment(struct bid *idl_in)
-{
-
-    char current = scan_curr(&idl_in->scanner);
-    if (current != '/' || scan_peek(&idl_in->scanner, 1) != '*')
-    {
-        return false;
-    }
-
-    while (!scan_end(&idl_in->scanner))
-    {
-        char current = scan_curr(&idl_in->scanner);
-        if (current == '*' && scan_peek(&idl_in->scanner, 1) == '/')
-        {
-            scan_next(&idl_in->scanner); // skip the '*'
-            scan_next(&idl_in->scanner); // skip the '/'
-            return true;
-        }
-        scan_next(&idl_in->scanner);
-    }
-
-    if (scan_end(&idl_in->scanner))
-    {
-        return false;
-    }
-
-    return false; // clang warns fix (unreachable code)
-}
-
-void skip_comment_and_space(struct bid *idl_in)
-{
-    // loop it until we don't hit a comment or a space
-
-    while ((skip_space(&idl_in->scanner).len != 0 ||
-            skip_comment(idl_in)))
-    {
-        if (scan_end(&idl_in->scanner))
-        {
-            return;
-        }
-    };
-}
-
 static BidParseResult scan_bid(struct bid *idl_in)
 {
     TRY(BidParseResult, scan_interface_definition(idl_in));
@@ -98,7 +40,7 @@ static BidParseResult scan_bid(struct bid *idl_in)
     return BID_SUCCESS;
 }
 
-BidResult init_bid(Str idl_in)
+BidResult bid_init(Str idl_in)
 {
     struct bid mbid = TRY(BidResult, create_bid(idl_in));
 
@@ -107,7 +49,7 @@ BidResult init_bid(Str idl_in)
     return OK(BidResult, mbid);
 }
 
-void destroy_bid(struct bid *in)
+void bid_deinit(struct bid *in)
 {
     destroy_ast_node_recursive(in->root_ast);
 }

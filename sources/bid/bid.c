@@ -1,70 +1,30 @@
 
 #include <bid/bid.h>
-#include <bid/c_convert/bid_convert_c.h>
+#include <brutal/alloc.h>
 #include <brutal/base.h>
 #include <brutal/io.h>
-#include <brutal/io/buffer.h>
-#include <brutal/io/scan.h>
+#include <brutal/host.h>
 #include <brutal/log.h>
-#include "brutal/alloc/global.h"
-#include "brutal/host/io.h"
-#include "brutal/host/log.h"
-#include "brutal/text/str.h"
-
-size_t get_line_count_from_input(size_t offset, Str input, int *line_offset)
-{
-
-    size_t count = 0;
-    for (size_t i = 0; i < offset; i++)
-    {
-        (*line_offset)++;
-        if (input.buffer[i] == '\n')
-        {
-            (*line_offset) = 0;
-            count++;
-        }
-    }
-    return count;
-}
-
-Str get_line(size_t line, Str input)
-{
-    size_t count = 0;
-    size_t start = 0;
-    size_t end = 0;
-
-    for (size_t i = 0; i < input.len; i++)
-    {
-        if (input.buffer[i] == '\n')
-        {
-            count++;
-            if (count == line && start == 0)
-            {
-                start = i + 1;
-            }
-            else if (start != 0)
-            {
-                end = i;
-                break;
-            }
-        }
-    }
-
-    if (end == 0 && start != 0)
-    {
-        end = input.len;
-    }
-
-    return str_cast_n(end - start, input.buffer + start);
-}
+#include <bid/generator-c.h>
 
 void print_error_pos(Str input, struct bid_error err)
 {
-    int line_offset = 0;
-    int line = get_line_count_from_input(err.pos.offset, input, &line_offset);
 
-    print(host_log_writer(), "{} | {} \n", line, get_line(line, input));
+    StrFix1 line_char;
+    line_char.buffer[0] = '\n';
+    line_char.len = 1;
+
+    int line = str_cnt(str_sub(input, 0, err.pos.offset), str_cast(&line_char)); // get the count of '\n' before error pos
+
+    int line_start = str_last(str_sub(input, 0, err.pos.offset), str_cast(&line_char)) + 1;             // get the last '\n' before error pos
+    int line_end = str_first(str_sub(input, line_start, input.len), str_cast(&line_char)) + line_start; // get the first '\n' after line start (or after error pos)
+
+    Str line_data = str_sub(input, line_start, line_end);
+
+    print(host_log_writer(), "{} | {}\n", line, line_data);
     print(host_log_writer(), "{} |", line);
+
+    int line_offset = err.pos.offset - line_start; // get the offset of error pos relative to the start of the line
 
     for (int i = 0; i < line_offset + 1; i++)
     {
@@ -118,7 +78,7 @@ BidResult read_bid_file(Str input_file)
 
     Str readed_result = str_cast_n(readed, (char *)file_buffer.data);
 
-    BidResult result = init_bid(readed_result);
+    BidResult result = bid_init(readed_result);
 
     if (!result.success)
     {
@@ -150,7 +110,7 @@ int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char const *argv[])
 
     write_c_file(str_cast(argv[2]), &bid);
 
-    destroy_bid(&(result._ok));
+    bid_deinit(&(result._ok));
 
     return 0;
 }

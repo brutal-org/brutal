@@ -1,18 +1,18 @@
 #include <bid/bid.h>
-#include <bid/parsing/bid_ast.h>
-#include "brutal/log/assert.h"
+#include <bid/parser.h>
+#include <brutal/log.h>
 #include "tests/test.h"
 
 TEST(bid_creation_destruction)
 {
-    auto bid = UNWRAP(init_bid(str_cast(" interface test { }")));
+    auto bid = UNWRAP(bid_init(str_cast(" interface test { }")));
 
-    destroy_bid(&bid);
+    bid_deinit(&bid);
 };
 
 TEST(bid_creation_fail)
 {
-    auto bid_result = (init_bid(str_cast(" interface test {")));
+    auto bid_result = (bid_init(str_cast(" interface test {")));
 
     assert_falsity(bid_result.success);
 
@@ -21,16 +21,16 @@ TEST(bid_creation_fail)
 
 TEST(bid_comment)
 {
-    auto bid_result = (init_bid(str_cast(" /* uwu */ interface test { /* another comment */ } /* another one */")));
+    auto bid_result = (bid_init(str_cast(" /* uwu */ interface test { /* another comment */ } /* another one */")));
 
     assert_truth(bid_result.success);
 
-    destroy_bid(&bid_result._ok);
+    bid_deinit(&bid_result._ok);
 };
 
 TEST(bid_unexpected_token_interface_name)
 {
-    auto bid_result = (init_bid(str_cast(" interface @ {")));
+    auto bid_result = (bid_init(str_cast(" interface @ {")));
 
     assert_falsity(bid_result.success);
 
@@ -40,7 +40,7 @@ TEST(bid_unexpected_token_interface_name)
 
 TEST(bid_unexpected_token_closing_brackets)
 {
-    auto bid_result = (init_bid(str_cast(" interface test { ")));
+    auto bid_result = (bid_init(str_cast(" interface test { ")));
 
     assert_falsity(bid_result.success);
 
@@ -50,7 +50,7 @@ TEST(bid_unexpected_token_closing_brackets)
 
 TEST(bid_unexpected_token_openning_brackets)
 {
-    auto bid_result = (init_bid(str_cast(" interface test  }")));
+    auto bid_result = (bid_init(str_cast(" interface test  }")));
 
     assert_falsity(bid_result.success);
 
@@ -60,7 +60,7 @@ TEST(bid_unexpected_token_openning_brackets)
 
 TEST(bid_unexpected_token_interface_str)
 {
-    auto bid_result = (init_bid(str_cast(" uwuterface test { }")));
+    auto bid_result = (bid_init(str_cast(" uwuterface test { }")));
 
     assert_falsity(bid_result.success);
 
