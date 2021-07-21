@@ -133,8 +133,6 @@ BrResult sys_alloc(BrSpace space_handle, BrMObj mobj_handle, uintptr_t *vaddr, B
 
     *vaddr = result._ok.base;
 
-    log("sys_alloc -> {p}", *vaddr);
-
     memory_object_deref(mobj);
     space_deref(space);
 

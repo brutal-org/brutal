@@ -19,7 +19,11 @@ void vec_init_impl(VecImpl *impl, int data_size, Alloc *alloc)
 
 void vec_deinit_impl(VecImpl *impl)
 {
-    alloc_release(impl->alloc, impl->data);
+    if (impl->data)
+    {
+        alloc_release(impl->alloc, impl->data);
+    }
+
     *impl = (VecImpl){};
 }
 

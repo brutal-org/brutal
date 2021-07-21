@@ -91,7 +91,6 @@ PmmResult pmm_alloc(size_t size)
     LOCK_RETAINER(&pmm_lock);
 
     used_memory += size;
-    // log("pmm_alloc(): {} (total: {x})", size, used_memory);
 
     auto page_size = size / HOST_MEM_PAGESIZE;
     auto page_range = bitmap_find_range(&pmm_bitmap, best_bet, page_size, PMM_UNUSED);
@@ -126,8 +125,6 @@ PmmResult pmm_used(PmmRange range)
 {
     LOCK_RETAINER(&pmm_lock);
 
-    log("pmm_used(): {x}-{x}...", range.base, range_end(range) - 1);
-
     size_t page_base = range.base / HOST_MEM_PAGESIZE;
     size_t page_size = range.size / HOST_MEM_PAGESIZE;
     auto page_range = (USizeRange){page_base, page_size};
@@ -142,7 +139,6 @@ PmmResult pmm_unused(PmmRange range)
     LOCK_RETAINER(&pmm_lock);
 
     used_memory -= range.size;
-    log("pmm_unused(): {x}-{x}...", range.base, range_end(range) - 1);
 
     if (range.base == 0)
     {
