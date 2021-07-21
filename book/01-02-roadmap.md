@@ -17,29 +17,48 @@
 - [x] Syscalls
 - [x] SIMD (avx, sse, fpu, xsave)
 
-## Milestone 2 - IPC And Userspace
+## Milestone 2 - Userspace
 
+- [ ] Syscalls
+  - [x] noop
+  - [x] log
+  - [x] space
+  - [x] mobj
+  - [x] map
+  - [x] alloc
+  - [x] unmap
+  - [x] task
+  - [x] start
+  - [x] exit
+  - [ ] send
+  - [ ] recv
+  - [ ] irq
+  - [x] drop
+  - [x] close
+- [ ] Userspace ELF loader
 - [ ] IPC
 - [ ] IDL
-- [ ] TTY
+
+## Milestone 3 - Filesystem
+
 - [ ] IRQ routing to userspace
+- [ ] Disk driver (virtio-block? AHCI? NVME? IDE (lol)?)
 - [ ] VFS
-- [ ] Disk driver (VIRT-IO? AHCI? NVME? IDE (lol)?)
 - [ ] ext2
 
-## Milestone 3 - User Interfaces
+## Milestone 4 - User Interfaces
 
-- [ ] Shell
 - [ ] Keyboard driver
 - [ ] Mouse driver
-- [ ] Framebuffer driver
+- [ ] Framebuffer driver (virtio-gpu ?)
 - [ ] Compositor
+- [ ] Shell
 
-## Milestone 4 - DOOM!
+## Milestone 5 - DOOM!
 
 - [ ] DOOM :rage2:
 
-## Milestone 5 - Networking
+## Milestone 6 - Networking
 
 - [ ] Implement virtio-net or E1000 driver
 - [ ] Implement TCP/IP
