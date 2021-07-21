@@ -326,7 +326,7 @@ BrSyscallFn *syscalls[BR_SYSCALL_COUNT] = {
 
 BrResult syscall_dispatch(BrSyscall syscall, BrArg arg1, BrArg arg2, BrArg arg3, BrArg arg4, BrArg arg5)
 {
-    log("Syscall: {}({p}, {p}, {p}, {p}, {p})",
+    log("Syscall: {}({#p}, {#p}, {#p}, {#p}, {#p})",
         str_cast(br_syscall_to_string(syscall)), arg1, arg2, arg3, arg4, arg5);
 
     if (syscall >= BR_SYSCALL_COUNT)
@@ -338,7 +338,7 @@ BrResult syscall_dispatch(BrSyscall syscall, BrArg arg1, BrArg arg2, BrArg arg3,
 
     auto result = syscalls[syscall](arg1, arg2, arg3, arg4, arg5);
 
-    log("Syscall: {}({p}, {p}, {p}, {p}, {p}) -> {}",
+    log("Syscall: {}({#p}, {#p}, {#p}, {#p}, {#p}) -> {}",
         str_cast(br_syscall_to_string(syscall)), arg1, arg2, arg3, arg4, arg5, str_cast(br_result_to_string(result)));
 
     task_end_syscall(task_self());
