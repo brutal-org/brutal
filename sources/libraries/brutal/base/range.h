@@ -40,7 +40,7 @@
 #define range_colide(LHS, RHS) (range_begin(LHS) < range_end(RHS) && range_end(LHS) > range_begin(RHS))
 
 #define range_from_start_and_end(T, START, END) \
-    (T) { START, END - START }
+    (T) { (START), (END - START) }
 
 #define range_merge(LHS, RHS) (                                 \
     {                                                           \
@@ -79,8 +79,8 @@
             range_end(__self) > range_end(__split))     \
         {                                               \
             result = (typeof(SELF)){                    \
-                range_end(__self),                      \
-                range_end(__split) - range_end(__self), \
+                range_end(__split),                     \
+                range_end(__self) - range_end(__split), \
             };                                          \
         }                                               \
                                                         \

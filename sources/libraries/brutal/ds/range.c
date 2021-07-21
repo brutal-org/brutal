@@ -20,7 +20,7 @@ void range_alloc_used(RangeAlloc *self, USizeRange range)
         if (range_eq(curr, range))
         {
             vec_splice(self, i, 1);
-            return;
+            break;
         }
 
         if (range_colide(curr, range))
@@ -31,14 +31,15 @@ void range_alloc_used(RangeAlloc *self, USizeRange range)
             if (lower_half.size != 0)
             {
                 self->data[i] = lower_half;
+
+                if (upper_half.size != 0)
+                {
+                    range_alloc_unused(self, upper_half);
+                }
             }
-            else if (lower_half.size == 0 && upper_half.size != 0)
+            else if (upper_half.size != 0)
             {
                 self->data[i] = upper_half;
-            }
-            else
-            {
-                range_alloc_unused(self, upper_half);
             }
         }
     }
@@ -68,7 +69,7 @@ USizeRange range_alloc_alloc(RangeAlloc *self, size_t size)
         }
     }
 
-    panic("No space left");
+    return (USizeRange){};
 }
 
 static void range_alloc_compress(RangeAlloc *self, int start)
@@ -106,5 +107,15 @@ void range_alloc_unused(RangeAlloc *self, USizeRange range)
             vec_insert(self, i + 1, range);
             return;
         }
+    }
+
+    vec_push(self, range);
+}
+
+void range_alloc_dump(RangeAlloc *self)
+{
+    vec_foreach(range, self)
+    {
+        log("- {p} {p}", range_begin(range), range_end(range));
     }
 }
