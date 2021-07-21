@@ -69,9 +69,11 @@ void space_destroy(Space *self)
     alloc_free(alloc_global(), self);
 }
 
-Space *space_create(void)
+Space *space_create(BrSpaceFlags flags)
 {
     auto self = alloc_make(alloc_global(), Space);
+
+    self->flags = flags;
     self->vmm = vmm_space_create();
     vec_init(&self->mappings, alloc_global());
     range_alloc_init(&self->alloc, alloc_global());

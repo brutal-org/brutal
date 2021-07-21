@@ -31,24 +31,14 @@ void channel_destroy(Channel *self)
     alloc_free(alloc_global(), self);
 }
 
-BrResult channel_send(Channel *self, Message *message)
+bool channel_send(Channel *self, Message *message)
 {
-    if (!ring_push(&self->messages, message))
-    {
-        return BR_CHANNEL_FULL;
-    }
-
-    return BR_SUCCESS;
+    return ring_push(&self->messages, message);
 }
 
-BrResult channel_recv(Channel *self, Message *message)
+bool channel_recv(Channel *self, Message *message)
 {
-    if (!ring_pop(&self->messages, message))
-    {
-        return BR_CHANNEL_EMPTY;
-    }
-
-    return BR_SUCCESS;
+    return ring_pop(&self->messages, message);
 }
 
 bool channel_any(Channel *self)

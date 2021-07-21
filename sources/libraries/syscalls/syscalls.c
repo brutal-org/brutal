@@ -50,9 +50,9 @@ BrResult br_unmap(BrSpace space, uintptr_t vaddr, size_t size)
     return br_syscall(BR_SC_UNMAP, space, vaddr, size, 0, 0);
 }
 
-BrResult br_task(BrTask *task, BrSpace space, BrTaskArgs const *args, BrTaskFlags flags)
+BrResult br_task(BrTask *task, BrSpace space, BrTaskFlags flags)
 {
-    return br_syscall(BR_SC_TASK, (BrArg)task, space, (BrArg)args, flags, 0);
+    return br_syscall(BR_SC_TASK, (BrArg)task, space, flags, 0, 0);
 }
 
 BrResult br_start(BrTask task, uintptr_t ip, uintptr_t sp, BrTaskArgs *args)

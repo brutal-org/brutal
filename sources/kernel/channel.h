@@ -25,8 +25,8 @@ Channel *channel_create(void);
 
 void channel_destroy(Channel *channel);
 
-BrResult channel_send(Channel *self, Message *message);
+bool channel_send(Channel *self, Message *message);
 
-BrResult channel_recv(Channel *self, Message *message);
+bool channel_recv(Channel *self, Message *message);
 
 bool channel_any(Channel *self);

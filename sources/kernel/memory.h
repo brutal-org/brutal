@@ -35,13 +35,14 @@ typedef struct
 {
     Object base;
 
+    BrSpaceFlags flags;
     Lock lock;
     VmmSpace vmm;
     Vec(MemoryMapping *) mappings;
     RangeAlloc alloc;
 } Space;
 
-Space *space_create(void);
+Space *space_create(BrSpaceFlags flags);
 
 void space_ref(Space *self);
 

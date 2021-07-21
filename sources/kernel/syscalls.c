@@ -25,7 +25,8 @@ BrResult sys_log(char const *message, size_t size)
 
 BrResult sys_space(BrSpace *handle, BrSpaceFlags flags)
 {
-    auto space = space_create();
+    auto space = space_create(flags);
+
     domain_add(task_self()->domain, base_cast(space));
     *handle = space->base.handle;
     space_deref(space);
@@ -39,6 +40,11 @@ BrResult sys_mobj(BrMObj *handle, uintptr_t addr, size_t size, BrMObjFlags flags
 
     if (flags & BR_MOBJ_PMM)
     {
+        if (!(task_self()->caps & BR_CAP_PMM))
+        {
+            return BR_BAD_CAPABILITY;
+        }
+
         mobj = memory_object_create_pmm((PmmRange){addr, size});
     }
     else
@@ -72,11 +78,11 @@ BrResult sys_map(BrSpace space_handle, BrMObj mobj_handle, uintptr_t vaddr, BrMe
         return BR_BAD_HANDLE;
     }
 
-    MemoryObject *mobj = (MemoryObject *)domain_lookup(task_self()->domain, space_handle, OBJECT_MEMORY);
+    MemoryObject *mobj = (MemoryObject *)domain_lookup(task_self()->domain, mobj_handle, OBJECT_MEMORY);
 
     if (mobj == nullptr)
     {
-        memory_object_deref(mobj);
+        space_deref(space);
         return BR_BAD_HANDLE;
     }
 
@@ -107,17 +113,27 @@ BrResult sys_alloc(BrSpace space_handle, BrMObj mobj_handle, uintptr_t *vaddr, B
         return BR_BAD_HANDLE;
     }
 
-    MemoryObject *mobj = (MemoryObject *)domain_lookup(task_self()->domain, space_handle, OBJECT_MEMORY);
+    MemoryObject *mobj = (MemoryObject *)domain_lookup(task_self()->domain, mobj_handle, OBJECT_MEMORY);
 
     if (mobj == nullptr)
     {
-        memory_object_deref(mobj);
+        space_deref(space);
         return BR_BAD_HANDLE;
     }
 
     auto result = space_alloc_obj(space, mobj);
 
+    if (!result.success)
+    {
+        memory_object_deref(mobj);
+        space_deref(space);
+
+        return result._error;
+    }
+
     *vaddr = result._ok.base;
+
+    log("sys_alloc -> {p}", *vaddr);
 
     memory_object_deref(mobj);
     space_deref(space);
@@ -151,8 +167,13 @@ BrResult sys_unmap(BrSpace space_handle, uintptr_t vaddr, size_t size)
     return BR_SUCCESS;
 }
 
-BrResult sys_task(BrTask *task_handle, BrSpace space_handle, BrTaskArgs const *args, BrTaskFlags flags)
+BrResult sys_task(BrTask *task_handle, BrSpace space_handle, BrTaskFlags flags)
 {
+    if (!(task_self()->caps & BR_CAP_TASK))
+    {
+        return BR_BAD_CAPABILITY;
+    }
+
     Space *space = nullptr;
 
     if (space_handle == BR_SPACE_SELF)
@@ -196,7 +217,7 @@ BrResult sys_start(BrTask task_handle, uintptr_t ip, uintptr_t sp, BrTaskArgs *a
 
     task_deref(task);
 
-    return BR_NOT_IMPLEMENTED;
+    return BR_SUCCESS;
 }
 
 BrResult sys_exit(BrTask task_handle, uintptr_t exit_value)
@@ -222,7 +243,7 @@ BrResult sys_exit(BrTask task_handle, uintptr_t exit_value)
 
     task_deref(task);
 
-    return BR_NOT_IMPLEMENTED;
+    return BR_SUCCESS;
 }
 
 BrResult sys_send(BrTask task_handle, BrMessage const *message, BrTimeout timeout, BrIpcFlags flags)
@@ -237,6 +258,11 @@ BrResult sys_recv(BrTask task_handle, BrMessage *message, BrTimeout timeout, BrI
 
 BrResult sys_irq(BrTask task_handle, BrIrq irq, BrIrqFlags flags)
 {
+    if (!(task_self()->caps & BR_CAP_IRQ))
+    {
+        return BR_BAD_CAPABILITY;
+    }
+
     return BR_NOT_IMPLEMENTED;
 }
 
@@ -259,7 +285,7 @@ BrResult sys_drop(BrTask task_handle, BrCap cap)
         return BR_BAD_HANDLE;
     }
 
-    if (task->caps & cap)
+    if (!(task->caps & cap))
     {
         task_deref(task);
         return BR_BAD_CAPABILITY;
@@ -300,25 +326,10 @@ BrSyscallFn *syscalls[BR_SYSCALL_COUNT] = {
     [BR_SC_CLOSE] = sys_close,
 };
 
-Str syscall_to_string(BrSyscall syscall)
-{
-    static const char *SYSCALL_NAMES[] = {
-#define ITER(SYSCALL) #SYSCALL,
-        FOREACH_SYSCALLS(ITER)
-#undef ITER
-    };
-
-    if (syscall >= BR_SYSCALL_COUNT)
-    {
-        return str_cast("INVALID");
-    }
-
-    return str_cast(SYSCALL_NAMES[syscall]);
-}
-
 BrResult syscall_dispatch(BrSyscall syscall, BrArg arg1, BrArg arg2, BrArg arg3, BrArg arg4, BrArg arg5)
 {
-    log("Syscall: {}({p}, {p}, {p}, {p}, {p})...", syscall_to_string(syscall), arg1, arg2, arg3, arg4, arg5);
+    log("Syscall: {}({p}, {p}, {p}, {p}, {p})",
+        str_cast(br_syscall_to_string(syscall)), arg1, arg2, arg3, arg4, arg5);
 
     if (syscall >= BR_SYSCALL_COUNT)
     {
@@ -328,6 +339,9 @@ BrResult syscall_dispatch(BrSyscall syscall, BrArg arg1, BrArg arg2, BrArg arg3,
     task_begin_syscall(task_self());
 
     auto result = syscalls[syscall](arg1, arg2, arg3, arg4, arg5);
+
+    log("Syscall: {}({p}, {p}, {p}, {p}, {p}) -> {}",
+        str_cast(br_syscall_to_string(syscall)), arg1, arg2, arg3, arg4, arg5, str_cast(br_result_to_string(result)));
 
     task_end_syscall(task_self());
 

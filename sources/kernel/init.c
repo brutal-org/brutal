@@ -74,7 +74,7 @@ void init_start(Handover *handover)
 
     assert_truth(elf_supported(elf, module->size));
 
-    auto space = space_create();
+    auto space = space_create(BR_SPACE_NONE);
     Task *task = UNWRAP(task_create(name, space, BR_TASK_USER));
     space_deref(space);
 

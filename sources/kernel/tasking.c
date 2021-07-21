@@ -187,7 +187,7 @@ void idle(void)
 
 Task *tasking_create_idle(void)
 {
-    auto space = space_create();
+    auto space = space_create(BR_SPACE_NONE);
     auto task = UNWRAP(task_create(str_cast("idle"), space, BR_TASK_NONE));
 
     context_start(task->context, (uintptr_t)idle, task->sp, (BrTaskArgs){}, task->flags);
@@ -198,7 +198,7 @@ Task *tasking_create_idle(void)
 
 Task *tasking_create_boot(void)
 {
-    auto space = space_create();
+    auto space = space_create(BR_SPACE_NONE);
     auto task = UNWRAP(task_create(str_cast("boot"), space, BR_TASK_NONE));
     space_deref(space);
     task_start(task, 0, 0, (BrTaskArgs){});
@@ -238,7 +238,7 @@ static inline void finalizer(void)
 
 void tasking_create_finalizer(void)
 {
-    auto space = space_create();
+    auto space = space_create(BR_SPACE_NONE);
     auto task = UNWRAP(task_create(str_cast("finalizer"), space, BR_TASK_NONE));
     space_deref(space);
     task_start(task, (uintptr_t)finalizer, task->sp, (BrTaskArgs){});

@@ -26,7 +26,7 @@ SYSCALL(alloc) (BrSpace space, BrMObj mobj, uintptr_t *vaddr, BrMemFlags flags);
 
 SYSCALL(unmap) (BrSpace space, uintptr_t vaddr, size_t size);
 
-SYSCALL(task) (BrTask *task, BrSpace space, BrTaskArgs const *args, BrTaskFlags flags);
+SYSCALL(task) (BrTask *task, BrSpace space, BrTaskFlags flags);
 
 SYSCALL(start) (BrTask task, uintptr_t ip, uintptr_t sp, BrTaskArgs *args);
 

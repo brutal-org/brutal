@@ -1,6 +1,7 @@
 #pragma once
 
 #include <brutal/base/attributes.h>
+#include <brutal/base/error.h>
 #include <brutal/base/std.h>
 
 #define FOREACH_SYSCALLS(SYSCALL) \
@@ -29,21 +30,97 @@ typedef enum
         BR_SYSCALL_COUNT
 } BrSyscall;
 
+static inline const char *br_syscall_to_string(BrSyscall syscall)
+{
+    static const char *SYSCALL_NAMES[] = {
+#define ITER(SYSCALL) #SYSCALL,
+        FOREACH_SYSCALLS(ITER)
+#undef ITER
+    };
+
+    if (syscall >= BR_SYSCALL_COUNT)
+    {
+        return "INVALID";
+    }
+
+    return SYSCALL_NAMES[syscall];
+}
+
+#define FOREACH_RESULTS(RESULT) \
+    RESULT(SUCCESS)             \
+    RESULT(BAD_ADDRESS)         \
+    RESULT(BAD_ARGUMENTS)       \
+    RESULT(BAD_CAPABILITY)      \
+    RESULT(BAD_HANDLE)          \
+    RESULT(BAD_SYSCALL)         \
+    RESULT(NOT_IMPLEMENTED)     \
+    RESULT(OUT_OF_MEMORY)       \
+    RESULT(TIMEOUT)             \
+    RESULT(WOULD_BLOCK)
+
 typedef enum
 {
-    BR_SUCCESS,
+#define ITER(RESULT) BR_##RESULT,
+    FOREACH_RESULTS(ITER)
+#undef ITER
 
-    BR_BAD_ADDRESS,
-    BR_OUT_OF_MEMORY,
-    BR_BAD_EXE_FORMAT,
-    BR_BAD_ARGUMENTS,
-    BR_BAD_CAPABILITY,
-    BR_BAD_HANDLE,
-    BR_NOT_IMPLEMENTED,
-    BR_BAD_SYSCALL,
-    BR_CHANNEL_FULL,
-    BR_CHANNEL_EMPTY,
+        BR_RESULT_COUNT
 } BrResult;
+
+static inline const char *br_result_to_string(BrResult result)
+{
+    static const char *RESULT_NAMES[] = {
+#define ITER(RESULT) #RESULT,
+        FOREACH_RESULTS(ITER)
+#undef ITER
+    };
+
+    if (result >= BR_RESULT_COUNT)
+    {
+        return "INVALID";
+    }
+
+    return RESULT_NAMES[result];
+}
+
+static inline Error br_result_to_error(BrResult result)
+{
+    switch (result)
+    {
+    case BR_SUCCESS:
+        return ERR_SUCCESS;
+
+    case BR_BAD_ADDRESS:
+        return ERR_BAD_ADDRESS;
+
+    case BR_OUT_OF_MEMORY:
+        return ERR_OUT_OF_MEMORY;
+
+    case BR_BAD_ARGUMENTS:
+        return ERR_BAD_ARGUMENTS;
+
+    case BR_BAD_CAPABILITY:
+        return ERR_DENIED;
+
+    case BR_BAD_HANDLE:
+        return ERR_BAD_HANDLE;
+
+    case BR_NOT_IMPLEMENTED:
+        return ERR_NOT_IMPLEMENTED;
+
+    case BR_BAD_SYSCALL:
+        return ERR_BAD_SYSCALL;
+
+    case BR_TIMEOUT:
+        return ERR_TIMEOUT;
+
+    case BR_WOULD_BLOCK:
+        return ERR_WOULD_BLOCK;
+
+    default:
+        return ERR_UNDEFINED;
+    }
+}
 
 typedef uint64_t BrArg;
 
@@ -91,11 +168,18 @@ typedef enum
     BR_TASK_USER = 1 << 0,
 } BrTaskFlags;
 
+#define BR_TIMEOUT_INFINITY (-1)
 typedef uint64_t BrTimeout;
+
+typedef uint64_t BrProtocol;
+
+typedef uint64_t BrMessageType;
 
 typedef struct PACKED
 {
     BrTask sender;
+    BrProtocol protocol;
+    BrMessageType type;
     size_t size;
     BrHandle handle;
 } BrMessageHeader;
