@@ -1,11 +1,11 @@
 
 #include <bid/bid.h>
+#include <bid/bid2c.h>
 #include <brutal/alloc.h>
 #include <brutal/base.h>
-#include <brutal/io.h>
 #include <brutal/host.h>
+#include <brutal/io.h>
 #include <brutal/log.h>
-#include <bid/generator-c.h>
 
 void print_error_pos(Str input, struct bid_error err)
 {
@@ -57,7 +57,7 @@ void write_c_file(Str output_path, const struct bid *from)
     UNWRAP(io_file_create(&output, output_path));
 
     auto output_writer = io_file_write(&output);
-    convert_bid_to_c(from, &output_writer.base);
+    bid2c(from, &output_writer.base);
 
     io_file_close(&output);
 }

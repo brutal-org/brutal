@@ -3,21 +3,21 @@
 #include <brutal/ds.h>
 #include <brutal/io/scan.h>
 
-void scan_init(struct scan *self, Str str)
+void scan_init(Scan *self, Str str)
 {
-    *self = (struct scan){
+    *self = (Scan){
         .buffer = str.buffer,
         .size = str.len,
         .head = 0,
     };
 }
 
-bool scan_end(struct scan *self)
+bool scan_end(Scan *self)
 {
     return self->head + 1 > self->size;
 }
 
-void scan_skip_space(struct scan *self)
+void scan_scan_skip_space(Scan *self)
 {
     while (isspace(scan_curr(self)) && !scan_end(self))
     {
@@ -25,7 +25,7 @@ void scan_skip_space(struct scan *self)
     }
 }
 
-Str scan_skip_until(struct scan *self, int (*callback)(int))
+Str scan_skip_until(Scan *self, int (*callback)(int))
 {
     size_t start = self->head;
     size_t length = 0;
@@ -38,7 +38,7 @@ Str scan_skip_until(struct scan *self, int (*callback)(int))
     return str_cast_n(length, (char *)self->buffer + start);
 }
 
-char scan_peek(struct scan *self, size_t offset)
+char scan_peek(Scan *self, size_t offset)
 {
     if (self->head + offset >= self->size)
     {
@@ -48,12 +48,12 @@ char scan_peek(struct scan *self, size_t offset)
     return self->buffer[self->head + offset];
 }
 
-char scan_curr(struct scan *self)
+char scan_curr(Scan *self)
 {
     return scan_peek(self, 0);
 }
 
-char scan_next(struct scan *self)
+char scan_next(Scan *self)
 {
     char c = scan_peek(self, 0);
 
@@ -65,7 +65,15 @@ char scan_next(struct scan *self)
     return c;
 }
 
-long scan_next_decimal(struct scan *self)
+void scan_next_n(Scan *self, int n)
+{
+    for (int i = 0; i < n; i++)
+    {
+        scan_next(self);
+    }
+}
+
+long scan_next_decimal(Scan *self)
 {
     long result = 0;
     bool is_negative = false;
@@ -103,7 +111,7 @@ long scan_next_decimal(struct scan *self)
     return result;
 }
 
-bool scan_skip(struct scan *self, char c)
+bool scan_skip(Scan *self, char c)
 {
     if (scan_curr(self) == c)
     {
@@ -115,4 +123,31 @@ bool scan_skip(struct scan *self, char c)
     {
         return false;
     }
+}
+
+bool scan_skip_word(Scan *self, Str word)
+{
+    for (size_t i = 0; i < word.len; i++)
+    {
+        if (scan_peek(self, i) != word.buffer[i])
+        {
+            return false;
+        }
+    }
+
+    scan_next_n(self, word.len);
+    return true;
+}
+
+bool scan_eat(Scan *self, ScanMatch *match)
+{
+    bool any = false;
+
+    while (match(scan_curr(self)) && !scan_end(self))
+    {
+        any = true;
+        scan_next(self);
+    }
+
+    return any;
 }

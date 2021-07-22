@@ -42,7 +42,7 @@ static char fmt_prefix(struct fmt self)
     }
 }
 
-static void fmt_parse_type(struct fmt *fmt, struct scan *scan)
+static void fmt_parse_type(struct fmt *fmt, Scan *scan)
 {
 
     switch (scan_curr(scan))
@@ -77,7 +77,7 @@ static void fmt_parse_type(struct fmt *fmt, struct scan *scan)
     }
 }
 
-static void fmt_parse_min_width(struct fmt *fmt, struct scan *scan)
+static void fmt_parse_min_width(struct fmt *fmt, Scan *scan)
 {
     if (scan_curr(scan) == '0')
     {
@@ -92,7 +92,7 @@ static void fmt_parse_min_width(struct fmt *fmt, struct scan *scan)
     fmt->min_width = scan_next_decimal(scan);
 }
 
-struct fmt fmt_parse(struct scan *scan)
+struct fmt fmt_parse(Scan *scan)
 {
     struct fmt fmt = {};
 

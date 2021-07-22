@@ -1,8 +1,8 @@
 #include <bid/bid.h>
+#include <bid/bid2c.h>
 #include <brutal/alloc.h>
 #include <brutal/io/buffer.h>
 #include <brutal/log.h>
-#include <bid/generator-c.h>
 #include "tests/test.h"
 
 TEST(bid_c_conversion_test)
@@ -20,7 +20,7 @@ TEST(bid_c_conversion_test)
     auto writer = io_buffer_write(&target);
 
     auto bid = UNWRAP(bid_init(str_cast(" interface net { }")));
-    convert_bid_to_c(&bid, &writer.base);
+    bid2c(&bid, &writer.base);
 
     assert_str_equal(str_cast_n(target.used, (char *)target.data), expected);
 
@@ -57,7 +57,7 @@ TEST(bid_c_conversion_test_method)
     auto writer = io_buffer_write(&target);
 
     auto bid = UNWRAP(bid_init(str_cast(" interface net { method uwu(x: int) -> int;}")));
-    convert_bid_to_c(&bid, &writer.base);
+    bid2c(&bid, &writer.base);
 
     assert_str_equal(str_cast_n(target.used, (char *)target.data), expected);
 
@@ -97,7 +97,7 @@ TEST(bid_c_conversion_test_errors)
     auto writer = io_buffer_write(&target);
 
     auto bid = UNWRAP(bid_init(str_cast(" interface net { errors {OWO, devse_is_life};}")));
-    convert_bid_to_c(&bid, &writer.base);
+    bid2c(&bid, &writer.base);
 
     assert_str_equal(str_cast_n(target.used, (char *)target.data), expected);
 
@@ -126,7 +126,7 @@ TEST(bid_c_conversion_type)
     auto writer = io_buffer_write(&target);
 
     auto bid = UNWRAP(bid_init(str_cast(" interface net { type Handle: int;}")));
-    convert_bid_to_c(&bid, &writer.base);
+    bid2c(&bid, &writer.base);
 
     assert_str_equal(str_cast_n(target.used, (char *)target.data), expected);
 

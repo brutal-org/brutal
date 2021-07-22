@@ -1,8 +1,8 @@
 
+#include <bid/bid2c.h>
 #include <brutal/alloc.h>
 #include <brutal/base.h>
 #include <brutal/log.h>
-#include <bid/generator-c.h>
 
 // ------------- header -------------
 
@@ -228,9 +228,8 @@ static void bid_write_node(IoWriter *writer, struct bid_ast_node *node, Str curr
     }
 }
 
-void convert_bid_to_c(const struct bid *bid, IoWriter *writer)
+void bid2c(const struct bid *bid, IoWriter *writer)
 {
     bid_write_header(bid, writer);
-
     bid_write_node(writer, bid->root_ast, str_cast(""));
 }

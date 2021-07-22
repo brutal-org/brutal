@@ -4,4 +4,4 @@
 
 typedef Result(struct bid_error, MonoState) BidParseResult;
 
-BidParseResult scan_interface_definition(struct bid *idl_in);
+BidParseResult bid_parse(struct bid *idl_in);

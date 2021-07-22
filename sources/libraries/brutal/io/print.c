@@ -60,7 +60,7 @@ IoWriteResult print_impl(IoWriter *writer, Str format, struct print_args args)
     size_t current = 0;
     size_t written = 0;
     bool skip_fmt = false;
-    struct scan scan;
+    Scan scan;
     scan_init(&scan, format);
 
     while (!scan_end(&scan))

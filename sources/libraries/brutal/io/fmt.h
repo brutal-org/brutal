@@ -23,7 +23,7 @@ struct fmt
     bool prefix;
 };
 
-struct fmt fmt_parse(struct scan *scan);
+struct fmt fmt_parse(Scan *scan);
 
 IoWriteResult fmt_signed(struct fmt self, IoWriter *writer, long value);
 

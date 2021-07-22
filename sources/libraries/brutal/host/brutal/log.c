@@ -1,6 +1,6 @@
 #include <brutal/alloc/global.h>
-#include <brutal/ds/buffer.h>
 #include <brutal/host/log.h>
+#include <brutal/io/buffer.h>
 #include <brutal/sync.h>
 #include <syscalls/syscalls.h>
 

@@ -4,4 +4,4 @@
 #include <brutal/base.h>
 #include <brutal/io.h>
 
-void convert_bid_to_c(const struct bid *bid, IoWriter *writer);
+void bid2c(const struct bid *bid, IoWriter *writer);

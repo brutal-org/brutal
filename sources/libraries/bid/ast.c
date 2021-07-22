@@ -11,7 +11,6 @@ struct bid_ast_node *create_ast_node(enum bid_ast_node_type type)
 
 void destroy_ast_node_recursive(struct bid_ast_node *from)
 {
-
     if (from != NULL)
     {
         for (int i = 0; i < from->children.length; i++)
