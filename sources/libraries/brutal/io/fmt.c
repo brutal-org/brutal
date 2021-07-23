@@ -2,6 +2,8 @@
 #include <brutal/base/keywords.h>
 #include <brutal/io/fmt.h>
 #include <brutal/text/vals.h>
+#include <ctype.h>
+#include "brutal/io/write.h"
 
 static int fmt_base(struct fmt self)
 {
@@ -42,8 +44,20 @@ static char fmt_prefix(struct fmt self)
     }
 }
 
-static void fmt_parse_type(struct fmt *fmt, Scan *scan)
+static void fmt_parse_attribute(struct fmt *fmt, Scan *scan)
 {
+
+    if (scan_skip_word(scan, str_cast("snake_case")))
+    {
+        fmt->flags |= FMT_FLAG_FORCE_SNAKE_CASE;
+        return;
+    }
+
+    if (scan_skip_word(scan, str_cast("CamelCase")))
+    {
+        fmt->flags |= FMT_FLAG_FORCE_CAMEL_CASE;
+        return;
+    }
 
     switch (scan_curr(scan))
     {
@@ -74,19 +88,30 @@ static void fmt_parse_type(struct fmt *fmt, Scan *scan)
     case 'x':
         fmt->type = FMT_HEXADECIMAL;
         break;
+
+    case '#':
+        fmt->flags |= FMT_FLAG_USE_PREFIX;
+        break;
+    case 'U':
+        fmt->flags |= FMT_FLAG_FORCE_UPPER_CASE;
+        break;
+    case 'u':
+        fmt->flags |= FMT_FLAG_FORCE_LOWER_CASE;
+        break;
     }
+    scan_next(scan);
 }
 
 static void fmt_parse_min_width(struct fmt *fmt, Scan *scan)
 {
     if (scan_curr(scan) == '0')
     {
-        fmt->fill_with_zero = true;
+        fmt->flags |= FMT_FLAG_FILL_WITH_ZERO;
         scan_next(scan);
     }
     else
     {
-        fmt->fill_with_zero = false;
+        fmt->flags |= ~(FMT_FLAG_FILL_WITH_ZERO);
     }
 
     fmt->min_width = scan_next_decimal(scan);
@@ -95,25 +120,20 @@ static void fmt_parse_min_width(struct fmt *fmt, Scan *scan)
 struct fmt fmt_parse(Scan *scan)
 {
     struct fmt fmt = {};
+    fmt.flags = 0;
 
     scan_skip(scan, '{');
 
     while (scan_curr(scan) != '}' &&
            !scan_end(scan))
     {
-        if (scan_curr(scan) == '#')
-        {
-            scan_next(scan);
-            fmt.prefix = true;
-        }
-        else if (scan_curr(scan) >= '0' && scan_curr(scan) <= '9')
+        if (isdigit(scan_curr(scan)))
         {
             fmt_parse_min_width(&fmt, scan);
         }
         else
         {
-            fmt_parse_type(&fmt, scan);
-            scan_next(scan);
+            fmt_parse_attribute(&fmt, scan);
         }
     }
 
@@ -171,7 +191,7 @@ IoWriteResult fmt_unsigned(struct fmt self, IoWriter *writer, unsigned long valu
 
         while (i < self.min_width)
         {
-            if (self.fill_with_zero)
+            if (self.flags & FMT_FLAG_FILL_WITH_ZERO)
             {
                 buffer[i] = '0';
             }
@@ -184,7 +204,7 @@ IoWriteResult fmt_unsigned(struct fmt self, IoWriter *writer, unsigned long valu
         }
     }
 
-    if (self.prefix)
+    if (self.flags & FMT_FLAG_USE_PREFIX)
     {
         buffer[i++] = fmt_prefix(self);
         buffer[i++] = '0';
@@ -204,7 +224,88 @@ IoWriteResult fmt_char(MAYBE_UNUSED struct fmt self, IoWriter *writer, char char
     return OK(IoWriteResult, written);
 }
 
+IoWriteResult fmt_string_formatted(struct fmt self, IoWriter *writer, Str value)
+{
+
+    size_t written = 0;
+    Scan scan;
+    scan_init(&scan, value);
+
+    while (!scan_end(&scan))
+    {
+        char out_char = scan_curr(&scan);
+
+        if (self.flags & FMT_FLAG_FORCE_CAMEL_CASE)
+        {
+
+            // hello world => HelloWorld
+            // hello_world => HelloWorld
+            if (scan_skip(&scan, ' ') || scan_skip(&scan, '_'))
+            {
+                out_char = scan_curr(&scan);
+                if (isalpha(out_char))
+                {
+                    out_char = toupper(out_char);
+                }
+            }
+            else if (scan.head == 0)
+            {
+                // first char is always upper case
+                if (isalpha(out_char))
+                {
+                    out_char = toupper(out_char);
+                }
+            }
+        }
+        else if (self.flags & FMT_FLAG_FORCE_SNAKE_CASE)
+        {
+            if (scan_skip(&scan, ' '))
+            {
+
+                written += TRY(IoWriteResult, io_put(writer, '_'));
+                out_char = scan_curr(&scan);
+            }
+
+            if (isupper(out_char))
+            {
+                // don't try to put '_' if this is the first char:
+                // HelloWorld must not result in: _hello_world
+                if (scan.head != 0)
+                    written += TRY(IoWriteResult, io_put(writer, '_'));
+
+                out_char = tolower(out_char);
+            }
+        }
+
+        if (self.flags & FMT_FLAG_FORCE_UPPER_CASE)
+        {
+            if (isalpha(out_char))
+            {
+                out_char = toupper(out_char);
+            }
+        }
+
+        else if (self.flags & FMT_FLAG_FORCE_LOWER_CASE)
+        {
+            if (isalpha(out_char))
+            {
+                out_char = tolower(out_char);
+            }
+        }
+
+        written += TRY(IoWriteResult, io_put(writer, (out_char)));
+        scan_next(&scan);
+    }
+    return OK(IoWriteResult, written);
+}
+
 IoWriteResult fmt_string(MAYBE_UNUSED struct fmt self, IoWriter *writer, Str value)
 {
-    return io_print(writer, value);
+
+    if (!(self.flags & FMT_STRING_MODIFICATION_FLAGS))
+    {
+        return io_print(writer, value);
+    }
+
+    return fmt_string_formatted(self, writer, value);
 }
