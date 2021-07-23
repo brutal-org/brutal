@@ -50,7 +50,12 @@ void buffer_push_impl(Buffer *self, uint8_t const *data, size_t size)
     self->used += size;
 }
 
-static IoReadResult io_buffer_read_impl(IoFBufferReader *read, char *data, size_t size)
+Str buffer_str(Buffer *self)
+{
+    return str_cast_n(self->used, (char *)self->data);
+}
+
+static IoReadResult io_buffer_read_impl(IoBufferReader *read, char *data, size_t size)
 {
     size_t readed = MIN(size + read->cur, read->buf->used);
 
@@ -58,15 +63,19 @@ static IoReadResult io_buffer_read_impl(IoFBufferReader *read, char *data, size_
     {
         data[i] = read->buf->data[i + read->cur];
     }
+
     read->cur += readed;
+
     return OK(IoReadResult, readed);
 }
-IoFBufferReader io_buffer_read(Buffer const *self)
+
+IoBufferReader io_buffer_read(Buffer const *self)
 {
-    IoFBufferReader reader = (IoFBufferReader){
+    IoBufferReader reader = (IoBufferReader){
         .base = {(IoRead *)io_buffer_read_impl},
         .buf = self,
     };
+
     return reader;
 }
 
@@ -76,13 +85,16 @@ static IoWriteResult io_buffer_write_impl(IoBufferWriter *writer, char const *da
     {
         buffer_push(writer->buf, data[i]);
     }
+
     return OK(IoWriteResult, size);
 }
+
 IoBufferWriter io_buffer_write(Buffer *self)
 {
     IoBufferWriter writer = (IoBufferWriter){
         .base = {(IoWrite *)io_buffer_write_impl},
         .buf = self,
     };
+
     return writer;
 }

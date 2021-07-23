@@ -23,6 +23,8 @@ void buffer_clear(Buffer *self);
 
 void buffer_push_impl(Buffer *self, uint8_t const *data, size_t size);
 
+Str buffer_str(Buffer *self);
+
 #define buffer_push(SELF, DATA) buffer_push_impl((SELF), (uint8_t const *)&(DATA), sizeof(DATA))
 
 #define buffer_write(...) buffer_push_impl(__VA_ARGS__)
@@ -33,20 +35,19 @@ void buffer_push_impl(Buffer *self, uint8_t const *data, size_t size);
 
 #define buffer_used(SELF) ((SELF)->used)
 
-typedef struct
+    typedef struct
 {
     IoReader base;
     Buffer const *buf;
     size_t cur;
-} IoFBufferReader;
+} IoBufferReader;
 
 typedef struct
 {
     IoWriter base;
     Buffer *buf;
-
 } IoBufferWriter;
 
-IoFBufferReader io_buffer_read(Buffer const *self);
+IoBufferReader io_buffer_read(Buffer const *self);
 
 IoBufferWriter io_buffer_write(Buffer *self);

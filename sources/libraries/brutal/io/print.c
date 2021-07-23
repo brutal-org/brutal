@@ -65,7 +65,17 @@ IoWriteResult print_impl(IoWriter *writer, Str format, struct print_args args)
 
     while (!scan_end(&scan))
     {
-        if (scan_curr(&scan) == '{' && !skip_fmt)
+        if (scan_skip_word(&scan, str_cast("{{")))
+        {
+            skip_fmt = false;
+            written += TRY(IoWriteResult, io_put(writer, '{'));
+        }
+        else if (scan_skip_word(&scan, str_cast("}}")))
+        {
+            skip_fmt = false;
+            written += TRY(IoWriteResult, io_put(writer, '}'));
+        }
+        else if (scan_curr(&scan) == '{' && !skip_fmt)
         {
             if (current < args.count)
             {
