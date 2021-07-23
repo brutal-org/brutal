@@ -1,8 +1,0 @@
-
-/* test comment uwu */
-
-interface gfx {
-    
-    method set_window_pos(x: int, y: int, handle: Handle) -> Result;
-
-}

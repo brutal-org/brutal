@@ -1,4 +1,29 @@
 interface example
 {
-    method ping() -> ();
+    errors
+    {
+        PC_LOAD_LETTER,
+    };
+
+    type Time : uint64_t;
+
+    event notification
+    {
+        type : enum
+        {
+            FOO,
+            BAR
+        },
+        nested : struct
+        {
+            data : int
+        }
+    };
+
+    type PingPong : {
+        time : Time
+    };
+
+    method ping PingPong -> PingPong;
+    method test { foo : int} -> { bar : float};
 }

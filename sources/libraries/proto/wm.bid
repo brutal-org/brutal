@@ -1,0 +1,11 @@
+interface wm
+{
+    errors
+    {
+        UNKNOWN_SERVICE,
+    };
+
+    type WindowHandle: uint64_t;
+
+    method window_create {width: int, height: int} -> {handle: WindowHandle, buffer: MObj};
+}

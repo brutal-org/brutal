@@ -1,226 +1,86 @@
+#include <bid/bid.h>
 
-#include <bid/bid2c.h>
-#include <brutal/alloc.h>
-#include <brutal/base.h>
-#include <brutal/log.h>
+static void gen_type(BidInterface const *interface, BidType const *type, IoWriter *writer);
 
-// ------------- header -------------
-
-void bid_write_header(const struct bid *bid, IoWriter *writer)
+static bool type_in_interface(BidInterface const *interface, Str name)
 {
-    (void)bid;
-    print(writer, "#pragma once\n\n");
-    print(writer, "#include <brutal/base.h>\n\n");
-    print(writer, "// -- generated idl file --\n\n");
-}
-
-// ------------- interface -------------
-
-Str bid_write_interface(IoWriter *writer, struct bid_ast_node *interface)
-{
-    print(writer, "// interface: {}\n\n", interface->interface.name);
-    return interface->interface.name;
-}
-
-// ------------- message type -------------
-
-void bid_convert_message_type(IoWriter *writer, struct bid_ast_node *interface, Str current_namespace)
-{
-    print(writer, "enum {}_messages_type\n\\{\n", current_namespace);
-
-    for (int i = 0; i < interface->children.length; i++)
+    vec_foreach(type, &interface->aliases)
     {
-        if (interface->children.data[i]->type == BID_AST_NODE_TYPE_METHOD)
+        if (str_eq(type.name, name))
         {
-            struct bid_ast_node *method_node = interface->children.data[i];
-            Str name = method_node->method.name;
-
-            print(writer, "\t{}_msg_{},\n", current_namespace, name);
+            return true;
         }
     }
-    print(writer, "};\n\n");
+
+    return false;
 }
 
-// ------------- types --------------
-
-void bid_write_type(IoWriter *writer, struct bid_ast_node *type)
+static void gen_generic(BidInterface const *interface, BidGeneric const *type, IoWriter *writer)
 {
-    if (type->children.length != 0)
+    if (type_in_interface(interface, type->name))
     {
-        print(writer, "{}(", type->ntype.name);
+        print(writer, "{}", interface->name);
+    }
 
-        for (int i = 0; i < type->children.length; i++)
+    print(writer, "{}", type->name);
+
+    if (type->params.length)
+    {
+        io_print(writer, str_cast("("));
+
+        for (int i = 0; i < type->params.length; i++)
         {
-            bid_write_type(writer, type->children.data[i]);
+            gen_type(interface, &type->params.data[i], writer);
 
-            if (i + 1 < type->children.length)
+            if (i + 1 != type->params.length)
             {
-                print(writer, ", ");
-            }
-            else
-            {
-                print(writer, ")");
+                io_print(writer, str_cast(","));
             }
         }
-    }
-    else
-    {
-        print(writer, "{}", type->ntype.name);
+
+        io_print(writer, str_cast(")"));
     }
 }
 
-// ------------- typedefs -----------
-
-void bid_write_typedef(IoWriter *writer, struct bid_ast_node *typedef_node)
+static void gen_enum(BidInterface const *interface, BidEnum const *type, IoWriter *writer)
 {
-    if (typedef_node->children.length < 2)
+    io_print(writer, str_cast("enum {\n"));
+
+    vec_foreach(member, &type->members)
     {
-        return;
+        print(writer, "{}_{},\n", interface->name, member);
     }
 
-    struct bid_ast_node *type_node = typedef_node->children.data[1];
-    struct bid_ast_node *name_node = typedef_node->children.data[0];
-
-    print(writer, "typedef ");
-    bid_write_type(writer, type_node);
-
-    print(writer, " ");
-    bid_write_type(writer, name_node);
-
-    print(writer, ";\n\n");
+    io_print(writer, str_cast("}"));
 }
 
-// ------------- methods ------------
-
-void bid_write_argument(IoWriter *writer, struct bid_ast_node *arg)
+static void gen_struct(BidInterface const *interface, BidStruct const *type, IoWriter *writer)
 {
-    struct bid_ast_node *target_type = NULL;
+    io_print(writer, str_cast("struct {\n"));
 
-    for (int i = 0; i < arg->children.length; i++)
+    vec_foreach(member, &type->members)
     {
-        if (arg->children.data[i]->type == BID_AST_NODE_TYPE)
-        {
-            target_type = arg->children.data[i];
-            break;
-        }
+        gen_type(interface, &member.type, writer);
+        print(writer, " {};\n", member.name);
     }
 
-    if (target_type == NULL)
-    {
-        // maybe later add a Any type
-        print(writer, "void* {}", arg->argument.name);
-        return;
-    }
-
-    bid_write_type(writer, target_type);
-
-    print(writer, " {}", arg->argument.name);
+    io_print(writer, str_cast("}"));
 }
 
-static void bid_write_method_send_structure(IoWriter *writer, struct bid_ast_node *method, Str current_namespace)
+static void gen_type(BidInterface const *interface, BidType const *type, IoWriter *writer)
 {
-    print(writer, "struct {}_{}_send\n\\{\n", current_namespace, method->method.name);
-
-    for (int i = 0; i < method->children.length; i++)
+    switch (type->type)
     {
-        if (method->children.data[i]->type == BID_AST_NODE_TYPE_VAR)
-        {
-            print(writer, "\t");
-
-            bid_write_argument(writer, method->children.data[i]);
-
-            print(writer, ";\n");
-        }
-    }
-
-    print(writer, "};\n\n");
-}
-
-void bid_write_method(IoWriter *writer, struct bid_ast_node *method, Str current_namespace)
-{
-
-    print(writer, "// - {}.{}\n\n", current_namespace, method->method.name);
-
-    //  bid_write_method_received_structure(writer, method);
-
-    bid_write_method_send_structure(writer, method, current_namespace);
-
-    struct bid_ast_node *return_value = NULL;
-    int arg_count = method->children.length;
-
-    for (int i = 0; i < method->children.length; i++)
-    {
-        if (method->children.data[i]->type == BID_AST_NODE_TYPE_METHOD_RETURN_TYPE)
-        {
-            return_value = method->children.data[i];
-        }
-    }
-
-    if (return_value != NULL)
-    {
-        bid_write_type(writer, return_value);
-        arg_count -= 1; // argument count = ast child - 1
-    }
-    else
-    {
-        print(writer, "void");
-    }
-
-    print(writer, " {}_{}(", current_namespace, method->method.name);
-
-    print(writer, "BrTask target, struct {}_{}_send* send", current_namespace, method->method.name);
-
-    print(writer, ");\n\n");
-}
-
-// ------------- errors -------------
-
-void bid_write_errors(IoWriter *writer, struct bid_ast_node *errors, Str namespace)
-{
-
-    print(writer, "enum {}_errors_type\n\\{\n", namespace);
-    print(writer, "\t{}_{},\n", namespace, "no_error");
-
-    for (int i = 0; i < errors->children.length; i++)
-    {
-        if (errors->children.data[i]->type == BID_AST_NODE_TYPE_ERROR_MEMBER)
-        {
-            print(writer, "\t{}_{},\n", namespace, errors->children.data[i]->errors.name);
-        }
-    }
-
-    print(writer, "};\n\n");
-
-    print(writer, "struct {}_errors\n\\{\n", namespace);
-    print(writer, "\tenum {}_errors_type type;\n", namespace);
-    print(writer, "};\n\n");
-}
-
-// ------------- C converter -------------
-
-static void bid_write_node(IoWriter *writer, struct bid_ast_node *node, Str current_namespace)
-{
-    switch (node->type)
-    {
-    case BID_AST_NODE_TYPE_INTERFACE:
-        current_namespace = bid_write_interface(writer, node);
-        if (node->children.length != 0)
-        {
-            bid_convert_message_type(writer, node, current_namespace);
-            for (int i = 0; i < node->children.length; i++)
-            {
-                bid_write_node(writer, node->children.data[i], current_namespace);
-            }
-        }
+    case BID_TYPE_GENERIC:
+        gen_generic(interface, &type->generic_, writer);
         break;
-    case BID_AST_NODE_TYPE_METHOD:
-        bid_write_method(writer, node, current_namespace);
+
+    case BID_TYPE_ENUM:
+        gen_enum(interface, &type->enum_, writer);
         break;
-    case BID_AST_NODE_TYPE_TYPEDEF:
-        bid_write_typedef(writer, node);
-        break;
-    case BID_AST_NODE_TYPE_ERROR:
-        bid_write_errors(writer, node, current_namespace);
+
+    case BID_TYPE_STRUCT:
+        gen_struct(interface, &type->struct_, writer);
         break;
 
     default:
@@ -228,8 +88,97 @@ static void bid_write_node(IoWriter *writer, struct bid_ast_node *node, Str curr
     }
 }
 
-void bid2c(const struct bid *bid, IoWriter *writer)
+void bid2c(BidInterface const *interface, IoWriter *writer)
 {
-    bid_write_header(bid, writer);
-    bid_write_node(writer, bid->root_ast, str_cast(""));
+    print(writer, R"c(#pragma once
+
+// This is file is auto generated by BID, don't edit it!
+
+#include <brutal/base.h>
+#include <syscalls/types.h>
+
+)c");
+
+    print(writer, "typedef ");
+    gen_enum(interface, &interface->errors, writer);
+    print(writer, " {}Error;\n", interface->name);
+
+    print(writer, "\n");
+
+    print(writer, "/* --- Types ---------------------------------------------------------------- */\n\n");
+
+    vec_foreach(alias, &interface->aliases)
+    {
+        print(writer, "typedef ");
+        gen_type(interface, &alias.type, writer);
+        print(writer, " {}{};\n", interface->name, alias.name);
+        print(writer, "\n");
+    }
+
+    print(writer, "/* --- Messages ------------------------------------------------------------- */\n\n");
+
+    vec_foreach(methode, &interface->methodes)
+    {
+        print(writer, "typedef ");
+        gen_type(interface, &methode.request, writer);
+        print(writer, " {}{}Request;\n", interface->name, methode.name);
+
+        print(writer, "\n");
+
+        print(writer, "typedef ");
+        gen_type(interface, &methode.response, writer);
+        print(writer, " {}{}Response;\n", interface->name, methode.name);
+
+        print(writer, "\n");
+    }
+
+    vec_foreach(event, &interface->events)
+    {
+        print(writer, "typedef ");
+        gen_type(interface, &event.data, writer);
+        print(writer, " {}{}Event;\n", interface->name, event.name);
+        print(writer, "\n");
+    }
+
+    print(writer, "typedef enum {{\n");
+
+    print(writer, "{}_INVALID,\n", interface->name);
+    print(writer, "{}_ERROR,\n", interface->name);
+
+    vec_foreach(methode, &interface->methodes)
+    {
+        print(writer, "{}_{}_REQUEST,\n", interface->name, methode.name);
+        print(writer, "{}_{}_RESPONSE,\n", interface->name, methode.name);
+    }
+
+    vec_foreach(event, &interface->events)
+    {
+        print(writer, "{}_{}_EVENT,\n", interface->name, event.name);
+    }
+
+    print(writer, "}} {}MessageType;\n", interface->name);
+
+    print(writer, "\n");
+
+    print(writer, "typedef struct {{\n");
+
+    print(writer, "BrMessageHeader header;\n");
+
+    print(writer, "union {{\n");
+    print(writer, "{}Error error;\n", interface->name);
+
+    vec_foreach(event, &interface->events)
+    {
+        print(writer, "{}{}Event {}_event;\n", interface->name, event.name, event.name);
+    }
+
+    vec_foreach(methode, &interface->methodes)
+    {
+        print(writer, "{}{}Request {}_request;\n", interface->name, methode.name, methode.name);
+        print(writer, "{}{}Response {}_response;\n", interface->name, methode.name, methode.name);
+    }
+
+    print(writer, "}};\n");
+
+    print(writer, "}} {}Message;\n", interface->name);
 }

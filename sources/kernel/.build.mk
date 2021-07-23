@@ -5,7 +5,7 @@ KERNEL_C_SRC+=$(wildcard sources/kernel/*.c) \
 KERNEL_S_SRC+=$(wildcard sources/kernel/$(CONFIG_ARCH)/*.s)
 
 KERNEL_LIBS_SRC = \
-			  $(wildcard sources/libraries/ansi/ctypes.c) \
+			  $(wildcard sources/libraries/ansi/ctype.c) \
 			  $(wildcard sources/libraries/ubsan/*.c) \
 			  $(wildcard sources/libraries/brutal/io/fmt.c) \
 			  $(wildcard sources/libraries/brutal/io/print.c) \

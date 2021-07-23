@@ -19,6 +19,6 @@ $(BID_BIN): $(BID_OBJ)
 	$(HOST_CC) -rdynamic $(HOST_CFLAGS) $(HOST_LDFLAGS) -fsanitize=address -fsanitize=undefined $^ -o $@
 
 run-bid: $(BID_BIN)
-	$(BID_BIN) sources/bid/test.bid sources/bid/test.h
+	$(BID_BIN) sources/libraries/proto/exemple.bid sources/libraries/proto/exemple.h
 
 bid: $(BID_BIN)

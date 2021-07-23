@@ -1,4 +1,4 @@
-#include <ctypes.h>
+#include <ctype.h>
 #include <stddef.h>
 
 // using https://koor.fr/C/cctype/Index.wp for ascii code

@@ -1,78 +1,81 @@
 #pragma once
+
 #include <bid/bid.h>
-#include <brutal/ds/vec.h>
+#include <brutal/ds.h>
 
-#define BID_INTERFACE_STR (str_cast("interface"))
-#define BID_ALNUM_STR (str_cast("[a-Az-Z_] string"))
-#define BID_CLOSING_BRACKETS (str_cast("}"))
-#define BID_OPENNING_BRACKETS (str_cast("{"))
-#define BID_CLOSING_PARENTHESIS (str_cast(")"))
-#define BID_OPENNING_PARENTHESIS (str_cast("("))
-#define BID_END_ARGUMENT (str_cast(") ,"))
-#define BID_END_TYPE (str_cast("> ,"))
-#define BID_DOUBLE_DOT (str_cast(":"))
-#define BID_GREATER_THAN (str_cast(">"))
-#define BID_ARROW (str_cast("->"))
-#define BID_END_LINE (str_cast(";"))
-#define BID_EQUAL (str_cast("="))
-#define BID_MEMBERS_BLOCK (str_cast("} ,"))
+typedef struct bid_type BidType;
 
-enum bid_ast_node_type
+typedef struct
 {
-    BID_AST_NODE_TYPE_UNKNOWN,
-    BID_AST_NODE_TYPE_INTERFACE,
-    BID_AST_NODE_TYPE_METHOD,
-    BID_AST_NODE_TYPE_TYPEDEF,
-    BID_AST_NODE_TYPE_METHOD_RETURN_TYPE, // type
-    BID_AST_NODE_TYPE_VAR,                // var
-    BID_AST_NODE_TYPE_ERROR,              // var
-    BID_AST_NODE_TYPE_ERROR_MEMBER,       // var
-    BID_AST_NODE_TYPE
-};
+    Str name;
+    Vec(BidType) params;
+} BidGeneric;
 
-struct bid_ast_node
+typedef struct
 {
-    enum bid_ast_node_type type;
-    Vec(struct bid_ast_node *) children;
+    Vec(Str) members;
+} BidEnum;
+
+typedef struct bid_var BidVar;
+
+typedef struct
+{
+    Vec(BidVar) members;
+} BidStruct;
+
+typedef enum
+{
+    BID_TYPE_NONE,
+
+    BID_TYPE_GENERIC,
+    BID_TYPE_ENUM,
+    BID_TYPE_STRUCT,
+} BidTypeType;
+
+struct bid_type
+{
+    BidTypeType type;
 
     union
     {
-        struct ast_node_interface
-        {
-            Str name;
-        } interface;
-
-        struct ast_node_method
-        {
-            Str name;
-        } method;
-
-        // a type may contain other:
-        // if we have Result<MaybeError<int>, Error>
-        // we will get a tree that may look like this:
-        // Result:
-        //      MaybeError:
-        //          int
-        //      Error
-
-        struct ast_node_type
-        {
-            Str name;
-        } ntype;
-
-        // an argument can have a type
-        struct ast_node_argument // argument -> type
-        {
-            Str name;
-        } argument;
-
-        struct ast_node_error_member
-        {
-            Str name;
-        } errors;
+        BidGeneric generic_;
+        BidEnum enum_;
+        BidStruct struct_;
     };
 };
 
-struct bid_ast_node *create_ast_node(enum bid_ast_node_type type);
+struct bid_var
+{
+    Str name;
+    BidType type;
+};
 
-void destroy_ast_node_recursive(struct bid_ast_node *from);
+typedef struct
+{
+    Str name;
+    BidType type;
+} BidAlias;
+
+typedef struct
+{
+    Str name;
+
+    BidType request;
+    BidType response;
+} BidMethod;
+
+typedef struct
+{
+    Str name;
+    BidType data;
+} BidEvent;
+
+typedef struct
+{
+    Str name;
+
+    BidEnum errors;
+    Vec(BidAlias) aliases;
+    Vec(BidEvent) events;
+    Vec(BidMethod) methodes;
+} BidInterface;
