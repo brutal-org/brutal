@@ -4,7 +4,7 @@
 #include <syscalls/types.h>
 #include "kernel/pmm.h"
 
-typedef Range(size_t) HeapRange;
+typedef USizeRange HeapRange;
 
 typedef Result(BrResult, HeapRange) HeapResult;
 

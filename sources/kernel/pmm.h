@@ -7,7 +7,7 @@
 #define PMM_USED (true)
 #define PMM_UNUSED (false)
 
-typedef Range(size_t) PmmRange;
+typedef USizeRange PmmRange;
 
 typedef Result(BrResult, PmmRange) PmmResult;
 

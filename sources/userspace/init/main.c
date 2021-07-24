@@ -1,7 +1,8 @@
 #include <brutal/base.h>
 #include <brutal/log.h>
+#include <handover/handover.h>
 
-int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char const *argv[])
+int br_entry(MAYBE_UNUSED Handover *handover)
 {
     log("Hello, world!");
 

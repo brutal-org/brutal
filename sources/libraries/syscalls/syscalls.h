@@ -2,44 +2,121 @@
 
 #include <syscalls/types.h>
 
+// clang-format off
+
 #ifdef __kernel__
 #    define SYSCALL(NAME) BrResult sys_##NAME
 #else
 #    define SYSCALL(NAME) BrResult br_##NAME
-SYSCALL(syscall)
-(BrSyscall syscall, BrArg arg1, BrArg arg2, BrArg arg3, BrArg arg4, BrArg arg5);
+SYSCALL(syscall) (BrSyscall syscall, BrArg arg1, BrArg arg2, BrArg arg3, BrArg arg4, BrArg arg5);
 #endif
+typedef struct
+{
+    char const *message;
+    size_t size;
+} BrLogArgs;
 
-// clang-format off
+SYSCALL(log) (BrLogArgs* args);
 
-SYSCALL(noop) (void);
+typedef struct
+{
+    BrSpace space;
+    BrSpaceFlags flags;
+} BrSpaceArgs;
 
-SYSCALL(log) (char const *message, size_t size);
+SYSCALL(space) (BrSpaceArgs* args);
 
-SYSCALL(space) (BrSpace *space, BrSpaceFlags flags);
+typedef struct
+{
+    BrMObj mobj;
+    uintptr_t addr;
+    size_t size;
+    BrMObjFlags flags;
+} BrMObjArgs;
 
-SYSCALL(mobj) (BrMObj *mobj, uintptr_t addr, size_t size, BrMObjFlags flags);
+SYSCALL(mobj) (BrMObjArgs* args);
 
-SYSCALL(map) (BrSpace space, BrMObj mobj, uintptr_t vaddr, BrMemFlags flags);
+typedef struct
+{
+    BrSpace space;
+    BrMObj mobj;
+    size_t offset;
+    size_t size;
+    uintptr_t vaddr;
+    BrMemFlags flags;
+} BrMapArgs;
 
-SYSCALL(alloc) (BrSpace space, BrMObj mobj, uintptr_t *vaddr, BrMemFlags flags);
+SYSCALL(map) (BrMapArgs* args);
 
-SYSCALL(unmap) (BrSpace space, uintptr_t vaddr, size_t size);
+typedef struct
+{
+    BrSpace space;
+    uintptr_t vaddr;
+    size_t size;
+} BrUnmapArgs;
 
-SYSCALL(task) (BrTask *task, BrSpace space, BrTaskFlags flags);
+SYSCALL(unmap) (BrUnmapArgs* args);
 
-SYSCALL(start) (BrTask task, uintptr_t ip, uintptr_t sp, BrTaskArgs *args);
+typedef struct
+{
+    BrTask task;
+    StrFix128 name;
+    BrSpace space;
+    BrTaskFlags flags;
+} BrCreateArgs;
 
-SYSCALL(exit) (BrTask task, uintptr_t exit_value);
+SYSCALL(create) (BrCreateArgs* args);
 
-SYSCALL(send) (BrTask task, BrMessage const *message, BrTimeout timeout, BrIpcFlags flags);
+typedef struct
+{
+    BrTask task;
+    uintptr_t ip;
+    uintptr_t sp;
+    BrTaskArgs args;
+} BrStartArgs;
 
-SYSCALL(recv) (BrTask task, BrMessage *message, BrTimeout timeout, BrIpcFlags flags);
+SYSCALL(start) (BrStartArgs* args);
 
-SYSCALL(irq) (BrTask task, BrIrq irq, BrIrqFlags flags);
+typedef struct
+{
+    BrTask task;
+    uintptr_t exit_value;
+} BrExitArgs;
 
-SYSCALL(drop) (BrTask task, BrCap cap);
+SYSCALL(exit) (BrExitArgs* args);
 
-SYSCALL(close) (BrHandle handle);
+typedef struct
+{
+    BrTask task;
+    BrMessage message;
+    BrTimeout timeout;
+    BrIpcFlags flags;
+} BrIpcArgs;
+
+SYSCALL(ipc) (BrIpcArgs* args);
+
+typedef struct
+{
+    BrTask task;
+    BrIrq irq;
+    BrIrqFlags flags;
+} BrIrqArgs;
+
+SYSCALL(irq) (BrIrqArgs* args);
+
+typedef struct
+{
+    BrTask task;
+    BrCap cap;
+} BrDropArgs;
+
+SYSCALL(drop) (BrDropArgs* args);
+
+typedef struct
+{
+    BrHandle handle;
+} BrCloseArgs;
+
+SYSCALL(close) (BrCloseArgs* args);
 
 // clang-format on

@@ -13,32 +13,54 @@ void host_mem_unlock(void)
 
 Error host_mem_acquire(size_t size, void **out_result, MAYBE_UNUSED enum host_mem_flag flags)
 {
-    BrMObj obj;
-    BrResult result;
-    uintptr_t vaddr = 0;
+    // Create the memory object
 
-    result = br_mobj(&obj, 0, size, BR_MOBJ_NONE);
+    BrMObjArgs mobj_args = {
+        .size = size,
+    };
 
-    if (result != BR_SUCCESS)
-    {
-        return br_result_to_error(result);
-    }
-
-    result = br_alloc(BR_SPACE_SELF, obj, &vaddr, BR_MEM_WRITABLE);
-    br_close(obj);
+    BrResult result = br_mobj(&mobj_args);
 
     if (result != BR_SUCCESS)
     {
         return br_result_to_error(result);
     }
 
-    *out_result = (void *)vaddr;
+    BrMObj mobj = mobj_args.mobj;
+
+    // Map the memory object
+
+    BrMapArgs map_args = {
+        .space = BR_SPACE_SELF,
+        .mobj = mobj,
+        .flags = BR_MEM_WRITABLE,
+    };
+
+    result = br_map(&map_args);
+
+    // Cleanup and return
+
+    br_close(&(BrCloseArgs){
+        .handle = mobj,
+    });
+
+    if (result != BR_SUCCESS)
+    {
+        return br_result_to_error(result);
+    }
+
+    *out_result = (void *)map_args.vaddr;
 
     return ERR_SUCCESS;
 }
 
 Error host_mem_release(void *addr, size_t size)
 {
-    auto result = br_unmap(BR_SPACE_SELF, (uintptr_t)addr, size);
+    auto result = br_unmap(&(BrUnmapArgs){
+        .space = BR_SPACE_SELF,
+        .vaddr = (uintptr_t)addr,
+        .size = size,
+    });
+
     return br_result_to_error(result);
 }

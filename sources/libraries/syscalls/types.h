@@ -5,18 +5,15 @@
 #include <brutal/base/std.h>
 
 #define FOREACH_SYSCALLS(SYSCALL) \
-    SYSCALL(NOOP)                 \
     SYSCALL(LOG)                  \
     SYSCALL(SPACE)                \
     SYSCALL(MOBJ)                 \
     SYSCALL(MAP)                  \
-    SYSCALL(ALLOC)                \
     SYSCALL(UNMAP)                \
-    SYSCALL(TASK)                 \
+    SYSCALL(CREATE)               \
     SYSCALL(START)                \
     SYSCALL(EXIT)                 \
-    SYSCALL(SEND)                 \
-    SYSCALL(RECV)                 \
+    SYSCALL(IPC)                  \
     SYSCALL(IRQ)                  \
     SYSCALL(DROP)                 \
     SYSCALL(CLOSE)

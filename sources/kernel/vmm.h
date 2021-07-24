@@ -6,7 +6,7 @@
 
 typedef void *VmmSpace;
 
-typedef Range(size_t) VmmRange;
+typedef USizeRange VmmRange;
 
 typedef Result(BrResult, VmmRange) VmmResult;
 

@@ -34,57 +34,76 @@ static bool elf_supported(Elf64Header const *header, size_t data_size)
     return true;
 }
 
-static void elf_load_program(Task *task, Elf64Header const *elf, void const *data)
+static void elf_load_program(Task *task, Elf64Header const *elf_header, MemObj *elf_obj)
 {
-    Elf64ProgramHeader *header = (Elf64ProgramHeader *)(data + elf->program_header_table_file_offset);
+    auto prog_header = (Elf64ProgramHeader *)((uint8_t *)elf_header + elf_header->program_header_table_file_offset);
 
-    for (size_t i = 0; i < elf->program_header_table_entry_count; i++)
+    for (size_t i = 0; i < elf_header->program_header_table_entry_count; i++)
     {
-        if (header->type != ELF_PROGRAM_HEADER_LOAD)
+        if (prog_header->type != ELF_PROGRAM_HEADER_LOAD)
         {
-            log("Ignoring segment with type={#0x}", header->type);
+            log("Ignoring segment with type={#0x}", prog_header->type);
             continue;
         }
 
-        auto size = MAX(header->memory_size, header->file_size);
-        auto range = UNWRAP(heap_alloc(size));
-        auto ptr = (uint8_t *)range.base;
+        auto size = ALIGN_UP(MAX(prog_header->memory_size, prog_header->file_size), HOST_MEM_PAGESIZE);
 
-        mem_set(ptr, 0, size);
-        mem_cpy(ptr, data + header->file_offset, header->file_size);
+        if (!(prog_header->flags & ELF_PROGRAM_HEADER_WRITABLE) &&
+            prog_header->file_size == prog_header->memory_size)
+        {
+            UNWRAP(space_map(task->space, elf_obj, prog_header->file_offset, size, prog_header->virtual_address));
+        }
+        else
+        {
+            HeapRange heap = UNWRAP(heap_alloc(size));
+            uint8_t *ptr = (uint8_t *)heap.base;
 
-        VmmRange target = (VmmRange){
-            .base = header->virtual_address,
-            .size = ALIGN_UP(header->memory_size, HOST_MEM_PAGESIZE),
-        };
+            mem_set(ptr, 0, size);
+            mem_cpy(ptr, (uint8_t *)elf_header + prog_header->file_offset, prog_header->file_size);
 
-        UNWRAP(space_map_pmm(task->space, target, heap_to_pmm(range)));
+            MemObj *prog_obj = mem_obj_heap(heap, MEM_OBJ_OWNING);
+            UNWRAP(space_map(task->space, prog_obj, 0, 0, prog_header->virtual_address));
+            mem_obj_deref(prog_obj);
+        }
 
-        header = (Elf64ProgramHeader *)((uintptr_t)header + elf->program_header_table_entry_size);
+        prog_header = (Elf64ProgramHeader *)((uint8_t *)prog_header + elf_header->program_header_table_entry_size);
     }
 }
 
 static BrTask init = BR_TASK_ERROR;
 
+void init_stack(Task *task)
+{
+    auto heap = UNWRAP(heap_alloc(KERNEL_STACK_SIZE));
+    auto obj = mem_obj_heap(heap, MEM_OBJ_OWNING);
+    space_map(task->space, obj, 0, 0, USER_STACK_BASE - KERNEL_STACK_SIZE);
+    mem_obj_deref(obj);
+}
+
 void init_start(Handover *handover)
 {
     auto name = str_cast("init");
-    auto module = handover_find_module(handover, name);
-    auto elf = (Elf64Header *)module->addr;
 
-    assert_truth(elf_supported(elf, module->size));
+    auto elf_module = handover_find_module(handover, name);
+    auto elf_header = (Elf64Header *)elf_module->addr;
+    auto elf_obj = mem_obj_heap((HeapRange){elf_module->addr, elf_module->size}, MEM_OBJ_NONE);
+
+    assert_truth(elf_supported(elf_header, elf_module->size));
 
     auto space = space_create(BR_SPACE_NONE);
     Task *task = UNWRAP(task_create(name, space, BR_TASK_USER));
     space_deref(space);
 
-    elf_load_program(task, elf, (void const *)module->addr);
+    elf_load_program(task, elf_header, elf_obj);
 
     // Create the user stack.
-    space_map(task->space, (VmmRange){USER_STACK_BASE - KERNEL_STACK_SIZE, KERNEL_STACK_SIZE});
+
+    init_stack(task);
 
     init = task->base.handle;
-    task_start(task, elf->entry, USER_STACK_BASE, (BrTaskArgs){});
+    task_start(task, elf_header->entry, USER_STACK_BASE, (BrTaskArgs){});
+
+    mem_obj_deref(elf_obj);
 }
 
 BrTask init_handle(void)

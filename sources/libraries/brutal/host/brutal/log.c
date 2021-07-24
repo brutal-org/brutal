@@ -22,7 +22,11 @@ static IoWriteResult host_log_write(MAYBE_UNUSED IoWriter *writer, char const *d
 
         if (data[i] == '\n')
         {
-            br_log((char const *)buffer_begin(&buffer), buffer_used(&buffer));
+            br_log(&(BrLogArgs){
+                .message = (char const *)buffer_begin(&buffer),
+                .size = buffer_used(&buffer),
+            });
+
             buffer_clear(&buffer);
         }
     }
@@ -49,6 +53,10 @@ void host_log_unlock(void)
 
 void host_log_panic(void)
 {
-    br_exit(BR_TASK_SELF, -1);
+    br_exit(&(BrExitArgs){
+        .task = BR_TASK_SELF,
+        .exit_value = -1,
+    });
+
     __builtin_unreachable();
 }

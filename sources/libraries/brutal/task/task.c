@@ -51,7 +51,7 @@ void task_abort(struct task *task)
     host_task_abort(task->handle);
 }
 
-task_wait_Result task_wait(struct task *task)
+TaskWaitResult task_wait(struct task *task)
 {
-    return OK(task_wait_Result, host_task_wait(task->handle));
+    return OK(TaskWaitResult, host_task_wait(task->handle));
 }

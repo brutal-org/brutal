@@ -3,32 +3,56 @@
 #include <brutal/ds.h>
 #include <brutal/sync.h>
 #include "kernel/domain.h"
+#include "kernel/heap.h"
 #include "kernel/pmm.h"
 #include "kernel/vmm.h"
 
 /* --- Memory Object -------------------------------------------------------- */
 
+typedef enum
+{
+    MEM_OBJ_PMM,
+    MEM_OBJ_HEAP,
+} MemObjType;
+
+typedef enum
+{
+    MEM_OBJ_NONE,
+    MEM_OBJ_OWNING,
+} MemObjFlags;
+
 typedef struct
 {
     Object base;
+    MemObjType type;
+    MemObjFlags flags;
 
-    PmmRange range;
-} MemoryObject;
+    union
+    {
+        HeapRange heap;
+        PmmRange pmm;
+    };
+} MemObj;
 
-MemoryObject *memory_object_create(size_t size);
+MemObj *mem_obj_heap(HeapRange heap, MemObjFlags flags);
 
-MemoryObject *memory_object_create_pmm(PmmRange range);
+MemObj *mem_obj_pmm(PmmRange range, MemObjFlags flags);
 
-void memory_object_ref(MemoryObject *self);
+void mem_obj_ref(MemObj *self);
 
-void memory_object_deref(MemoryObject *self);
+void mem_obj_deref(MemObj *self);
+
+PmmRange mem_obj_range(MemObj *self);
+
+size_t mem_obj_size(MemObj *self);
 
 /* --- Memory Space --------------------------------------------------------- */
 
 typedef struct
 {
     VmmRange range;
-    MemoryObject *object;
+    MemObj *object;
+    size_t offset;
 } MemoryMapping;
 
 typedef struct
@@ -52,14 +76,6 @@ void space_switch(Space *self);
 
 typedef Result(BrResult, VmmRange) SpaceResult;
 
-SpaceResult space_map(Space *self, VmmRange range);
-
-SpaceResult space_map_obj(Space *self, VmmRange range, MemoryObject *mobj);
-
-SpaceResult space_map_pmm(Space *self, VmmRange range, PmmRange pmm_range);
-
-SpaceResult space_alloc(Space *self, size_t size);
-
-SpaceResult space_alloc_obj(Space *self, MemoryObject *mobj);
+SpaceResult space_map(Space *self, MemObj *mobj, size_t offset, size_t size, uintptr_t vaddr);
 
 void space_unmap(Space *self, VmmRange range);

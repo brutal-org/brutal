@@ -15,77 +15,62 @@ BrResult br_syscall(BrSyscall syscall, BrArg arg1, BrArg arg2, BrArg arg3, BrArg
     return result;
 }
 
-BrResult br_noop(void)
+BrResult br_log(BrLogArgs *args)
 {
-    return br_syscall(BR_SC_NOOP, 0, 0, 0, 0, 0);
+    return br_syscall(BR_SC_LOG, (BrArg)args, 0, 0, 0, 0);
 }
 
-BrResult br_log(char const *message, size_t size)
+BrResult br_space(BrSpaceArgs *args)
 {
-    return br_syscall(BR_SC_LOG, (BrArg)message, size, 0, 0, 0);
+    return br_syscall(BR_SC_SPACE, (BrArg)args, 0, 0, 0, 0);
 }
 
-BrResult br_space(BrSpace *space, BrSpaceFlags flags)
+BrResult br_mobj(BrMObjArgs *args)
 {
-    return br_syscall(BR_SC_SPACE, (BrArg)space, flags, 0, 0, 0);
+    return br_syscall(BR_SC_MOBJ, (BrArg)args, 0, 0, 0, 0);
 }
 
-BrResult br_mobj(BrMObj *mobj, uintptr_t addr, size_t size, BrMObjFlags flags)
+BrResult br_map(BrMapArgs *args)
 {
-    return br_syscall(BR_SC_MOBJ, (BrArg)mobj, addr, size, flags, 0);
+    return br_syscall(BR_SC_MAP, (BrArg)args, 0, 0, 0, 0);
 }
 
-BrResult br_map(BrSpace space, BrMObj mobj, uintptr_t vaddr, BrMemFlags flags)
+BrResult br_unmap(BrUnmapArgs *args)
 {
-    return br_syscall(BR_SC_MAP, space, mobj, vaddr, flags, 0);
+    return br_syscall(BR_SC_UNMAP, (BrArg)args, 0, 0, 0, 0);
 }
 
-BrResult br_alloc(BrSpace space, BrMObj mobj, uintptr_t *vaddr, BrMemFlags flags)
+BrResult br_create(BrCreateArgs *args)
 {
-    return br_syscall(BR_SC_ALLOC, space, mobj, (BrArg)vaddr, flags, 0);
+    return br_syscall(BR_SC_CREATE, (BrArg)args, 0, 0, 0, 0);
 }
 
-BrResult br_unmap(BrSpace space, uintptr_t vaddr, size_t size)
+BrResult br_start(BrStartArgs *args)
 {
-    return br_syscall(BR_SC_UNMAP, space, vaddr, size, 0, 0);
+    return br_syscall(BR_SC_START, (BrArg)args, 0, 0, 0, 0);
 }
 
-BrResult br_task(BrTask *task, BrSpace space, BrTaskFlags flags)
+BrResult br_exit(BrExitArgs *args)
 {
-    return br_syscall(BR_SC_TASK, (BrArg)task, space, flags, 0, 0);
+    return br_syscall(BR_SC_EXIT, (BrArg)args, 0, 0, 0, 0);
 }
 
-BrResult br_start(BrTask task, uintptr_t ip, uintptr_t sp, BrTaskArgs *args)
+BrResult br_ipc(BrIpcArgs *args)
 {
-    return br_syscall(BR_SC_START, task, ip, sp, (BrArg)args, 0);
+    return br_syscall(BR_SC_IPC, (BrArg)args, 0, 0, 0, 0);
 }
 
-BrResult br_exit(BrTask task, uintptr_t exit_value)
+BrResult br_irq(BrIrqArgs *args)
 {
-    return br_syscall(BR_SC_EXIT, task, exit_value, 0, 0, 0);
+    return br_syscall(BR_SC_IRQ, (BrArg)args, 0, 0, 0, 0);
 }
 
-BrResult br_send(BrTask task, BrMessage const *message, BrTimeout timeout, BrIpcFlags flags)
+BrResult br_drop(BrDropArgs *args)
 {
-    return br_syscall(BR_SC_SEND, task, (BrArg)message, timeout, flags, 0);
+    return br_syscall(BR_SC_DROP, (BrArg)args, 0, 0, 0, 0);
 }
 
-BrResult br_recv(BrTask task, BrMessage *message, BrTimeout timeout, BrIpcFlags flags)
+BrResult br_close(BrCloseArgs *args)
 {
-    return br_syscall(BR_SC_RECV, task, (BrArg)message, timeout, flags, 0);
-}
-
-BrResult br_irq(BrTask task, BrIrq irq, BrIrqFlags flags)
-{
-    return br_syscall(BR_SC_IRQ, task, irq, flags, 0, 0);
-}
-
-BrResult br_drop(BrTask task, BrCap cap)
-{
-    return br_syscall(BR_SC_DROP, task, cap, 0, 0, 0);
-}
-
-BrResult br_close(BrHandle handle)
-{
-    return br_syscall(BR_SC_CLOSE, handle, 0, 0, 0, 0);
+    return br_syscall(BR_SC_CLOSE, (BrArg)args, 0, 0, 0, 0);
 }
