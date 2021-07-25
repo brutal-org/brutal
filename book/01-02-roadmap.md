@@ -20,18 +20,14 @@
 ## Milestone 2 - Userspace
 
 - [ ] Syscalls
-  - [x] noop
   - [x] log
-  - [x] space
-  - [x] mobj
   - [x] map
   - [x] alloc
   - [x] unmap
-  - [x] task
+  - [x] create
   - [x] start
   - [x] exit
-  - [ ] send
-  - [ ] recv
+  - [ ] ipc
   - [ ] irq
   - [x] drop
   - [x] close
