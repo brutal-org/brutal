@@ -30,7 +30,7 @@ void task_destroy(Task *task)
     alloc_free(alloc_global(), task);
 }
 
-TaskCreateResult task_create(Str name, Space *space, BrTaskFlags flags)
+TaskCreateResult task_create(Str name, Space *space, BrCap caps, BrTaskFlags flags)
 {
     log("Creating Task({})...", name);
 
@@ -39,6 +39,7 @@ TaskCreateResult task_create(Str name, Space *space, BrTaskFlags flags)
     task->name = str_cast_fix(StrFix128, name);
     task->flags = flags;
 
+    task->caps = caps;
     task->context = context_create();
     space_ref(space);
     task->space = space;
@@ -188,7 +189,7 @@ void idle(void)
 Task *tasking_create_idle(void)
 {
     auto space = space_create(BR_SPACE_NONE);
-    auto task = UNWRAP(task_create(str_cast("idle"), space, BR_TASK_NONE));
+    auto task = UNWRAP(task_create(str_cast("idle"), space, BR_CAP_NONE, BR_TASK_NONE));
 
     context_start(task->context, (uintptr_t)idle, task->sp, (BrTaskArgs){}, task->flags);
     task->state = TASK_STATE_IDLE;
@@ -199,7 +200,7 @@ Task *tasking_create_idle(void)
 Task *tasking_create_boot(void)
 {
     auto space = space_create(BR_SPACE_NONE);
-    auto task = UNWRAP(task_create(str_cast("boot"), space, BR_TASK_NONE));
+    auto task = UNWRAP(task_create(str_cast("boot"), space, BR_CAP_NONE, BR_TASK_NONE));
     space_deref(space);
     task_start(task, 0, 0, (BrTaskArgs){});
     task->is_running = true;
@@ -239,7 +240,7 @@ static inline void finalizer(void)
 void tasking_create_finalizer(void)
 {
     auto space = space_create(BR_SPACE_NONE);
-    auto task = UNWRAP(task_create(str_cast("finalizer"), space, BR_TASK_NONE));
+    auto task = UNWRAP(task_create(str_cast("finalizer"), space, BR_CAP_NONE, BR_TASK_NONE));
     space_deref(space);
     task_start(task, (uintptr_t)finalizer, task->sp, (BrTaskArgs){});
     task_deref(task);

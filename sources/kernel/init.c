@@ -91,7 +91,7 @@ void init_start(Handover *handover)
     assert_truth(elf_supported(elf_header, elf_module->size));
 
     auto space = space_create(BR_SPACE_NONE);
-    Task *task = UNWRAP(task_create(name, space, BR_TASK_USER));
+    Task *task = UNWRAP(task_create(name, space, BR_CAP_ALL, BR_TASK_USER));
     space_deref(space);
 
     elf_load_program(task, elf_header, elf_obj);

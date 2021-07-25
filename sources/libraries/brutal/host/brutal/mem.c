@@ -15,18 +15,21 @@ Error host_mem_acquire(size_t size, void **out_result, MAYBE_UNUSED enum host_me
 {
     // Create the memory object
 
-    BrMObjArgs mobj_args = {
-        .size = size,
+    BrCreateArgs mobj_args = {
+        .type = BR_OBJECT_MEMORY,
+        .mem_obj = {
+            .size = size,
+        },
     };
 
-    BrResult result = br_mobj(&mobj_args);
+    BrResult result = br_create(&mobj_args);
 
     if (result != BR_SUCCESS)
     {
         return br_result_to_error(result);
     }
 
-    BrMObj mobj = mobj_args.mobj;
+    BrMObj mobj = mobj_args.mem_obj_handle;
 
     // Map the memory object
 

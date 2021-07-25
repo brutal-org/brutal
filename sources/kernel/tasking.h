@@ -70,7 +70,7 @@ typedef Result(BrResult, Task *) TaskCreateResult;
 
 Task *task_self(void);
 
-TaskCreateResult task_create(Str name, Space *space, BrTaskFlags flags);
+TaskCreateResult task_create(Str name, Space *space, BrCap caps, BrTaskFlags flags);
 
 void task_ref(Task *self);
 

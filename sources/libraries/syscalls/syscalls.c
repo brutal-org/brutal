@@ -20,16 +20,6 @@ BrResult br_log(BrLogArgs *args)
     return br_syscall(BR_SC_LOG, (BrArg)args, 0, 0, 0, 0);
 }
 
-BrResult br_space(BrSpaceArgs *args)
-{
-    return br_syscall(BR_SC_SPACE, (BrArg)args, 0, 0, 0, 0);
-}
-
-BrResult br_mobj(BrMObjArgs *args)
-{
-    return br_syscall(BR_SC_MOBJ, (BrArg)args, 0, 0, 0, 0);
-}
-
 BrResult br_map(BrMapArgs *args)
 {
     return br_syscall(BR_SC_MAP, (BrArg)args, 0, 0, 0, 0);

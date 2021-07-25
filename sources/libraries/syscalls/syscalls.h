@@ -21,24 +21,6 @@ SYSCALL(log) (BrLogArgs* args);
 typedef struct
 {
     BrSpace space;
-    BrSpaceFlags flags;
-} BrSpaceArgs;
-
-SYSCALL(space) (BrSpaceArgs* args);
-
-typedef struct
-{
-    BrMObj mobj;
-    uintptr_t addr;
-    size_t size;
-    BrMObjFlags flags;
-} BrMObjArgs;
-
-SYSCALL(mobj) (BrMObjArgs* args);
-
-typedef struct
-{
-    BrSpace space;
     BrMObj mobj;
     size_t offset;
     size_t size;
@@ -57,12 +39,46 @@ typedef struct
 
 SYSCALL(unmap) (BrUnmapArgs* args);
 
+
 typedef struct
 {
-    BrTask task;
     StrFix128 name;
     BrSpace space;
+    BrCap caps;
     BrTaskFlags flags;
+} BrCreateTaskArgs;
+
+typedef struct
+{
+    uintptr_t addr;
+    size_t size;
+    BrMObjFlags flags;
+} BrCreateMemObjArgs;
+
+typedef struct
+{
+    BrSpaceFlags flags;
+} BrCreateSpaceArgs;
+
+typedef struct
+{
+    BrObjectType type;
+
+    union
+    {
+        BrHandle handle;
+
+        BrTask task_handle;
+        BrMObj mem_obj_handle;
+        BrSpace space_handle;
+    };
+
+    union
+    {
+        BrCreateTaskArgs task;
+        BrCreateMemObjArgs mem_obj;
+        BrCreateSpaceArgs space;
+    };
 } BrCreateArgs;
 
 SYSCALL(create) (BrCreateArgs* args);

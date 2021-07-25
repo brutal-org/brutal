@@ -6,8 +6,6 @@
 
 #define FOREACH_SYSCALLS(SYSCALL) \
     SYSCALL(LOG)                  \
-    SYSCALL(SPACE)                \
-    SYSCALL(MOBJ)                 \
     SYSCALL(MAP)                  \
     SYSCALL(UNMAP)                \
     SYSCALL(CREATE)               \
@@ -118,6 +116,16 @@ static inline Error br_result_to_error(BrResult result)
         return ERR_UNDEFINED;
     }
 }
+
+typedef enum
+{
+    BR_OBJECT_NONE,
+
+    BR_OBJECT_MEMORY,
+    BR_OBJECT_DOMAIN,
+    BR_OBJECT_SPACE,
+    BR_OBJECT_TASK,
+} BrObjectType;
 
 typedef uint64_t BrArg;
 

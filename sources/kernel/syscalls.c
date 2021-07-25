@@ -18,49 +18,6 @@ BrResult sys_log(BrLogArgs *args)
     return BR_SUCCESS;
 }
 
-BrResult sys_space(BrSpaceArgs *args)
-{
-    auto space = space_create(args->flags);
-
-    domain_add(task_self()->domain, base_cast(space));
-    args->space = space->base.handle;
-    space_deref(space);
-
-    return BR_SUCCESS;
-}
-
-BrResult sys_mobj(BrMObjArgs *args)
-{
-    MemObj *mobj = nullptr;
-
-    if (args->flags & BR_MOBJ_PMM)
-    {
-        if (!(task_self()->caps & BR_CAP_PMM))
-        {
-            return BR_BAD_CAPABILITY;
-        }
-
-        mobj = mem_obj_pmm((PmmRange){args->addr, args->size}, MEM_OBJ_NONE);
-    }
-    else
-    {
-        auto heap_result = heap_alloc(args->size);
-
-        if (!heap_result.success)
-        {
-            return heap_result._error;
-        }
-
-        mobj = mem_obj_heap(UNWRAP(heap_result), MEM_OBJ_OWNING);
-    }
-
-    domain_add(task_self()->domain, base_cast(mobj));
-    args->mobj = mobj->base.handle;
-    mem_obj_deref(mobj);
-
-    return BR_SUCCESS;
-}
-
 BrResult sys_map(BrMapArgs *args)
 {
     Space *space = nullptr;
@@ -127,13 +84,8 @@ BrResult sys_unmap(BrUnmapArgs *args)
     return BR_SUCCESS;
 }
 
-BrResult sys_create(BrCreateArgs *args)
+BrResult sys_create_task(BrTask *handle, BrCreateTaskArgs *args)
 {
-    if (!(task_self()->caps & BR_CAP_TASK))
-    {
-        return BR_BAD_CAPABILITY;
-    }
-
     Space *space = nullptr;
 
     if (args->space == BR_SPACE_SELF)
@@ -151,17 +103,87 @@ BrResult sys_create(BrCreateArgs *args)
         return BR_BAD_HANDLE;
     }
 
-    auto task = UNWRAP(task_create(str_cast("user-task"), space, args->flags | BR_TASK_USER));
+    auto task = UNWRAP(task_create(
+        str_cast(&args->name),
+        space,
+        args->caps & task_self()->caps,
+        args->flags | BR_TASK_USER));
 
     domain_add(task_self()->domain, base_cast(task));
 
     space_deref(space);
 
-    args->task = task->base.handle;
+    *handle = task->base.handle;
 
     task_deref(task);
 
     return BR_SUCCESS;
+}
+
+BrResult sys_create_mem_obj(BrMObj *handle, BrCreateMemObjArgs *args)
+{
+    MemObj *mobj = nullptr;
+
+    if (args->flags & BR_MOBJ_PMM)
+    {
+        if (!(task_self()->caps & BR_CAP_PMM))
+        {
+            return BR_BAD_CAPABILITY;
+        }
+
+        mobj = mem_obj_pmm((PmmRange){args->addr, args->size}, MEM_OBJ_NONE);
+    }
+    else
+    {
+        auto heap_result = heap_alloc(args->size);
+
+        if (!heap_result.success)
+        {
+            return heap_result._error;
+        }
+
+        mobj = mem_obj_heap(UNWRAP(heap_result), MEM_OBJ_OWNING);
+    }
+
+    domain_add(task_self()->domain, base_cast(mobj));
+    *handle = mobj->base.handle;
+    mem_obj_deref(mobj);
+
+    return BR_SUCCESS;
+}
+
+BrResult sys_create_space(BrSpace *handle, BrCreateSpaceArgs *args)
+{
+    auto space = space_create(args->flags);
+
+    domain_add(task_self()->domain, base_cast(space));
+    *handle = space->base.handle;
+    space_deref(space);
+
+    return BR_SUCCESS;
+}
+
+BrResult sys_create(BrCreateArgs *args)
+{
+    if (!(task_self()->caps & BR_CAP_TASK))
+    {
+        return BR_BAD_CAPABILITY;
+    }
+
+    switch (args->type)
+    {
+    case BR_OBJECT_TASK:
+        return sys_create_task(&args->task_handle, &args->task);
+
+    case BR_OBJECT_SPACE:
+        return sys_create_space(&args->space_handle, &args->space);
+
+    case BR_OBJECT_MEMORY:
+        return sys_create_mem_obj(&args->mem_obj_handle, &args->mem_obj);
+
+    default:
+        return BR_BAD_ARGUMENTS;
+    }
 }
 
 BrResult sys_start(BrStartArgs *args)
@@ -265,8 +287,6 @@ typedef BrResult BrSyscallFn();
 
 BrSyscallFn *syscalls[BR_SYSCALL_COUNT] = {
     [BR_SC_LOG] = sys_log,
-    [BR_SC_SPACE] = sys_space,
-    [BR_SC_MOBJ] = sys_mobj,
     [BR_SC_MAP] = sys_map,
     [BR_SC_UNMAP] = sys_unmap,
     [BR_SC_CREATE] = sys_create,
