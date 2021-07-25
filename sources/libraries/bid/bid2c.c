@@ -116,17 +116,17 @@ void bid2c(BidInterface const *interface, IoWriter *writer)
 
     print(writer, "/* --- Messages ------------------------------------------------------------- */\n\n");
 
-    vec_foreach(methode, &interface->methodes)
+    vec_foreach(method, &interface->methods)
     {
         print(writer, "typedef ");
-        gen_type(interface, &methode.request, writer);
-        print(writer, " {}{}Request;\n", interface->name, methode.name);
+        gen_type(interface, &method.request, writer);
+        print(writer, " {}{}Request;\n", interface->name, method.name);
 
         print(writer, "\n");
 
         print(writer, "typedef ");
-        gen_type(interface, &methode.response, writer);
-        print(writer, " {}{}Response;\n", interface->name, methode.name);
+        gen_type(interface, &method.response, writer);
+        print(writer, " {}{}Response;\n", interface->name, method.name);
 
         print(writer, "\n");
     }
@@ -144,10 +144,10 @@ void bid2c(BidInterface const *interface, IoWriter *writer)
     print(writer, "{}_INVALID,\n", interface->name);
     print(writer, "{}_ERROR,\n", interface->name);
 
-    vec_foreach(methode, &interface->methodes)
+    vec_foreach(method, &interface->methods)
     {
-        print(writer, "{}_{}_REQUEST,\n", interface->name, methode.name);
-        print(writer, "{}_{}_RESPONSE,\n", interface->name, methode.name);
+        print(writer, "{}_{}_REQUEST,\n", interface->name, method.name);
+        print(writer, "{}_{}_RESPONSE,\n", interface->name, method.name);
     }
 
     vec_foreach(event, &interface->events)
@@ -171,10 +171,10 @@ void bid2c(BidInterface const *interface, IoWriter *writer)
         print(writer, "{}{}Event {}_event;\n", interface->name, event.name, event.name);
     }
 
-    vec_foreach(methode, &interface->methodes)
+    vec_foreach(method, &interface->methods)
     {
-        print(writer, "{}{}Request {}_request;\n", interface->name, methode.name, methode.name);
-        print(writer, "{}{}Response {}_response;\n", interface->name, methode.name, methode.name);
+        print(writer, "{}{}Request {}_request;\n", interface->name, method.name, method.name);
+        print(writer, "{}{}Response {}_response;\n", interface->name, method.name, method.name);
     }
 
     print(writer, "}};\n");

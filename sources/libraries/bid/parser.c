@@ -186,7 +186,7 @@ static BidEvent parse_event(Scan *scan, Alloc *alloc)
     return event;
 }
 
-static BidMethod parse_methode(Scan *scan, Alloc *alloc)
+static BidMethod parse_method(Scan *scan, Alloc *alloc)
 {
     BidMethod method = {};
 
@@ -213,7 +213,7 @@ BidInterface bid_parse(Scan *scan, Alloc *alloc)
 
     vec_init(&interface.aliases, alloc);
     vec_init(&interface.events, alloc);
-    vec_init(&interface.methodes, alloc);
+    vec_init(&interface.methods, alloc);
 
     skip_comment_and_space(scan);
 
@@ -249,7 +249,7 @@ BidInterface bid_parse(Scan *scan, Alloc *alloc)
         else if (scan_skip_word(scan, str_cast("method")))
         {
             skip_comment_and_space(scan);
-            vec_push(&interface.methodes, parse_methode(scan, alloc));
+            vec_push(&interface.methods, parse_method(scan, alloc));
         }
         else
         {

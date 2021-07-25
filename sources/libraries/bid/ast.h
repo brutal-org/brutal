@@ -77,5 +77,5 @@ typedef struct
     BidEnum errors;
     Vec(BidAlias) aliases;
     Vec(BidEvent) events;
-    Vec(BidMethod) methodes;
+    Vec(BidMethod) methods;
 } BidInterface;
