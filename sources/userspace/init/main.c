@@ -4,7 +4,9 @@
 
 int br_entry(MAYBE_UNUSED Handover *handover)
 {
-    log("Hello, world!");
+    log("Handover at {#p}", (void *)handover);
+
+    handover_dump(handover);
 
     while (1)
     {

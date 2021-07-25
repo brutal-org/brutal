@@ -20,6 +20,7 @@ BrResult sys_log(BrLogArgs *args)
 
 BrResult sys_map(BrMapArgs *args)
 {
+    BrResult result = BR_SUCCESS;
     Space *space = nullptr;
 
     if (args->space == BR_SPACE_SELF)
@@ -51,11 +52,15 @@ BrResult sys_map(BrMapArgs *args)
     {
         args->vaddr = UNWRAP(map_result).base;
     }
+    else
+    {
+        result = map_result._error;
+    }
 
     mem_obj_deref(mobj);
     space_deref(space);
 
-    return map_result._error;
+    return result;
 }
 
 BrResult sys_unmap(BrUnmapArgs *args)
@@ -300,7 +305,7 @@ BrSyscallFn *syscalls[BR_SYSCALL_COUNT] = {
 
 BrResult syscall_dispatch(BrSyscall syscall, BrArg args)
 {
-    log("Syscall: {}({#p})", str_cast(br_syscall_to_string(syscall)), args);
+    //log("Syscall: {}({#p})", str_cast(br_syscall_to_string(syscall)), args);
 
     if (syscall >= BR_SYSCALL_COUNT)
     {
@@ -311,7 +316,10 @@ BrResult syscall_dispatch(BrSyscall syscall, BrArg args)
 
     auto result = syscalls[syscall](args);
 
-    log("Syscall: {}({#p}) -> {}", str_cast(br_syscall_to_string(syscall)), args, str_cast(br_result_to_string(result)));
+    if (result != BR_SUCCESS)
+    {
+        log("Syscall: {}({#p}) -> {}", str_cast(br_syscall_to_string(syscall)), args, str_cast(br_result_to_string(result)));
+    }
 
     task_end_syscall(task_self());
 

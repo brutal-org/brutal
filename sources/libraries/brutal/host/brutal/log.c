@@ -5,13 +5,18 @@
 #include <syscalls/syscalls.h>
 
 static bool initialized = false;
-static Lock lock;
-static Buffer buffer;
-static IoWriter log;
+static Lock lock = {};
+static Buffer buffer = {};
+static IoWriter log = {};
 
 void host_log_lock(void)
 {
     lock_acquire(&lock);
+}
+
+void host_log_unlock(void)
+{
+    lock_release(&lock);
 }
 
 static IoWriteResult host_log_write(MAYBE_UNUSED IoWriter *writer, char const *data, size_t size)
@@ -44,11 +49,6 @@ IoWriter *host_log_writer(void)
     }
 
     return &log;
-}
-
-void host_log_unlock(void)
-{
-    lock_release(&lock);
 }
 
 void host_log_panic(void)

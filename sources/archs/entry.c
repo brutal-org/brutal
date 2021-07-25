@@ -1,4 +1,5 @@
 
+#include <brutal/log.h>
 #include <syscalls/syscalls.h>
 
 __attribute__((weak)) int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char **argv, MAYBE_UNUSED char **envp)

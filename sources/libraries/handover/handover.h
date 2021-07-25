@@ -45,7 +45,7 @@ typedef struct
 
 typedef struct
 {
-    size_t module_count;
+    size_t size;
 #define MAX_MODULE_COUNT 16
     HandoverModule module[MAX_MODULE_COUNT];
 } HandoverModules;
@@ -59,3 +59,5 @@ typedef struct
 } Handover;
 
 HandoverModule *handover_find_module(Handover *handover, Str name);
+
+void handover_dump(Handover *handover);

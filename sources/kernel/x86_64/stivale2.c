@@ -95,15 +95,15 @@ static void fill_handover_rsdp(Handover *target, struct stivale2_struct_tag_rsdp
 void fill_handover_framebuffer(Handover *target, struct stivale2_struct_tag_framebuffer *framebuffer)
 {
     target->framebuffer.has_framebuffer = true;
+    target->framebuffer.addr = framebuffer->framebuffer_addr;
     target->framebuffer.width = framebuffer->framebuffer_width;
     target->framebuffer.height = framebuffer->framebuffer_height;
-    target->framebuffer.height = framebuffer->framebuffer_bpp;
-    target->framebuffer.addr = framebuffer->framebuffer_addr;
+    target->framebuffer.bpp = framebuffer->framebuffer_bpp;
 }
 
 void fill_handover_modules(Handover *target, struct stivale2_struct_tag_modules *modules)
 {
-    target->modules.module_count = modules->module_count;
+    target->modules.size = modules->module_count;
 
     for (size_t i = 0; i < MIN(modules->module_count, MAX_MODULE_COUNT); i++)
     {

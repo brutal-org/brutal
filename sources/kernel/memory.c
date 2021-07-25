@@ -163,7 +163,7 @@ SpaceResult space_map(Space *self, MemObj *mobj, size_t offset, size_t size, uin
 
     if (vaddr == 0)
     {
-        auto range = range_cast(VmmRange, range_alloc_alloc(&self->alloc, size));
+        range = range_cast(VmmRange, range_alloc_alloc(&self->alloc, size));
 
         if (range.size == 0)
         {

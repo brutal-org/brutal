@@ -80,6 +80,17 @@ void init_stack(Task *task)
     mem_obj_deref(obj);
 }
 
+uintptr_t init_pass(Task *task, Handover *handover)
+{
+    auto heap = UNWRAP(heap_alloc(ALIGN_UP(sizeof(Handover), HOST_MEM_PAGESIZE)));
+    mem_cpy((void *)heap.base, handover, sizeof(Handover));
+    auto obj = mem_obj_heap(heap, MEM_OBJ_OWNING);
+    auto addr = UNWRAP(space_map(task->space, obj, 0, 0, 0)).base;
+    mem_obj_deref(obj);
+
+    return addr;
+}
+
 void init_start(Handover *handover)
 {
     auto name = str_cast("init");
@@ -97,11 +108,15 @@ void init_start(Handover *handover)
     elf_load_program(task, elf_header, elf_obj);
 
     // Create the user stack.
-
     init_stack(task);
 
+    range_alloc_dump(&task->space->alloc);
+
+    auto hoaddr = init_pass(task, handover);
+    range_alloc_dump(&task->space->alloc);
+
     init = task->base.handle;
-    task_start(task, elf_header->entry, USER_STACK_BASE, (BrTaskArgs){});
+    task_start(task, elf_header->entry, USER_STACK_BASE, (BrTaskArgs){.arg1 = hoaddr});
 
     mem_obj_deref(elf_obj);
 }
