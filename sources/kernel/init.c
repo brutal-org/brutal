@@ -4,6 +4,7 @@
 #include "kernel/heap.h"
 #include "kernel/init.h"
 #include "kernel/kernel.h"
+#include "kernel/mmap.h"
 
 static bool elf_supported(Elf64Header const *header, size_t data_size)
 {
@@ -96,8 +97,8 @@ void init_start(Handover *handover)
     auto name = str_cast("init");
 
     auto elf_module = handover_find_module(handover, name);
-    auto elf_header = (Elf64Header *)elf_module->addr;
-    auto elf_obj = mem_obj_heap((HeapRange){elf_module->addr, elf_module->size}, MEM_OBJ_NONE);
+    auto elf_header = (Elf64Header *)mmap_phys_to_io(elf_module->addr);
+    auto elf_obj = mem_obj_pmm((HeapRange){elf_module->addr, elf_module->size}, MEM_OBJ_NONE);
 
     assert_truth(elf_supported(elf_header, elf_module->size));
 

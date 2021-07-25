@@ -28,11 +28,12 @@ void handover_dump(Handover *handover)
 
     log("Framebuffer:");
 
-    if (handover->framebuffer.has_framebuffer)
+    if (handover->framebuffer.present)
     {
         log("\tAddress: {#p}", handover->framebuffer.addr);
         log("\tWidth: {}", handover->framebuffer.width);
         log("\tHeight: {}", handover->framebuffer.height);
+        log("\tPitch: {}", handover->framebuffer.pitch);
         log("\tBpp: {}", handover->framebuffer.bpp);
     }
     else

@@ -29,11 +29,12 @@ typedef struct
 
 typedef struct
 {
-    bool has_framebuffer;
-    uint16_t width;
-    uint16_t height;
-    uint16_t bpp;
+    bool present;
     uintptr_t addr;
+    uint32_t width;
+    uint32_t height;
+    uint32_t pitch;
+    uint32_t bpp;
 } HandoverFramebuffer;
 
 typedef struct

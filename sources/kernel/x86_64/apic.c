@@ -1,12 +1,12 @@
 #include <brutal/base.h>
 #include <brutal/log.h>
+#include "kernel/mmap.h"
 #include "kernel/mmio.h"
 #include "kernel/x86_64/acpi.h"
 #include "kernel/x86_64/apic.h"
 #include "kernel/x86_64/apic/timer.h"
 #include "kernel/x86_64/asm.h"
 #include "kernel/x86_64/cpu.h"
-#include "kernel/x86_64/memory/mmap.h"
 #include "kernel/x86_64/pic.h"
 
 /* --- Lapic ---------------------------------------------------------------- */

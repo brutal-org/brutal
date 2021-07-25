@@ -1,8 +1,8 @@
 #include <brutal/base.h>
 #include <brutal/log.h>
 #include <brutal/text.h>
+#include "kernel/mmap.h"
 #include "kernel/x86_64/acpi.h"
-#include "kernel/x86_64/memory/mmap.h"
 
 struct acpi_sdth *acpi_rsdt_child(struct acpi_rsdt *rsdt, Str signature)
 {

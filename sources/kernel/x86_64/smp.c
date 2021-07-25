@@ -4,6 +4,7 @@
 #include "kernel/arch.h"
 #include "kernel/heap.h"
 #include "kernel/kernel.h"
+#include "kernel/mmap.h"
 #include "kernel/mmio.h"
 #include "kernel/pmm.h"
 #include "kernel/vmm.h"
@@ -11,7 +12,6 @@
 #include "kernel/x86_64/asm.h"
 #include "kernel/x86_64/cpu.h"
 #include "kernel/x86_64/hpet.h"
-#include "kernel/x86_64/memory/mmap.h"
 #include "kernel/x86_64/smp.h"
 
 atomic_bool cpu_ready = false;

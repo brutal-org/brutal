@@ -4,8 +4,8 @@
 #include <brutal/mem.h>
 #include <brutal/sync.h>
 #include "kernel/arch.h"
+#include "kernel/mmap.h"
 #include "kernel/pmm.h"
-#include "kernel/x86_64/memory/mmap.h"
 
 static Bitmap pmm_bitmap = {};
 static size_t best_bet = 0;

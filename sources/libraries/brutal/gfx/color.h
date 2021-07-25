@@ -24,6 +24,9 @@ typedef struct
 #define GFX_COLOR_RED \
     ((GfxColor){0xff, 0x0, 0x0, 0xff})
 
+#define GFX_COLOR_MAGENTA \
+    ((GfxColor){0xff, 0x0, 0xff, 0xff})
+
 static_assert(sizeof(GfxColor) == sizeof(uint32_t), "GfxColor should fit in an uint32_t");
 
 static inline GfxColor gfx_color_blend(GfxColor fg, GfxColor bg)

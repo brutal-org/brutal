@@ -1,8 +1,8 @@
 #include <brutal/log.h>
 #include <brutal/sync.h>
+#include "kernel/mmap.h"
 #include "kernel/vmm.h"
 #include "kernel/x86_64/asm.h"
-#include "kernel/x86_64/memory/mmap.h"
 #include "kernel/x86_64/paging.h"
 
 static struct pml *kernel_pml = nullptr;

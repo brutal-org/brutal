@@ -1,6 +1,6 @@
 #include "kernel/x86_64/hpet.h"
+#include "kernel/mmap.h"
 #include "kernel/mmio.h"
-#include "kernel/x86_64/memory/mmap.h"
 
 static uintptr_t hpet_base = 0;
 static uint64_t hpet_clock = 0;

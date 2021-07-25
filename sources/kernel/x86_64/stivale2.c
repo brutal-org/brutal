@@ -3,8 +3,8 @@
 #include <brutal/mem.h>
 #include "kernel/arch.h"
 #include "kernel/kernel.h"
+#include "kernel/mmap.h"
 #include "kernel/x86_64/asm.h"
-#include "kernel/x86_64/memory/mmap.h"
 #include "kernel/x86_64/stivale2.h"
 
 static uint8_t stack[KERNEL_STACK_SIZE];
@@ -94,10 +94,11 @@ static void fill_handover_rsdp(Handover *target, struct stivale2_struct_tag_rsdp
 
 void fill_handover_framebuffer(Handover *target, struct stivale2_struct_tag_framebuffer *framebuffer)
 {
-    target->framebuffer.has_framebuffer = true;
-    target->framebuffer.addr = framebuffer->framebuffer_addr;
+    target->framebuffer.present = true;
+    target->framebuffer.addr = mmap_io_to_phys(framebuffer->framebuffer_addr);
     target->framebuffer.width = framebuffer->framebuffer_width;
     target->framebuffer.height = framebuffer->framebuffer_height;
+    target->framebuffer.pitch = framebuffer->framebuffer_pitch;
     target->framebuffer.bpp = framebuffer->framebuffer_bpp;
 }
 
@@ -107,8 +108,8 @@ void fill_handover_modules(Handover *target, struct stivale2_struct_tag_modules 
 
     for (size_t i = 0; i < MIN(modules->module_count, MAX_MODULE_COUNT); i++)
     {
-        target->modules.module[i].addr = modules->modules[i].begin;
-        target->modules.module[i].size = modules->modules[i].end - modules->modules[i].begin;
+        target->modules.module[i].addr = mmap_io_to_phys(modules->modules[i].begin);
+        target->modules.module[i].size = ALIGN_UP(modules->modules[i].end - modules->modules[i].begin, HOST_MEM_PAGESIZE);
 
         target->modules.module[i].module_name = str_cast_fix(StrFix128, modules->modules[i].string);
     }
