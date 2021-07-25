@@ -18,7 +18,7 @@ static void display_bootimage(Handover *handover)
         .mem_obj = {
             .addr = fb->addr,
             .size = fb_size,
-            .flags = BR_MOBJ_PMM,
+            .flags = BR_MEM_OBJ_PMM,
         },
     };
 
@@ -26,7 +26,7 @@ static void display_bootimage(Handover *handover)
 
     BrMapArgs fb_map = {
         .space = BR_SPACE_SELF,
-        .mobj = fb_obj.handle,
+        .mem_obj = fb_obj.handle,
         .flags = BR_MEM_WRITABLE,
     };
 
@@ -51,7 +51,7 @@ static void display_bootimage(Handover *handover)
         .mem_obj = {
             .addr = img->addr,
             .size = img->size,
-            .flags = BR_MOBJ_PMM,
+            .flags = BR_MEM_OBJ_PMM,
         },
     };
 
@@ -59,7 +59,7 @@ static void display_bootimage(Handover *handover)
 
     BrMapArgs img_map = {
         .space = BR_SPACE_SELF,
-        .mobj = img_obj.handle,
+        .mem_obj = img_obj.handle,
         .flags = BR_MEM_WRITABLE,
     };
 

@@ -1,5 +1,4 @@
-
-## syscalls 
+## Syscalls
 
 The kernel syscalls are defined in the file `librairies/syscalls/syscalls.h`.
 
@@ -13,8 +12,8 @@ The syscall does nothing and always returns `BR_SUCCESS`.
 
 ### br_log
 
-- Arguments: 
-  - `const char* message`: message to be displayed. 
+- Arguments:
+  - `const char* message`: message to be displayed.
   - `size_t size`: size of the message.
 
 - Result:
@@ -40,10 +39,10 @@ This syscall creates a new address space. If there is an error during the creat
 ### br_mobj
 
 - Arguments: 
-  - (out) `BrMObj* mobj`: handle of the mobj if created successfully, or `BR_MOBJ_ERROR`.
-  - `uintptr_t addr`: physical address of the MOBJ if `BR_MOBJ_PMM` is set.
+  - (out) `BrMemObj* mobj`: handle of the mobj if created successfully, or `BR_MOBJ_ERROR`.
+  - `uintptr_t addr`: physical address of the MOBJ if `BR_MEM_OBJ_PMM` is set.
   - `size_t size`: size of the MOBJ. 
-  - `BrMObjFlags flags`.
+  - `BrMemObjFlags flags`.
 
 - Result:
   - `BR_SUCCESS`: The mobj was created successfully.
@@ -51,7 +50,7 @@ This syscall creates a new address space. If there is an error during the creat
   - `BR_BAD_CAPABILITY`: The task doesn't have the required capabilities.
   - `BR_OUT_OF_MEMORY`: There was not enough memory to complete the operation.
 
-This syscall creates a new virtual memory object that can be passed across multiples address spaces. It returns the created object in `mobj` or `BR_MOBJ_ERROR` if there is an error during the creation of the MOBJ. The physical address may be `addr` if `BR_MOBJ_PMM` flag is set. 
+This syscall creates a new virtual memory object that can be passed across multiples address spaces. It returns the created object in `mobj` or `BR_MOBJ_ERROR` if there is an error during the creation of the MOBJ. The physical address may be `addr` if `BR_MEM_OBJ_PMM` flag is set. 
 
 ### br_map
 
@@ -72,7 +71,7 @@ This syscall map a Mobj into a target address space.
 
 - Arguments:
   - `BrSpace space`: Address space where the mobj will be mapped.
-  - `BrMObj mobj`: MOBJ that will be mapped into the address space.
+  - `BrMemObj mobj`: MOBJ that will be mapped into the address space.
   - (out) `uintptr_t vaddr`: Address where the MOBJ is mapped.
   - `BrMemFlags flags`: Access flags.
 

@@ -98,3 +98,4 @@ typedef struct PACKED
 } Elf64ProgramHeader;
 
 bool elf_validate(const Elf64Header *header);
+

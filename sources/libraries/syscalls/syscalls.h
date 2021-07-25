@@ -21,7 +21,7 @@ SYSCALL(log) (BrLogArgs* args);
 typedef struct
 {
     BrSpace space;
-    BrMObj mobj;
+    BrMemObj mem_obj;
     size_t offset;
     size_t size;
     uintptr_t vaddr;
@@ -52,7 +52,7 @@ typedef struct
 {
     uintptr_t addr;
     size_t size;
-    BrMObjFlags flags;
+    BrMemObjFlags flags;
 } BrCreateMemObjArgs;
 
 typedef struct
@@ -69,7 +69,7 @@ typedef struct
         BrHandle handle;
 
         BrTask task_handle;
-        BrMObj mem_obj_handle;
+        BrMemObj mem_obj_handle;
         BrSpace space_handle;
     };
 

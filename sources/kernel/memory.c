@@ -145,14 +145,14 @@ void space_switch(Space *self)
     vmm_space_switch(self->vmm);
 }
 
-SpaceResult space_map(Space *self, MemObj *mobj, size_t offset, size_t size, uintptr_t vaddr)
+SpaceResult space_map(Space *self, MemObj *mem_obj, size_t offset, size_t size, uintptr_t vaddr)
 {
     if (size == 0)
     {
-        size = mem_obj_size(mobj);
+        size = mem_obj_size(mem_obj);
     }
 
-    if (offset + size > mem_obj_size(mobj))
+    if (offset + size > mem_obj_size(mem_obj))
     {
         return ERR(SpaceResult, BR_BAD_ARGUMENTS);
     }
@@ -176,7 +176,7 @@ SpaceResult space_map(Space *self, MemObj *mobj, size_t offset, size_t size, uin
         range_alloc_used(&self->alloc, range_cast(USizeRange, range));
     }
 
-    memory_mapping_create(self, mobj, offset, range);
+    memory_mapping_create(self, mem_obj, offset, range);
 
     return OK(SpaceResult, range);
 }

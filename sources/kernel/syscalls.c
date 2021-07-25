@@ -38,15 +38,15 @@ BrResult sys_map(BrMapArgs *args)
         return BR_BAD_HANDLE;
     }
 
-    MemObj *mobj = (MemObj *)domain_lookup(task_self()->domain, args->mobj, OBJECT_MEMORY);
+    MemObj *mem_obj = (MemObj *)domain_lookup(task_self()->domain, args->mem_obj, OBJECT_MEMORY);
 
-    if (mobj == nullptr)
+    if (mem_obj == nullptr)
     {
         space_deref(space);
         return BR_BAD_HANDLE;
     }
 
-    auto map_result = space_map(space, mobj, args->offset, args->size, args->vaddr);
+    auto map_result = space_map(space, mem_obj, args->offset, args->size, args->vaddr);
 
     if (map_result.success)
     {
@@ -57,7 +57,7 @@ BrResult sys_map(BrMapArgs *args)
         result = map_result._error;
     }
 
-    mem_obj_deref(mobj);
+    mem_obj_deref(mem_obj);
     space_deref(space);
 
     return result;
@@ -125,18 +125,18 @@ BrResult sys_create_task(BrTask *handle, BrCreateTaskArgs *args)
     return BR_SUCCESS;
 }
 
-BrResult sys_create_mem_obj(BrMObj *handle, BrCreateMemObjArgs *args)
+BrResult sys_create_mem_obj(BrMemObj *handle, BrCreateMemObjArgs *args)
 {
-    MemObj *mobj = nullptr;
+    MemObj *mem_obj = nullptr;
 
-    if (args->flags & BR_MOBJ_PMM)
+    if (args->flags & BR_MEM_OBJ_PMM)
     {
         if (!(task_self()->caps & BR_CAP_PMM))
         {
             return BR_BAD_CAPABILITY;
         }
 
-        mobj = mem_obj_pmm((PmmRange){args->addr, args->size}, MEM_OBJ_NONE);
+        mem_obj = mem_obj_pmm((PmmRange){args->addr, args->size}, MEM_OBJ_NONE);
     }
     else
     {
@@ -147,12 +147,12 @@ BrResult sys_create_mem_obj(BrMObj *handle, BrCreateMemObjArgs *args)
             return heap_result._error;
         }
 
-        mobj = mem_obj_heap(UNWRAP(heap_result), MEM_OBJ_OWNING);
+        mem_obj = mem_obj_heap(UNWRAP(heap_result), MEM_OBJ_OWNING);
     }
 
-    domain_add(task_self()->domain, base_cast(mobj));
-    *handle = mobj->base.handle;
-    mem_obj_deref(mobj);
+    domain_add(task_self()->domain, base_cast(mem_obj));
+    *handle = mem_obj->base.handle;
+    mem_obj_deref(mem_obj);
 
     return BR_SUCCESS;
 }

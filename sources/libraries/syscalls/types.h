@@ -141,16 +141,16 @@ typedef enum
     BR_SPACE_NONE = 0,
 } BrSpaceFlags;
 
-typedef BrHandle BrMObj;
+typedef BrHandle BrMemObj;
 
-#define BR_MOBJ_ERROR ((BrMObj)-1)
+#define BR_MEM_OBJ_ERROR ((BrMemObj)-1)
 
 typedef enum
 {
-    BR_MOBJ_NONE = 0,
+    BR_MEM_OBJ_NONE = 0,
 
-    BR_MOBJ_PMM = 1 << 0,
-} BrMObjFlags;
+    BR_MEM_OBJ_PMM = 1 << 0,
+} BrMemObjFlags;
 
 typedef enum
 {
@@ -202,6 +202,8 @@ typedef enum
     BR_IPC_NONE = 0,
 
     BR_IPC_BLOCK = 1 << 0,
+    BR_IPC_SEND = 1 << 1,
+    BR_IPC_RECV = 1 << 2,
 } BrIpcFlags;
 
 typedef uint64_t BrIrq;

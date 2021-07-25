@@ -15,27 +15,27 @@ Error host_mem_acquire(size_t size, void **out_result, MAYBE_UNUSED enum host_me
 {
     // Create the memory object
 
-    BrCreateArgs mobj_args = {
+    BrCreateArgs mem_obj_args = {
         .type = BR_OBJECT_MEMORY,
         .mem_obj = {
             .size = size,
         },
     };
 
-    BrResult result = br_create(&mobj_args);
+    BrResult result = br_create(&mem_obj_args);
 
     if (result != BR_SUCCESS)
     {
         return br_result_to_error(result);
     }
 
-    BrMObj mobj = mobj_args.mem_obj_handle;
+    BrMemObj mem_obj = mem_obj_args.mem_obj_handle;
 
     // Map the memory object
 
     BrMapArgs map_args = {
         .space = BR_SPACE_SELF,
-        .mobj = mobj,
+        .mem_obj = mem_obj,
         .flags = BR_MEM_WRITABLE,
     };
 
@@ -44,7 +44,7 @@ Error host_mem_acquire(size_t size, void **out_result, MAYBE_UNUSED enum host_me
     // Cleanup and return
 
     br_close(&(BrCloseArgs){
-        .handle = mobj,
+        .handle = mem_obj,
     });
 
     if (result != BR_SUCCESS)
