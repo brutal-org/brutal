@@ -17,7 +17,8 @@ INC_LIBS= \
 	-Isources/libraries/ansi \
 	-Isources/libraries/posix \
 	-Isources/libraries/bsd \
-	-Isources/libraries/gnu
+	-Isources/libraries/gnu \
+	-Isources/libraries/math
 
 INC_LIBBRUTAL= \
 	-Isources/libraries/
