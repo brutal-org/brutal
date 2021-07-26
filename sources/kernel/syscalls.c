@@ -9,6 +9,7 @@
 BrResult sys_log(BrLogArgs *args)
 {
     host_log_lock();
+    print(host_log_writer(), "{}({}) ", str_cast(&task_self()->name), task_self()->base.handle);
     io_write(host_log_writer(), args->message, args->size);
     host_log_unlock();
 
@@ -137,14 +138,14 @@ BrResult sys_create_mem_obj(BrMemObj *handle, BrCreateMemObjArgs *args)
     }
     else
     {
-        auto heap_result = heap_alloc(args->size);
+        auto pmm_result = pmm_alloc(args->size);
 
-        if (!heap_result.success)
+        if (!pmm_result.success)
         {
-            return heap_result._error;
+            return pmm_result._error;
         }
 
-        mem_obj = mem_obj_heap(UNWRAP(heap_result), MEM_OBJ_OWNING);
+        mem_obj = mem_obj_pmm(UNWRAP(pmm_result), MEM_OBJ_OWNING);
     }
 
     domain_add(task_self()->domain, base_cast(mem_obj));
@@ -300,7 +301,13 @@ BrSyscallFn *syscalls[BR_SYSCALL_COUNT] = {
 
 BrResult syscall_dispatch(BrSyscall syscall, BrArg args)
 {
-    //log("Syscall: {}({#p})", str_cast(br_syscall_to_string(syscall)), args);
+    /*
+        log("Syscall: {}({}).{}({#p})",
+            str_cast(&task_self()->name),
+            task_self()->base.handle,
+            str_cast(br_syscall_to_string(syscall)),
+            args);
+    */
 
     if (syscall >= BR_SYSCALL_COUNT)
     {
@@ -313,7 +320,12 @@ BrResult syscall_dispatch(BrSyscall syscall, BrArg args)
 
     if (result != BR_SUCCESS)
     {
-        log("Syscall: {}({#p}) -> {}", str_cast(br_syscall_to_string(syscall)), args, str_cast(br_result_to_string(result)));
+        log("Syscall: {}({}).{}({#p}) -> {}",
+            str_cast(&task_self()->name),
+            task_self()->base.handle,
+            str_cast(br_syscall_to_string(syscall)),
+            args,
+            str_cast(br_result_to_string(result)));
     }
 
     task_end_syscall(task_self());
