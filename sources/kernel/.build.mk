@@ -17,7 +17,7 @@ KERNEL_LIBS_SRC = \
 			  $(wildcard sources/libraries/brutal/sync/*.c) \
 			  $(wildcard sources/libraries/brutal/ds/*.c) \
 			  $(wildcard sources/libraries/brutal/log/*.c) \
-			  $(wildcard sources/libraries/elf/*.c) \
+			  $(wildcard sources/libraries/elf/elf.c) \
 			  $(wildcard sources/libraries/handover/*.c) \
 			  $(wildcard sources/libraries/ansi/string.c) \
 			  $(wildcard sources/libraries/brutal/host/kernel/*.c) \

@@ -10,7 +10,8 @@ LIBS_SRC = \
 	$(wildcard sources/libraries/brutal/*/*.c) \
 	$(wildcard sources/libraries/brutal/host/brutal/*.c) \
 	$(wildcard sources/libraries/handover/*.c) \
-	$(wildcard sources/libraries/math/*.c)
+	$(wildcard sources/libraries/math/*.c) \
+	$(wildcard sources/libraries/elf/*.c)
 
 LIBS_OBJ = $(patsubst sources/%.c, $(BUILDDIR_CROSS)/%.c.o, $(LIBS_SRC))
 
