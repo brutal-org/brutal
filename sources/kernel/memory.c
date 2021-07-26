@@ -29,6 +29,8 @@ MemObj *mem_obj_heap(HeapRange heap, MemObjFlags flags)
     self->heap = heap;
     object_init(base_cast(self), OBJECT_MEMORY, (ObjectDtor *)mem_obj_destroy);
 
+    log("Created HeapMemObj({}) at {#p}-{#p}", self->base.handle, heap.base, heap.base + heap.size - 1);
+
     return self;
 }
 
@@ -39,6 +41,8 @@ MemObj *mem_obj_pmm(PmmRange pmm, MemObjFlags flags)
     self->flags = flags;
     self->pmm = pmm;
     object_init(base_cast(self), OBJECT_MEMORY, (ObjectDtor *)mem_obj_destroy);
+
+    log("Created PmmMemObj({}) at {#p}-{#p}", self->base.handle, pmm.base, pmm.base + pmm.size - 1);
 
     return self;
 }
@@ -192,6 +196,27 @@ void space_unmap(Space *self, VmmRange range)
             range_alloc_unused(&self->alloc, range_cast(USizeRange, range));
             memory_mapping_destroy(self, mapping);
             return;
+        }
+    }
+}
+
+void space_dump(Space *self)
+{
+    LOCK_RETAINER(&self->lock);
+
+    log("MemorySpace({})", self->base.handle);
+
+    vec_foreach(mapping, &self->mappings)
+    {
+        log("\t{#p}-{#p} ({})", mapping->range.base, mapping->range.base + mapping->range.size - 1, mapping->offset);
+
+        if (mapping->object->type == MEM_OBJ_HEAP)
+        {
+            log("\t ->({}) {#p}-{#p} ({})", mapping->object->base.handle, mapping->object->heap.base, mapping->object->heap.base + mapping->object->heap.size - 1, mapping->object->heap.size);
+        }
+        else
+        {
+            log("\t ->({}) {#p}-{#p} ({})", mapping->object->base.handle, mapping->object->pmm.base, mapping->object->pmm.base + mapping->object->pmm.size - 1, mapping->object->heap.size);
         }
     }
 }
