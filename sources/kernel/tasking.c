@@ -19,7 +19,7 @@ Task *task_self(void)
 
 void task_destroy(Task *task)
 {
-    log("Destroying task({}) {}", task->base.handle, str_cast(&task->name));
+    log("Destroying task {}({})", str_cast(&task->name), task->base.handle);
 
     context_destroy(task->context);
     space_deref(task->space);
@@ -32,7 +32,7 @@ void task_destroy(Task *task)
 
 TaskCreateResult task_create(Str name, Space *space, BrCap caps, BrTaskFlags flags)
 {
-    log("Creating Task({})...", name);
+    log("Creating Task {}...", name);
 
     auto task = alloc_make(alloc_global(), Task);
 
@@ -70,6 +70,8 @@ void task_deref(Task *self)
 void task_start(Task *self, uintptr_t ip, uintptr_t sp, BrTaskArgs args)
 {
     LOCK_RETAINER(&task_lock);
+
+    log("Starting task {}({})", str_cast(&self->name), self->base.handle);
 
     assert_truth(self->state == TASK_STATE_NONE);
 
@@ -287,45 +289,55 @@ void scheduler_unblock(void)
     }
 }
 
+Task *scheduler_pick(Task *next, Task *maybe)
+{
+    if (maybe->state != TASK_STATE_RUNNING || maybe->is_running)
+    {
+        return next;
+    }
+
+    if (next != nullptr && next->last_tick < maybe->last_tick)
+    {
+        return next;
+    }
+
+    return maybe;
+}
+
+Task *scheduler_dequeue(void)
+{
+    Task *next = nullptr;
+
+    vec_foreach(task, &tasks)
+    {
+        next = scheduler_pick(next, task);
+    }
+
+    return next;
+}
+
 void scheduler_update(void)
 {
-    for (size_t i = 0; i < cpu_count(); i++)
+    cpu_self()->current->is_running = false;
+
+    Task *next = scheduler_dequeue();
+
+    if (next == nullptr)
     {
-        Task *current = cpu(i)->current;
-        Task *next = nullptr;
-
-        current->is_running = false;
-
-        vec_foreach(task, &tasks)
-        {
-            if (task->state == TASK_STATE_RUNNING &&
-                !task->is_running &&
-                (next == nullptr || task->last_tick < next->last_tick))
-            {
-                next = task;
-            }
-        }
-
-        if (next == nullptr)
-        {
-            next = cpu(i)->idle;
-        }
-
-        next->last_tick = tick;
-        next->is_running = true;
-
-        cpu(i)->next = next;
+        next = cpu_self()->idle;
     }
+
+    next->last_tick = tick;
+    next->is_running = true;
+
+    cpu_self()->next = next;
 }
 
 void scheduler_switch_other(void)
 {
     for (size_t i = 1; i < cpu_count(); i++)
     {
-        if (cpu(i)->current != cpu(i)->next)
-        {
-            cpu_resched_other(i);
-        }
+        cpu_resched_other(i);
     }
 }
 
@@ -340,7 +352,7 @@ void scheduler_switch(void)
     cpu_self()->current = cpu_self()->next;
 }
 
-void scheduler_schedule_and_switch(void)
+void scheduler_schedule(void)
 {
     tick++;
 
@@ -351,7 +363,25 @@ void scheduler_schedule_and_switch(void)
 
     scheduler_unblock();
     scheduler_update();
+
+    if (cpu_self()->current != cpu_self()->next)
+    {
+        scheduler_switch();
+    }
+
+    lock_release(&task_lock);
+
     scheduler_switch_other();
+}
+
+void scheduler_schedule_other(void)
+{
+    if (!lock_try_acquire(&task_lock))
+    {
+        return;
+    }
+
+    scheduler_update();
 
     if (cpu_self()->current != cpu_self()->next)
     {

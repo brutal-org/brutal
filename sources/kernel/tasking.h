@@ -98,6 +98,6 @@ void tasking_initialize(void);
 
 void scheduler_yield(void);
 
-void scheduler_switch(void);
+void scheduler_schedule(void);
 
-void scheduler_schedule_and_switch(void);
+void scheduler_schedule_other(void);

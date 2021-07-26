@@ -153,13 +153,13 @@ uint64_t interrupt_handler(uint64_t rsp)
     else if (regs->int_no == 32)
     {
         scheduler_save_context(regs);
-        scheduler_schedule_and_switch();
+        scheduler_schedule();
         scheduler_load_context(regs);
     }
     else if (regs->int_no == IPIT_RESCHED)
     {
         scheduler_save_context(regs);
-        scheduler_switch();
+        scheduler_schedule_other();
         scheduler_load_context(regs);
     }
     else if (regs->int_no == IPIT_STOP)
