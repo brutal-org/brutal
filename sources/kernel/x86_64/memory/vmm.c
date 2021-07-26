@@ -1,5 +1,6 @@
 #include <brutal/log.h>
 #include <brutal/sync.h>
+#include "kernel/heap.h"
 #include "kernel/mmap.h"
 #include "kernel/vmm.h"
 #include "kernel/x86_64/asm.h"
@@ -42,12 +43,12 @@ static VmmResult vmm_get_pml_or_alloc(struct pml *table, size_t idx, size_t flag
     }
     else
     {
-        uintptr_t target = TRY(VmmResult, pmm_alloc(HOST_MEM_PAGESIZE)).base;
+        uintptr_t target = TRY(VmmResult, heap_alloc(HOST_MEM_PAGESIZE)).base;
 
-        mem_set((void *)mmap_phys_to_io(target), 0, HOST_MEM_PAGESIZE);
-        table->entries[idx] = pml_make_entry(target, flags);
+        mem_set((void *)target, 0, HOST_MEM_PAGESIZE);
+        table->entries[idx] = pml_make_entry(mmap_io_to_phys(target), flags);
 
-        VmmRange range = {mmap_phys_to_io(target), HOST_MEM_PAGESIZE};
+        VmmRange range = {target, HOST_MEM_PAGESIZE};
         return OK(VmmResult, range);
     }
 }
@@ -135,9 +136,9 @@ static void vmm_load_memory_map(VmmSpace target, HandoverMmap const *memory_map)
 
 void vmm_initialize(Handover const *handover)
 {
-    auto PmmResult = pmm_alloc(HOST_MEM_PAGESIZE);
+    auto heap_result = heap_alloc(HOST_MEM_PAGESIZE);
 
-    kernel_pml = (struct pml *)mmap_phys_to_io(UNWRAP(PmmResult).base);
+    kernel_pml = (struct pml *)UNWRAP(heap_result).base;
     mem_set(kernel_pml, 0, HOST_MEM_PAGESIZE);
 
     vmm_load_memory_map(kernel_pml, &handover->mmap);
@@ -150,9 +151,9 @@ VmmSpace vmm_space_create(void)
 {
     LOCK_RETAINER(&vmm_lock);
 
-    auto PmmResult = pmm_alloc(HOST_MEM_PAGESIZE);
+    auto heap_result = heap_alloc(HOST_MEM_PAGESIZE);
 
-    VmmSpace vmm_address_space = (VmmSpace)mmap_phys_to_io(UNWRAP(PmmResult).base);
+    VmmSpace vmm_address_space = (VmmSpace)UNWRAP(heap_result).base;
     mem_set(vmm_address_space, 0, HOST_MEM_PAGESIZE);
 
     struct pml *pml_table = (struct pml *)vmm_address_space;
@@ -170,9 +171,31 @@ VmmSpace vmm_space_create(void)
     return vmm_address_space;
 }
 
-void vmm_space_destroy(MAYBE_UNUSED VmmSpace space)
+static void vmm_space_destroy_pml(int level, struct pml *pml, size_t start, size_t end)
 {
-    todo("Implement vmm_space_destroy");
+    if (level < 1)
+    {
+        return;
+    }
+
+    for (size_t i = start; i < end; i++)
+    {
+        auto vmm_result = vmm_get_pml(pml, i);
+
+        if (!vmm_result.success)
+        {
+            continue;
+        }
+
+        vmm_space_destroy_pml(level - 1, (struct pml *)UNWRAP(vmm_result).base, 0, 512);
+    }
+
+    heap_free((HeapRange){(uintptr_t)pml, HOST_MEM_PAGESIZE});
+}
+
+void vmm_space_destroy(VmmSpace space)
+{
+    vmm_space_destroy_pml(4, (struct pml *)space, 0, 255);
 }
 
 void vmm_space_switch(VmmSpace space)
