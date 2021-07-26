@@ -43,6 +43,7 @@ void domain_add(Domain *self, Object *new_object)
         }
     }
 
+    object_ref(new_object);
     vec_push(&self->objects, new_object);
 }
 
@@ -54,6 +55,7 @@ void domain_remove(Domain *self, BrHandle handle)
     {
         if (object->handle == handle)
         {
+            object_deref(object);
             vec_remove(&self->objects, object);
             return;
         }
@@ -68,7 +70,7 @@ Object *domain_lookup(Domain *self, BrHandle handle, ObjectType type)
     {
         if (object->handle == handle && object->type == type)
         {
-            refcount_ref(&object->refcount);
+            object_ref(object);
             return object;
         }
     }
@@ -106,6 +108,7 @@ void object_ref(Object *self)
 void object_deref(Object *self)
 {
     lock_acquire(&lock);
+
     if (refcount_deref(&self->refcount) == REFCOUNT_0)
     {
         vec_remove(&global, self);
@@ -132,7 +135,7 @@ Object *global_lookup(BrHandle handle, ObjectType type)
     {
         if (object->handle == handle && object->type == type)
         {
-            refcount_ref(&object->refcount);
+            object_ref(object);
             return object;
         }
     }
