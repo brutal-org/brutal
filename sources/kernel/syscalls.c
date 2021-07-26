@@ -6,9 +6,6 @@
 #include "kernel/syscalls.h"
 #include "kernel/tasking.h"
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-
 BrResult sys_log(BrLogArgs *args)
 {
     host_log_lock();
@@ -233,12 +230,12 @@ BrResult sys_exit(BrExitArgs *args)
     return BR_SUCCESS;
 }
 
-BrResult sys_ipc(BrIpcArgs *args)
+BrResult sys_ipc(MAYBE_UNUSED BrIpcArgs *args)
 {
     return BR_NOT_IMPLEMENTED;
 }
 
-BrResult sys_irq(BrIrqArgs *args)
+BrResult sys_irq(MAYBE_UNUSED BrIrqArgs *args)
 {
     if (!(task_self()->caps & BR_CAP_IRQ))
     {
@@ -285,8 +282,6 @@ BrResult sys_close(BrCloseArgs *args)
     domain_remove(task_self()->domain, args->handle);
     return BR_SUCCESS;
 }
-
-#pragma GCC diagnostic pop
 
 typedef BrResult BrSyscallFn();
 
