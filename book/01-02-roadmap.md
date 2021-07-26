@@ -31,7 +31,7 @@
   - [ ] irq
   - [x] drop
   - [x] close
-- [ ] Userspace ELF loader
+- [x] Userspace ELF loader
 - [ ] IPC
 - [ ] IDL
 
