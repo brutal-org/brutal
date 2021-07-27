@@ -16,5 +16,5 @@ void apic_timer_initialize(void)
 
     lapic_write(LAPIC_REG_LVT_TIMER, LAPIC_IRQ | LAPIC_LVT_TIMER_MODE_PERIODIC);
     lapic_write(LAPIC_REG_TIMER_DIV, APIC_TIMER_DIVIDE_BY_16);
-    lapic_write(LAPIC_REG_TIMER_INITCNT, tick_in_10ms);
+    lapic_write(LAPIC_REG_TIMER_INITCNT, tick_in_10ms / 10);
 }

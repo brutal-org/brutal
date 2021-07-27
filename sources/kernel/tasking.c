@@ -235,7 +235,7 @@ static inline void finalizer(void)
 
         lock_release(&task_lock);
 
-        task_sleep(task_self(), 250);
+        task_sleep(task_self(), 2500);
     }
 }
 
