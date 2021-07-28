@@ -82,7 +82,7 @@ void init_stack(Task *task)
     mem_obj_deref(obj);
 }
 
-uintptr_t init_pass(Task *task, Handover *handover)
+static uintptr_t init_pass(Task *task, const Handover *handover)
 {
     auto heap = UNWRAP(heap_alloc(ALIGN_UP(sizeof(Handover), HOST_MEM_PAGESIZE)));
     mem_cpy((void *)heap.base, handover, sizeof(Handover));
