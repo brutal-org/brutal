@@ -16,10 +16,17 @@ typedef enum
 
 typedef void ObjectDtor(void *object);
 
+#define OBJECT_HEADER    \
+    union                \
+    {                    \
+        BrHandle handle; \
+        Object base;     \
+    }
+
 typedef struct
 {
-    RefCount refcount;
     BrHandle handle;
+    RefCount refcount;
     ObjectType type;
 
     ObjectDtor *dtor;
@@ -29,7 +36,7 @@ typedef Vec(Object *) VecObject;
 
 typedef struct
 {
-    Object base;
+    OBJECT_HEADER;
 
     Lock lock;
     VecObject objects;

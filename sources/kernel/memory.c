@@ -24,12 +24,14 @@ void mem_obj_destroy(MemObj *self)
 MemObj *mem_obj_heap(HeapRange heap, MemObjFlags flags)
 {
     auto self = alloc_make(alloc_global(), MemObj);
+
     self->type = MEM_OBJ_HEAP;
     self->flags = flags;
     self->heap = heap;
+
     object_init(base_cast(self), OBJECT_MEMORY, (ObjectDtor *)mem_obj_destroy);
 
-    log("Created HeapMemObj({}) at {#p}-{#p}", self->base.handle, heap.base, heap.base + heap.size - 1);
+    log("Created HeapMemObj({}) at {#p}-{#p}", self->handle, heap.base, heap.base + heap.size - 1);
 
     return self;
 }
@@ -37,12 +39,14 @@ MemObj *mem_obj_heap(HeapRange heap, MemObjFlags flags)
 MemObj *mem_obj_pmm(PmmRange pmm, MemObjFlags flags)
 {
     auto self = alloc_make(alloc_global(), MemObj);
+
     self->type = MEM_OBJ_PMM;
     self->flags = flags;
     self->pmm = pmm;
+
     object_init(base_cast(self), OBJECT_MEMORY, (ObjectDtor *)mem_obj_destroy);
 
-    log("Created PmmMemObj({}) at {#p}-{#p}", self->base.handle, pmm.base, pmm.base + pmm.size - 1);
+    log("Created PmmMemObj({}) at {#p}-{#p}", self->handle, pmm.base, pmm.base + pmm.size - 1);
 
     return self;
 }
@@ -84,9 +88,13 @@ size_t mem_obj_size(MemObj *self)
 static void memory_mapping_create(Space *space, MemObj *object, size_t offset, VmmRange vmm)
 {
     mem_obj_ref(object);
+
     auto mapping = alloc_make(alloc_global(), MemoryMapping);
+
     mapping->range = vmm;
     mapping->object = object;
+    mapping->offset = offset;
+
     vec_push(&space->mappings, mapping);
 
     PmmRange pmm = {mem_obj_base(object) + offset, vmm.size};
@@ -125,8 +133,8 @@ Space *space_create(BrSpaceFlags flags)
     self->flags = flags;
     self->vmm = vmm_space_create();
     vec_init(&self->mappings, alloc_global());
-    range_alloc_init(&self->alloc, alloc_global());
 
+    range_alloc_init(&self->alloc, alloc_global());
     range_alloc_unused(&self->alloc, (USizeRange){0x400000, 0x7fffffffffff});
 
     object_init(base_cast(self), OBJECT_SPACE, (ObjectDtor *)space_destroy);
@@ -204,19 +212,24 @@ void space_dump(Space *self)
 {
     LOCK_RETAINER(&self->lock);
 
-    log("MemorySpace({})", self->base.handle);
+    log("MemorySpace({})", self->handle);
 
     vec_foreach(mapping, &self->mappings)
     {
-        log("\t{#p}-{#p} ({})", mapping->range.base, mapping->range.base + mapping->range.size - 1, mapping->offset);
+        auto vmm_range = mapping->range;
+
+        log("\trange:{#p}-{#p} offset:{} size:{}",
+            vmm_range.base, vmm_range.base + vmm_range.size - 1, mapping->offset, vmm_range.size);
 
         if (mapping->object->type == MEM_OBJ_HEAP)
         {
-            log("\t ->({}) {#p}-{#p} ({})", mapping->object->base.handle, mapping->object->heap.base, mapping->object->heap.base + mapping->object->heap.size - 1, mapping->object->heap.size);
+            auto heap_range = mapping->object->heap;
+            log("\t  ->  handle:{} range:{#p}-{#p} size:{}", mapping->object->handle, heap_range.base, heap_range.base + heap_range.size - 1, heap_range.size);
         }
         else
         {
-            log("\t ->({}) {#p}-{#p} ({})", mapping->object->base.handle, mapping->object->pmm.base, mapping->object->pmm.base + mapping->object->pmm.size - 1, mapping->object->heap.size);
+            auto pmm_range = mapping->object->pmm;
+            log("\t  ->  handle:{} range:{#p}-{#p} size:{}", mapping->object->handle, pmm_range.base, pmm_range.base + pmm_range.size - 1, pmm_range.size);
         }
     }
 }

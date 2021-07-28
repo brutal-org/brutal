@@ -40,3 +40,8 @@ void arch_stop(void)
         asm_hlt();
     }
 }
+
+void arch_yield(void)
+{
+    asm("int $100");
+}

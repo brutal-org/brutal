@@ -3,23 +3,31 @@
 #include <syscalls/syscalls.h>
 #include "kernel/domain.h"
 #include "kernel/memory.h"
+#include "kernel/sched.h"
 #include "kernel/syscalls.h"
-#include "kernel/tasking.h"
+#include "kernel/task.h"
 
 BrResult sys_log(BrLogArgs *args)
 {
     host_log_lock();
-    print(host_log_writer(), "{}({}) ", str_cast(&task_self()->name), task_self()->base.handle);
+    print(host_log_writer(), "{}({}) ", str_cast(&task_self()->name), task_self()->handle);
     io_write(host_log_writer(), args->message, args->size);
     host_log_unlock();
 
     return BR_SUCCESS;
 }
 
+BrResult sys_debug(BrDebugArgs *args)
+{
+    log("{}", args->val);
+    return BR_SUCCESS;
+}
+
 BrResult sys_map(BrMapArgs *args)
 {
-    BrResult result = BR_SUCCESS;
     Space *space = nullptr;
+    MemObj *mem_obj = nullptr;
+    BrResult result = BR_SUCCESS;
 
     if (args->space == BR_SPACE_SELF)
     {
@@ -33,30 +41,38 @@ BrResult sys_map(BrMapArgs *args)
 
     if (space == nullptr)
     {
-        return BR_BAD_HANDLE;
+        result = BR_BAD_HANDLE;
+        goto cleanup_and_return;
     }
 
-    MemObj *mem_obj = (MemObj *)domain_lookup(task_self()->domain, args->mem_obj, OBJECT_MEMORY);
+    mem_obj = (MemObj *)domain_lookup(task_self()->domain, args->mem_obj, OBJECT_MEMORY);
 
     if (mem_obj == nullptr)
     {
-        space_deref(space);
-        return BR_BAD_HANDLE;
+        result = BR_BAD_HANDLE;
+        goto cleanup_and_return;
     }
 
     auto map_result = space_map(space, mem_obj, args->offset, args->size, args->vaddr);
 
-    if (map_result.success)
-    {
-        args->vaddr = UNWRAP(map_result).base;
-    }
-    else
+    if (!map_result.success)
     {
         result = map_result._error;
+        goto cleanup_and_return;
     }
 
-    mem_obj_deref(mem_obj);
-    space_deref(space);
+    args->vaddr = UNWRAP(map_result).base;
+
+cleanup_and_return:
+    if (space)
+    {
+        space_deref(space);
+    }
+
+    if (mem_obj)
+    {
+        mem_obj_deref(mem_obj);
+    }
 
     return result;
 }
@@ -116,7 +132,7 @@ BrResult sys_create_task(BrTask *handle, BrCreateTaskArgs *args)
 
     space_deref(space);
 
-    *handle = task->base.handle;
+    *handle = task->handle;
 
     task_deref(task);
 
@@ -149,7 +165,7 @@ BrResult sys_create_mem_obj(BrMemObj *handle, BrCreateMemObjArgs *args)
     }
 
     domain_add(task_self()->domain, base_cast(mem_obj));
-    *handle = mem_obj->base.handle;
+    *handle = mem_obj->handle;
     mem_obj_deref(mem_obj);
 
     return BR_SUCCESS;
@@ -160,7 +176,7 @@ BrResult sys_create_space(BrSpace *handle, BrCreateSpaceArgs *args)
     auto space = space_create(args->flags);
 
     domain_add(task_self()->domain, base_cast(space));
-    *handle = space->base.handle;
+    *handle = space->handle;
     space_deref(space);
 
     return BR_SUCCESS;
@@ -198,7 +214,7 @@ BrResult sys_start(BrStartArgs *args)
         return BR_BAD_HANDLE;
     }
 
-    task_start(task, args->ip, args->sp, args->args);
+    sched_start(task, args->ip, args->sp, args->args);
 
     task_deref(task);
 
@@ -224,7 +240,7 @@ BrResult sys_exit(BrExitArgs *args)
         return BR_BAD_HANDLE;
     }
 
-    task_cancel(task, args->exit_value);
+    sched_stop(task, args->exit_value);
 
     task_deref(task);
 
@@ -288,6 +304,7 @@ typedef BrResult BrSyscallFn();
 
 BrSyscallFn *syscalls[BR_SYSCALL_COUNT] = {
     [BR_SC_LOG] = sys_log,
+    [BR_SC_DEBUG] = sys_debug,
     [BR_SC_MAP] = sys_map,
     [BR_SC_UNMAP] = sys_unmap,
     [BR_SC_CREATE] = sys_create,
@@ -302,9 +319,9 @@ BrSyscallFn *syscalls[BR_SYSCALL_COUNT] = {
 BrResult syscall_dispatch(BrSyscall syscall, BrArg args)
 {
     /*
-        log("Syscall: {}({}).{}({#p})",
+        log("Syscall: {}({}): {}({#p})",
             str_cast(&task_self()->name),
-            task_self()->base.handle,
+            task_self()->handle,
             str_cast(br_syscall_to_string(syscall)),
             args);
     */
@@ -314,21 +331,21 @@ BrResult syscall_dispatch(BrSyscall syscall, BrArg args)
         return BR_BAD_SYSCALL;
     }
 
-    task_begin_syscall(task_self());
+    task_begin_syscall();
 
     auto result = syscalls[syscall](args);
 
     if (result != BR_SUCCESS)
     {
-        log("Syscall: {}({}).{}({#p}) -> {}",
+        log("Syscall: {}({}): {}({#p}) -> {}",
             str_cast(&task_self()->name),
-            task_self()->base.handle,
+            task_self()->handle,
             str_cast(br_syscall_to_string(syscall)),
             args,
             str_cast(br_result_to_string(result)));
     }
 
-    task_end_syscall(task_self());
+    task_end_syscall();
 
     return result;
 }

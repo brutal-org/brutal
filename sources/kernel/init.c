@@ -5,6 +5,7 @@
 #include "kernel/init.h"
 #include "kernel/kernel.h"
 #include "kernel/mmap.h"
+#include "kernel/sched.h"
 
 static bool elf_supported(Elf64Header const *header, size_t data_size)
 {
@@ -111,8 +112,9 @@ void init_start(Handover *handover)
     init_stack(task);
     auto hoaddr = init_pass(task, handover);
 
-    init = task->base.handle;
-    task_start(task, elf_header->entry, USER_STACK_BASE, (BrTaskArgs){.arg1 = hoaddr});
+    init = task->handle;
+
+    sched_start(task, elf_header->entry, USER_STACK_BASE, (BrTaskArgs){.arg1 = hoaddr});
 
     mem_obj_deref(elf_obj);
 }

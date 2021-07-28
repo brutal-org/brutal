@@ -20,6 +20,11 @@ BrResult br_log(BrLogArgs *args)
     return br_syscall(BR_SC_LOG, (BrArg)args, 0, 0, 0, 0);
 }
 
+BrResult br_debug(BrDebugArgs *args)
+{
+    return br_syscall(BR_SC_DEBUG, (BrArg)args, 0, 0, 0, 0);
+}
+
 BrResult br_map(BrMapArgs *args)
 {
     return br_syscall(BR_SC_MAP, (BrArg)args, 0, 0, 0, 0);

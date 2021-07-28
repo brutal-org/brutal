@@ -2,11 +2,9 @@
 
 #include <brutal/base.h>
 #include <brutal/types.h>
-#include "kernel/tasking.h"
+#include "kernel/task.h"
 
-typedef uint8_t CpuId;
-
-struct cpu
+typedef struct
 {
     CpuId id;
     bool present;
@@ -17,13 +15,13 @@ struct cpu
     Task *idle;
     Task *current;
     Task *next;
-};
+} Cpu;
 
-struct cpu *cpu(CpuId id);
+Cpu *cpu(CpuId id);
 
-size_t cpu_count(void);
+int cpu_count(void);
 
-struct cpu *cpu_self(void);
+Cpu *cpu_self(void);
 
 CpuId cpu_self_id(void);
 

@@ -3,7 +3,7 @@
 #include "brutal/types.h"
 #include "kernel/context.h"
 #include "kernel/cpu.h"
-#include "kernel/tasking.h"
+#include "kernel/sched.h"
 #include "kernel/x86_64/apic.h"
 #include "kernel/x86_64/asm.h"
 #include "kernel/x86_64/interrupts.h"
@@ -102,7 +102,7 @@ void interrupt_error_handler(Regs *regs, uintptr_t rsp)
 
     if (task_self() != nullptr)
     {
-        log_unlock("Running task is {}({})", str_cast(&task_self()->name), task_self()->base.handle);
+        log_unlock("Running task is {}({})", str_cast(&task_self()->name), task_self()->handle);
         log_unlock("");
     }
 
@@ -120,7 +120,7 @@ void interrupt_error_handler(Regs *regs, uintptr_t rsp)
     }
 }
 
-void scheduler_save_context(Regs const *regs)
+static void save_context(Regs const *regs)
 {
     auto context = task_self()->context;
 
@@ -128,7 +128,7 @@ void scheduler_save_context(Regs const *regs)
     context->regs = *regs;
 }
 
-void scheduler_load_context(Regs *regs)
+static void load_context(Regs *regs)
 {
     auto task = task_self();
     auto context = task_self()->context;
@@ -152,15 +152,16 @@ uint64_t interrupt_handler(uint64_t rsp)
     }
     else if (regs->int_no == 32)
     {
-        scheduler_save_context(regs);
-        scheduler_schedule();
-        scheduler_load_context(regs);
+        save_context(regs);
+        sched_schedule();
+        sched_switch();
+        load_context(regs);
     }
     else if (regs->int_no == IPIT_RESCHED)
     {
-        scheduler_save_context(regs);
-        scheduler_schedule_other();
-        scheduler_load_context(regs);
+        save_context(regs);
+        sched_switch();
+        load_context(regs);
     }
     else if (regs->int_no == IPIT_STOP)
     {

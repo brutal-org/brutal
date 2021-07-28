@@ -69,7 +69,7 @@ void elf_load(BrSpace space, Elf64Header const *elf_header, BrMemObj elf_obj)
 
             assert_truth(br_unmap(&(BrUnmapArgs){
                              .space = BR_SPACE_SELF,
-                             prog_local_map.vaddr,
+                             .vaddr = prog_local_map.vaddr,
                              .size = size,
                          }) == BR_SUCCESS);
 

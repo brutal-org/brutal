@@ -23,7 +23,8 @@ typedef enum
 
 typedef struct
 {
-    Object base;
+    OBJECT_HEADER;
+
     MemObjType type;
     MemObjFlags flags;
 
@@ -57,7 +58,7 @@ typedef struct
 
 typedef struct
 {
-    Object base;
+    OBJECT_HEADER;
 
     BrSpaceFlags flags;
     Lock lock;

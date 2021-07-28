@@ -2,5 +2,8 @@
 
 #include <brutal/base.h>
 
-typedef uint8_t CpuId;
+#define CPU_NONE (-1)
+
+typedef int CpuId;
+
 typedef uint32_t TaskId;

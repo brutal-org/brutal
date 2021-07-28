@@ -99,7 +99,7 @@ static void display_bootimage(Handover *handover)
                  }) == BR_SUCCESS);
 }
 
-void srv_run(Handover *handover, Str name)
+BrTask srv_run(Handover *handover, Str name)
 {
     auto elf = handover_find_module(handover, name);
     assert_not_null(elf);
@@ -177,6 +177,10 @@ void srv_run(Handover *handover, Str name)
         .vaddr = elf_map.vaddr,
         .size = elf_map.size,
     }));
+
+    log("Service '{}' created!", name);
+
+    return elf_task.handle;
 }
 
 int br_entry(Handover *handover)
@@ -190,7 +194,23 @@ int br_entry(Handover *handover)
         display_bootimage(handover);
     }
 
-    srv_run(handover, str_cast("posix"));
+    auto posix_task = srv_run(handover, str_cast("posix"));
+
+    br_ipc(&(BrIpcArgs){
+        .task = posix_task,
+        .message = {
+            .header = {
+                .protocol = 0xC001C0DE,
+                .type = 0xCAFEBABE,
+                .size = 1,
+            },
+            .data = {0x69},
+        },
+        .timeout = 0,
+        .flags = BR_IPC_SEND,
+    });
+
+    log("IPC messaged sent!");
 
     return 0;
 }

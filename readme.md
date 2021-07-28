@@ -18,19 +18,19 @@
 <br/>
 
 <p align="center">
-    <a href="https://github.com/brutal-org/brutal/actions/workflows/main.yml"> 
+    <a href="https://github.com/brutal-org/brutal/actions/workflows/main.yml">
       <img src="https://github.com/brutal-org/brutal/actions/workflows/main.yml/badge.svg">
     </a>
-    <a href="https://github.com/brutal-org/brutal/issues"> 
+    <a href="https://github.com/brutal-org/brutal/issues">
       <img src="https://img.shields.io/github/issues/brutal-org/brutal">
     </a>
-    <a href="https://github.com/brutal-org/brutal/network"> 
+    <a href="https://github.com/brutal-org/brutal/network">
       <img src="https://img.shields.io/github/forks/brutal-org/brutal">
     </a>
-    <a href="https://github.com/brutal-org/brutal/stargazers"> 
+    <a href="https://github.com/brutal-org/brutal/stargazers">
       <img src="https://img.shields.io/github/stars/brutal-org/brutal">
     </a>
-    <a href="https://github.com/brutal-org/brutal/blob/main/license"> 
+    <a href="https://github.com/brutal-org/brutal/blob/main/license">
       <img src="https://img.shields.io/github/license/brutal-org/brutal">
     </a>
 </p>

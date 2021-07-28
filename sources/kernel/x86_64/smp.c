@@ -84,13 +84,13 @@ static void smp_initialize_cpu(uint32_t lapic_id)
     apic_start_processor(lapic_id, 4096);
 }
 
-void arch_boot_other(void)
+void smp_boot_other(void)
 {
     smp_trampoline_map();
 
     log("Booting other CPUs...");
 
-    for (size_t cpu = 0; cpu < cpu_count(); cpu++)
+    for (int cpu = 0; cpu < cpu_count(); cpu++)
     {
         if (cpu == apic_current_cpu())
         {
@@ -112,11 +112,11 @@ void arch_boot_other(void)
 
 void smp_stop_all(void)
 {
-    for (CpuId i = 0; i < cpu_count(); i++)
+    for (int i = 0; i < cpu_count(); i++)
     {
         if (i != cpu_self_id())
         {
-            apic_send_ipit(i, IPIT_STOP);
+            apic_send_ipit(cpu_impl(i)->lapic, IPIT_STOP);
         }
     }
 }

@@ -93,10 +93,12 @@ static void vmm_load_memory_map(VmmSpace target, HandoverMmap const *memory_map)
     vmm_map(target,
             (VmmRange){
                 .base = mmap_phys_to_io(0),
-                .size = 0xffffffff},
+                .size = 0xffffffff,
+            },
             (PmmRange){
                 .base = 0,
-                .size = 0xffffffff},
+                .size = 0xffffffff,
+            },
             BR_MEM_WRITABLE);
 
     for (size_t i = 0; i < memory_map->size; i++)
@@ -211,7 +213,7 @@ VmmResult vmm_map(VmmSpace space, VmmRange virtual_range, PmmRange physical_rang
 
     if (virtual_range.size != physical_range.size)
     {
-        panic("virtual_range.size must be equal to physical_range for the moment");
+        panic("virtual_range.size must be equal to physical_range.size");
         return ERR(VmmResult, BR_BAD_ARGUMENTS);
     }
 

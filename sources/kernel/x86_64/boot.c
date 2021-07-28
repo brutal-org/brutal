@@ -1,8 +1,11 @@
 #include <brutal/base.h>
 #include <brutal/log.h>
 #include "kernel/arch.h"
+#include "kernel/init.h"
 #include "kernel/kernel.h"
 #include "kernel/pmm.h"
+#include "kernel/sched.h"
+#include "kernel/tasking.h"
 #include "kernel/vmm.h"
 #include "kernel/x86_64/apic.h"
 #include "kernel/x86_64/apic/timer.h"
@@ -18,12 +21,24 @@
 #include "kernel/x86_64/stivale2.h"
 #include "kernel/x86_64/syscall.h"
 
+static atomic_int other_ready = 0;
+
+void arch_wait_other(void)
+{
+    WAIT_FOR(other_ready == cpu_count());
+}
+
+void arch_boot_other(void)
+{
+    smp_boot_other();
+}
+
 void arch_entry_main(Handover *handover)
 {
+    kernel_splash();
+
     cpu_disable_interrupts();
     cpu_retain_disable();
-
-    log("Initializing arch x86_64...");
 
     com_initialize(COM1);
     gdt_initialize();
@@ -36,10 +51,19 @@ void arch_entry_main(Handover *handover)
     apic_initalize(handover);
     cpu_initialize();
     syscall_initialize();
+    sched_initialize();
+    tasking_initialize();
 
-    log("Arch x86_64 initialized!");
+    other_ready++;
+    arch_boot_other();
+    arch_wait_other();
 
-    kernel_entry_main(handover);
+    cpu_retain_enable();
+    cpu_enable_interrupts();
+
+    init_start(handover);
+
+    sched_stop(task_self(), 0);
     assert_unreachable();
 }
 
@@ -50,10 +74,15 @@ void arch_entry_other(void)
 
     apic_enable();
     simd_initialize();
-
     cpu_initialize();
     syscall_initialize();
 
-    kernel_entry_other();
+    other_ready++;
+    arch_wait_other();
+
+    cpu_retain_enable();
+    cpu_enable_interrupts();
+
+    sched_stop(task_self(), 0);
     assert_unreachable();
 }

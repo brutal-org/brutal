@@ -6,6 +6,7 @@
 
 #define FOREACH_SYSCALLS(SYSCALL) \
     SYSCALL(LOG)                  \
+    SYSCALL(DEBUG)                \
     SYSCALL(MAP)                  \
     SYSCALL(UNMAP)                \
     SYSCALL(CREATE)               \
@@ -43,6 +44,8 @@ static inline const char *br_syscall_to_string(BrSyscall syscall)
 
 #define FOREACH_RESULTS(RESULT) \
     RESULT(SUCCESS)             \
+    RESULT(INTERRUPTED)         \
+    RESULT(TIMEOUT)             \
     RESULT(BAD_ADDRESS)         \
     RESULT(BAD_ARGUMENTS)       \
     RESULT(BAD_CAPABILITY)      \
@@ -50,7 +53,6 @@ static inline const char *br_syscall_to_string(BrSyscall syscall)
     RESULT(BAD_SYSCALL)         \
     RESULT(NOT_IMPLEMENTED)     \
     RESULT(OUT_OF_MEMORY)       \
-    RESULT(TIMEOUT)             \
     RESULT(WOULD_BLOCK)
 
 typedef enum
@@ -156,8 +158,10 @@ typedef enum
 {
     BR_MEM_NONE = 0,
 
-    BR_MEM_WRITABLE = 1 << 0,
-    BR_MEM_USER = 1 << 1,
+    BR_MEM_READABLE = 1 << 0,
+    BR_MEM_WRITABLE = 1 << 1,
+    BR_MEM_EXECUTABLE = 1 << 2,
+    BR_MEM_USER = 1 << 3,
 } BrMemFlags;
 
 typedef BrHandle BrTask;
@@ -236,3 +240,18 @@ typedef struct
     uintptr_t arg4;
     uintptr_t arg5;
 } BrTaskArgs;
+
+typedef struct
+{
+} BrGlobalInfo;
+
+typedef struct
+{
+} BrLocalInfo;
+
+typedef struct
+{
+    BrGlobalInfo *global_info;
+    BrLocalInfo *local_info;
+    BrTaskArgs args;
+} BrStartInfo;

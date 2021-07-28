@@ -119,13 +119,13 @@ struct acpi_sdth *acpi_rsdt_child(struct acpi_rsdt *rsdt, Str signature);
 
 struct acpi_madt_record *acpi_madt_record(struct acpi_madt *madt, enum acpi_madt_record_type type);
 
-struct acpi_madt_record_table acpi_madt_multiple_record(struct acpi_madt *madt, enum acpi_madt_record_type type);
-
 struct acpi_madt *acpi_find_madt(uintptr_t rsdp_address);
 
 struct acpi_hpet *acpi_find_hpet(uintptr_t rsdp_address);
 
 uint32_t acpi_find_lapic(uintptr_t rsdp_address);
+
+struct acpi_madt_record_table acpi_madt_multiple_record(struct acpi_madt *madt, enum acpi_madt_record_type type);
 
 struct lapic_record_table acpi_find_lapic_table(uintptr_t rsdp_address);
 

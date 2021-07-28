@@ -6,7 +6,7 @@
 
 #define MAX_CPU_COUNT 255
 
-struct cpu_impl
+typedef struct
 {
     uintptr_t syscall_kernel_stack;
     uintptr_t syscall_user_stack;
@@ -14,12 +14,12 @@ struct cpu_impl
     struct tss tss;
 
     uint8_t lapic;
-    struct cpu base;
-};
+    Cpu base;
+} CpuImpl;
 
-struct cpu_impl *cpu_impl_self(void);
+CpuImpl *cpu_impl_self(void);
 
-struct cpu_impl *cpu_impl(CpuId id);
+CpuImpl *cpu_impl(CpuId id);
 
 void cpu_found(CpuId id, int lapic);
 

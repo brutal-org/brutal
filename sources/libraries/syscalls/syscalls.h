@@ -18,6 +18,13 @@ typedef struct
 
 SYSCALL(log) (BrLogArgs* args);
 
+typedef struct 
+{
+    int val;
+} BrDebugArgs;
+
+SYSCALL(debug) (BrDebugArgs* args);
+
 typedef struct
 {
     BrSpace space;
