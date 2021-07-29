@@ -104,7 +104,7 @@ BrResult sched_block(Blocker blocker)
 
 Task *sched_pick(Task *best, Task *other)
 {
-    if (!task_runnable(other) || task_running(other))
+    if (!task_runnable(other) || task_running(other) || other->time_end == tick)
     {
         return best;
     }
@@ -300,7 +300,52 @@ void sched_dump(void)
     log_unlock("CPUs:");
     for (int i = 0; i < cpu_count(); i++)
     {
-        log_unlock("CPU{} : {}({})", i, str_cast(&cpu(i)->next->name), cpu(i)->next->handle);
+        log_unlock("CPU{} : c:{}({}) n:{}({})",
+                   i,
+                   str_cast(&cpu(i)->current->name),
+                   cpu(i)->current->handle,
+                   str_cast(&cpu(i)->next->name),
+                   cpu(i)->next->handle);
+    }
+}
+
+void sched_ensure_no_duplicated(void)
+{
+    for (int i = 0; i < cpu_count(); i++)
+    {
+        for (int j = 0; j < cpu_count(); j++)
+        {
+            if (i == j)
+            {
+                continue;
+            }
+
+            if (cpu(i)->next == cpu(j)->next)
+            {
+                sched_dump();
+                panic("sched_ensure_no_duplicated failled (CPU{} and CPU{})!", i, j);
+            }
+        }
+    }
+}
+
+void sched_ensure_no_cpu_jump(void)
+{
+    for (int i = 0; i < cpu_count(); i++)
+    {
+        for (int j = 0; j < cpu_count(); j++)
+        {
+            if (i == j)
+            {
+                continue;
+            }
+
+            if (cpu(i)->current == cpu(j)->next)
+            {
+                sched_dump();
+                panic("sched_ensure_no_cpu_jump failled (from CPU{} to CPU{})!", i, j);
+            }
+        }
     }
 }
 
@@ -309,6 +354,9 @@ void sched_yield(void)
     lock_acquire(&lock);
 
     sched_next(sched_peek() ?: cpu_self()->idle, cpu_self());
+
+    sched_ensure_no_cpu_jump();
+    sched_ensure_no_duplicated();
 
     lock_release(&lock);
 
@@ -328,6 +376,9 @@ void sched_schedule(void)
 
     while (sched_dispatch(sched_peek()))
         ;
+
+    sched_ensure_no_cpu_jump();
+    sched_ensure_no_duplicated();
 
     lock_release(&lock);
 

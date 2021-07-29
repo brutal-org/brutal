@@ -117,8 +117,6 @@ void fill_handover_modules(Handover *target, struct stivale2_struct_tag_modules 
 
 void stivale2_entry(struct stivale2_struct *info)
 {
-    log("Booting from a stivale2 bootloader...");
-
     static Handover handover = {};
 
     auto memory_map = stivale2_get_tag(info, STIVALE2_STRUCT_TAG_MEMMAP_ID);

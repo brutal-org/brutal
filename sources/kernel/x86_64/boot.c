@@ -35,10 +35,10 @@ void arch_boot_other(void)
 
 void arch_entry_main(Handover *handover)
 {
-    kernel_splash();
-
     cpu_disable_interrupts();
     cpu_retain_disable();
+
+    kernel_splash();
 
     com_initialize(COM1);
     gdt_initialize();
@@ -63,6 +63,16 @@ void arch_entry_main(Handover *handover)
 
     init_start(handover);
 
+    while (true)
+    {
+        log("I'm alive!");
+
+        sched_block((Blocker){
+            .type = BLOCKER_TIME,
+            .deadline = sched_tick() + 1000,
+        });
+    }
+
     sched_stop(task_self(), 0);
     assert_unreachable();
 }
@@ -82,6 +92,16 @@ void arch_entry_other(void)
 
     cpu_retain_enable();
     cpu_enable_interrupts();
+
+    while (true)
+    {
+        log("I'm alive!");
+
+        sched_block((Blocker){
+            .type = BLOCKER_TIME,
+            .deadline = sched_tick() + 1000,
+        });
+    }
 
     sched_stop(task_self(), 0);
     assert_unreachable();

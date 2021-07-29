@@ -70,9 +70,7 @@ void log_impl(enum log_level level, SourceLocation location, Str fmt, struct pri
 
 noreturn void panic_impl(enum log_level level, SourceLocation location, Str fmt, struct print_args args)
 {
-    host_log_lock();
     log_unlock_impl(level, location, fmt, args);
-    host_log_unlock();
 
     host_log_panic();
 }
