@@ -17,14 +17,14 @@ static uintptr_t memory_map_get_highest_address(HandoverMmap const *memory_map)
     size_t length = memory_map->entries[memory_map->size - 1].length;
     size_t start = memory_map->entries[memory_map->size - 1].base;
 
-    return ALIGN_UP(length + start, HOST_MEM_PAGESIZE);
+    return ALIGN_UP(length + start, MEM_PAGE_SIZE);
 }
 
 static void pmm_bitmap_initialize(HandoverMmap const *memory_map)
 {
     log("Allocating memory bitmap...");
 
-    size_t bitmap_target_size = memory_map_get_highest_address(memory_map) / HOST_MEM_PAGESIZE / 8;
+    size_t bitmap_target_size = memory_map_get_highest_address(memory_map) / MEM_PAGE_SIZE / 8;
 
     log("A bitmap {}kib long is needed", bitmap_target_size / 1024);
 
@@ -57,8 +57,8 @@ static void pmm_load_memory_map(HandoverMmap const *memory_map)
 
     for (size_t i = 0; i < memory_map->size; i++)
     {
-        size_t base = ALIGN_UP(memory_map->entries[i].base, HOST_MEM_PAGESIZE);
-        size_t size = ALIGN_DOWN(memory_map->entries[i].length, HOST_MEM_PAGESIZE);
+        size_t base = ALIGN_UP(memory_map->entries[i].base, MEM_PAGE_SIZE);
+        size_t size = ALIGN_DOWN(memory_map->entries[i].length, MEM_PAGE_SIZE);
 
         log("    type: {x} {x}-{x}", memory_map->entries[i].type, base, base + size - 1);
 
@@ -81,7 +81,7 @@ void pmm_initialize(Handover const *handover)
     pmm_load_memory_map(&handover->mmap);
 
     // we set the first page used, as the page 0 is NULL
-    pmm_used((PmmRange){(uintptr_t)0, HOST_MEM_PAGESIZE * 32});
+    pmm_used((PmmRange){(uintptr_t)0, MEM_PAGE_SIZE * 32});
     used_memory = 0;
     pmm_used((PmmRange){mmap_io_to_phys((uintptr_t)pmm_bitmap.data), pmm_bitmap.size});
 }
@@ -92,7 +92,7 @@ PmmResult pmm_alloc(size_t size)
 
     used_memory += size;
 
-    auto page_size = size / HOST_MEM_PAGESIZE;
+    auto page_size = size / MEM_PAGE_SIZE;
     auto page_range = bitmap_find_range(&pmm_bitmap, best_bet, page_size, PMM_UNUSED);
 
     if (range_empty(page_range))
@@ -109,8 +109,8 @@ PmmResult pmm_alloc(size_t size)
 
         auto pmm_range = range_cast(PmmRange, page_range);
 
-        pmm_range.base *= HOST_MEM_PAGESIZE;
-        pmm_range.size *= HOST_MEM_PAGESIZE;
+        pmm_range.base *= MEM_PAGE_SIZE;
+        pmm_range.size *= MEM_PAGE_SIZE;
 
         return OK(PmmResult, pmm_range);
     }
@@ -125,8 +125,8 @@ PmmResult pmm_used(PmmRange range)
 {
     LOCK_RETAINER(&pmm_lock);
 
-    size_t page_base = range.base / HOST_MEM_PAGESIZE;
-    size_t page_size = range.size / HOST_MEM_PAGESIZE;
+    size_t page_base = range.base / MEM_PAGE_SIZE;
+    size_t page_size = range.size / MEM_PAGE_SIZE;
     auto page_range = (USizeRange){page_base, page_size};
 
     bitmap_set_range(&pmm_bitmap, page_range, PMM_USED);
@@ -145,8 +145,8 @@ PmmResult pmm_unused(PmmRange range)
         return ERR(PmmResult, BR_BAD_ADDRESS);
     }
 
-    size_t page_base = range.base / HOST_MEM_PAGESIZE;
-    size_t page_size = range.size / HOST_MEM_PAGESIZE;
+    size_t page_base = range.base / MEM_PAGE_SIZE;
+    size_t page_size = range.size / MEM_PAGE_SIZE;
     auto page_range = (USizeRange){page_base, page_size};
 
     bitmap_set_range(&pmm_bitmap, page_range, PMM_UNUSED);

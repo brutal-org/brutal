@@ -59,6 +59,6 @@ typedef struct
     uintptr_t rsdp;
 } Handover;
 
-HandoverModule *handover_find_module(Handover *handover, Str name);
+HandoverModule const *handover_find_module(Handover const *handover, Str name);
 
-void handover_dump(Handover *handover);
+void handover_dump(Handover const *handover);

@@ -1,3 +1,4 @@
+#include <brutal/base/keywords.h>
 #include <brutal/ds/grid.h>
 
 void grid_init_impl(GridImpl *impl, int width, int height, int data_size, Alloc *alloc)

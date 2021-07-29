@@ -5,7 +5,6 @@
 #include "kernel/heap.h"
 #include "kernel/kernel.h"
 #include "kernel/mmap.h"
-#include "kernel/mmio.h"
 #include "kernel/pmm.h"
 #include "kernel/vmm.h"
 #include "kernel/x86_64/apic.h"
@@ -21,8 +20,8 @@ extern uint32_t trampoline_end;
 
 static size_t smp_trampoline_size(void)
 {
-    uint64_t trampoline_len = (uintptr_t)&trampoline_end - (uintptr_t)&trampoline_start + HOST_MEM_PAGESIZE;
-    return ALIGN_UP(trampoline_len, HOST_MEM_PAGESIZE);
+    uint64_t trampoline_len = (uintptr_t)&trampoline_end - (uintptr_t)&trampoline_start + MEM_PAGE_SIZE;
+    return ALIGN_UP(trampoline_len, MEM_PAGE_SIZE);
 }
 
 static void smp_trampoline_map(void)
@@ -30,7 +29,7 @@ static void smp_trampoline_map(void)
     log("Initializing cpu trampoline");
     log("trampoline is {x} bytes in size", smp_trampoline_size());
 
-    uint64_t trampoline_len = (uintptr_t)&trampoline_end - (uintptr_t)&trampoline_start + HOST_MEM_PAGESIZE;
+    uint64_t trampoline_len = (uintptr_t)&trampoline_end - (uintptr_t)&trampoline_start + MEM_PAGE_SIZE;
 
     vmm_map(vmm_kernel_space(),
             (VmmRange){
@@ -64,17 +63,17 @@ void smp_entry_other(void)
 static void smp_trampoline_setup(void)
 {
     // Load future cpu page table
-    mmio_write64(SMP_INIT_PAGE_TABLE, asm_read_cr3());
+    volatile_write64(SMP_INIT_PAGE_TABLE, asm_read_cr3());
 
     // Load future cpu stack
     uint8_t *cpu_stack = (uint8_t *)UNWRAP(heap_alloc(KERNEL_STACK_SIZE)).base;
-    mmio_write64(SMP_INIT_STACK, (uint64_t)(cpu_stack + KERNEL_STACK_SIZE));
+    volatile_write64(SMP_INIT_STACK, (uint64_t)(cpu_stack + KERNEL_STACK_SIZE));
 
     asm volatile(
         "sgdt 0x530\n"
         "sidt 0x540\n");
 
-    mmio_write64(SMP_INIT_ENTRY, (uintptr_t)smp_entry_other);
+    volatile_write64(SMP_INIT_ENTRY, (uintptr_t)smp_entry_other);
 }
 
 static void smp_initialize_cpu(uint32_t lapic_id)

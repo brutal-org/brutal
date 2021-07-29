@@ -2,8 +2,6 @@
 
 #include <brutal/base.h>
 
-#define HOST_MEM_PAGESIZE 4096
-
 enum host_mem_flag
 {
     HOST_MEM_NONE,

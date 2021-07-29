@@ -1,6 +1,6 @@
-#include "kernel/x86_64/apic/timer.h"
-#include "kernel/mmio.h"
+#include <brutal/mem.h>
 #include "kernel/x86_64/apic.h"
+#include "kernel/x86_64/apic/timer.h"
 #include "kernel/x86_64/hpet.h"
 
 void apic_timer_initialize(void)

@@ -7,7 +7,7 @@
 #include <syscalls/helpers.h>
 #include <syscalls/syscalls.h>
 
-static void display_bootimage(Handover *handover)
+static void display_bootimage(Handover const *handover)
 {
     // Open the framebuffer
 
@@ -99,7 +99,7 @@ static void display_bootimage(Handover *handover)
                  }) == BR_SUCCESS);
 }
 
-BrTask srv_run(Handover *handover, Str name)
+BrTask srv_run(Handover const *handover, Str name)
 {
     auto elf = handover_find_module(handover, name);
     assert_not_null(elf);
@@ -183,7 +183,7 @@ BrTask srv_run(Handover *handover, Str name)
     return elf_task.handle;
 }
 
-int br_entry(Handover *handover)
+int br_entry(Handover const *handover)
 {
     log("Handover at {#p}", (void *)handover);
 

@@ -109,7 +109,7 @@ void fill_handover_modules(Handover *target, struct stivale2_struct_tag_modules 
     for (size_t i = 0; i < MIN(modules->module_count, MAX_MODULE_COUNT); i++)
     {
         target->modules.module[i].addr = mmap_io_to_phys(modules->modules[i].begin);
-        target->modules.module[i].size = ALIGN_UP(modules->modules[i].end - modules->modules[i].begin, HOST_MEM_PAGESIZE);
+        target->modules.module[i].size = ALIGN_UP(modules->modules[i].end - modules->modules[i].begin, MEM_PAGE_SIZE);
 
         target->modules.module[i].module_name = str_cast_fix(StrFix128, modules->modules[i].string);
     }

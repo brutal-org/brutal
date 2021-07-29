@@ -2,7 +2,7 @@
 #include <brutal/log.h>
 #include <handover/handover.h>
 
-HandoverModule *handover_find_module(Handover *handover, Str name)
+HandoverModule const *handover_find_module(Handover const *handover, Str name)
 {
     for (size_t i = 0; i < handover->modules.size; i++)
     {
@@ -15,7 +15,7 @@ HandoverModule *handover_find_module(Handover *handover, Str name)
     return nullptr;
 }
 
-void handover_dump(Handover *handover)
+void handover_dump(Handover const *handover)
 {
     log("Memory Map:");
 

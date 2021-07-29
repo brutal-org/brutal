@@ -5,6 +5,7 @@
  * under the terms of the MIT license. See LICENSE for details.
  */
 
+#include <brutal/base/keywords.h>
 #include <brutal/base/std.h>
 #include <brutal/ds/vec.h>
 #include <brutal/mem.h>

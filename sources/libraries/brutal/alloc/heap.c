@@ -46,20 +46,20 @@ static struct alloc_major *major_block_create(size_t size)
     st += MINOR_BLOCK_HEADER_SIZE;
 
     // Perfect amount of space?
-    if ((st % HOST_MEM_PAGESIZE) == 0)
+    if ((st % MEM_PAGE_SIZE) == 0)
     {
-        st = st / (HOST_MEM_PAGESIZE);
+        st = st / (MEM_PAGE_SIZE);
     }
     else
     {
-        st = st / (HOST_MEM_PAGESIZE) + 1;
+        st = st / (MEM_PAGE_SIZE) + 1;
     }
 
     // Make sure it's >= the minimum size.
     st = MAX(st, ALLOC_HEAP_REQUEST); // The number of pages to request per chunk.
 
     struct alloc_major *maj;
-    if (host_mem_acquire(st * HOST_MEM_PAGESIZE, (void **)&maj, HOST_MEM_NONE).kind != ERR_KIND_SUCCESS)
+    if (host_mem_acquire(st * MEM_PAGE_SIZE, (void **)&maj, HOST_MEM_NONE).kind != ERR_KIND_SUCCESS)
     {
         panic("Failled to allocate memory!");
     }
@@ -67,7 +67,7 @@ static struct alloc_major *major_block_create(size_t size)
     maj->prev = nullptr;
     maj->next = nullptr;
     maj->pages = st;
-    maj->size = st * HOST_MEM_PAGESIZE;
+    maj->size = st * MEM_PAGE_SIZE;
     maj->usage = MAJOR_BLOCK_HEADER_SIZE;
     maj->first = nullptr;
 
@@ -379,7 +379,7 @@ void alloc_heap_release(struct alloc_heap *alloc, void *ptr)
             maj->next->prev = maj->prev;
         }
 
-        host_mem_release(maj, maj->pages * HOST_MEM_PAGESIZE);
+        host_mem_release(maj, maj->pages * MEM_PAGE_SIZE);
     }
     else
     {

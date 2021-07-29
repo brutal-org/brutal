@@ -1,5 +1,6 @@
 #pragma once
 
+#include <brutal/base/attributes.h>
 #include <brutal/gfx/color.h>
 #include <brutal/log/assert.h>
 

@@ -72,28 +72,34 @@ typedef StrFix(128) StrFix128;
 static inline Str str_forward(Str str) { return str; }
 static inline Str str_make_from_inline_str(InlineStr *str) { return (Str){str->len, str->buffer}; }
 static inline Str str_make_from_cstr(char const *cstr) { return (Str){cstr_len(cstr), (char *)cstr}; }
-static inline Str str_make_from_str_fix1(StrFix1 *str_fix) { return (Str){str_fix->len, str_fix->buffer}; }
-static inline Str str_make_from_str_fix8(StrFix8 *str_fix) { return (Str){str_fix->len, str_fix->buffer}; }
-static inline Str str_make_from_str_fix16(StrFix16 *str_fix) { return (Str){str_fix->len, str_fix->buffer}; }
-static inline Str str_make_from_str_fix32(StrFix32 *str_fix) { return (Str){str_fix->len, str_fix->buffer}; }
-static inline Str str_make_from_str_fix64(StrFix64 *str_fix) { return (Str){str_fix->len, str_fix->buffer}; }
-static inline Str str_make_from_str_fix128(StrFix128 *str_fix) { return (Str){str_fix->len, str_fix->buffer}; }
+static inline Str str_make_from_str_fix1(StrFix1 const *str_fix) { return (Str){str_fix->len, (char *)str_fix->buffer}; }
+static inline Str str_make_from_str_fix8(StrFix8 const *str_fix) { return (Str){str_fix->len, (char *)str_fix->buffer}; }
+static inline Str str_make_from_str_fix16(StrFix16 const *str_fix) { return (Str){str_fix->len, (char *)str_fix->buffer}; }
+static inline Str str_make_from_str_fix32(StrFix32 const *str_fix) { return (Str){str_fix->len, (char *)str_fix->buffer}; }
+static inline Str str_make_from_str_fix64(StrFix64 const *str_fix) { return (Str){str_fix->len, (char *)str_fix->buffer}; }
+static inline Str str_make_from_str_fix128(StrFix128 const *str_fix) { return (Str){str_fix->len, (char *)str_fix->buffer}; }
 
 // clang-format off
 
 // Create a new instance of a non owning string.
-#define str_cast(literal)                       \
-    _Generic((literal),                         \
-        Str         : str_forward,              \
-        InlineStr * : str_make_from_inline_str, \
-        char*       : str_make_from_cstr,       \
-        char const* : str_make_from_cstr,       \
-        StrFix1*    : str_make_from_str_fix1,   \
-        StrFix8*    : str_make_from_str_fix8,   \
-        StrFix16*   : str_make_from_str_fix16,  \
-        StrFix32*   : str_make_from_str_fix32,  \
-        StrFix64*   : str_make_from_str_fix64,  \
-        StrFix128*  : str_make_from_str_fix128  \
+#define str_cast(literal)                            \
+    _Generic((literal),                              \
+        Str              : str_forward,              \
+        InlineStr *      : str_make_from_inline_str, \
+        char*            : str_make_from_cstr,       \
+        char const*      : str_make_from_cstr,       \
+        StrFix1*         : str_make_from_str_fix1,   \
+        StrFix1 const*   : str_make_from_str_fix1,   \
+        StrFix8*         : str_make_from_str_fix8,   \
+        StrFix8 const*   : str_make_from_str_fix8,   \
+        StrFix16*        : str_make_from_str_fix16,  \
+        StrFix16 const*  : str_make_from_str_fix16,  \
+        StrFix32*        : str_make_from_str_fix32,  \
+        StrFix32 const*  : str_make_from_str_fix32,  \
+        StrFix64*        : str_make_from_str_fix64,  \
+        StrFix64 const*  : str_make_from_str_fix64,  \
+        StrFix128*       : str_make_from_str_fix128, \
+        StrFix128 const* : str_make_from_str_fix128  \
     )(literal)
 
 // clang-format on

@@ -1,7 +1,7 @@
 #include <brutal/base.h>
 #include <brutal/log.h>
+#include <brutal/mem.h>
 #include "kernel/mmap.h"
-#include "kernel/mmio.h"
 #include "kernel/x86_64/acpi.h"
 #include "kernel/x86_64/apic.h"
 #include "kernel/x86_64/apic/timer.h"
@@ -15,12 +15,12 @@ static uintptr_t lapic_base = 0;
 
 uint32_t lapic_read(uint32_t reg)
 {
-    return mmio_read32((uintptr_t)lapic_base + reg);
+    return volatile_read32((uintptr_t)lapic_base + reg);
 }
 
 void lapic_write(uint32_t reg, uint32_t value)
 {
-    mmio_write32(lapic_base + reg, value);
+    volatile_write32(lapic_base + reg, value);
 }
 
 void lapic_enable_spurious(void)
@@ -50,16 +50,16 @@ static inline uint32_t ioapic_read(int index, uint32_t reg)
 {
     auto base = mmap_phys_to_io(ioapic_table.table[index]->address);
 
-    mmio_write32(base + IOAPIC_REG_OFFSET, reg);
-    return mmio_read32(base + IOAPIC_VALUE_OFFSET);
+    volatile_write32(base + IOAPIC_REG_OFFSET, reg);
+    return volatile_read32(base + IOAPIC_VALUE_OFFSET);
 }
 
 static inline void ioapic_write(int index, uint32_t reg, uint32_t value)
 {
     auto base = mmap_phys_to_io(ioapic_table.table[index]->address);
 
-    mmio_write32(base + IOAPIC_REG_OFFSET, reg);
-    mmio_write32(base + IOAPIC_VALUE_OFFSET, value);
+    volatile_write32(base + IOAPIC_REG_OFFSET, reg);
+    volatile_write32(base + IOAPIC_VALUE_OFFSET, value);
 }
 
 struct ioapic_version ioapic_get_version(int index)

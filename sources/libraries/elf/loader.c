@@ -15,7 +15,7 @@ void elf_load(BrSpace space, Elf64Header const *elf_header, BrMemObj elf_obj)
             continue;
         }
 
-        auto size = ALIGN_UP(MAX(prog_header->memory_size, prog_header->file_size), HOST_MEM_PAGESIZE);
+        auto size = ALIGN_UP(MAX(prog_header->memory_size, prog_header->file_size), MEM_PAGE_SIZE);
 
         if (!(prog_header->flags & ELF_PROGRAM_HEADER_WRITABLE) &&
             prog_header->file_size == prog_header->memory_size)
