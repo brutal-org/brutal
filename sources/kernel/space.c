@@ -112,19 +112,22 @@ SpaceResult space_map(Space *self, MemObj *mem_obj, size_t offset, size_t size, 
     return OK(SpaceResult, range);
 }
 
-void space_unmap(Space *self, VmmRange range)
+SpaceResult space_unmap(Space *self, VmmRange range)
 {
     LOCK_RETAINER(&self->lock);
 
     vec_foreach(mapping, &self->mappings)
     {
-        if (mapping->range.base == range.base)
+        if (mapping->range.base == range.base &&
+            mapping->range.size == range.size)
         {
             range_alloc_unused(&self->alloc, range_cast(USizeRange, range));
             memory_mapping_destroy(self, mapping);
-            return;
+            return OK(SpaceResult, range);
         }
     }
+
+    return ERR(SpaceResult, BR_BAD_ADDRESS);
 }
 
 void space_dump(Space *self)

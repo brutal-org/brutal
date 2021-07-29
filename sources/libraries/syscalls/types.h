@@ -6,7 +6,6 @@
 
 #define FOREACH_SYSCALLS(SYSCALL) \
     SYSCALL(LOG)                  \
-    SYSCALL(DEBUG)                \
     SYSCALL(MAP)                  \
     SYSCALL(UNMAP)                \
     SYSCALL(CREATE)               \

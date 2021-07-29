@@ -18,13 +18,6 @@ typedef struct
 
 SYSCALL(log) (BrLogArgs* args);
 
-typedef struct 
-{
-    int val;
-} BrDebugArgs;
-
-SYSCALL(debug) (BrDebugArgs* args);
-
 typedef struct
 {
     BrSpace space;
@@ -71,14 +64,7 @@ typedef struct
 {
     BrObjectType type;
 
-    union
-    {
-        BrHandle handle;
-
-        BrTask task_handle;
-        BrMemObj mem_obj_handle;
-        BrSpace space_handle;
-    };
+    BrHandle handle;
 
     union
     {

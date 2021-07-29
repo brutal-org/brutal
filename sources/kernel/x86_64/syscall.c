@@ -27,9 +27,7 @@ void syscall_initialize(void)
     // ucode + 8 : user data
     // ucode + 16 : user code
 
-    asm_write_msr(MSR_STAR, ((uint64_t)(GDT_KERNEL_CODE * 8) << STAR_KCODE_OFFSET) |
-                                ((uint64_t)(((GDT_USER_DATA - 1) * 8) | GDT_RING_3) << STAR_UCODE_OFFSET));
-
+    asm_write_msr(MSR_STAR, ((uint64_t)(GDT_KERNEL_CODE * 8) << STAR_KCODE_OFFSET) | ((uint64_t)(((GDT_USER_DATA - 1) * 8) | GDT_RING_3) << STAR_UCODE_OFFSET));
     asm_write_msr(MSR_LSTAR, (uint64_t)__syscall);
     asm_write_msr(MSR_SYSCALL_FLAG_MASK, 0);
 }

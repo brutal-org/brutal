@@ -33,6 +33,6 @@ typedef Result(BrResult, VmmRange) SpaceResult;
 
 SpaceResult space_map(Space *self, MemObj *mem_obj, size_t offset, size_t size, uintptr_t vaddr);
 
-void space_unmap(Space *self, VmmRange range);
+SpaceResult space_unmap(Space *self, VmmRange range);
 
 void space_dump(Space *self);

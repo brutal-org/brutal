@@ -1,6 +1,6 @@
 #include <brutal/alloc.h>
 #include <brutal/log.h>
-#include <elf/elf.h>
+#include <elf/exec.h>
 #include <syscalls/syscalls.h>
 
 void elf_load(BrSpace space, Elf64Header const *elf_header, BrMemObj elf_obj)
@@ -80,4 +80,74 @@ void elf_load(BrSpace space, Elf64Header const *elf_header, BrMemObj elf_obj)
 
         prog_header = (Elf64ProgramHeader *)((uint8_t *)prog_header + elf_header->program_header_table_entry_size);
     }
+}
+
+BrTask elf_exec(BrMemObj elf_obj, Str name)
+{
+    BrMapArgs elf_map = {
+        .space = BR_SPACE_SELF,
+        .mem_obj = elf_obj,
+        .flags = BR_MEM_WRITABLE,
+    };
+
+    assert_truth(br_map(&elf_map) == BR_SUCCESS);
+
+    BrCreateArgs elf_space = {
+        .type = BR_OBJECT_SPACE,
+        .space = {
+            .flags = BR_SPACE_NONE,
+        },
+    };
+
+    assert_truth(br_create(&elf_space) == BR_SUCCESS);
+
+    BrCreateArgs elf_task = {
+        .type = BR_OBJECT_TASK,
+        .task = {
+            .name = str_cast_fix(StrFix128, name),
+            .space = elf_space.handle,
+            .caps = BR_CAP_ALL,
+        },
+    };
+
+    assert_truth(br_create(&elf_task) == BR_SUCCESS);
+
+    Elf64Header *elf_header = (Elf64Header *)elf_map.vaddr;
+
+    elf_load(elf_space.handle, elf_header, elf_obj);
+
+    BrCreateArgs stack_obj = {
+        .type = BR_OBJECT_MEMORY,
+        .mem_obj = {
+            .size = 0x4000,
+            .flags = BR_MEM_OBJ_NONE,
+        },
+    };
+
+    assert_truth(br_create(&stack_obj) == BR_SUCCESS);
+
+    BrMapArgs stack_map = {
+        .space = elf_space.handle,
+        .mem_obj = stack_obj.handle,
+        .vaddr = 0xC0000000 - 0x4000,
+        .flags = BR_MEM_WRITABLE,
+    };
+
+    assert_truth(br_map(&stack_map) == BR_SUCCESS);
+
+    assert_truth(br_start(&(BrStartArgs){
+                     .task = elf_task.handle,
+                     .ip = elf_header->entry,
+                     .sp = 0xC0000000,
+                 }) == BR_SUCCESS);
+
+    assert_truth(br_unmap(&(BrUnmapArgs){
+        .space = BR_SPACE_SELF,
+        .vaddr = elf_map.vaddr,
+        .size = elf_map.size,
+    }));
+
+    log("Service '{}' created!", name);
+
+    return elf_task.handle;
 }

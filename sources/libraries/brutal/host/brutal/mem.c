@@ -29,7 +29,7 @@ Error host_mem_acquire(size_t size, void **out_result, MAYBE_UNUSED enum host_me
         return br_result_to_error(result);
     }
 
-    BrMemObj mem_obj = mem_obj_args.mem_obj_handle;
+    BrMemObj mem_obj = mem_obj_args.handle;
 
     // Map the memory object
 

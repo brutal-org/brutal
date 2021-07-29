@@ -17,12 +17,6 @@ BrResult sys_log(BrLogArgs *args)
     return BR_SUCCESS;
 }
 
-BrResult sys_debug(BrDebugArgs *args)
-{
-    log("{}", args->val);
-    return BR_SUCCESS;
-}
-
 BrResult sys_map(BrMapArgs *args)
 {
     Space *space = nullptr;
@@ -62,6 +56,7 @@ BrResult sys_map(BrMapArgs *args)
     }
 
     args->vaddr = UNWRAP(map_result).base;
+    args->size = UNWRAP(map_result).size;
 
 cleanup_and_return:
     if (space)
@@ -80,6 +75,7 @@ cleanup_and_return:
 BrResult sys_unmap(BrUnmapArgs *args)
 {
     Space *space = nullptr;
+    BrResult result = BR_SUCCESS;
 
     if (args->space == BR_SPACE_SELF)
     {
@@ -93,14 +89,22 @@ BrResult sys_unmap(BrUnmapArgs *args)
 
     if (space == nullptr)
     {
-        return BR_BAD_HANDLE;
+        result = BR_BAD_HANDLE;
+        goto cleanup_and_return;
     }
 
-    space_unmap(space, (VmmRange){args->vaddr, args->size});
+    auto unmap_result = space_unmap(space, (VmmRange){args->vaddr, args->size});
 
+    if (!unmap_result.success)
+    {
+        result = unmap_result._error;
+        goto cleanup_and_return;
+    }
+
+cleanup_and_return:
     space_deref(space);
 
-    return BR_SUCCESS;
+    return result;
 }
 
 BrResult sys_create_task(BrTask *handle, BrCreateTaskArgs *args)
@@ -192,13 +196,13 @@ BrResult sys_create(BrCreateArgs *args)
     switch (args->type)
     {
     case BR_OBJECT_TASK:
-        return sys_create_task(&args->task_handle, &args->task);
+        return sys_create_task(&args->handle, &args->task);
 
     case BR_OBJECT_SPACE:
-        return sys_create_space(&args->space_handle, &args->space);
+        return sys_create_space(&args->handle, &args->space);
 
     case BR_OBJECT_MEMORY:
-        return sys_create_mem_obj(&args->mem_obj_handle, &args->mem_obj);
+        return sys_create_mem_obj(&args->handle, &args->mem_obj);
 
     default:
         return BR_BAD_ARGUMENTS;
@@ -304,7 +308,6 @@ typedef BrResult BrSyscallFn();
 
 BrSyscallFn *syscalls[BR_SYSCALL_COUNT] = {
     [BR_SC_LOG] = sys_log,
-    [BR_SC_DEBUG] = sys_debug,
     [BR_SC_MAP] = sys_map,
     [BR_SC_UNMAP] = sys_unmap,
     [BR_SC_CREATE] = sys_create,
