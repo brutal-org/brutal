@@ -6,7 +6,7 @@
 #include <syscalls/types.h>
 #include "kernel/channel.h"
 #include "kernel/context.h"
-#include "kernel/memory.h"
+#include "kernel/space.h"
 
 typedef enum
 {
