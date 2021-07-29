@@ -22,16 +22,7 @@ void vmm_space_switch(VmmSpace space);
 
 VmmSpace vmm_kernel_space(void);
 
-VmmResult vmm_alloc(
-    VmmSpace space,
-    PmmRange range,
-    BrMemFlags flags);
-
-VmmResult vmm_map(
-    VmmSpace space,
-    VmmRange virtual_range,
-    PmmRange physical_range,
-    BrMemFlags flags);
+VmmResult vmm_map(VmmSpace space, VmmRange virtual_range, PmmRange physical_range, BrMemFlags flags);
 
 VmmResult vmm_unmap(VmmSpace space, VmmRange virtual_range);
 
