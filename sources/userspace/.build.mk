@@ -11,7 +11,7 @@ SERVERS+=$$($(1)_BIN)
 
 $(BUILDDIR_CROSS)/userspace/$($(1)_NAME)/%.c.o: sources/userspace/$($(1)_NAME)/%.c
 	$$(MKCWD)
-	$(CROSS_CC) -c -o $$@ $$< $(CROSS_UCFLAGS)
+	$(CROSS_CC) -c -o $$@ $$< $(CROSS_UCFLAGS) -fsanitize=undefined
 
 $$($(1)_BIN): $$($(1)_OBJ) $(LIBS_BIN) $(CRTS_BIN)
 	$$(MKCWD)
