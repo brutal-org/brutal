@@ -13,7 +13,7 @@ The syscall does nothing and always returns `BR_SUCCESS`.
 ### br_log
 
 - Arguments:
-  - `const char* message`: message to be displayed.
+  - `char const* message`: message to be displayed.
   - `size_t size`: size of the message.
 
 - Result:
@@ -38,10 +38,10 @@ This syscall creates a new address space. If there is an error during the creat
 
 ### br_mobj
 
-- Arguments: 
+- Arguments:
   - (out) `BrMemObj* mobj`: handle of the mobj if created successfully, or `BR_MOBJ_ERROR`.
   - `uintptr_t addr`: physical address of the MOBJ if `BR_MEM_OBJ_PMM` is set.
-  - `size_t size`: size of the MOBJ. 
+  - `size_t size`: size of the MOBJ.
   - `BrMemObjFlags flags`.
 
 - Result:
@@ -75,7 +75,7 @@ This syscall map a Mobj into a target address space.
   - (out) `uintptr_t vaddr`: Address where the MOBJ is mapped.
   - `BrMemFlags flags`: Access flags.
 
-- Result: 
+- Result:
   - `BR_SUCCESS`: The mapping was created successfully.
   - `BR_BAD_HANDLE`: The handle of the `space` or `mobj` was invalid.
   - `BR_OUT_OF_MEMORY`: There was not enough memory to complete the operation.
@@ -89,7 +89,7 @@ This syscall finds some space in the target address space and maps the mobj into
   - `uintptr_t vaddr`: Start of the range that will be unmapped.
   - `size_t size`: Size of the range that will be unmapped.
 
-- Result: 
+- Result:
   - `BR_SUCCESS`: The memory was unmapped successfully.
   - `BR_BAD_HANDLE`: The handle to the space is invalid.
   - `BR_BAD_ADDRESS`: The range is not in the address space.
@@ -105,7 +105,7 @@ This syscall unmaps a memory range from an address space.
   - `BrTaskArgs const* args`: Arguments of the task.
   - `BrTaskFlags flags`: Flags to tweaks the behavior of the task.
 
-- Result: 
+- Result:
   - `BR_SUCCESS`: The task was created successfully.
   - `BR_BAD_HANDLE`: The handle to the space is invalid.
   - `BR_BAD_ADDRESS`: The address of the task was not located in user memory.
@@ -121,7 +121,7 @@ This syscall creates a new task.
   - `uintptr_t sp`: The stack pointer of the task.
   - `BrTaskArgs* args`: The task argument.
 
-- Result: 
+- Result:
   - `BR_SUCCESS`: The task was started successfully.
   - `BR_BAD_HANDLE`: The handle to the task was invalid.
   - `BR_BAD_ADDRESS`: The address of `ip`, `sp` or `args` was not located in user memory.
@@ -163,8 +163,8 @@ Map an irq to a process.
 
 ### br_drop
 
-- Arguments: 
-  - `BrTask task_handle`: Target task 
+- Arguments:
+  - `BrTask task_handle`: Target task
   - `BrCap cap`: The capability to remove.
 
 - Result:
@@ -178,7 +178,7 @@ This syscall drop one or more task capabilities.
 - Arguments:
   - `BrHandle handle`: handle to close.
 
-- Result: 
+- Result:
   - `BR_SUCCESS`: The handle was closed successfully.
   - `BR_BAD_HANDLE`: The handle was invalid.
 

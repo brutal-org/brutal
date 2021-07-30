@@ -37,7 +37,7 @@ void syscall_set_stack(uintptr_t stack)
     cpu_impl_self()->syscall_kernel_stack = stack;
 }
 
-uint64_t syscall_handler(const Regs *regs)
+uint64_t syscall_handler(Regs const *regs)
 {
     // NOTE: we can't use r11 and rcx because they are used for storing the ip (r11) and the flags (rcx)
     return syscall_dispatch(regs->rax, regs->rbx);

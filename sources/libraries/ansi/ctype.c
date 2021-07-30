@@ -90,7 +90,7 @@ int isprint(int c)
 
 int ispunct(int c)
 {
-    const char *punctuation = "!\"#$%&'()*+,-./:;<=>?@ [\\]^_`{|}~";
+    char const *punctuation = "!\"#$%&'()*+,-./:;<=>?@ [\\]^_`{|}~";
 
     for (size_t i = 0; i < sizeof(punctuation); i++)
     {

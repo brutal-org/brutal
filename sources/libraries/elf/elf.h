@@ -97,5 +97,4 @@ typedef struct PACKED
     uint64_t alignment;
 } Elf64ProgramHeader;
 
-bool elf_validate(const Elf64Header *header);
-
+bool elf_validate(Elf64Header const *header);

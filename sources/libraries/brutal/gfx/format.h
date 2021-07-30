@@ -93,25 +93,25 @@ static inline GfxColor gfx_pixel_load(const void *src, GfxPixelFormat format)
     {
     case GFX_PIXEL_FORMAT_GRAYSCALE_8:
     {
-        auto p = *((const GfxPixelGrayScale8 *)src);
+        auto p = *((GfxPixelGrayScale8 const *)src);
         return (GfxColor){p.v, p.v, p.v, 0};
     }
 
     case GFX_PIXEL_FORMAT_RGB888:
     {
-        auto p = *((const GfxPixelRGB888 *)src);
+        auto p = *((GfxPixelRGB888 const *)src);
         return (GfxColor){p.r, p.g, p.b, 0};
     }
 
     case GFX_PIXEL_FORMAT_RGBA8888:
     {
-        auto p = *((const GfxPixelRGBA8888 *)src);
+        auto p = *((GfxPixelRGBA8888 const *)src);
         return (GfxColor){p.r, p.g, p.b, p.a};
     }
 
     case GFX_PIXEL_FORMAT_BGRA8888:
     {
-        auto p = *((const GfxPixelBGRA8888 *)src);
+        auto p = *((GfxPixelBGRA8888 const *)src);
         return (GfxColor){p.r, p.g, p.b, p.a};
     }
 

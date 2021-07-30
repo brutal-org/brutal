@@ -37,17 +37,17 @@ typedef struct
 
 void str_rvs(Str str);
 
-bool str_eq(const Str lhs, const Str rhs);
+bool str_eq(Str const lhs, Str const rhs);
 
-int str_count(const Str lStr, const Str rStr);
+int str_count(Str const lStr, Str const rStr);
 
 int str_count_chr(Str const str, char chr);
 
-int str_last(const Str lStr, const Str rStr);
+int str_last(Str const lStr, Str const rStr);
 
 int str_last_chr(Str const str, char chr);
 
-int str_first(const Str lStr, const Str rStr);
+int str_first(Str const lStr, Str const rStr);
 
 int str_first_chr(Str const str, char chr);
 

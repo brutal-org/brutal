@@ -1,6 +1,6 @@
 #include <elf/elf.h>
 
-bool elf_validate(const Elf64Header *header)
+bool elf_validate(Elf64Header const *header)
 {
     return header->identifier.magics[0] == '\177' &&
            header->identifier.magics[1] == 'E' &&

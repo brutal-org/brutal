@@ -19,7 +19,7 @@ static struct stivale2_header_tag_framebuffer framebuffer_hdr_tag = {
     .framebuffer_bpp = 0,
 };
 
-void stivale2_entry(const struct stivale2_struct *info);
+void stivale2_entry(struct stivale2_struct const *info);
 
 [[gnu::section(".stivale2hdr"), gnu::used]] static struct stivale2_header stivale_hdr = {
     .entry_point = (uintptr_t)stivale2_entry,
@@ -28,7 +28,7 @@ void stivale2_entry(const struct stivale2_struct *info);
     .tags = (uintptr_t)&framebuffer_hdr_tag,
 };
 
-void *stivale2_get_tag(const struct stivale2_struct *stivale2_struct, uint64_t id)
+void *stivale2_get_tag(struct stivale2_struct const *stivale2_struct, uint64_t id)
 {
     struct stivale2_tag *current_tag = (void *)stivale2_struct->tags;
 
@@ -87,12 +87,12 @@ static void fill_handover_mmap(Handover *target, const struct stivale2_struct_ta
     }
 }
 
-static void fill_handover_rsdp(Handover *target, const struct stivale2_struct_tag_rsdp *rsdp)
+static void fill_handover_rsdp(Handover *target, struct stivale2_struct_tag_rsdp const *rsdp)
 {
     target->rsdp = mmap_io_to_phys(rsdp->rsdp);
 }
 
-static void fill_handover_framebuffer(Handover *target, const struct stivale2_struct_tag_framebuffer *framebuffer)
+static void fill_handover_framebuffer(Handover *target, struct stivale2_struct_tag_framebuffer const *framebuffer)
 {
     target->framebuffer.present = true;
     target->framebuffer.addr = mmap_io_to_phys(framebuffer->framebuffer_addr);
@@ -102,7 +102,7 @@ static void fill_handover_framebuffer(Handover *target, const struct stivale2_st
     target->framebuffer.bpp = framebuffer->framebuffer_bpp;
 }
 
-void fill_handover_modules(Handover *target, const struct stivale2_struct_tag_modules *modules)
+void fill_handover_modules(Handover *target, struct stivale2_struct_tag_modules const *modules)
 {
     target->modules.size = modules->module_count;
 
@@ -115,7 +115,7 @@ void fill_handover_modules(Handover *target, const struct stivale2_struct_tag_mo
     }
 }
 
-void stivale2_entry(const struct stivale2_struct *info)
+void stivale2_entry(struct stivale2_struct const *info)
 {
     static Handover handover = {};
 
