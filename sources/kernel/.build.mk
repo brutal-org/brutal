@@ -34,19 +34,15 @@ DEPENDENCIES += $(KERNEL_OBJ:.o=.d)
 
 $(BUILDDIR_CROSS)/kernel/%.c.o: sources/kernel/%.c
 	$(MKCWD)
-	$(CROSS_CC) -c -o $@ $< $(CROSS_KCFLAGS)
+	$(CROSS_CC) -c -o $@ $< $(CROSS_KCFLAGS) -fsanitize=undefined
 
 $(BUILDDIR_CROSS)/kernel/%.s.o: sources/kernel/%.s
 	$(MKCWD)
 	$(CROSS_AS) -o $@ $< $(CROSS_ASFLAGS)
 
-$(BUILDDIR_CROSS)/kernel/libraries/brutal/%.c.o: sources/libraries/brutal/%.c
-	$(MKCWD)
-	$(CROSS_CC) -c -o $@ $< $(CROSS_KCFLAGS)
-
 $(BUILDDIR_CROSS)/kernel/libraries/%.c.o: sources/libraries/%.c
 	$(MKCWD)
-	$(CROSS_CC) -c -o $@ $< $(CROSS_KCFLAGS)
+	$(CROSS_CC) -c -o $@ $< $(CROSS_KCFLAGS) -fsanitize=undefined
 
 $(KERNEL): $(KERNEL_OBJ)
 	$(MKCWD)
