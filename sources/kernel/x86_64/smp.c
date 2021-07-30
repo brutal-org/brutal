@@ -78,9 +78,9 @@ static void smp_trampoline_setup(void)
 
 static void smp_initialize_cpu(uint32_t lapic_id)
 {
-    apic_init_processor(lapic_id);
+    lapic_send_init(lapic_id);
     hpet_sleep(10);
-    apic_start_processor(lapic_id, 4096);
+    lapic_send_sipi(lapic_id, 4096);
 }
 
 void smp_boot_other(void)
@@ -91,7 +91,7 @@ void smp_boot_other(void)
 
     for (int cpu = 0; cpu < cpu_count(); cpu++)
     {
-        if (cpu == apic_current_cpu())
+        if (cpu == lapic_current_cpu())
         {
             continue; // don't init current cpu
         }
@@ -115,7 +115,7 @@ void smp_stop_all(void)
     {
         if (i != cpu_self_id())
         {
-            apic_send_ipit(cpu_impl(i)->lapic, IPIT_STOP);
+            lapic_send_ipi(cpu_impl(i)->lapic, IPI_STOP);
         }
     }
 }

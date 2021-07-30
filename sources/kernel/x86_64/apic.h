@@ -4,8 +4,10 @@
 #include <handover/handover.h>
 #include "kernel/cpu.h"
 
-#define IPIT_RESCHED (100)
-#define IPIT_STOP (101)
+/* --- LApic ---------------------------------------------------------------- */
+
+#define IPI_RESCHED (100)
+#define IPI_STOP (101)
 
 #define LAPIC_ENABLE (0x800)
 
@@ -22,10 +24,6 @@
 #define IOAPIC_REG_OFFSET (0)
 #define IOAPIC_VALUE_OFFSET (16)
 
-typedef Result(int, int) IoApicRedirectResult;
-
-#define LAPIC_REGISTER_LVT_INT_MASKED 0x10000
-
 enum lapic_reg
 {
     LAPIC_CPU_ID = 0x20,
@@ -39,6 +37,46 @@ enum lapic_reg
     LAPIC_REG_TIMER_DIV = 0x3e0,
 };
 
+#define LAPIC_TIMER_IRQ (32)
+#define LAPIC_TIMER_PERIODIC (0x20000)
+#define LAPIC_TIMER_MASKED (0x10000)
+
+/* Intel Volume 3A 10.5.4 */
+
+enum apic_timer_division
+{
+    APIC_TIMER_DIVIDE_BY_2 = 0,
+    APIC_TIMER_DIVIDE_BY_4 = 1,
+    APIC_TIMER_DIVIDE_BY_8 = 2,
+    APIC_TIMER_DIVIDE_BY_16 = 3,
+    APIC_TIMER_DIVIDE_BY_32 = 4,
+    APIC_TIMER_DIVIDE_BY_64 = 5,
+    APIC_TIMER_DIVIDE_BY_128 = 6,
+    APIC_TIMER_DIVIDE_BY_1 = 7
+};
+
+void lapic_timer_initialize(void);
+
+uint32_t lapic_read(uint32_t reg);
+
+void lapic_write(uint32_t reg, uint32_t value);
+
+void lapic_enable(void);
+
+void lapic_enable_spurious(void);
+
+void lapic_eoi(void);
+
+void lapic_send_ipi(CpuId cpu_id, uint32_t interrupt_id);
+
+void lapic_send_init(CpuId cpu_id);
+
+void lapic_send_sipi(CpuId cpu_id, uintptr_t entry);
+
+CpuId lapic_current_cpu(void);
+
+/* --- IoApic --------------------------------------------------------------- */
+
 enum ioapic_reg
 {
     IOAPIC_REG_VERSION = 0x1,
@@ -49,33 +87,30 @@ struct PACKED ioapic_version
 {
     uint8_t version;
     uint8_t reserved;
-    uint8_t maximum_redirection;
+    uint8_t max_redirect;
     uint8_t reserved2;
 };
 
-enum PACKED ioapic_ipit_flags
-{
-    IPIT_FLAGS_ACTIVE_HIGH_LOW = 1 << 1,
-    IPIT_EDGE_LOW = 1 << 3
-};
+#define IOAPIC_ACTIVE_HIGH_LOW (1 << 1)
+#define IOAPIC_TRIGGER_EDGE_LOW (1 << 3)
 
-struct PACKED ioapic_ipit_redirection_entry
+struct PACKED ioapic_redirect
 {
     union
     {
 
         struct PACKED
         {
-            uint64_t interrupt : 8;
-            uint64_t delivery_mode : 3;
-            uint64_t destination_mode : 1;
-            uint64_t delivery_status : 1;
-            uint64_t pin_polarity : 1;
-            uint64_t remote_irr : 1;
-            uint64_t trigger_mode : 1;
-            uint64_t mask : 1;
+            uint8_t interrupt;
+            uint8_t delivery_mode : 3;
+            uint8_t destination_mode : 1;
+            uint8_t delivery_status : 1;
+            uint8_t pin_polarity : 1;
+            uint8_t remote_irr : 1;
+            uint8_t trigger_mode : 1;
+            uint8_t mask : 1;
             uint64_t _reserved : 39;
-            uint64_t destination : 8;
+            uint8_t destination;
         };
 
         struct PACKED
@@ -86,28 +121,14 @@ struct PACKED ioapic_ipit_redirection_entry
     };
 };
 
-uint32_t lapic_read(uint32_t reg);
-
-void lapic_write(uint32_t reg, uint32_t value);
-
-void apic_enable(void);
-
-void apic_initalize(Handover const *handover);
-
-void lapic_enable_spurious(void);
-
-void apic_eoi(void);
-
-void apic_send_ipit(CpuId cpu_id, uint32_t interrupt_id);
-
-void apic_init_processor(CpuId cpu_id);
-
-void apic_start_processor(CpuId cpu_id, uintptr_t entry);
-
-CpuId apic_current_cpu(void);
+static_assert(sizeof(struct ioapic_redirect) == sizeof(uint64_t));
 
 struct ioapic_version ioapic_get_version(int ioapic_id);
 
-IoApicRedirectResult apic_redirect_irq_to_cpu(CpuId id, uint8_t irq, bool enable, uintptr_t rsdp);
+void ioapic_redirect_irq_to_cpu(CpuId id, uint8_t irq, bool enable, uintptr_t rsdp);
 
-IoApicRedirectResult apic_init_interrupt_redirection(Handover const *handover);
+void ioapic_redirect_legacy_irq(Handover const *handover);
+
+/* --- Apic ----------------------------------------------------------------- */
+
+void apic_initalize(Handover const *handover);

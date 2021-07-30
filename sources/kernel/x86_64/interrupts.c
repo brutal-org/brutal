@@ -157,13 +157,13 @@ uint64_t interrupt_handler(uint64_t rsp)
         sched_switch();
         load_context(regs);
     }
-    else if (regs->int_no == IPIT_RESCHED)
+    else if (regs->int_no == IPI_RESCHED)
     {
         save_context(regs);
         sched_switch();
         load_context(regs);
     }
-    else if (regs->int_no == IPIT_STOP)
+    else if (regs->int_no == IPI_STOP)
     {
         while (true)
         {
@@ -178,7 +178,7 @@ uint64_t interrupt_handler(uint64_t rsp)
 
     cpu_end_interrupt();
 
-    apic_eoi();
+    lapic_eoi();
 
     return rsp;
 }

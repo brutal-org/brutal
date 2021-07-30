@@ -8,7 +8,6 @@
 #include "kernel/tasking.h"
 #include "kernel/vmm.h"
 #include "kernel/x86_64/apic.h"
-#include "kernel/x86_64/apic/timer.h"
 #include "kernel/x86_64/asm.h"
 #include "kernel/x86_64/com.h"
 #include "kernel/x86_64/cpu.h"
@@ -82,7 +81,7 @@ void arch_entry_other(void)
     cpu_disable_interrupts();
     cpu_retain_disable();
 
-    apic_enable();
+    lapic_enable();
     simd_initialize();
     cpu_initialize();
     syscall_initialize();

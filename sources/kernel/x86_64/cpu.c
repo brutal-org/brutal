@@ -54,7 +54,7 @@ void cpu_initialize(void)
 
 CpuId cpu_self_id(void)
 {
-    return apic_current_cpu();
+    return lapic_current_cpu();
 }
 
 Cpu *cpu_self(void)
@@ -69,7 +69,7 @@ Cpu *cpu(CpuId id)
 
 void cpu_resched_other(CpuId cpu)
 {
-    apic_send_ipit(cpu, IPIT_RESCHED);
+    lapic_send_ipi(cpu, IPI_RESCHED);
 }
 
 void cpu_enable_interrupts(void)

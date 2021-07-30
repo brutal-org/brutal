@@ -3,6 +3,6 @@
 #include <elf/elf.h>
 #include "kernel/task.h"
 
-void init_start(Handover *handover);
+void init_start(Handover const *handover);
 
 BrTask init_handle(void);
