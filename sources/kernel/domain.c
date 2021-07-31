@@ -1,4 +1,5 @@
 #include <brutal/alloc.h>
+#include <brutal/log.h>
 #include "kernel/domain.h"
 
 void domain_destroy(Domain *self)
@@ -77,4 +78,3 @@ Object *domain_lookup(Domain *self, BrHandle handle, ObjectType type)
 
     return nullptr;
 }
-

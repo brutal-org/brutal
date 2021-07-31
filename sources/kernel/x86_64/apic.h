@@ -121,7 +121,7 @@ struct PACKED ioapic_redirect
     };
 };
 
-static_assert(sizeof(struct ioapic_redirect) == sizeof(uint64_t));
+static_assert(sizeof(struct ioapic_redirect) == sizeof(uint64_t), "");
 
 struct ioapic_version ioapic_get_version(int ioapic_id);
 
