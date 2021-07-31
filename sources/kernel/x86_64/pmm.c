@@ -90,6 +90,8 @@ PmmResult pmm_alloc(size_t size)
 {
     LOCK_RETAINER(&pmm_lock);
 
+    assert_truth(mem_is_size_page_aligned(size));
+
     used_memory += size;
 
     auto page_size = size / MEM_PAGE_SIZE;
@@ -125,6 +127,8 @@ PmmResult pmm_used(PmmRange range)
 {
     LOCK_RETAINER(&pmm_lock);
 
+    assert_truth(mem_is_range_page_aligned(range));
+
     size_t page_base = range.base / MEM_PAGE_SIZE;
     size_t page_size = range.size / MEM_PAGE_SIZE;
     auto page_range = (USizeRange){page_base, page_size};
@@ -137,6 +141,8 @@ PmmResult pmm_used(PmmRange range)
 PmmResult pmm_unused(PmmRange range)
 {
     LOCK_RETAINER(&pmm_lock);
+
+    assert_truth(mem_is_range_page_aligned(range));
 
     used_memory -= range.size;
 
