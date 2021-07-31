@@ -1,9 +1,10 @@
 #include <brutal/log.h>
 #include "kernel/arch.h"
+#include "kernel/x86_64/apic.h"
 #include "kernel/x86_64/gdt.h"
 #include "kernel/x86_64/idt.h"
 
-extern uintptr_t __interrupt_vector[128];
+extern uintptr_t __interrupt_vector[256];
 
 static struct idt idt = {};
 
@@ -34,10 +35,15 @@ void idt_initialize(void)
         idt.entries[i] = idt_entry(__interrupt_vector[i], 0, IDT_GATE);
     }
 
-    idt.entries[32] = idt_entry(__interrupt_vector[32], 1, IDT_GATE);
+    for (int i = 48; i < 256; i++)
+    {
+        idt.entries[i] = idt_entry(__interrupt_vector[i], 0, IDT_GATE);
+    }
 
-    idt.entries[100] = idt_entry(__interrupt_vector[48], 1, IDT_GATE);
-    idt.entries[101] = idt_entry(__interrupt_vector[49], 0, IDT_GATE);
+    // Specials cases for IPIs dans the timer IRQ.
+    idt.entries[32] = idt_entry(__interrupt_vector[32], 1, IDT_GATE);
+    idt.entries[IPI_RESCHED] = idt_entry(__interrupt_vector[IPI_RESCHED], 1, IDT_GATE);
+    idt.entries[IPI_STOP] = idt_entry(__interrupt_vector[IPI_STOP], 0, IDT_GATE);
 
     idt_update(&idt_descriptor);
 }
