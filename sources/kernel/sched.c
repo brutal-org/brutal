@@ -343,7 +343,7 @@ void sched_ensure_no_cpu_jump(void)
             if (cpu(i)->current == cpu(j)->next)
             {
                 sched_dump();
-                panic("sched_ensure_no_cpu_jump failled (from CPU{} to CPU{})!", i, j);
+                panic("sched_ensure_no_cpu_jump failled {}({}) jumped from CPU{} to CPU{})!", str_cast(&cpu(i)->current->name), cpu(i)->current->handle, i, j);
             }
         }
     }
