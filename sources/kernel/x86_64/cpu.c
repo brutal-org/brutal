@@ -1,6 +1,7 @@
 #include <brutal/log.h>
 #include "kernel/cpu.h"
 #include "kernel/heap.h"
+#include "kernel/kernel.h"
 #include "kernel/x86_64/apic.h"
 #include "kernel/x86_64/asm.h"
 #include "kernel/x86_64/cpu.h"
@@ -29,10 +30,10 @@ void cpu_found(CpuId id, int lapic)
     cpu_impl(id)->lapic = lapic;
 
     // Irq and Isr stack
-    cpu_impl(id)->tss.rsp[0] = range_end(UNWRAP(heap_alloc(4096)));
+    cpu_impl(id)->tss.rsp[0] = range_end(UNWRAP(heap_alloc(KERNEL_STACK_SIZE)));
 
     // Shed stack
-    cpu_impl(id)->tss.ist[0] = range_end(UNWRAP(heap_alloc(4096)));
+    cpu_impl(id)->tss.ist[0] = range_end(UNWRAP(heap_alloc(KERNEL_STACK_SIZE)));
 }
 
 /* --- Public API ----------------------------------------------------------- */
