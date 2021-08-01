@@ -83,8 +83,8 @@ static void display_bootimage(Handover const *handover)
 
     // Cleanup
 
-    br_close(&(BrCloseArgs){.handle = img_obj.handle});
-    br_close(&(BrCloseArgs){.handle = fb_obj.handle});
+    brh_close(img_obj.handle);
+    brh_close(fb_obj.handle);
 
     assert_truth(br_unmap(&(BrUnmapArgs){
                      .space = BR_SPACE_SELF,
@@ -118,7 +118,7 @@ BrTask srv_run(Handover const *handover, Str name)
 
     auto task_handle = elf_exec(elf_obj.handle, name);
 
-    br_helper_close(elf_obj.handle);
+    brh_close(elf_obj.handle);
 
     log("Service '{}' created!", name);
 

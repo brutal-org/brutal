@@ -3,7 +3,7 @@
 
 static uint8_t from_binary_coded_decimal(uint8_t value)
 {
-    return (((value) / 16) * 10 + ((value)&0xf));
+    return (value / 16) * 10 + (value & 0xf);
 }
 
 uint8_t cmos_read(enum cmos_regs reg)

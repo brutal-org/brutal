@@ -1,5 +1,6 @@
 #pragma once
 
+#include <brutal/base/attributes.h>
 #include <brutal/base/std.h>
 
 typedef uint64_t Tick;
@@ -9,7 +10,7 @@ typedef uint64_t Seconds;
 typedef uint64_t Minutes;
 typedef uint64_t Hours;
 
-typedef struct
+typedef struct PACKED
 {
     Seconds second;
     Minutes minute;
@@ -20,14 +21,14 @@ typedef uint64_t Day;
 typedef uint64_t Mounth;
 typedef uint64_t Year;
 
-typedef struct
+typedef struct PACKED
 {
     Day day;
     Mounth month;
     Year year;
 } Date;
 
-typedef union
+typedef union PACKED
 {
     struct
     {

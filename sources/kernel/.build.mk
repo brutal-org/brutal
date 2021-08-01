@@ -13,6 +13,7 @@ KERNEL_LIBS_SRC = \
 			  $(wildcard sources/libraries/brutal/io/write.c) \
 			  $(wildcard sources/libraries/brutal/io/buffer.c) \
 			  $(wildcard sources/libraries/brutal/mem/*.c) \
+			  $(wildcard sources/libraries/brutal/time/convert.c) \
 			  $(wildcard sources/libraries/brutal/text/*.c) \
 			  $(wildcard sources/libraries/brutal/sync/*.c) \
 			  $(wildcard sources/libraries/brutal/ds/*.c) \

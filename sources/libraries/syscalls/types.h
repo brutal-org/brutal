@@ -3,6 +3,7 @@
 #include <brutal/base/attributes.h>
 #include <brutal/base/error.h>
 #include <brutal/base/std.h>
+#include <brutal/time/types.h>
 
 #define FOREACH_SYSCALLS(SYSCALL) \
     SYSCALL(LOG)                  \
@@ -145,6 +146,8 @@ typedef enum
 typedef BrHandle BrMemObj;
 
 #define BR_MEM_OBJ_ERROR ((BrMemObj)-1)
+#define BR_MEM_OBJ_GINFO ((BrMemObj)-2)
+#define BR_MEM_OBJ_LINFO ((BrMemObj)-3)
 
 typedef enum
 {
@@ -242,10 +245,14 @@ typedef struct
 
 typedef struct
 {
+    Tick tick;
+    TimeStamp time;
 } BrGlobalInfo;
 
 typedef struct
 {
+    BrTask task;
+    StrFix128 name;
 } BrLocalInfo;
 
 typedef struct

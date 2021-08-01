@@ -2,6 +2,7 @@
 #include <brutal/log.h>
 #include <syscalls/syscalls.h>
 #include "kernel/domain.h"
+#include "kernel/global.h"
 #include "kernel/memory.h"
 #include "kernel/sched.h"
 #include "kernel/syscalls.h"
@@ -39,7 +40,14 @@ BrResult sys_map(BrMapArgs *args)
         goto cleanup_and_return;
     }
 
-    mem_obj = (MemObj *)domain_lookup(task_self()->domain, args->mem_obj, OBJECT_MEMORY);
+    if (args->mem_obj == BR_MEM_OBJ_GINFO)
+    {
+        mem_obj = global_create_obj();
+    }
+    else
+    {
+        mem_obj = (MemObj *)domain_lookup(task_self()->domain, args->mem_obj, OBJECT_MEMORY);
+    }
 
     if (mem_obj == nullptr)
     {

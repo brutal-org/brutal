@@ -1,4 +1,5 @@
 #include <brutal/host/mem.h>
+#include <syscalls/helpers.h>
 #include <syscalls/syscalls.h>
 
 void host_mem_lock(void)
@@ -43,9 +44,7 @@ Error host_mem_acquire(size_t size, void **out_result, MAYBE_UNUSED enum host_me
 
     // Cleanup and return
 
-    br_close(&(BrCloseArgs){
-        .handle = mem_obj,
-    });
+    brh_close(mem_obj);
 
     if (result != BR_SUCCESS)
     {

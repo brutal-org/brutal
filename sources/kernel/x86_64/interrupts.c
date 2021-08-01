@@ -1,11 +1,14 @@
 #include <brutal/log.h>
 #include <brutal/sync.h>
-#include "brutal/types.h"
+#include <brutal/time.h>
+#include <brutal/types.h>
 #include "kernel/context.h"
 #include "kernel/cpu.h"
+#include "kernel/global.h"
 #include "kernel/sched.h"
 #include "kernel/x86_64/apic.h"
 #include "kernel/x86_64/asm.h"
+#include "kernel/x86_64/cmos.h"
 #include "kernel/x86_64/interrupts.h"
 #include "kernel/x86_64/pic.h"
 #include "kernel/x86_64/simd.h"
@@ -152,6 +155,12 @@ uint64_t interrupt_handler(uint64_t rsp)
     }
     else if (regs->int_no == 32)
     {
+        global()->tick++;
+        if (global()->tick % 500)
+        {
+            global()->time = datetime_to_timestamp(cmos_read_rtc());
+        }
+
         save_context(regs);
         sched_schedule();
         sched_switch();

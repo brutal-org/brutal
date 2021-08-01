@@ -1,6 +1,7 @@
 #include <brutal/alloc.h>
 #include <brutal/log.h>
 #include <elf/exec.h>
+#include <syscalls/helpers.h>
 #include <syscalls/syscalls.h>
 
 void elf_load(BrSpace space, Elf64Header const *elf_header, BrMemObj elf_obj)
@@ -73,9 +74,7 @@ void elf_load(BrSpace space, Elf64Header const *elf_header, BrMemObj elf_obj)
                              .size = size,
                          }) == BR_SUCCESS);
 
-            assert_truth(br_close(&(BrCloseArgs){
-                             .handle = prog_obj.handle,
-                         }) == BR_SUCCESS);
+            assert_truth(brh_close(prog_obj.handle) == BR_SUCCESS);
         }
 
         prog_header = (Elf64ProgramHeader *)((uint8_t *)prog_header + elf_header->program_header_table_entry_size);

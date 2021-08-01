@@ -8,4 +8,4 @@ Time timestamp_to_time(TimeStamp timestamp);
 
 DateTime timestamp_to_datetime(TimeStamp timestamp);
 
-TimeStamp DateTimeo_timestamp(DateTime datetime);
+TimeStamp datetime_to_timestamp(DateTime datetime);

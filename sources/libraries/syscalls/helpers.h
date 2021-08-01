@@ -1,10 +1,9 @@
 #pragma once
 
-#include <syscalls/syscalls.h>
+#include <syscalls/types.h>
 
-BrResult br_helper_close(BrHandle handle)
-{
-    return br_close(&(BrCloseArgs){
-        .handle = handle,
-    });
-}
+BrResult brh_close(BrHandle handle);
+
+BrGlobalInfo *brh_global_info(void);
+
+BrLocalInfo *brh_local_info(void);
