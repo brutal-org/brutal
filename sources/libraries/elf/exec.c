@@ -144,7 +144,7 @@ BrTask elf_exec(BrMemObj elf_obj, Str name)
         .space = BR_SPACE_SELF,
         .vaddr = elf_map.vaddr,
         .size = elf_map.size,
-    }));
+    }) == BR_SUCCESS);
 
     log("Service '{}' created!", name);
 
