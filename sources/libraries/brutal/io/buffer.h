@@ -35,7 +35,7 @@ Str buffer_str(Buffer *self);
 
 #define buffer_used(SELF) ((SELF)->used)
 
-    typedef struct
+typedef struct
 {
     IoReader base;
     Buffer const *buf;

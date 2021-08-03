@@ -2,6 +2,7 @@
 
 #include <brutal/alloc/base.h>
 #include <brutal/base/cast.h>
+#include <brutal/base/keywords.h>
 #include <brutal/base/macros.h>
 #include <brutal/mem.h>
 
