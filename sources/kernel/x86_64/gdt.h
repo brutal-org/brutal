@@ -72,6 +72,8 @@ struct PACKED gdt
 
 struct gdt_entry gdt_entry(uint32_t base, uint32_t limit, uint8_t granularity, uint8_t flags);
 
+struct gdt_entry gdt_entry_null();
+
 struct gdt_entry gdt_entry_simple(uint8_t flags, uint8_t granularity);
 
 struct gdt_tss_entry gdt_entry_tss(uintptr_t tss);

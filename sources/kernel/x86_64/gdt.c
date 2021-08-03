@@ -33,6 +33,11 @@ struct gdt_entry gdt_entry(uint32_t base, uint32_t limit, uint8_t granularity, u
     };
 }
 
+struct gdt_entry gdt_entry_null()
+{
+    return gdt_entry(0, 0, 0, 0);
+}
+
 struct gdt_entry gdt_entry_simple(uint8_t flags, uint8_t granularity)
 {
     return gdt_entry(0, 0, granularity, flags);
@@ -54,11 +59,11 @@ struct gdt_tss_entry gdt_entry_tss(uintptr_t tss)
 
 void gdt_initialize(void)
 {
-    gdt.entries[0] = gdt_entry(0, 0, 0, 0); // null descriptor
+    gdt.entries[0] = gdt_entry_null();
     gdt.entries[GDT_KERNEL_CODE] = gdt_entry_simple(GDT_PRESENT | GDT_SEGMENT | GDT_READWRITE | GDT_EXECUTABLE, GDT_LONG_MODE_GRANULARITY);
     gdt.entries[GDT_KERNEL_DATA] = gdt_entry_simple(GDT_PRESENT | GDT_SEGMENT | GDT_READWRITE, 0);
 
-    gdt.entries[3] = gdt_entry(0, 0, 0, 0);
+    gdt.entries[3] = gdt_entry_null();
     gdt.entries[GDT_USER_DATA] = gdt_entry_simple(GDT_PRESENT | GDT_SEGMENT | GDT_READWRITE | GDT_USER, 0);
     gdt.entries[GDT_USER_CODE] = gdt_entry_simple(GDT_PRESENT | GDT_SEGMENT | GDT_READWRITE | GDT_EXECUTABLE | GDT_USER, GDT_LONG_MODE_GRANULARITY);
 
