@@ -367,10 +367,7 @@ void sched_schedule(void)
 {
     tick++;
 
-    if (!lock_try_acquire(&lock))
-    {
-        return;
-    }
+    lock_acquire(&lock);
 
     sched_updated_blocked();
 
