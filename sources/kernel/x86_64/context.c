@@ -1,5 +1,4 @@
 #include <brutal/alloc.h>
-#include <brutal/base.h>
 #include <brutal/log.h>
 #include "kernel/context.h"
 #include "kernel/x86_64/asm.h"

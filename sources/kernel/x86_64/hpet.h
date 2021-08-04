@@ -1,6 +1,5 @@
 #pragma once
 
-#include <brutal/base.h>
 #include <handover/handover.h>
 #include "kernel/x86_64/acpi.h"
 

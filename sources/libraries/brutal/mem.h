@@ -1,5 +1,7 @@
 #pragma once
 
+#include <brutal/base.h>
+/* --- */
 #include <brutal/base/std.h>
 #include <brutal/mem/units.h>
 #include <brutal/mem/volatile.h>

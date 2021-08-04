@@ -1,4 +1,3 @@
-#include <brutal/base.h>
 #include <brutal/log.h>
 #include "kernel/arch.h"
 #include "kernel/init.h"

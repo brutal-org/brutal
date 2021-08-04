@@ -1,4 +1,3 @@
-#include <brutal/base.h>
 #include <brutal/ds.h>
 #include <brutal/log.h>
 #include <brutal/mem.h>

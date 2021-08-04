@@ -37,6 +37,14 @@ struct alloc
         ptr;                                     \
     })
 
+// Move an object to the heap
+#define alloc_move(SELF, VALUE) (                                \
+    {                                                            \
+        typeof(VALUE) *ptr = alloc_acquire(SELF, sizeof(VALUE)); \
+        mem_cpy(ptr, &(VALUE), sizeof(VALUE));                   \
+        ptr;                                                     \
+    })
+
 #define alloc_make_array(SELF, T, COUNT) \
     ((T *)alloc_calloc(SELF, sizeof(T), COUNT))
 

@@ -443,3 +443,16 @@ void alloc_heap_init(struct alloc_heap *alloc)
         .root = nullptr,
     };
 }
+
+void alloc_heap_deinit(struct alloc_heap *alloc)
+{
+    struct alloc_major *current = alloc->root;
+    while (current)
+    {
+        struct alloc_major *next = current->next;
+        host_mem_release(current, current->pages * MEM_PAGE_SIZE);
+        current = next;
+    }
+
+    *alloc = (struct alloc_heap){};
+}

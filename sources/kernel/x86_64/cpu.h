@@ -1,6 +1,5 @@
 #pragma once
 
-#include <brutal/base.h>
 #include "kernel/cpu.h"
 #include "kernel/x86_64/gdt.h"
 

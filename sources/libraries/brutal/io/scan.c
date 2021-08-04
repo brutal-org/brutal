@@ -89,6 +89,20 @@ void scan_next_n(Scan *self, int n)
     }
 }
 
+long scan_next_digit(Scan *self)
+{
+    char c = tolower(scan_next(self));
+
+    if (isalnum(c))
+    {
+        return c - 'a' + 10;
+    }
+    else
+    {
+        return c - '0';
+    }
+}
+
 long scan_next_decimal(Scan *self)
 {
     long result = 0;
@@ -168,6 +182,20 @@ bool scan_eat(Scan *self, ScanMatch *match)
 
     return any;
 }
+
+void scan_begin_token(Scan *self)
+{
+    self->token = self->head;
+}
+
+Str scan_end_token(Scan *self)
+{
+    return str_cast_n(
+        self->head - self->token,
+        (char *)self->buffer + self->token);
+}
+
+/* --- Error Handeling ------------------------------------------------------ */
 
 void scan_throw(Scan *self, Str message, Str token)
 {

@@ -1,4 +1,3 @@
-#include <brutal/base.h>
 #include <brutal/codec/tga.h>
 #include <brutal/gfx.h>
 #include <brutal/log.h>

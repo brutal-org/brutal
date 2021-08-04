@@ -10,3 +10,5 @@ struct alloc_heap
 };
 
 void alloc_heap_init(struct alloc_heap *alloc);
+
+void alloc_heap_deinit(struct alloc_heap *alloc);

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <brutal/base.h>
+/* --- */
 #include <brutal/math/edge.h>
 #include <brutal/math/mat3x2.h>
 #include <brutal/math/rect.h>

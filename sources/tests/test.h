@@ -1,6 +1,5 @@
 #pragma once
 
-#include <brutal/base.h>
 #include <brutal/log.h>
 
 typedef void TestFunc(void);

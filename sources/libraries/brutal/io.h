@@ -1,5 +1,7 @@
 #pragma once
 
+#include <brutal/base.h>
+/* --- */
 #include <brutal/io/buffer.h>
 #include <brutal/io/copy.h>
 #include <brutal/io/fmt.h>

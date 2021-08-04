@@ -1,6 +1,4 @@
 BID_SRC= $(wildcard sources/bid/*.c) \
-		 $(wildcard sources/bid/*/*.c) \
-		 $(wildcard sources/bid/*/*/*.c) \
 		 $(wildcard sources/libraries/brutal/*.c) \
 		 $(wildcard sources/libraries/brutal/*/*.c) \
 		 $(wildcard sources/libraries/bid/*/*.c) \

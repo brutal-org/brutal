@@ -1,6 +1,5 @@
 #pragma once
 
-#include <brutal/base.h>
 #include <syscalls/types.h>
 #include "kernel/pmm.h"
 

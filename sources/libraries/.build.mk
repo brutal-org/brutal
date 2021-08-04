@@ -5,6 +5,7 @@ LIBS_SRC = \
 	$(wildcard sources/libraries/brutal/*.c)             \
 	$(wildcard sources/libraries/brutal/*/*.c)           \
 	$(wildcard sources/libraries/brutal/host/brutal/*.c) \
+	$(wildcard sources/libraries/bs/*.c)                 \
 	$(wildcard sources/libraries/bsd/*.c)                \
 	$(wildcard sources/libraries/elf/*.c)                \
 	$(wildcard sources/libraries/gnu/*.c)                \

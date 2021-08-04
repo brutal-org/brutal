@@ -1,9 +1,6 @@
 #pragma once
 
-#include <brutal/base/attributes.h>
-#include <brutal/base/error.h>
-#include <brutal/base/std.h>
-#include <brutal/time/types.h>
+#include <brutal/time.h>
 
 #define FOREACH_SYSCALLS(SYSCALL) \
     SYSCALL(LOG)                  \

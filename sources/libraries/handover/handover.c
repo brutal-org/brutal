@@ -1,4 +1,3 @@
-#include <brutal/base.h>
 #include <brutal/log.h>
 #include <handover/handover.h>
 

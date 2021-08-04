@@ -20,6 +20,8 @@ typedef struct
     size_t size;
     size_t head;
 
+    size_t token;
+
     bool has_error;
     ScanError error;
 } Scan;
@@ -36,6 +38,8 @@ char scan_next(Scan *self);
 
 void scan_next_n(Scan *self, int n);
 
+long scan_next_digit(Scan *self);
+
 long scan_next_decimal(Scan *self);
 
 bool scan_skip(Scan *self, char c);
@@ -47,6 +51,12 @@ Str scan_skip_until(Scan *self, ScanMatch *match);
 #define scan_skip_space(scan) scan_skip_until(scan, isspace)
 
 bool scan_eat(Scan *self, ScanMatch *match);
+
+void scan_begin_token(Scan *self);
+
+Str scan_end_token(Scan *self);
+
+/* --- Error Handeling ------------------------------------------------------ */
 
 void scan_throw(Scan *self, Str message, Str token);
 

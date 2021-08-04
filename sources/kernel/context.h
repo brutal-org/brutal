@@ -1,6 +1,5 @@
 #pragma once
 
-#include <brutal/base.h>
 #include <syscalls/types.h>
 
 #ifdef __x86_64__
