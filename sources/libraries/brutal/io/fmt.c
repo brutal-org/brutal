@@ -1,6 +1,7 @@
 #include <brutal/base/attributes.h>
 #include <brutal/base/keywords.h>
 #include <brutal/io/fmt.h>
+#include <brutal/text/rune.h>
 #include <brutal/text/vals.h>
 
 static int fmt_base(struct fmt self)
@@ -149,7 +150,6 @@ IoWriteResult fmt_signed(struct fmt self, IoWriter *writer, long value)
 
 IoWriteResult fmt_unsigned(struct fmt self, IoWriter *writer, unsigned long value)
 {
-
     char buffer[64] = {};
     size_t i = 0;
 
@@ -168,7 +168,6 @@ IoWriteResult fmt_unsigned(struct fmt self, IoWriter *writer, unsigned long valu
 
     if (self.min_width != 0)
     {
-
         while (i < self.min_width)
         {
             if (self.fill_with_zero)
@@ -195,11 +194,13 @@ IoWriteResult fmt_unsigned(struct fmt self, IoWriter *writer, unsigned long valu
     return io_write(writer, buffer, i);
 }
 
-IoWriteResult fmt_char(MAYBE_UNUSED struct fmt self, IoWriter *writer, char character)
+IoWriteResult fmt_char(MAYBE_UNUSED struct fmt self, IoWriter *writer, unsigned int character)
 {
     size_t written = 0;
 
-    written += TRY(IoWriteResult, io_put(writer, character));
+    auto utf8 = rune_to_utf8((Rune)character);
+
+    written += TRY(IoWriteResult, io_print(writer, str_cast(&utf8)));
 
     return OK(IoWriteResult, written);
 }

@@ -6,6 +6,8 @@
 
 enum fmt_type
 {
+    FMT_NONE,
+
     FMT_CHAR,
     FMT_STRING,
     FMT_BINARY,
@@ -31,4 +33,4 @@ IoWriteResult fmt_unsigned(struct fmt self, IoWriter *writer, unsigned long valu
 
 IoWriteResult fmt_string(struct fmt self, IoWriter *writer, Str string);
 
-IoWriteResult fmt_char(struct fmt self, IoWriter *writer, char character);
+IoWriteResult fmt_char(struct fmt self, IoWriter *writer, unsigned int character);

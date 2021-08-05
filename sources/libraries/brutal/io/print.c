@@ -37,10 +37,24 @@ IoWriteResult print_dispatch(IoWriter *writer, struct fmt fmt, struct print_valu
     switch (value.type)
     {
     case PRINT_SIGNED:
-        return fmt_signed(fmt, writer, value._signed);
+        if (fmt.type == FMT_CHAR)
+        {
+            return fmt_char(fmt, writer, value._unsigned);
+        }
+        else
+        {
+            return fmt_signed(fmt, writer, value._signed);
+        }
 
     case PRINT_UNSIGNED:
-        return fmt_unsigned(fmt, writer, value._unsigned);
+        if (fmt.type == FMT_CHAR)
+        {
+            return fmt_char(fmt, writer, value._unsigned);
+        }
+        else
+        {
+            return fmt_unsigned(fmt, writer, value._unsigned);
+        }
 
     case PRINT_STRING:
         return fmt_string(fmt, writer, value._string);
