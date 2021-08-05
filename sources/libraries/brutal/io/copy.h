@@ -19,7 +19,7 @@ static inline IoCopyResult io_copy(IoReader *from, IoWriter *to)
             return OK(IoCopyResult, total);
         }
 
-        auto written = TRY(IoCopyResult, io_write(to, buffer, 512));
+        auto written = TRY(IoCopyResult, io_write(to, buffer, read));
 
         if (written == 0)
         {
