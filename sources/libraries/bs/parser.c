@@ -79,21 +79,26 @@ static int isany(int c, char const *what)
     return false;
 }
 
-static int isatom_start(int c)
+static int is_num(int c)
 {
-    return isalnum(c) | isany(c, "!$%&*/:<=>?^_~");
+    return isdigit(c) | isany(c, "+-");
 }
 
-static int isatom(int c)
+static int is_atom_start(int c)
 {
-    return isatom_start(c) || isdigit(c) || isany(c, "+-.@");
+    return isalpha(c) | isany(c, "!$%&*/:<=>?^_~");
+}
+
+static int is_atom(int c)
+{
+    return is_atom_start(c) || isdigit(c) || isany(c, "+-.@");
 }
 
 static BsExpr parse_atom(Scan *scan)
 {
     scan_begin_token(scan);
     scan_next(scan);
-    scan_skip_until(scan, isatom);
+    scan_skip_until(scan, is_atom);
     return bs_atom(scan_end_token(scan));
 }
 
@@ -176,6 +181,14 @@ static BsExpr parse_expression(Scan *scan, Alloc *alloc)
     {
         return bs_bool(false);
     }
+    else if (is_atom_start(scan_curr(scan)))
+    {
+        return parse_atom(scan);
+    }
+    else if (is_num(scan_curr(scan)))
+    {
+        return bs_num(scan_next_decimal(scan));
+    }
     else if (skip_keyword(scan, "#\\"))
     {
         return parse_rune(scan);
@@ -184,10 +197,6 @@ static BsExpr parse_expression(Scan *scan, Alloc *alloc)
     {
         skip_atmosphere(scan);
         return parse_pair(scan, alloc);
-    }
-    else if (isatom_start(scan_curr(scan)))
-    {
-        return parse_atom(scan);
     }
     else
     {

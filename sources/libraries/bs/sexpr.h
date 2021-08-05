@@ -13,6 +13,7 @@
     TYPE(STR)               \
     TYPE(PAIR)              \
     TYPE(BUILTIN)           \
+    TYPE(SYNTAX)            \
     TYPE(LAMBDA)
 
 typedef enum
@@ -61,7 +62,8 @@ typedef struct
     BsExpr *cdr;
 } BsPair;
 
-typedef BsExpr (*BsBuiltin)(BsExpr args);
+typedef BsExpr (*BsBuiltin)(BsExpr args, BsExpr *env, Alloc *alloc);
+typedef BsBuiltin BsSyntax;
 
 typedef struct
 {
@@ -84,9 +86,63 @@ struct bs_expr
         BsStr str_;
         BsPair pair_;
         BsBuiltin builtin_;
+        BsSyntax syntax_;
         BsLambda lambda_;
     };
 };
+
+static inline bool bs_eq(BsExpr lhs, BsExpr rhs)
+{
+    if (lhs.type != rhs.type)
+    {
+        return false;
+    }
+
+    switch (lhs.type)
+    {
+    case BS_VAL_NIL:
+        return true;
+
+    case BS_VAL_BOOL:
+        return lhs.bool_ == rhs.bool_;
+
+    case BS_VAL_ATOM:
+        return str_eq(lhs.atom_, rhs.atom_);
+
+    case BS_VAL_NUM:
+        return lhs.num_ == rhs.num_;
+
+    case BS_VAL_RUNE:
+        return lhs.rune_ == rhs.rune_;
+
+    case BS_VAL_STR:
+        return str_eq(lhs.str_, rhs.str_);
+
+    default:
+        return false;
+    }
+}
+
+static inline bool bs_is(BsExpr expr, BsType type)
+{
+    return expr.type == type;
+}
+
+static inline bool bs_is_truth(BsExpr expr)
+{
+    return !bs_is(expr, BS_VAL_NIL) &&
+           !bs_is(expr, BS_VAL_BOOL) &&
+           (expr.bool_ != BS_FALSE);
+}
+
+static inline bool bs_is_self_quoting(BsType type)
+{
+    return type == BS_VAL_NIL ||
+           type == BS_VAL_BOOL ||
+           type == BS_VAL_NUM ||
+           type == BS_VAL_RUNE ||
+           type == BS_VAL_STR;
+}
 
 static inline BsExpr bs_nil(void)
 {
@@ -152,7 +208,15 @@ static inline BsExpr bs_builtin(BsBuiltin builtin)
     };
 }
 
-static inline BsExpr br_lambda(Alloc *alloc, BsExpr env, BsExpr parms, BsExpr body)
+static inline BsExpr bs_syntax(BsSyntax syntax)
+{
+    return (BsExpr){
+        .type = BS_VAL_SYNTAX,
+        .syntax_ = syntax,
+    };
+}
+
+static inline BsExpr bs_lambda(Alloc *alloc, BsExpr env, BsExpr parms, BsExpr body)
 {
     return (BsExpr){
         .type = BS_VAL_LAMBDA,
@@ -163,3 +227,54 @@ static inline BsExpr br_lambda(Alloc *alloc, BsExpr env, BsExpr parms, BsExpr bo
         },
     };
 }
+
+static inline BsExpr bs_car(BsExpr expr)
+{
+    if (expr.type != BS_VAL_PAIR)
+    {
+        return bs_nil();
+    }
+
+    return *expr.pair_.car;
+}
+
+static inline BsExpr bs_cdr(BsExpr expr)
+{
+    if (expr.type != BS_VAL_PAIR)
+    {
+        return bs_nil();
+    }
+
+    return *expr.pair_.cdr;
+}
+
+#define bs_caar(obj) bs_car(bs_car(obj))
+#define bs_cadr(obj) bs_car(bs_cdr(obj))
+#define bs_cdar(obj) bs_cdr(bs_car(obj))
+#define bs_cddr(obj) bs_cdr(bs_cdr(obj))
+
+#define bs_caaar(obj) bs_car(bs_car(bs_car(obj)))
+#define bs_caadr(obj) bs_car(bs_car(bs_cdr(obj)))
+#define bs_cadar(obj) bs_car(bs_cdr(bs_car(obj)))
+#define bs_caddr(obj) bs_car(bs_cdr(bs_cdr(obj)))
+#define bs_cdaar(obj) bs_cdr(bs_car(bs_car(obj)))
+#define bs_cdadr(obj) bs_cdr(bs_car(bs_cdr(obj)))
+#define bs_cddar(obj) bs_cdr(bs_cdr(bs_car(obj)))
+#define bs_cdddr(obj) bs_cdr(bs_cdr(bs_cdr(obj)))
+
+#define bs_caaaar(obj) bs_car(bs_car(bs_car(bs_car(obj))))
+#define bs_caaadr(obj) bs_car(bs_car(bs_car(bs_cdr(obj))))
+#define bs_caadar(obj) bs_car(bs_car(bs_cdr(bs_car(obj))))
+#define bs_caaddr(obj) bs_car(bs_car(bs_cdr(bs_cdr(obj))))
+#define bs_cadaar(obj) bs_car(bs_cdr(bs_car(bs_car(obj))))
+#define bs_cadadr(obj) bs_car(bs_cdr(bs_car(bs_cdr(obj))))
+#define bs_caddar(obj) bs_car(bs_cdr(bs_cdr(bs_car(obj))))
+#define bs_cadddr(obj) bs_car(bs_cdr(bs_cdr(bs_cdr(obj))))
+#define bs_cdaaar(obj) bs_cdr(bs_car(bs_car(bs_car(obj))))
+#define bs_cdaadr(obj) bs_cdr(bs_car(bs_car(bs_cdr(obj))))
+#define bs_cdadar(obj) bs_cdr(bs_car(bs_cdr(bs_car(obj))))
+#define bs_cdaddr(obj) bs_cdr(bs_car(bs_cdr(bs_cdr(obj))))
+#define bs_cddaar(obj) bs_cdr(bs_cdr(bs_car(bs_car(obj))))
+#define bs_cddadr(obj) bs_cdr(bs_cdr(bs_car(bs_cdr(obj))))
+#define bs_cdddar(obj) bs_cdr(bs_cdr(bs_cdr(bs_car(obj))))
+#define bs_cddddr(obj) bs_cdr(bs_cdr(bs_cdr(bs_cdr(obj))))

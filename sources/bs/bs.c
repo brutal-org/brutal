@@ -33,7 +33,17 @@ int main(int argc, char const *argv[])
         return -1;
     }
 
+    log("File size {}", buffer_str(&source_buffer).len);
+    print(io_std_out(), "[CODE] {}", buffer_str(&source_buffer));
+
+    print(io_std_out(), "[AST] ");
     bs_dump(&expr, io_std_out());
+
+    print(io_std_out(), "\n[RES] ");
+
+    BsExpr env = bs_nil();
+    BsExpr result = bs_eval(expr, &env, alloc_global());
+    bs_dump(&result, io_std_out());
 
     return 0;
 }

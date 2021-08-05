@@ -17,6 +17,21 @@ void bs_dump(BsExpr const *expr, IoWriter *writer)
         print(writer, "{}", expr->atom_);
         break;
 
+    case BS_VAL_NUM:
+        print(writer, "{}", expr->num_);
+        break;
+
+    case BS_VAL_RUNE:
+        if (isprint(expr->rune_))
+        {
+            print(writer, "{c}", expr->rune_);
+        }
+        else
+        {
+            print(writer, "{#02x}", expr->rune_);
+        }
+        break;
+
     case BS_VAL_PAIR:
         print(writer, "car=");
         bs_dump(expr->pair_.car, writer);
