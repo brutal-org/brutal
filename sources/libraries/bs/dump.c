@@ -1,0 +1,32 @@
+#include <bs/bs.h>
+
+void bs_dump(BsExpr const *expr, IoWriter *writer)
+{
+    print(writer, "{}[", bs_type_to_string(expr->type));
+
+    switch (expr->type)
+    {
+    case BS_VAL_NIL:
+        break;
+
+    case BS_VAL_BOOL:
+        print(writer, expr->bool_ ? "true" : "false");
+        break;
+
+    case BS_VAL_ATOM:
+        print(writer, "{}", expr->atom_);
+        break;
+
+    case BS_VAL_PAIR:
+        print(writer, "car=");
+        bs_dump(expr->pair_.car, writer);
+        print(writer, ", cdr=");
+        bs_dump(expr->pair_.cdr, writer);
+        break;
+
+    default:
+        break;
+    }
+
+    print(writer, "]", bs_type_to_string(expr->type));
+}

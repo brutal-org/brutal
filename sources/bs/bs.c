@@ -1,17 +1,15 @@
-#include <bid/bid.h>
 #include <brutal/alloc.h>
 #include <brutal/io.h>
 #include <brutal/log.h>
+#include <bs/bs.h>
 
 int main(int argc, char const *argv[])
 {
-    if (argc < 3)
+    if (argc < 2)
     {
-        log("bid usage [bid input] [c output]");
+        log("bs [files]");
         return 0;
     }
-
-    log("converting {} to {}", str_cast(argv[1]), str_cast(argv[2]));
 
     IoFile source_file;
     io_file_open(&source_file, str_cast(argv[1]));
@@ -28,19 +26,14 @@ int main(int argc, char const *argv[])
     Scan scan;
     scan_init(&scan, buffer_str(&source_buffer));
 
-    BidInterface interface = bid_parse(&scan, alloc_global());
+    BsExpr expr = bs_parse(&scan, alloc_global());
 
     if (scan_dump_error(&scan, io_std_err()))
     {
         return -1;
     }
 
-    IoFile output_file;
-    io_file_create(&output_file, str_cast(argv[2]));
-
-    IoFileWriter output_file_writer = io_file_write(&output_file);
-
-    bid2c(&interface, base_cast(&output_file_writer));
+    bs_dump(&expr, io_std_out());
 
     return 0;
 }

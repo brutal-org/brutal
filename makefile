@@ -6,7 +6,7 @@ CFLAGS_STD ?= \
 	-std=gnu2x
 
 CFLAGS_OPT ?= \
-	-O3
+	-g
 
 CFLAGS_WARN ?= \
 	-Wall \
@@ -49,6 +49,7 @@ include sources/userspace/.build.mk
 include sources/tests/.build.mk
 include sysroot/.build.mk
 include sources/bid/.build.mk
+include sources/bs/.build.mk
 
 all: $(ISO)
 
