@@ -1,4 +1,6 @@
+#include <brutal/log.h>
 #include <bs/bs.h>
+#include <bs/builtin.h>
 
 BsExpr bs_env_def(BsExpr env, BsExpr key, BsExpr value, Alloc *alloc)
 {
@@ -34,15 +36,26 @@ BsExpr bs_env_set(BsExpr env, BsExpr key, BsExpr value, Alloc *alloc)
 
 BsExpr bs_env_lookup(BsExpr env, BsExpr key)
 {
-    if (bs_eq(bs_caar(env), bs_nil()))
+    if (bs_eq(env, bs_nil()))
     {
         return bs_nil();
     }
 
     if (bs_eq(bs_caar(env), key))
     {
-        return bs_cadr(env);
+        return bs_cdar(env);
     }
 
     return bs_env_lookup(bs_cdr(env), key);
+}
+
+BsExpr bs_env_default(Alloc *alloc)
+{
+    BsExpr env = bs_nil();
+
+    env = bs_env_def_syntax(env, "bs-builtin-define", bs_builtin_define, alloc);
+    env = bs_env_def_syntax(env, "bs-builtin-lambda", bs_builtin_lambda, alloc);
+    env = bs_env_def_syntax(env, "bs-builtin-block", bs_builtin_block, alloc);
+
+    return env;
 }

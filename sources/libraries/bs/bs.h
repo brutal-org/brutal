@@ -17,3 +17,5 @@ BsExpr bs_env_def(BsExpr env, BsExpr key, BsExpr value, Alloc *alloc);
 BsExpr bs_env_set(BsExpr env, BsExpr key, BsExpr value, Alloc *alloc);
 
 BsExpr bs_env_lookup(BsExpr env, BsExpr key);
+
+BsExpr bs_env_default(Alloc *alloc);

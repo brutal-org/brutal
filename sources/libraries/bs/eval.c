@@ -54,7 +54,11 @@ BsExpr bs_eval(BsExpr expr, BsExpr *env, Alloc *alloc)
         return op.builtin_(args, env, alloc);
     }
 
-    BsExpr local_env = bs_extend_env(*op.lambda_.parms, args, *env, alloc);
+    if (bs_is(op, BS_VAL_LAMBDA))
+    {
+        BsExpr local_env = bs_extend_env(*op.lambda_.parms, args, *env, alloc);
+        return bs_eval(*op.lambda_.body, &local_env, alloc);
+    }
 
-    return bs_eval(*op.lambda_.body, &local_env, alloc);
+    return bs_nil();
 }

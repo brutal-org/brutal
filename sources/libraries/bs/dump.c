@@ -39,6 +39,14 @@ void bs_dump(BsExpr const *expr, IoWriter *writer)
         bs_dump(expr->pair_.cdr, writer);
         break;
 
+    case BS_VAL_LAMBDA:
+        print(writer, "params=");
+        bs_dump(expr->lambda_.parms, writer);
+        print(writer, ", env=");
+        bs_dump(expr->lambda_.env, writer);
+        print(writer, ", body=");
+        bs_dump(expr->lambda_.body, writer);
+
     default:
         break;
     }

@@ -39,10 +39,15 @@ int main(int argc, char const *argv[])
     print(io_std_out(), "[AST] ");
     bs_dump(&expr, io_std_out());
 
-    print(io_std_out(), "\n[RES] ");
+    BsExpr env = bs_env_default(alloc_global());
 
-    BsExpr env = bs_nil();
+    print(io_std_out(), "\n[ENV] ");
+    bs_dump(&env, io_std_out());
+    print(io_std_out(), "\n");
+
     BsExpr result = bs_eval(expr, &env, alloc_global());
+
+    print(io_std_out(), "\n[RES] ");
     bs_dump(&result, io_std_out());
 
     return 0;

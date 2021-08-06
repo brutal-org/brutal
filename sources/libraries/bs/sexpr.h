@@ -91,59 +91,6 @@ struct bs_expr
     };
 };
 
-static inline bool bs_eq(BsExpr lhs, BsExpr rhs)
-{
-    if (lhs.type != rhs.type)
-    {
-        return false;
-    }
-
-    switch (lhs.type)
-    {
-    case BS_VAL_NIL:
-        return true;
-
-    case BS_VAL_BOOL:
-        return lhs.bool_ == rhs.bool_;
-
-    case BS_VAL_ATOM:
-        return str_eq(lhs.atom_, rhs.atom_);
-
-    case BS_VAL_NUM:
-        return lhs.num_ == rhs.num_;
-
-    case BS_VAL_RUNE:
-        return lhs.rune_ == rhs.rune_;
-
-    case BS_VAL_STR:
-        return str_eq(lhs.str_, rhs.str_);
-
-    default:
-        return false;
-    }
-}
-
-static inline bool bs_is(BsExpr expr, BsType type)
-{
-    return expr.type == type;
-}
-
-static inline bool bs_is_truth(BsExpr expr)
-{
-    return !bs_is(expr, BS_VAL_NIL) &&
-           !bs_is(expr, BS_VAL_BOOL) &&
-           (expr.bool_ != BS_FALSE);
-}
-
-static inline bool bs_is_self_quoting(BsType type)
-{
-    return type == BS_VAL_NIL ||
-           type == BS_VAL_BOOL ||
-           type == BS_VAL_NUM ||
-           type == BS_VAL_RUNE ||
-           type == BS_VAL_STR;
-}
-
 static inline BsExpr bs_nil(void)
 {
     return (BsExpr){.type = BS_VAL_NIL};
@@ -278,3 +225,66 @@ static inline BsExpr bs_cdr(BsExpr expr)
 #define bs_cddadr(obj) bs_cdr(bs_cdr(bs_car(bs_cdr(obj))))
 #define bs_cdddar(obj) bs_cdr(bs_cdr(bs_cdr(bs_car(obj))))
 #define bs_cddddr(obj) bs_cdr(bs_cdr(bs_cdr(bs_cdr(obj))))
+
+static inline bool bs_eq(BsExpr lhs, BsExpr rhs)
+{
+    if (lhs.type != rhs.type)
+    {
+        return false;
+    }
+
+    switch (lhs.type)
+    {
+    case BS_VAL_NIL:
+        return true;
+
+    case BS_VAL_BOOL:
+        return lhs.bool_ == rhs.bool_;
+
+    case BS_VAL_ATOM:
+        return str_eq(lhs.atom_, rhs.atom_);
+
+    case BS_VAL_NUM:
+        return lhs.num_ == rhs.num_;
+
+    case BS_VAL_RUNE:
+        return lhs.rune_ == rhs.rune_;
+
+    case BS_VAL_STR:
+        return str_eq(lhs.str_, rhs.str_);
+
+    default:
+        return false;
+    }
+}
+
+static inline bool bs_is(BsExpr expr, BsType type)
+{
+    return expr.type == type;
+}
+
+static inline bool bs_car_is(BsExpr expr, BsType type)
+{
+    return bs_car(expr).type == type;
+}
+
+static inline bool bs_cdr_is(BsExpr expr, BsType type)
+{
+    return bs_cdr(expr).type == type;
+}
+
+static inline bool bs_is_truth(BsExpr expr)
+{
+    return !bs_is(expr, BS_VAL_NIL) &&
+           !bs_is(expr, BS_VAL_BOOL) &&
+           (expr.bool_ != BS_FALSE);
+}
+
+static inline bool bs_is_self_quoting(BsType type)
+{
+    return type == BS_VAL_NIL ||
+           type == BS_VAL_BOOL ||
+           type == BS_VAL_NUM ||
+           type == BS_VAL_RUNE ||
+           type == BS_VAL_STR;
+}
