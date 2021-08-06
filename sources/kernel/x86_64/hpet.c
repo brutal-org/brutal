@@ -1,5 +1,5 @@
-#include <brutal/mem.h>
 #include <brutal/log.h>
+#include <brutal/mem.h>
 #include "brutal/mem/volatile.h"
 #include "kernel/mmap.h"
 #include "kernel/x86_64/hpet.h"
@@ -14,7 +14,7 @@ void hpet_write(uintptr_t reg, uint64_t value)
 
 uint64_t hpet_read(uintptr_t reg)
 {
-    return volatile_read64(reg + hpet_base);  
+    return volatile_read64(reg + hpet_base);
 }
 
 void hpet_initialize(Handover *handover)
@@ -22,7 +22,7 @@ void hpet_initialize(Handover *handover)
     struct acpi_hpet *hpet_table = acpi_find_hpet(handover->rsdp);
     hpet_base = mmap_phys_to_io(hpet_table->address);
 
-    if(hpet_table->address_space_id == HPET_ADDRESS_SPACE_IO)
+    if (hpet_table->address_space_id == HPET_ADDRESS_SPACE_IO)
     {
         log("hpet address io id is not supported");
         return;

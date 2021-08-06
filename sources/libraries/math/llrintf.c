@@ -4,5 +4,5 @@
 
 long long llrintf(float x)
 {
-	return rintf(x);
+    return rintf(x);
 }

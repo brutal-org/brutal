@@ -3,5 +3,5 @@
 
 double significand(double x)
 {
-	return scalbn(x, -ilogb(x));
+    return scalbn(x, -ilogb(x));
 }

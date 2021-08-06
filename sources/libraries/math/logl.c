@@ -57,7 +57,7 @@
 #if LDBL_MANT_DIG == 53 && LDBL_MAX_EXP == 1024
 long double logl(long double x)
 {
-	return log(x);
+    return log(x);
 }
 #elif LDBL_MANT_DIG == 64 && LDBL_MAX_EXP == 16384
 /* Coefficients for log(1+x) = x - x**2/2 + x**3 P(x)/Q(x)
@@ -65,22 +65,22 @@ long double logl(long double x)
  * Theoretical peak relative error = 2.32e-20
  */
 static const long double P[] = {
- 4.5270000862445199635215E-5L,
- 4.9854102823193375972212E-1L,
- 6.5787325942061044846969E0L,
- 2.9911919328553073277375E1L,
- 6.0949667980987787057556E1L,
- 5.7112963590585538103336E1L,
- 2.0039553499201281259648E1L,
+    4.5270000862445199635215E-5L,
+    4.9854102823193375972212E-1L,
+    6.5787325942061044846969E0L,
+    2.9911919328553073277375E1L,
+    6.0949667980987787057556E1L,
+    5.7112963590585538103336E1L,
+    2.0039553499201281259648E1L,
 };
 static const long double Q[] = {
-/* 1.0000000000000000000000E0,*/
- 1.5062909083469192043167E1L,
- 8.3047565967967209469434E1L,
- 2.2176239823732856465394E2L,
- 3.0909872225312059774938E2L,
- 2.1642788614495947685003E2L,
- 6.0118660497603843919306E1L,
+    /* 1.0000000000000000000000E0,*/
+    1.5062909083469192043167E1L,
+    8.3047565967967209469434E1L,
+    2.2176239823732856465394E2L,
+    3.0909872225312059774938E2L,
+    2.1642788614495947685003E2L,
+    6.0118660497603843919306E1L,
 };
 
 /* Coefficients for log(x) = z + z^3 P(z^2)/Q(z^2),
@@ -89,87 +89,95 @@ static const long double Q[] = {
  * Theoretical peak relative error = 6.16e-22
  */
 static const long double R[4] = {
- 1.9757429581415468984296E-3L,
--7.1990767473014147232598E-1L,
- 1.0777257190312272158094E1L,
--3.5717684488096787370998E1L,
+    1.9757429581415468984296E-3L,
+    -7.1990767473014147232598E-1L,
+    1.0777257190312272158094E1L,
+    -3.5717684488096787370998E1L,
 };
 static const long double S[4] = {
-/* 1.00000000000000000000E0L,*/
--2.6201045551331104417768E1L,
- 1.9361891836232102174846E2L,
--4.2861221385716144629696E2L,
+    /* 1.00000000000000000000E0L,*/
+    -2.6201045551331104417768E1L,
+    1.9361891836232102174846E2L,
+    -4.2861221385716144629696E2L,
 };
 static const long double C1 = 6.9314575195312500000000E-1L;
 static const long double C2 = 1.4286068203094172321215E-6L;
 
-#define SQRTH 0.70710678118654752440L
+#    define SQRTH 0.70710678118654752440L
 
 long double logl(long double x)
 {
-	long double y, z;
-	int e;
+    long double y, z;
+    int e;
 
-	if (isnan(x))
-		return x;
-	if (x == INFINITY)
-		return x;
-	if (x <= 0.0) {
-		if (x == 0.0)
-			return -1/(x*x); /* -inf with divbyzero */
-		return 0/0.0f; /* nan with invalid */
-	}
+    if (isnan(x))
+        return x;
+    if (x == INFINITY)
+        return x;
+    if (x <= 0.0)
+    {
+        if (x == 0.0)
+            return -1 / (x * x); /* -inf with divbyzero */
+        return 0 / 0.0f;         /* nan with invalid */
+    }
 
-	/* separate mantissa from exponent */
-	/* Note, frexp is used so that denormal numbers
+    /* separate mantissa from exponent */
+    /* Note, frexp is used so that denormal numbers
 	 * will be handled properly.
 	 */
-	x = frexpl(x, &e);
+    x = frexpl(x, &e);
 
-	/* logarithm using log(x) = z + z**3 P(z)/Q(z),
+    /* logarithm using log(x) = z + z**3 P(z)/Q(z),
 	 * where z = 2(x-1)/(x+1)
 	 */
-	if (e > 2 || e < -2) {
-		if (x < SQRTH) {  /* 2(2x-1)/(2x+1) */
-			e -= 1;
-			z = x - 0.5;
-			y = 0.5 * z + 0.5;
-		} else {  /*  2 (x-1)/(x+1)   */
-			z = x - 0.5;
-			z -= 0.5;
-			y = 0.5 * x  + 0.5;
-		}
-		x = z / y;
-		z = x*x;
-		z = x * (z * __polevll(z, R, 3) / __p1evll(z, S, 3));
-		z = z + e * C2;
-		z = z + x;
-		z = z + e * C1;
-		return z;
-	}
+    if (e > 2 || e < -2)
+    {
+        if (x < SQRTH)
+        { /* 2(2x-1)/(2x+1) */
+            e -= 1;
+            z = x - 0.5;
+            y = 0.5 * z + 0.5;
+        }
+        else
+        { /*  2 (x-1)/(x+1)   */
+            z = x - 0.5;
+            z -= 0.5;
+            y = 0.5 * x + 0.5;
+        }
+        x = z / y;
+        z = x * x;
+        z = x * (z * __polevll(z, R, 3) / __p1evll(z, S, 3));
+        z = z + e * C2;
+        z = z + x;
+        z = z + e * C1;
+        return z;
+    }
 
-	/* logarithm using log(1+x) = x - .5x**2 + x**3 P(x)/Q(x) */
-	if (x < SQRTH) {
-		e -= 1;
-		x = 2.0*x - 1.0;
-	} else {
-		x = x - 1.0;
-	}
-	z = x*x;
-	y = x * (z * __polevll(x, P, 6) / __p1evll(x, Q, 6));
-	y = y + e * C2;
-	z = y - 0.5*z;
-	/* Note, the sum of above terms does not exceed x/4,
+    /* logarithm using log(1+x) = x - .5x**2 + x**3 P(x)/Q(x) */
+    if (x < SQRTH)
+    {
+        e -= 1;
+        x = 2.0 * x - 1.0;
+    }
+    else
+    {
+        x = x - 1.0;
+    }
+    z = x * x;
+    y = x * (z * __polevll(x, P, 6) / __p1evll(x, Q, 6));
+    y = y + e * C2;
+    z = y - 0.5 * z;
+    /* Note, the sum of above terms does not exceed x/4,
 	 * so it contributes at most about 1/4 lsb to the error.
 	 */
-	z = z + x;
-	z = z + e * C1; /* This sum has an error of 1/2 lsb. */
-	return z;
+    z = z + x;
+    z = z + e * C1; /* This sum has an error of 1/2 lsb. */
+    return z;
 }
 #elif LDBL_MANT_DIG == 113 && LDBL_MAX_EXP == 16384
 // TODO: broken implementation to make things compile
 long double logl(long double x)
 {
-	return log(x);
+    return log(x);
 }
 #endif

@@ -141,10 +141,10 @@ BrTask elf_exec(BrMemObj elf_obj, Str name)
                  }) == BR_SUCCESS);
 
     assert_truth(br_unmap(&(BrUnmapArgs){
-        .space = BR_SPACE_SELF,
-        .vaddr = elf_map.vaddr,
-        .size = elf_map.size,
-    }) == BR_SUCCESS);
+                     .space = BR_SPACE_SELF,
+                     .vaddr = elf_map.vaddr,
+                     .size = elf_map.size,
+                 }) == BR_SUCCESS);
 
     log("Service '{}' created!", name);
 

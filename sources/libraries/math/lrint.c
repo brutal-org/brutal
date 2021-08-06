@@ -1,5 +1,5 @@
-#include <limits.h>
 #include <fenv.h>
+#include <limits.h>
 #include "libm.h"
 
 /*
@@ -25,21 +25,21 @@ otherwise LONG_MAX and LONG_MIN can be represented exactly
 as a double.
 */
 
-#if LONG_MAX < 1U<<53 && defined(FE_INEXACT)
+#if LONG_MAX < 1U << 53 && defined(FE_INEXACT)
 long lrint(double x)
 {
-	int e;
+    int e;
 
-	e = fetestexcept(FE_INEXACT);
-	x = rint(x);
-	if (!e && (x > LONG_MAX || x < LONG_MIN))
-		feclearexcept(FE_INEXACT);
-	/* conversion */
-	return x;
+    e = fetestexcept(FE_INEXACT);
+    x = rint(x);
+    if (!e && (x > LONG_MAX || x < LONG_MIN))
+        feclearexcept(FE_INEXACT);
+    /* conversion */
+    return x;
 }
 #else
 long lrint(double x)
 {
-	return rint(x);
+    return rint(x);
 }
 #endif

@@ -3,5 +3,5 @@
 
 int finite(double x)
 {
-	return isfinite(x);
+    return isfinite(x);
 }

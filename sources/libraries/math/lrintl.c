@@ -1,12 +1,11 @@
-#include <limits.h>
 #include <fenv.h>
+#include <limits.h>
 #include "libm.h"
-
 
 #if LDBL_MANT_DIG == 53 && LDBL_MAX_EXP == 1024
 long lrintl(long double x)
 {
-	return lrint(x);
+    return lrint(x);
 }
 #elif defined(FE_INEXACT)
 /*
@@ -18,18 +17,18 @@ raises inexact (with tonearest or upward rounding mode)
 */
 long lrintl(long double x)
 {
-	int e;
+    int e;
 
-	e = fetestexcept(FE_INEXACT);
-	x = rintl(x);
-	if (!e && (x > LONG_MAX || x < LONG_MIN))
-		feclearexcept(FE_INEXACT);
-	/* conversion */
-	return x;
+    e = fetestexcept(FE_INEXACT);
+    x = rintl(x);
+    if (!e && (x > LONG_MAX || x < LONG_MIN))
+        feclearexcept(FE_INEXACT);
+    /* conversion */
+    return x;
 }
 #else
 long lrintl(long double x)
 {
-	return rintl(x);
+    return rintl(x);
 }
 #endif

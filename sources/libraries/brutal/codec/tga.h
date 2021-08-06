@@ -7,7 +7,7 @@
 // using http://tfc.duke.free.fr/coding/tga_specs.pdf
 
 #define TGA_IMGDESC_ORIGIN_BITS 0b00110000
-#define TGA_IMGDESC_ALPHA_BITS  0b00001111
+#define TGA_IMGDESC_ALPHA_BITS 0b00001111
 
 enum tga_image_origin
 {

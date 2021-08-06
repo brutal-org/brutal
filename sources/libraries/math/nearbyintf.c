@@ -4,14 +4,14 @@
 float nearbyintf(float x)
 {
 #ifdef FE_INEXACT
-	int e;
+    int e;
 
-	e = fetestexcept(FE_INEXACT);
+    e = fetestexcept(FE_INEXACT);
 #endif
-	x = rintf(x);
+    x = rintf(x);
 #ifdef FE_INEXACT
-	if (!e)
-		feclearexcept(FE_INEXACT);
+    if (!e)
+        feclearexcept(FE_INEXACT);
 #endif
-	return x;
+    return x;
 }

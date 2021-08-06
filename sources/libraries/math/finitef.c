@@ -3,5 +3,5 @@
 
 int finitef(float x)
 {
-	return isfinite(x);
+    return isfinite(x);
 }

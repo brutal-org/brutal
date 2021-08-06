@@ -3,5 +3,5 @@
 
 float significandf(float x)
 {
-	return scalbnf(x, -ilogbf(x));
+    return scalbnf(x, -ilogbf(x));
 }
