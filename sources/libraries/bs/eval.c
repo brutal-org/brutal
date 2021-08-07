@@ -2,7 +2,7 @@
 
 BsExpr bs_eval_args(BsExpr expr, BsExpr *env, Alloc *alloc)
 {
-    if (bs_is(expr, BS_VAL_NIL))
+    if (bs_is(expr, BS_NIL))
     {
         return bs_nil();
     }
@@ -17,7 +17,7 @@ BsExpr bs_eval_args(BsExpr expr, BsExpr *env, Alloc *alloc)
 
 BsExpr bs_extend_env(BsExpr params, BsExpr vals, BsExpr env, Alloc *alloc)
 {
-    if (bs_is(params, BS_VAL_NIL))
+    if (bs_is(params, BS_NIL))
     {
         return env;
     }
@@ -35,26 +35,26 @@ BsExpr bs_eval(BsExpr expr, BsExpr *env, Alloc *alloc)
         return expr;
     }
 
-    if (bs_is(expr, BS_VAL_ATOM))
+    if (bs_is(expr, BS_ATOM))
     {
         return bs_env_lookup(*env, expr);
     }
 
     BsExpr op = bs_eval(bs_car(expr), env, alloc);
 
-    if (bs_is(op, BS_VAL_SYNTAX))
+    if (bs_is(op, BS_SYNTAX))
     {
         return op.syntax_(bs_cdr(expr), env, alloc);
     }
 
     BsExpr args = bs_eval_args(bs_cdr(expr), env, alloc);
 
-    if (bs_is(op, BS_VAL_BUILTIN))
+    if (bs_is(op, BS_BUILTIN))
     {
         return op.builtin_(args, env, alloc);
     }
 
-    if (bs_is(op, BS_VAL_LAMBDA))
+    if (bs_is(op, BS_LAMBDA))
     {
         BsExpr local_env = bs_extend_env(*op.lambda_.parms, args, *env, alloc);
         return bs_eval(*op.lambda_.body, &local_env, alloc);

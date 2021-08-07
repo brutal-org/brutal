@@ -6,22 +6,22 @@ void bs_dump(BsExpr const *expr, IoWriter *writer)
 
     switch (expr->type)
     {
-    case BS_VAL_NIL:
+    case BS_NIL:
         break;
 
-    case BS_VAL_BOOL:
+    case BS_BOOL:
         print(writer, expr->bool_ ? "true" : "false");
         break;
 
-    case BS_VAL_ATOM:
+    case BS_ATOM:
         print(writer, "{}", expr->atom_);
         break;
 
-    case BS_VAL_NUM:
+    case BS_NUM:
         print(writer, "{}", expr->num_);
         break;
 
-    case BS_VAL_RUNE:
+    case BS_RUNE:
         if (isprint(expr->rune_))
         {
             print(writer, "{c}", expr->rune_);
@@ -32,14 +32,14 @@ void bs_dump(BsExpr const *expr, IoWriter *writer)
         }
         break;
 
-    case BS_VAL_PAIR:
+    case BS_PAIR:
         print(writer, "car=");
         bs_dump(expr->pair_.car, writer);
         print(writer, ", cdr=");
         bs_dump(expr->pair_.cdr, writer);
         break;
 
-    case BS_VAL_LAMBDA:
+    case BS_LAMBDA:
         print(writer, "params=");
         bs_dump(expr->lambda_.parms, writer);
         print(writer, ", env=");

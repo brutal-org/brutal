@@ -55,7 +55,8 @@ BsExpr bs_env_default(Alloc *alloc)
 
     env = bs_env_def_syntax(env, "bs-builtin-define", bs_builtin_define, alloc);
     env = bs_env_def_syntax(env, "bs-builtin-lambda", bs_builtin_lambda, alloc);
-    env = bs_env_def_syntax(env, "bs-builtin-block", bs_builtin_block, alloc);
+    env = bs_env_def_syntax(env, "bs-builtin-block" , bs_builtin_block , alloc);
+    env = bs_env_def_syntax(env, "bs-builtin-quote" , bs_builtin_quote , alloc);
 
     return env;
 }

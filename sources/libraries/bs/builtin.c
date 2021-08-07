@@ -4,7 +4,7 @@
 
 BsExpr bs_builtin_define(BsExpr args, BsExpr *env, Alloc *alloc)
 {
-    if (bs_car_is(args, BS_VAL_ATOM))
+    if (bs_car_is(args, BS_ATOM))
     {
         BsExpr key = bs_car(args);
         BsExpr value = bs_eval(bs_cadr(args), env, alloc);
@@ -13,7 +13,7 @@ BsExpr bs_builtin_define(BsExpr args, BsExpr *env, Alloc *alloc)
 
         return bs_bool(BS_TRUE);
     }
-    else if (bs_car_is(args, BS_VAL_PAIR))
+    else if (bs_car_is(args, BS_PAIR))
     {
         BsExpr key = bs_caar(args);
         BsExpr parms = bs_cdar(args);
@@ -40,11 +40,16 @@ BsExpr bs_builtin_block(BsExpr args, BsExpr *env, Alloc *alloc)
     BsExpr current = args;
     BsExpr result = bs_nil();
 
-    while (bs_is(current, BS_VAL_PAIR))
+    while (bs_is(current, BS_PAIR))
     {
         result = bs_eval(bs_car(current), env, alloc);
         current = bs_cdr(current);
     }
 
     return result;
+}
+
+BsExpr bs_builtin_quote(BsExpr args, MAYBE_UNUSED BsExpr *env, MAYBE_UNUSED Alloc *alloc)
+{
+    return args;
 }

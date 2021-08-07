@@ -1,4 +1,5 @@
 #include <brutal/alloc.h>
+#include <brutal/log.h>
 #include <bs/bs.h>
 
 static BsExpr parse_expression(Scan *scan, Alloc *alloc);
@@ -15,9 +16,10 @@ static bool skip_space(Scan *scan)
 
 static void skip_nested_comment(Scan *scan)
 {
-    while (!skip_keyword(scan, "|#") && !scan_end(scan))
+    while (!skip_keyword(scan, "*/") && !scan_end(scan))
     {
-        if (skip_keyword(scan, "#|"))
+        scan_next(scan);
+        if (skip_keyword(scan, "/*"))
         {
             skip_nested_comment(scan);
         }
@@ -26,24 +28,7 @@ static void skip_nested_comment(Scan *scan)
 
 static bool skip_comment(Scan *scan)
 {
-    if (scan_skip(scan, ';'))
-    {
-        while (scan_next(scan) != '\n' && !scan_end(scan))
-        {
-            if (skip_keyword(scan, "#|"))
-            {
-                skip_nested_comment(scan);
-            }
-        }
-
-        return true;
-    }
-    else if (skip_keyword(scan, "#|"))
-    {
-        skip_nested_comment(scan);
-        return true;
-    }
-    else if (skip_keyword(scan, "#|"))
+    if (skip_keyword(scan, "//!"))
     {
         skip_space(scan);
 
@@ -52,6 +37,23 @@ static bool skip_comment(Scan *scan)
         parse_expression(scan, base_cast(&heap));
         alloc_heap_deinit(&heap);
 
+        return true;
+    }
+    else if (skip_keyword(scan, "//"))
+    {
+        while (scan_next(scan) != '\n' && !scan_end(scan))
+        {
+            if (skip_keyword(scan, "/*"))
+            {
+                skip_nested_comment(scan);
+            }
+        }
+
+        return true;
+    }
+    else if (skip_keyword(scan, "/*"))
+    {
+        skip_nested_comment(scan);
         return true;
     }
     else
@@ -86,7 +88,7 @@ static int is_num(int c)
 
 static int is_atom_start(int c)
 {
-    return isalpha(c) | isany(c, "!$%&*/:<=>?^_~");
+    return isalpha(c) | isany(c, "!$%&*/<=>?^_~");
 }
 
 static int is_atom(int c)
@@ -159,7 +161,7 @@ static BsExpr parse_rune(Scan *scan)
 
 static BsExpr parse_pair(Scan *scan, Alloc *alloc)
 {
-    if (scan_skip(scan, ')'))
+    if (scan_skip(scan, ')') || scan_end(scan))
     {
         return bs_nil();
     }
@@ -169,6 +171,55 @@ static BsExpr parse_pair(Scan *scan, Alloc *alloc)
     BsExpr cdr = parse_pair(scan, alloc);
 
     return bs_pair(alloc, car, cdr);
+}
+
+static BsExpr parse_line(Scan *scan, Alloc *alloc)
+{
+    if (scan_curr(scan) == ';' || scan_end(scan))
+    {
+        return bs_nil();
+    }
+
+    BsExpr car = parse_expression(scan, alloc);
+    skip_atmosphere(scan);
+    BsExpr cdr = parse_line(scan, alloc);
+
+    if (bs_is(cdr, BS_NIL))
+    {
+        return car;
+    }
+
+    return bs_pair(alloc, car, cdr);
+}
+
+static BsExpr parse_block(Scan *scan, Alloc *alloc)
+{
+    BsExpr body = bs_nil();
+
+    skip_atmosphere(scan);
+
+    while (scan_curr(scan) != '}' && !scan_end(scan))
+    {
+        BsExpr expr = bs_nil();
+
+        expr = parse_line(scan, alloc);
+
+        if (!scan_expect(scan, ';'))
+        {
+            return bs_nil();
+        }
+
+        body = bs_pair(alloc, expr, body);
+
+        skip_atmosphere(scan);
+    }
+
+    scan_expect(scan, '}');
+
+    return bs_pair(
+        alloc,
+        bs_atom(str_cast("bs-builtin-block")),
+        body);
 }
 
 static BsExpr parse_expression(Scan *scan, Alloc *alloc)
@@ -198,6 +249,18 @@ static BsExpr parse_expression(Scan *scan, Alloc *alloc)
         skip_atmosphere(scan);
         return parse_pair(scan, alloc);
     }
+    else if (scan_skip(scan, '{'))
+    {
+        skip_atmosphere(scan);
+        return parse_block(scan, alloc);
+    }
+    else if (scan_skip(scan, '\''))
+    {
+        return bs_pair(
+            alloc,
+            bs_atom(str_cast("bs-builtin-quote")),
+            parse_expression(scan, alloc));
+    }
     else
     {
         char c = scan_curr(scan);
@@ -206,8 +269,36 @@ static BsExpr parse_expression(Scan *scan, Alloc *alloc)
     }
 }
 
+static BsExpr parse_module(Scan *scan, Alloc *alloc)
+{
+    BsExpr body = bs_nil();
+
+    skip_atmosphere(scan);
+
+    while (!scan_end(scan))
+    {
+        BsExpr expr = bs_nil();
+
+        expr = parse_line(scan, alloc);
+
+        if (!scan_expect(scan, ';'))
+        {
+            return bs_nil();
+        }
+
+        body = bs_pair(alloc, expr, body);
+
+        skip_atmosphere(scan);
+    }
+
+    return bs_pair(
+        alloc,
+        bs_atom(str_cast("bs-builtin-block")),
+        body);
+}
+
 BsExpr bs_parse(Scan *scan, Alloc *alloc)
 {
     skip_atmosphere(scan);
-    return parse_expression(scan, alloc);
+    return parse_module(scan, alloc);
 }
