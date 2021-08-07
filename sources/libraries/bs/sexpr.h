@@ -58,8 +58,8 @@ typedef Str BsStr;
 
 typedef struct
 {
-    BsExpr *car;
-    BsExpr *cdr;
+    BsExpr *lhs;
+    BsExpr *rhs;
 } BsPair;
 
 typedef BsExpr (*BsBuiltin)(BsExpr args, BsExpr *env, Alloc *alloc);
@@ -136,13 +136,13 @@ static inline BsExpr bs_str(Str str)
     };
 }
 
-static inline BsExpr bs_pair(Alloc *alloc, BsExpr car, BsExpr cdr)
+static inline BsExpr bs_pair(Alloc *alloc, BsExpr lhs, BsExpr rhs)
 {
     return (BsExpr){
         .type = BS_PAIR,
         .pair_ = {
-            .car = alloc_move(alloc, car),
-            .cdr = alloc_move(alloc, cdr),
+            .lhs = alloc_move(alloc, lhs),
+            .rhs = alloc_move(alloc, rhs),
         },
     };
 }
@@ -175,30 +175,30 @@ static inline BsExpr bs_lambda(Alloc *alloc, BsExpr env, BsExpr parms, BsExpr bo
     };
 }
 
-static inline BsExpr bs_car(BsExpr expr)
+static inline BsExpr bs_lhs(BsExpr expr)
 {
     if (expr.type != BS_PAIR)
     {
         return bs_nil();
     }
 
-    return *expr.pair_.car;
+    return *expr.pair_.lhs;
 }
 
-static inline BsExpr bs_cdr(BsExpr expr)
+static inline BsExpr bs_rhs(BsExpr expr)
 {
     if (expr.type != BS_PAIR)
     {
         return bs_nil();
     }
 
-    return *expr.pair_.cdr;
+    return *expr.pair_.rhs;
 }
 
-#define bs_caar(obj) bs_car(bs_car(obj))
-#define bs_cadr(obj) bs_car(bs_cdr(obj))
-#define bs_cdar(obj) bs_cdr(bs_car(obj))
-#define bs_cddr(obj) bs_cdr(bs_cdr(obj))
+#define bs_llhs(obj) bs_lhs(bs_lhs(obj))
+#define bs_lrhs(obj) bs_lhs(bs_rhs(obj))
+#define bs_rlhs(obj) bs_rhs(bs_lhs(obj))
+#define bs_rrhs(obj) bs_rhs(bs_rhs(obj))
 
 static inline bool bs_eq(BsExpr lhs, BsExpr rhs)
 {
@@ -237,14 +237,14 @@ static inline bool bs_is(BsExpr expr, BsType type)
     return expr.type == type;
 }
 
-static inline bool bs_car_is(BsExpr expr, BsType type)
+static inline bool bs_lhs_is(BsExpr expr, BsType type)
 {
-    return bs_car(expr).type == type;
+    return bs_lhs(expr).type == type;
 }
 
-static inline bool bs_cdr_is(BsExpr expr, BsType type)
+static inline bool bs_rhs_is(BsExpr expr, BsType type)
 {
-    return bs_cdr(expr).type == type;
+    return bs_rhs(expr).type == type;
 }
 
 static inline bool bs_is_truth(BsExpr expr)

@@ -10,8 +10,8 @@ BsExpr bs_eval_args(BsExpr expr, BsExpr *env, Alloc *alloc)
     {
         return bs_pair(
             alloc,
-            bs_eval(bs_car(expr), env, alloc),
-            bs_eval_args(bs_cdr(expr), env, alloc));
+            bs_eval(bs_lhs(expr), env, alloc),
+            bs_eval_args(bs_rhs(expr), env, alloc));
     }
 }
 
@@ -24,8 +24,8 @@ BsExpr bs_extend_env(BsExpr params, BsExpr vals, BsExpr env, Alloc *alloc)
 
     return bs_pair(
         alloc,
-        bs_pair(alloc, bs_car(params), bs_car(vals)),
-        bs_extend_env(bs_cdr(params), bs_cdr(vals), env, alloc));
+        bs_pair(alloc, bs_lhs(params), bs_lhs(vals)),
+        bs_extend_env(bs_rhs(params), bs_rhs(vals), env, alloc));
 }
 
 BsExpr bs_eval(BsExpr expr, BsExpr *env, Alloc *alloc)
@@ -40,14 +40,14 @@ BsExpr bs_eval(BsExpr expr, BsExpr *env, Alloc *alloc)
         return bs_env_lookup(*env, expr);
     }
 
-    BsExpr op = bs_eval(bs_car(expr), env, alloc);
+    BsExpr op = bs_eval(bs_lhs(expr), env, alloc);
 
     if (bs_is(op, BS_SYNTAX))
     {
-        return op.syntax_(bs_cdr(expr), env, alloc);
+        return op.syntax_(bs_rhs(expr), env, alloc);
     }
 
-    BsExpr args = bs_eval_args(bs_cdr(expr), env, alloc);
+    BsExpr args = bs_eval_args(bs_rhs(expr), env, alloc);
 
     if (bs_is(op, BS_BUILTIN))
     {

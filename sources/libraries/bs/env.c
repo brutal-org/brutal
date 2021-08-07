@@ -24,13 +24,13 @@ BsExpr bs_env_set(BsExpr env, BsExpr key, BsExpr value, Alloc *alloc)
         return bs_nil();
     }
 
-    if (bs_eq(bs_caar(env), key))
+    if (bs_eq(bs_llhs(env), key))
     {
-        return bs_pair(alloc, bs_pair(alloc, key, value), bs_cdr(env));
+        return bs_pair(alloc, bs_pair(alloc, key, value), bs_rhs(env));
     }
     else
     {
-        return bs_pair(alloc, bs_car(env), bs_env_set(env, key, value, alloc));
+        return bs_pair(alloc, bs_lhs(env), bs_env_set(env, key, value, alloc));
     }
 }
 
@@ -41,12 +41,12 @@ BsExpr bs_env_lookup(BsExpr env, BsExpr key)
         return bs_nil();
     }
 
-    if (bs_eq(bs_caar(env), key))
+    if (bs_eq(bs_llhs(env), key))
     {
-        return bs_cdar(env);
+        return bs_rlhs(env);
     }
 
-    return bs_env_lookup(bs_cdr(env), key);
+    return bs_env_lookup(bs_rhs(env), key);
 }
 
 BsExpr bs_env_default(Alloc *alloc)
@@ -55,8 +55,8 @@ BsExpr bs_env_default(Alloc *alloc)
 
     env = bs_env_def_syntax(env, "bs-builtin-define", bs_builtin_define, alloc);
     env = bs_env_def_syntax(env, "bs-builtin-lambda", bs_builtin_lambda, alloc);
-    env = bs_env_def_syntax(env, "bs-builtin-block" , bs_builtin_block , alloc);
-    env = bs_env_def_syntax(env, "bs-builtin-quote" , bs_builtin_quote , alloc);
+    env = bs_env_def_syntax(env, "bs-builtin-block", bs_builtin_block, alloc);
+    env = bs_env_def_syntax(env, "bs-builtin-quote", bs_builtin_quote, alloc);
 
     return env;
 }

@@ -33,10 +33,10 @@ void bs_dump(BsExpr const *expr, IoWriter *writer)
         break;
 
     case BS_PAIR:
-        print(writer, "car=");
-        bs_dump(expr->pair_.car, writer);
-        print(writer, ", cdr=");
-        bs_dump(expr->pair_.cdr, writer);
+        print(writer, "lhs=");
+        bs_dump(expr->pair_.lhs, writer);
+        print(writer, ", rhs=");
+        bs_dump(expr->pair_.rhs, writer);
         break;
 
     case BS_LAMBDA:

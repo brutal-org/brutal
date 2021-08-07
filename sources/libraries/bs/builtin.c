@@ -4,20 +4,20 @@
 
 BsExpr bs_builtin_define(BsExpr args, BsExpr *env, Alloc *alloc)
 {
-    if (bs_car_is(args, BS_ATOM))
+    if (bs_lhs_is(args, BS_ATOM))
     {
-        BsExpr key = bs_car(args);
-        BsExpr value = bs_eval(bs_cadr(args), env, alloc);
+        BsExpr key = bs_lhs(args);
+        BsExpr value = bs_eval(bs_lrhs(args), env, alloc);
 
         *env = bs_env_def(*env, key, value, alloc);
 
         return bs_bool(BS_TRUE);
     }
-    else if (bs_car_is(args, BS_PAIR))
+    else if (bs_lhs_is(args, BS_PAIR))
     {
-        BsExpr key = bs_caar(args);
-        BsExpr parms = bs_cdar(args);
-        BsExpr body = bs_cadr(args);
+        BsExpr key = bs_llhs(args);
+        BsExpr parms = bs_rlhs(args);
+        BsExpr body = bs_lrhs(args);
 
         BsExpr lambda = bs_lambda(alloc, *env, parms, body);
         *env = bs_env_def(*env, key, lambda, alloc);
@@ -32,7 +32,7 @@ BsExpr bs_builtin_define(BsExpr args, BsExpr *env, Alloc *alloc)
 
 BsExpr bs_builtin_lambda(BsExpr args, BsExpr *env, Alloc *alloc)
 {
-    return bs_lambda(alloc, *env, bs_car(args), bs_cadr(args));
+    return bs_lambda(alloc, *env, bs_lhs(args), bs_lrhs(args));
 }
 
 BsExpr bs_builtin_block(BsExpr args, BsExpr *env, Alloc *alloc)
@@ -42,8 +42,8 @@ BsExpr bs_builtin_block(BsExpr args, BsExpr *env, Alloc *alloc)
 
     while (bs_is(current, BS_PAIR))
     {
-        result = bs_eval(bs_car(current), env, alloc);
-        current = bs_cdr(current);
+        result = bs_eval(bs_lhs(current), env, alloc);
+        current = bs_rhs(current);
     }
 
     return result;

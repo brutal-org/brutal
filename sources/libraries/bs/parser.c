@@ -166,11 +166,11 @@ static BsExpr parse_pair(Scan *scan, Alloc *alloc)
         return bs_nil();
     }
 
-    BsExpr car = parse_expression(scan, alloc);
+    BsExpr lhs = parse_expression(scan, alloc);
     skip_atmosphere(scan);
-    BsExpr cdr = parse_pair(scan, alloc);
+    BsExpr rhs = parse_pair(scan, alloc);
 
-    return bs_pair(alloc, car, cdr);
+    return bs_pair(alloc, lhs, rhs);
 }
 
 static BsExpr parse_line(Scan *scan, Alloc *alloc)
@@ -180,16 +180,16 @@ static BsExpr parse_line(Scan *scan, Alloc *alloc)
         return bs_nil();
     }
 
-    BsExpr car = parse_expression(scan, alloc);
+    BsExpr lhs = parse_expression(scan, alloc);
     skip_atmosphere(scan);
-    BsExpr cdr = parse_line(scan, alloc);
+    BsExpr rhs = parse_line(scan, alloc);
 
-    if (bs_is(cdr, BS_NIL))
+    if (bs_is(rhs, BS_NIL))
     {
-        return car;
+        return lhs;
     }
 
-    return bs_pair(alloc, car, cdr);
+    return bs_pair(alloc, lhs, rhs);
 }
 
 static BsExpr parse_block(Scan *scan, Alloc *alloc)
