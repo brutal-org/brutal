@@ -49,7 +49,7 @@ include sources/userspace/.build.mk
 include sources/tests/.build.mk
 include sysroot/.build.mk
 include sources/bid/.build.mk
-include sources/bs/.build.mk
+include sources/udfore/.build.mk
 
 all: $(ISO)
 

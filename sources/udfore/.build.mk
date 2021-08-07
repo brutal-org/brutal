@@ -1,8 +1,8 @@
-BS_SRC= $(wildcard sources/bs/*.c) \
+BS_SRC= $(wildcard sources/udfore/*.c) \
 		 $(wildcard sources/libraries/brutal/*.c) \
 		 $(wildcard sources/libraries/brutal/*/*.c) \
-		 $(wildcard sources/libraries/bs/*/*.c) \
-		 $(wildcard sources/libraries/bs/*.c) \
+		 $(wildcard sources/libraries/udfore/*/*.c) \
+		 $(wildcard sources/libraries/udfore/*.c) \
 		 $(wildcard sources/libraries/brutal/host/linux/*.c)
 
 BS_OBJ=$(patsubst sources/%.c, $(BUILDDIR_HOST)/%.c.o, $(BS_SRC))
@@ -17,6 +17,6 @@ $(BS_BIN): $(BS_OBJ)
 	$(HOST_CC) -rdynamic $(HOST_CFLAGS) $(HOST_LDFLAGS) -fsanitize=address -fsanitize=undefined $^ -o $@
 
 run-bs: $(BS_BIN)
-	$(BS_BIN) sources/bs/test.scm
+	$(BS_BIN) sources/udfore/test.scm
 
 bs: $(BS_BIN)

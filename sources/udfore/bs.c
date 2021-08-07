@@ -1,13 +1,13 @@
 #include <brutal/alloc.h>
 #include <brutal/io.h>
 #include <brutal/log.h>
-#include <bs/bs.h>
+#include <udfore/udfore.h>
 
 int main(int argc, char const *argv[])
 {
     if (argc < 2)
     {
-        log("bs [files]");
+        log("{} [files]", str_cast(argv[0]));
         return 0;
     }
 
@@ -26,7 +26,7 @@ int main(int argc, char const *argv[])
     Scan scan;
     scan_init(&scan, buffer_str(&source_buffer));
 
-    BsExpr expr = bs_parse(&scan, alloc_global());
+    UdExpr expr = ud_parse(&scan, alloc_global());
 
     if (scan_dump_error(&scan, io_std_err()))
     {
@@ -37,18 +37,18 @@ int main(int argc, char const *argv[])
     print(io_std_out(), "[CODE] {}", buffer_str(&source_buffer));
 
     print(io_std_out(), "[AST] ");
-    bs_dump(&expr, io_std_out());
+    ud_dump(&expr, io_std_out());
 
-    BsExpr env = bs_env_default(alloc_global());
+    UdExpr env = ud_env_default(alloc_global());
 
     print(io_std_out(), "\n[ENV] ");
-    bs_dump(&env, io_std_out());
+    ud_dump(&env, io_std_out());
     print(io_std_out(), "\n");
 
-    BsExpr result = bs_eval(expr, &env, alloc_global());
+    UdExpr result = ud_eval(expr, &env, alloc_global());
 
     print(io_std_out(), "\n[RES] ");
-    bs_dump(&result, io_std_out());
+    ud_dump(&result, io_std_out());
 
     return 0;
 }

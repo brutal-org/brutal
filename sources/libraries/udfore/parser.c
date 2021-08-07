@@ -1,8 +1,8 @@
 #include <brutal/alloc.h>
 #include <brutal/log.h>
-#include <bs/bs.h>
+#include <udfore/udfore.h>
 
-static BsExpr parse_expression(Scan *scan, Alloc *alloc);
+static UdExpr parse_expression(Scan *scan, Alloc *alloc);
 
 static bool skip_keyword(Scan *scan, const char *expected)
 {
@@ -96,51 +96,51 @@ static int is_atom(int c)
     return is_atom_start(c) || isdigit(c) || isany(c, "+-.@");
 }
 
-static BsExpr parse_atom(Scan *scan)
+static UdExpr parse_atom(Scan *scan)
 {
     scan_begin_token(scan);
     scan_next(scan);
     scan_skip_until(scan, is_atom);
-    return bs_atom(scan_end_token(scan));
+    return ud_atom(scan_end_token(scan));
 }
 
-static BsExpr parse_rune(Scan *scan)
+static UdExpr parse_rune(Scan *scan)
 {
     if (skip_keyword(scan, "alarm"))
     {
-        return bs_rune('\a');
+        return ud_rune('\a');
     }
     else if (skip_keyword(scan, "backspace"))
     {
-        return bs_rune('\xb');
+        return ud_rune('\xb');
     }
     else if (skip_keyword(scan, "delete"))
     {
-        return bs_rune('\xff');
+        return ud_rune('\xff');
     }
     else if (skip_keyword(scan, "escape"))
     {
-        return bs_rune('\e');
+        return ud_rune('\e');
     }
     else if (skip_keyword(scan, "newline"))
     {
-        return bs_rune('\n');
+        return ud_rune('\n');
     }
     else if (skip_keyword(scan, "null"))
     {
-        return bs_rune('\0');
+        return ud_rune('\0');
     }
     else if (skip_keyword(scan, "return"))
     {
-        return bs_rune('\r');
+        return ud_rune('\r');
     }
     else if (skip_keyword(scan, "space"))
     {
-        return bs_rune(' ');
+        return ud_rune(' ');
     }
     else if (skip_keyword(scan, "tab"))
     {
-        return bs_rune('\t');
+        return ud_rune('\t');
     }
 
     if (scan_curr(scan) == 'x' && isxdigit(scan_peek(scan, 1)))
@@ -153,84 +153,84 @@ static BsExpr parse_rune(Scan *scan)
             rune += scan_next_digit(scan);
         }
 
-        return bs_rune(rune);
+        return ud_rune(rune);
     }
 
-    return bs_rune(scan_next(scan));
+    return ud_rune(scan_next(scan));
 }
 
-static BsExpr parse_pair(Scan *scan, Alloc *alloc)
+static UdExpr parse_pair(Scan *scan, Alloc *alloc)
 {
     if (scan_skip(scan, ')') || scan_end(scan))
     {
-        return bs_nil();
+        return ud_nil();
     }
 
-    BsExpr lhs = parse_expression(scan, alloc);
+    UdExpr lhs = parse_expression(scan, alloc);
     skip_atmosphere(scan);
-    BsExpr rhs = parse_pair(scan, alloc);
+    UdExpr rhs = parse_pair(scan, alloc);
 
-    return bs_pair(alloc, lhs, rhs);
+    return ud_pair(alloc, lhs, rhs);
 }
 
-static BsExpr parse_line(Scan *scan, Alloc *alloc)
+static UdExpr parse_line(Scan *scan, Alloc *alloc)
 {
     if (scan_curr(scan) == ';' || scan_end(scan))
     {
-        return bs_nil();
+        return ud_nil();
     }
 
-    BsExpr lhs = parse_expression(scan, alloc);
+    UdExpr lhs = parse_expression(scan, alloc);
     skip_atmosphere(scan);
-    BsExpr rhs = parse_line(scan, alloc);
+    UdExpr rhs = parse_line(scan, alloc);
 
-    if (bs_is(rhs, BS_NIL))
+    if (ud_is(rhs, UD_NIL))
     {
         return lhs;
     }
 
-    return bs_pair(alloc, lhs, rhs);
+    return ud_pair(alloc, lhs, rhs);
 }
 
-static BsExpr parse_block(Scan *scan, Alloc *alloc)
+static UdExpr parse_block(Scan *scan, Alloc *alloc)
 {
-    BsExpr body = bs_nil();
+    UdExpr body = ud_nil();
 
     skip_atmosphere(scan);
 
     while (scan_curr(scan) != '}' && !scan_end(scan))
     {
-        BsExpr expr = bs_nil();
+        UdExpr expr = ud_nil();
 
         expr = parse_line(scan, alloc);
 
         if (!scan_expect(scan, ';'))
         {
-            return bs_nil();
+            return ud_nil();
         }
 
-        body = bs_pair(alloc, expr, body);
+        body = ud_pair(alloc, expr, body);
 
         skip_atmosphere(scan);
     }
 
     scan_expect(scan, '}');
 
-    return bs_pair(
+    return ud_pair(
         alloc,
-        bs_atom(str_cast("bs-builtin-block")),
+        ud_atom(str_cast("bs-builtin-block")),
         body);
 }
 
-static BsExpr parse_expression(Scan *scan, Alloc *alloc)
+static UdExpr parse_expression(Scan *scan, Alloc *alloc)
 {
     if (skip_keyword(scan, "#true") || skip_keyword(scan, "#t"))
     {
-        return bs_bool(true);
+        return ud_bool(true);
     }
     else if (skip_keyword(scan, "#false") || skip_keyword(scan, "#f"))
     {
-        return bs_bool(false);
+        return ud_bool(false);
     }
     else if (is_atom_start(scan_curr(scan)))
     {
@@ -238,7 +238,7 @@ static BsExpr parse_expression(Scan *scan, Alloc *alloc)
     }
     else if (is_num(scan_curr(scan)))
     {
-        return bs_num(scan_next_decimal(scan));
+        return ud_num(scan_next_decimal(scan));
     }
     else if (skip_keyword(scan, "#\\"))
     {
@@ -256,48 +256,48 @@ static BsExpr parse_expression(Scan *scan, Alloc *alloc)
     }
     else if (scan_skip(scan, '\''))
     {
-        return bs_pair(
+        return ud_pair(
             alloc,
-            bs_atom(str_cast("bs-builtin-quote")),
+            ud_atom(str_cast("bs-builtin-quote")),
             parse_expression(scan, alloc));
     }
     else
     {
         char c = scan_curr(scan);
         scan_throw(scan, str_cast("unexpected-character"), str_cast_n(1, &c));
-        return bs_nil();
+        return ud_nil();
     }
 }
 
-static BsExpr parse_module(Scan *scan, Alloc *alloc)
+static UdExpr parse_module(Scan *scan, Alloc *alloc)
 {
-    BsExpr body = bs_nil();
+    UdExpr body = ud_nil();
 
     skip_atmosphere(scan);
 
     while (!scan_end(scan))
     {
-        BsExpr expr = bs_nil();
+        UdExpr expr = ud_nil();
 
         expr = parse_line(scan, alloc);
 
         if (!scan_expect(scan, ';'))
         {
-            return bs_nil();
+            return ud_nil();
         }
 
-        body = bs_pair(alloc, expr, body);
+        body = ud_pair(alloc, expr, body);
 
         skip_atmosphere(scan);
     }
 
-    return bs_pair(
+    return ud_pair(
         alloc,
-        bs_atom(str_cast("bs-builtin-block")),
+        ud_atom(str_cast("bs-builtin-block")),
         body);
 }
 
-BsExpr bs_parse(Scan *scan, Alloc *alloc)
+UdExpr ud_parse(Scan *scan, Alloc *alloc)
 {
     skip_atmosphere(scan);
     return parse_module(scan, alloc);
