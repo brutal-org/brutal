@@ -88,12 +88,18 @@ ASM_MAKE_CRN(2);
 ASM_MAKE_CRN(3);
 ASM_MAKE_CRN(4);
 
-#define ASM_XCR0_XSAVE_SAVE_X87 (1 << 0)
-#define ASM_XCR0_XSAVE_SAVE_SSE (1 << 1)
-#define ASM_XCR0_ENABLE_AVX (1 << 2)
-#define ASM_XCR0_ENABLE_AVX512 (1 << 5)
-#define ASM_XCR0_ENABLE_ZMM0_15 (1 << 6)
-#define ASM_XCR0_ENABLE_ZMM16_32 (1 << 7)
+enum xcr0_bit
+{
+    XCR0_XSAVE_SAVE_X87 = (1 << 0),
+    XCR0_XSAVE_SAVE_SSE = (1 << 1),
+    XCR0_AVX_ENABLE = (1 << 2),
+    XCR0_BNDREG_ENABLE = (1 << 3),
+    XCR0_BNDCSR_ENABLE = (1 << 4),
+    XCR0_AVX512_ENABLE = (1 << 5),
+    XCR0_ZMM0_15_ENABLE = (1 << 6),
+    XCR0_ZMM16_32_ENABLE = (1 << 7),
+    XCR0_PKRU_ENABLE = (1 << 9),
+};
 
 static inline void asm_write_xcr(uint32_t i, uint64_t value)
 {

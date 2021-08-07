@@ -24,19 +24,19 @@ void simd_initialize_xcr0(void)
 {
     uint64_t xcr0 = 0;
 
-    xcr0 |= ASM_XCR0_XSAVE_SAVE_X87;
-    xcr0 |= ASM_XCR0_XSAVE_SAVE_SSE;
+    xcr0 |= XCR0_XSAVE_SAVE_X87;
+    xcr0 |= XCR0_XSAVE_SAVE_SSE;
 
     if (cpuid_has_avx())
     {
-        xcr0 |= ASM_XCR0_ENABLE_AVX;
+        xcr0 |= XCR0_AVX_ENABLE;
     }
 
     if (cpuid_has_avx512())
     {
-        xcr0 |= ASM_XCR0_ENABLE_AVX512;
-        xcr0 |= ASM_XCR0_ENABLE_ZMM0_15;
-        xcr0 |= ASM_XCR0_ENABLE_ZMM16_32;
+        xcr0 |= XCR0_AVX512_ENABLE;
+        xcr0 |= XCR0_ZMM0_15_ENABLE;
+        xcr0 |= XCR0_ZMM16_32_ENABLE;
     }
 
     asm_write_xcr(0, xcr0);
