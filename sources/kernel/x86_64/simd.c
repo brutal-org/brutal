@@ -5,19 +5,19 @@
 
 void simd_initialize_fpu(void)
 {
-    asm_write_cr0(asm_read_cr0() & ~ASM_CR0_EMULATION);
-    asm_write_cr0(asm_read_cr0() | ASM_CR0_NATIVE_EXCEPTION);
-    asm_write_cr0(asm_read_cr0() | ASM_CR0_MONITOR_CO_PROCESSOR);
+    asm_write_cr0(asm_read_cr0() & ~CR0_EMULATION);
+    asm_write_cr0(asm_read_cr0() | CR0_NUMERIC_ERROR_ENABLE);
+    asm_write_cr0(asm_read_cr0() | CR0_MONITOR_CO_PROCESSOR);
 
-    asm_write_cr4(asm_read_cr4() | ASM_CR4_FXSR);
-    asm_write_cr4(asm_read_cr4() | ASM_CR4_UNMASKED_FPU_EXCEPTION);
+    asm_write_cr4(asm_read_cr4() | CR4_FXSR_ENABLE);
+    asm_write_cr4(asm_read_cr4() | CR4_SIMD_EXCEPTION_SUPPORT);
 
     asm_fninit();
 }
 
 void simd_enable_xsave(void)
 {
-    asm_write_cr4(asm_read_cr4() | ASM_CR4_XSAVE);
+    asm_write_cr4(asm_read_cr4() | CR4_XSAVE_ENABLE);
 }
 
 void simd_initialize_xcr0(void)
