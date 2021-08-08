@@ -1,9 +1,9 @@
 BID_SRC= $(wildcard sources/bid/*.c) \
-		 $(wildcard sources/libraries/brutal/*.c) \
-		 $(wildcard sources/libraries/brutal/*/*.c) \
-		 $(wildcard sources/libraries/bid/*/*.c) \
-		 $(wildcard sources/libraries/bid/*.c) \
-		 $(wildcard sources/libraries/brutal/host/linux/*.c)
+		 $(wildcard sources/libs/brutal/*.c) \
+		 $(wildcard sources/libs/brutal/*/*.c) \
+		 $(wildcard sources/libs/bid/*/*.c) \
+		 $(wildcard sources/libs/bid/*.c) \
+		 $(wildcard sources/libs/brutal/host/linux/*.c)
 
 BID_OBJ=$(patsubst sources/%.c, $(BUILDDIR_HOST)/%.c.o, $(BID_SRC))
 BID_BIN=$(BUILDDIR_HOST)/bid.elf
@@ -17,6 +17,6 @@ $(BID_BIN): $(BID_OBJ)
 	$(HOST_CC) -rdynamic $(HOST_CFLAGS) $(HOST_LDFLAGS) -fsanitize=address -fsanitize=undefined $^ -o $@
 
 run-bid: $(BID_BIN)
-	$(BID_BIN) sources/libraries/proto/exemple.bid sources/libraries/proto/exemple.h
+	$(BID_BIN) sources/libs/proto/exemple.bid sources/libs/proto/exemple.h
 
 bid: $(BID_BIN)

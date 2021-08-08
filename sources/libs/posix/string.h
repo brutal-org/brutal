@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libraries/posix/locale/local_t.h>
+#include <locale/local_t.h>
 
 void *memccpy(void *restrict s1, void const *restrict s2, int c, size_t n);
 

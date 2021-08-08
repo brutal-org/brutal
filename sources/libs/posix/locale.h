@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libraries/posix/locale/local_t.h>
+#include <locale/local_t.h>
 
 locale_t duplocale(locale_t);
 

@@ -1,9 +1,9 @@
 BS_SRC= $(wildcard sources/udfore/*.c) \
-		 $(wildcard sources/libraries/brutal/*.c) \
-		 $(wildcard sources/libraries/brutal/*/*.c) \
-		 $(wildcard sources/libraries/udfore/*/*.c) \
-		 $(wildcard sources/libraries/udfore/*.c) \
-		 $(wildcard sources/libraries/brutal/host/linux/*.c)
+		 $(wildcard sources/libs/brutal/*.c) \
+		 $(wildcard sources/libs/brutal/*/*.c) \
+		 $(wildcard sources/libs/udfore/*/*.c) \
+		 $(wildcard sources/libs/udfore/*.c) \
+		 $(wildcard sources/libs/brutal/host/linux/*.c)
 
 BS_OBJ=$(patsubst sources/%.c, $(BUILDDIR_HOST)/%.c.o, $(BS_SRC))
 BS_BIN=$(BUILDDIR_HOST)/bs.elf

@@ -5,25 +5,25 @@ KERNEL_C_SRC+=$(wildcard sources/kernel/*.c) \
 KERNEL_S_SRC+=$(wildcard sources/kernel/$(CONFIG_ARCH)/*.s)
 
 KERNEL_LIBS_SRC = \
-	$(wildcard sources/libraries/ansi/ctype.c)           \
-	$(wildcard sources/libraries/ansi/string.c)          \
-	$(wildcard sources/libraries/brutal/alloc/*.c)       \
-	$(wildcard sources/libraries/brutal/ds/*.c)          \
-	$(wildcard sources/libraries/brutal/hash/*.c)        \
-	$(wildcard sources/libraries/brutal/host/kernel/*.c) \
-	$(wildcard sources/libraries/brutal/io/buffer.c)     \
-	$(wildcard sources/libraries/brutal/io/fmt.c)        \
-	$(wildcard sources/libraries/brutal/io/print.c)      \
-	$(wildcard sources/libraries/brutal/io/scan.c)       \
-	$(wildcard sources/libraries/brutal/io/write.c)      \
-	$(wildcard sources/libraries/brutal/log/*.c)         \
-	$(wildcard sources/libraries/brutal/mem/*.c)         \
-	$(wildcard sources/libraries/brutal/sync/*.c)        \
-	$(wildcard sources/libraries/brutal/text/*.c)        \
-	$(wildcard sources/libraries/brutal/time/convert.c)  \
-	$(wildcard sources/libraries/elf/elf.c)              \
-	$(wildcard sources/libraries/handover/*.c)           \
-	$(wildcard sources/libraries/ubsan/*.c)
+	$(wildcard sources/libs/ansi/ctype.c)           \
+	$(wildcard sources/libs/ansi/string.c)          \
+	$(wildcard sources/libs/brutal/alloc/*.c)       \
+	$(wildcard sources/libs/brutal/ds/*.c)          \
+	$(wildcard sources/libs/brutal/hash/*.c)        \
+	$(wildcard sources/libs/brutal/host/kernel/*.c) \
+	$(wildcard sources/libs/brutal/io/buffer.c)     \
+	$(wildcard sources/libs/brutal/io/fmt.c)        \
+	$(wildcard sources/libs/brutal/io/print.c)      \
+	$(wildcard sources/libs/brutal/io/scan.c)       \
+	$(wildcard sources/libs/brutal/io/write.c)      \
+	$(wildcard sources/libs/brutal/log/*.c)         \
+	$(wildcard sources/libs/brutal/mem/*.c)         \
+	$(wildcard sources/libs/brutal/sync/*.c)        \
+	$(wildcard sources/libs/brutal/text/*.c)        \
+	$(wildcard sources/libs/brutal/time/convert.c)  \
+	$(wildcard sources/libs/elf/elf.c)              \
+	$(wildcard sources/libs/handover/*.c)           \
+	$(wildcard sources/libs/ubsan/*.c)
 
 KERNEL_OBJ= \
 	$(patsubst sources/%.c, $(BUILDDIR_CROSS)/%.c.o, $(KERNEL_C_SRC)) \
@@ -42,7 +42,7 @@ $(BUILDDIR_CROSS)/kernel/%.s.o: sources/kernel/%.s
 	$(MKCWD)
 	$(CROSS_AS) -o $@ $< $(CROSS_ASFLAGS)
 
-$(BUILDDIR_CROSS)/kernel/libraries/%.c.o: sources/libraries/%.c
+$(BUILDDIR_CROSS)/kernel/libs/%.c.o: sources/libs/%.c
 	$(MKCWD)
 	$(CROSS_CC) -c -o $@ $< $(CROSS_KCFLAGS) -fsanitize=undefined
 

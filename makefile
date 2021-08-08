@@ -14,14 +14,14 @@ CFLAGS_WARN ?= \
 	-Werror
 
 INC_LIBS= \
-	-Isources/libraries/ansi \
-	-Isources/libraries/posix \
-	-Isources/libraries/bsd \
-	-Isources/libraries/gnu \
-	-Isources/libraries/math
+	-Isources/libs/ansi \
+	-Isources/libs/posix \
+	-Isources/libs/bsd \
+	-Isources/libs/gnu \
+	-Isources/libs/math
 
 INC_LIBBRUTAL= \
-	-Isources/libraries/
+	-Isources/libs/
 
 HOST_CFLAGS_INC ?= \
 	$(INC_LIBBRUTAL) \
@@ -43,7 +43,7 @@ include meta/config/default.mk
 include meta/toolchain/$(CONFIG_TOOLCHAIN)/.build.mk
 
 include sources/kernel/.build.mk
-include sources/libraries/.build.mk
+include sources/libs/.build.mk
 include sources/archs/.build.mk
 include sources/userspace/.build.mk
 include sources/tests/.build.mk
