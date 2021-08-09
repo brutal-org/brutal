@@ -35,7 +35,8 @@ LIBS_HOST_SRC = \
 	$(wildcard sources/libs/brutal/host/linux/*.c)  \
 	$(wildcard sources/libs/udfore/*.c)             \
 	$(wildcard sources/libs/elf/*.c)                \
-	$(wildcard sources/libs/handover/*.c)
+	$(wildcard sources/libs/handover/*.c)           \
+	$(wildcard sources/libs/bid/*.c)
 
 LIBS_HOSTED_OBJ = $(patsubst sources/%.c, $(BUILDDIR_HOST)/%.c.o, $(LIBS_HOST_SRC))
 

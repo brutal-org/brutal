@@ -37,10 +37,6 @@ jobs:
         run: |
           meta/toolchain/${{matrix.toolchain}}/build.sh
 
-      - name: Build BID 
-        run: |
-          make CONFIG_TOOLCHAIN=${{matrix.toolchain}} bid
-
       - name: Build Kernel
         run: |
           make CONFIG_TOOLCHAIN=${{matrix.toolchain}} all
@@ -49,3 +45,10 @@ jobs:
         run: |
           make CONFIG_TOOLCHAIN=${{matrix.toolchain}} run-test
 
+      - name: Run BID
+        run: |
+          make CONFIG_TOOLCHAIN=${{matrix.toolchain}} run-bid
+
+      - name: Run UD
+        run: |
+          make CONFIG_TOOLCHAIN=${{matrix.toolchain}} run-ud
