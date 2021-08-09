@@ -13,6 +13,16 @@ CFLAGS_WARN ?= \
 	-Wextra \
 	-Werror
 
+QEMUFLAGS ?= \
+	-M q35 \
+	-smp 4 \
+	-m 256M \
+	-serial mon:stdio \
+	-no-reboot \
+	-no-shutdown \
+	-cdrom $(ISO) \
+	-d guest_errors
+
 INC_LIBS= \
 	-Isources/libs/ansi \
 	-Isources/libs/posix \
@@ -53,17 +63,10 @@ include sources/utils/.build.mk
 all: $(ISO)
 
 run: $(ISO)
-	qemu-system-x86_64 \
-		-M q35 \
-		-cpu host \
-		-smp 4 \
-		-m 256M \
-		-enable-kvm \
-		-serial mon:stdio \
-		-no-reboot \
-		-no-shutdown \
-		-cdrom $(ISO) \
-		-d guest_errors
+	qemu-system-x86_64 -cpu max $(QEMUFLAGS)
+
+run-kvm: $(ISO)
+	qemu-system-x86_64 -cpu host -enable-kvm $(QEMUFLAGS)
 
 bochs: $(ISO)
 	bochs
