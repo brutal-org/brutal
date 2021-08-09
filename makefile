@@ -48,8 +48,7 @@ include sources/archs/.build.mk
 include sources/userspace/.build.mk
 include sources/tests/.build.mk
 include sysroot/.build.mk
-include sources/bid/.build.mk
-include sources/udfore/.build.mk
+include sources/utils/.build.mk
 
 all: $(ISO)
 

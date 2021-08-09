@@ -33,9 +33,6 @@ int main(int argc, char const *argv[])
         return -1;
     }
 
-    log("File size {}", buffer_str(&source_buffer).len);
-    print(io_std_out(), "[CODE] {}", buffer_str(&source_buffer));
-
     print(io_std_out(), "[AST] ");
     ud_dump(&expr, io_std_out());
 

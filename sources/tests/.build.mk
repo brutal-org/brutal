@@ -1,23 +1,18 @@
 TEST_SRC= \
-	$(wildcard sources/tests/*.c)                       \
-	$(wildcard sources/tests/*/*.c)                     \
-	$(wildcard sources/tests/*/*/*.c)                   \
-	$(wildcard sources/libs/brutal/*.c)            \
-	$(wildcard sources/libs/brutal/*/*.c)          \
-	$(wildcard sources/libs/bid/*/*.c)             \
-	$(wildcard sources/libs/bid/*.c)               \
-	$(wildcard sources/libs/brutal/host/linux/*.c)
+	$(wildcard sources/tests/*.c) \
+	$(wildcard sources/tests/*/*.c) \
+	$(wildcard sources/tests/*/*/*.c)
 
 TEST_OBJ=$(patsubst sources/%.c, $(BUILDDIR_HOST)/%.c.o, $(TEST_SRC))
 TEST_BIN=$(BUILDDIR_HOST)/test.elf
 
 $(BUILDDIR_HOST)/%.c.o: sources/%.c
 	$(MKCWD)
-	$(HOST_CC) $(HOST_CFLAGS) -fsanitize=address -fsanitize=undefined -c -o $@ $^
+	$(HOST_CC) -c -o $@ $^ $(HOST_CFLAGS)
 
-$(TEST_BIN): $(TEST_OBJ)
+$(TEST_BIN): $(TEST_OBJ) $(LIBS_HOSTED_BIN)
 	$(MKCWD)
-	$(HOST_CC) -rdynamic $(HOST_CFLAGS) $(HOST_LDFLAGS) -fsanitize=address -fsanitize=undefined $^ -o $@
+	$(HOST_CC) -o $@ $^ $(HOST_CFLAGS) $(HOST_LDFLAGS)
 
 run-test: $(TEST_BIN)
 	$(TEST_BIN)

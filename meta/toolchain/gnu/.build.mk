@@ -13,6 +13,9 @@ HOST_CFLAGS= \
 HOST_LD=ld
 HOST_LDFLAGS=
 
+HOST_AR=ar
+HOST_ARFLAGS=rcsv
+
 # --- Cross-Compiler --------------------------------------------------------- #
 
 CROSS_AS=nasm

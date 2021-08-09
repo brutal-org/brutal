@@ -36,7 +36,7 @@ DEPENDENCIES += $(KERNEL_OBJ:.o=.d)
 
 $(BUILDDIR_CROSS)/kernel/%.c.o: sources/kernel/%.c
 	$(MKCWD)
-	$(CROSS_CC) -c -o $@ $< $(CROSS_KCFLAGS) -fsanitize=undefined
+	$(CROSS_CC) -c -o $@ $< $(CROSS_KCFLAGS)
 
 $(BUILDDIR_CROSS)/kernel/%.s.o: sources/kernel/%.s
 	$(MKCWD)
@@ -44,7 +44,7 @@ $(BUILDDIR_CROSS)/kernel/%.s.o: sources/kernel/%.s
 
 $(BUILDDIR_CROSS)/kernel/libs/%.c.o: sources/libs/%.c
 	$(MKCWD)
-	$(CROSS_CC) -c -o $@ $< $(CROSS_KCFLAGS) -fsanitize=undefined
+	$(CROSS_CC) -c -o $@ $< $(CROSS_KCFLAGS)
 
 $(KERNEL): $(KERNEL_OBJ)
 	$(MKCWD)
