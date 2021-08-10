@@ -49,6 +49,7 @@ include sources/userspace/.build.mk
 include sources/tests/.build.mk
 include sysroot/.build.mk
 include sources/utils/.build.mk
+include sources/loader/.build.mk
 
 all: $(ISO)
 
@@ -67,6 +68,7 @@ run: $(ISO)
 bochs: $(ISO)
 	bochs
 
+loader: $(EFI_FILE)
 clean:
 	rm -rf build/
 
