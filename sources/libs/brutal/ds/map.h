@@ -40,13 +40,17 @@ bool map_get_impl(MapImpl *impl, Str key, void *data);
 
 #define map_deinit(SELF) map_deinit_impl(impl_cast(SELF));
 
-#define map_put(SELF, KEY, DATA) (                            \
-    {                                                         \
-        typeof(*(SELF)->_T) value = (DATA);                   \
-        map_put_impl(impl_cast(SELF), str_cast(KEY), &value); \
+#define map_put(SELF, KEY, DATA) (                              \
+    {                                                           \
+        typeof(*(SELF)->_T) __value = (DATA);                   \
+        map_put_impl(impl_cast(SELF), str_cast(KEY), &__value); \
     })
 
-#define map_get(SELF, KEY, DATA) map_get_impl(impl_cast(SELF), str_cast(KEY), (DATA))
+#define map_get(SELF, KEY, DATA) (                                 \
+    {                                                              \
+        static_assert(sizeof(*(DATA)) == sizeof(*(SELF)->_T), ""); \
+        map_get_impl(impl_cast(SELF), str_cast(KEY), (DATA));      \
+    })
 
 // clang-format off
 
