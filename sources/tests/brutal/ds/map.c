@@ -4,7 +4,7 @@
 
 TEST(map_put_get)
 {
-    Map(uintptr_t) map;
+    Map(uint32_t) map;
     uint32_t value;
 
     map_init(&map, alloc_global());
