@@ -1,8 +1,9 @@
 #include "utils.h"
-#include "misc.h"
+#include "efi/console.h"
 #include "efi/file.h"
 #include "efi/lip.h"
 #include "efi/st.h"
+#include "misc.h"
 
 EFISystemTable *st;
 EFIHandle image_handle;
@@ -16,6 +17,44 @@ void init_lib(EFISystemTable *st2, EFIHandle image_handle2)
 {
     st = st2;
     image_handle = image_handle2;
+}
+
+void set_attribute(u64 attr)
+{
+    st->console_out->set_attribute(st->console_out, attr);
+}
+
+void clear_screen()
+{
+    st->console_out->clear_screen(st->console_out);
+}
+
+void panic(char *str, ...)
+{
+    va_list args;
+    va_start(args, str);
+
+    u16 buffer[256];
+
+    clear_screen();
+    set_attribute(EFI_LIGHTRED);
+
+    st->console_out->output_string(st->console_out, u"ERROR: ");
+
+    set_attribute(EFI_WHITE);
+
+    u16vsnprintf(buffer, sizeof(buffer), str, args);
+
+    st->console_out->output_string(st->console_out, buffer);
+
+    st->console_out->output_string(st->console_out, u"\r\n");
+
+    st->console_out->output_string(st->console_out, u"Halting.");
+    
+    va_end(args);
+
+    while (1)
+        ;
 }
 
 static EFIStatus get_rootdir(EFISimpleFileSystemProtocol *rootfs, EFIFileProtocol **rootdir)
