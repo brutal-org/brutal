@@ -1,42 +1,64 @@
 #include "elf.h"
 #include "efi/file.h"
 
-ELF64Program load_elf_file(char16 *path)
+ElfResult load_elf_file(char16 *path)
 {
     File f = open_file(path);
-    ELF64Program ret;
-
-    ret.efi_status = 0;
-    ret.status = OK;
+    Elf64Program ret;
 
     get_file_info(&f);
 
     if (f.status != 0)
     {
         close_file(&f);
-        ret.efi_status = f.status;
-        return ret;
+        return ERR(ElfResult, FILE_NOT_FOUND);
     }
 
-    ELF64Header ehdr;
+    Elf64Header ehdr;
 
     read_file(&f, &ehdr);
 
     ret.hdr = ehdr;
 
-    if (!IS_ELF(ehdr))
+    if (!elf_validate(&ehdr))
     {
-        ret.status = NOT_AN_ELF_FILE;
-        return ret;
+        return ERR(ElfResult, NOT_AN_ELF_FILE);
     }
 
-    if (ehdr.e_machine != ELF_X86_64)
+    if (ehdr.machine_type != ELF_X86_64)
     {
-        ret.status = UNSUPPORTED_MACHINE;
-        return ret;
+        return ERR(ElfResult, UNSUPPORTED_MACHINE);
     }
 
     close_file(&f);
 
-    return ret;
+    return OK(ElfResult, ret);
+}
+
+char *elf_get_error_message(ElfResult res)
+{
+
+    if (!res.success)
+    {
+        switch (res._error)
+        {
+        case NOT_AN_ELF_FILE:
+        {
+            return "not an elf file";
+        }
+        case UNSUPPORTED_MACHINE:
+        {
+            return "unsupported elf architecture";
+            break;
+        }
+
+        case FILE_NOT_FOUND:
+        {
+            return "elf file not found";
+            break;
+        }
+        }
+    }
+
+    return "this shouldn't happen";
 }

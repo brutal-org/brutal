@@ -1,4 +1,3 @@
-#include "config.h"
 #include <efi/base.h>
 #include <efi/console.h>
 #include <efi/lip.h>
@@ -6,6 +5,7 @@
 #include <efi/st.h>
 #include <efi/utils.h>
 #include <stddef.h>
+#include "config.h"
 #include "elf.h"
 
 EFIBootServices *BS;
@@ -13,28 +13,27 @@ EFIBootServices *BS;
 void __chkstk() { return; }
 
 char16 *logo[] = {
+    u"/yyyyo:yyyys  `:osys/.",
+    u"  -hMMd .yMMN oNMMNmMMMh.",
+    u"   -hd   .yNyMMy.  `+MMm`",
+    u"/sssss:ssssyNMM`     dMM-",
+    u"  :dMMd -hMMNoMMh:` .sMMd",
+    u"   :dd   -hN /mMMMMMMNs`                 Press Enter to boot",
+    u".+++++y+++++y+++ydhdd+`                  Press ESC to shutdown",
+    u":MMMMMMMMMMMMMMMd: dMMNs`",
+    u":MMh     `MMMMd:   dMMMMd",
+    u":MMh      MMMy/////mMMMMM-",
+    u":MMh      MMNyMMMMMMMMMMm`",
+    u":MMNmmmmmmMMN sNMMMMMMMh.",
 
-    L"/yyyyo:yyyys  `:osys/.",
-    L"  -hMMd .yMMN oNMMNmMMMh.",
-    L"   -hd   .yNyMMy.  `+MMm`",
-    L"/sssss:ssssyNMM`     dMM-",
-    L"  :dMMd -hMMNoMMh:` .sMMd",
-    L"   :dd   -hN /mMMMMMMNs`                 Press Enter to boot",
-    L".+++++y+++++y+++ydhdd+`                  Press ESC to shutdown",
-    L":MMMMMMMMMMMMMMMd: dMMNs`",
-    L":MMh     `MMMMd:   dMMMMd",
-    L":MMh      MMMy/////mMMMMM-",
-    L":MMh      MMNyMMMMMMMMMMm`",
-    L":MMNmmmmmmMMN sNMMMMMMMh.",
-    L".yyyyyyyyyyys  `/oyys+."};
+    u".yyyyyyyyyyys  `/oyys+."};
 
 EFIStatus efi_main(EFIHandle image_handle, EFISystemTable *system_table)
 {
     /* Initializing EFI */
-
     init_lib(system_table, image_handle);
 
-    system_table->console_out->clear_screen(system_table->console_out);
+    clear_screen();
 
     system_table->console_in->reset(system_table->console_in, false);
 
@@ -42,11 +41,11 @@ EFIStatus efi_main(EFIHandle image_handle, EFISystemTable *system_table)
     u64 key_event = 0;
 
     /* Setting color to red then white */
-    system_table->console_out->set_attribute(system_table->console_out, EFI_LIGHTRED);
+    set_attribute(EFI_LIGHTRED);
 
     efi_printf("Brutal boot\r\n");
 
-    system_table->console_out->set_attribute(system_table->console_out, EFI_WHITE);
+    set_attribute(EFI_WHITE);
 
     /* Opening config file */
     uint16_t path[] = u"efi\\config.cfg";
@@ -66,10 +65,13 @@ EFIStatus efi_main(EFIHandle image_handle, EFISystemTable *system_table)
     close_file(&f);
 
     File elf_file = open_file(utf16_ptr);
-    
+
     get_file_info(&elf_file);
 
-    efi_printf("ELF machine: %x\r\n", load_elf_file(utf16_ptr).hdr.e_machine);
+    auto func_result = load_elf_file(utf16_ptr);
+    auto result = UNWRAP_WITH_MSG(func_result, elf_get_error_message(func_result));
+
+    efi_printf("ELF machine: %x\r\n", result.hdr.machine_type);
 
     for (size_t i = 0; i < sizeof(logo) / sizeof(*logo); i++)
     {
@@ -89,10 +91,10 @@ EFIStatus efi_main(EFIHandle image_handle, EFISystemTable *system_table)
             system_table->runtime_services->reset_system(EFI_RESET_SHUTDOWN, 0, 0, NULL);
         }
 
-        else if((u64)key.unicode_char == CHAR_CARRIAGE_RETURN)
+        else if ((u64)key.unicode_char == CHAR_CARRIAGE_RETURN)
         {
             efi_printf("Boot not available yet!\r\n");
-	    continue;
+            continue;
         }
     }
 

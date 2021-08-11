@@ -8,6 +8,7 @@ LDFLAGS = -subsystem:efi_application -nodefaultlib -dll
 DIRECTORY_GUARD=@mkdir -p $(@D)
 
 BRUTAL_BOOT_LIBS_SRCS = \
+	$(wildcard sources/libs/elf/elf.c)              \
 	$(wildcard sources/libs/efi/*.c)                \
 	$(wildcard sources/libs/ansi/ctype.c)           \
 	$(wildcard sources/libs/ansi/string.c)          \
