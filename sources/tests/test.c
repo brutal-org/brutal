@@ -96,6 +96,16 @@ int test_run_all(void)
     }
 }
 
+TEST(should_run)
+{
+
+}
+
+TEST_WITH_FLAGS(should_fail, TEST_EXPECTED_TO_FAIL)
+{
+    panic("this test should fail");
+}
+
 int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char const *argv[])
 {
     for (int i = 0; i < argc; i++)
