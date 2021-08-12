@@ -23,5 +23,4 @@ EFIFileInfo get_file_info(File *file);
 void efi_printf(char *fmt, ...);
 void *efi_malloc(u64 size);
 void efi_free(void *ptr);
-
 void *to_utf16(void* ptr, char *buffer);
