@@ -1,6 +1,7 @@
 #include "utils.h"
 #include <brutal/alloc.h>
 #include <brutal/host/mem.h>
+#include <stdatomic.h>
 #include "brutal/base/error.h"
 #include "efi/file.h"
 #include "efi/lip.h"
@@ -147,10 +148,11 @@ void host_mem_unlock(void)
 
 void *to_utf16(void *ptr, char *buffer)
 {
-    ptr = efi_malloc(strlen(buffer) << 1);
+    ptr = alloc_acquire(alloc_global(), strlen(buffer) << 1);
 
     memset(ptr, 0, sizeof(ptr));
-    for (size_t i = 0; i < sizeof(buffer) / sizeof(*buffer); i++)
+    
+    for (size_t i = 0; i < strlen(buffer); i++)
     {
         *(char16 *)(ptr + (i << 1)) = buffer[i];
     }
