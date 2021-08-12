@@ -2,7 +2,8 @@
 
 IoWriteResult io_put(IoWriter *writer, char c)
 {
-    return io_write(writer, &c, 1);
+    char buf[2] = {c, 0};
+    return io_write(writer, buf, 1);
 }
 
 IoWriteResult io_print(IoWriter *writer, Str str)
