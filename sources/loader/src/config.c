@@ -19,9 +19,11 @@ char *strncpy(char *dst, const char *src, size_t size)
 
 char *get_config_key(char *key, char *data, File *file)
 {
-    char *text = efi_malloc(file->info.file_size);
+    char *text = alloc_malloc(alloc_global(), file->info.file_size);
 
     read_file(file, text);
+
+    text[file->info.file_size] = '\0';
 
     char __key[strlen(key)];
 
@@ -71,7 +73,7 @@ char *get_config_key(char *key, char *data, File *file)
         kv[i++] = c;
     }
 
-    efi_free(text);
 
+    host_mem_release(text, 0);
     return data;
 }
