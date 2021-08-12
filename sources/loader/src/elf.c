@@ -38,9 +38,9 @@ ElfResult load_elf_file(char16 *path)
 char *elf_get_error_message(ElfResult res)
 {
 
-    if (!res.success)
+    if (!res.succ)
     {
-        switch (res._error)
+        switch (res.err)
         {
         case NOT_AN_ELF_FILE:
         {

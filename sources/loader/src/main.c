@@ -69,7 +69,7 @@ EFIStatus efi_main(EFIHandle image_handle, EFISystemTable *system_table)
     get_file_info(&elf_file);
 
     auto func_result = load_elf_file(utf16_ptr);
-    auto result = UNWRAP_WITH_MSG(func_result, elf_get_error_message(func_result));
+    auto result = UNWRAP_OR_MESSAGE(func_result, elf_get_error_message(func_result));
 
     efi_printf("ELF machine: %x\r\n", result.hdr.machine_type);
 

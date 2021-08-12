@@ -34,15 +34,3 @@ void panic(char *str, ...);
     {                                                             \
         *(char16 *)(ptr + (i << 1)) = buffer[i];                  \
     }
-
-#define UNWRAP_WITH_MSG(expr, msg, ...) (           \
-    {                                               \
-        auto expr_value = (expr);                   \
-                                                    \
-        if (!expr_value.success)                    \
-        {                                           \
-            panic(msg, __VA_OPT__(, ) __VA_ARGS__); \
-        }                                           \
-                                                    \
-        expr_value._ok;                             \
-    })
