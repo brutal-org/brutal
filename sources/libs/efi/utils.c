@@ -1,4 +1,7 @@
 #include "utils.h"
+#include <brutal/alloc.h>
+#include <brutal/host/mem.h>
+#include "brutal/base/error.h"
 #include "efi/file.h"
 #include "efi/lip.h"
 #include "efi/st.h"
@@ -108,21 +111,38 @@ void efi_printf(char *fmt, ...)
     va_end(args);
 }
 
-#define DIV_ROUNDUP(A, B) (      \
-    {                            \
-        __typeof__(A) _a_ = A;   \
-        __typeof__(B) _b_ = B;   \
-        (_a_ + (_b_ - 1)) / _b_; \
-    })
-
-void *efi_malloc(u64 size)
+Error host_mem_acquire(size_t size, void **out_result, MAYBE_UNUSED enum host_mem_flag flags)
 {
-    size_t page_count = DIV_ROUNDUP(size, 4096);
+    auto status = st->boot_services->allocate_pool(EFI_BOOT_SERVICES_DATA, size, out_result);
 
-    void *ptr;
-    st->boot_services->allocate_pool(EFI_BOOT_SERVICES_DATA, page_count, &ptr);
+    if (status != EFI_SUCCESS)
+    {
+        return ERR_UNDEFINED;
+    }
 
-    return ptr;
+    return ERR_SUCCESS;
+}
+
+Error host_mem_release(void *addr, MAYBE_UNUSED size_t size)
+{
+    auto status = st->boot_services->free_pool(addr);
+
+    if (status != EFI_SUCCESS)
+    {
+        return ERR_UNDEFINED;
+    }
+
+    return ERR_SUCCESS;
+}
+
+void host_mem_lock(void)
+{
+    return;
+}
+
+void host_mem_unlock(void)
+{
+    return;
 }
 
 void *to_utf16(void *ptr, char *buffer)
@@ -136,9 +156,4 @@ void *to_utf16(void *ptr, char *buffer)
     }
 
     return ptr;
-}
-
-void efi_free(void *ptr)
-{
-    st->boot_services->free_pool(ptr);
 }
