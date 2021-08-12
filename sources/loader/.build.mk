@@ -1,13 +1,19 @@
 CC = clang
 LD = lld-link
 
-CFLAGS = $(CROSS_KCFLAGS) -I. -target x86_64-pc-win32-coff -fno-stack-protector -fshort-wchar -mno-red-zone
+CFLAGS = $(CROSS_CFLAGS) -I. -target x86_64-pc-win32-coff -fno-stack-protector -fshort-wchar -mno-red-zone
 
 LDFLAGS = -subsystem:efi_application -nodefaultlib -dll
 
 DIRECTORY_GUARD=@mkdir -p $(@D)
 
 BRUTAL_BOOT_LIBS_SRCS = \
+	sources/libs/brutal/io/fmt.c \
+	sources/libs/brutal/io/write.c \
+	sources/libs/brutal/io/print.c \
+	sources/libs/brutal/io/scan.c \
+	$(wildcard sources/libs/brutal/log/*.c) \
+	$(wildcard sources/libs/brutal/alloc/*.c)	\
 	$(wildcard sources/libs/elf/elf.c)              \
 	$(wildcard sources/libs/efi/*.c)                \
 	$(wildcard sources/libs/ansi/ctype.c)           \
@@ -39,7 +45,7 @@ $(BUILD_DIRECTORY)/libs/%.c.o: sources/libs/%.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 run-loader: $(EFI_FILE) $(BUILD_DIRECTORY)/tools/OVMF.fd $(BUILD_DIRECTORY)/image/EFI/BOOT/BOOTX64.EFI
-	qemu-system-x86_64 -bios $(BUILD_DIRECTORY)/tools/OVMF.fd -machine q35 -debugcon stdio -cpu host  -enable-kvm -drive file=fat:rw:$(BUILD_DIRECTORY)/image,media=disk,format=raw
+	qemu-system-x86_64 -bios $(BUILD_DIRECTORY)/tools/OVMF.fd -machine q35 -debugcon stdio -cpu host -enable-kvm -drive file=fat:rw:$(BUILD_DIRECTORY)/image,media=disk,format=raw
 
 $(BUILD_DIRECTORY)/image/EFI/BOOT/BOOTX64.EFI:
 	$(DIRECTORY_GUARD)

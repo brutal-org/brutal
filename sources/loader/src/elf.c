@@ -1,4 +1,5 @@
 #include "elf.h"
+#include <efi/utils.h>
 #include "efi/file.h"
 
 ElfResult load_elf_file(char16 *path)

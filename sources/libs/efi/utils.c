@@ -19,44 +19,6 @@ void init_lib(EFISystemTable *st2, EFIHandle image_handle2)
     image_handle = image_handle2;
 }
 
-void set_attribute(u64 attr)
-{
-    st->console_out->set_attribute(st->console_out, attr);
-}
-
-void clear_screen()
-{
-    st->console_out->clear_screen(st->console_out);
-}
-
-void panic(char *str, ...)
-{
-    va_list args;
-    va_start(args, str);
-
-    u16 buffer[256];
-
-    clear_screen();
-    set_attribute(EFI_LIGHTRED);
-
-    st->console_out->output_string(st->console_out, u"ERROR: ");
-
-    set_attribute(EFI_WHITE);
-
-    u16vsnprintf(buffer, sizeof(buffer), str, args);
-
-    st->console_out->output_string(st->console_out, buffer);
-
-    st->console_out->output_string(st->console_out, u"\r\n");
-
-    st->console_out->output_string(st->console_out, u"Halting.");
-    
-    va_end(args);
-
-    while (1)
-        ;
-}
-
 static EFIStatus get_rootdir(EFISimpleFileSystemProtocol *rootfs, EFIFileProtocol **rootdir)
 {
     return rootfs->open_volume(rootfs, rootdir);
@@ -135,36 +97,93 @@ void close_file(File *file)
     file->status = rootdir->close(file->efi_file);
 }
 
-void efi_printf(char *fmt, ...)
+Error host_mem_acquire(size_t size, void **out_result, MAYBE_UNUSED enum host_mem_flag flags)
 {
-    va_list args;
-    va_start(args, fmt);
-    u16 buffer[1024];
+    auto status = st->boot_services->allocate_pool(EFI_BOOT_SERVICES_DATA, size, out_result);
 
-    u16vsnprintf(buffer, sizeof(buffer), fmt, args);
-    st->console_out->output_string(st->console_out, buffer);
+    if (status != EFI_SUCCESS)
+    {
+        return ERR_UNDEFINED;
+    }
 
-    va_end(args);
+    return ERR_SUCCESS;
 }
 
-#define DIV_ROUNDUP(A, B) (      \
-    {                            \
-        __typeof__(A) _a_ = A;   \
-        __typeof__(B) _b_ = B;   \
-        (_a_ + (_b_ - 1)) / _b_; \
-    })
-
-void *efi_malloc(u64 size)
+Error host_mem_release(void *addr, MAYBE_UNUSED size_t size)
 {
-    size_t page_count = DIV_ROUNDUP(size, 4096);
+    st->boot_services->free_pool(addr);
 
-    void *ptr;
-    st->boot_services->allocate_pool(EFI_BOOT_SERVICES_DATA, page_count, &ptr);
-
-    return ptr;
+    return ERR_SUCCESS;
 }
 
-void efi_free(void *ptr)
+void host_mem_lock(void)
 {
-    st->boot_services->free_pool(ptr);
+    return;
 }
+
+void host_mem_unlock(void)
+{
+    return;
+}
+
+static void *_ptr;
+
+void *to_utf16(char *buffer)
+{
+    _ptr = alloc_malloc(alloc_global(), strlen(buffer) << 1);
+
+    memset(_ptr, 0, sizeof(*_ptr));
+
+    for (size_t i = 0; i < strlen(buffer); i++)
+    {
+        *(char16 *)(_ptr + (i << 1)) = buffer[i];
+    }
+
+    return _ptr;
+}
+
+void set_attribute(u64 attribute)
+{
+    st->console_out->set_attribute(st->console_out, attribute);
+}
+void clear_screen()
+{
+    st->console_out->clear_screen(st->console_out);
+}
+
+IoWriteResult efi_write(MAYBE_UNUSED IoWriter *writer, char const *text, size_t size)
+{
+
+    u16 *ptr = to_utf16((char *)text);
+
+    ptr[u16strlen(ptr)] = '\0';
+
+    st->console_out->output_string(st->console_out, ptr);
+
+    return OK(IoWriteResult, size);
+}
+
+static IoWriter efi_writer;
+
+IoWriter *host_log_writer()
+{
+    efi_writer.write = efi_write;
+
+    return &efi_writer;
+}
+
+void host_log_lock() { return; }
+
+void host_log_unlock() { return; }
+
+void efi_print_impl(Str fmt, struct print_args args)
+{
+    print_impl(host_log_writer(), fmt, args);
+    print(host_log_writer(), "\r\n");
+}
+
+void host_log_panic()
+{
+    while (1)
+        ;
+};
