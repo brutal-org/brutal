@@ -1,6 +1,7 @@
 #pragma once
 
 #include <brutal/base/attributes.h>
+#include <brutal/base/banned.h>
 #include <brutal/base/cast.h>
 #include <brutal/base/count.h>
 #include <brutal/base/endian.h>

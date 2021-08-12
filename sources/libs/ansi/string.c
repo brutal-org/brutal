@@ -1,3 +1,4 @@
+#define I_M_A_BAD_PROGRAMMER_OR_I_M_WRITING_A_C_LIBRARY
 
 /* --- 7.24 - String handling ----------------------------------------------- */
 

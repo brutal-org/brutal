@@ -1,11 +1,11 @@
 #include <brutal/base.h>
 #include <brutal/host/log.h>
+#include <errno.h>
 #include <execinfo.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
-#include <errno.h>
+#include <unistd.h>
 
 static bool log_initialized = false;
 static IoWriter log;
