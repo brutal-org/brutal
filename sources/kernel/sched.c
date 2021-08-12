@@ -280,9 +280,10 @@ static void sched_updated_blocked(void)
 
 static void sched_switch_other(void)
 {
-    for (int i = 1; i < cpu_count(); i++)
+    for (int i = 0; i < cpu_count(); i++)
     {
-        if (cpu(i)->next != cpu(i)->current)
+        if (cpu_self_id() != i &&
+            cpu(i)->next != cpu(i)->current)
         {
             cpu_resched_other(i);
         }

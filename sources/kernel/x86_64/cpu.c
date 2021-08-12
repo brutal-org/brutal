@@ -34,6 +34,7 @@ void cpu_found(CpuId id, int lapic)
 
     // Shed stack
     cpu_impl(id)->tss.ist[0] = range_end(UNWRAP(heap_alloc(KERNEL_STACK_SIZE)));
+    cpu_impl(id)->tss.ist[1] = range_end(UNWRAP(heap_alloc(KERNEL_STACK_SIZE)));
 }
 
 /* --- Public API ----------------------------------------------------------- */

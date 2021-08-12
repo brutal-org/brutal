@@ -41,9 +41,9 @@ void idt_initialize(void)
     }
 
     // Specials cases for IPIs dans the timer IRQ.
-    idt.entries[32] = idt_entry(__interrupt_vector[32], 1, IDT_GATE);
-    idt.entries[IPI_RESCHED] = idt_entry(__interrupt_vector[IPI_RESCHED], 1, IDT_GATE);
-    idt.entries[IPI_STOP] = idt_entry(__interrupt_vector[IPI_STOP], 0, IDT_GATE);
+    idt.entries[32] = idt_entry(__interrupt_vector[32], 0, IDT_GATE);
+    idt.entries[IPI_RESCHED] = idt_entry(__interrupt_vector[IPI_RESCHED], 0, IDT_GATE);
+    idt.entries[IPI_STOP] = idt_entry(__interrupt_vector[IPI_STOP], 1, IDT_GATE);
 
     idt_update(&idt_descriptor);
 }
