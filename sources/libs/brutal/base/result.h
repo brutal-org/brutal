@@ -30,28 +30,45 @@
         .err = (ERROR) \
     }
 
-#define TRY(T, EXPR) (                   \
-    {                                    \
-        auto __result = (EXPR);          \
-                                         \
-        if (!__result.succ)              \
-        {                                \
-            return ERR(T, __result.err); \
-        }                                \
-                                         \
-        __result.ok;                     \
+#define TRY(T, EXPR) (                 \
+    {                                  \
+        auto __expr = (EXPR);          \
+                                       \
+        if (!__expr.succ)              \
+        {                              \
+            return ERR(T, __expr.err); \
+        }                              \
+                                       \
+        __expr.ok;                     \
     })
 
 #define UNWRAP_OR_MESSAGE(EXPR, MESSAGE) ( \
     {                                      \
-        auto __result = (EXPR);            \
+        auto __expr = (EXPR);              \
                                            \
-        if (!__result.succ)                \
+        if (!__expr.succ)                  \
         {                                  \
             panic(MESSAGE);                \
         }                                  \
                                            \
-        __result.ok;                       \
+        __expr.ok;                         \
+    })
+
+#define UNWRAP_OR(EXPR, VALUE) (    \
+    {                               \
+        auto __expr = (EXPR);       \
+        typeof(__expr.ok) __result; \
+                                    \
+        if (__expr.succ)            \
+        {                           \
+            __result = __expr.ok;   \
+        }                           \
+        else                        \
+        {                           \
+            __result = (VALUE);     \
+        }                           \
+                                    \
+        __result;                   \
     })
 
 #define UNWRAP(EXPR) \
