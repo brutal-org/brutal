@@ -163,7 +163,7 @@ static void vmm_space_destroy_pml(int level, struct pml *pml, size_t start, size
     {
         auto vmm_result = vmm_get_pml(pml, i);
 
-        if (!vmm_result.success)
+        if (!vmm_result.succ)
         {
             continue;
         }

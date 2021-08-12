@@ -19,7 +19,7 @@ Error host_mem_acquire(size_t size, void **out_result, MAYBE_UNUSED enum host_me
 {
     auto alloc_result = heap_alloc(size);
 
-    if (!alloc_result.success)
+    if (!alloc_result.succ)
     {
         return ERR_UNDEFINED;
     }

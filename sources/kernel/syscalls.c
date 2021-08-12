@@ -57,9 +57,9 @@ BrResult sys_map(BrMapArgs *args)
 
     auto map_result = space_map(space, mem_obj, args->offset, args->size, args->vaddr);
 
-    if (!map_result.success)
+    if (!map_result.succ)
     {
-        result = map_result._error;
+        result = map_result.err;
         goto cleanup_and_return;
     }
 
@@ -103,9 +103,9 @@ BrResult sys_unmap(BrUnmapArgs *args)
 
     auto unmap_result = space_unmap(space, (VmmRange){args->vaddr, args->size});
 
-    if (!unmap_result.success)
+    if (!unmap_result.succ)
     {
-        result = unmap_result._error;
+        result = unmap_result.err;
         goto cleanup_and_return;
     }
 
@@ -168,9 +168,9 @@ BrResult sys_create_mem_obj(BrMemObj *handle, BrCreateMemObjArgs *args)
     {
         auto pmm_result = pmm_alloc(args->size);
 
-        if (!pmm_result.success)
+        if (!pmm_result.succ)
         {
-            return pmm_result._error;
+            return pmm_result.err;
         }
 
         mem_obj = mem_obj_pmm(UNWRAP(pmm_result), MEM_OBJ_OWNING);

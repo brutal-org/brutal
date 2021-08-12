@@ -4,50 +4,55 @@
 #include <brutal/base/std.h>
 #include <brutal/base/types.h>
 
-#define Result(TError, TOk) \
-    struct                  \
-    {                       \
-        bool success;       \
-        union               \
-        {                   \
-            TError _error;  \
-            TOk _ok;        \
-        };                  \
-    }
-
-#define OK(T, value)     \
-    (T)                  \
-    {                    \
-        .success = true, \
-        ._ok = (value),  \
-    }
-
-#define ERR(T, value)     \
-    (T)                   \
+#define Result(ERROR, OK) \
+    struct                \
     {                     \
-        .success = false, \
-        ._error = (value) \
+        bool succ;        \
+                          \
+        union             \
+        {                 \
+            ERROR err;    \
+            OK ok;        \
+        };                \
     }
 
-#define TRY(T, expr)                          \
-    (                                         \
-        {                                     \
-            auto result = (expr);             \
-            if (!result.success)              \
-            {                                 \
-                return ERR(T, result._error); \
-            }                                 \
-            result._ok;                       \
-        })
+#define OK(T, VALUE)   \
+    (T)                \
+    {                  \
+        .succ = true,  \
+        .ok = (VALUE), \
+    }
 
-#define UNWRAP(expr) (                          \
-    {                                           \
-        auto expr_value = (expr);               \
-                                                \
-        if (!expr_value.success)                \
-        {                                       \
-            panic("UNWRAP(" #expr ") failled"); \
-        }                                       \
-                                                \
-        expr_value._ok;                         \
+#define ERR(T, ERROR)  \
+    (T)                \
+    {                  \
+        .succ = false, \
+        .err = (ERROR) \
+    }
+
+#define TRY(T, EXPR) (                   \
+    {                                    \
+        auto __result = (EXPR);          \
+                                         \
+        if (!__result.succ)              \
+        {                                \
+            return ERR(T, __result.err); \
+        }                                \
+                                         \
+        __result.ok;                     \
     })
+
+#define UNWRAP_OR_MESSAGE(EXPR, MESSAGE) ( \
+    {                                      \
+        auto __result = (EXPR);            \
+                                           \
+        if (!__result.succ)                \
+        {                                  \
+            panic(MESSAGE);                \
+        }                                  \
+                                           \
+        __result.ok;                       \
+    })
+
+#define UNWRAP(EXPR) \
+    UNWRAP_OR_MESSAGE(EXPR, "UNWRAP(" #EXPR ") failled")

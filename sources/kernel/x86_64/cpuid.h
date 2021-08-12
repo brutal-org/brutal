@@ -4,18 +4,18 @@
 
 typedef struct
 {
-    bool success;
+    bool succ;
     uint32_t eax;
     uint32_t ebx;
     uint32_t ecx;
     uint32_t edx;
-} cpuid_Result;
+} CpuidResult;
 
 #define CPUID_XSAVE (1 << 26)
 #define CPUID_AVX (1 << 28)
 #define CPUID_AVX512 (1 << 16)
 
-cpuid_Result cpuid(uint32_t leaf, uint32_t subleaf);
+CpuidResult cpuid(uint32_t leaf, uint32_t subleaf);
 
 static inline bool cpuid_has_xsave(void)
 {
