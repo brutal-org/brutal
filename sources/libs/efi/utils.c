@@ -1,5 +1,5 @@
 #include "utils.h"
-#include "efi/console.h"
+#include "brutal/base/error.h"
 #include "efi/file.h"
 #include "efi/lip.h"
 #include "efi/st.h"

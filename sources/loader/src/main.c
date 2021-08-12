@@ -1,3 +1,4 @@
+#include <brutal/host/log.h>
 #include <efi/base.h>
 #include <efi/console.h>
 #include <efi/lip.h>
@@ -12,21 +13,23 @@ EFIBootServices *BS;
 
 void __chkstk() { return; }
 
-char16 *logo[] = {
-    u"/yyyyo:yyyys  `:osys/.",
-    u"  -hMMd .yMMN oNMMNmMMMh.",
-    u"   -hd   .yNyMMy.  `+MMm`",
-    u"/sssss:ssssyNMM`     dMM-",
-    u"  :dMMd -hMMNoMMh:` .sMMd",
-    u"   :dd   -hN /mMMMMMMNs`                 Press Enter to boot",
-    u".+++++y+++++y+++ydhdd+`                  Press ESC to shutdown",
-    u":MMMMMMMMMMMMMMMd: dMMNs`",
-    u":MMh     `MMMMd:   dMMMMd",
-    u":MMh      MMMy/////mMMMMM-",
-    u":MMh      MMNyMMMMMMMMMMm`",
-    u":MMNmmmmmmMMN sNMMMMMMMh.",
+char *logo[] = {
+    "/yyyyo:yyyys  `:osys/.",
+    "  -hMMd .yMMN oNMMNmMMMh.",
+    "   -hd   .yNyMMy.  `+MMm`",
+    "/sssss:ssssyNMM`     dMM-",
+    "  :dMMd -hMMNoMMh:` .sMMd",
+    "   :dd   -hN /mMMMMMMNs`                 Press Enter to boot",
+    ".+++++y+++++y+++ydhdd+`                  Press ESC to shutdown",
+    ":MMMMMMMMMMMMMMMd: dMMNs`",
+    ":MMh     `MMMMd:   dMMMMd",
+    ":MMh      MMMy/////mMMMMM-",
+    ":MMh      MMNyMMMMMMMMMMm`",
+    ":MMNmmmmmmMMN sNMMMMMMMh.",
 
-    u".yyyyyyyyyyys  `/oyys+."};
+    ".yyyyyyyyyyys  `/oyys+."};
+
+
 
 EFIStatus efi_main(EFIHandle image_handle, EFISystemTable *system_table)
 {
@@ -43,7 +46,7 @@ EFIStatus efi_main(EFIHandle image_handle, EFISystemTable *system_table)
     /* Setting color to red then white */
     set_attribute(EFI_LIGHTRED);
 
-    efi_printf("Brutal boot\r\n");
+    efi_print("Brutal boot");
 
     set_attribute(EFI_WHITE);
 
@@ -58,9 +61,9 @@ EFIStatus efi_main(EFIHandle image_handle, EFISystemTable *system_table)
 
     get_config_key("ELF", data_buf, &f);
 
-    TO_UTF16(utf16_ptr, data_buf);
+    u16 *utf16_ptr = to_utf16(data_buf);
 
-    efi_printf("Read config file (%d bytes)\r\n\r\n", f.info.file_size, data_buf);
+    efi_print("Read config file ({} bytes)\r\n", f.info.file_size);
 
     close_file(&f);
 
@@ -69,15 +72,15 @@ EFIStatus efi_main(EFIHandle image_handle, EFISystemTable *system_table)
     get_file_info(&elf_file);
 
     auto func_result = load_elf_file(utf16_ptr);
+
     auto result = UNWRAP_OR_MESSAGE(func_result, elf_get_error_message(func_result));
 
-    efi_printf("ELF machine: %x\r\n", result.hdr.machine_type);
+    efi_print("ELF machine: {x}", result.hdr.machine_type);
 
     for (size_t i = 0; i < sizeof(logo) / sizeof(*logo); i++)
     {
 
-        efi_printf("%w", logo[i]);
-        efi_printf("\r\n");
+        efi_print("{}", logo[i]);
     }
 
     while ((u64)key.scan_code != SCAN_ESC)
@@ -93,8 +96,21 @@ EFIStatus efi_main(EFIHandle image_handle, EFISystemTable *system_table)
 
         else if ((u64)key.unicode_char == CHAR_CARRIAGE_RETURN)
         {
-            efi_printf("Boot not available yet!\r\n");
-            continue;
+            efi_print("ok");
+
+            int (*entry)(void);
+
+            entry = (int (*)(void))result.entry_point;
+
+            efi_print("Calling entry_point()... goodbye!");
+
+            int ret = entry();
+
+            if (ret == 42)
+            {
+                efi_print("yes");
+            }
+            break;
         }
     }
 

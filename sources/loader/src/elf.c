@@ -15,21 +15,52 @@ ElfResult load_elf_file(char16 *path)
         return ERR(ElfResult, FILE_NOT_FOUND);
     }
 
-    Elf64Header ehdr;
+    u8 *file_buf = NULL;
 
-    read_file(&f, &ehdr);
+    read_file(&f, file_buf);
 
-    ret.hdr = ehdr;
+    Elf64Header *ehdr = (Elf64Header *)file_buf;
 
-    if (!elf_validate(&ehdr))
+    ret.hdr = *ehdr;
+
+    if (!elf_validate(ehdr))
     {
         return ERR(ElfResult, NOT_AN_ELF_FILE);
     }
 
-    if (ehdr.machine_type != ELF_X86_64)
+    if (ehdr->machine_type != ELF_X86_64)
     {
         return ERR(ElfResult, UNSUPPORTED_MACHINE);
     }
+
+    auto phdr = &ehdr + ehdr->program_header_table_file_offset;
+
+    Elf64ProgramHeader *phdr_ptr;
+
+    for (auto i = 0; i < ehdr->program_header_table_entry_count; i++)
+    {
+        phdr_ptr = (Elf64ProgramHeader *)phdr;
+
+        if (phdr_ptr->type == ELF_TYPE_EXECUTABLE)
+        {
+            auto file_segment = (void *)((u64)file_buf + phdr_ptr->file_offset);
+            auto mem_segment = (void *)phdr_ptr->virtual_address;
+
+            memcpy(mem_segment, file_segment, phdr_ptr->file_size);
+
+            auto extra_zeroes = (u8 *)mem_segment + phdr_ptr->file_size;
+            u64 extra_zeroes_count = phdr_ptr->memory_size - phdr_ptr->file_size;
+	    
+            if (extra_zeroes_count > 0)
+            {
+                memset(extra_zeroes, 0x00, extra_zeroes_count);
+            }
+        }
+
+        phdr_ptr += ehdr->program_header_table_entry_size;
+    }
+
+    ret.entry_point = ehdr->entry;
 
     close_file(&f);
 

@@ -1,3 +1,4 @@
-int main(){
-return 42;
+int foo(void)
+{
+    return 42;
 }
