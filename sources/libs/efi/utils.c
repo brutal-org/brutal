@@ -1,8 +1,8 @@
 #include "utils.h"
-#include "misc.h"
 #include "efi/file.h"
 #include "efi/lip.h"
 #include "efi/st.h"
+#include "misc.h"
 
 EFISystemTable *st;
 EFIHandle image_handle;
@@ -121,6 +121,19 @@ void *efi_malloc(u64 size)
 
     void *ptr;
     st->boot_services->allocate_pool(EFI_BOOT_SERVICES_DATA, page_count, &ptr);
+
+    return ptr;
+}
+
+void *to_utf16(void *ptr, char *buffer)
+{
+    ptr = efi_malloc(strlen(buffer) << 1);
+
+    memset(ptr, 0, sizeof(ptr));
+    for (size_t i = 0; i < sizeof(buffer) / sizeof(*buffer); i++)
+    {
+        *(char16 *)(ptr + (i << 1)) = buffer[i];
+    }
 
     return ptr;
 }

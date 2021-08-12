@@ -24,10 +24,4 @@ void efi_printf(char *fmt, ...);
 void *efi_malloc(u64 size);
 void efi_free(void *ptr);
 
-#define TO_UTF16(ptr, buffer)                                     \
-    void *ptr = efi_malloc(strlen(buffer) << 1);                 \
-    memset(ptr, 0, sizeof(ptr));                                 \
-    for (size_t i = 0; i < sizeof(buffer) / sizeof(*buffer); i++) \
-    {                                                             \
-        *(char16 *)(ptr + (i << 1)) = buffer[i];                  \
-    }
+void *to_utf16(void* ptr, char *buffer);
