@@ -1,7 +1,6 @@
 #include "utils.h"
 #include <brutal/alloc.h>
 #include <brutal/host/mem.h>
-#include <stdatomic.h>
 #include "brutal/base/error.h"
 #include "efi/file.h"
 #include "efi/lip.h"
