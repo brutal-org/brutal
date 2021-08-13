@@ -119,6 +119,7 @@ static inline Error br_result_to_error(BrResult result)
 typedef enum
 {
     BR_OBJECT_NONE,
+    BR_OBJECT_ANY,
 
     BR_OBJECT_MEMORY,
     BR_OBJECT_DOMAIN,
@@ -128,10 +129,13 @@ typedef enum
 
 typedef uint64_t BrArg;
 
+#define BR_HANDLE_NIL ((BrHandle)0)
+
 typedef uint64_t BrHandle;
 
 typedef BrHandle BrSpace;
 
+#define BR_SPACE_NIL ((BrSpace)0)
 #define BR_SPACE_ERROR ((BrSpace)-1)
 #define BR_SPACE_SELF ((BrSpace)-2)
 
@@ -142,6 +146,7 @@ typedef enum
 
 typedef BrHandle BrMemObj;
 
+#define BR_MEM_OBJ_NIL ((BrMemObj)0)
 #define BR_MEM_OBJ_ERROR ((BrMemObj)-1)
 #define BR_MEM_OBJ_GINFO ((BrMemObj)-2)
 #define BR_MEM_OBJ_LINFO ((BrMemObj)-3)
@@ -165,6 +170,7 @@ typedef enum
 
 typedef BrHandle BrTask;
 
+#define BR_TASK_NIL ((BrTask)0)
 #define BR_TASK_ERROR ((BrTask)-1)
 #define BR_TASK_SELF ((BrTask)-2)
 #define BR_TASK_INIT ((BrTask)-3)
@@ -179,23 +185,10 @@ typedef enum
 #define BR_TIMEOUT_INFINITY (-1)
 typedef uint64_t BrTimeout;
 
-typedef uint64_t BrProtocol;
-
-typedef uint64_t BrMessageType;
-
 typedef struct PACKED
 {
-    BrTask sender;
-    BrProtocol protocol;
-    BrMessageType type;
     size_t size;
-    BrHandle handle;
-} BrMessageHeader;
-
-typedef struct PACKED
-{
-    BrMessageHeader header;
-    uint8_t data[512 - sizeof(BrMessageHeader)];
+    uint8_t data[512 - sizeof(size_t)];
 } BrMessage;
 
 _Static_assert(sizeof(BrMessage) == 512, "");

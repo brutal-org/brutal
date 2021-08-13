@@ -146,7 +146,5 @@ BrTask elf_exec(BrMemObj elf_obj, Str name)
                      .size = elf_map.size,
                  }) == BR_SUCCESS);
 
-    log("Service '{}' created!", name);
-
     return elf_task.handle;
 }

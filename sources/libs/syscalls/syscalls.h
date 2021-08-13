@@ -97,6 +97,7 @@ SYSCALL(exit) (BrExitArgs* args);
 typedef struct
 {
     BrTask task;
+    BrHandle handle;
     BrMessage message;
     BrTimeout timeout;
     BrIpcFlags flags;

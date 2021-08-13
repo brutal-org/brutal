@@ -4,7 +4,10 @@
 
 void message_init(Message *message, BrTask sender, Object *object, uint8_t *data, size_t size)
 {
-    object_ref(object);
+    if (object)
+    {
+        object_ref(object);
+    }
 
     message->sender = sender;
     message->object = object;
@@ -15,7 +18,10 @@ void message_init(Message *message, BrTask sender, Object *object, uint8_t *data
 
 void message_deinit(Message *message)
 {
-    object_deref(message->object);
+    if (message->object)
+    {
+        object_deref(message->object);
+    }
 }
 
 Channel *channel_create(void)
@@ -33,15 +39,18 @@ void channel_destroy(Channel *self)
 
 bool channel_send(Channel *self, Message *message)
 {
+    LOCK_RETAINER(&self->lock);
     return ring_push(&self->messages, message);
 }
 
 bool channel_recv(Channel *self, Message *message)
 {
+    LOCK_RETAINER(&self->lock);
     return ring_pop(&self->messages, message);
 }
 
 bool channel_any(Channel *self)
 {
+    LOCK_RETAINER(&self->lock);
     return ring_any(&self->messages);
 }

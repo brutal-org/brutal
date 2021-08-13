@@ -6,7 +6,7 @@ static bool initialized = false;
 static VecObject global = {};
 static Lock lock = {};
 
-void object_init(Object *self, ObjectType type, ObjectDtor *dtor)
+void object_init(Object *self, BrObjectType type, ObjectDtor *dtor)
 {
     refcount_init(&self->refcount);
     self->handle = handles++;
@@ -14,10 +14,13 @@ void object_init(Object *self, ObjectType type, ObjectDtor *dtor)
     self->dtor = dtor;
 
     lock_acquire(&lock);
+
     if (!initialized)
     {
         vec_init(&global, alloc_global());
+        initialized = true;
     }
+
     vec_push(&global, self);
     lock_release(&lock);
 }
@@ -45,7 +48,7 @@ void object_deref(Object *self)
     }
 }
 
-Object *global_lookup(BrHandle handle, ObjectType type)
+Object *global_lookup(BrHandle handle, BrObjectType type)
 {
     LOCK_RETAINER(&lock);
 
@@ -56,7 +59,7 @@ Object *global_lookup(BrHandle handle, ObjectType type)
 
     vec_foreach(object, &global)
     {
-        if (object->handle == handle && object->type == type)
+        if (object->handle == handle && (object->type == type || type == BR_OBJECT_ANY))
         {
             object_ref(object);
             return object;

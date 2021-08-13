@@ -18,7 +18,7 @@ Domain *domain_create(void)
     Domain *self = alloc_make(alloc_global(), Domain);
     vec_init(&self->objects, alloc_global());
 
-    object_init(base_cast(self), OBJECT_DOMAIN, (ObjectDtor *)domain_destroy);
+    object_init(base_cast(self), BR_OBJECT_DOMAIN, (ObjectDtor *)domain_destroy);
     return self;
 }
 
@@ -63,13 +63,13 @@ void domain_remove(Domain *self, BrHandle handle)
     }
 }
 
-Object *domain_lookup(Domain *self, BrHandle handle, ObjectType type)
+Object *domain_lookup(Domain *self, BrHandle handle, BrObjectType type)
 {
     LOCK_RETAINER(&self->lock);
 
     vec_foreach(object, &self->objects)
     {
-        if (object->handle == handle && object->type == type)
+        if (object->handle == handle && (object->type == type || type == BR_OBJECT_ANY))
         {
             object_ref(object);
             return object;

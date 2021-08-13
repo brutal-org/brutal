@@ -9,7 +9,7 @@ typedef struct
     BrTask sender;
     size_t size;
     Object *object;
-    uint8_t data[sizeof(BrMessage) - sizeof(BrMessageHeader)];
+    uint8_t data[member_size(BrMessage, data)];
 } Message;
 
 void message_init(Message *message, BrTask sender, Object *object, uint8_t *data, size_t size);
@@ -18,6 +18,7 @@ void message_deinit(Message *message);
 
 typedef struct
 {
+    Lock lock;
     Ring(Message) messages;
 } Channel;
 

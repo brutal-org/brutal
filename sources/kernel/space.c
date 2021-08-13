@@ -56,7 +56,7 @@ Space *space_create(BrSpaceFlags flags)
     range_alloc_init(&self->alloc, alloc_global());
     range_alloc_unused(&self->alloc, (USizeRange){0x400000, 0x7fffffffffff});
 
-    object_init(base_cast(self), OBJECT_SPACE, (ObjectDtor *)space_destroy);
+    object_init(base_cast(self), BR_OBJECT_SPACE, (ObjectDtor *)space_destroy);
 
     return self;
 }

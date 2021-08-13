@@ -45,7 +45,7 @@ TaskCreateResult task_create(Str name, Space *space, BrCap caps, BrTaskFlags fla
     task->stack = UNWRAP(heap_alloc(KERNEL_STACK_SIZE));
     task->sp = range_end(task->stack);
 
-    object_init(base_cast(task), OBJECT_TASK, (ObjectDtor *)task_destroy);
+    object_init(base_cast(task), BR_OBJECT_TASK, (ObjectDtor *)task_destroy);
 
     log("Task {}({}) created...", str_cast(&task->name), task->handle);
 

@@ -31,7 +31,7 @@ BrResult sys_map(BrMapArgs *args)
     }
     else
     {
-        space = (Space *)domain_lookup(task_self()->domain, args->space, OBJECT_SPACE);
+        space = (Space *)domain_lookup(task_self()->domain, args->space, BR_OBJECT_SPACE);
     }
 
     if (space == nullptr)
@@ -46,7 +46,7 @@ BrResult sys_map(BrMapArgs *args)
     }
     else
     {
-        mem_obj = (MemObj *)domain_lookup(task_self()->domain, args->mem_obj, OBJECT_MEMORY);
+        mem_obj = (MemObj *)domain_lookup(task_self()->domain, args->mem_obj, BR_OBJECT_MEMORY);
     }
 
     if (mem_obj == nullptr)
@@ -92,7 +92,7 @@ BrResult sys_unmap(BrUnmapArgs *args)
     }
     else
     {
-        space = (Space *)domain_lookup(task_self()->domain, args->space, OBJECT_SPACE);
+        space = (Space *)domain_lookup(task_self()->domain, args->space, BR_OBJECT_SPACE);
     }
 
     if (space == nullptr)
@@ -126,7 +126,7 @@ BrResult sys_create_task(BrTask *handle, BrCreateTaskArgs *args)
     }
     else
     {
-        space = (Space *)domain_lookup(task_self()->domain, args->space, OBJECT_SPACE);
+        space = (Space *)domain_lookup(task_self()->domain, args->space, BR_OBJECT_SPACE);
     }
 
     if (space == nullptr)
@@ -219,7 +219,7 @@ BrResult sys_create(BrCreateArgs *args)
 
 BrResult sys_start(BrStartArgs *args)
 {
-    Task *task = (Task *)domain_lookup(task_self()->domain, args->task, OBJECT_TASK);
+    Task *task = (Task *)domain_lookup(task_self()->domain, args->task, BR_OBJECT_TASK);
 
     if (!task)
     {
@@ -244,7 +244,7 @@ BrResult sys_exit(BrExitArgs *args)
     }
     else
     {
-        task = (Task *)domain_lookup(task_self()->domain, args->task, OBJECT_TASK);
+        task = (Task *)domain_lookup(task_self()->domain, args->task, BR_OBJECT_TASK);
     }
 
     if (!task)
@@ -259,9 +259,96 @@ BrResult sys_exit(BrExitArgs *args)
     return BR_SUCCESS;
 }
 
-BrResult sys_ipc(MAYBE_UNUSED BrIpcArgs *args)
+BrResult sys_ipc(BrIpcArgs *args)
 {
-    return BR_NOT_IMPLEMENTED;
+    BrResult result = BR_SUCCESS;
+
+    if (args->flags & BR_IPC_SEND)
+    {
+        Task *task = (Task *)global_lookup(args->task, BR_OBJECT_TASK);
+
+        if (!task)
+        {
+            result = BR_BAD_HANDLE;
+            goto send_cleanup_and_return;
+        }
+
+        Object *object = nullptr;
+
+        if (args->handle != BR_HANDLE_NIL)
+        {
+            object = domain_lookup(task_self()->domain, args->handle, BR_OBJECT_ANY);
+
+            if (object == nullptr)
+            {
+                result = BR_BAD_HANDLE;
+                goto send_cleanup_and_return;
+            }
+        }
+
+        Message msg;
+        message_init(&msg, task_self()->handle, object, args->message.data, args->message.size);
+
+        if (args->flags & BR_IPC_BLOCK)
+        {
+            todo("Implement blocking IPC");
+        }
+        else
+        {
+            if (!channel_send(task->channel, &msg))
+            {
+                result = BR_WOULD_BLOCK;
+                goto send_cleanup_and_return;
+            }
+        }
+
+    send_cleanup_and_return:
+        if (object)
+        {
+            object_deref(object);
+        }
+
+        if (task)
+        {
+            task_deref(task);
+        }
+    }
+
+    if (result != BR_SUCCESS)
+    {
+        return result;
+    }
+
+    if (args->flags & BR_IPC_RECV)
+    {
+        bool has_msg = false;
+        Message msg;
+
+        if (args->flags & BR_IPC_BLOCK)
+        {
+            todo("Implement blocking IPC");
+        }
+        else
+        {
+            if (!channel_recv(task_self()->channel, &msg))
+            {
+                result = BR_WOULD_BLOCK;
+                goto recv_cleanup_and_return;
+            }
+
+            has_msg = true;
+        }
+
+        mem_cpy(args->message.data, msg.data, msg.size);
+
+    recv_cleanup_and_return:
+        if (has_msg)
+        {
+            message_deinit(&msg);
+        }
+    }
+
+    return result;
 }
 
 BrResult sys_irq(MAYBE_UNUSED BrIrqArgs *args)
@@ -285,7 +372,7 @@ BrResult sys_drop(BrDropArgs *args)
     }
     else
     {
-        task = (Task *)domain_lookup(task_self()->domain, args->task, OBJECT_TASK);
+        task = (Task *)domain_lookup(task_self()->domain, args->task, BR_OBJECT_TASK);
     }
 
     if (!task)

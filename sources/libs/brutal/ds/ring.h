@@ -47,10 +47,10 @@ int ring_length_impl(RingImpl *impl);
     ring_deinit_impl(impl_cast(SELF))
 
 #define ring_push(SELF, DATA) \
-    ring_push_impl(impl_cast(SELF), (uint8_t *)(DATA))
+    ring_push_impl(impl_cast(SELF), (uint8_t const *)(DATA))
 
 #define ring_pop(SELF, DATA) \
-    ring_push_impl(impl_cast(SELF), (uint8_t const *)(DATA))
+    ring_pop_impl(impl_cast(SELF), (uint8_t *)(DATA))
 
 #define ring_clear(SELF) \
     ring_clear_impl(impl_cast(SELF))

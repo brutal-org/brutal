@@ -20,4 +20,4 @@ void domain_add(Domain *self, Object *object);
 
 void domain_remove(Domain *self, BrHandle handle);
 
-Object *domain_lookup(Domain *self, BrHandle handle, ObjectType type);
+Object *domain_lookup(Domain *self, BrHandle handle, BrObjectType type);

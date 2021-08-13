@@ -140,11 +140,7 @@ int br_entry(Handover const *handover)
     br_ipc(&(BrIpcArgs){
         .task = posix_task,
         .message = {
-            .header = {
-                .protocol = 0xC001C0DE,
-                .type = 0xCAFEBABE,
-                .size = 1,
-            },
+            .size = 1,
             .data = {0x69},
         },
         .timeout = 0,

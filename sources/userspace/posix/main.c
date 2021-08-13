@@ -13,15 +13,13 @@ int br_entry()
     log("Time is {}/{}/{}", dt.day, dt.month, dt.year);
 
     BrIpcArgs ipc = {
-        .flags = BR_IPC_RECV | BR_IPC_BLOCK,
+        .flags = BR_IPC_RECV,
         .timeout = -1,
     };
 
     br_ipc(&ipc);
 
-    log("Got IPC message with proto:{} type:{} data:{}",
-        ipc.message.header.protocol,
-        ipc.message.header.type,
+    log("Got IPC message with data:{}",
         ipc.message.data[0]);
 
     return 0;
