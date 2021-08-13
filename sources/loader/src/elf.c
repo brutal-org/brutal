@@ -44,19 +44,17 @@ ElfResult load_elf_file(char16 *path)
 	
         if (header->type == ELF_PROGRAM_HEADER_LOAD)
         {
-            efi_print("Found segment ({}) that is executable!", i);
-
             auto file_segment = (void *)((u64)file_buf + header->file_offset);
             auto mem_segment = (void *)header->virtual_address;
 
-            memcpy(mem_segment, file_segment, header->file_size);
+            mem_cpy(mem_segment, file_segment, header->file_size);
 
             auto extra_zeroes = (u8 *)mem_segment + header->file_size;
             u64 extra_zeroes_count = header->memory_size - header->file_size;
 
             if (extra_zeroes_count > 0)
             {
-                memset(extra_zeroes, 0x00, extra_zeroes_count);
+                mem_set(extra_zeroes, 0x00, extra_zeroes_count);
             }
         }
 

@@ -72,8 +72,6 @@ EFIStatus efi_main(EFIHandle image_handle, EFISystemTable *system_table)
 
     auto result = UNWRAP_OR_MESSAGE(func_result, elf_get_error_message(func_result));
 
-    efi_print("ELF machine: {x}", result.hdr.machine_type);
-
     for (size_t i = 0; i < sizeof(logo) / sizeof(*logo); i++)
     {
 
@@ -108,7 +106,6 @@ boot:
 
     clear_screen();
     entry();
-    
 }
 
     while (1)

@@ -34,6 +34,7 @@ EFI_FILE = $(BUILD_DIRECTORY)/main.efi
 $(EFI_FILE): $(OBJS)
 	$(LD) $(LDFLAGS) -entry:efi_main $^ -out:$@
 	$(MAKE) -C sources/loader/test
+	$(MAKE) -C sources/loader/test clean
 
 
 $(BUILD_DIRECTORY)/%.c.o: sources/%.c

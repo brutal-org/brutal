@@ -8,7 +8,6 @@
 #include <efi/lip.h>
 #include <efi/sfsp.h>
 #include <efi/st.h>
-#include <string.h>
 
 typedef struct
 {

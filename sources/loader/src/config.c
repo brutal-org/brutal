@@ -1,21 +1,7 @@
-#include <ansi/string.h>
 #include <brutal/base.h>
 #include <efi/utils.h>
 #include "brutal/mem.h"
 #include "config.h"
-
-char *strncpy(char *dst, const char *src, size_t size)
-{
-    size_t i = 0;
-
-    for (; i < size && src[i]; ++i)
-        dst[i] = src[i];
-
-    for (; i < size; ++i)
-        dst[i] = '\0';
-
-    return dst;
-}
 
 char *get_config_key(char *key, char *data, File *file)
 {
@@ -25,7 +11,7 @@ char *get_config_key(char *key, char *data, File *file)
 
     text[file->info.file_size] = '\0';
 
-    char __key[strlen(key)];
+    char __key[cstr_len(key)];
 
     char c, kv[100] = {0};
 
@@ -40,11 +26,15 @@ char *get_config_key(char *key, char *data, File *file)
         else if (c == '=')
         {
             /* finished reading a key */
-            kv[i] = 0x0;
+            kv[i] = '\0';
 
-            strncpy(__key, kv, strlen(kv));
+            auto kv_str = str_cast(kv);
 
-            memset(kv, 0, sizeof(kv));
+            mem_cpy(__key, kv, kv_str.len);
+
+            __key[kv_str.len] = '\0';
+
+            mem_set(kv, 0, sizeof(kv));
 
             i = 0;
             continue;
@@ -53,18 +43,22 @@ char *get_config_key(char *key, char *data, File *file)
         else if (c == '\n')
         {
             /* finished reading a value */
-            kv[i] = 0x0;
+            kv[i] = '\0';
 
-            if (strcmp(__key, key) == 0)
+            if (str_eq(str_cast(__key), str_cast(key)))
             {
-                strncpy(data, kv, strlen(kv));
+                auto kv_str = str_cast(kv);
 
-                memset(__key, 0, sizeof(__key));
+                mem_cpy(data, kv, kv_str.len);
+
+                data[kv_str.len] = '\0';
+		
+                mem_set(__key, 0, sizeof(__key));
 
                 break;
             }
 
-            memset(kv, 0, sizeof(kv));
+            mem_set(kv, 0, sizeof(kv));
 
             i = 0;
             continue;
@@ -73,7 +67,7 @@ char *get_config_key(char *key, char *data, File *file)
         kv[i++] = c;
     }
 
-
     host_mem_release(text, 0);
+
     return data;
 }
