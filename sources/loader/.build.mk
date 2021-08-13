@@ -33,7 +33,7 @@ EFI_FILE = $(BUILD_DIRECTORY)/main.efi
 
 $(EFI_FILE): $(OBJS)
 	$(LD) $(LDFLAGS) -entry:efi_main $^ -out:$@
-	cp sources/loader/test/test.* sources/loader/test/config.cfg $(BUILD_DIRECTORY)/image/EFI/
+	$(MAKE) -C sources/loader/test
 
 
 $(BUILD_DIRECTORY)/%.c.o: sources/%.c

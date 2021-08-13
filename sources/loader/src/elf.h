@@ -4,15 +4,9 @@
 #include <efi/utils.h>
 #include <elf/elf.h>
 #include "efi/file.h"
+#include <brutal/base/error.h>
 
 #define ELF_X86_64 0x3E
-
-typedef enum
-{
-    NOT_AN_ELF_FILE,
-    UNSUPPORTED_MACHINE,
-    FILE_NOT_FOUND
-} ElfStatus;
 
 typedef struct
 {
@@ -21,7 +15,7 @@ typedef struct
     uint64_t entry_point;
 } Elf64Program;
 
-typedef Result(ElfStatus, Elf64Program) ElfResult;
+typedef Result(Error, Elf64Program) ElfResult;
 
 ElfResult load_elf_file(char16 *path);
 

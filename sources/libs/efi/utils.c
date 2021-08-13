@@ -186,4 +186,4 @@ void host_log_panic()
 {
     while (1)
         ;
-};
+}

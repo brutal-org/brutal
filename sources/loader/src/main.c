@@ -26,10 +26,7 @@ char *logo[] = {
     ":MMh      MMMy/////mMMMMM-",
     ":MMh      MMNyMMMMMMMMMMm`",
     ":MMNmmmmmmMMN sNMMMMMMMh.",
-
     ".yyyyyyyyyyys  `/oyys+."};
-
-
 
 EFIStatus efi_main(EFIHandle image_handle, EFISystemTable *system_table)
 {
@@ -96,20 +93,15 @@ EFIStatus efi_main(EFIHandle image_handle, EFISystemTable *system_table)
 
         else if ((u64)key.unicode_char == CHAR_CARRIAGE_RETURN)
         {
-            efi_print("ok");
-
             int (*entry)(void);
 
             entry = (int (*)(void))result.entry_point;
 
-            efi_print("Calling entry_point()... goodbye!");
-
+	    clear_screen();
             int ret = entry();
 
-            if (ret == 42)
-            {
-                efi_print("yes");
-            }
+	    efi_print("Loaded elf, called entry point, return code: {}", ret);
+
             break;
         }
     }

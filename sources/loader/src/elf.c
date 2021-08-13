@@ -1,6 +1,7 @@
 #include "elf.h"
 #include <efi/utils.h>
 #include "efi/file.h"
+#include "elf/elf.h"
 
 ElfResult load_elf_file(char16 *path)
 {
@@ -12,52 +13,59 @@ ElfResult load_elf_file(char16 *path)
     if (f.status != 0)
     {
         close_file(&f);
-        return ERR(ElfResult, FILE_NOT_FOUND);
+
+        return ERR(ElfResult, ERR_UNDEFINED);
     }
 
-    u8 *file_buf = NULL;
+    void *file_buf = {0};
 
     read_file(&f, file_buf);
 
-    Elf64Header *ehdr = (Elf64Header *)file_buf;
+    auto ehdr = (Elf64Header *)file_buf;
+
+    efi_print("Section count: {}", ehdr->program_header_table_entry_count);
+    efi_print("Program headers offset: {}", ehdr->program_header_table_file_offset);
+    efi_print("Program headers size: {}", ehdr->program_header_table_entry_size);
+    efi_print("Entry point: {x}", ehdr->entry);
 
     ret.hdr = *ehdr;
 
     if (!elf_validate(ehdr))
     {
-        return ERR(ElfResult, NOT_AN_ELF_FILE);
+        return ERR(ElfResult, make_error(ERR_KIND_INVALID_DATA, "Not an elf file."));
     }
 
     if (ehdr->machine_type != ELF_X86_64)
     {
-        return ERR(ElfResult, UNSUPPORTED_MACHINE);
+        return ERR(ElfResult, make_error(ERR_KIND_UNSUPPORTED, "Unsupported elf architecture."));
     }
 
-    auto phdr = &ehdr + ehdr->program_header_table_file_offset;
+    void *__header = (file_buf + ehdr->program_header_table_file_offset);
 
-    Elf64ProgramHeader *phdr_ptr;
-
-    for (auto i = 0; i < ehdr->program_header_table_entry_count; i++)
+    for (int i = 0; i < ehdr->program_header_table_entry_count; i++)
     {
-        phdr_ptr = (Elf64ProgramHeader *)phdr;
 
-        if (phdr_ptr->type == ELF_TYPE_EXECUTABLE)
+        Elf64ProgramHeader *header = (Elf64ProgramHeader *)__header;
+	
+        if (header->type == ELF_PROGRAM_HEADER_LOAD)
         {
-            auto file_segment = (void *)((u64)file_buf + phdr_ptr->file_offset);
-            auto mem_segment = (void *)phdr_ptr->virtual_address;
+            efi_print("Found segment ({}) that is executable!", i);
 
-            memcpy(mem_segment, file_segment, phdr_ptr->file_size);
+            auto file_segment = (void *)((u64)file_buf + header->file_offset);
+            auto mem_segment = (void *)header->virtual_address;
 
-            auto extra_zeroes = (u8 *)mem_segment + phdr_ptr->file_size;
-            u64 extra_zeroes_count = phdr_ptr->memory_size - phdr_ptr->file_size;
-	    
+            memcpy(mem_segment, file_segment, header->file_size);
+
+            auto extra_zeroes = (u8 *)mem_segment + header->file_size;
+            u64 extra_zeroes_count = header->memory_size - header->file_size;
+
             if (extra_zeroes_count > 0)
             {
                 memset(extra_zeroes, 0x00, extra_zeroes_count);
             }
         }
 
-        phdr_ptr += ehdr->program_header_table_entry_size;
+        __header += ehdr->program_header_table_entry_size;
     }
 
     ret.entry_point = ehdr->entry;
@@ -72,24 +80,7 @@ char *elf_get_error_message(ElfResult res)
 
     if (!res.succ)
     {
-        switch (res.err)
-        {
-        case NOT_AN_ELF_FILE:
-        {
-            return "not an elf file";
-        }
-        case UNSUPPORTED_MACHINE:
-        {
-            return "unsupported elf architecture";
-            break;
-        }
-
-        case FILE_NOT_FOUND:
-        {
-            return "elf file not found";
-            break;
-        }
-        }
+        return res.err.message.buffer;
     }
 
     return "this shouldn't happen";
