@@ -1,4 +1,4 @@
-int foo(void)
+int main(void)
 {
-    return 42;
+  return 42;
 }
