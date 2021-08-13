@@ -1,3 +1,5 @@
+#define I_M_A_BAD_PROGRAMMER_OR_I_M_WRITING_A_C_LIBRARY
+#include <handover/handover.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -53,7 +55,7 @@ void com_putc(SerialPort port, char c)
     outb(port, c);
 }
 
-void com_write_string(SerialPort port, char *str)
+void com_write_string(SerialPort port, char const *str)
 {
     while (*str)
     {
@@ -68,8 +70,154 @@ char com_getc(SerialPort port)
     return inb(port);
 }
 
-int main(void)
+size_t strlen(char const *str)
 {
-    com_write_string(COM1, "Hello world!");
-    return 42;
+    size_t i;
+    for (i = 0; str[i] != '\0'; i++)
+        ;
+    return i;
+}
+
+char *strncat(char *dest, char const *src, size_t n)
+{
+    size_t dest_length = strlen(dest);
+    size_t i;
+
+    for (i = 0; i < n && src[i] != '\0'; i++)
+    {
+        dest[dest_length + i] = src[i];
+    }
+
+    dest[dest_length + i] = '\0';
+
+    return dest;
+}
+
+char *strcat(char *dest, char *src)
+{
+    return strncat(dest, src, strlen(src));
+}
+
+// This function isn't perfect but it works for now :)
+char *string_convert(unsigned int num, int base)
+{
+    static char Representation[] = "0123456789ABCDEF";
+    static char buffer[50];
+    char *ptr;
+
+    ptr = &buffer[49];
+    *ptr = '\0';
+
+    do
+    {
+        *--ptr = Representation[num % base];
+        num /= base;
+    } while (num != 0);
+    return (ptr);
+}
+
+void *memset(void *bufptr, int value, size_t size)
+{
+    unsigned char *buf = (unsigned char *)bufptr;
+    size_t i;
+    for (i = 0; i < size; i++)
+        buf[i] = (unsigned char)value;
+
+    return bufptr;
+}
+
+void vsprintf(char *str, char *format, va_list arg)
+{
+    unsigned int i;
+    unsigned int ZERO = 0;
+    char *s;
+
+    int position = 0;
+
+    while (*format)
+    {
+
+        if (*format == '%')
+        {
+            format++;
+            switch (*format)
+            {
+            case 'c':
+                i = va_arg(arg, int);
+                str[position] = i;
+                position++;
+                break;
+
+            case 'd':
+                i = va_arg(arg, int);
+                if (i < ZERO)
+                {
+                    i = -i;
+                    str[position] = '-';
+                }
+                strcat(str, string_convert(i, 10));
+                position += strlen(string_convert(i, 10));
+
+                break;
+
+            case 'o':
+                i = va_arg(arg, unsigned int);
+                strcat(str, string_convert(i, 8));
+                position += strlen(string_convert(i, 8));
+                break;
+
+            case 's':
+                s = va_arg(arg, char *);
+                strcat(str, s);
+                position += strlen(s);
+                break;
+
+            case 'x':
+                i = va_arg(arg, unsigned int);
+                strcat(str, string_convert(i, 16));
+                position += strlen(string_convert(i, 16));
+                break;
+
+            default:
+                str[position] = '%';
+                position++;
+                break;
+            }
+        }
+
+        else
+        {
+            str[position] = *format;
+            position++;
+        }
+
+        format++;
+    }
+}
+
+void printf(char *format, ...)
+{
+
+    va_list arg;
+    va_start(arg, format);
+
+    char message[4096] = {0};
+
+    vsprintf(message, format, arg);
+
+    com_write_string(COM1, message);
+
+    va_end(arg);
+}
+
+void kmain(Handover *handover)
+{
+    auto fb = handover->framebuffer;
+
+    size_t index = 10 + (fb.pitch / sizeof(uint32_t)) * 10;
+
+    ((uint32_t *)fb.addr)[index] = 0xffffff;
+
+    while (1)
+        ;
 }

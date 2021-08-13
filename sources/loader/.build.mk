@@ -16,6 +16,7 @@ BRUTAL_BOOT_LIBS_SRCS = \
 	$(wildcard sources/libs/brutal/alloc/*.c)	\
 	$(wildcard sources/libs/elf/elf.c)              \
 	$(wildcard sources/libs/efi/*.c)                \
+	$(wildcard sources/libs/handover/*.c)		\
 	$(wildcard sources/libs/ansi/ctype.c)           \
 	$(wildcard sources/libs/ansi/string.c)          \
 	$(wildcard sources/libs/brutal/mem/*.c)         \
