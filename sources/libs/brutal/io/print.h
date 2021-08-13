@@ -58,10 +58,9 @@ struct print_value print_val_pointer(void *);
         signed long: print_val_signed,        \
                                               \
         unsigned char: print_val_unsigned,    \
-        unsigned short: print_val_unsigned,    \
+        unsigned short: print_val_unsigned,   \
         unsigned int: print_val_unsigned,     \
         unsigned long: print_val_unsigned,    \
-                                              \
         char*: print_val_cstring,             \
         char: print_val_char,                 \
         Str: print_val_string,                \
