@@ -266,14 +266,13 @@ BrResult sys_ipc(BrIpcArgs *args)
     if (args->flags & BR_IPC_SEND)
     {
         Task *task = (Task *)global_lookup(args->task, BR_OBJECT_TASK);
+        Object *object = nullptr;
 
         if (!task)
         {
             result = BR_BAD_HANDLE;
             goto send_cleanup_and_return;
         }
-
-        Object *object = nullptr;
 
         if (args->handle != BR_HANDLE_NIL)
         {

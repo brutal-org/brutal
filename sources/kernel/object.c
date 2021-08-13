@@ -27,7 +27,6 @@ void object_init(Object *self, BrObjectType type, ObjectDtor *dtor)
 
 void object_ref(Object *self)
 {
-    LOCK_RETAINER(&lock);
     refcount_ref(&self->refcount);
 }
 
