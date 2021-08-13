@@ -5,9 +5,11 @@
 #include <efi/sfsp.h>
 #include <efi/st.h>
 #include <efi/utils.h>
+#include <handover/handover.h>
 #include <stddef.h>
 #include "config.h"
 #include "elf.h"
+#include "loader/src/protocol.h"
 
 EFIBootServices *BS;
 
@@ -98,14 +100,21 @@ EFIStatus efi_main(EFIHandle image_handle, EFISystemTable *system_table)
 
 boot:
 {
-    int (*entry)(void);
+    void (*entry)(Handover*);
 
-    entry = (int (*)(void))result.entry_point;
+    entry = (void (*)(Handover*))result.entry_point;
 
     //BS->exit_boot_services(image_handle, map_key);
 
     clear_screen();
-    entry();
+
+    auto handover = get_handover(system_table);
+
+    // passing data to the kernel in a hacky way lol
+    asm volatile("mov %0, %%rdi"::"a"(&handover));
+
+    entry(&handover);
+
 }
 
     while (1)

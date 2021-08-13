@@ -1,12 +1,11 @@
 CC = clang
-LD = lld
+LD = ld.lld
 
 KERNEL_CFLAGS := \
-	-ffreestanding -MMD -mno-red-zone -std=c11 \
-	-target x86_64-unknown-gnu -Wall -Werror -pedantic
+	-D__brutal__ -I../../libs -ffreestanding -MMD -mno-red-zone -std=gnu2x \
+	-target x86_64-unknown-gnu -Wall -Werror
 
-KERNEL_LDFLAGS := \
-	-flavor ld -e main
+KERNEL_LDFLAGS := -e kmain
 
 SRCS := test.c
 
