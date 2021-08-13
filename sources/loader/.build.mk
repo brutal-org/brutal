@@ -45,7 +45,7 @@ $(BUILD_DIRECTORY)/libs/%.c.o: sources/libs/%.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 run-loader: $(EFI_FILE) $(BUILD_DIRECTORY)/tools/OVMF.fd $(BUILD_DIRECTORY)/image/EFI/BOOT/BOOTX64.EFI
-	qemu-system-x86_64 -bios $(BUILD_DIRECTORY)/tools/OVMF.fd -machine q35 -debugcon stdio -cpu host -enable-kvm -drive file=fat:rw:$(BUILD_DIRECTORY)/image,media=disk,format=raw
+	qemu-system-x86_64 -bios $(BUILD_DIRECTORY)/tools/OVMF.fd -machine q35 -serial stdio -cpu host -enable-kvm -drive file=fat:rw:$(BUILD_DIRECTORY)/image,media=disk,format=raw
 
 $(BUILD_DIRECTORY)/image/EFI/BOOT/BOOTX64.EFI:
 	$(DIRECTORY_GUARD)

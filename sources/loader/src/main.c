@@ -93,21 +93,25 @@ EFIStatus efi_main(EFIHandle image_handle, EFISystemTable *system_table)
 
         else if ((u64)key.unicode_char == CHAR_CARRIAGE_RETURN)
         {
-            int (*entry)(void);
-
-            entry = (int (*)(void))result.entry_point;
-
-	    clear_screen();
-            int ret = entry();
-
-	    efi_print("Loaded elf, called entry point, return code: {}", ret);
-
+            goto boot;
             break;
         }
     }
 
+boot:
+{
+    int (*entry)(void);
+
+    entry = (int (*)(void))result.entry_point;
+
+    //BS->exit_boot_services(image_handle, map_key);
+
+    clear_screen();
+    entry();
+    
+}
+
     while (1)
         ;
-
     return EFI_SUCCESS;
 }

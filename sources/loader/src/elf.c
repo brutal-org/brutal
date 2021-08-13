@@ -23,11 +23,6 @@ ElfResult load_elf_file(char16 *path)
 
     auto ehdr = (Elf64Header *)file_buf;
 
-    efi_print("Section count: {}", ehdr->program_header_table_entry_count);
-    efi_print("Program headers offset: {}", ehdr->program_header_table_file_offset);
-    efi_print("Program headers size: {}", ehdr->program_header_table_entry_size);
-    efi_print("Entry point: {x}", ehdr->entry);
-
     ret.hdr = *ehdr;
 
     if (!elf_validate(ehdr))
