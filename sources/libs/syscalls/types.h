@@ -160,15 +160,13 @@ typedef enum
     BR_MEM_OBJ_PMM = 1 << 0,
 } BrMemObjFlags;
 
-typedef enum
-{
-    BR_MEM_NONE = 0,
+#define BR_MEM_NONE ((BrMemFlags)0)
+#define BR_MEM_READABLE ((BrMemFlags)(1 << 0))
+#define BR_MEM_WRITABLE ((BrMemFlags)(1 << 1))
+#define BR_MEM_EXECUTABLE ((BrMemFlags)(1 << 2))
+#define BR_MEM_USER ((BrMemFlags)(1 << 3))
 
-    BR_MEM_READABLE = 1 << 0,
-    BR_MEM_WRITABLE = 1 << 1,
-    BR_MEM_EXECUTABLE = 1 << 2,
-    BR_MEM_USER = 1 << 3,
-} BrMemFlags;
+typedef uint32_t BrMemFlags;
 
 typedef BrHandle BrTask;
 
@@ -177,12 +175,10 @@ typedef BrHandle BrTask;
 #define BR_TASK_SELF ((BrTask)-2)
 #define BR_TASK_INIT ((BrTask)-3)
 
-typedef enum
-{
-    BR_TASK_NONE = 0,
+#define BR_TASK_NONE (BrTaskFlags)(0)
+#define BR_TASK_USER (BrTaskFlags)(1 << 0)
 
-    BR_TASK_USER = 1 << 0,
-} BrTaskFlags;
+typedef uint8_t BrTaskFlags;
 
 #define BR_TIMEOUT_INFINITY ((BrTimeout)-1)
 typedef uint64_t BrTimeout;
@@ -195,14 +191,12 @@ typedef struct PACKED
 
 _Static_assert(sizeof(BrMessage) == 512, "");
 
-typedef enum
-{
-    BR_IPC_NONE = 0,
+#define BR_IPC_NONE ((BrIpcFlags)(0))
+#define BR_IPC_BLOCK ((BrIpcFlags)(1 << 0))
+#define BR_IPC_SEND ((BrIpcFlags)(1 << 1))
+#define BR_IPC_RECV ((BrIpcFlags)(1 << 2))
 
-    BR_IPC_BLOCK = 1 << 0,
-    BR_IPC_SEND = 1 << 1,
-    BR_IPC_RECV = 1 << 2,
-} BrIpcFlags;
+typedef uint32_t BrIpcFlags;
 
 typedef uint64_t BrIrq;
 
@@ -214,17 +208,14 @@ typedef enum
     BR_IRQ_UNBIND = 1 << 1,
 } BrIrqFlags;
 
-typedef enum
-{
-    BR_CAP_NONE,
+#define BR_CAP_NONE (0)
+#define BR_CAP_IRQ (1 << 0)
+#define BR_CAP_PMM (1 << 1)
+#define BR_CAP_LOG (1 << 2)
+#define BR_CAP_TASK (1 << 3)
+#define BR_CAP_ALL (0xffffffff)
 
-    BR_CAP_IRQ = 1 << 0,
-    BR_CAP_PMM = 1 << 1,
-    BR_CAP_LOG = 1 << 2,
-    BR_CAP_TASK = 1 << 3,
-
-    BR_CAP_ALL = 0xffffffff,
-} BrCap;
+typedef uint32_t BrCap;
 
 typedef struct
 {

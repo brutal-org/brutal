@@ -78,7 +78,7 @@ struct print_value print_val_pointer(void *);
 // clang-format on
 
 #define PRINT_ARGS_(...) \
-    (struct print_args) { 0, (struct print_value[]){}, }
+    (struct print_args) { .count = 0, }
 
 #define PRINT_ARGS_N(...) \
     (struct print_args) { COUNT(__VA_ARGS__), (struct print_value[]){MAP(PRINT_MATCH, __VA_ARGS__)}, }

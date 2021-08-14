@@ -40,5 +40,5 @@ void syscall_set_stack(uintptr_t stack)
 uint64_t syscall_handler(Regs const *regs)
 {
     // NOTE: we can't use r11 and rcx because they are used for storing the ip (r11) and the flags (rcx)
-    return syscall_dispatch(regs->rax, regs->rbx);
+    return syscall_dispatch((BrSyscall)regs->rax, regs->rbx);
 }

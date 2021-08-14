@@ -3,7 +3,7 @@
 void ring_init_impl(RingImpl *impl, int capacity, int data_size, Alloc *alloc)
 {
     *impl = (RingImpl){
-        .data = alloc_calloc(alloc, data_size, capacity),
+        .data = (uint8_t *)alloc_calloc(alloc, data_size, capacity),
         .head = 0,
         .tail = 0,
         .used = 0,

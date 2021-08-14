@@ -4,6 +4,7 @@
 
 typedef struct
 {
+    int _dummy;
 } fenv_t;
 
 #define FE_DIVBYZERO (1 << 0)

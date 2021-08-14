@@ -30,19 +30,19 @@ struct alloc
 #define alloc_release(SELF, PTR) \
     ((SELF)->release((SELF), (PTR)))
 
-#define alloc_make(SELF, T) (                    \
-    {                                            \
-        T *ptr = alloc_acquire(SELF, sizeof(T)); \
-        mem_set(ptr, 0, sizeof(T));              \
-        ptr;                                     \
+#define alloc_make(SELF, T) (                         \
+    {                                                 \
+        T *ptr = (T *)alloc_acquire(SELF, sizeof(T)); \
+        mem_set(ptr, 0, sizeof(T));                   \
+        ptr;                                          \
     })
 
 // Move an object to the heap
-#define alloc_move(SELF, VALUE) (                                \
-    {                                                            \
-        typeof(VALUE) *ptr = alloc_acquire(SELF, sizeof(VALUE)); \
-        mem_cpy(ptr, &(VALUE), sizeof(VALUE));                   \
-        ptr;                                                     \
+#define alloc_move(SELF, VALUE) (                                                 \
+    {                                                                             \
+        typeof(VALUE) *ptr = (typeof(VALUE) *)alloc_acquire(SELF, sizeof(VALUE)); \
+        mem_cpy(ptr, &(VALUE), sizeof(VALUE));                                    \
+        ptr;                                                                      \
     })
 
 #define alloc_make_array(SELF, T, COUNT) \

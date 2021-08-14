@@ -26,9 +26,9 @@ IoWriteResult tga_encode(IoWriter *writer, GfxSurface surface)
 
 GfxSurface tga_decode_in_memory(void *addr, size_t size)
 {
-    //assert_greater_than(size, sizeof(TgaHeader));
+    assert_greater_than(size, sizeof(TgaHeader));
 
-    TgaHeader *header = addr;
+    TgaHeader *header = (TgaHeader *)addr;
     void *buffer = header + 1;
 
     return (GfxSurface){

@@ -29,12 +29,14 @@ static inline int a_clz_64(uint64_t x)
     return r | !(y >> 1);
 }
 
-#define ASUINT64(x) ((union           \
-                      {               \
-                          double f;   \
-                          uint64_t i; \
-                      }){x})          \
-                        .i
+union f_to_i64
+{
+    double f;
+    uint64_t i;
+};
+
+#define ASUINT64(x) (((union f_to_i64){x}).i)
+
 #define ZEROINFNAN (0x7ff - 0x3ff - 52 - 1)
 
 struct num

@@ -3,7 +3,7 @@
 #include "tests/test.h"
 
 static size_t tests_count = 0;
-static struct test tests[1024] = {0};
+static struct test tests[1024] = {};
 
 void test_register(struct test test)
 {
@@ -98,7 +98,6 @@ int test_run_all(void)
 
 TEST(should_run)
 {
-
 }
 
 TEST_WITH_FLAGS(should_fail, TEST_EXPECTED_TO_FAIL)

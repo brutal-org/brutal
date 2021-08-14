@@ -4,7 +4,7 @@
 void bitmap_init(Bitmap *self, void *data, size_t size)
 {
     *self = (Bitmap){
-        .data = data,
+        .data = (uint8_t *)data,
         .size = size,
     };
 }

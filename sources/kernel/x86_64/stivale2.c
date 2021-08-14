@@ -29,7 +29,7 @@ void stivale2_entry(struct stivale2_struct const *info);
 
 void *stivale2_get_tag(struct stivale2_struct const *stivale2_struct, uint64_t id)
 {
-    struct stivale2_tag *current_tag = (void *)stivale2_struct->tags;
+    struct stivale2_tag *current_tag = (struct stivale2_tag *)stivale2_struct->tags;
 
     while (current_tag)
     {
@@ -38,7 +38,7 @@ void *stivale2_get_tag(struct stivale2_struct const *stivale2_struct, uint64_t i
             return current_tag;
         }
 
-        current_tag = (void *)current_tag->next;
+        current_tag = (struct stivale2_tag *)current_tag->next;
     }
 
     return nullptr;
@@ -72,7 +72,7 @@ static HandoverMmapType stivale_mmap_type_to_handover_type(int stivale_entry)
     }
 }
 
-static void fill_handover_mmap(Handover *target, const struct stivale2_struct_tag_memmap *memory_map)
+static void fill_handover_mmap(Handover *target, struct stivale2_struct_tag_memmap const *memory_map)
 {
     target->mmap.size = memory_map->entries;
 
@@ -122,28 +122,28 @@ void stivale2_entry(struct stivale2_struct const *info)
 
     if (memory_map)
     {
-        fill_handover_mmap(&handover, memory_map);
+        fill_handover_mmap(&handover, (struct stivale2_struct_tag_memmap const *)memory_map);
     }
 
     auto rsdp = stivale2_get_tag(info, STIVALE2_STRUCT_TAG_RSDP_ID);
 
     if (rsdp)
     {
-        fill_handover_rsdp(&handover, rsdp);
+        fill_handover_rsdp(&handover, (struct stivale2_struct_tag_rsdp const *)rsdp);
     }
 
     auto framebuffer = stivale2_get_tag(info, STIVALE2_STRUCT_TAG_FRAMEBUFFER_ID);
 
     if (framebuffer)
     {
-        fill_handover_framebuffer(&handover, framebuffer);
+        fill_handover_framebuffer(&handover, (struct stivale2_struct_tag_framebuffer const *)framebuffer);
     }
 
     auto modules = stivale2_get_tag(info, STIVALE2_STRUCT_TAG_MODULES_ID);
 
     if (modules)
     {
-        fill_handover_modules(&handover, modules);
+        fill_handover_modules(&handover, (struct stivale2_struct_tag_modules const *)modules);
     }
 
     arch_entry_main(&handover);

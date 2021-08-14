@@ -8,7 +8,7 @@
 
 HostIoOpenFileResult host_io_file_open(Str path)
 {
-    char *cstr = alloc_malloc(alloc_global(), path.len + 1);
+    char *cstr = (char *)alloc_malloc(alloc_global(), path.len + 1);
 
     mem_cpy(cstr, path.buffer, path.len);
     cstr[path.len] = '\0';
@@ -21,7 +21,7 @@ HostIoOpenFileResult host_io_file_open(Str path)
 
 HostIoOpenFileResult host_io_file_create(Str path)
 {
-    char *cstr = alloc_malloc(alloc_global(), path.len + 1);
+    char *cstr = (char *)alloc_malloc(alloc_global(), path.len + 1);
 
     mem_cpy(cstr, path.buffer, path.len);
     cstr[path.len] = '\0';

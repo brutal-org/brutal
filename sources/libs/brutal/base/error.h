@@ -46,6 +46,7 @@ typedef struct
 
 typedef struct
 {
+    char _dummy;
 } Success;
 
 #define SUCCESS OK(MaybeError, (Success){})

@@ -19,6 +19,7 @@ enum task_type
 
 struct task_fork
 {
+    int _dummy;
 };
 
 typedef void task_clone_entry_t(void);
@@ -30,6 +31,7 @@ struct task_clone
 
 struct task_exec
 {
+    int _dummy;
 };
 
 struct task

@@ -43,7 +43,7 @@ bool vec_realloc_impl(VecImpl *impl, int new_length)
         alloc_release(impl->alloc, impl->data);
     }
 
-    impl->data = ptr;
+    impl->data = (char *)ptr;
     impl->capacity = new_length;
 
     return true;

@@ -40,6 +40,7 @@ typedef struct ud_expr UdExpr;
 
 typedef struct
 {
+    int _dummy;
 } UdNil;
 
 typedef enum

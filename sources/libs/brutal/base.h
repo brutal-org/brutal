@@ -11,4 +11,3 @@
 #include <brutal/base/range.h>
 #include <brutal/base/result.h>
 #include <brutal/base/std.h>
-#include <brutal/base/types.h>

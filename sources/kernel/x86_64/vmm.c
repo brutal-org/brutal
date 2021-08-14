@@ -242,7 +242,7 @@ VmmResult vmm_map(VmmSpace space, VmmRange virtual_range, PmmRange physical_rang
     for (size_t i = 0; i < (virtual_range.size / MEM_PAGE_SIZE); i++)
     {
         vmm_map_page(
-            space,
+            (struct pml *)space,
             i * MEM_PAGE_SIZE + ALIGN_DOWN(virtual_range.base, MEM_PAGE_SIZE),
             i * MEM_PAGE_SIZE + ALIGN_DOWN(physical_range.base, MEM_PAGE_SIZE),
             flags);
@@ -259,7 +259,7 @@ VmmResult vmm_unmap(VmmSpace space, VmmRange virtual_range)
 
     for (size_t i = 0; i < (virtual_range.size / MEM_PAGE_SIZE); i++)
     {
-        vmm_unmap_page(space, i * MEM_PAGE_SIZE + ALIGN_DOWN(virtual_range.base, MEM_PAGE_SIZE));
+        vmm_unmap_page((struct pml *)space, i * MEM_PAGE_SIZE + ALIGN_DOWN(virtual_range.base, MEM_PAGE_SIZE));
     }
 
     return OK(VmmResult, virtual_range);
@@ -269,7 +269,7 @@ PmmResult vmm_virt2phys(VmmSpace space, VmmRange virtual_range)
 {
     LOCK_RETAINER(&vmm_lock);
 
-    struct pml *pml4 = space;
+    struct pml *pml4 = (struct pml *)space;
 
     auto pml3_range = TRY(PmmResult, vmm_get_pml(pml4, PML4_GET_INDEX(virtual_range.base)));
     struct pml *pml3 = (struct pml *)(pml3_range.base);

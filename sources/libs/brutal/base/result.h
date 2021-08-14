@@ -2,7 +2,6 @@
 
 #include <brutal/base/keywords.h>
 #include <brutal/base/std.h>
-#include <brutal/base/types.h>
 
 #define Result(ERROR, OK) \
     struct                \

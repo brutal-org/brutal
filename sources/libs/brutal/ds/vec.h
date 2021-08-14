@@ -136,7 +136,7 @@ void vec_swap_impl(VecImpl *impl, int idx1, int idx2);
                      __it != vec_end(SELF);                             \
                  });                                                    \
              __it++)                                                    \
-            for (typeof(*(SELF)->data) VAR = *__it; __once == nullptr; __once = (void *)1)
+            for (typeof(*(SELF)->data) VAR = *__it; __once == nullptr; __once = (typeof((SELF)->data))1)
 
 typedef Vec(void *) VecPtr;
 typedef Vec(int) VecInt;

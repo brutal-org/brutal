@@ -9,11 +9,11 @@
 #    undef strncpy
 #    undef strncat
 
-#    define strcpy(...) BANNED(strcpy)
-#    define strcat(...) BANNED(strcat)
-#    define strncpy(...) BANNED(strncpy)
-#    define strncat(...) BANNED(strncat)
-#    define sprintf(...) BANNED(sprintf)
-#    define vsprintf(...) BANNED(vsprintf)
+#    define strcpy BANNED(strcpy)
+#    define strcat BANNED(strcat)
+#    define strncpy BANNED(strncpy)
+#    define strncat BANNED(strncat)
+#    define sprintf BANNED(sprintf)
+#    define vsprintf BANNED(vsprintf)
 
 #endif

@@ -28,12 +28,12 @@ void buffer_ensure(Buffer *self, size_t capacity)
 
     if (self->capacity == 0)
     {
-        self->data = alloc_calloc(self->alloc, 1, capacity);
+        self->data = (uint8_t *)alloc_calloc(self->alloc, 1, capacity);
         self->capacity = capacity;
         return;
     }
 
-    self->data = alloc_resize(self->alloc, self->data, capacity);
+    self->data = (uint8_t *)alloc_resize(self->alloc, self->data, capacity);
     self->capacity = capacity;
 }
 
