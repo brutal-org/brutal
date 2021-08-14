@@ -15,6 +15,8 @@ void sched_finalize(void);
 
 BrResult sched_block(Blocker blocker);
 
+Tick sched_deadline(BrTimeout timeout);
+
 void sched_yield(void);
 
 void sched_next(Task *task, Cpu *cpu);

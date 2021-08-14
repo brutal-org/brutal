@@ -14,8 +14,6 @@ static void display_bootimage(Handover const *handover)
 
     size_t fb_size = fb->height * fb->pitch;
 
-    log("Framebuffer memory size is {}kio", fb_size / 1024);
-
     BrCreateArgs fb_obj = {
         .type = BR_OBJECT_MEMORY,
         .mem_obj = {
@@ -137,14 +135,18 @@ int br_entry(Handover const *handover)
 
     auto posix_task = srv_run(handover, str_cast("posix"));
 
+    for (size_t i = 0; i < 100; i++)
+    {
+        display_bootimage(handover);
+    }
+
     br_ipc(&(BrIpcArgs){
+        .flags = BR_IPC_SEND,
         .task = posix_task,
         .message = {
             .size = 1,
             .data = {0x69},
         },
-        .timeout = 0,
-        .flags = BR_IPC_SEND,
     });
 
     log("IPC messaged sent!");

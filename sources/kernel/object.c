@@ -32,6 +32,11 @@ void object_ref(Object *self)
 
 void object_deref(Object *self)
 {
+    if (self == nullptr)
+    {
+        return;
+    }
+
     lock_acquire(&lock);
 
     if (refcount_deref(&self->refcount) == REFCOUNT_0)

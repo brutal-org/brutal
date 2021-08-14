@@ -259,58 +259,81 @@ BrResult sys_exit(BrExitArgs *args)
     return BR_SUCCESS;
 }
 
+static BrResult sys_ipc_send(BrIpcArgs *args)
+{
+    Task *task CLEANUP(object_cleanup) = nullptr;
+    Object *object CLEANUP(object_cleanup) = nullptr;
+
+    task = (Task *)global_lookup(args->task, BR_OBJECT_TASK);
+
+    if (!task)
+    {
+        return BR_BAD_HANDLE;
+    }
+
+    BrResult result = BR_SUCCESS;
+
+    if (args->handle != BR_HANDLE_NIL)
+    {
+        object = domain_lookup(task_self()->domain, args->handle, BR_OBJECT_ANY);
+
+        if (object == nullptr)
+        {
+            return BR_BAD_HANDLE;
+        }
+    }
+
+    Message msg;
+    message_init(&msg, task_self()->handle, object, args->message.data, args->message.size);
+
+    if (args->flags & BR_IPC_BLOCK)
+    {
+        result = channel_send_blocking(task->channel, &msg, args->timeout);
+    }
+    else
+    {
+        result = channel_send(task->channel, &msg);
+    }
+
+    if (result != BR_SUCCESS)
+    {
+        message_deinit(&msg);
+    }
+
+    return result;
+}
+
+static BrResult sys_ipc_recv(BrIpcArgs *args)
+{
+    BrResult result = BR_SUCCESS;
+
+    Message msg;
+
+    if (args->flags & BR_IPC_BLOCK)
+    {
+        result = channel_recv_blocking(task_self()->channel, &msg, args->timeout);
+    }
+    else
+    {
+        result = channel_recv(task_self()->channel, &msg);
+    }
+
+    if (result == BR_SUCCESS)
+    {
+        mem_cpy(args->message.data, msg.data, msg.size);
+        message_deinit(&msg);
+    }
+
+    return result;
+}
+
 BrResult sys_ipc(BrIpcArgs *args)
 {
     BrResult result = BR_SUCCESS;
 
     if (args->flags & BR_IPC_SEND)
     {
-        Task *task = (Task *)global_lookup(args->task, BR_OBJECT_TASK);
-        Object *object = nullptr;
-
-        if (!task)
-        {
-            result = BR_BAD_HANDLE;
-            goto send_cleanup_and_return;
-        }
-
-        if (args->handle != BR_HANDLE_NIL)
-        {
-            object = domain_lookup(task_self()->domain, args->handle, BR_OBJECT_ANY);
-
-            if (object == nullptr)
-            {
-                result = BR_BAD_HANDLE;
-                goto send_cleanup_and_return;
-            }
-        }
-
-        Message msg;
-        message_init(&msg, task_self()->handle, object, args->message.data, args->message.size);
-
-        if (args->flags & BR_IPC_BLOCK)
-        {
-            todo("Implement blocking IPC");
-        }
-        else
-        {
-            if (!channel_send(task->channel, &msg))
-            {
-                result = BR_WOULD_BLOCK;
-                goto send_cleanup_and_return;
-            }
-        }
-
-    send_cleanup_and_return:
-        if (object)
-        {
-            object_deref(object);
-        }
-
-        if (task)
-        {
-            task_deref(task);
-        }
+        result = sys_ipc_send(args);
     }
 
     if (result != BR_SUCCESS)
@@ -320,31 +343,7 @@ BrResult sys_ipc(BrIpcArgs *args)
 
     if (args->flags & BR_IPC_RECV)
     {
-        bool has_msg = false;
-        Message msg;
-
-        if (args->flags & BR_IPC_BLOCK)
-        {
-            todo("Implement blocking IPC");
-        }
-        else
-        {
-            if (!channel_recv(task_self()->channel, &msg))
-            {
-                result = BR_WOULD_BLOCK;
-                goto recv_cleanup_and_return;
-            }
-
-            has_msg = true;
-        }
-
-        mem_cpy(args->message.data, msg.data, msg.size);
-
-    recv_cleanup_and_return:
-        if (has_msg)
-        {
-            message_deinit(&msg);
-        }
+        result = sys_ipc_recv(args);
     }
 
     return result;
@@ -415,14 +414,6 @@ BrSyscallFn *syscalls[BR_SYSCALL_COUNT] = {
 
 BrResult syscall_dispatch(BrSyscall syscall, BrArg args)
 {
-    /*
-        log("Syscall: {}({}): {}({#p})",
-            str_cast(&task_self()->name),
-            task_self()->handle,
-            str_cast(br_syscall_to_string(syscall)),
-            args);
-    */
-
     if (syscall >= BR_SYSCALL_COUNT)
     {
         return BR_BAD_SYSCALL;

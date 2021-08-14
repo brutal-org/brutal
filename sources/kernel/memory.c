@@ -29,8 +29,6 @@ MemObj *mem_obj_heap(HeapRange heap, MemObjFlags flags)
 
     object_init(base_cast(self), BR_OBJECT_MEMORY, (ObjectDtor *)mem_obj_destroy);
 
-    log("Created HeapMemObj({}) at {#p}-{#p}", self->handle, heap.base, heap.base + heap.size - 1);
-
     return self;
 }
 
@@ -43,8 +41,6 @@ MemObj *mem_obj_pmm(PmmRange pmm, MemObjFlags flags)
     self->pmm = pmm;
 
     object_init(base_cast(self), BR_OBJECT_MEMORY, (ObjectDtor *)mem_obj_destroy);
-
-    log("Created PmmMemObj({}) at {#p}-{#p}", self->handle, pmm.base, pmm.base + pmm.size - 1);
 
     return self;
 }

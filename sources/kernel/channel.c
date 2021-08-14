@@ -1,6 +1,8 @@
 #include <brutal/alloc.h>
+#include <brutal/log.h>
 #include "kernel/channel.h"
 #include "kernel/kernel.h"
+#include "kernel/sched.h"
 
 void message_init(Message *message, BrTask sender, Object *object, uint8_t *data, size_t size)
 {
@@ -37,20 +39,132 @@ void channel_destroy(Channel *self)
     alloc_free(alloc_global(), self);
 }
 
-bool channel_send(Channel *self, Message *message)
+static BrResult channel_send_unlock(Channel *self, Message *message)
 {
-    LOCK_RETAINER(&self->lock);
-    return ring_push(&self->messages, message);
+    if (!ring_push(&self->messages, message))
+    {
+        return BR_CHANNEL_FULL;
+    }
+
+    return BR_SUCCESS;
 }
 
-bool channel_recv(Channel *self, Message *message)
+static BrResult channel_recv_unlock(Channel *self, Message *message)
 {
-    LOCK_RETAINER(&self->lock);
-    return ring_pop(&self->messages, message);
+    if (!ring_pop(&self->messages, message))
+    {
+        return BR_CHANNEL_EMPTY;
+    }
+
+    return BR_SUCCESS;
 }
 
-bool channel_any(Channel *self)
+static bool channel_wait_send(Channel *self)
+{
+    if (!lock_try_acquire(&self->lock))
+    {
+        return false;
+    }
+
+    if (!ring_full(&self->messages))
+    {
+        lock_release(&self->lock);
+        return false;
+    }
+
+    return true;
+}
+
+static bool channel_wait_recv(Channel *self)
+{
+    if (!lock_try_acquire(&self->lock))
+    {
+        return false;
+    }
+
+    if (!ring_any(&self->messages))
+    {
+        lock_release(&self->lock);
+        return false;
+    }
+
+    return true;
+}
+
+BrResult channel_send_blocking(Channel *self, Message *message, BrTimeout timeout)
+{
+    BrResult result = BR_SUCCESS;
+
+    if (lock_try_acquire(&self->lock))
+    {
+        result = channel_send_unlock(self, message);
+        lock_release(&self->lock);
+    }
+
+    if (result == BR_CHANNEL_FULL)
+    {
+        return result;
+    }
+
+    result = sched_block((Blocker){
+        .function = (BlockerFn *)channel_wait_send,
+        .context = self,
+        .deadline = sched_deadline(timeout),
+    });
+
+    if (result != BR_SUCCESS)
+    {
+        return result;
+    }
+
+    result = channel_send_unlock(self, message);
+
+    lock_release(&self->lock);
+
+    return result;
+}
+
+BrResult channel_recv_blocking(Channel *self, Message *message, BrTimeout timeout)
+{
+    BrResult result = BR_SUCCESS;
+
+    if (lock_try_acquire(&self->lock))
+    {
+        result = channel_recv_unlock(self, message);
+        lock_release(&self->lock);
+    }
+
+    if (result != BR_CHANNEL_EMPTY)
+    {
+        return result;
+    }
+
+    result = sched_block((Blocker){
+        .function = (BlockerFn *)channel_wait_recv,
+        .context = self,
+        .deadline = sched_deadline(timeout),
+    });
+
+    if (result != BR_SUCCESS)
+    {
+        return result;
+    }
+
+    result = channel_recv_unlock(self, message);
+
+    lock_release(&self->lock);
+
+    return result;
+}
+
+BrResult channel_send(Channel *self, Message *message)
 {
     LOCK_RETAINER(&self->lock);
-    return ring_any(&self->messages);
+    return channel_send_unlock(self, message);
+}
+
+BrResult channel_recv(Channel *self, Message *message)
+{
+    LOCK_RETAINER(&self->lock);
+    return channel_recv_unlock(self, message);
 }

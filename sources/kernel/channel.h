@@ -26,8 +26,10 @@ Channel *channel_create(void);
 
 void channel_destroy(Channel *channel);
 
-bool channel_send(Channel *self, Message *message);
+BrResult channel_send_blocking(Channel *self, Message *message, BrTimeout timeout);
 
-bool channel_recv(Channel *self, Message *message);
+BrResult channel_recv_blocking(Channel *self, Message *message, BrTimeout timeout);
 
-bool channel_any(Channel *self);
+BrResult channel_send(Channel *self, Message *message);
+
+BrResult channel_recv(Channel *self, Message *message);

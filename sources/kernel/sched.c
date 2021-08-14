@@ -100,6 +100,16 @@ BrResult sched_block(Blocker blocker)
     return task_self()->blocker.result;
 }
 
+Tick sched_deadline(BrTimeout timeout)
+{
+    if (timeout == BR_TIMEOUT_INFINITY)
+    {
+        return -1;
+    }
+
+    return tick + timeout;
+}
+
 /* --- Peek ----------------------------------------------------------------- */
 
 Task *sched_pick(Task *best, Task *other)
@@ -261,18 +271,29 @@ static void sched_updated_blocked(void)
             continue;
         }
 
-        if (task->blocker.deadline != (Tick)-1 &&
-            task->blocker.deadline < tick)
+        Blocker *blocker = &task->blocker;
+
+        bool has_reached_function =
+            blocker->function &&
+            blocker->function(blocker->context);
+
+        bool has_reached_deadline =
+            blocker->deadline != (Tick)-1 &&
+            blocker->deadline < tick;
+
+        if (has_reached_function)
         {
+            blocker->result = BR_SUCCESS;
             task->is_blocked = false;
-            task->blocker.result = BR_SUCCESS;
-
-            continue;
         }
-
-        if (task->is_stopped)
+        else if (has_reached_deadline)
         {
-            task->blocker.result = BR_INTERRUPTED;
+            blocker->result = BR_TIMEOUT;
+            task->is_blocked = false;
+        }
+        else if (task->is_stopped)
+        {
+            blocker->result = BR_INTERRUPTED;
             task->is_blocked = false;
         }
     }

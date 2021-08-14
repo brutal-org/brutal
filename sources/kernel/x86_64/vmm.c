@@ -239,8 +239,6 @@ VmmResult vmm_map(VmmSpace space, VmmRange virtual_range, PmmRange physical_rang
 
     LOCK_RETAINER(&vmm_lock);
 
-    log("vmm_map: {#p}-{#p} {#p}", virtual_range.base, virtual_range.base + virtual_range.size - 1, physical_range.base);
-
     if (virtual_range.size != physical_range.size)
     {
         panic("virtual_range.size must be equal to physical_range.size");

@@ -66,7 +66,6 @@ void arch_entry_main(Handover *handover)
         log("I'm alive!");
 
         sched_block((Blocker){
-            .type = BLOCKER_TIME,
             .deadline = sched_tick() + 1000,
         });
     }
@@ -96,7 +95,6 @@ void arch_entry_other(void)
         log("I'm alive!");
 
         sched_block((Blocker){
-            .type = BLOCKER_TIME,
             .deadline = sched_tick() + 1000,
         });
     }

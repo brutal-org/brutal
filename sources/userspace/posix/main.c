@@ -13,8 +13,8 @@ int br_entry()
     log("Time is {}/{}/{}", dt.day, dt.month, dt.year);
 
     BrIpcArgs ipc = {
-        .flags = BR_IPC_RECV,
-        .timeout = -1,
+        .flags = BR_IPC_RECV | BR_IPC_BLOCK,
+        .timeout = BR_TIMEOUT_INFINITY,
     };
 
     br_ipc(&ipc);

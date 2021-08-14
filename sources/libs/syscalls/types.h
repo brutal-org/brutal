@@ -50,6 +50,8 @@ static inline const char *br_syscall_to_string(BrSyscall syscall)
     RESULT(BAD_SYSCALL)         \
     RESULT(NOT_IMPLEMENTED)     \
     RESULT(OUT_OF_MEMORY)       \
+    RESULT(CHANNEL_FULL)        \
+    RESULT(CHANNEL_EMPTY)       \
     RESULT(WOULD_BLOCK)
 
 typedef enum
@@ -182,7 +184,7 @@ typedef enum
     BR_TASK_USER = 1 << 0,
 } BrTaskFlags;
 
-#define BR_TIMEOUT_INFINITY (-1)
+#define BR_TIMEOUT_INFINITY ((BrTimeout)-1)
 typedef uint64_t BrTimeout;
 
 typedef struct PACKED

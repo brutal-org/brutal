@@ -8,18 +8,13 @@
 #include "kernel/context.h"
 #include "kernel/space.h"
 
-typedef enum
-{
-    BLOCKER_NONE,
-
-    BLOCKER_SEND,
-    BLOCKER_RECV,
-    BLOCKER_TIME,
-} BlockerType;
+typedef bool BlockerFn(void *context);
 
 typedef struct
 {
-    BlockerType type;
+    BlockerFn *function;
+    void *context;
+
     Tick deadline;
     BrResult result;
 } Blocker;
@@ -71,8 +66,8 @@ void task_end_syscall(void);
 
 static inline bool task_runnable(Task *self)
 {
-    bool blocked_or_stopped = (self->is_blocked || self->is_stopped) && !self->in_syscall;
-    return self->is_started && !blocked_or_stopped;
+    bool blocked_or_stopped = self->is_blocked || (self->is_stopped && !self->in_syscall);
+    return self->is_started && (!blocked_or_stopped);
 }
 
 static inline bool task_running(Task *self)
