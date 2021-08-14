@@ -4,4 +4,4 @@
 #include "efi/st.h"
 #include <efi/gop.h>
 
-Handover get_handover(EFISystemTable* st);
+Handover get_handover(EFISystemTable* st, EFIHandle* image_handle);
