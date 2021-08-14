@@ -14,7 +14,7 @@ int br_entry()
 
     BrIpcArgs ipc = {
         .flags = BR_IPC_RECV | BR_IPC_BLOCK,
-        .timeout = BR_TIMEOUT_INFINITY,
+        .timeout = 2500,
     };
 
     br_ipc(&ipc);

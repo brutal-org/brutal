@@ -102,24 +102,22 @@ PmmResult pmm_alloc(size_t size)
         page_range = bitmap_find_range(&pmm_bitmap, 0, page_size, PMM_UNUSED);
     }
 
-    if (range_any(page_range))
+    if (!range_any(page_range))
     {
-        best_bet = range_end(page_range);
-
-        bitmap_set_range(&pmm_bitmap, page_range, PMM_USED);
-
-        auto pmm_range = range_cast(PmmRange, page_range);
-
-        pmm_range.base *= MEM_PAGE_SIZE;
-        pmm_range.size *= MEM_PAGE_SIZE;
-
-        return OK(PmmResult, pmm_range);
-    }
-    else
-    {
-        log("pmm_alloc(): {} error out of memory", size);
+        log("pmm_alloc({}): out of memory!", size);
         return ERR(PmmResult, BR_OUT_OF_MEMORY);
     }
+
+    best_bet = range_end(page_range);
+
+    bitmap_set_range(&pmm_bitmap, page_range, PMM_USED);
+
+    auto pmm_range = range_cast(PmmRange, page_range);
+
+    pmm_range.base *= MEM_PAGE_SIZE;
+    pmm_range.size *= MEM_PAGE_SIZE;
+
+    return OK(PmmResult, pmm_range);
 }
 
 PmmResult pmm_used(PmmRange range)
@@ -130,6 +128,7 @@ PmmResult pmm_used(PmmRange range)
 
     size_t page_base = range.base / MEM_PAGE_SIZE;
     size_t page_size = range.size / MEM_PAGE_SIZE;
+
     auto page_range = (USizeRange){page_base, page_size};
 
     bitmap_set_range(&pmm_bitmap, page_range, PMM_USED);

@@ -91,7 +91,7 @@ void smp_boot_other(void)
 
     for (int cpu = 0; cpu < cpu_count(); cpu++)
     {
-        if (cpu == lapic_current_cpu())
+        if (cpu == cpu_self_id())
         {
             continue; // don't init current cpu
         }

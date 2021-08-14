@@ -135,11 +135,6 @@ int br_entry(Handover const *handover)
 
     auto posix_task = srv_run(handover, str_cast("posix"));
 
-    for (size_t i = 0; i < 100; i++)
-    {
-        display_bootimage(handover);
-    }
-
     br_ipc(&(BrIpcArgs){
         .flags = BR_IPC_SEND,
         .task = posix_task,

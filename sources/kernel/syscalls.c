@@ -320,6 +320,16 @@ static BrResult sys_ipc_recv(BrIpcArgs *args)
 
     if (result == BR_SUCCESS)
     {
+        if (msg.object != nullptr)
+        {
+            domain_add(task_self()->domain, msg.object);
+            args->handle = msg.object->handle;
+        }
+        else
+        {
+            args->handle = BR_HANDLE_NIL;
+        }
+
         mem_cpy(args->message.data, msg.data, msg.size);
         message_deinit(&msg);
     }

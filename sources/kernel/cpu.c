@@ -1,12 +1,15 @@
+#include <brutal/log.h>
 #include "kernel/cpu.h"
 
 void cpu_begin_interrupt(void)
 {
+    assert_truth(cpu_self()->retain_enable);
     cpu_self()->retain_enable = false;
 }
 
 void cpu_end_interrupt(void)
 {
+    assert_falsity(cpu_self()->retain_enable);
     cpu_self()->retain_enable = true;
 }
 

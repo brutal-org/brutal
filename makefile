@@ -6,7 +6,7 @@ CFLAGS_STD ?= \
 	-std=gnu2x
 
 CFLAGS_OPT ?= \
-	-g
+	-O3
 
 CFLAGS_WARN ?= \
 	-Wall \
@@ -62,8 +62,7 @@ run: $(ISO)
 		-serial mon:stdio \
 		-no-reboot \
 		-no-shutdown \
-		-cdrom $(ISO) \
-		-d guest_errors
+		-cdrom $(ISO)
 
 bochs: $(ISO)
 	bochs

@@ -13,19 +13,17 @@ static VmmResult vmm_get_pml(struct pml *table, size_t idx)
 {
     auto entry = table->entries[idx];
 
-    if (entry.present)
-    {
-        VmmRange range = {
-            mmap_phys_to_io(entry.physical << 12),
-            MEM_PAGE_SIZE,
-        };
-
-        return OK(VmmResult, range);
-    }
-    else
+    if (!entry.present)
     {
         return ERR(VmmResult, BR_BAD_ADDRESS);
     }
+
+    VmmRange range = {
+        mmap_phys_to_io(entry.physical << 12),
+        MEM_PAGE_SIZE,
+    };
+
+    return OK(VmmResult, range);
 }
 
 static VmmResult vmm_get_pml_or_alloc(struct pml *table, size_t idx, size_t flags)
@@ -105,10 +103,6 @@ static void vmm_load_memory_map(VmmSpace target, HandoverMmap const *memory_map)
                         .base = ALIGN_DOWN(entry.base, MEM_PAGE_SIZE),
                         .size = ALIGN_UP(entry.length, MEM_PAGE_SIZE)},
                     BR_MEM_WRITABLE);
-        }
-        else
-        {
-            log(" - Skipped!");
         }
     }
 
