@@ -187,3 +187,34 @@ void host_log_panic()
     while (1)
         ;
 }
+
+u64 read_unaligned64(const u64 *buffer)
+{
+    return *buffer;
+}
+
+bool compare_guids(EFIGUID *guid1, EFIGUID *guid2)
+{
+
+    u64 low_guid1 = read_unaligned64((const u64 *)guid1);
+    u64 low_guid2 = read_unaligned64((const u64 *)guid2);
+    u64 high_guid1 = read_unaligned64((const u64 *)guid1 + 1);
+    u64 high_guid2 = read_unaligned64((const u64 *)guid2 + 1);
+
+    return (low_guid1 == low_guid2 && high_guid1 == high_guid2);
+}
+
+EFIStatus get_system_config_table(EFIGUID *table_guid, void **table)
+{
+
+    for (u64 i = 0; i < st->num_table_entries; i++)
+    {
+        if (compare_guids(table_guid, &st->config_table[i].vendor_guid))
+        {
+            *table = st->config_table[i].vendor_table;
+            return EFI_SUCCESS;
+        }
+    }
+
+    return EFI_NOT_FOUND;
+}

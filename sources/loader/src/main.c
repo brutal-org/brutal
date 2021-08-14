@@ -8,8 +8,11 @@
 #include <handover/handover.h>
 #include <stddef.h>
 #include "config.h"
+#include "efi/bs.h"
+#include "efi/dpp.h"
 #include "elf.h"
 #include "loader/src/protocol.h"
+
 
 EFIBootServices *BS;
 
@@ -36,7 +39,8 @@ EFIStatus efi_main(EFIHandle image_handle, EFISystemTable *system_table)
     init_lib(system_table, image_handle);
 
     clear_screen();
-
+    
+    system_table->boot_services->set_watchdog_timer(0, 0, 0, NULL);
     system_table->console_in->reset(system_table->console_in, false);
 
     EFIInputKey key;
@@ -100,21 +104,18 @@ EFIStatus efi_main(EFIHandle image_handle, EFISystemTable *system_table)
 
 boot:
 {
-    void (*entry)(Handover*);
+    void (*entry)(Handover *);
 
-    entry = (void (*)(Handover*))result.entry_point;
-
-    //BS->exit_boot_services(image_handle, map_key);
+    entry = (void (*)(Handover *))result.entry_point;
 
     clear_screen();
 
-    auto handover = get_handover(system_table);
+    auto handover = get_handover(system_table, image_handle);
 
     // passing data to the kernel in a hacky way lol
-    asm volatile("mov %0, %%rdi"::"a"(&handover));
+    asm volatile("mov %0, %%rdi" ::"a"(&handover));
 
     entry(&handover);
-
 }
 
     while (1)

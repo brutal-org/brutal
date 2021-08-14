@@ -212,6 +212,9 @@ void printf(char *format, ...)
 
 void kmain(Handover *handover)
 {
+
+    printf("%x", handover->rsdp);
+    
     auto fb = handover->framebuffer;
 
     size_t index = 10 + (fb.pitch / sizeof(uint32_t)) * 10;
