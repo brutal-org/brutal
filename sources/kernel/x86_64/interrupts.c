@@ -123,26 +123,6 @@ void interrupt_error_handler(Regs *regs, uintptr_t rsp)
     }
 }
 
-static void save_context(Regs const *regs)
-{
-    auto context = task_self()->context;
-
-    simd_context_save(context->simd);
-    context->regs = *regs;
-}
-
-static void load_context(Regs *regs)
-{
-    auto task = task_self();
-    auto context = task_self()->context;
-
-    space_switch(task->space);
-    syscall_set_stack(range_end(task->stack));
-
-    *regs = context->regs;
-    simd_context_load(context->simd);
-}
-
 uint64_t interrupt_handler(uint64_t rsp)
 {
     auto regs = (Regs *)rsp;
@@ -161,16 +141,20 @@ uint64_t interrupt_handler(uint64_t rsp)
             global()->time = datetime_to_timestamp(cmos_read_rtc());
         }
 
-        save_context(regs);
+        context_save(task_self()->context, regs);
         sched_schedule();
         sched_switch();
-        load_context(regs);
+        context_load(task_self()->context, regs);
+
+        space_switch(task_self()->space);
     }
     else if (regs->int_no == IPI_RESCHED)
     {
-        save_context(regs);
+        context_save(task_self()->context, regs);
         sched_switch();
-        load_context(regs);
+        context_load(task_self()->context, regs);
+
+        space_switch(task_self()->space);
     }
     else if (regs->int_no == IPI_STOP)
     {

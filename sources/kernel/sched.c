@@ -39,7 +39,7 @@ void sched_start(Task *task, uintptr_t ip, uintptr_t sp, BrTaskArgs args)
 
     log("Starting task {}({})", str_cast(&task->name), task->handle);
 
-    context_start(task->context, ip, sp, args, task->flags);
+    context_start(task->context, ip, sp, range_end(task->stack), args, task->flags);
     task->is_started = true;
     sched_enqueue(task);
 

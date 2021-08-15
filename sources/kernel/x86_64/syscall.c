@@ -32,9 +32,10 @@ void syscall_initialize(void)
     asm_write_msr(MSR_SYSCALL_FLAG_MASK, 0);
 }
 
-void syscall_set_stack(uintptr_t stack)
+void syscall_set_gs(uintptr_t addr)
 {
-    cpu_impl_self()->syscall_kernel_stack = stack;
+    asm_write_msr(MSR_GS_BASE, addr);
+    asm_write_msr(MSR_KERN_GS_BASE, addr);
 }
 
 uint64_t syscall_handler(Regs const *regs)

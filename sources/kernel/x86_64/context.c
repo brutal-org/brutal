@@ -4,6 +4,7 @@
 #include "kernel/x86_64/asm.h"
 #include "kernel/x86_64/gdt.h"
 #include "kernel/x86_64/simd.h"
+#include "kernel/x86_64/syscall.h"
 
 Context *context_create(void)
 {
@@ -17,7 +18,7 @@ void context_destroy(Context *self)
     alloc_free(alloc_global(), self);
 }
 
-void context_start(Context *self, uintptr_t ip, uintptr_t sp, BrTaskArgs args, BrTaskFlags flags)
+void context_start(Context *self, uintptr_t ip, uintptr_t sp, uintptr_t ksp, BrTaskArgs args, BrTaskFlags flags)
 {
     Regs regs;
 
@@ -46,4 +47,19 @@ void context_start(Context *self, uintptr_t ip, uintptr_t sp, BrTaskArgs args, B
     regs.rsp = sp;
 
     self->regs = regs;
+    self->syscall_kernel_stack = ksp;
+}
+
+void context_save(Context *self, Regs const *regs)
+{
+    simd_context_save(self->simd);
+    self->regs = *regs;
+}
+
+void context_load(Context *self, Regs *regs)
+{
+    syscall_set_gs((uintptr_t)self);
+
+    *regs = self->regs;
+    simd_context_load(self->simd);
 }

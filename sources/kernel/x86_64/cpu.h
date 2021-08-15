@@ -7,11 +7,7 @@
 
 typedef struct
 {
-    uintptr_t syscall_kernel_stack;
-    uintptr_t syscall_user_stack;
-
     struct tss tss;
-
     uint8_t lapic;
     Cpu base;
 } CpuImpl;

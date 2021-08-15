@@ -4,4 +4,4 @@
 
 void syscall_initialize(void);
 
-void syscall_set_stack(uintptr_t stack);
+void syscall_set_gs(uintptr_t addr);

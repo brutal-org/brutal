@@ -46,10 +46,6 @@ int cpu_count(void)
 
 void cpu_initialize(void)
 {
-    // Setup swapgs
-    asm_write_msr(MSR_GS_BASE, (uintptr_t)cpu_impl_self());
-    asm_write_msr(MSR_KERN_GS_BASE, (uintptr_t)cpu_impl_self());
-
     // Setup tss
     gdt_load_tss(&cpu_impl_self()->tss);
 }

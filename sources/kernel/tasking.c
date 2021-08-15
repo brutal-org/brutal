@@ -29,7 +29,7 @@ Task *tasking_create_idle(void)
     auto space = space_create(BR_SPACE_NONE);
     auto task = UNWRAP(task_create(str_cast("idle"), space, BR_CAP_NONE, BR_TASK_NONE));
 
-    context_start(task->context, (uintptr_t)idle, task->sp, (BrTaskArgs){}, task->flags);
+    context_start(task->context, (uintptr_t)idle, task->sp, task->sp, (BrTaskArgs){}, task->flags);
 
     space_deref(space);
 
