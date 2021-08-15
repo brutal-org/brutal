@@ -19,7 +19,7 @@
 
 ## Milestone 2 - Userspace
 
-- [ ] Syscalls
+- [x] Syscalls
   - [x] log
   - [x] map
   - [x] alloc
@@ -27,12 +27,12 @@
   - [x] create
   - [x] start
   - [x] exit
-  - [ ] ipc
-  - [ ] irq
+  - [x] ipc
+  - [x] irq (stub)
   - [x] drop
   - [x] close
 - [x] Userspace ELF loader
-- [ ] IPC
+- [x] IPC
 - [ ] IDL
 
 ## Milestone 3 - Filesystem
