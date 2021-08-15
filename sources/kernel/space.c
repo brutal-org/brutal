@@ -19,6 +19,8 @@ static void memory_mapping_create(Space *space, MemObj *object, size_t offset, V
     PmmRange pmm = {mem_obj_base(object) + offset, vmm.size};
 
     vmm_map(space->vmm, vmm, pmm, BR_MEM_USER | BR_MEM_WRITABLE);
+    
+    vmm_flush(space->vmm, vmm);
 }
 
 static void memory_mapping_destroy(Space *space, MemoryMapping *mapping)

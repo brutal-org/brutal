@@ -26,3 +26,5 @@ VmmResult vmm_map(VmmSpace space, VmmRange virtual_range, PmmRange physical_rang
 VmmResult vmm_unmap(VmmSpace space, VmmRange virtual_range);
 
 PmmResult vmm_virt2phys(VmmSpace space, VmmRange virtual_range);
+
+VmmResult vmm_flush(VmmSpace space, VmmRange virtual_range);

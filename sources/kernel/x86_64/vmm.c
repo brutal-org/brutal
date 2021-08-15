@@ -9,6 +9,24 @@
 static struct pml *kernel_pml = nullptr;
 static Lock vmm_lock;
 
+static void flush_tlb(uintptr_t addr)
+{
+    asm volatile("invlpg (%0)" ::"r"(addr)
+                 : "memory");
+}
+
+VmmResult vmm_flush(VmmSpace space, VmmRange virtual_range)
+{
+    (void)space;
+    
+    for (size_t i = 0; i < (virtual_range.size / MEM_PAGE_SIZE); i++)
+    {
+        flush_tlb(((virtual_range.base / MEM_PAGE_SIZE) + i) * MEM_PAGE_SIZE);
+    }
+    
+    return OK(VmmResult, virtual_range);
+}
+
 static VmmResult vmm_get_pml(struct pml *table, size_t idx)
 {
     auto entry = table->entries[idx];
@@ -204,6 +222,7 @@ static VmmResult vmm_map_page(struct pml *pml4, uintptr_t virtual_page, uintptr_
     pml1->entries[PML1_GET_INDEX(virtual_page)] = pml_make_entry(physical_page, flags);
 
     VmmRange range = {virtual_page, MEM_PAGE_SIZE};
+
     return OK(VmmResult, range);
 }
 
