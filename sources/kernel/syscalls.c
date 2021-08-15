@@ -11,7 +11,7 @@
 BrResult sys_log(BrLogArgs *args)
 {
     host_log_lock();
-    print(host_log_writer(), "{}({}) ", str_cast(&task_self()->name), task_self()->handle);
+    print(host_log_writer(), "cpu{}: {}({}): ", cpu_self_id(), str_cast(&task_self()->name), task_self()->handle);
     io_write(host_log_writer(), args->message, args->size);
     host_log_unlock();
 
@@ -259,79 +259,50 @@ BrResult sys_exit(BrExitArgs *args)
     return BR_SUCCESS;
 }
 
-static BrResult sys_ipc_send(BrIpcArgs *args)
+static BrResult sys_ipc_send(BrMsg *msg, BrTimeout timeout, BrIpcFlags flags)
 {
     Task *task CLEANUP(object_cleanup) = nullptr;
-    Object *object CLEANUP(object_cleanup) = nullptr;
+    Object *obj CLEANUP(object_cleanup) = nullptr;
 
-    task = (Task *)global_lookup(args->task, BR_OBJECT_TASK);
+    msg->from = task_self()->handle;
+    task = (Task *)global_lookup(msg->to, BR_OBJECT_TASK);
 
     if (!task)
     {
         return BR_BAD_HANDLE;
     }
 
-    BrResult result = BR_SUCCESS;
-
-    if (args->handle != BR_HANDLE_NIL)
+    if (msg->hnd != BR_HANDLE_NIL)
     {
-        object = domain_lookup(task_self()->domain, args->handle, BR_OBJECT_ANY);
+        obj = domain_lookup(task_self()->domain, msg->hnd, BR_OBJECT_ANY);
 
-        if (object == nullptr)
+        if (obj == nullptr)
         {
             return BR_BAD_HANDLE;
         }
     }
 
-    Message msg;
-    message_init(&msg, task_self()->handle, object, args->message.data, args->message.size);
+    return channel_send(task->channel, msg, obj, timeout, flags);
+}
 
-    if (args->flags & BR_IPC_BLOCK)
-    {
-        result = channel_send_blocking(task->channel, &msg, args->timeout);
-    }
-    else
-    {
-        result = channel_send(task->channel, &msg);
-    }
+static BrResult sys_ipc_recv(BrMsg *msg, BrTimeout timeout, BrIpcFlags flags)
+{
+    Object *obj CLEANUP(object_cleanup) = nullptr;
+    BrResult result = channel_recv(task_self()->channel, msg, &obj, timeout, flags);
 
     if (result != BR_SUCCESS)
     {
-        message_deinit(&msg);
+        return result;
     }
 
-    return result;
-}
-
-static BrResult sys_ipc_recv(BrIpcArgs *args)
-{
-    BrResult result = BR_SUCCESS;
-
-    Message msg;
-
-    if (args->flags & BR_IPC_BLOCK)
+    if (obj != nullptr)
     {
-        result = channel_recv_blocking(task_self()->channel, &msg, args->timeout);
+        domain_add(task_self()->domain, obj);
+        msg->hnd = obj->handle;
     }
     else
     {
-        result = channel_recv(task_self()->channel, &msg);
-    }
-
-    if (result == BR_SUCCESS)
-    {
-        if (msg.object != nullptr)
-        {
-            domain_add(task_self()->domain, msg.object);
-            args->handle = msg.object->handle;
-        }
-        else
-        {
-            args->handle = BR_HANDLE_NIL;
-        }
-
-        mem_cpy(args->message.data, msg.data, msg.size);
-        message_deinit(&msg);
+        msg->hnd = BR_HANDLE_NIL;
     }
 
     return result;
@@ -343,7 +314,7 @@ BrResult sys_ipc(BrIpcArgs *args)
 
     if (args->flags & BR_IPC_SEND)
     {
-        result = sys_ipc_send(args);
+        result = sys_ipc_send(&args->msg, args->timeout, args->flags);
     }
 
     if (result != BR_SUCCESS)
@@ -353,7 +324,7 @@ BrResult sys_ipc(BrIpcArgs *args)
 
     if (args->flags & BR_IPC_RECV)
     {
-        result = sys_ipc_recv(args);
+        result = sys_ipc_recv(&args->msg, args->timeout, args->flags);
     }
 
     return result;

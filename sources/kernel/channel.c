@@ -4,56 +4,47 @@
 #include "kernel/kernel.h"
 #include "kernel/sched.h"
 
-void message_init(Message *message, BrTask sender, Object *object, uint8_t *data, size_t size)
-{
-    if (object)
-    {
-        object_ref(object);
-    }
-
-    message->sender = sender;
-    message->object = object;
-    message->size = size;
-
-    mem_cpy(message->data, data, size);
-}
-
-void message_deinit(Message *message)
-{
-    if (message->object)
-    {
-        object_deref(message->object);
-    }
-}
-
 Channel *channel_create(void)
 {
     auto self = alloc_make(alloc_global(), Channel);
-    ring_init(&self->messages, IPC_CHANNEL_SIZE, alloc_global());
+    ring_init(&self->msgs, IPC_CHANNEL_SIZE, alloc_global());
+    ring_init(&self->objs, IPC_CHANNEL_SIZE, alloc_global());
     return self;
 }
 
 void channel_destroy(Channel *self)
 {
-    ring_deinit(&self->messages);
+    ring_deinit(&self->msgs);
+    ring_deinit(&self->objs);
     alloc_free(alloc_global(), self);
 }
 
-static BrResult channel_send_unlock(Channel *self, Message *message)
+static BrResult channel_send_unlock(Channel *self, BrMsg const *msg, Object *obj)
 {
-    if (!ring_push(&self->messages, message))
+    if (!ring_push(&self->msgs, msg))
     {
         return BR_CHANNEL_FULL;
+    }
+
+    if (msg->hnd != BR_HANDLE_NIL)
+    {
+        object_ref(obj);
+        ring_push(&self->objs, &obj);
     }
 
     return BR_SUCCESS;
 }
 
-static BrResult channel_recv_unlock(Channel *self, Message *message)
+static BrResult channel_recv_unlock(Channel *self, BrMsg *msg, Object **obj)
 {
-    if (!ring_pop(&self->messages, message))
+    if (!ring_pop(&self->msgs, msg))
     {
         return BR_CHANNEL_EMPTY;
+    }
+
+    if (msg->hnd != BR_HANDLE_NIL)
+    {
+        ring_pop(&self->objs, &obj);
     }
 
     return BR_SUCCESS;
@@ -66,7 +57,7 @@ static bool channel_wait_send(Channel *self)
         return false;
     }
 
-    if (!ring_full(&self->messages))
+    if (!ring_full(&self->msgs))
     {
         lock_release(&self->lock);
         return false;
@@ -82,7 +73,7 @@ static bool channel_wait_recv(Channel *self)
         return false;
     }
 
-    if (!ring_any(&self->messages))
+    if (!ring_any(&self->msgs))
     {
         lock_release(&self->lock);
         return false;
@@ -91,17 +82,17 @@ static bool channel_wait_recv(Channel *self)
     return true;
 }
 
-BrResult channel_send_blocking(Channel *self, Message *message, BrTimeout timeout)
+BrResult channel_send_blocking(Channel *self, BrMsg const *msg, Object *obj, BrTimeout timeout)
 {
     BrResult result = BR_SUCCESS;
 
     if (lock_try_acquire(&self->lock))
     {
-        result = channel_send_unlock(self, message);
+        result = channel_send_unlock(self, msg, obj);
         lock_release(&self->lock);
     }
 
-    if (result == BR_CHANNEL_FULL)
+    if (result != BR_CHANNEL_FULL)
     {
         return result;
     }
@@ -117,20 +108,20 @@ BrResult channel_send_blocking(Channel *self, Message *message, BrTimeout timeou
         return result;
     }
 
-    result = channel_send_unlock(self, message);
+    result = channel_send_unlock(self, msg, obj);
 
     lock_release(&self->lock);
 
     return result;
 }
 
-BrResult channel_recv_blocking(Channel *self, Message *message, BrTimeout timeout)
+BrResult channel_recv_blocking(Channel *self, BrMsg *msg, Object **obj, BrTimeout timeout)
 {
     BrResult result = BR_SUCCESS;
 
     if (lock_try_acquire(&self->lock))
     {
-        result = channel_recv_unlock(self, message);
+        result = channel_recv_unlock(self, msg, obj);
         lock_release(&self->lock);
     }
 
@@ -150,21 +141,45 @@ BrResult channel_recv_blocking(Channel *self, Message *message, BrTimeout timeou
         return result;
     }
 
-    result = channel_recv_unlock(self, message);
+    result = channel_recv_unlock(self, msg, obj);
 
     lock_release(&self->lock);
 
     return result;
 }
 
-BrResult channel_send(Channel *self, Message *message)
+BrResult channel_send_non_blocking(Channel *self, BrMsg const *msg, Object *obj)
 {
     LOCK_RETAINER(&self->lock);
-    return channel_send_unlock(self, message);
+    return channel_send_unlock(self, msg, obj);
 }
 
-BrResult channel_recv(Channel *self, Message *message)
+BrResult channel_recv_non_blocking(Channel *self, BrMsg *msg, Object **obj)
 {
     LOCK_RETAINER(&self->lock);
-    return channel_recv_unlock(self, message);
+    return channel_recv_unlock(self, msg, obj);
+}
+
+BrResult channel_send(Channel *self, BrMsg const *msg, Object *obj, BrTimeout timeout, BrIpcFlags flags)
+{
+    if (flags & BR_IPC_BLOCK)
+    {
+        return channel_send_blocking(self, msg, obj, timeout);
+    }
+    else
+    {
+        return channel_send_non_blocking(self, msg, obj);
+    }
+}
+
+BrResult channel_recv(Channel *self, BrMsg *msg, Object **obj, BrTimeout timeout, BrIpcFlags flags)
+{
+    if (flags & BR_IPC_BLOCK)
+    {
+        return channel_recv_blocking(self, msg, obj, timeout);
+    }
+    else
+    {
+        return channel_recv_non_blocking(self, msg, obj);
+    }
 }

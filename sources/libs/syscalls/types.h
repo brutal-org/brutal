@@ -183,13 +183,24 @@ typedef uint8_t BrTaskFlags;
 #define BR_TIMEOUT_INFINITY ((BrTimeout)-1)
 typedef uint64_t BrTimeout;
 
+#define BR_MESSAGE_HEADER \
+    BrTask from;          \
+    BrTask to;            \
+    BrHandle hnd;         \
+    size_t size
+
 typedef struct PACKED
 {
-    size_t size;
-    uint8_t data[512 - sizeof(size_t)];
-} BrMessage;
+    BR_MESSAGE_HEADER;
+} BrMsgHeader;
 
-_Static_assert(sizeof(BrMessage) == 512, "");
+typedef struct PACKED
+{
+    BR_MESSAGE_HEADER;
+    uint8_t data[512 - sizeof(BrMsgHeader)];
+} BrMsg;
+
+_Static_assert(sizeof(BrMsg) == 512, "");
 
 #define BR_IPC_NONE ((BrIpcFlags)(0))
 #define BR_IPC_BLOCK ((BrIpcFlags)(1 << 0))

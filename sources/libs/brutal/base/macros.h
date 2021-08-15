@@ -37,10 +37,10 @@
 
 #define member_type(T, MEMBER) typeof(((T *)0)->MEMBER)
 
-#define swap(X, Y)          \
-    do                      \
-    {                       \
-        typeof(X) SWAP = X; \
-        X = Y;              \
-        Y = SWAP;           \
+#define swap(X, Y)            \
+    do                        \
+    {                         \
+        typeof(X) SWAP = (X); \
+        (X) = (Y);            \
+        (Y) = SWAP;           \
     } while (0)

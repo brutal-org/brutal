@@ -10,6 +10,7 @@
 #    define SYSCALL(NAME) BrResult br_##NAME
 SYSCALL(syscall) (BrSyscall syscall, BrArg arg1, BrArg arg2, BrArg arg3, BrArg arg4, BrArg arg5);
 #endif
+
 typedef struct
 {
     char const *message;
@@ -38,7 +39,6 @@ typedef struct
 } BrUnmapArgs;
 
 SYSCALL(unmap) (BrUnmapArgs* args);
-
 
 typedef struct
 {
@@ -96,11 +96,9 @@ SYSCALL(exit) (BrExitArgs* args);
 
 typedef struct
 {
-    BrTask task;
-    BrHandle handle;
-    BrMessage message;
     BrTimeout timeout;
     BrIpcFlags flags;
+    BrMsg msg;
 } BrIpcArgs;
 
 SYSCALL(ipc) (BrIpcArgs* args);

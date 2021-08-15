@@ -12,15 +12,5 @@ int br_entry()
     auto dt = timestamp_to_datetime(brh_global_info()->time);
     log("Time is {}/{}/{}", dt.day, dt.month, dt.year);
 
-    BrIpcArgs ipc = {
-        .flags = BR_IPC_RECV | BR_IPC_BLOCK,
-        .timeout = 2500,
-    };
-
-    br_ipc(&ipc);
-
-    log("Got IPC message with data:{}",
-        ipc.message.data[0]);
-
     return 0;
 }

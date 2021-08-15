@@ -160,7 +160,7 @@ void bid2c(BidInterface const *interface, IoWriter *writer)
 
     print(writer, "typedef struct {{\n");
 
-    print(writer, "BrMessageHeader header;\n");
+    print(writer, "BrMsgHeader header;\n");
 
     print(writer, "union {{\n");
     print(writer, "{}Error error;\n", interface->name);

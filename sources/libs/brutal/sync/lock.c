@@ -4,7 +4,7 @@
 static bool lock_try_acquire_impl(Lock *lock)
 {
     bool expected = false;
-    auto result = atomic_compare_exchange_weak(&lock->locked, &expected, true);
+    auto result = atomic_compare_exchange_strong(&lock->locked, &expected, true);
 
     atomic_thread_fence(memory_order_seq_cst);
 

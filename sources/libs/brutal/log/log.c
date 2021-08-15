@@ -53,6 +53,11 @@ void log_unlock_impl(enum log_level level, SourceLocation location, Str fmt, str
 {
 #ifdef __kernel__
     print(host_log_writer(), "cpu{}: ", cpu_self_id());
+
+    if (task_self())
+    {
+        print(host_log_writer(), "{}({}): ", str_cast(&task_self()->name), task_self()->handle);
+    }
 #endif
 
     print(host_log_writer(), "{}{}: ", log_color(level), log_prefix(level));

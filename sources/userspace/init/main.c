@@ -133,18 +133,8 @@ int br_entry(Handover const *handover)
         display_bootimage(handover);
     }
 
-    auto posix_task = srv_run(handover, str_cast("posix"));
-
-    br_ipc(&(BrIpcArgs){
-        .flags = BR_IPC_SEND,
-        .task = posix_task,
-        .message = {
-            .size = 1,
-            .data = {0x69},
-        },
-    });
-
-    log("IPC messaged sent!");
+    srv_run(handover, str_cast("posix"));
+    srv_run(handover, str_cast("echo"));
 
     return 0;
 }
