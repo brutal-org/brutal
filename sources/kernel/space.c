@@ -29,6 +29,9 @@ static void memory_mapping_destroy(Space *space, MemoryMapping *mapping)
     mem_obj_deref(mapping->object);
     vec_remove(&space->mappings, mapping);
     alloc_free(alloc_global(), mapping);
+    
+    vmm_flush(space->vmm, mapping->range);
+
 }
 
 /* --- Memory Space --------------------------------------------------------- */
