@@ -33,7 +33,7 @@
   - [x] close
 - [x] Userspace ELF loader
 - [x] IPC
-- [ ] IDL
+- [x] IDL
 
 ## Milestone 3 - Filesystem
 
