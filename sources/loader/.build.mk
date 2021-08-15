@@ -1,7 +1,7 @@
 CC = clang
 LD = lld-link
 
-CFLAGS = $(CROSS_CFLAGS) -I. -target x86_64-pc-win32-coff -fno-stack-protector -fshort-wchar -mno-red-zone
+CFLAGS = $(CROSS_CFLAGS) -D__x86_64__ -I. -target x86_64-pc-win32-coff -fno-stack-protector -fshort-wchar -mno-red-zone
 
 LDFLAGS = -subsystem:efi_application -nodefaultlib -dll
 
@@ -47,7 +47,7 @@ $(BUILD_DIRECTORY)/libs/%.c.o: sources/libs/%.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 run-loader: $(EFI_FILE) $(BUILD_DIRECTORY)/tools/OVMF.fd $(BUILD_DIRECTORY)/image/EFI/BOOT/BOOTX64.EFI
-	qemu-system-x86_64 -serial stdio -m 256 -bios $(BUILD_DIRECTORY)/tools/OVMF.fd -machine q35 -cpu host -enable-kvm -drive file=fat:rw:$(BUILD_DIRECTORY)/image,media=disk,format=raw
+	qemu-system-x86_64 -serial stdio -m 256 -bios $(BUILD_DIRECTORY)/tools/OVMF.fd -cpu host -enable-kvm -drive file=fat:rw:$(BUILD_DIRECTORY)/image,media=disk,format=raw
 
 $(BUILD_DIRECTORY)/image/EFI/BOOT/BOOTX64.EFI:
 	$(DIRECTORY_GUARD)

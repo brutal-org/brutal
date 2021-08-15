@@ -32,6 +32,16 @@ static int is_transmit_empty(SerialPort port)
     return inb(port + 5) & 0x20;
 }
 
+void *memcpy(void *dst, const void *src, size_t size)
+{
+    const char *from = src;
+    char *to = dst;
+
+    for (size_t i = 0; i < size; ++i)
+        *to++ = *from++;
+    return dst;
+}
+
 static int serial_received(SerialPort port)
 {
     return inb(port + 5) & 1;
@@ -213,9 +223,25 @@ void printf(char *format, ...)
 void kmain(Handover *handover)
 {
 
-    printf("%x", handover->rsdp);
-    
+    printf("%x\n", handover->rsdp);
+
     auto fb = handover->framebuffer;
+    auto mmap = handover->mmap;
+
+    uint64_t size = 0;
+
+    uint64_t free_pages = 0;
+    
+    for (int i = 0; i < mmap.size; i++)
+    {
+        auto entry = mmap.entries[i];
+
+	if(entry.type == HANDOVER_MMAP_FREE)
+	  free_pages += entry.length;
+        size += entry.length;
+    }
+
+    printf("%d mb of memory\n %d", size / 1024 / 1024, free_pages / 1024 / 1024);
 
     size_t index = 10 + (fb.pitch / sizeof(uint32_t)) * 10;
 
