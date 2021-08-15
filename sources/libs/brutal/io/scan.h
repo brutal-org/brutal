@@ -17,10 +17,10 @@ typedef struct
 typedef struct
 {
     char const *buffer;
-    size_t size;
-    size_t head;
+    int size;
+    int head;
 
-    size_t token;
+    int token;
 
     bool has_error;
     ScanError error;
@@ -30,7 +30,7 @@ void scan_init(Scan *self, Str str);
 
 bool scan_end(Scan *self);
 
-char scan_peek(Scan *self, size_t offset);
+char scan_peek(Scan *self, int offset);
 
 char scan_curr(Scan *self);
 

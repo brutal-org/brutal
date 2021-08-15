@@ -2,6 +2,7 @@
 
 #include <brutal/io/scan.h>
 #include <brutal/io/write.h>
+#include <brutal/text/case.h>
 #include <brutal/text/str.h>
 
 enum fmt_type
@@ -20,6 +21,8 @@ enum fmt_type
 struct fmt
 {
     enum fmt_type type;
+    Case casing;
+
     size_t min_width;
     bool fill_with_zero;
     bool prefix;

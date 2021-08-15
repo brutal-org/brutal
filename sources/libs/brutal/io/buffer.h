@@ -25,9 +25,17 @@ void buffer_push_impl(Buffer *self, uint8_t const *data, size_t size);
 
 Str buffer_str(Buffer *self);
 
-#define buffer_push(SELF, DATA) buffer_push_impl((SELF), (uint8_t const *)&(DATA), sizeof(DATA))
+#define buffer_putc(SELF, CHR) \
+    buffer_push(SELF, (char)(CHR))
 
-#define buffer_write(...) buffer_push_impl(__VA_ARGS__)
+#define buffer_push(SELF, DATA) (                                             \
+    {                                                                         \
+        typeof(DATA) __data = (DATA);                                         \
+        buffer_push_impl((SELF), (uint8_t const *)&(__data), sizeof(__data)); \
+    })
+
+#define buffer_write(SELF, DATA, SIZE) \
+    buffer_push_impl((SELF), (uint8_t const *)(DATA), (SIZE))
 
 #define buffer_begin(SELF) ((SELF)->data)
 

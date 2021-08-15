@@ -1,6 +1,8 @@
+#include <brutal/alloc/global.h>
 #include <brutal/base/attributes.h>
 #include <brutal/base/keywords.h>
 #include <brutal/io/fmt.h>
+#include <brutal/text/case.h>
 #include <brutal/text/rune.h>
 #include <brutal/text/vals.h>
 
@@ -40,6 +42,86 @@ static char fmt_prefix(struct fmt self)
     case FMT_POINTER:
     case FMT_HEXADECIMAL:
         return 'x';
+    }
+}
+
+static void fmt_pase_case(struct fmt *fmt, Scan *scan)
+{
+    if (scan_skip_word(scan, str_cast("default")))
+    {
+        fmt->casing = CASE_DEFAULT;
+    }
+    else if (scan_skip_word(scan, str_cast("camel")))
+    {
+        fmt->casing = CASE_CAMEL;
+    }
+    else if (scan_skip_word(scan, str_cast("capital")))
+    {
+        fmt->casing = CASE_CAPITAL;
+    }
+    else if (scan_skip_word(scan, str_cast("constant")))
+    {
+        fmt->casing = CASE_CONSTANT;
+    }
+    else if (scan_skip_word(scan, str_cast("dot")))
+    {
+        fmt->casing = CASE_DOT;
+    }
+    else if (scan_skip_word(scan, str_cast("header")))
+    {
+        fmt->casing = CASE_HEADER;
+    }
+    else if (scan_skip_word(scan, str_cast("no")))
+    {
+        fmt->casing = CASE_NO;
+    }
+    else if (scan_skip_word(scan, str_cast("param")))
+    {
+        fmt->casing = CASE_PARAM;
+    }
+    else if (scan_skip_word(scan, str_cast("pascal")))
+    {
+        fmt->casing = CASE_PASCAL;
+    }
+    else if (scan_skip_word(scan, str_cast("path")))
+    {
+        fmt->casing = CASE_PATH;
+    }
+    else if (scan_skip_word(scan, str_cast("sentence")))
+    {
+        fmt->casing = CASE_SENTENCE;
+    }
+    else if (scan_skip_word(scan, str_cast("snake")))
+    {
+        fmt->casing = CASE_SNAKE;
+    }
+    else if (scan_skip_word(scan, str_cast("title")))
+    {
+        fmt->casing = CASE_TITLE;
+    }
+    else if (scan_skip_word(scan, str_cast("swap")))
+    {
+        fmt->casing = CASE_SWAP;
+    }
+    else if (scan_skip_word(scan, str_cast("lower")))
+    {
+        fmt->casing = CASE_LOWER;
+    }
+    else if (scan_skip_word(scan, str_cast("lower-first")))
+    {
+        fmt->casing = CASE_LOWER_FIRST;
+    }
+    else if (scan_skip_word(scan, str_cast("upper")))
+    {
+        fmt->casing = CASE_UPPER;
+    }
+    else if (scan_skip_word(scan, str_cast("upper-first")))
+    {
+        fmt->casing = CASE_UPPER_FIRST;
+    }
+    else if (scan_skip_word(scan, str_cast("sponge")))
+    {
+        fmt->casing = CASE_SPONGE;
     }
 }
 
@@ -102,6 +184,8 @@ struct fmt fmt_parse(Scan *scan)
     while (scan_curr(scan) != '}' &&
            !scan_end(scan))
     {
+        scan_skip_space(scan);
+
         if (scan_curr(scan) == '#')
         {
             scan_next(scan);
@@ -110,6 +194,10 @@ struct fmt fmt_parse(Scan *scan)
         else if (scan_curr(scan) >= '0' && scan_curr(scan) <= '9')
         {
             fmt_parse_min_width(&fmt, scan);
+        }
+        else if (scan_skip_word(scan, str_cast("case:")))
+        {
+            fmt_pase_case(&fmt, scan);
         }
         else
         {
@@ -205,7 +293,17 @@ IoWriteResult fmt_char(MAYBE_UNUSED struct fmt self, IoWriter *writer, unsigned 
     return OK(IoWriteResult, written);
 }
 
-IoWriteResult fmt_string(MAYBE_UNUSED struct fmt self, IoWriter *writer, Str value)
+IoWriteResult fmt_string(struct fmt self, IoWriter *writer, Str value)
 {
-    return io_print(writer, value);
+    if (self.casing == CASE_DEFAULT)
+    {
+        return io_print(writer, value);
+    }
+    else
+    {
+        Buffer buffer = case_change(self.casing, value, alloc_global());
+        auto result = io_print(writer, buffer_str(&buffer));
+        buffer_deinit(&buffer);
+        return result;
+    }
 }

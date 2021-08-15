@@ -62,7 +62,7 @@
                                                                    \
         if (!str_eq(__lhs_value, __rhs_value))                     \
         {                                                          \
-            panic("{} == {}: {} is not equal to {}",               \
+            panic("{} == {}: '{}' is not equal to '{}'",           \
                   #lhs_expr, #rhs_expr, __lhs_value, __rhs_value); \
         }                                                          \
     })
@@ -74,7 +74,7 @@
                                                                    \
         if (str_eq(__lhs_value, __rhs_value))                      \
         {                                                          \
-            panic("{} != {}: {} is equal to {}",                   \
+            panic("{} != {}: '{}' is equal to '{}'",               \
                   #lhs_expr, #rhs_expr, __lhs_value, __rhs_value); \
         }                                                          \
     })

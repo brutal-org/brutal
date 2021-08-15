@@ -19,7 +19,7 @@ static void gen_generic(BidInterface const *interface, BidGeneric const *type, I
 {
     if (type_in_interface(interface, type->name))
     {
-        print(writer, "{}", interface->name);
+        print(writer, "{case:pascal}", interface->name);
     }
 
     print(writer, "{}", type->name);
@@ -48,7 +48,7 @@ static void gen_enum(BidInterface const *interface, BidEnum const *type, IoWrite
 
     vec_foreach(member, &type->members)
     {
-        print(writer, "{}_{},\n", interface->name, member);
+        print(writer, "{case:upper}_{case:upper},\n", interface->name, member);
     }
 
     io_print(writer, str_cast("}"));
@@ -99,7 +99,7 @@ void bid2c(BidInterface const *interface, IoWriter *writer)
 
     print(writer, "typedef ");
     gen_enum(interface, &interface->errors, writer);
-    print(writer, " {}Error;\n", interface->name);
+    print(writer, " {case:pascal}Error;\n", interface->name);
 
     print(writer, "\n");
 
@@ -109,7 +109,7 @@ void bid2c(BidInterface const *interface, IoWriter *writer)
     {
         print(writer, "typedef ");
         gen_type(interface, &alias.type, writer);
-        print(writer, " {}{};\n", interface->name, alias.name);
+        print(writer, " {case:pascal}{case:pascal};\n", interface->name, alias.name);
         print(writer, "\n");
     }
 
@@ -119,13 +119,13 @@ void bid2c(BidInterface const *interface, IoWriter *writer)
     {
         print(writer, "typedef ");
         gen_type(interface, &method.request, writer);
-        print(writer, " {}{}Request;\n", interface->name, method.name);
+        print(writer, " {case:pascal}{case:pascal}Request;\n", interface->name, method.name);
 
         print(writer, "\n");
 
         print(writer, "typedef ");
         gen_type(interface, &method.response, writer);
-        print(writer, " {}{}Response;\n", interface->name, method.name);
+        print(writer, " {case:pascal}{case:pascal}Response;\n", interface->name, method.name);
 
         print(writer, "\n");
     }
@@ -134,27 +134,27 @@ void bid2c(BidInterface const *interface, IoWriter *writer)
     {
         print(writer, "typedef ");
         gen_type(interface, &event.data, writer);
-        print(writer, " {}{}Event;\n", interface->name, event.name);
+        print(writer, " {case:pascal}{case:pascal}Event;\n", interface->name, event.name);
         print(writer, "\n");
     }
 
     print(writer, "typedef enum {{\n");
 
-    print(writer, "{}_INVALID,\n", interface->name);
-    print(writer, "{}_ERROR,\n", interface->name);
+    print(writer, "{case:upper}_INVALID,\n", interface->name);
+    print(writer, "{case:upper}_ERROR,\n", interface->name);
 
     vec_foreach(method, &interface->methods)
     {
-        print(writer, "{}_{}_REQUEST,\n", interface->name, method.name);
-        print(writer, "{}_{}_RESPONSE,\n", interface->name, method.name);
+        print(writer, "{case:upper}_{case:upper}_REQUEST,\n", interface->name, method.name);
+        print(writer, "{case:upper}_{case:upper}_RESPONSE,\n", interface->name, method.name);
     }
 
     vec_foreach(event, &interface->events)
     {
-        print(writer, "{}_{}_EVENT,\n", interface->name, event.name);
+        print(writer, "{case:upper}_{case:upper}_EVENT,\n", interface->name, event.name);
     }
 
-    print(writer, "}} {}MessageType;\n", interface->name);
+    print(writer, "}} {case:pascal}MessageType;\n", interface->name);
 
     print(writer, "\n");
 
@@ -163,20 +163,20 @@ void bid2c(BidInterface const *interface, IoWriter *writer)
     print(writer, "BrMsgHeader header;\n");
 
     print(writer, "union {{\n");
-    print(writer, "{}Error error;\n", interface->name);
+    print(writer, "{case:pascal}Error error;\n", interface->name);
 
     vec_foreach(event, &interface->events)
     {
-        print(writer, "{}{}Event {}_event;\n", interface->name, event.name, event.name);
+        print(writer, "{case:pascal}{case:pascal}Event {case:sake}_event;\n", interface->name, event.name, event.name);
     }
 
     vec_foreach(method, &interface->methods)
     {
-        print(writer, "{}{}Request {}_request;\n", interface->name, method.name, method.name);
-        print(writer, "{}{}Response {}_response;\n", interface->name, method.name, method.name);
+        print(writer, "{case:pascal}{case:pascal}Request {case:sake}_request;\n", interface->name, method.name, method.name);
+        print(writer, "{case:pascal}{case:pascal}Response {case:sake}_response;\n", interface->name, method.name, method.name);
     }
 
     print(writer, "}};\n");
 
-    print(writer, "}} {}Message;\n", interface->name);
+    print(writer, "}} {case:pascal}Message;\n", interface->name);
 }

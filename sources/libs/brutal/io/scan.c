@@ -17,9 +17,14 @@ bool scan_end(Scan *self)
     return self->head + 1 > self->size || self->has_error;
 }
 
-char scan_peek(Scan *self, size_t offset)
+char scan_peek(Scan *self, int offset)
 {
     if (self->has_error)
+    {
+        return '\0';
+    }
+
+    if (offset < 0 && -offset > self->head)
     {
         return '\0';
     }
@@ -64,8 +69,8 @@ void scan_scan_skip_space(Scan *self)
 
 Str scan_skip_until(Scan *self, int (*callback)(int))
 {
-    size_t start = self->head;
-    size_t length = 0;
+    int start = self->head;
+    int length = 0;
 
     while (callback(scan_curr(self)) && !scan_end(self))
     {

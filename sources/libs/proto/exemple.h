@@ -5,59 +5,59 @@
 #include <syscalls/types.h>
 
 typedef enum {
-example_PC_LOAD_LETTER,
-} exampleError;
+EXAMPLE_PC_LOAD_LETTER,
+} ExampleError;
 
 /* --- Types ---------------------------------------------------------------- */
 
-typedef uint64_t exampleTime;
+typedef uint64_t ExampleTime;
 
 typedef struct {
-exampleTime time;
-} examplePingPong;
+ExampleTime time;
+} ExamplePingPong;
 
 /* --- Messages ------------------------------------------------------------- */
 
-typedef examplePingPong examplepingRequest;
+typedef ExamplePingPong ExamplePingRequest;
 
-typedef examplePingPong examplepingResponse;
+typedef ExamplePingPong ExamplePingResponse;
 
 typedef struct {
 int foo;
-} exampletestRequest;
+} ExampleTestRequest;
 
 typedef struct {
 float bar;
-} exampletestResponse;
+} ExampleTestResponse;
 
 typedef struct {
 enum {
-example_FOO,
-example_BAR,
+EXAMPLE_FOO,
+EXAMPLE_BAR,
 } type;
 struct {
 int data;
 } nested;
-} examplenotificationEvent;
+} ExampleNotificationEvent;
 
 typedef enum {
-example_INVALID,
-example_ERROR,
-example_ping_REQUEST,
-example_ping_RESPONSE,
-example_test_REQUEST,
-example_test_RESPONSE,
-example_notification_EVENT,
-} exampleMessageType;
+EXAMPLE_INVALID,
+EXAMPLE_ERROR,
+EXAMPLE_PING_REQUEST,
+EXAMPLE_PING_RESPONSE,
+EXAMPLE_TEST_REQUEST,
+EXAMPLE_TEST_RESPONSE,
+EXAMPLE_NOTIFICATION_EVENT,
+} ExampleMessageType;
 
 typedef struct {
-BrMessageHeader header;
+BrMsgHeader header;
 union {
-exampleError error;
-examplenotificationEvent notification_event;
-examplepingRequest ping_request;
-examplepingResponse ping_response;
-exampletestRequest test_request;
-exampletestResponse test_response;
+ExampleError error;
+ExampleNotificationEvent notification_event;
+ExamplePingRequest ping_request;
+ExamplePingResponse ping_response;
+ExampleTestRequest test_request;
+ExampleTestResponse test_response;
 };
-} exampleMessage;
+} ExampleMessage;
