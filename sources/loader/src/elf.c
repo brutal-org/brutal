@@ -39,7 +39,6 @@ ElfResult load_elf_file(char16 *path)
 
     for (int i = 0; i < ehdr->program_header_table_entry_count; i++)
     {
-
         Elf64ProgramHeader *header = (Elf64ProgramHeader *)__header;
 	
         if (header->type == ELF_PROGRAM_HEADER_LOAD)

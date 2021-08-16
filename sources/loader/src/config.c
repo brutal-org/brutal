@@ -121,15 +121,23 @@ static ConfigEntry parse_config(File *file)
 
     scanner.head = start_pos;
 
-    Str key_name = str_cast(remove_useless_chars(removechar(get_until_c(&scanner, is_equal_sign, alloc_global()).buffer, ' ')));
+    while (scan_next(&scanner) != '}')
+    {
 
-    Str key_data = str_cast(remove_useless_chars(removechar(get_until_c(&scanner, is_semicolon, alloc_global()).buffer, '"')));
+        Str key_name = str_cast(remove_useless_chars(removechar(get_until_c(&scanner, is_equal_sign, alloc_global()).buffer, ' ')));
 
+        Str key_data = str_cast(remove_useless_chars(removechar(get_until_c(&scanner, is_semicolon, alloc_global()).buffer, '"')));
 
-    ret.keys[ret.num_of_keys].data = key_data;
-    ret.keys[ret.num_of_keys].name = key_name;
+        ret.keys[ret.num_of_keys].data = key_data;
+        ret.keys[ret.num_of_keys].name = key_name;
 
-    ret.num_of_keys++;
+        ret.num_of_keys++;
+
+        if (scan_peek(&scanner, 1) == '}')
+        {
+            return ret;
+        }
+    }
 
     return ret;
 }
@@ -137,28 +145,27 @@ static ConfigEntry parse_config(File *file)
 char *get_config_key(char *key, char *data, File *file)
 {
     ConfigEntry entry = parse_config(file);
-    
+
     ConfigKey curr_key = entry.keys[0];
 
-    int i = 0;
+    bool is_found = false;
 
-    while (str_eq(curr_key.name, str_cast(key)) != true)
+    for (int i = 0; i < entry.num_of_keys; i++)
     {
         curr_key = entry.keys[i];
 
         if (str_eq(curr_key.name, str_cast(key)) == true)
         {
+            is_found = true;
             break;
-        }
-
-        i++;
-
-        if (i > entry.num_of_keys)
-        {
-            panic("Couldn't find key {}", key);
         }
     }
 
+    if (!is_found)
+    {
+        panic("Couldn't find key {}", key);
+    }
+    
     mem_cpy(data, curr_key.data.buffer, curr_key.data.len);
 
     return data;
