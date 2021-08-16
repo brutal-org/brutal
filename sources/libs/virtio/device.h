@@ -66,7 +66,7 @@ typedef struct
     VirtioDeviceType device_type;
     NegociateFunc negociate_func;
     SetupFunc setup_func;
-} VirtioDeviceClass;
+} VirtioDeviceInit;
 
 // Returns true if `status` is set, false otherwise
 bool virtio_in_status(VirtioDevice *device, uint8_t status);
@@ -75,7 +75,7 @@ bool virtio_in_status(VirtioDevice *device, uint8_t status);
 VirtioDeviceResult virtio_set_status(VirtioDevice *device, uint8_t status);
 
 // Initializes the virtio device at `base_address`
-VirtioDeviceResult virtio_device_init(VirtioDevice *device, VirtioDeviceClass device_class);
+VirtioDeviceResult virtio_device_init(VirtioDevice *device, VirtioDeviceInit device_class);
 
 // Negociates features with the virtio device for the caller.
 // Returns VIRTIO_DEVICE_FEATURES_NEGOCIATE_FAILED the driver cannot negociate any feature with the virtio device

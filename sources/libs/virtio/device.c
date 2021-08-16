@@ -62,7 +62,7 @@ VirtioDeviceResult virtio_device_reset(VirtioDevice *device)
     return result;
 }
 
-VirtioDeviceResult virtio_device_init(VirtioDevice *device, VirtioDeviceClass device_class)
+VirtioDeviceResult virtio_device_init(VirtioDevice *device, VirtioDeviceInit device_init)
 {
     VirtioDeviceResult result;
 
@@ -76,7 +76,7 @@ VirtioDeviceResult virtio_device_init(VirtioDevice *device, VirtioDeviceClass de
     result = virtio_set_status(device, VIRTIO_STATUS_DRIVER_AVAILABLE);
 
     // Step 4: Negociate the features
-    result = virtio_device_negociate_features(device, device_class.negociate_func);
+    result = virtio_device_negociate_features(device, device_init.negociate_func);
 
     // Step 5: Set the FEATURES_OK status
     result = virtio_set_status(device, VIRTIO_STATUS_FEATURES_OK);
@@ -87,7 +87,7 @@ VirtioDeviceResult virtio_device_init(VirtioDevice *device, VirtioDeviceClass de
         return VIRTIO_DEVICE_FEATURES_NEGOCIATE_FAILED;
 
     // Step 7: Device-specific setup
-    result = device_class.setup_func(device);
+    result = device_init.setup_func(device);
 
     // Step 8: Set the DRIVER_OK status
     virtio_set_status(device, VIRTIO_STATUS_DRIVER_OK);
