@@ -154,7 +154,7 @@ void clear_screen()
 IoWriteResult efi_write(MAYBE_UNUSED IoWriter *writer, char const *text, size_t size)
 {
 
-    u16 *ptr = to_utf16((char *)text);
+    u16 *ptr = (u16 *)to_utf16((char *)text);
 
     ptr[u16strlen(ptr)] = '\0';
 

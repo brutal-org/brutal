@@ -11,6 +11,7 @@ BRUTAL_BOOT_LIBS_SRCS = \
 	sources/libs/brutal/io/fmt.c \
 	sources/libs/brutal/io/write.c \
 	sources/libs/brutal/io/print.c \
+	sources/libs/brutal/io/buffer.c \
 	sources/libs/brutal/io/scan.c \
 	$(wildcard sources/libs/brutal/log/*.c) \
 	$(wildcard sources/libs/brutal/alloc/*.c)	\
@@ -47,6 +48,8 @@ $(BUILD_DIRECTORY)/libs/%.c.o: sources/libs/%.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 run-loader: $(EFI_FILE) $(BUILD_DIRECTORY)/tools/OVMF.fd $(BUILD_DIRECTORY)/image/EFI/BOOT/BOOTX64.EFI
+	$(MAKE) -C sources/loader/test clean
+	$(MAKE) -C sources/loader/test
 	qemu-system-x86_64 -serial stdio -m 256 -bios $(BUILD_DIRECTORY)/tools/OVMF.fd -cpu host -enable-kvm -drive file=fat:rw:$(BUILD_DIRECTORY)/image,media=disk,format=raw
 
 $(BUILD_DIRECTORY)/image/EFI/BOOT/BOOTX64.EFI:

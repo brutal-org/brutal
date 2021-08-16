@@ -36,6 +36,7 @@ void clear_screen();
 void efi_print_impl(Str fmt, struct print_args args);
 
 bool compare_guids(EFIGUID *guid1, EFIGUID *guid2);
+
 EFIStatus get_system_config_table(EFIGUID *table_guid, void **table);
 
 #define efi_print(fmt, ...) \
