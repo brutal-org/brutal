@@ -13,7 +13,6 @@
 #include "elf.h"
 #include "loader/src/protocol.h"
 
-
 EFIBootServices *BS;
 
 void __chkstk() { return; }
@@ -39,7 +38,7 @@ EFIStatus efi_main(EFIHandle image_handle, EFISystemTable *system_table)
     init_lib(system_table, image_handle);
 
     clear_screen();
-    
+
     system_table->boot_services->set_watchdog_timer(0, 0, 0, NULL);
     system_table->console_in->reset(system_table->console_in, false);
 
@@ -60,14 +59,14 @@ EFIStatus efi_main(EFIHandle image_handle, EFISystemTable *system_table)
 
     get_file_info(&f);
 
-    char data_buf[20] = {0};
+    char data_buf[40] = {0};
 
-    get_config_key("ELF", data_buf, &f);
+    get_config_key("kernel", data_buf, &f);
 
     u16 *utf16_ptr = to_utf16(data_buf);
 
     efi_print("Read config file ({} bytes)\r\n", f.info.file_size);
-
+    
     close_file(&f);
 
     File elf_file = open_file(utf16_ptr);
