@@ -62,7 +62,7 @@ VirtioDeviceResult virtio_device_reset(VirtioDevice *device)
     return result;
 }
 
-VirtioDeviceResult virtio_device_init(VirtioDevice *device, VirtioDeviceInit device_init)
+VirtioDeviceResult virtio_device_init(VirtioDevice *device, VirtioDeviceInit *device_init)
 {
     VirtioDeviceResult result;
 
@@ -76,7 +76,7 @@ VirtioDeviceResult virtio_device_init(VirtioDevice *device, VirtioDeviceInit dev
     result = virtio_set_status(device, VIRTIO_STATUS_DRIVER_AVAILABLE);
 
     // Step 4: Negociate the features
-    result = virtio_device_negociate_features(device, device_init.negociate_func);
+    result = virtio_device_negociate_features(device, device_init);
 
     // Step 5: Set the FEATURES_OK status
     result = virtio_set_status(device, VIRTIO_STATUS_FEATURES_OK);
@@ -87,7 +87,7 @@ VirtioDeviceResult virtio_device_init(VirtioDevice *device, VirtioDeviceInit dev
         return VIRTIO_DEVICE_FEATURES_NEGOCIATE_FAILED;
 
     // Step 7: Device-specific setup
-    result = device_init.setup_func(device);
+    result = device_init->setup_func(device);
 
     // Step 8: Set the DRIVER_OK status
     virtio_set_status(device, VIRTIO_STATUS_DRIVER_OK);
@@ -95,13 +95,13 @@ VirtioDeviceResult virtio_device_init(VirtioDevice *device, VirtioDeviceInit dev
     return result;
 }
 
-// TODO: Maybe bad implementation
-VirtioDeviceResult virtio_device_negociate_features(VirtioDevice *device, NegociateFunc negociate_func)
+VirtioDeviceResult virtio_device_negociate_features(VirtioDevice *device, VirtioDeviceInit *init)
 {
-    uint64_t gotten_features = negociate_func(device->device_features);
+    uint64_t device_features = device->device_features;
+    uint64_t needed_features = init->needed_features;
 
-    // In this case the driver didn't successfully negociate with the device
-    if (gotten_features == 0)
+    // In this case the device doesn't have all the features needed by the driver
+    if ((device_features & needed_features) == needed_features)
     {
         virtio_set_status(device, VIRTIO_STATUS_FAILURE);
         return VIRTIO_DEVICE_FEATURES_NEGOCIATE_FAILED;

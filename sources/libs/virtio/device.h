@@ -54,9 +54,6 @@ typedef enum
     VIRTIO_MEMORY,
 } VirtioDeviceType;
 
-// The negociate function pointer. This must be passed as a parameter by the driver
-typedef uint64_t (*NegociateFunc)(uint64_t device_features);
-
 // The setup function pointer. This must be passed as a parameter by the device-specific handler
 typedef VirtioDeviceResult (*SetupFunc)(VirtioDevice *device);
 
@@ -64,9 +61,11 @@ typedef VirtioDeviceResult (*SetupFunc)(VirtioDevice *device);
 typedef struct
 {
     VirtioDeviceType device_type;
-    NegociateFunc negociate_func;
+    uint64_t needed_features;
     SetupFunc setup_func;
 } VirtioDeviceInit;
+
+typedef uint64_t VirtioDriverFeatures;
 
 // Returns true if `status` is set, false otherwise
 bool virtio_in_status(VirtioDevice *device, uint8_t status);
@@ -75,8 +74,8 @@ bool virtio_in_status(VirtioDevice *device, uint8_t status);
 VirtioDeviceResult virtio_set_status(VirtioDevice *device, uint8_t status);
 
 // Initializes the virtio device at `base_address`
-VirtioDeviceResult virtio_device_init(VirtioDevice *device, VirtioDeviceInit device_class);
+VirtioDeviceResult virtio_device_init(VirtioDevice *device, VirtioDeviceInit *device_class);
 
 // Negociates features with the virtio device for the caller.
 // Returns VIRTIO_DEVICE_FEATURES_NEGOCIATE_FAILED the driver cannot negociate any feature with the virtio device
-VirtioDeviceResult virtio_device_negociate_features(VirtioDevice *device, NegociateFunc negociate_func);
+VirtioDeviceResult virtio_device_negociate_features(VirtioDevice *device, VirtioDeviceInit *init);
