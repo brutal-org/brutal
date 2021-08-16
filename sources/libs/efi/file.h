@@ -91,7 +91,7 @@ typedef struct _EFI_FILE_IO
     u64 revision;
     EFI_FILE_OPEN open;
     EFI_FILE_CLOSE close;
-    EFI_FILE_DELETE delete;
+    EFI_FILE_DELETE delete_file;
     EFI_FILE_READ read;
     EFI_FILE_WRITE write;
     EFI_FILE_GET_POSITION get_position;
