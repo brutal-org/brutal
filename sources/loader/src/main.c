@@ -53,7 +53,7 @@ EFIStatus efi_main(EFIHandle image_handle, EFISystemTable *system_table)
     set_attribute(EFI_WHITE);
 
     /* Opening config file */
-    uint16_t path[] = u"efi\\config.cfg";
+    u16 path[] = u"efi\\config.cfg";
 
     File f = open_file(path);
 
@@ -66,20 +66,19 @@ EFIStatus efi_main(EFIHandle image_handle, EFISystemTable *system_table)
     u16 *utf16_ptr = to_utf16(data_buf);
 
     efi_print("Read config file ({} bytes)\r\n", f.info.file_size);
-    
+
     close_file(&f);
 
     File elf_file = open_file(utf16_ptr);
-
+    
     get_file_info(&elf_file);
-
+    
     auto func_result = load_elf_file(utf16_ptr);
 
     auto result = UNWRAP_OR_MESSAGE(func_result, elf_get_error_message(func_result));
 
     for (size_t i = 0; i < sizeof(logo) / sizeof(*logo); i++)
     {
-
         efi_print("{}", logo[i]);
     }
 
