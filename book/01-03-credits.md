@@ -12,7 +12,7 @@ BSD 2-Clause "Simplified" License
 Copyright 2019, 2020, 2021 mintsuki and contributors.
 ```
 
-## **rix/vec**
+## **rxi/vec**
 
 A type-safe dynamic array implementation for C.
 
