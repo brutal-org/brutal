@@ -1,7 +1,6 @@
 LIBS_BIN = $(BUILDDIR_CROSS)/libbrutal.a
 
 LIBS_SRC = \
-	$(wildcard sources/libs/efi/*.c)               \
 	$(wildcard sources/libs/ansi/*.c)               \
 	$(wildcard sources/libs/brutal/*.c)             \
 	$(wildcard sources/libs/brutal/*/*.c)           \

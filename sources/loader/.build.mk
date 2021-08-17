@@ -7,17 +7,17 @@ LDFLAGS = -subsystem:efi_application -nodefaultlib -dll
 
 DIRECTORY_GUARD=@mkdir -p $(@D)
 
-BRUTAL_BOOT_LIBS_SRCS = \
-	sources/libs/brutal/io/fmt.c \
-	sources/libs/brutal/io/write.c \
-	sources/libs/brutal/io/print.c \
-	sources/libs/brutal/io/buffer.c \
-	sources/libs/brutal/io/scan.c \
-	$(wildcard sources/libs/brutal/log/*.c) \
-	$(wildcard sources/libs/brutal/alloc/*.c)	\
+BRUTAL_BOOT_LIBS_SRCS =                             \
+	sources/libs/brutal/io/fmt.c                    \
+	sources/libs/brutal/io/write.c                  \
+	sources/libs/brutal/io/print.c                  \
+	sources/libs/brutal/io/buffer.c                 \
+	sources/libs/brutal/io/scan.c                   \
+	$(wildcard sources/libs/brutal/log/*.c)         \
+	$(wildcard sources/libs/brutal/alloc/*.c)	    \
 	$(wildcard sources/libs/elf/elf.c)              \
 	$(wildcard sources/libs/efi/*.c)                \
-	$(wildcard sources/libs/handover/*.c)		\
+	$(wildcard sources/libs/handover/*.c)		    \
 	$(wildcard sources/libs/ansi/ctype.c)           \
 	$(wildcard sources/libs/ansi/string.c)          \
 	$(wildcard sources/libs/brutal/mem/*.c)         \
@@ -37,7 +37,6 @@ $(EFI_FILE): $(OBJS)
 	$(LD) $(LDFLAGS) -entry:efi_main $^ -out:$@
 	$(MAKE) -C sources/loader/test
 	$(MAKE) -C sources/loader/test clean
-
 
 $(BUILD_DIRECTORY)/%.c.o: sources/%.c
 	$(DIRECTORY_GUARD)

@@ -20,7 +20,8 @@ MAYBE_UNUSED static HandoverMmapType efi_mmap_type_to_handover[] = {
     [EFI_BOOT_SERVICES_CODE] = HANDOVER_MMAP_RECLAIMABLE,
     [EFI_BOOT_SERVICES_DATA] = HANDOVER_MMAP_RECLAIMABLE,
     [EFI_CONVENTIONAL_MEMORY] = HANDOVER_MMAP_FREE,
-    [EFI_ACPI_MEMORY_NVS] = HANDOVER_MMAP_RESERVED};
+    [EFI_ACPI_MEMORY_NVS] = HANDOVER_MMAP_RESERVED,
+};
 
 HandoverModules get_modules();
 
@@ -104,11 +105,10 @@ HandoverMmap get_mmap(EFIBootServices *bs, MAYBE_UNUSED EFIHandle *image_handle)
         last_end = phys_end;
     }
 
-
     h_mmap->size = entries;
-    
+
     bs->exit_boot_services(image_handle, map_key);
-    
+
     return *h_mmap;
 }
 
