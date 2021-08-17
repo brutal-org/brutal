@@ -41,7 +41,7 @@
 - [ ] Event loop
 - [ ] IRQ routing to userspace
 - [ ] ACPI Server
-  - [ ] MADT
+  - [ ] MCFG
 - [ ] PCIe Server
   - [ ] Device enumeration
 - [ ] Virtio
@@ -58,7 +58,6 @@
 
 - [ ] VFS
 - [ ] ext2
-- [ ] Framebuffer driver (virtio-gpu ?)
 - [ ] Compositor
 - [ ] Shell
 
