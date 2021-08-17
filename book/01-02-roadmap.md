@@ -1,6 +1,6 @@
 # Roadmap
 
-## Milestone 1 - Baby Steps
+## Milestone 1 - To userspace and beyond
 
 - [x] Baby steps (x86_64)
 - [x] GDT/IDT
@@ -17,7 +17,7 @@
 - [x] Syscalls
 - [x] SIMD (avx, sse, fpu, xsave)
 
-## Milestone 2 - Userspace
+## Milestone 2 - Userspace, IPC, and Syscalls
 
 - [x] Syscalls
   - [x] log
@@ -35,17 +35,29 @@
 - [x] IPC
 - [x] IDL
 
-## Milestone 3 - Filesystem
+## Milestone 3 - ACPI, PCIe, VirtIO
 
+- [ ] Fibers
+- [ ] Event loop
 - [ ] IRQ routing to userspace
-- [ ] Disk driver (virtio-block? AHCI? NVME? IDE (lol)?)
+- [ ] ACPI Server
+  - [ ] MADT
+- [ ] PCIe Server
+  - [ ] Device enumeration
+- [ ] Virtio
+  - [ ] Device Configuration
+  - [ ] Virt Queues
+  - [ ] network device
+  - [ ] gpu device
+  - [ ] input device
+  - [ ] entropy device
+  - [ ] console device
+  - [ ] block device
+
+## Milestone 4 - Filesystem and User Interfaces
+
 - [ ] VFS
 - [ ] ext2
-
-## Milestone 4 - User Interfaces
-
-- [ ] Keyboard driver
-- [ ] Mouse driver
 - [ ] Framebuffer driver (virtio-gpu ?)
 - [ ] Compositor
 - [ ] Shell
@@ -56,7 +68,6 @@
 
 ## Milestone 6 - Networking
 
-- [ ] Implement virtio-net or E1000 driver
 - [ ] Implement TCP/IP
 - [ ] Send a message on IRC
 
@@ -64,3 +75,4 @@
 
 - [ ] Multiboot support
 - [ ] FAT32
+- [ ] In house bootloader
