@@ -39,8 +39,6 @@ TaskCreateResult task_create(Str name, Space *space, BrCap caps, BrTaskFlags fla
     task->domain = domain_create();
     task->channel = channel_create();
 
-    task->cpu = CPU_NONE;
-
     // Create the kernel stack
     task->stack = UNWRAP(heap_alloc(KERNEL_STACK_SIZE));
     task->sp = range_end(task->stack);

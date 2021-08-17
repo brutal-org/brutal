@@ -67,27 +67,26 @@ void sched_stop(Task *task, uintptr_t result)
     }
 }
 
-void sched_finalize(void)
-{
-    lock_acquire(&lock);
-
-    for (int i = 0; i < tasks.length; i++)
-    {
-        auto task = tasks.data[i];
-
-        if (task->is_stopped && task->cpu == CPU_NONE && !task->in_syscall)
-        {
-            log("Finalizing task({}) {}", task->handle, str_cast(&task->name));
-            sched_dequeue(task);
-            i--;
-        }
-    }
-
-    lock_release(&lock);
-}
-
 BrResult sched_block(Blocker blocker)
 {
+    bool has_reached_function =
+        blocker.function &&
+        blocker.function(blocker.context);
+
+    if (has_reached_function)
+    {
+        return BR_SUCCESS;
+    }
+
+    bool has_reached_deadline =
+        blocker.deadline != (Tick)-1 &&
+        blocker.deadline < tick;
+
+    if (has_reached_deadline)
+    {
+        return BR_TIMEOUT;
+    }
+
     lock_acquire(&lock);
 
     task_self()->blocker = blocker;
@@ -110,11 +109,78 @@ Tick sched_deadline(BrTimeout timeout)
     return tick + timeout;
 }
 
+/* --- Attach/Detach -------------------------------------------------------- */
+
+Cpu *sched_cpu(Task *task)
+{
+    for (int i = 0; i < cpu_count(); i++)
+    {
+        if (cpu(i)->next == task)
+        {
+            return cpu(i);
+        }
+    }
+
+    return nullptr;
+}
+
+void sched_detach(Task *task)
+{
+    if (!task)
+    {
+        return;
+    }
+
+    task->time_end = tick;
+
+    for (int i = 0; i < cpu_count(); i++)
+    {
+        if (cpu(i)->next == task)
+        {
+            cpu(i)->next = nullptr;
+        }
+    }
+}
+
+void sched_attach(Task *task, Cpu *cpu)
+{
+    if (!task)
+    {
+        return;
+    }
+
+    task->time_start = tick;
+    cpu->next = task;
+}
+
+bool sched_runnable(Task *task)
+{
+    return (task->is_started && !task->is_blocked) ||
+           (task->is_started && task->is_stopped && !task->in_syscall);
+}
+
+bool sched_running(Task *task)
+{
+    return sched_cpu(task) != nullptr;
+}
+
+void sched_next(Task *task, Cpu *cpu)
+{
+    sched_detach(cpu->next);
+    sched_attach(task, cpu);
+}
+
+void sched_current(Task *task, Cpu *cpu)
+{
+    sched_next(task, cpu);
+    cpu->current = task;
+}
+
 /* --- Peek ----------------------------------------------------------------- */
 
 Task *sched_pick(Task *best, Task *other)
 {
-    if (!task_runnable(other) || task_running(other) || other->time_end == tick)
+    if (!task_runnable(other) || sched_running(other) || other->time_end == tick)
     {
         return best;
     }
@@ -142,39 +208,18 @@ Task *sched_peek(void)
 
 /* --- Dispatch ------------------------------------------------------------- */
 
-void sched_detach(Task *task)
+bool sched_dispatch_to_current(Task *task)
 {
-    task->time_end = tick;
-    task->cpu = CPU_NONE;
-}
-
-void sched_attach(Task *task, Cpu *cpu)
-{
-    task->cpu = cpu->id;
-    task->time_start = tick;
-}
-
-void sched_next(Task *task, Cpu *cpu)
-{
-    if (cpu->next)
+    for (int i = 0; i < cpu_count(); i++)
     {
-        sched_detach(cpu->next);
+        if (cpu(i)->current == task)
+        {
+            sched_next(task, cpu(i));
+            return true;
+        }
     }
 
-    cpu->next = nullptr;
-
-    if (task)
-    {
-        sched_attach(task, cpu);
-    }
-
-    cpu->next = task;
-}
-
-void sched_current(Task *task, Cpu *cpu)
-{
-    sched_next(task, cpu);
-    cpu->current = task;
+    return false;
 }
 
 bool sched_dispatch_to_idle(Task *task)
@@ -196,47 +241,24 @@ static size_t active_time(Task *task)
     return tick - task->time_start;
 }
 
-static Cpu *sched_active_cpu(void)
-{
-    Task *result = nullptr;
-
-    vec_foreach(task, &tasks)
-    {
-        if (!task_running(task))
-        {
-            continue;
-        }
-
-        if (result == nullptr)
-        {
-            result = task;
-        }
-        else if (active_time(result) < active_time(task))
-        {
-            result = task;
-        }
-    }
-
-    if (!result || active_time(result) == 0)
-    {
-        return nullptr;
-    }
-    else
-    {
-        return cpu(result->cpu);
-    }
-}
-
 static bool sched_dispatch_to_active(Task *task)
 {
-    auto cpu = sched_active_cpu();
+    Cpu *best = cpu(0);
 
-    if (!cpu)
+    for (int i = 0; i < cpu_count(); i++)
+    {
+        if (active_time(best->next) < active_time(cpu(i)->next))
+        {
+            best = cpu(i);
+        }
+    }
+
+    if (active_time(best->next) == 0)
     {
         return false;
     }
 
-    sched_next(task, cpu);
+    sched_next(task, best);
 
     return true;
 }
@@ -248,7 +270,8 @@ static bool sched_dispatch(Task *task)
         return false;
     }
 
-    return sched_dispatch_to_idle(task) ||
+    return sched_dispatch_to_current(task) ||
+           sched_dispatch_to_idle(task) ||
            sched_dispatch_to_active(task);
 }
 
@@ -256,14 +279,6 @@ static bool sched_dispatch(Task *task)
 
 static void sched_updated_blocked(void)
 {
-    for (int i = 0; i < cpu_count(); i++)
-    {
-        if (!task_runnable(cpu(i)->current))
-        {
-            sched_next(cpu(i)->idle, cpu(i));
-        }
-    }
-
     vec_foreach(task, &tasks)
     {
         if (!task->is_blocked)
@@ -297,6 +312,14 @@ static void sched_updated_blocked(void)
             task->is_blocked = false;
         }
     }
+
+    for (int i = 0; i < cpu_count(); i++)
+    {
+        if (!task_runnable(cpu(i)->current))
+        {
+            sched_next(cpu(i)->idle, cpu(i));
+        }
+    }
 }
 
 static void sched_switch_other(void)
@@ -316,7 +339,8 @@ void sched_dump(void)
     log_unlock("Tasks:");
     vec_foreach(task, &tasks)
     {
-        log_unlock("{}({}) : CPU{}", str_cast(&task->name), task->handle, task->cpu);
+        Cpu *cpu = sched_cpu(task);
+        log_unlock("{}({}) : CPU{}", str_cast(&task->name), task->handle, cpu ? cpu->id : -1);
     }
 
     log_unlock("CPUs:");
@@ -365,7 +389,10 @@ void sched_ensure_no_cpu_jump(void)
             if (cpu(i)->current == cpu(j)->next)
             {
                 sched_dump();
-                panic("sched_ensure_no_cpu_jump failled {}({}) jumped from CPU{} to CPU{})!", str_cast(&cpu(i)->current->name), cpu(i)->current->handle, i, j);
+                panic("sched_ensure_no_cpu_jump() failled {}:{#p}({}) jumped from CPU{} to CPU{} taking the place of {}:{#p}({})!",
+                      str_cast(&cpu(i)->current->name), (uintptr_t)cpu(i)->next, cpu(i)->current->handle,
+                      i, j,
+                      str_cast(&cpu(j)->next->name), (uintptr_t)cpu(j)->next, cpu(j)->next->handle);
             }
         }
     }
@@ -406,5 +433,30 @@ void sched_schedule(void)
 
 void sched_switch(void)
 {
+    lock_acquire(&lock);
+
     cpu_self()->current = cpu_self()->next;
+
+    lock_release(&lock);
+}
+
+/* --- Finalizer ------------------------------------------------------------ */
+
+void sched_finalize(void)
+{
+    lock_acquire(&lock);
+
+    for (int i = 0; i < tasks.length; i++)
+    {
+        auto task = tasks.data[i];
+
+        if (task->is_stopped && !sched_runnable(task) && !sched_running(task))
+        {
+            log("Finalizing task({}) {}", task->handle, str_cast(&task->name));
+            sched_dequeue(task);
+            i--;
+        }
+    }
+
+    lock_release(&lock);
 }

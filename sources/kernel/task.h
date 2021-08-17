@@ -28,8 +28,6 @@ typedef struct
 
     Blocker blocker;
 
-    CpuId cpu;
-
     bool in_syscall;
     bool is_stopped;
     bool is_blocked;
@@ -68,9 +66,4 @@ static inline bool task_runnable(Task *self)
 {
     bool blocked_or_stopped = self->is_blocked || (self->is_stopped && !self->in_syscall);
     return self->is_started && (!blocked_or_stopped);
-}
-
-static inline bool task_running(Task *self)
-{
-    return self->cpu != CPU_NONE;
 }
