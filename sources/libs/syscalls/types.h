@@ -183,24 +183,24 @@ typedef uint8_t BrTaskFlags;
 #define BR_TIMEOUT_INFINITY ((BrTimeout)-1)
 typedef uint64_t BrTimeout;
 
-#define BR_MESSAGE_HEADER \
-    BrTask from;          \
-    BrTask to;            \
-    BrHandle hnd;         \
-    size_t size
+#define BR_MSG_ARG_COUNT (5)
 
-typedef struct PACKED
-{
-    BR_MESSAGE_HEADER;
-} BrMsgHeader;
+#define BR_MSG_NONE (0)
+#define BR_MSG_HND(I) (1 << (I))
 
-typedef struct PACKED
+typedef uint32_t BrMsgFlags;
+
+typedef struct
 {
-    BR_MESSAGE_HEADER;
-    uint8_t data[512 - sizeof(BrMsgHeader)];
+    BrTask from;
+    BrMsgFlags flags;
+    uint32_t udata;
+    uint32_t prot;
+    uint32_t type;
+    BrArg arg[BR_MSG_ARG_COUNT];
 } BrMsg;
 
-_Static_assert(sizeof(BrMsg) == 512, "");
+_Static_assert(sizeof(BrMsg) == 64, "");
 
 #define BR_IPC_NONE ((BrIpcFlags)(0))
 #define BR_IPC_BLOCK ((BrIpcFlags)(1 << 0))
@@ -211,13 +211,11 @@ typedef uint32_t BrIpcFlags;
 
 typedef uint64_t BrIrq;
 
-typedef enum
-{
-    BR_IRQ_NONE = 0,
+#define BR_IRQ_NONE (0)
+#define BR_IRQ_BIND (1 << 0)
+#define BR_IRQ_UNBIND (1 << 1)
 
-    BR_IRQ_BIND = 1 << 0,
-    BR_IRQ_UNBIND = 1 << 1,
-} BrIrqFlags;
+typedef uint64_t BrIrqFlags;
 
 #define BR_CAP_NONE (0)
 #define BR_CAP_IRQ (1 << 0)

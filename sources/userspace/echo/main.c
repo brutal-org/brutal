@@ -3,16 +3,19 @@
 
 int main()
 {
+    WAIT_FOR(false);
+
     while (true)
     {
         BrIpcArgs args = {};
 
         args.flags = BR_IPC_RECV | BR_IPC_BLOCK;
         args.timeout = BR_TIMEOUT_INFINITY;
+
         br_ipc(&args);
 
         args.flags = BR_IPC_SEND;
-        swap(args.msg.from, args.msg.to);
+        args.to = args.msg.from;
 
         br_ipc(&args);
     }

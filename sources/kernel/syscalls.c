@@ -259,51 +259,41 @@ BrResult sys_exit(BrExitArgs *args)
     return BR_SUCCESS;
 }
 
-static BrResult sys_ipc_send(BrMsg *msg, BrTimeout timeout, BrIpcFlags flags)
+static BrResult sys_ipc_send(BrTask to, BrMsg *msg, BrTimeout timeout, BrIpcFlags flags)
 {
     Task *task CLEANUP(object_cleanup) = nullptr;
-    Object *obj CLEANUP(object_cleanup) = nullptr;
+    Envelope envelope CLEANUP(envelope_cleanup) = {};
 
     msg->from = task_self()->handle;
-    task = (Task *)global_lookup(msg->to, BR_OBJECT_TASK);
+    task = (Task *)global_lookup(to, BR_OBJECT_TASK);
 
     if (!task)
     {
         return BR_BAD_HANDLE;
     }
 
-    if (msg->hnd != BR_HANDLE_NIL)
-    {
-        obj = domain_lookup(task_self()->domain, msg->hnd, BR_OBJECT_ANY);
-
-        if (obj == nullptr)
-        {
-            return BR_BAD_HANDLE;
-        }
-    }
-
-    return channel_send(task->channel, msg, obj, timeout, flags);
-}
-
-static BrResult sys_ipc_recv(BrMsg *msg, BrTimeout timeout, BrIpcFlags flags)
-{
-    Object *obj CLEANUP(object_cleanup) = nullptr;
-    BrResult result = channel_recv(task_self()->channel, msg, &obj, timeout, flags);
+    BrResult result = envelope_send(&envelope, msg, task_self()->domain);
 
     if (result != BR_SUCCESS)
     {
         return result;
     }
 
-    if (obj != nullptr)
+    return channel_send(task->channel, &envelope, timeout, flags);
+}
+
+static BrResult sys_ipc_recv(BrMsg *msg, BrTimeout timeout, BrIpcFlags flags)
+{
+    Envelope envelope CLEANUP(envelope_cleanup) = {};
+
+    BrResult result = channel_recv(task_self()->channel, &envelope, timeout, flags);
+
+    if (result != BR_SUCCESS)
     {
-        domain_add(task_self()->domain, obj);
-        msg->hnd = obj->handle;
+        return result;
     }
-    else
-    {
-        msg->hnd = BR_HANDLE_NIL;
-    }
+
+    envelope_recv(&envelope, msg, task_self()->domain);
 
     return result;
 }
@@ -314,7 +304,7 @@ BrResult sys_ipc(BrIpcArgs *args)
 
     if (args->flags & BR_IPC_SEND)
     {
-        result = sys_ipc_send(&args->msg, args->timeout, args->flags);
+        result = sys_ipc_send(args->to, &args->msg, args->timeout, args->flags);
     }
 
     if (result != BR_SUCCESS)

@@ -134,7 +134,24 @@ int br_entry(Handover const *handover)
     }
 
     srv_run(handover, str_cast("posix"));
-    srv_run(handover, str_cast("echo"));
+    BrTask echo_srv = srv_run(handover, str_cast("echo"));
+
+    while (true)
+    {
+        br_ipc(&(BrIpcArgs){
+            .to = echo_srv,
+            .flags = BR_IPC_SEND | BR_IPC_RECV | BR_IPC_BLOCK,
+            .msg = {
+                .arg = {
+                    0x1,
+                    0x2,
+                    0x3,
+                    0x4,
+                    0x5,
+                },
+            },
+        });
+    }
 
     return 0;
 }
