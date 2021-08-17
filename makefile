@@ -68,7 +68,6 @@ run: $(ISO)
 bochs: $(ISO)
 	bochs
 
-loader: $(EFI_FILE)
 clean:
 	rm -rf build/
 
