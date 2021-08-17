@@ -33,7 +33,7 @@ static void sched_dequeue(Task *task)
 
 void sched_start(Task *task, uintptr_t ip, uintptr_t sp, BrTaskArgs args)
 {
-    lock_acquire(&lock);
+    LOCK_RETAINER(&lock);
 
     assert_truth(!task->is_started);
 
@@ -42,8 +42,6 @@ void sched_start(Task *task, uintptr_t ip, uintptr_t sp, BrTaskArgs args)
     context_start(task->context, ip, sp, range_end(task->stack), args, task->flags);
     task->is_started = true;
     sched_enqueue(task);
-
-    lock_release(&lock);
 }
 
 void sched_stop(Task *task, uintptr_t result)
@@ -433,18 +431,16 @@ void sched_schedule(void)
 
 void sched_switch(void)
 {
-    lock_acquire(&lock);
+    LOCK_RETAINER(&lock);
 
     cpu_self()->current = cpu_self()->next;
-
-    lock_release(&lock);
 }
 
 /* --- Finalizer ------------------------------------------------------------ */
 
 void sched_finalize(void)
 {
-    lock_acquire(&lock);
+    LOCK_RETAINER(&lock);
 
     for (int i = 0; i < tasks.length; i++)
     {
@@ -457,6 +453,4 @@ void sched_finalize(void)
             i--;
         }
     }
-
-    lock_release(&lock);
 }

@@ -9,7 +9,7 @@ BrGlobalInfo *info = nullptr;
 
 static void global_ensure(void)
 {
-    lock_acquire(&lock);
+    LOCK_RETAINER(&lock);
 
     if (info == nullptr)
     {
@@ -18,8 +18,6 @@ static void global_ensure(void)
 
         *info = (BrGlobalInfo){};
     }
-
-    lock_release(&lock);
 }
 
 BrGlobalInfo *global(void)
