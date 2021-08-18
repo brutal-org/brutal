@@ -5,7 +5,7 @@
 uint16_t *str_to_cstr_utf16(Str str, Alloc *alloc)
 {
     size_t size = (str.len + 1) * 2;
-    uint16_t *utf16 = alloc_malloc(alloc, size);
+    uint16_t *utf16 = (uint16_t *)alloc_malloc(alloc, size);
 
     for (size_t i = 0; i < str.len; i++)
     {
