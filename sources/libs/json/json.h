@@ -1,79 +1,48 @@
 #pragma once
+#include <brutal/alloc/heap.h>
 #include <brutal/base.h>
 #include <brutal/ds.h>
 #include <brutal/io.h>
 
 enum json_type
 {
-    JSON_VALUE,
     JSON_ARRAY,
-    JSON_CLASS,
-};
-
-enum json_error
-{
-    JSON_NOT_FOUNDED,
-    JSON_NOT_VALID_TYPE,
-    JSON_ARRAY_OVERFLOW,
-};
-
-enum json_value_type
-{
+    JSON_OBJECT,
     JSON_VALUE_STRING,
     JSON_VALUE_NUMBER,
     JSON_VALUE_CHAR,
+    JSON_VALUE_BOOL,
+    JSON_VALUE_NULL,
 };
 
-struct json_value
-{
-    enum json_value_type type;
-    union
-    {
-        Str string;
-        long number;
-        char character;
-    };
-};
+struct json_object;
 
-struct json_data
+typedef Map(struct json_object) json_members;
+
+struct json_object
 {
-    Str name;
     enum json_type type;
 
     union
     {
         struct
         {
-            Vec(struct json_data) childs;
-        } json_class;
+            json_members members;
+        } object;
 
         struct
         {
-            Vec(struct json_value) values;
-        } json_array;
+            Vec(struct json_object) elements;
+        } array;
 
-        struct json_value value;
+        Str string;
+
+        long number;
+
+        char character;
+
+        bool boolean;
     };
 };
 
-struct json
-{
-    struct json_data *data;
-    Alloc *alloc;
-};
-
-typedef Result(enum json_error, struct json_data) JsonDataResult;
-typedef Result(enum json_error, struct json_value) JsonValueResult;
-typedef Result(enum json_error, size_t) JsonArraySizeResult;
-
-void json_destroy(struct json *entry);
-
-struct json json_parse(Scan *scan, Alloc *alloc);
-
-JsonDataResult json_get_child(struct json_data const *root, Str name);
-
-JsonValueResult json_value(struct json_data const *root);
-
-JsonValueResult json_array_entry(struct json_data const *root, int entry);
-
-JsonArraySizeResult json_array_size(struct json_data const *root);
+struct json_object json_parse(Scan *scan, Alloc *alloc);
