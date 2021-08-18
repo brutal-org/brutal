@@ -3,7 +3,7 @@
 #include <brutal/base/keywords.h>
 #include <brutal/io/fmt.h>
 #include <brutal/text/case.h>
-#include <brutal/text/rune.h>
+#include <brutal/text/utf8.h>
 #include <brutal/text/vals.h>
 
 static int fmt_base(struct fmt self)

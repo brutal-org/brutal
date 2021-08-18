@@ -4,7 +4,7 @@ KERNEL_C_SRC+=$(wildcard sources/kernel/*.c) \
 
 KERNEL_S_SRC+=$(wildcard sources/kernel/$(CONFIG_ARCH)/*.s)
 
-KERNEL_LIBS_SRC = \
+KERNEL_LIBS_SRC= \
 	$(wildcard sources/libs/ansi/ctype.c)           \
 	$(wildcard sources/libs/ansi/string.c)          \
 	$(wildcard sources/libs/brutal/alloc/*.c)       \

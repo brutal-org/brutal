@@ -1,7 +1,6 @@
 #pragma once
 
-#include <efi/base.h>
-#include <efi/file.h>
+#include <efi/types.h>
 
 #define EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_REVISION 0x00010000
 
@@ -12,10 +11,10 @@
 
 struct EFI_SIMPLE_FILE_SYSTEM_PROTOCOL;
 
-typedef EFIStatus (*EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_OPEN_VOLUME)(struct EFI_SIMPLE_FILE_SYSTEM_PROTOCOL*, EFIFileProtocol **Root);
+typedef EFIStatus (*EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_OPEN_VOLUME)(struct EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *, EFIFileProtocol **Root);
 
 typedef struct EFI_SIMPLE_FILE_SYSTEM_PROTOCOL
 {
-    u64 revision;
+    uint64_t revision;
     EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_OPEN_VOLUME open_volume;
 } EFISimpleFileSystemProtocol;

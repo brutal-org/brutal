@@ -1,4 +1,4 @@
-#include <brutal/text/rune.h>
+#include <brutal/text/utf8.h>
 
 StrFix8 rune_to_utf8(Rune rune)
 {
@@ -127,4 +127,14 @@ size_t utf8_length(uint8_t first)
     {
         return 1;
     }
+}
+
+uint8_t *str_to_cstr_utf8(Str str, Alloc *alloc)
+{
+    uint8_t *cstr = (uint8_t *)alloc_malloc(alloc, str.len + 1);
+
+    mem_cpy(cstr, str.buffer, str.len);
+    cstr[str.len] = '\0';
+
+    return cstr;
 }

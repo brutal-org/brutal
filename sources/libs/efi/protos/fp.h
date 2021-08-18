@@ -1,7 +1,6 @@
 #pragma once
 
-#include <efi/base.h>
-#include <efi/dpp.h>
+#include <efi/protos/dpp.h>
 
 #define EFI_FILE_INFO_ID                                                               \
     {                                                                                  \
@@ -34,23 +33,23 @@
 
 typedef struct EFI_FILE_INFO
 {
-    u64 size;
-    u64 file_size;
-    u64 physical_size;
+    uint64_t size;
+    uint64_t file_size;
+    uint64_t physical_size;
     EFITime create_time;
     EFITime last_access_time;
     EFITime modification_time;
-    u64 attribute;
+    uint64_t attribute;
     char16 file_name[256];
 } EFIFileInfo;
 
 typedef struct EFI_FILE_SYSTEM_INFO
 {
-    u64 size;
+    uint64_t size;
     bool read_only;
-    u64 volume_size;
-    u64 free_space;
-    u32 block_size;
+    uint64_t volume_size;
+    uint64_t free_space;
+    uint32_t block_size;
     char16 volume_label;
 } EFIFileSystemInfo;
 
@@ -63,7 +62,7 @@ typedef struct
 {
     EFIEvent event;
     EFIStatus status;
-    u32 buffer_size;
+    uint32_t buffer_size;
     void *buffer;
 } EFIFileIOToken;
 
@@ -71,24 +70,24 @@ struct _EFI_FILE_IO;
 
 #define DEF_FILE_EFI_FUNC(name, ...) typedef EFIStatus (*EFI_FILE_##name)(struct _EFI_FILE_IO * self __VA_OPT__(, ) __VA_ARGS__)
 
-DEF_FILE_EFI_FUNC(OPEN, struct _EFI_FILE_IO **, char16 *, u64, u64);
+DEF_FILE_EFI_FUNC(OPEN, struct _EFI_FILE_IO **, char16 *, uint64_t, uint64_t);
 DEF_FILE_EFI_FUNC(CLOSE);
 DEF_FILE_EFI_FUNC(DELETE);
-DEF_FILE_EFI_FUNC(READ, u64*, void *);
-DEF_FILE_EFI_FUNC(WRITE, u8, void *);
-DEF_FILE_EFI_FUNC(GET_POSITION, u64 *);
-DEF_FILE_EFI_FUNC(SET_POSITION, u64);
-DEF_FILE_EFI_FUNC(GET_INFO, EFIGUID *, u64 *, void *);
-DEF_FILE_EFI_FUNC(SET_INFO, EFIGUID *, u64, void *);
+DEF_FILE_EFI_FUNC(READ, uint64_t *, void *);
+DEF_FILE_EFI_FUNC(WRITE, uint8_t, void *);
+DEF_FILE_EFI_FUNC(GET_POSITION, uint64_t *);
+DEF_FILE_EFI_FUNC(SET_POSITION, uint64_t);
+DEF_FILE_EFI_FUNC(GET_INFO, EFIGUID *, uint64_t *, void *);
+DEF_FILE_EFI_FUNC(SET_INFO, EFIGUID *, uint64_t, void *);
 DEF_FILE_EFI_FUNC(FLUSH);
-DEF_FILE_EFI_FUNC(OPEN_EX, struct _EFI_FILE_IO **, char16 *, u64, u64, EFIFileIOToken *);
+DEF_FILE_EFI_FUNC(OPEN_EX, struct _EFI_FILE_IO **, char16 *, uint64_t, uint64_t, EFIFileIOToken *);
 DEF_FILE_EFI_FUNC(READ_EX, EFIFileIOToken *);
 DEF_FILE_EFI_FUNC(WRITE_EX, EFIFileIOToken *);
 DEF_FILE_EFI_FUNC(FLUSH_EX, EFIFileIOToken *);
 
 typedef struct _EFI_FILE_IO
 {
-    u64 revision;
+    uint64_t revision;
     EFI_FILE_OPEN open;
     EFI_FILE_CLOSE close;
     EFI_FILE_DELETE delete_file;

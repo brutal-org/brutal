@@ -11,14 +11,13 @@ SRCS := test.c
 
 default: all
 
-all: test.elf
+all: kernel.elf
 
 %.o: %.c
 	$(CC) $(KERNEL_CFLAGS) -c $< -o $@
 
-test.elf: test.o
+kernel.elf: test.o
 	$(LD) $(KERNEL_LDFLAGS) $< -o $@
-	cp config.cfg $@ ../../../build/loader/image/EFI
 
 -include $(SRCS:.c=.d)
 

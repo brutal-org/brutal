@@ -37,7 +37,19 @@ char *strcpy(char *restrict s1, char const *restrict s2)
 
 /* --- 7.24.4 - Comparison functions ---------------------------------------- */
 
-// int memcmp(void const *s1, const void *s2, size_t n) {}
+int memcmp(void const *s1, const void *s2, size_t n)
+{
+    for (size_t i = 0; i < n; i++)
+    {
+        int diff = *(char *)s1 - *(char *)s2;
+        if (diff != 0)
+        {
+            return diff;
+        }
+    }
+
+    return 0;
+}
 
 int strcmp(char const *s1, char const *s2)
 {

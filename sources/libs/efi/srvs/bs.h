@@ -1,7 +1,7 @@
 #pragma once
 
-#include <efi/base.h>
-#include <efi/dpp.h>
+#include <efi/protos/dpp.h>
+#include <efi/types.h>
 
 /* Event Types */
 #define EVT_TIMER 0x80000000
@@ -73,22 +73,22 @@ typedef struct EFI_OPEN_PROTOCOL_INFORMATION_ENTRY
 {
     EFIHandle agent_handle;
     EFIHandle controller_handle;
-    u32 attributes;
-    u32 open_count;
+    uint32_t attributes;
+    uint32_t open_count;
 } EFIOpenProtocolInformationEntry;
 
 #define DEF_EFI_FUNC(name, ...) typedef EFIStatus (*EFI_##name)(__VA_ARGS__)
 
-DEF_EFI_FUNC(RAISE_TPL, u64);
-DEF_EFI_FUNC(RESTORE_TPL, u64);
-DEF_EFI_FUNC(ALLOCATE_PAGES, EFIAllocateType, u64, u64, u64 *);
-DEF_EFI_FUNC(FREE_PAGES, u64, u64);
-DEF_EFI_FUNC(GET_MEMORY_MAP, u64 *, EFIMemoryDescriptor *, u64 *, u64 *, u32 *);
-DEF_EFI_FUNC(ALLOCATE_POOL, u64, u64, void **);
+DEF_EFI_FUNC(RAISE_TPL, uint64_t);
+DEF_EFI_FUNC(RESTORE_TPL, uint64_t);
+DEF_EFI_FUNC(ALLOCATE_PAGES, EFIAllocateType, uint64_t, uint64_t, uint64_t *);
+DEF_EFI_FUNC(FREE_PAGES, uint64_t, uint64_t);
+DEF_EFI_FUNC(GET_MEMORY_MAP, uint64_t *, EFIMemoryDescriptor *, uint64_t *, uint64_t *, uint32_t *);
+DEF_EFI_FUNC(ALLOCATE_POOL, uint64_t, uint64_t, void **);
 DEF_EFI_FUNC(FREE_POOL, void *);
-DEF_EFI_FUNC(CREATE_EVENT, u32, u64, EFIEventNotifyFunction, void *, EFIGUID *, EFIEvent *);
-DEF_EFI_FUNC(SET_TIMER, EFIEvent, EFITimerDelay, u64);
-DEF_EFI_FUNC(WAIT_FOR_EVENT, u64, EFIEvent *, u64 *);
+DEF_EFI_FUNC(CREATE_EVENT, uint32_t, uint64_t, EFIEventNotifyFunction, void *, EFIGUID *, EFIEvent *);
+DEF_EFI_FUNC(SET_TIMER, EFIEvent, EFITimerDelay, uint64_t);
+DEF_EFI_FUNC(WAIT_FOR_EVENT, uint64_t, EFIEvent *, uint64_t *);
 DEF_EFI_FUNC(SIGNAL_EVENT, EFIEvent);
 DEF_EFI_FUNC(CLOSE_EVENT, EFIEvent);
 DEF_EFI_FUNC(CHECK_EVENT, EFIEvent);
@@ -97,31 +97,31 @@ DEF_EFI_FUNC(REINSTALL_PROTOCOL_INTERFACE, EFIHandle, EFIGUID *, void *, void *)
 DEF_EFI_FUNC(UNINSTALL_PROTOCOL_INTERFACE, EFIHandle, EFIGUID *, void *);
 DEF_EFI_FUNC(HANDLE_PROTOCOL, EFIHandle, EFIGUID *, void **);
 DEF_EFI_FUNC(REGISTER_PROTOCOL_NOTIFY, EFIGUID *, EFIEvent, void **);
-DEF_EFI_FUNC(LOCATE_HANDLE, EFILocateSearchType, EFIGUID *, void *, u64 *, EFIHandle);
+DEF_EFI_FUNC(LOCATE_HANDLE, EFILocateSearchType, EFIGUID *, void *, uint64_t *, EFIHandle);
 DEF_EFI_FUNC(LOCATE_DEVICE_PATH, EFIGUID *, EFIDevicePath **, EFIHandle);
 DEF_EFI_FUNC(INSTALL_CONFIGURATION_TABLE, EFIGUID *, void *);
-DEF_EFI_FUNC(IMAGE_LOAD, bool, EFIHandle, EFIDevicePath *, void *, u64, EFIHandle *);
-DEF_EFI_FUNC(IMAGE_START, EFIHandle, u64 *, char16 **);
-DEF_EFI_FUNC(EXIT, EFIHandle, EFIStatus, u64, char16 *);
+DEF_EFI_FUNC(IMAGE_LOAD, bool, EFIHandle, EFIDevicePath *, void *, uint64_t, EFIHandle *);
+DEF_EFI_FUNC(IMAGE_START, EFIHandle, uint64_t *, char16 **);
+DEF_EFI_FUNC(EXIT, EFIHandle, EFIStatus, uint64_t, char16 *);
 DEF_EFI_FUNC(IMAGE_UNLOAD, EFIHandle);
-DEF_EFI_FUNC(EXIT_BOOT_SERVICES, EFIHandle, u64);
-DEF_EFI_FUNC(GET_NEXT_MONOTONIC_COUNT, u64 *);
-DEF_EFI_FUNC(STALL, u64);
-DEF_EFI_FUNC(SET_WATCHDOG_TIMER, u64, u64, u64, char16 *);
+DEF_EFI_FUNC(EXIT_BOOT_SERVICES, EFIHandle, uint64_t);
+DEF_EFI_FUNC(GET_NEXT_MONOTONIC_COUNT, uint64_t *);
+DEF_EFI_FUNC(STALL, uint64_t);
+DEF_EFI_FUNC(SET_WATCHDOG_TIMER, uint64_t, uint64_t, uint64_t, char16 *);
 DEF_EFI_FUNC(CONNECT_CONTROLLER, EFIHandle, EFIHandle *, EFIDevicePath *, bool);
 DEF_EFI_FUNC(DISCONNECT_CONTROLLER, EFIHandle, EFIHandle, EFIHandle);
-DEF_EFI_FUNC(OPEN_PROTOCOL, EFIHandle, EFIGUID *, void **, EFIHandle, EFIHandle, u32);
+DEF_EFI_FUNC(OPEN_PROTOCOL, EFIHandle, EFIGUID *, void **, EFIHandle, EFIHandle, uint32_t);
 DEF_EFI_FUNC(CLOSE_PROTOCOL, EFIHandle, EFIGUID *, EFIHandle, EFIHandle);
-DEF_EFI_FUNC(OPEN_PROTOCOL_INFORMATION, EFIHandle, EFIGUID *, EFIOpenProtocolInformationEntry **, u64 *);
-DEF_EFI_FUNC(PROTOCOLS_PER_HANDLE, EFIHandle, EFIGUID **, u64 *);
-DEF_EFI_FUNC(LOCATE_HANDLE_BUFFER, EFILocateSearchType, EFIGUID *, void *, u64 *, EFIHandle **);
+DEF_EFI_FUNC(OPEN_PROTOCOL_INFORMATION, EFIHandle, EFIGUID *, EFIOpenProtocolInformationEntry **, uint64_t *);
+DEF_EFI_FUNC(PROTOCOLS_PER_HANDLE, EFIHandle, EFIGUID **, uint64_t *);
+DEF_EFI_FUNC(LOCATE_HANDLE_BUFFER, EFILocateSearchType, EFIGUID *, void *, uint64_t *, EFIHandle **);
 DEF_EFI_FUNC(LOCATE_PROTOCOL, EFIGUID *, void *, void **);
 DEF_EFI_FUNC(INSTALL_MULTIPLE_PROTOCOL_INTERFACES, EFIHandle *, ...);
 DEF_EFI_FUNC(UNINSTALL_MULTIPLE_PROTOCOL_INTERFACES, EFIHandle *, ...);
-DEF_EFI_FUNC(CALCULATE_CRC32, void *, u64, u32 *);
-DEF_EFI_FUNC(COPY_MEM, void *, void *, u64);
-DEF_EFI_FUNC(SET_MEM, void *, u64, u8);
-DEF_EFI_FUNC(CREATE_EVENT_EX, u32, u64, EFIEventNotifyFunction, void *, EFIGUID *, EFIEvent *);
+DEF_EFI_FUNC(CALCULATE_CRC32, void *, uint64_t, uint32_t *);
+DEF_EFI_FUNC(COPY_MEM, void *, void *, uint64_t);
+DEF_EFI_FUNC(SET_MEM, void *, uint64_t, uint8_t);
+DEF_EFI_FUNC(CREATE_EVENT_EX, uint32_t, uint64_t, EFIEventNotifyFunction, void *, EFIGUID *, EFIEvent *);
 
 typedef struct
 {

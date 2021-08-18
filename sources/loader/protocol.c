@@ -1,12 +1,12 @@
-#include "protocol.h"
+#include <brutal/alloc.h>
 #include <brutal/log.h>
-#include <efi/utils.h>
-#include "efi/base.h"
-#include "efi/bs.h"
-#include "efi/st.h"
-#include "handover/handover.h"
+#include <efi/lib.h>
+#include <efi/protos.h>
+#include <efi/srvs.h>
+#include <handover/handover.h>
+#include "loader/protocol.h"
 
-MAYBE_UNUSED static HandoverMmapType efi_mmap_type_to_handover[] = {
+static HandoverMmapType efi_mmap_type_to_handover[] = {
     [EFI_RESERVED_MEMORY_TYPE] = HANDOVER_MMAP_RESERVED,
     [EFI_RUNTIME_SERVICES_CODE] = HANDOVER_MMAP_RESERVED,
     [EFI_RUNTIME_SERVICES_DATA] = HANDOVER_MMAP_RESERVED,
@@ -23,29 +23,13 @@ MAYBE_UNUSED static HandoverMmapType efi_mmap_type_to_handover[] = {
     [EFI_ACPI_MEMORY_NVS] = HANDOVER_MMAP_RESERVED,
 };
 
-HandoverModules get_modules();
-
-void query_gop_modes(EFIGraphicsOutputProtocol *gop, u64 num_modes, u64 native_mode)
+HandoverMmap get_mmap(EFIBootServices *bs)
 {
-
-    EFIGraphicsOutputModeInfo *info;
-    u64 size_of_info;
-
-    for (u64 i = 0; i < num_modes; i++)
-    {
-        gop->query_mode(gop, i, &size_of_info, &info);
-        efi_print("mode {} width {} height {} format {}{}", i, info->horizontal_resolution, info->vertical_resolution, info->pixel_format, i == native_mode ? "(current)" : "");
-    }
-}
-
-HandoverMmap get_mmap(EFIBootServices *bs, MAYBE_UNUSED EFIHandle *image_handle)
-{
-
-    u8 tmp_mmap[1];
-    u64 mmap_size = sizeof(tmp_mmap);
-    u64 map_key = 0;
-    u64 descriptor_size = 0;
-    u32 descriptor_version = 0;
+    uint8_t tmp_mmap[1];
+    uint64_t mmap_size = sizeof(tmp_mmap);
+    uint64_t map_key = 0;
+    uint64_t descriptor_size = 0;
+    uint32_t descriptor_version = 0;
 
     bs->get_memory_map(&mmap_size, (EFIMemoryDescriptor *)tmp_mmap, &map_key, &descriptor_size, &descriptor_version);
 
@@ -55,7 +39,7 @@ HandoverMmap get_mmap(EFIBootServices *bs, MAYBE_UNUSED EFIHandle *image_handle)
 
     bs->get_memory_map(&mmap_size, mmap, &map_key, &descriptor_size, &descriptor_version);
 
-    u64 entry_count = (mmap_size / descriptor_size);
+    uint64_t entry_count = (mmap_size / descriptor_size);
 
     HandoverMmap *h_mmap = alloc_malloc(alloc_global(), (sizeof(HandoverMmap) + (mmap_size / descriptor_size) * sizeof(HandoverMmapEntry)));
 
@@ -63,19 +47,19 @@ HandoverMmap get_mmap(EFIBootServices *bs, MAYBE_UNUSED EFIHandle *image_handle)
 
     HandoverMmapEntry *start_from = h_mmap->entries;
 
-    u64 pages_count = 0;
+    uint64_t pages_count = 0;
 
     int last_type = -1;
-    u64 last_end = 0xFFFFFFFFFFFF;
+    uint64_t last_end = 0xFFFFFFFFFFFF;
 
-    u64 entries = 0;
-    for (u64 i = 0; i < entry_count; i++)
+    uint64_t entries = 0;
+    for (uint64_t i = 0; i < entry_count; i++)
     {
-        EFIMemoryDescriptor *desc = (EFIMemoryDescriptor *)((u64)mmap + descriptor_size * i);
+        EFIMemoryDescriptor *desc = (EFIMemoryDescriptor *)((uint64_t)mmap + descriptor_size * i);
 
-        u64 length = desc->num_pages << 12;
-        u64 phys_base = desc->physical_start;
-        u64 phys_end = desc->physical_start + length;
+        uint64_t length = desc->num_pages << 12;
+        uint64_t phys_base = desc->physical_start;
+        uint64_t phys_end = desc->physical_start + length;
 
         int type = HANDOVER_MMAP_RESERVED;
 
@@ -107,30 +91,41 @@ HandoverMmap get_mmap(EFIBootServices *bs, MAYBE_UNUSED EFIHandle *image_handle)
 
     h_mmap->size = entries;
 
-    bs->exit_boot_services(image_handle, map_key);
+    bs->exit_boot_services(efi_handle(), map_key);
 
     return *h_mmap;
+}
+
+EFIStatus get_system_config_table(EFIGUID table_guid, void **table)
+{
+    for (uint64_t i = 0; i < efi_st()->num_table_entries; i++)
+    {
+        if (efi_guid_eq(table_guid, efi_st()->config_table[i].vendor_guid))
+        {
+            *table = efi_st()->config_table[i].vendor_table;
+            return EFI_SUCCESS;
+        }
+    }
+
+    return EFI_NOT_FOUND;
 }
 
 uintptr_t get_rsdp()
 {
     void *acpi_table = NULL;
-    EFIGUID guid2 = ACPI2_TABLE_GUID;
+
     EFIGUID guid = ACPI_TABLE_GUID;
+    EFIGUID guid2 = ACPI2_TABLE_GUID;
 
-    EFIStatus status;
-
-    if ((status = get_system_config_table(&guid2, &acpi_table)) == EFI_SUCCESS)
+    if (get_system_config_table(guid, &acpi_table) == EFI_SUCCESS ||
+        get_system_config_table(guid2, &acpi_table) == EFI_SUCCESS)
     {
         return (uintptr_t)acpi_table;
     }
-
-    else if ((status = get_system_config_table(&guid, &acpi_table)) == EFI_SUCCESS)
+    else
     {
-        return (uintptr_t)acpi_table;
+        return 0;
     }
-
-    return 0;
 }
 
 HandoverFramebuffer get_framebuffer(EFIBootServices *bs)
@@ -142,7 +137,7 @@ HandoverFramebuffer get_framebuffer(EFIBootServices *bs)
 
     EFIGraphicsOutputModeInfo *info;
 
-    u64 size_of_info, num_modes, native_mode;
+    uint64_t size_of_info, num_modes, native_mode;
 
     auto status = gop->query_mode(gop, gop->mode == NULL ? 0 : gop->mode->mode, &size_of_info, &info);
 
@@ -170,13 +165,16 @@ HandoverFramebuffer get_framebuffer(EFIBootServices *bs)
     return (HandoverFramebuffer){true, addr, width, height, pitch, gop->mode->info->pixel_format};
 }
 
-Handover get_handover(EFISystemTable *st, EFIHandle *image_handle)
+Handover get_handover(void)
 {
-    auto bs = st->boot_services;
+    auto bs = efi_st()->boot_services;
     auto fb = get_framebuffer(bs);
     auto rsdp = get_rsdp();
-    MAYBE_UNUSED auto mmap = get_mmap(bs, image_handle);
+    auto mmap = get_mmap(bs);
 
     return (Handover){
-        .framebuffer = fb, .rsdp = rsdp, .mmap = mmap};
+        .framebuffer = fb,
+        .rsdp = rsdp,
+        .mmap = mmap,
+    };
 }

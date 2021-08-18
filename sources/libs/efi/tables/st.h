@@ -1,15 +1,16 @@
 #pragma once
-#include <efi/base.h>
-#include <efi/bs.h>
-#include <efi/console.h>
-#include <efi/ct.h>
-#include <efi/rs.h>
+
+#include <efi/protos/stip.h>
+#include <efi/protos/stop.h>
+#include <efi/srvs/bs.h>
+#include <efi/srvs/rs.h>
+#include <efi/tables/ct.h>
 
 typedef struct
 {
     EFITableHeader hdr;
     char16 *firmware_vendor;
-    u32 firmware_revision;
+    uint32_t firmware_revision;
     EFIHandle console_in_handle;
     EFISimpleTextInput *console_in;
     EFIHandle console_out_handle;
@@ -18,6 +19,6 @@ typedef struct
     EFISimpleTextOutput *std_error;
     EFIRuntimeServices *runtime_services;
     EFIBootServices *boot_services;
-    u64 num_table_entries;
+    uint64_t num_table_entries;
     EFIConfigurationTable *config_table;
 } EFISystemTable;

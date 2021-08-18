@@ -1,6 +1,7 @@
 #pragma once
-#include <efi/base.h>
-#include <efi/bs.h>
+
+#include <efi/srvs/bs.h>
+#include <efi/types.h>
 
 #define EFI_OPTIONAL_POINTER 0x00000001
 
@@ -18,11 +19,11 @@ typedef enum
 
 typedef struct
 {
-    u64 length;
+    uint64_t length;
     union
     {
-        u64 data_block;
-        u64 continuation_pointer;
+        uint64_t data_block;
+        uint64_t continuation_pointer;
     } _union;
 
 } EFICapsuleBlockDescriptor;
@@ -30,25 +31,25 @@ typedef struct
 typedef struct
 {
     EFIGUID capsule_guid;
-    u32 header_size;
-    u32 flags;
-    u32 capsule_image_size;
+    uint32_t header_size;
+    uint32_t flags;
+    uint32_t capsule_image_size;
 } EFICapsuleHeader;
 
 DEF_EFI_FUNC(GET_TIME, EFITime *, EFITimeCapabilities *);
 DEF_EFI_FUNC(SET_TIME, EFITime *);
 DEF_EFI_FUNC(GET_WAKEUP_TIME, bool *, bool *, EFITime *);
 DEF_EFI_FUNC(SET_WAKEUP_TIME, bool, EFITime *);
-DEF_EFI_FUNC(SET_VIRTUAL_ADDRESS_MAP, u64, u64, u32, EFIMemoryDescriptor *);
-DEF_EFI_FUNC(CONVERT_POINTER, u64, void **);
-DEF_EFI_FUNC(GET_VARIABLE, char16 *, EFIGUID *, u32 *, u64 *, void *);
-DEF_EFI_FUNC(GET_NEXT_VARIABLE_NAME, u64, char16 *, EFIGUID *);
-DEF_EFI_FUNC(SET_VARIABLE, char16 *, EFIGUID *, u32, u64, void *);
-DEF_EFI_FUNC(GET_NEXT_HIGH_MONO_COUNT, u32 *);
-DEF_EFI_FUNC(RESET_SYSTEM, EFIResetType, EFIStatus, u64, void *);
-DEF_EFI_FUNC(UPDATE_CAPSULE, EFICapsuleHeader **, u64, u64);
-DEF_EFI_FUNC(QUERY_CAPSULE_CAPABILITIES, EFICapsuleHeader **, u64, u64 *, EFIResetType *);
-DEF_EFI_FUNC(QUERY_VARIABLE_INFO, u32, u64 *, u64 *, u64 *);
+DEF_EFI_FUNC(SET_VIRTUAL_ADDRESS_MAP, uint64_t, uint64_t, uint32_t, EFIMemoryDescriptor *);
+DEF_EFI_FUNC(CONVERT_POINTER, uint64_t, void **);
+DEF_EFI_FUNC(GET_VARIABLE, char16 *, EFIGUID *, uint32_t *, uint64_t *, void *);
+DEF_EFI_FUNC(GET_NEXT_VARIABLE_NAME, uint64_t, char16 *, EFIGUID *);
+DEF_EFI_FUNC(SET_VARIABLE, char16 *, EFIGUID *, uint32_t, uint64_t, void *);
+DEF_EFI_FUNC(GET_NEXT_HIGH_MONO_COUNT, uint32_t *);
+DEF_EFI_FUNC(RESET_SYSTEM, EFIResetType, EFIStatus, uint64_t, void *);
+DEF_EFI_FUNC(UPDATE_CAPSULE, EFICapsuleHeader **, uint64_t, uint64_t);
+DEF_EFI_FUNC(QUERY_CAPSULE_CAPABILITIES, EFICapsuleHeader **, uint64_t, uint64_t *, EFIResetType *);
+DEF_EFI_FUNC(QUERY_VARIABLE_INFO, uint32_t, uint64_t *, uint64_t *, uint64_t *);
 
 typedef struct
 {

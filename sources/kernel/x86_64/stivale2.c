@@ -62,13 +62,13 @@ static HandoverMmapType stivale_mmap_type_to_handover_type(int stivale_entry)
 
     case STIVALE2_MMAP_BOOTLOADER_RECLAIMABLE:
     case STIVALE2_MMAP_ACPI_RECLAIMABLE:
-        return HANDOVER_MMAP_RECLAIMABLE; // may be used after everything is loaded
+        return HANDOVER_MMAP_RECLAIMABLE;
 
     case STIVALE2_MMAP_FRAMEBUFFER:
         return HANDOVER_MMAP_FRAMEBUFFER;
 
     default:
-        return HANDOVER_MMAP_RESERVED; // by default not detected entry are unused
+        return HANDOVER_MMAP_RESERVED;
     }
 }
 

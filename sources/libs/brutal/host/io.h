@@ -7,7 +7,9 @@
 #include <brutal/io/write.h>
 #include <brutal/text/str.h>
 
-#if defined(__linux__)
+#if defined(__efi__)
+#    include <brutal/host/efi/io.h>
+#elif defined(__linux__)
 #    include <brutal/host/linux/io.h>
 #elif defined(__brutal__)
 #    include <brutal/host/brutal/io.h>

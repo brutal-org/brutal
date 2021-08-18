@@ -89,8 +89,8 @@
 
 #define range_eq(LHS, RHS) ((LHS).base == (RHS.base) && (LHS).size == (RHS).size)
 
-typedef Range(uint8_t) U8Range;
-typedef Range(uint16_t) U16Range;
-typedef Range(uint32_t) U32Range;
-typedef Range(uint64_t) U64Range;
+typedef Range(uint8_t) uint8_tRange;
+typedef Range(uint16_t) uint16_tRange;
+typedef Range(uint32_t) uint32_tRange;
+typedef Range(uint64_t) uint64_tRange;
 typedef Range(size_t) USizeRange;

@@ -29,3 +29,12 @@ static inline IoCopyResult io_copy(IoReader *from, IoWriter *to)
         total += written;
     } while (1);
 }
+
+static inline Buffer io_readall(IoReader *from, Alloc *alloc)
+{
+    Buffer buffer;
+    buffer_init(&buffer, 512, alloc);
+    IoBufferWriter to = io_buffer_write(&buffer);
+    io_copy(from, base_cast(&to));
+    return buffer;
+}

@@ -1,6 +1,7 @@
 #include <brutal/alloc.h>
 #include <brutal/host/io.h>
 #include <brutal/log/assert.h>
+#include <brutal/text/utf8.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -8,10 +9,7 @@
 
 HostIoOpenFileResult host_io_file_open(Str path)
 {
-    char *cstr = (char *)alloc_malloc(alloc_global(), path.len + 1);
-
-    mem_cpy(cstr, path.buffer, path.len);
-    cstr[path.len] = '\0';
+    char *cstr = str_to_cstr_utf8(path, alloc_global());
 
     HostIoFileHandle handle = open(cstr, O_RDONLY);
 
@@ -21,14 +19,12 @@ HostIoOpenFileResult host_io_file_open(Str path)
 
 HostIoOpenFileResult host_io_file_create(Str path)
 {
-    char *cstr = (char *)alloc_malloc(alloc_global(), path.len + 1);
-
-    mem_cpy(cstr, path.buffer, path.len);
-    cstr[path.len] = '\0';
+    char *cstr = str_to_cstr_utf8(path, alloc_global());
 
     HostIoFileHandle handle = open(cstr, O_CREAT | O_WRONLY | O_TRUNC, 0666);
 
     alloc_free(alloc_global(), cstr);
+
     return OK(HostIoOpenFileResult, handle);
 }
 

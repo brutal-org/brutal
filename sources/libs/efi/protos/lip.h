@@ -1,6 +1,6 @@
 #pragma once
-#include <efi/base.h>
-#include <efi/st.h>
+
+#include <efi/tables/st.h>
 
 #define EFI_LOADED_IMAGE_PROTOCOL_GUID                                                 \
     {                                                                                  \
@@ -13,16 +13,16 @@ typedef EFIStatus (*EFI_IMAGE_UNLOAD)(EFIHandle);
 
 typedef struct EFI_LOADED_IMAGE_PROTOCOL
 {
-    u32 revision;
+    uint32_t revision;
     EFIHandle parent_handle;
     EFISystemTable *system_table;
     EFIHandle device_handle;
     EFIDevicePath *file_path;
     void *reserved;
-    u32 load_options_size;
+    uint32_t load_options_size;
     void *load_options;
     void *image_base;
-    u64 image_size;
-    u64 image_code_type;
+    uint64_t image_size;
+    uint64_t image_code_type;
     EFI_IMAGE_UNLOAD unload;
 } EFILoadedImage;

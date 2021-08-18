@@ -1,64 +1,86 @@
-CC = clang
-LD = lld-link
+LOADER_CC = clang
+LOADER_LD = lld-link
 
-CFLAGS = $(CROSS_CFLAGS) -D__x86_64__ -I. -target x86_64-pc-win32-coff -fno-stack-protector -fshort-wchar -mno-red-zone
+BUILDDIR_LOADER=build/loader
 
-LDFLAGS = -subsystem:efi_application -nodefaultlib -dll
+LOADER_CFLAGS= \
+	$(CROSS_CFLAGS) \
+	-D__x86_64__ \
+	-D__efi__ \
+	-target x86_64-pc-win32-coff \
+	-fno-stack-protector \
+	-fshort-wchar \
+	-mno-red-zone
 
-DIRECTORY_GUARD=@mkdir -p $(@D)
+LOADER_LDFLAGS= \
+	-entry:efi_main \
+	-subsystem:efi_application \
+	-nodefaultlib \
+	-dll
 
-BRUTAL_BOOT_LIBS_SRCS =                             \
-	sources/libs/brutal/io/fmt.c                    \
-	sources/libs/brutal/io/write.c                  \
-	sources/libs/brutal/io/print.c                  \
+LOADER_LIBS_SRC = \
 	sources/libs/brutal/io/buffer.c                 \
+	sources/libs/brutal/io/fmt.c                    \
+	sources/libs/brutal/io/file.c                   \
+	sources/libs/brutal/io/std.c                    \
+	sources/libs/brutal/io/print.c                  \
 	sources/libs/brutal/io/scan.c                   \
-	$(wildcard sources/libs/brutal/log/*.c)         \
+	sources/libs/brutal/io/write.c                  \
+	sources/libs/ansi/string.c                   	\
 	$(wildcard sources/libs/brutal/alloc/*.c)	    \
-	$(wildcard sources/libs/elf/elf.c)              \
-	$(wildcard sources/libs/efi/*.c)                \
-	$(wildcard sources/libs/handover/*.c)		    \
-	$(wildcard sources/libs/ansi/ctype.c)           \
-	$(wildcard sources/libs/ansi/string.c)          \
+	$(wildcard sources/libs/brutal/host/efi/*.c)	\
+	$(wildcard sources/libs/brutal/log/*.c)         \
 	$(wildcard sources/libs/brutal/mem/*.c)         \
 	$(wildcard sources/libs/brutal/text/*.c)        \
+	$(wildcard sources/libs/ansi/ctype.c)           \
+	$(wildcard sources/libs/ansi/string.c)          \
+	$(wildcard sources/libs/handover/*.c)		    \
+	$(wildcard sources/libs/elf/elf.c) 				\
+	$(wildcard sources/libs/efi/*/*.c)              \
+	$(wildcard sources/libs/efi/*.c)
 
-BRUTAL_BOOT_SRCS = $(wildcard sources/loader/src/*.c)
+LOADER_SRCS = $(wildcard sources/loader/*.c)
 
-OBJS = \
-	$(patsubst sources/%.c, $(BUILD_DIRECTORY)/%.c.o, $(BRUTAL_BOOT_SRCS)) \
-	$(patsubst sources/%.c, $(BUILD_DIRECTORY)/%.c.o, $(BRUTAL_BOOT_LIBS_SRCS)) \
+LOADER_OBJS = \
+	$(patsubst sources/%.c, $(BUILDDIR_LOADER)/%.c.o, $(LOADER_SRCS)) \
+	$(patsubst sources/%.c, $(BUILDDIR_LOADER)/%.c.o, $(LOADER_LIBS_SRC)) \
 
-BUILD_DIRECTORY = build/loader
+LOADER=$(BUILDDIR_CROSS)/BOOTX64.EFI
 
-EFI_FILE = $(BUILD_DIRECTORY)/main.efi
+$(LOADER): $(LOADER_OBJS)
+	$(MKCWD)
+	$(LOADER_LD) -out:$@ $^  $(LOADER_LDFLAGS)
 
-$(EFI_FILE): $(OBJS)
-	$(LD) $(LDFLAGS) -entry:efi_main $^ -out:$@
-	$(MAKE) -C sources/loader/test
-	$(MAKE) -C sources/loader/test clean
+$(BUILDDIR_LOADER)/%.c.o: sources/%.c
+	$(MKCWD)
+	$(LOADER_CC) -c -o $@ $< $(LOADER_CFLAGS)
 
-$(BUILD_DIRECTORY)/%.c.o: sources/%.c
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) -c -o $@ $<
+$(BUILDDIR_LOADER)/libs/%.c.o: sources/libs/%.c
+	$(MKCWD)
+	$(LOADER_CC) -c -o $@ $< $(LOADER_CFLAGS)
 
-$(BUILD_DIRECTORY)/libs/%.c.o: sources/libs/%.c
-	$(DIRECTORY_GUARD)
-	$(CC) $(CFLAGS) -c -o $@ $<
-
-run-loader: $(EFI_FILE) $(BUILD_DIRECTORY)/tools/OVMF.fd $(BUILD_DIRECTORY)/image/EFI/BOOT/BOOTX64.EFI
-	$(MAKE) -C sources/loader/test clean
-	$(MAKE) -C sources/loader/test
-	qemu-system-x86_64 -serial stdio -m 256 -bios $(BUILD_DIRECTORY)/tools/OVMF.fd -cpu host -enable-kvm -drive file=fat:rw:$(BUILD_DIRECTORY)/image,media=disk,format=raw
-
-$(BUILD_DIRECTORY)/image/EFI/BOOT/BOOTX64.EFI:
-	$(DIRECTORY_GUARD)
-	ln -sf ../../../../../$(EFI_FILE) $@
-
-$(BUILD_DIRECTORY)/tools/OVMF.fd:
-	$(DIRECTORY_GUARD)
+$(BUILDDIR_LOADER)/tools/OVMF.fd:
+	$(MKCWD)
 	wget https://efi.akeo.ie/OVMF/OVMF-X64.zip
 	unzip OVMF-X64.zip OVMF.fd
 	rm OVMF-X64.zip
-	mv OVMF.fd $(@D)
+	mv OVMF.fd $@
 
+loader: $(LOADER)
+
+run-loader: $(LOADER) $(BUILDDIR_LOADER)/tools/OVMF.fd
+	$(MAKE) -C sources/loader/test clean
+	$(MAKE) -C sources/loader/test
+
+	mkdir -p $(BUILDDIR_LOADER)/image/EFI/BOOT/
+	cp sources/loader/test/kernel.elf $(BUILDDIR_LOADER)/image/
+	cp sources/loader/test/config.json $(BUILDDIR_LOADER)/image/
+	cp $(LOADER) $(BUILDDIR_LOADER)/image/EFI/BOOT/BOOTX64.EFI
+
+	qemu-system-x86_64 \
+		-serial stdio \
+		-m 256 \
+		-bios $(BUILDDIR_LOADER)/tools/OVMF.fd \
+		-cpu host \
+		-enable-kvm \
+		-drive file=fat:rw:$(BUILDDIR_LOADER)/image,media=disk,format=raw

@@ -1,5 +1,6 @@
 #pragma once
-#include <efi/base.h>
+
+#include <efi/types.h>
 
 #define EFI_DEVICE_PATH_PROTOCOL_GUID                                                  \
     {                                                                                  \
@@ -15,7 +16,7 @@
 
 typedef struct
 {
-    u8 type;
-    u8 sub_type;
-    u8 length[2];
+    uint8_t type;
+    uint8_t sub_type;
+    uint8_t length[2];
 } EFIDevicePath;

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <efi/base.h>
+#include <efi/types.h>
 
-#define ACPI2_TABLE_GUID                                                            \
+#define ACPI2_TABLE_GUID                                                               \
     {                                                                                  \
         0x8868e871, 0xe4f1, 0x11d3, { 0xbc, 0x22, 0x00, 0x80, 0xc7, 0x3c, 0x88, 0x81 } \
     }
