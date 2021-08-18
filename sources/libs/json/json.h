@@ -1,4 +1,5 @@
 #pragma once
+
 #include <brutal/alloc/heap.h>
 #include <brutal/base.h>
 #include <brutal/ds.h>
@@ -6,38 +7,77 @@
 
 enum json_type
 {
+    JSON_NULL,
+    JSON_TRUE,
+    JSON_FALSE,
     JSON_ARRAY,
     JSON_OBJECT,
     JSON_STRING,
     JSON_NUMBER,
-    JSON_BOOL,
-    JSON_NULL,
     JSON_ERROR
 };
 
-struct json_value;
+typedef struct json_value JsonValue;
 
-typedef Map(struct json_value) json_object;
-typedef Vec(struct json_value) json_array;
+typedef Map(JsonValue) json_object;
+typedef Vec(JsonValue) json_array;
 
-typedef struct json_value
+struct json_value
 {
     enum json_type type;
 
     union
     {
         json_object object;
-
         json_array array;
-
         Str string;
-
         long number;
-
         char character;
-
-        bool boolean;
     };
-} JsonValue;
+};
 
 JsonValue json_parse(Scan *scan, Alloc *alloc);
+
+static inline JsonValue json_null(void)
+{
+    return (JsonValue){
+        .type = JSON_NULL,
+    };
+}
+
+static inline JsonValue json_true(void)
+{
+    return (JsonValue){
+        .type = JSON_TRUE,
+    };
+}
+
+static inline JsonValue json_false(void)
+{
+    return (JsonValue){
+        .type = JSON_FALSE,
+    };
+}
+
+static inline JsonValue json_error(void)
+{
+    return (JsonValue){
+        .type = JSON_ERROR,
+    };
+}
+
+static inline JsonValue json_number(long number)
+{
+    return (JsonValue){
+        .type = JSON_NUMBER,
+        .number = number,
+    };
+}
+
+static inline JsonValue json_string(Str str)
+{
+    return (JsonValue){
+        .type = JSON_STRING,
+        .string = str,
+    };
+}

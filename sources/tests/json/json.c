@@ -6,11 +6,11 @@
 #include "brutal/log/assert.h"
 #include "tests/test.h"
 
-#define JSON_TEST_START()                                      \
-    struct alloc_heap heap;                                    \
-    alloc_heap_init(&heap);                                    \
-    Scan scanner = {};                                         \
-    scan_init(&scanner, base);                                 \
+#define JSON_TEST_START()                              \
+    struct alloc_heap heap;                            \
+    alloc_heap_init(&heap);                            \
+    Scan scanner = {};                                 \
+    scan_init(&scanner, base);                         \
     JsonValue json = json_parse(&scanner, &heap.base); \
     assert_equal((int)json.type, (int)JSON_OBJECT)
 
@@ -20,7 +20,7 @@
 #define JSON_MEMBER_GET(_object, _type, _name)                      \
     (                                                               \
         {                                                           \
-            JsonValue _res = {};                            \
+            JsonValue _res = {};                                    \
             assert_truth(map_get(&_object.object, _name, &(_res))); \
             assert_equal((int)_res.type, (int)_type);               \
             _res;                                                   \
@@ -58,9 +58,7 @@ TEST(json_parse_false)
 
     JSON_TEST_START();
 
-    JsonValue res = JSON_MEMBER_GET(json, JSON_BOOL, str_cast("hello"));
-
-    assert_equal((int)res.boolean, (int)false);
+    JSON_MEMBER_GET(json, JSON_FALSE, str_cast("hello"));
 
     JSON_TEST_END();
 }
@@ -71,9 +69,7 @@ TEST(json_parse_true)
 
     JSON_TEST_START();
 
-    JsonValue res = JSON_MEMBER_GET(json, JSON_BOOL, str_cast("hello"));
-
-    assert_equal((int)res.boolean, (int)true);
+    JSON_MEMBER_GET(json, JSON_TRUE, str_cast("hello"));
 
     JSON_TEST_END();
 }

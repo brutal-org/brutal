@@ -71,46 +71,40 @@ static JsonValue json_parse_object(Scan *scan, Alloc *alloc)
 
 JsonValue json_parse(Scan *scan, Alloc *alloc)
 {
-    JsonValue from;
     scan_skip_space(scan);
 
     if (scan_curr(scan) == '"') // string
     {
-        from.type = JSON_STRING;
-        from.string = json_parse_str(scan);
+        return json_string(json_parse_str(scan));
     }
     else if (isdigit(scan_curr(scan)) || scan_curr(scan) == '-') // number
     {
-        from.type = JSON_NUMBER;
-        from.number = scan_next_decimal(scan);
+        return json_number(scan_next_decimal(scan));
     }
     else if (scan_skip_word(scan, str_cast("true"))) // boolean (true)
     {
-        from.type = JSON_BOOL;
-        from.boolean = true;
+        return json_true();
     }
     else if (scan_skip_word(scan, str_cast("false"))) // boolean (false)
     {
-        from.type = JSON_BOOL;
-        from.boolean = false;
+        return json_false();
     }
     else if (scan_skip_word(scan, str_cast("null"))) // boolean (false)
     {
-        from.type = JSON_NULL;
+        return json_null();
     }
     else if (scan_skip(scan, '{')) // object
     {
-        from = json_parse_object(scan, alloc);
+        return json_parse_object(scan, alloc);
     }
     else if (scan_skip(scan, '[')) // array
     {
-        from = json_parse_array(scan, alloc);
+        return json_parse_array(scan, alloc);
     }
     else
     {
-        from.type = JSON_ERROR;
         scan_throw(scan, str_cast("expected a value"), str_cast(""));
-    }
 
-    return from;
+        return json_error();
+    }
 }
