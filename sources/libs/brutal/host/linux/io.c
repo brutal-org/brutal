@@ -9,7 +9,7 @@
 
 HostIoOpenFileResult host_io_file_open(Str path)
 {
-    char *cstr = str_to_cstr_utf8(path, alloc_global());
+    char *cstr = (char *)str_to_cstr_utf8(path, alloc_global());
 
     HostIoFileHandle handle = open(cstr, O_RDONLY);
 
@@ -19,7 +19,7 @@ HostIoOpenFileResult host_io_file_open(Str path)
 
 HostIoOpenFileResult host_io_file_create(Str path)
 {
-    char *cstr = str_to_cstr_utf8(path, alloc_global());
+    char *cstr = (char *)str_to_cstr_utf8(path, alloc_global());
 
     HostIoFileHandle handle = open(cstr, O_CREAT | O_WRONLY | O_TRUNC, 0666);
 
