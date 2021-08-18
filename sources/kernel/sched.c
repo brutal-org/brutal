@@ -67,24 +67,6 @@ void sched_stop(Task *task, uintptr_t result)
 
 BrResult sched_block(Blocker blocker)
 {
-    bool has_reached_function =
-        blocker.function &&
-        blocker.function(blocker.context);
-
-    if (has_reached_function)
-    {
-        return BR_SUCCESS;
-    }
-
-    bool has_reached_deadline =
-        blocker.deadline != (Tick)-1 &&
-        blocker.deadline < tick;
-
-    if (has_reached_deadline)
-    {
-        return BR_TIMEOUT;
-    }
-
     lock_acquire(&lock);
 
     task_self()->blocker = blocker;

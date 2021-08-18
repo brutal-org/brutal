@@ -3,8 +3,6 @@
 
 int main()
 {
-    WAIT_FOR(false);
-
     while (true)
     {
         BrIpcArgs args = {};

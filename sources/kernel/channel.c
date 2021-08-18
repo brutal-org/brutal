@@ -44,7 +44,7 @@ static bool channel_wait_send(Channel *self)
         return false;
     }
 
-    if (!ring_full(&self->msgs))
+    if (ring_full(&self->msgs))
     {
         lock_release(&self->lock);
         return false;
