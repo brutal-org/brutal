@@ -8,32 +8,27 @@ enum json_type
 {
     JSON_ARRAY,
     JSON_OBJECT,
-    JSON_VALUE_STRING,
-    JSON_VALUE_NUMBER,
-    JSON_VALUE_CHAR,
-    JSON_VALUE_BOOL,
-    JSON_VALUE_NULL,
+    JSON_STRING,
+    JSON_NUMBER,
+    JSON_BOOL,
+    JSON_NULL,
+    JSON_ERROR
 };
 
-struct json_object;
+struct json_value;
 
-typedef Map(struct json_object) json_members;
+typedef Map(struct json_value) json_object;
+typedef Vec(struct json_value) json_array;
 
-struct json_object
+typedef struct json_value
 {
     enum json_type type;
 
     union
     {
-        struct
-        {
-            json_members members;
-        } object;
+        json_object object;
 
-        struct
-        {
-            Vec(struct json_object) elements;
-        } array;
+        json_array array;
 
         Str string;
 
@@ -43,6 +38,6 @@ struct json_object
 
         bool boolean;
     };
-};
+} JsonValue;
 
-struct json_object json_parse(Scan *scan, Alloc *alloc);
+JsonValue json_parse(Scan *scan, Alloc *alloc);
