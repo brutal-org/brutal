@@ -44,7 +44,6 @@ void arch_entry_main(Handover *handover)
     simd_initialize();
     pmm_initialize(handover);
     vmm_initialize(handover);
-    pic_initialize();
     hpet_initialize(handover);
     apic_initalize(handover);
     cpu_initialize();
