@@ -11,14 +11,10 @@ typedef struct PACKED
     uint32_t rsdt;
 } AcpiRsdp;
 
-
-
 typedef struct
 {
     AcpiSdth stdh;
     uint32_t children[];
 } AcpiRsdt;
-
-
 
 t

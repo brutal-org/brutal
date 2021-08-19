@@ -18,12 +18,12 @@ static void flush_tlb(uintptr_t addr)
 VmmResult vmm_flush(VmmSpace space, VmmRange virtual_range)
 {
     (void)space;
-    
+
     for (size_t i = 0; i < (virtual_range.size / MEM_PAGE_SIZE); i++)
     {
         flush_tlb(((virtual_range.base / MEM_PAGE_SIZE) + i) * MEM_PAGE_SIZE);
     }
-    
+
     return OK(VmmResult, virtual_range);
 }
 

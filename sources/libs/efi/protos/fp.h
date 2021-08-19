@@ -21,7 +21,7 @@
 
 #define EFI_FILE_MODE_READ (1 << 0)
 #define EFI_FILE_MODE_WRITE (1 << 1)
-#define EFI_FILE_MODE_CREATE (1 << 63)
+#define EFI_FILE_MODE_CREATE (1ull << 63)
 
 #define EFI_FILE_READ_ONLY (1 << 0)
 #define EFI_FILE_HIDDEN (1 << 1)

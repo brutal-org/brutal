@@ -2,14 +2,13 @@
 
 #if defined(__x86_64__) || defined(__x86_32__)
 
-void __stosb_set(void* d, uint8_t s, size_t c)
+void __stosb_set(void *d, uint8_t s, size_t c)
 {
-    asm volatile (
+    asm volatile(
         "rep stosb"
-        :"=D"(d),"=c"(c)
-        :"0"(d),"a"(s),"1"(c)
-        :"memory"
-    );
+        : "=D"(d), "=c"(c)
+        : "0"(d), "a"(s), "1"(c)
+        : "memory");
 }
 
 #endif

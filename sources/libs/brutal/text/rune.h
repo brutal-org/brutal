@@ -4,4 +4,3 @@
 #include <brutal/text/str.h>
 
 typedef uint32_t Rune;
-

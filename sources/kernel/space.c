@@ -19,7 +19,7 @@ static void memory_mapping_create(Space *space, MemObj *object, size_t offset, V
     PmmRange pmm = {mem_obj_base(object) + offset, vmm.size};
 
     vmm_map(space->vmm, vmm, pmm, BR_MEM_USER | BR_MEM_WRITABLE);
-    
+
     vmm_flush(space->vmm, vmm);
 }
 
@@ -29,9 +29,8 @@ static void memory_mapping_destroy(Space *space, MemoryMapping *mapping)
     mem_obj_deref(mapping->object);
     vec_remove(&space->mappings, mapping);
     alloc_free(alloc_global(), mapping);
-    
-    vmm_flush(space->vmm, mapping->range);
 
+    vmm_flush(space->vmm, mapping->range);
 }
 
 /* --- Memory Space --------------------------------------------------------- */

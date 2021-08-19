@@ -1,6 +1,7 @@
 #pragma once
 
 #include <efi/types.h>
+#include <efi/protos/fp.h>
 
 #define EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_REVISION 0x00010000
 

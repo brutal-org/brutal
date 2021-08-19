@@ -231,13 +231,13 @@ void kmain(Handover *handover)
     uint64_t size = 0;
 
     uint64_t free_pages = 0;
-    
+
     for (int i = 0; i < mmap.size; i++)
     {
         auto entry = mmap.entries[i];
 
-	if(entry.type == HANDOVER_MMAP_FREE)
-	  free_pages += entry.length;
+        if (entry.type == HANDOVER_MMAP_FREE)
+            free_pages += entry.length;
         size += entry.length;
     }
 

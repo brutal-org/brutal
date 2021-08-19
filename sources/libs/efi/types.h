@@ -21,10 +21,16 @@ typedef uint64_t EFIStatus;
 typedef void *EFIEvent;
 typedef void *EFIHandle;
 
+// https://uefi.org/sites/default/files/resources/UEFI%20Spec%202.8B%20May%202020.pdf part 8.3
+
 typedef struct
 {
     uint16_t year;
     uint8_t month;
+    uint8_t day;
+    uint8_t hour;
+    uint8_t minute;
+    uint8_t second;
     uint8_t _pad1;
     uint32_t nanosecond;
     int16_t time_zone;

@@ -94,7 +94,6 @@ HostIoOpenFileResult host_io_file_open(Str path)
 
     EFIFileProtocol *file = nullptr;
 
-
     EFIStatus status = efi_rootdir()->open(efi_rootdir(), &file, cstr, EFI_FILE_MODE_READ, EFI_FILE_READ_ONLY);
 
     alloc_free(alloc_global(), cstr);
