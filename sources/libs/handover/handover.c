@@ -80,7 +80,4 @@ void handover_dump(Handover const *handover)
     {
         log("\tNot found!");
     }
-    while (true)
-    {
-    }
 }
