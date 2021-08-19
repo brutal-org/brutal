@@ -8,6 +8,8 @@
 #include "loader/config.h"
 #include "loader/protocol.h"
 
+typedef void (*entry_point_func)(Handover *handover, uint64_t t) __attribute__((sysv_abi));
+
 void __chkstk() { return; }
 
 char *logo[] = {
@@ -66,7 +68,7 @@ void loader_load(Elf64Header const *elf_header, void *base)
     }
 }
 
-uintptr_t loader_load_kernel(Str path)
+entry_point_func loader_load_kernel(Str path)
 {
     IoFile file;
     IoFileReader reader;
@@ -95,25 +97,20 @@ uintptr_t loader_load_kernel(Str path)
 
     log("Entry is {#x}", entry);
 
-    return entry;
+    return (entry_point_func)entry;
 }
 
 void loader_boot(LoaderEntry *entry)
 {
     log("Loading kernel...");
 
-    uintptr_t entry_point = loader_load_kernel(entry->kernel);
+    auto entry_point = loader_load_kernel(entry->kernel);
 
     log("Kernel loaded, jumping in to it...");
 
     Handover handover = get_handover();
 
-    asm volatile(
-        "mov %0, %%rdi\n"
-        "mov %1, %%rsi\n"
-        "mov %2, %%rax\n"
-        "call *%%rax\n" ::"a"(&handover),
-        "b"((uint64_t)0xC001B001), "c"((uint64_t)entry_point));
+    entry_point(&handover, 0xC001B001);
 
     assert_unreachable();
 }
