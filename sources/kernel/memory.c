@@ -27,7 +27,7 @@ MemObj *mem_obj_heap(HeapRange heap, MemObjFlags flags)
     self->flags = flags;
     self->heap = heap;
 
-    object_init(base_cast(self), BR_OBJECT_MEMORY, (ObjectDtor *)mem_obj_destroy);
+    object_init(base$(self), BR_OBJECT_MEMORY, (ObjectDtor *)mem_obj_destroy);
 
     return self;
 }
@@ -40,19 +40,19 @@ MemObj *mem_obj_pmm(PmmRange pmm, MemObjFlags flags)
     self->flags = flags;
     self->pmm = pmm;
 
-    object_init(base_cast(self), BR_OBJECT_MEMORY, (ObjectDtor *)mem_obj_destroy);
+    object_init(base$(self), BR_OBJECT_MEMORY, (ObjectDtor *)mem_obj_destroy);
 
     return self;
 }
 
 void mem_obj_ref(MemObj *self)
 {
-    object_ref(base_cast(self));
+    object_ref(base$(self));
 }
 
 void mem_obj_deref(MemObj *self)
 {
-    object_deref(base_cast(self));
+    object_deref(base$(self));
 }
 
 PmmRange mem_obj_range(MemObj *self)

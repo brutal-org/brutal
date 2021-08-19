@@ -9,7 +9,7 @@ IoWriteResult host_log_write(IoWriter *writer, char const *text, size_t size)
 {
     UNUSED(writer);
 
-    uint16_t *cstr = str_to_cstr_utf16_dos(str_cast_n(size, (char *)text), alloc_global());
+    uint16_t *cstr = str_to_cstr_utf16_dos(str$_n(size, (char *)text), alloc_global());
 
     efi_st()->console_out->output_string(efi_st()->console_out, cstr);
 

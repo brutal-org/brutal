@@ -60,19 +60,19 @@ Space *space_create(BrSpaceFlags flags)
     range_alloc_init(&self->alloc, alloc_global());
     range_alloc_unused(&self->alloc, (USizeRange){0x400000, 0x7fffffffffff});
 
-    object_init(base_cast(self), BR_OBJECT_SPACE, (ObjectDtor *)space_destroy);
+    object_init(base$(self), BR_OBJECT_SPACE, (ObjectDtor *)space_destroy);
 
     return self;
 }
 
 void space_ref(Space *self)
 {
-    object_ref(base_cast(self));
+    object_ref(base$(self));
 }
 
 void space_deref(Space *self)
 {
-    object_deref(base_cast(self));
+    object_deref(base$(self));
 }
 
 void space_switch(Space *self)
@@ -98,7 +98,7 @@ SpaceResult space_map(Space *self, MemObj *mem_obj, size_t offset, size_t size, 
 
     if (vaddr == 0)
     {
-        range = range_cast(VmmRange, range_alloc_alloc(&self->alloc, size));
+        range = range$(VmmRange, range_alloc_alloc(&self->alloc, size));
 
         if (range.size == 0)
         {
@@ -108,7 +108,7 @@ SpaceResult space_map(Space *self, MemObj *mem_obj, size_t offset, size_t size, 
     else
     {
         range = (VmmRange){vaddr, size};
-        range_alloc_used(&self->alloc, range_cast(USizeRange, range));
+        range_alloc_used(&self->alloc, range$(USizeRange, range));
     }
 
     memory_mapping_create(self, mem_obj, offset, range);
@@ -125,7 +125,7 @@ SpaceResult space_unmap(Space *self, VmmRange range)
         if (mapping->range.base == range.base &&
             mapping->range.size == range.size)
         {
-            range_alloc_unused(&self->alloc, range_cast(USizeRange, range));
+            range_alloc_unused(&self->alloc, range$(USizeRange, range));
             memory_mapping_destroy(self, mapping);
             return OK(SpaceResult, range);
         }

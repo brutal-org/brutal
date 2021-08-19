@@ -52,7 +52,7 @@ void buffer_push_impl(Buffer *self, uint8_t const *data, size_t size)
 
 Str buffer_str(Buffer *self)
 {
-    return str_cast_n(self->used, (char *)self->data);
+    return str$_n(self->used, (char *)self->data);
 }
 
 static IoReadResult io_buffer_read_impl(IoBufferReader *read, char *data, size_t size)

@@ -14,7 +14,7 @@ struct print_value print_val_unsigned(unsigned long val)
 
 struct print_value print_val_cstring(char *val)
 {
-    return (struct print_value){nullstr, PRINT_STRING, {._string = str_cast(val)}};
+    return (struct print_value){nullstr, PRINT_STRING, {._string = str$(val)}};
 }
 
 struct print_value print_val_char(char val)
@@ -79,12 +79,12 @@ IoWriteResult print_impl(IoWriter *writer, Str format, struct print_args args)
 
     while (!scan_end(&scan))
     {
-        if (scan_skip_word(&scan, str_cast("{{")))
+        if (scan_skip_word(&scan, str$("{{")))
         {
             skip_fmt = false;
             written += TRY(IoWriteResult, io_put(writer, '{'));
         }
-        else if (scan_skip_word(&scan, str_cast("}}")))
+        else if (scan_skip_word(&scan, str$("}}")))
         {
             skip_fmt = false;
             written += TRY(IoWriteResult, io_put(writer, '}'));

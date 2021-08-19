@@ -11,10 +11,10 @@ int main(int argc, char const *argv[])
         return 0;
     }
 
-    log("converting {} to {}", str_cast(argv[1]), str_cast(argv[2]));
+    log("converting {} to {}", str$(argv[1]), str$(argv[2]));
 
     IoFile source_file;
-    io_file_open(&source_file, str_cast(argv[1]));
+    io_file_open(&source_file, str$(argv[1]));
 
     IoFileReader source_file_reader = io_file_read(&source_file);
 
@@ -23,7 +23,7 @@ int main(int argc, char const *argv[])
 
     IoBufferWriter source_buffer_writer = io_buffer_write(&source_buffer);
 
-    io_copy(base_cast(&source_file_reader), base_cast(&source_buffer_writer));
+    io_copy(base$(&source_file_reader), base$(&source_buffer_writer));
 
     Scan scan;
     scan_init(&scan, buffer_str(&source_buffer));
@@ -36,11 +36,11 @@ int main(int argc, char const *argv[])
     }
 
     IoFile output_file;
-    io_file_create(&output_file, str_cast(argv[2]));
+    io_file_create(&output_file, str$(argv[2]));
 
     IoFileWriter output_file_writer = io_file_write(&output_file);
 
-    bid2c(&interface, base_cast(&output_file_writer));
+    bid2c(&interface, base$(&output_file_writer));
 
     return 0;
 }

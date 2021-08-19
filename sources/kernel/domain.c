@@ -18,18 +18,18 @@ Domain *domain_create(void)
     Domain *self = alloc_make(alloc_global(), Domain);
     vec_init(&self->objects, alloc_global());
 
-    object_init(base_cast(self), BR_OBJECT_DOMAIN, (ObjectDtor *)domain_destroy);
+    object_init(base$(self), BR_OBJECT_DOMAIN, (ObjectDtor *)domain_destroy);
     return self;
 }
 
 void domain_ref(Domain *self)
 {
-    object_ref(base_cast(self));
+    object_ref(base$(self));
 }
 
 void domain_deref(Domain *self)
 {
-    object_deref(base_cast(self));
+    object_deref(base$(self));
 }
 
 void domain_add(Domain *self, Object *new_object)

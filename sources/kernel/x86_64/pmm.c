@@ -112,7 +112,7 @@ PmmResult pmm_alloc(size_t size)
 
     bitmap_set_range(&pmm_bitmap, page_range, PMM_USED);
 
-    auto pmm_range = range_cast(PmmRange, page_range);
+    auto pmm_range = range$(PmmRange, page_range);
 
     pmm_range.base *= MEM_PAGE_SIZE;
     pmm_range.size *= MEM_PAGE_SIZE;

@@ -12,7 +12,7 @@ Task *task_self(void)
 
 void task_destroy(Task *task)
 {
-    log("Destroying task {}({})", str_cast(&task->name), task->handle);
+    log("Destroying task {}({})", str$(&task->name), task->handle);
 
     context_destroy(task->context);
     space_deref(task->space);
@@ -29,7 +29,7 @@ TaskCreateResult task_create(Str name, Space *space, BrCap caps, BrTaskFlags fla
 
     auto task = alloc_make(alloc_global(), Task);
 
-    task->name = str_cast_fix(StrFix128, name);
+    task->name = str_fix$(StrFix128, name);
     task->flags = flags;
 
     task->caps = caps;
@@ -43,21 +43,21 @@ TaskCreateResult task_create(Str name, Space *space, BrCap caps, BrTaskFlags fla
     task->stack = UNWRAP(heap_alloc(KERNEL_STACK_SIZE));
     task->sp = range_end(task->stack);
 
-    object_init(base_cast(task), BR_OBJECT_TASK, (ObjectDtor *)task_destroy);
+    object_init(base$(task), BR_OBJECT_TASK, (ObjectDtor *)task_destroy);
 
-    log("Task {}({}) created...", str_cast(&task->name), task->handle);
+    log("Task {}({}) created...", str$(&task->name), task->handle);
 
     return OK(TaskCreateResult, task);
 }
 
 void task_ref(Task *self)
 {
-    object_ref(base_cast(self));
+    object_ref(base$(self));
 }
 
 void task_deref(Task *self)
 {
-    object_deref(base_cast(self));
+    object_deref(base$(self));
 }
 
 void task_begin_syscall(void)

@@ -10,4 +10,4 @@ typedef struct
 } SourceLocation;
 
 #define source_location_current \
-    (SourceLocation) { __LINE__, str_cast(__func__), str_cast(__FILENAME__), }
+    (SourceLocation) { __LINE__, str$(__func__), str$(__FILENAME__), }

@@ -3,14 +3,14 @@
 
 static bool parser_skip_comment(Scan *scan)
 {
-    if (!scan_skip_word(scan, str_cast("/*")))
+    if (!scan_skip_word(scan, str$("/*")))
     {
         return false;
     }
 
     while (!scan_end(scan))
     {
-        if (scan_skip_word(scan, str_cast("*/")))
+        if (scan_skip_word(scan, str$("*/")))
         {
             return true;
         }
@@ -41,7 +41,7 @@ static Str parse_identifier(Scan *scan)
 
     if (name.len == 0)
     {
-        scan_throw(scan, str_cast("invalid identifier"), name);
+        scan_throw(scan, str$("invalid identifier"), name);
     }
 
     return name;
@@ -136,13 +136,13 @@ static BidType parse_type(Scan *scan, Alloc *alloc)
 {
     BidType type = {};
 
-    if (scan_skip_word(scan, str_cast("struct")) || scan_curr(scan) == '{')
+    if (scan_skip_word(scan, str$("struct")) || scan_curr(scan) == '{')
     {
         skip_comment_and_space(scan);
         type.type = BID_TYPE_STRUCT;
         type.struct_ = parse_struct(scan, alloc);
     }
-    else if (scan_skip_word(scan, str_cast("enum")))
+    else if (scan_skip_word(scan, str$("enum")))
     {
         skip_comment_and_space(scan);
         type.type = BID_TYPE_ENUM;
@@ -198,7 +198,7 @@ static BidMethod parse_method(Scan *scan, Alloc *alloc)
 
     skip_comment_and_space(scan);
 
-    scan_skip_word(scan, str_cast("->"));
+    scan_skip_word(scan, str$("->"));
 
     skip_comment_and_space(scan);
 
@@ -217,7 +217,7 @@ BidInterface bid_parse(Scan *scan, Alloc *alloc)
 
     skip_comment_and_space(scan);
 
-    scan_expect_word(scan, str_cast("interface"));
+    scan_expect_word(scan, str$("interface"));
 
     skip_comment_and_space(scan);
 
@@ -231,29 +231,29 @@ BidInterface bid_parse(Scan *scan, Alloc *alloc)
 
     while (scan_curr(scan) != '}' && !scan_end(scan))
     {
-        if (scan_skip_word(scan, str_cast("errors")))
+        if (scan_skip_word(scan, str$("errors")))
         {
             skip_comment_and_space(scan);
             interface.errors = parse_enum(scan, alloc);
         }
-        else if (scan_skip_word(scan, str_cast("type")))
+        else if (scan_skip_word(scan, str$("type")))
         {
             skip_comment_and_space(scan);
             vec_push(&interface.aliases, parse_alias(scan, alloc));
         }
-        else if (scan_skip_word(scan, str_cast("event")))
+        else if (scan_skip_word(scan, str$("event")))
         {
             skip_comment_and_space(scan);
             vec_push(&interface.events, parse_event(scan, alloc));
         }
-        else if (scan_skip_word(scan, str_cast("method")))
+        else if (scan_skip_word(scan, str$("method")))
         {
             skip_comment_and_space(scan);
             vec_push(&interface.methods, parse_method(scan, alloc));
         }
         else
         {
-            scan_throw(scan, str_cast("expected errors/type/event/method"), parse_identifier(scan));
+            scan_throw(scan, str$("expected errors/type/event/method"), parse_identifier(scan));
         }
 
         skip_comment_and_space(scan);

@@ -17,7 +17,7 @@ typedef Rect(float) Rectf;
 #define rect_create(T, x, y, w, h) \
     ((T){(x), (y), (w), (h)})
 
-#define rect_cast(T, RECT) \
+#define rect$(T, RECT) \
     rect_create(T, (RECT).x, (RECT).y, (RECT).w, (RECT).h)
 
 #define rect_collide(RECTA, RECTB)                    \

@@ -35,6 +35,6 @@ static inline Buffer io_readall(IoReader *from, Alloc *alloc)
     Buffer buffer;
     buffer_init(&buffer, 512, alloc);
     IoBufferWriter to = io_buffer_write(&buffer);
-    io_copy(from, base_cast(&to));
+    io_copy(from, base$(&to));
     return buffer;
 }

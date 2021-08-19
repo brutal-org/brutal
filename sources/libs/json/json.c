@@ -86,15 +86,15 @@ JsonValue json_parse(Scan *scan, Alloc *alloc)
     {
         return json_number(scan_next_decimal(scan));
     }
-    else if (scan_skip_word(scan, str_cast("true"))) // boolean (true)
+    else if (scan_skip_word(scan, str$("true"))) // boolean (true)
     {
         return json_true();
     }
-    else if (scan_skip_word(scan, str_cast("false"))) // boolean (false)
+    else if (scan_skip_word(scan, str$("false"))) // boolean (false)
     {
         return json_false();
     }
-    else if (scan_skip_word(scan, str_cast("null"))) // boolean (false)
+    else if (scan_skip_word(scan, str$("null"))) // boolean (false)
     {
         return json_null();
     }
@@ -108,7 +108,7 @@ JsonValue json_parse(Scan *scan, Alloc *alloc)
     }
     else
     {
-        scan_throw(scan, str_cast("expected a value"), str_cast(""));
+        scan_throw(scan, str$("expected a value"), str$(""));
 
         return json_error();
     }

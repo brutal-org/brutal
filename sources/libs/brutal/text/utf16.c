@@ -27,7 +27,7 @@ uint16_t *str_to_cstr_utf16_dos(Str str, Alloc *alloc)
 
     while (!scan_end(&scan))
     {
-        if (scan_skip_word(&scan, str_cast("\r\n")))
+        if (scan_skip_word(&scan, str$("\r\n")))
         {
             buffer_push(&buffer, u'\r');
             buffer_push(&buffer, u'\n');

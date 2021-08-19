@@ -33,7 +33,7 @@ typedef struct
     char *buffer;
 } Str;
 
-#define nullstr str_cast("")
+#define nullstr str$("")
 
 void str_rvs(Str str);
 
@@ -82,7 +82,7 @@ static inline Str str_make_from_str_fix128(StrFix128 const *str_fix) { return (S
 // clang-format off
 
 // Create a new instance of a non owning string.
-#define str_cast(literal)                            \
+#define str$(literal)                            \
     _Generic((literal),                              \
         Str              : str_forward,              \
         InlineStr *      : str_make_from_inline_str, \
@@ -104,18 +104,18 @@ static inline Str str_make_from_str_fix128(StrFix128 const *str_fix) { return (S
 
 // clang-format on
 
-#define str_cast_n(n, str) \
+#define str$_n(n, str) \
     (Str) { n, str }
 
 // Create a new instance of a fix size string.
-#define str_cast_fix(T, str) (                                \
+#define str_fix$(T, str) (                                    \
     {                                                         \
         T dst_str = {};                                       \
-        auto src_str = str_cast(str);                         \
+        auto src_str = str$(str);                             \
         mem_cpy(dst_str.buffer, src_str.buffer, src_str.len); \
         dst_str.len = src_str.len;                            \
         dst_str;                                              \
     })
 
 #define str_sub(str, start, end) \
-    str_cast_n(end - start, (char *)str.buffer + start)
+    str$_n(end - start, (char *)str.buffer + start)

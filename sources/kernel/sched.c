@@ -37,7 +37,7 @@ void sched_start(Task *task, uintptr_t ip, uintptr_t sp, BrTaskArgs args)
 
     assert_truth(!task->is_started);
 
-    log("Starting task {}({})", str_cast(&task->name), task->handle);
+    log("Starting task {}({})", str$(&task->name), task->handle);
 
     context_start(task->context, ip, sp, range_end(task->stack), args, task->flags);
     task->is_started = true;
@@ -320,7 +320,7 @@ void sched_dump(void)
     vec_foreach(task, &tasks)
     {
         Cpu *cpu = sched_cpu(task);
-        log_unlock("{}({}) : CPU{}", str_cast(&task->name), task->handle, cpu ? cpu->id : -1);
+        log_unlock("{}({}) : CPU{}", str$(&task->name), task->handle, cpu ? cpu->id : -1);
     }
 
     log_unlock("CPUs:");
@@ -328,9 +328,9 @@ void sched_dump(void)
     {
         log_unlock("CPU{} : c:{}({}) n:{}({})",
                    i,
-                   str_cast(&cpu(i)->current->name),
+                   str$(&cpu(i)->current->name),
                    cpu(i)->current->handle,
-                   str_cast(&cpu(i)->next->name),
+                   str$(&cpu(i)->next->name),
                    cpu(i)->next->handle);
     }
 }
@@ -370,9 +370,9 @@ void sched_ensure_no_cpu_jump(void)
             {
                 sched_dump();
                 panic("sched_ensure_no_cpu_jump() failled {}:{#p}({}) jumped from CPU{} to CPU{} taking the place of {}:{#p}({})!",
-                      str_cast(&cpu(i)->current->name), (uintptr_t)cpu(i)->next, cpu(i)->current->handle,
+                      str$(&cpu(i)->current->name), (uintptr_t)cpu(i)->next, cpu(i)->current->handle,
                       i, j,
-                      str_cast(&cpu(j)->next->name), (uintptr_t)cpu(j)->next, cpu(j)->next->handle);
+                      str$(&cpu(j)->next->name), (uintptr_t)cpu(j)->next, cpu(j)->next->handle);
             }
         }
     }
@@ -430,7 +430,7 @@ void sched_finalize(void)
 
         if (task->is_stopped && !sched_runnable(task) && !sched_running(task))
         {
-            log("Finalizing task({}) {}", task->handle, str_cast(&task->name));
+            log("Finalizing task({}) {}", task->handle, str$(&task->name));
             sched_dequeue(task);
             i--;
         }

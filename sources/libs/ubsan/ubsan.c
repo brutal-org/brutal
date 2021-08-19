@@ -18,7 +18,7 @@ struct ubsan_type_descriptor
 
 static void ubsan_print_location(char *message, struct ubsan_source_location loc)
 {
-    panic("ubsan: {} at file {}, line {}, column {}", message, str_cast(loc.file), loc.line, loc.column);
+    panic("ubsan: {} at file {}, line {}, column {}", message, str$(loc.file), loc.line, loc.column);
 }
 
 struct ubsan_overflow_data
@@ -171,12 +171,12 @@ void __ubsan_handle_invalid_builtin(struct ubsan_invalid_builtin_data *data)
     ubsan_print_location("invalid builtin", data->location);
 }
 
-struct ubsan_float_cast_overflow_data
+struct ubsan_float$_overflow_data
 {
     struct ubsan_source_location location;
 };
 
-void __ubsan_handle_float_cast_overflow(struct ubsan_float_cast_overflow_data *data)
+void __ubsan_handle_float$_overflow(struct ubsan_float$_overflow_data *data)
 {
     ubsan_print_location("float cast overflow", data->location);
 }

@@ -80,10 +80,10 @@ static_assert(sizeof(le_int64_t) == sizeof(int64_t), "le and native are expected
 
 #define store_be(VALUE, DEST) ({ (DEST)->_be_data = swap_big_endian(VALUE); })
 #define load_be(VALUE) swap_big_endian((VALUE)._be_data)
-#define be_cast(T, VALUE) \
+#define be$(T, VALUE) \
     ((T){swap_big_endian(VALUE)})
 
 #define store_le(VALUE, DEST) ({ (DEST)->_le_data = swap_little_endian(VALUE); })
 #define load_le(VALUE) swap_little_endian((VALUE)._le_data)
-#define le_cast(T, VALUE) \
+#define le$(T, VALUE) \
     ((T){swap_little_endian(VALUE)})

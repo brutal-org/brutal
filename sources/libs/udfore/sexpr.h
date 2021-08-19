@@ -31,7 +31,7 @@ static inline Str ud_type_to_string(UdType type)
 #undef ITER
     };
 
-    return str_cast(TYPES_NAMES[type]);
+    return str$(TYPES_NAMES[type]);
 }
 
 #undef FOREACH_TYPES

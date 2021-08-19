@@ -20,9 +20,9 @@ TEST(gfx_draw_rectangle)
     gfx_canvas_end(&canvas);
 
     IoFile file;
-    io_file_create(&file, str_cast("test.tga"));
+    io_file_create(&file, str$("test.tga"));
     IoFileWriter writer = io_file_write(&file);
-    tga_encode(base_cast(&writer), gfx_canvas_surface(&canvas));
+    tga_encode(base$(&writer), gfx_canvas_surface(&canvas));
     io_file_close(&file);
 
     gfx_canvas_deinit(&canvas);

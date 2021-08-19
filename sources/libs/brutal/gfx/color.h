@@ -13,10 +13,10 @@ typedef struct
     float r, g, b, a;
 } GfxColorf;
 
-#define gfx_colorf_cast(COLOR) \
+#define gfx_colorf$(COLOR) \
     ((GfxColorf){(COLOR).r / 255.0f, (COLOR).g / 255.0f, (COLOR).b / 255.0f, (COLOR).a / 255.0f})
 
-#define gfx_colori_cast(COLORF) \
+#define gfx_colori$(COLORF) \
     ((GfxColor){(COLORF).r * 255, (COLORF).g * 255, (COLORF).b * 255, (COLORF).a * 255})
 
 #define GFX_COLOR_BLACK \
@@ -55,8 +55,8 @@ static inline GfxColor gfx_color_blend(GfxColor fg, GfxColor bg)
         return (GfxColor){r, g, b, 0xff};
     }
 
-    GfxColorf fgf = gfx_colorf_cast(fg);
-    GfxColorf bgf = gfx_colorf_cast(fg);
+    GfxColorf fgf = gfx_colorf$(fg);
+    GfxColorf bgf = gfx_colorf$(fg);
 
     float a = (1 - fgf.a) * bgf.a + fgf.a;
 
@@ -65,5 +65,5 @@ static inline GfxColor gfx_color_blend(GfxColor fg, GfxColor bg)
     float b = ((1 - fgf.a) * bgf.a * bgf.b + fgf.a * fgf.b) / a;
 
     GfxColorf res = (GfxColorf){r, g, b, a};
-    return gfx_colori_cast(res);
+    return gfx_colori$(res);
 }

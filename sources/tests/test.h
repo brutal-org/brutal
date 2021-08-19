@@ -33,7 +33,7 @@ void test_register(struct test test);
     {                                                                           \
         test_register((struct test){                                            \
             flags,                                                              \
-            str_cast(#name),                                                    \
+            str$(#name),                                                        \
             TEST_FUNCTION_NAME(name),                                           \
         });                                                                     \
     }                                                                           \

@@ -27,7 +27,7 @@ typedef struct
     Str message;
 } Error;
 
-#define make_error(KIND, MESSAGE) ((Error){(KIND), str_cast(MESSAGE)})
+#define make_error(KIND, MESSAGE) ((Error){(KIND), str$(MESSAGE)})
 
 #define ERR_SUCCESS make_error(ERR_KIND_SUCCESS, "success")
 

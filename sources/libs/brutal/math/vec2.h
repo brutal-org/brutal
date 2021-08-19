@@ -13,5 +13,5 @@ typedef Vec2(float) Vec2f;
 #define vec_create(T, x, y) \
     ((T){(x), (y)})
 
-#define vec_cast(T, VEC) \
+#define vec$(T, VEC) \
     vec_create((T), (VEC).x, (VEC).y)

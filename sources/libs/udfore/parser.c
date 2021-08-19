@@ -6,7 +6,7 @@ static UdExpr parse_expression(Scan *scan, Alloc *alloc);
 
 static bool skip_keyword(Scan *scan, const char *expected)
 {
-    return scan_skip_word(scan, str_cast(expected));
+    return scan_skip_word(scan, str$(expected));
 }
 
 static bool skip_space(Scan *scan)
@@ -34,7 +34,7 @@ static bool skip_comment(Scan *scan)
 
         struct alloc_heap heap;
         alloc_heap_init(&heap);
-        parse_expression(scan, base_cast(&heap));
+        parse_expression(scan, base$(&heap));
         alloc_heap_deinit(&heap);
 
         return true;
@@ -218,7 +218,7 @@ static UdExpr parse_block(Scan *scan, Alloc *alloc)
 
     return ud_pair(
         alloc,
-        ud_atom(str_cast("bs-builtin-block")),
+        ud_atom(str$("bs-builtin-block")),
         body);
 }
 
@@ -258,13 +258,13 @@ static UdExpr parse_expression(Scan *scan, Alloc *alloc)
     {
         return ud_pair(
             alloc,
-            ud_atom(str_cast("bs-builtin-quote")),
+            ud_atom(str$("bs-builtin-quote")),
             parse_expression(scan, alloc));
     }
     else
     {
         char c = scan_curr(scan);
-        scan_throw(scan, str_cast("unexpected-character"), str_cast_n(1, &c));
+        scan_throw(scan, str$("unexpected-character"), str$_n(1, &c));
         return ud_nil();
     }
 }
@@ -293,7 +293,7 @@ static UdExpr parse_module(Scan *scan, Alloc *alloc)
 
     return ud_pair(
         alloc,
-        ud_atom(str_cast("bs-builtin-block")),
+        ud_atom(str$("bs-builtin-block")),
         body);
 }
 

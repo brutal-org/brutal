@@ -47,35 +47,35 @@ void vec_swapsplice_impl(VecImpl *impl, int start, int count);
 
 void vec_swap_impl(VecImpl *impl, int idx1, int idx2);
 
-#define vec_init(v, alloc_) vec_init_impl(impl_cast(v), sizeof(*(v)->data), alloc_)
+#define vec_init(v, alloc_) vec_init_impl(impl$(v), sizeof(*(v)->data), alloc_)
 
-#define vec_deinit(v) vec_deinit_impl(impl_cast(v))
+#define vec_deinit(v) vec_deinit_impl(impl$(v))
 
 #define vec_push(v, val) \
-    (vec_expand_impl(impl_cast(v)) ? ((v)->data[(v)->length++] = (val), true) : false)
+    (vec_expand_impl(impl$(v)) ? ((v)->data[(v)->length++] = (val), true) : false)
 
 #define vec_pop(v) (v)->data[--(v)->length]
 
 #define vec_splice(v, start, count) \
-    (vec_splice_impl(impl_cast(v), start, count), (v)->length -= (count))
+    (vec_splice_impl(impl$(v), start, count), (v)->length -= (count))
 
 #define vec_swapsplice(v, start, count) \
-    (vec_swapsplice_impl(impl_cast(v), start, count), (v)->length -= (count))
+    (vec_swapsplice_impl(impl$(v), start, count), (v)->length -= (count))
 
-#define vec_insert(v, idx, val) (                         \
-    {                                                     \
-        auto result = vec_insert_impl(impl_cast(v), idx); \
-        if (result)                                       \
-        {                                                 \
-            (v)->data[idx] = (val);                       \
-            (v)->length++;                                \
-        }                                                 \
-        result;                                           \
+#define vec_insert(v, idx, val) (                     \
+    {                                                 \
+        auto result = vec_insert_impl(impl$(v), idx); \
+        if (result)                                   \
+        {                                             \
+            (v)->data[idx] = (val);                   \
+            (v)->length++;                            \
+        }                                             \
+        result;                                       \
     })
 
 #define vec_sort(v, fn) qsort((v)->data, (v)->length, sizeof(*(v)->data), fn)
 
-#define vec_swap(v, idx1, idx2) vec_swap_impl(impl_cast(v), idx1, idx2)
+#define vec_swap(v, idx1, idx2) vec_swap_impl(impl$(v), idx1, idx2)
 
 #define Vecruncate(v, len) \
     ((v)->length = (len) < (v)->length ? (len) : (v)->length)
@@ -90,9 +90,9 @@ void vec_swap_impl(VecImpl *impl, int idx1, int idx2);
 
 #define vec_end(v) ((v)->data + (v)->length)
 
-#define vec_reserve(v, n) vec_reserve_impl(impl_cast(v), n)
+#define vec_reserve(v, n) vec_reserve_impl(impl$(v), n)
 
-#define vec_compact(v) vec_compact_impl(impl_cast(v))
+#define vec_compact(v) vec_compact_impl(impl$(v))
 
 #define vec_find(v, val, idx)                         \
     STMT(                                             \

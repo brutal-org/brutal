@@ -47,79 +47,79 @@ static char fmt_prefix(struct fmt self)
 
 static void fmt_pase_case(struct fmt *fmt, Scan *scan)
 {
-    if (scan_skip_word(scan, str_cast("default")))
+    if (scan_skip_word(scan, str$("default")))
     {
         fmt->casing = CASE_DEFAULT;
     }
-    else if (scan_skip_word(scan, str_cast("camel")))
+    else if (scan_skip_word(scan, str$("camel")))
     {
         fmt->casing = CASE_CAMEL;
     }
-    else if (scan_skip_word(scan, str_cast("capital")))
+    else if (scan_skip_word(scan, str$("capital")))
     {
         fmt->casing = CASE_CAPITAL;
     }
-    else if (scan_skip_word(scan, str_cast("constant")))
+    else if (scan_skip_word(scan, str$("constant")))
     {
         fmt->casing = CASE_CONSTANT;
     }
-    else if (scan_skip_word(scan, str_cast("dot")))
+    else if (scan_skip_word(scan, str$("dot")))
     {
         fmt->casing = CASE_DOT;
     }
-    else if (scan_skip_word(scan, str_cast("header")))
+    else if (scan_skip_word(scan, str$("header")))
     {
         fmt->casing = CASE_HEADER;
     }
-    else if (scan_skip_word(scan, str_cast("no")))
+    else if (scan_skip_word(scan, str$("no")))
     {
         fmt->casing = CASE_NO;
     }
-    else if (scan_skip_word(scan, str_cast("param")))
+    else if (scan_skip_word(scan, str$("param")))
     {
         fmt->casing = CASE_PARAM;
     }
-    else if (scan_skip_word(scan, str_cast("pascal")))
+    else if (scan_skip_word(scan, str$("pascal")))
     {
         fmt->casing = CASE_PASCAL;
     }
-    else if (scan_skip_word(scan, str_cast("path")))
+    else if (scan_skip_word(scan, str$("path")))
     {
         fmt->casing = CASE_PATH;
     }
-    else if (scan_skip_word(scan, str_cast("sentence")))
+    else if (scan_skip_word(scan, str$("sentence")))
     {
         fmt->casing = CASE_SENTENCE;
     }
-    else if (scan_skip_word(scan, str_cast("snake")))
+    else if (scan_skip_word(scan, str$("snake")))
     {
         fmt->casing = CASE_SNAKE;
     }
-    else if (scan_skip_word(scan, str_cast("title")))
+    else if (scan_skip_word(scan, str$("title")))
     {
         fmt->casing = CASE_TITLE;
     }
-    else if (scan_skip_word(scan, str_cast("swap")))
+    else if (scan_skip_word(scan, str$("swap")))
     {
         fmt->casing = CASE_SWAP;
     }
-    else if (scan_skip_word(scan, str_cast("lower")))
+    else if (scan_skip_word(scan, str$("lower")))
     {
         fmt->casing = CASE_LOWER;
     }
-    else if (scan_skip_word(scan, str_cast("lower-first")))
+    else if (scan_skip_word(scan, str$("lower-first")))
     {
         fmt->casing = CASE_LOWER_FIRST;
     }
-    else if (scan_skip_word(scan, str_cast("upper")))
+    else if (scan_skip_word(scan, str$("upper")))
     {
         fmt->casing = CASE_UPPER;
     }
-    else if (scan_skip_word(scan, str_cast("upper-first")))
+    else if (scan_skip_word(scan, str$("upper-first")))
     {
         fmt->casing = CASE_UPPER_FIRST;
     }
-    else if (scan_skip_word(scan, str_cast("sponge")))
+    else if (scan_skip_word(scan, str$("sponge")))
     {
         fmt->casing = CASE_SPONGE;
     }
@@ -195,7 +195,7 @@ struct fmt fmt_parse(Scan *scan)
         {
             fmt_parse_min_width(&fmt, scan);
         }
-        else if (scan_skip_word(scan, str_cast("case:")))
+        else if (scan_skip_word(scan, str$("case:")))
         {
             fmt_pase_case(&fmt, scan);
         }
@@ -277,7 +277,7 @@ IoWriteResult fmt_unsigned(struct fmt self, IoWriter *writer, unsigned long valu
         buffer[i++] = '0';
     }
 
-    str_rvs(str_cast(buffer));
+    str_rvs(str$(buffer));
 
     return io_write(writer, buffer, i);
 }
@@ -288,7 +288,7 @@ IoWriteResult fmt_char(MAYBE_UNUSED struct fmt self, IoWriter *writer, unsigned 
 
     auto utf8 = rune_to_utf8((Rune)character);
 
-    written += TRY(IoWriteResult, io_print(writer, str_cast(&utf8)));
+    written += TRY(IoWriteResult, io_print(writer, str$(&utf8)));
 
     return OK(IoWriteResult, written);
 }

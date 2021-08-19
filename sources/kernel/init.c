@@ -95,7 +95,7 @@ static uintptr_t init_pass(Task *task, Handover const *handover)
 
 void init_start(Handover const *handover)
 {
-    auto name = str_cast("init");
+    auto name = str$("init");
 
     auto elf_module = handover_find_module(handover, name);
     auto elf_header = (Elf64Header *)mmap_phys_to_io(elf_module->addr);

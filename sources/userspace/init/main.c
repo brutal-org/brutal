@@ -44,7 +44,7 @@ static void display_bootimage(Handover const *handover)
 
     // Open the bootimage
 
-    auto img = handover_find_module(handover, str_cast("bootimg"));
+    auto img = handover_find_module(handover, str$("bootimg"));
     assert_not_null(img);
 
     BrCreateArgs img_obj = {
@@ -133,8 +133,8 @@ int br_entry(Handover const *handover)
         display_bootimage(handover);
     }
 
-    srv_run(handover, str_cast("posix"));
-    BrTask echo_srv = srv_run(handover, str_cast("echo"));
+    srv_run(handover, str$("posix"));
+    BrTask echo_srv = srv_run(handover, str$("echo"));
 
     while (true)
     {

@@ -35,15 +35,15 @@ static IoStdWriter err = {
 
 IoReader *io_std_in(void)
 {
-    return base_cast(&in);
+    return base$(&in);
 }
 
 IoWriter *io_std_out(void)
 {
-    return base_cast(&out);
+    return base$(&out);
 }
 
 IoWriter *io_std_err(void)
 {
-    return base_cast(&err);
+    return base$(&err);
 }

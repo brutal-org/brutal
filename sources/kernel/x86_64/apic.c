@@ -118,7 +118,7 @@ struct ioapic_version ioapic_get_version(int index)
 {
     uint32_t raw = ioapic_read(index, IOAPIC_REG_VERSION);
 
-    return union_cast(struct ioapic_version, raw);
+    return union$(struct ioapic_version, raw);
 }
 
 void ioapic_initialize(Handover const *handover)

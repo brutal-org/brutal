@@ -77,7 +77,7 @@ entry_point_func loader_load_kernel(Str path)
     log("Loading elf file...");
     io_file_open(&file, path);
     reader = io_file_read(&file);
-    buffer = io_readall(base_cast(&reader), alloc_global());
+    buffer = io_readall(base$(&reader), alloc_global());
 
     Elf64Header *header = (Elf64Header *)buffer.data;
 
@@ -125,7 +125,7 @@ void loader_menu(void)
         {
             efi_tty_clear();
             loader_boot(&(LoaderEntry){
-                .kernel = str_cast("/kernel.elf"),
+                .kernel = str$("/kernel.elf"),
             });
         }
 

@@ -109,20 +109,20 @@ TEST_WITH_FLAGS(assert_unreachable_should_fail, TEST_EXPECTED_TO_FAIL)
 
 TEST(assert_equal_str_pass)
 {
-    assert_str_equal(str_cast("foo"), str_cast("foo"));
+    assert_str_equal(str$("foo"), str$("foo"));
 }
 
 TEST_WITH_FLAGS(assert_equal_str_should_fail, TEST_EXPECTED_TO_FAIL)
 {
-    assert_str_equal(str_cast("fooowo"), str_cast("foo"));
+    assert_str_equal(str$("fooowo"), str$("foo"));
 }
 
 TEST(assert_not_equal_str_pass)
 {
-    assert_str_not_equal(str_cast("foo"), str_cast("uwu"));
+    assert_str_not_equal(str$("foo"), str$("uwu"));
 }
 
 TEST_WITH_FLAGS(assert_not_equal_str_should_fail, TEST_EXPECTED_TO_FAIL)
 {
-    assert_str_not_equal(str_cast("foo"), str_cast("foo"));
+    assert_str_not_equal(str$("foo"), str$("foo"));
 }

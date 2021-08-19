@@ -157,7 +157,7 @@ IoWriteResult host_io_write_std(IoStdChannel channel, char const *data, size_t s
 {
     assert_not_equal((int)channel, IO_STD_IN);
 
-    uint16_t *cstr = str_to_cstr_utf16_dos(str_cast_n(size, (char *)data), alloc_global());
+    uint16_t *cstr = str_to_cstr_utf16_dos(str$_n(size, (char *)data), alloc_global());
 
     efi_st()->console_out->output_string(efi_st()->console_out, cstr);
 

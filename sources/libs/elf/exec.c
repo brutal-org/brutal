@@ -103,7 +103,7 @@ BrTask elf_exec(BrMemObj elf_obj, Str name)
     BrCreateArgs elf_task = {
         .type = BR_OBJECT_TASK,
         .task = {
-            .name = str_cast_fix(StrFix128, name),
+            .name = str_fix$(StrFix128, name),
             .space = elf_space.handle,
             .caps = BR_CAP_ALL,
         },

@@ -11,7 +11,7 @@ struct acpi_sdth *acpi_rsdt_child(struct acpi_rsdt *rsdt, Str signature)
     {
         auto sdth = mmap_io_ptr_from_phys(struct acpi_sdth *, rsdt->children[i]);
 
-        if (str_eq(signature, str_cast_n(4, sdth->signature)))
+        if (str_eq(signature, str$_n(4, sdth->signature)))
         {
             return sdth;
         }
@@ -63,7 +63,7 @@ struct acpi_madt *acpi_find_madt(uintptr_t rsdp_address)
     auto rsdp = mmap_io_ptr_from_phys(struct acpi_rsdp *, rsdp_address);
     auto rsdt = mmap_io_ptr_from_phys(struct acpi_rsdt *, rsdp->rsdt_address);
 
-    return (struct acpi_madt *)acpi_rsdt_child(rsdt, str_cast("APIC"));
+    return (struct acpi_madt *)acpi_rsdt_child(rsdt, str$("APIC"));
 }
 
 struct acpi_hpet *acpi_find_hpet(uintptr_t rsdp_address)
@@ -71,7 +71,7 @@ struct acpi_hpet *acpi_find_hpet(uintptr_t rsdp_address)
     auto rsdp = mmap_io_ptr_from_phys(struct acpi_rsdp *, rsdp_address);
     auto rsdt = mmap_io_ptr_from_phys(struct acpi_rsdt *, rsdp->rsdt_address);
 
-    return (struct acpi_hpet *)acpi_rsdt_child(rsdt, str_cast("HPET"));
+    return (struct acpi_hpet *)acpi_rsdt_child(rsdt, str$("HPET"));
 }
 
 uint32_t acpi_find_lapic(uintptr_t rsdp_address)

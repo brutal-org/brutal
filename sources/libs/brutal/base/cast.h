@@ -1,18 +1,18 @@
 #pragma once
 
-#define base_cast(SELF) \
+#define base$(SELF) \
     (&(SELF)->base)
 
-#define impl_cast(SELF) \
+#define impl$(SELF) \
     (&(SELF)->_impl)
 
-#define union_cast(T, x) ( \
-    {                      \
-        union              \
-        {                  \
-            typeof(x) a;   \
-            T b;           \
-        } u;               \
-        u.a = x;           \
-        u.b;               \
+#define union$(T, x) (   \
+    {                    \
+        union            \
+        {                \
+            typeof(x) a; \
+            T b;         \
+        } u;             \
+        u.a = x;         \
+        u.b;             \
     })

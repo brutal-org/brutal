@@ -57,7 +57,7 @@ void gfx_canvas_clear(GfxCanvas *self)
     auto surface_bound = gfx_surface_bound(gfx_canvas_surface(self));
     gfx_cache_rect(
         &self->cache,
-        rect_cast(Rectf, surface_bound),
+        rect$(Rectf, surface_bound),
         gfx_stroke_none(),
         self->paint,
         gfx_transform_identity());

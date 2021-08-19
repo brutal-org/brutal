@@ -35,26 +35,26 @@ void linear_buffer_attach_impl(LinearBufferImpl *impl, uint8_t const *data, size
 void linear_buffer_clear_impl(LinearBufferImpl *impl);
 
 #define linear_buffer_init(SELF, ALLOC) \
-    linear_buffer_init_impl(impl_cast(SELF), (ALLOC))
+    linear_buffer_init_impl(impl$(SELF), (ALLOC))
 
 #define linear_buffer_deinit(SELF) \
-    linear_buffer_deinit_impl(impl_cast(SELF))
+    linear_buffer_deinit_impl(impl$(SELF))
 
-#define linear_buffer_push(SELF, VALUE) (                                             \
-    {                                                                                 \
-        auto tmp = (VALUE);                                                           \
-        linear_buffer_push_impl(impl_cast(SELF), (uint8_t const *)&tmp, sizeof(tmp)); \
+#define linear_buffer_push(SELF, VALUE) (                                         \
+    {                                                                             \
+        auto tmp = (VALUE);                                                       \
+        linear_buffer_push_impl(impl$(SELF), (uint8_t const *)&tmp, sizeof(tmp)); \
     })
 
 #define linear_buffer_attach(SELF, VALUE) ({})
 
 #define linear_buffer_clear(SELF) \
-    linear_buffer_clear_impl(impl_cast(SELF))
+    linear_buffer_clear_impl(impl$(SELF))
 
-#define linear_buffer_foreach(VAR, SELF)                                         \
-    for (auto __it = (LinearBufferNode *)buffer_begin(&impl_cast(SELF)->buffer); \
-         __it < (LinearBufferNode *)buffer_end(&impl_cast(SELF)->buffer);        \
-         __it = (LinearBufferNode *)(((uint8_t *)__it) + __it->size))            \
-        for (auto VAR = (typeof((SELF)->_T))&__it->data;                         \
-             VAR;                                                                \
+#define linear_buffer_foreach(VAR, SELF)                                     \
+    for (auto __it = (LinearBufferNode *)buffer_begin(&impl$(SELF)->buffer); \
+         __it < (LinearBufferNode *)buffer_end(&impl$(SELF)->buffer);        \
+         __it = (LinearBufferNode *)(((uint8_t *)__it) + __it->size))        \
+        for (auto VAR = (typeof((SELF)->_T))&__it->data;                     \
+             VAR;                                                            \
              VAR = nullptr)

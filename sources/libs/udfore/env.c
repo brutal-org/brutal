@@ -9,12 +9,12 @@ UdExpr ud_env_def(UdExpr env, UdExpr key, UdExpr value, Alloc *alloc)
 
 UdExpr ud_env_def_builtin(UdExpr env, const char *name, UdBuiltin builtin, Alloc *alloc)
 {
-    return ud_env_def(env, ud_atom(str_cast(name)), ud_builtin(builtin), alloc);
+    return ud_env_def(env, ud_atom(str$(name)), ud_builtin(builtin), alloc);
 }
 
 UdExpr ud_env_def_syntax(UdExpr env, const char *name, UdSyntax syntax, Alloc *alloc)
 {
-    return ud_env_def(env, ud_atom(str_cast(name)), ud_syntax(syntax), alloc);
+    return ud_env_def(env, ud_atom(str$(name)), ud_syntax(syntax), alloc);
 }
 
 UdExpr ud_env_set(UdExpr env, UdExpr key, UdExpr value, Alloc *alloc)

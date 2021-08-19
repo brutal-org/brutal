@@ -11,7 +11,7 @@
 BrResult sys_log(BrLogArgs *args)
 {
     host_log_lock();
-    print(host_log_writer(), "cpu{}: {}({}): ", cpu_self_id(), str_cast(&task_self()->name), task_self()->handle);
+    print(host_log_writer(), "cpu{}: {}({}): ", cpu_self_id(), str$(&task_self()->name), task_self()->handle);
     io_write(host_log_writer(), args->message, args->size);
     host_log_unlock();
 
@@ -135,12 +135,12 @@ BrResult sys_create_task(BrTask *handle, BrCreateTaskArgs *args)
     }
 
     auto task = UNWRAP(task_create(
-        str_cast(&args->name),
+        str$(&args->name),
         space,
         args->caps & task_self()->caps,
         args->flags | BR_TASK_USER));
 
-    domain_add(task_self()->domain, base_cast(task));
+    domain_add(task_self()->domain, base$(task));
 
     space_deref(space);
 
@@ -176,7 +176,7 @@ BrResult sys_create_mem_obj(BrMemObj *handle, BrCreateMemObjArgs *args)
         mem_obj = mem_obj_pmm(UNWRAP(pmm_result), MEM_OBJ_OWNING);
     }
 
-    domain_add(task_self()->domain, base_cast(mem_obj));
+    domain_add(task_self()->domain, base$(mem_obj));
     *handle = mem_obj->handle;
     mem_obj_deref(mem_obj);
 
@@ -187,7 +187,7 @@ BrResult sys_create_space(BrSpace *handle, BrCreateSpaceArgs *args)
 {
     auto space = space_create(args->flags);
 
-    domain_add(task_self()->domain, base_cast(space));
+    domain_add(task_self()->domain, base$(space));
     *handle = space->handle;
     space_deref(space);
 
@@ -397,11 +397,11 @@ BrResult syscall_dispatch(BrSyscall syscall, BrArg args)
     if (result != BR_SUCCESS)
     {
         log("Syscall: {}({}): {}({#p}) -> {}",
-            str_cast(&task_self()->name),
+            str$(&task_self()->name),
             task_self()->handle,
-            str_cast(br_syscall_to_string(syscall)),
+            str$(br_syscall_to_string(syscall)),
             args,
-            str_cast(br_result_to_string(result)));
+            str$(br_result_to_string(result)));
     }
 
     task_end_syscall();

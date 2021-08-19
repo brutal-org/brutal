@@ -32,19 +32,19 @@ void slot_acquire_impl(SlotImpl *impl, size_t index);
 void slot_release_impl(SlotImpl *impl, SlotIndex index);
 
 #define slot_init(self, alloc) \
-    slot_init_impl(impl_cast(self), sizeof(&(self)->data), (alloc))
+    slot_init_impl(impl$(self), sizeof(&(self)->data), (alloc))
 
 #define slot_deinit(self) \
-    slot_deinit_impl(impl_cast(self))
+    slot_deinit_impl(impl$(self))
 
 #define slot_alloc(self) \
-    slot_alloc_impl(impl_cast(self))
+    slot_alloc_impl(impl$(self))
 
 #define slot_acquire(self, index) \
-    slot_acquire_impl(impl_cast(self), index)
+    slot_acquire_impl(impl$(self), index)
 
 #define slot_release(self, index) \
-    slot_release_impl(impl_cast(self), index)
+    slot_release_impl(impl$(self), index)
 
 #define slot_at(self, index) \
     ({ &self->data[index]; })

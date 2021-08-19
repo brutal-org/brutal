@@ -72,7 +72,7 @@ struct print_value print_val_pointer(void *);
 #define PRINT_NAMED(NAME, VALUE)                \
     ({                                          \
        auto print_value = PRINT_MATCH(VALUE);   \
-       print_value.name = str_cast(NAME);       \
+       print_value.name = str$(NAME);       \
        print_value;                             \
     })
 
@@ -90,4 +90,4 @@ struct print_value print_val_pointer(void *);
 IoWriteResult print_impl(IoWriter *writer, Str format, struct print_args args);
 
 #define print(writer, fmt, ...) \
-    print_impl(writer, str_cast(fmt), PRINT_ARGS(__VA_ARGS__))
+    print_impl(writer, str$(fmt), PRINT_ARGS(__VA_ARGS__))

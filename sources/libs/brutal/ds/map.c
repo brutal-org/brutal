@@ -40,7 +40,7 @@ static MapNode *map_node(MapImpl *impl, Str key, uint32_t hash)
     vec_foreach(node, bucket)
     {
         if (node->hash == hash &&
-            str_eq(key, str_cast(&node->key)))
+            str_eq(key, str$(&node->key)))
         {
             return node;
         }

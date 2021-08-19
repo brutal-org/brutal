@@ -13,7 +13,7 @@ HeapResult heap_alloc(size_t size)
 
     auto pmm_range = TRY(HeapResult, pmm_alloc(size));
     pmm_range.base = mmap_phys_to_io(pmm_range.base);
-    auto heap_range = range_cast(HeapRange, pmm_range);
+    auto heap_range = range$(HeapRange, pmm_range);
     return OK(HeapResult, heap_range);
 }
 
@@ -21,7 +21,7 @@ HeapResult heap_free(HeapRange range)
 {
     LOCK_RETAINER(&heap_lock)
 
-    auto pmm_range = range_cast(PmmRange, range);
+    auto pmm_range = range$(PmmRange, range);
     pmm_range.base = mmap_io_to_phys(pmm_range.base);
     TRY(HeapResult, pmm_unused(pmm_range));
     return OK(HeapResult, range);
@@ -29,7 +29,7 @@ HeapResult heap_free(HeapRange range)
 
 PmmRange heap_to_pmm(HeapRange range)
 {
-    auto pmm_range = range_cast(PmmRange, range);
+    auto pmm_range = range$(PmmRange, range);
     pmm_range.base = mmap_io_to_phys(pmm_range.base);
     return pmm_range;
 }

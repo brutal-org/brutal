@@ -46,7 +46,7 @@ char scan_next(Scan *self)
 
     if (scan_end(self))
     {
-        scan_throw(self, str_cast("unexpected end of file"), str_cast("EOF"));
+        scan_throw(self, str$("unexpected end of file"), str$("EOF"));
     }
 
     char c = scan_peek(self, 0);
@@ -78,7 +78,7 @@ Str scan_skip_until(Scan *self, int (*callback)(int))
         scan_next(self);
     }
 
-    return str_cast_n(length, (char *)self->buffer + start);
+    return str$_n(length, (char *)self->buffer + start);
 }
 
 char scan_curr(Scan *self)
@@ -195,7 +195,7 @@ void scan_begin_token(Scan *self)
 
 Str scan_end_token(Scan *self)
 {
-    return str_cast_n(
+    return str$_n(
         self->head - self->token,
         (char *)self->buffer + self->token);
 }
@@ -213,20 +213,20 @@ void scan_throw(Scan *self, Str message, Str token)
     self->error = (ScanError){
         .message = message,
         .position = self->head,
-        .token = str_cast_fix(StrFix128, token),
+        .token = str_fix$(StrFix128, token),
     };
 }
 
 void scan_breakpoint(Scan *self)
 {
-    scan_throw(self, str_cast("debug"), str_cast("breakpoint"));
+    scan_throw(self, str$("debug"), str$("breakpoint"));
 }
 
 bool scan_expect(Scan *self, char c)
 {
     if (!scan_skip(self, c))
     {
-        scan_throw(self, str_cast("expected character"), str_cast_n(1, &c));
+        scan_throw(self, str$("expected character"), str$_n(1, &c));
         return false;
     }
 
@@ -237,7 +237,7 @@ bool scan_expect_word(Scan *self, Str word)
 {
     if (!scan_skip_word(self, word))
     {
-        scan_throw(self, str_cast("expected token"), word);
+        scan_throw(self, str$("expected token"), word);
         return false;
     }
 
@@ -252,9 +252,9 @@ bool scan_dump_error(Scan *self, IoWriter *writer)
     }
 
     ScanError err = self->error;
-    Str src = str_cast_n(self->size, (char *)self->buffer);
+    Str src = str$_n(self->size, (char *)self->buffer);
 
-    print(writer, "error: {}: {}\n", err.message, str_cast(&err.token));
+    print(writer, "error: {}: {}\n", err.message, str$(&err.token));
 
     int line_number = str_count_chr(str_sub(src, 0, err.position), '\n') + 1;
     int line_start = str_last_chr(str_sub(src, 0, err.position), '\n') + 1;

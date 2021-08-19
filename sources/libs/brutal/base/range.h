@@ -9,7 +9,7 @@
         T size;  \
     }
 
-#define range_cast(T, RANGE) (        \
+#define range$(T, RANGE) (            \
     {                                 \
         typeof(RANGE) _range = RANGE; \
                                       \

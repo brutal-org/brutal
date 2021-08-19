@@ -105,7 +105,7 @@ void interrupt_error_handler(Regs *regs, uintptr_t rsp)
 
     if (task_self() != nullptr)
     {
-        log_unlock("Running task is {}({})", str_cast(&task_self()->name), task_self()->handle);
+        log_unlock("Running task is {}({})", str$(&task_self()->name), task_self()->handle);
         log_unlock("");
     }
 

@@ -5,7 +5,7 @@ HandoverModule const *handover_find_module(Handover const *handover, Str name)
 {
     for (size_t i = 0; i < handover->modules.size; i++)
     {
-        if (str_eq(name, str_cast(&handover->modules.module[i].module_name)))
+        if (str_eq(name, str$(&handover->modules.module[i].module_name)))
         {
             return &handover->modules.module[i];
         }
@@ -64,7 +64,7 @@ void handover_dump(Handover const *handover)
     {
         auto entry = handover->modules.module[i];
 
-        log("\t{#p}-{#p} {#}", entry.addr, entry.addr + entry.size, str_cast(&entry.module_name));
+        log("\t{#p}-{#p} {#}", entry.addr, entry.addr + entry.size, str$(&entry.module_name));
     }
 
     log("Rsdp:");
@@ -74,7 +74,7 @@ void handover_dump(Handover const *handover)
 
     if (handover->cmd_lines.present)
     {
-        log("\t value: '{}'", str_cast(&handover->cmd_lines.cmd_line));
+        log("\t value: '{}'", str$(&handover->cmd_lines.cmd_line));
     }
     else
     {

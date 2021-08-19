@@ -26,7 +26,7 @@ static void gen_generic(BidInterface const *interface, BidGeneric const *type, I
 
     if (type->params.length)
     {
-        io_print(writer, str_cast("("));
+        io_print(writer, str$("("));
 
         for (int i = 0; i < type->params.length; i++)
         {
@@ -34,29 +34,29 @@ static void gen_generic(BidInterface const *interface, BidGeneric const *type, I
 
             if (i + 1 != type->params.length)
             {
-                io_print(writer, str_cast(","));
+                io_print(writer, str$(","));
             }
         }
 
-        io_print(writer, str_cast(")"));
+        io_print(writer, str$(")"));
     }
 }
 
 static void gen_enum(BidInterface const *interface, BidEnum const *type, IoWriter *writer)
 {
-    io_print(writer, str_cast("enum {\n"));
+    io_print(writer, str$("enum {\n"));
 
     vec_foreach(member, &type->members)
     {
         print(writer, "{case:upper}_{case:upper},\n", interface->name, member);
     }
 
-    io_print(writer, str_cast("}"));
+    io_print(writer, str$("}"));
 }
 
 static void gen_struct(BidInterface const *interface, BidStruct const *type, IoWriter *writer)
 {
-    io_print(writer, str_cast("struct {\n"));
+    io_print(writer, str$("struct {\n"));
 
     vec_foreach(member, &type->members)
     {
@@ -64,7 +64,7 @@ static void gen_struct(BidInterface const *interface, BidStruct const *type, IoW
         print(writer, " {};\n", member.name);
     }
 
-    io_print(writer, str_cast("}"));
+    io_print(writer, str$("}"));
 }
 
 static void gen_type(BidInterface const *interface, BidType const *type, IoWriter *writer)

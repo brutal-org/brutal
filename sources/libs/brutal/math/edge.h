@@ -15,5 +15,5 @@ typedef Edge(Vec2f) Edgef;
 #define edge_create(T, start, end) \
     ((T){start, end})
 
-#define edge_cast(T, from) \
+#define edge$(T, from) \
     edge_create(T, (from).start, (from).end)

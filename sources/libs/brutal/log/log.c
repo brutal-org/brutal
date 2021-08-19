@@ -10,20 +10,20 @@ static Str log_color(enum log_level level)
     switch (level)
     {
     case LOG_PANIC:
-        return str_cast("");
+        return str$("");
 
     case LOG_TODO:
-        return str_cast("");
+        return str$("");
 
     case LOG_FIXME:
-        return str_cast("");
+        return str$("");
 
     case LOG_DEFAULT:
-        return str_cast("");
+        return str$("");
 
     default:
     case LOG_DEBUG:
-        return str_cast("");
+        return str$("");
     }
 }
 
@@ -32,20 +32,20 @@ static Str log_prefix(enum log_level level)
     switch (level)
     {
     case LOG_PANIC:
-        return str_cast("panic");
+        return str$("panic");
 
     case LOG_TODO:
-        return str_cast("todo");
+        return str$("todo");
 
     case LOG_FIXME:
-        return str_cast("fixme");
+        return str$("fixme");
 
     case LOG_DEFAULT:
-        return str_cast("info");
+        return str$("info");
 
     default:
     case LOG_DEBUG:
-        return str_cast("debug");
+        return str$("debug");
     }
 }
 
@@ -56,7 +56,7 @@ void log_unlock_impl(enum log_level level, SourceLocation location, Str fmt, str
 
     if (task_self())
     {
-        print(host_log_writer(), "{}({}): ", str_cast(&task_self()->name), task_self()->handle);
+        print(host_log_writer(), "{}({}): ", str$(&task_self()->name), task_self()->handle);
     }
 #endif
 

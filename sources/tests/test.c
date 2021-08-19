@@ -109,12 +109,12 @@ int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char const *argv[])
 {
     for (int i = 0; i < argc; i++)
     {
-        log("argc[{}]='{}'", i, str_cast(argv[i]));
+        log("argc[{}]='{}'", i, str$(argv[i]));
     }
 
-    if (argc == 3 && str_eq(str_cast(argv[1]), str_cast("-t")))
+    if (argc == 3 && str_eq(str$(argv[1]), str$("-t")))
     {
-        test_run_by_name(str_cast(argv[2]));
+        test_run_by_name(str$(argv[2]));
     }
     else
     {
