@@ -18,7 +18,7 @@ typedef struct EFI_LOADED_IMAGE_PROTOCOL
     EFISystemTable *system_table;
     EFIHandle device_handle;
     EFIDevicePath *file_path;
-    void *reserved;
+    void *_reserved;
     uint32_t load_options_size;
     void *load_options;
     void *image_base;

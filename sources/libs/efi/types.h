@@ -16,10 +16,8 @@ static inline bool efi_guid_eq(EFIGUID lhs, EFIGUID rhs)
     return memcmp(&lhs, &rhs, sizeof(EFIGUID)) == 0;
 }
 
-#define EFI_SUCCESS 0
-
 typedef unsigned short char16;
-typedef unsigned long long EFIStatus;
+typedef uint64_t EFIStatus;
 typedef void *EFIEvent;
 typedef void *EFIHandle;
 
@@ -27,11 +25,11 @@ typedef struct
 {
     uint16_t year;
     uint8_t month;
-    uint8_t pad1;
+    uint8_t _pad1;
     uint32_t nanosecond;
     int16_t time_zone;
     uint8_t daylight;
-    uint8_t pad2;
+    uint8_t _pad2;
 } EFITime;
 
 typedef struct
@@ -56,10 +54,11 @@ typedef struct
     uint32_t revision;
     uint32_t header_size;
     uint32_t CRC32;
-    uint32_t reserved;
+    uint32_t _reserved;
 } EFITableHeader;
 
-#define EFI_ERR 0x8000000000000000
+#define EFI_SUCCESS 0
+#define EFI_ERR (1ull << 63)
 #define EFI_LOAD_ERROR (EFI_ERR | 0x1)
 #define EFI_INVALID_PARAMETER (EFI_ERR | 0x2)
 #define EFI_UNSUPPORTED (EFI_ERR | 0x3)
