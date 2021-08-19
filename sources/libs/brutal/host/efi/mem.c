@@ -1,6 +1,7 @@
 #include <brutal/host/mem.h>
 #include <efi/lib.h>
 #include <efi/srvs/bs.h>
+#include <brutal/log.h>
 
 Error host_mem_acquire(size_t size, void **out_result, MAYBE_UNUSED enum host_mem_flag flags)
 {
@@ -8,6 +9,7 @@ Error host_mem_acquire(size_t size, void **out_result, MAYBE_UNUSED enum host_me
 
     if (status != EFI_SUCCESS)
     {
+        panic("Failed to allocate memory: {}", status);
         return ERR_UNDEFINED;
     }
 
