@@ -114,9 +114,20 @@ void fill_handover_modules(Handover *target, struct stivale2_struct_tag_modules 
     }
 }
 
+void fill_handover_cmdline(Handover *target, struct stivale2_struct_tag_cmdline const *cmdline)
+{
+    target->cmd_lines.present = true;
+
+    mem_cpy(target->cmd_lines.cmd_line.buffer, (void *)cmdline->cmdline, cstr_len((char *)cmdline->cmdline));
+    target->cmd_lines.cmd_line.len = cstr_len((char *)cmdline->cmdline);
+}
+
 void stivale2_entry(struct stivale2_struct const *info)
 {
     static Handover handover = {};
+
+    handover.tag = HANDOVER_TAG;
+    handover.boolloader_from = HANDOVER_BOOT_SRC_STIVALE2;
 
     auto memory_map = stivale2_get_tag(info, STIVALE2_STRUCT_TAG_MEMMAP_ID);
 
@@ -144,6 +155,13 @@ void stivale2_entry(struct stivale2_struct const *info)
     if (modules)
     {
         fill_handover_modules(&handover, (struct stivale2_struct_tag_modules const *)modules);
+    }
+
+    auto cmd_line = stivale2_get_tag(info, STIVALE2_STRUCT_TAG_CMDLINE_ID);
+
+    if (cmd_line)
+    {
+        fill_handover_cmdline(&handover, (struct stivale2_struct_tag_cmdline const *)cmd_line);
     }
 
     arch_entry_main(&handover);

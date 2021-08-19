@@ -1,6 +1,17 @@
 #pragma once
 
 #include <brutal/text.h>
+#include "brutal/text/str.h"
+
+// "handover" in ascii
+#define HANDOVER_TAG 0x68616e646f766572
+
+typedef enum
+{
+    HANDOVER_BOOT_SRC_OTHER,
+    HANDOVER_BOOT_SRC_BRUTAL_LOADER,
+    HANDOVER_BOOT_SRC_STIVALE2,
+} HandoverBootSource;
 
 typedef enum
 {
@@ -53,10 +64,20 @@ typedef struct
 
 typedef struct
 {
+    bool present;
+    StrFix128 cmd_line;
+} HandoverCmdLines;
+
+typedef struct
+{
+    uint64_t tag; // must be HANDOVER_TAG
+    HandoverBootSource boolloader_from;
+
     HandoverMmap mmap;
     HandoverFramebuffer framebuffer;
     HandoverModules modules;
     uintptr_t rsdp;
+    HandoverCmdLines cmd_lines;
 } Handover;
 
 HandoverModule const *handover_find_module(Handover const *handover, Str name);

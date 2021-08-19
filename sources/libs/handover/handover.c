@@ -16,6 +16,24 @@ HandoverModule const *handover_find_module(Handover const *handover, Str name)
 
 void handover_dump(Handover const *handover)
 {
+    if (handover->tag != HANDOVER_TAG)
+    {
+        log("not valid handover tag: {}", handover->tag);
+    }
+
+    switch (handover->boolloader_from)
+    {
+    case HANDOVER_BOOT_SRC_STIVALE2:
+        log("converted from stivale2");
+        break;
+    case HANDOVER_BOOT_SRC_BRUTAL_LOADER:
+        log("booted from brutal loader");
+        break;
+    default:
+        log("booted from an unknown loader");
+        break;
+    }
+
     log("Memory Map:");
 
     for (size_t i = 0; i < handover->mmap.size; i++)
@@ -51,4 +69,18 @@ void handover_dump(Handover const *handover)
 
     log("Rsdp:");
     log("\tAddress: {#p}", handover->rsdp);
+
+    log("Cmd lines:");
+
+    if (handover->cmd_lines.present)
+    {
+        log("\t value: '{}'", str_cast(&handover->cmd_lines.cmd_line));
+    }
+    else
+    {
+        log("\tNot found!");
+    }
+    while (true)
+    {
+    }
 }
