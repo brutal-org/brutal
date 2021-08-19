@@ -144,6 +144,8 @@ EFIStatus efi_main(EFIHandle handle, EFISystemTable *st)
     efi_tty_reset();
     efi_tty_clear();
 
+    config_get_key(str_cast("test"), str_cast("/config.json"));
+    
     loader_splash();
     loader_menu();
 
