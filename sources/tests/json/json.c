@@ -1,9 +1,4 @@
-#include <brutal/alloc.h>
-#include <brutal/alloc/heap.h>
-#include <brutal/gfx.h>
-#include <brutal/io.h>
 #include <json/json.h>
-#include "brutal/log/assert.h"
 #include "tests/test.h"
 
 #define JSON_TEST_START()                              \

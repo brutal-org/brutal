@@ -1,7 +1,6 @@
 #pragma once
 
-#include <brutal/alloc/heap.h>
-#include <brutal/base.h>
+#include <brutal/alloc.h>
 #include <brutal/ds.h>
 #include <brutal/io.h>
 
