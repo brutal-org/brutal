@@ -26,8 +26,11 @@ LOADER_LIBS_SRC = \
 	sources/libs/brutal/io/print.c                  \
 	sources/libs/brutal/io/scan.c                   \
 	sources/libs/brutal/io/write.c                  \
-	sources/libs/ansi/string.c                   	\
-	$(wildcard sources/libs/brutal/alloc/*.c)	    \
+	sources/libs/ansi/string.c			\
+	$(wildcard sources/libs/json/*.c)		\
+	$(wildcard sources/libs/brutal/alloc/*.c)	\
+	$(wildcard sources/libs/brutal/ds/*.c) 		\
+	$(wildcard sources/libs/brutal/hash/*.c)	\
 	$(wildcard sources/libs/brutal/host/efi/*.c)	\
 	$(wildcard sources/libs/brutal/log/*.c)         \
 	$(wildcard sources/libs/brutal/mem/*.c)         \
