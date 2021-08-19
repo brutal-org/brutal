@@ -39,6 +39,8 @@ static JsonValue json_parse_array(Scan *scan, Alloc *alloc)
         {
             return ret;
         }
+
+        scan_skip_space(scan);
     }
 
     return ret;
@@ -61,10 +63,13 @@ static JsonValue json_parse_object(Scan *scan, Alloc *alloc)
         map_put(&ret.object, name, value);
 
         scan_skip_space(scan);
+        
         if (!scan_skip(scan, ','))
         {
             return ret;
         }
+
+        scan_skip_space(scan);
     }
     return ret;
 }
