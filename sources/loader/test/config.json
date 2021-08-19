@@ -2,7 +2,7 @@
 	"entries" :	[
 		{
 			"name": "Brutal",
-			"kernel" : "efi/kernel.elf"
+			"kernel" : "/kernel.elf"
 		}
 	]
 }

@@ -15,4 +15,4 @@ typedef struct
     Vec(LoaderModule) modules;
 } LoaderEntry;
 
-Str config_get_key(Str key, Str path);
+LoaderEntry config_get_entry(Str name, Str path, Buffer* buffer);

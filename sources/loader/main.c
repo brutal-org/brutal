@@ -100,11 +100,13 @@ entry_point_func loader_load_kernel(Str path)
     return (entry_point_func)entry;
 }
 
-void loader_boot(LoaderEntry *entry)
+void loader_boot(LoaderEntry *entry, Buffer *config_buf)
 {
     log("Loading kernel...");
 
     auto entry_point = loader_load_kernel(entry->kernel);
+
+    buffer_deinit(config_buf);
 
     log("Kernel loaded, jumping in to it...");
 
@@ -119,14 +121,16 @@ void loader_menu(void)
 {
     EFIInputKey key = efi_tty_get_key();
 
+    Buffer buffer;
+
+    auto entry = config_get_entry(str_cast("Brutal"), str_cast("/config.json"), &buffer);
+
     while (key.scan_code != SCAN_ESC)
     {
         if (key.unicode_char == CHAR_CARRIAGE_RETURN)
         {
             efi_tty_clear();
-            loader_boot(&(LoaderEntry){
-                .kernel = str$("/kernel.elf"),
-            });
+            loader_boot(&entry, &buffer);
         }
 
         key = efi_tty_get_key();
@@ -144,9 +148,8 @@ EFIStatus efi_main(EFIHandle handle, EFISystemTable *st)
     efi_tty_reset();
     efi_tty_clear();
 
-    config_get_key(str_cast("test"), str_cast("/config.json"));
-    
     loader_splash();
+
     loader_menu();
 
     assert_unreachable();
