@@ -3,7 +3,6 @@
 global fibers_switch_context
 fibers_switch_context:
 
-    fxsave [rdi+64]
     mov r8, [rsp]
     mov [rdi] , r8
     
@@ -17,6 +16,8 @@ fibers_switch_context:
     mov [rdi+40], r13
     mov [rdi+48], r14
     mov [rdi+56], r15
+    stmxcsr [rdi+64]
+    fnstcw [rdi+68]
 
     mov rsp, [rsi+8]
     
@@ -26,8 +27,9 @@ fibers_switch_context:
     mov r13, [rsi+40]
     mov r14, [rsi+48]
     mov r15, [rsi+56]
-
-    fxrstor [rsi+64]
+ 
+    ldmxcsr [rsi+64]
+    fldcw [rsi+68]
     mov r8, [rsi]
     push r8
 

@@ -7,10 +7,13 @@
 Fiber *root_fiber;
 Fiber *curr_fiber;
 
-int fiber_next_uid = 0;
-bool next_switch_must_delete_fiber = false;
+static int fiber_next_uid = 0;
+static bool next_switch_must_delete_fiber = false;
 
-extern void fibers_switch_context(fibers_reg *save, fibers_reg *load);
+// instead of checking each fibers for block every switch, only check them when we know there is at least one blocked
+static bool has_blocked_fibers = false;
+
+extern void fibers_switch_context(FibersContext *save, FibersContext *load);
 
 static void fiber_delete(Fiber *fiber)
 {
@@ -18,7 +21,31 @@ static void fiber_delete(Fiber *fiber)
     alloc_free(alloc_global(), fiber);
 }
 
-static void delete_free_fiber()
+static void fiber_update_blocked(void)
+{
+    if (!has_blocked_fibers)
+    {
+        return;
+    }
+    has_blocked_fibers = false;
+    Fiber *target = root_fiber;
+
+    while (target != nullptr)
+    {
+        if (target->state == FIBER_SUSPENDED)
+        {
+            has_blocked_fibers = true;
+            if (target->block.function(target->block.context))
+            {
+                target->state = FIBER_RUNNING;
+            }
+        }
+
+        target = target->next;
+    }
+}
+
+static void delete_free_fiber(void)
 {
     Fiber *target = root_fiber;
 
@@ -30,7 +57,7 @@ static void delete_free_fiber()
             if (target->next == curr_fiber)
             {
                 next_switch_must_delete_fiber = true;
-                fiber_switch();
+                fiber_yield();
             }
 
             Fiber *to_delete = target->next;
@@ -42,7 +69,7 @@ static void delete_free_fiber()
     }
 }
 
-static Fiber *alloc_fiber()
+static Fiber *alloc_fiber(void)
 {
     if (root_fiber == nullptr)
     {
@@ -74,6 +101,7 @@ static Fiber *next_fiber(Fiber *from)
         {
             return target;
         }
+
         target = target->next;
     }
 
@@ -85,21 +113,25 @@ static Fiber *next_fiber(Fiber *from)
     {
         todo("implement fibers return result");
         log("no more fibers exiting \n");
-        task_exit(task_self(), 0);
+        while (true)
+        {
+        }
     }
-
-    return from;
 }
 
-void fiber_switch()
+void fiber_yield(void)
 {
+    // update before so if a fiber is unlocked we can directly switch into it
+    fiber_update_blocked();
     Fiber *next = next_fiber(curr_fiber->next);
 
     if (next != curr_fiber) // don't switch if we doesn't need to
     {
-        fibers_switch_context(&curr_fiber->regs, &next->regs);
-
+        // We need to save it here because if we keep curr_fiber and switch it later, it will use the one from the previous fiber stack resulting in a loop
+        Fiber *prev_next = curr_fiber;
         curr_fiber = next;
+
+        fibers_switch_context(&prev_next->regs, &next->regs);
 
         if (next_switch_must_delete_fiber)
         {
@@ -109,15 +141,17 @@ void fiber_switch()
     }
 }
 
-Fiber *fiber_init(fiber_function call)
+Fiber *fiber_start(fiber_function call)
 {
     Fiber *f = alloc_fiber();
 
     if (call != nullptr)
     {
         f->stack = alloc_malloc(alloc_global(), FIBER_STACK_SIZE);
-        f->regs.rsp = (uint64_t)f->stack + (FIBER_STACK_SIZE - 128);
+        f->regs.rsp = (uint64_t)f->stack + (FIBER_STACK_SIZE - 8);
         f->regs.rip = (uint64_t)call;
+        f->regs.fc_mxcsr = 0;
+        f->regs.fc_x86_cw = 0;
     }
     else
     {
@@ -130,23 +164,25 @@ Fiber *fiber_init(fiber_function call)
     return f;
 }
 
-void pause_fiber(Fiber *fiber)
+void fiber_pause(Fiber *fiber, FiberBlocker blocker)
 {
+    has_blocked_fibers = true;
     fiber->state = FIBER_SUSPENDED;
+    fiber->block = blocker;
     if (fiber == curr_fiber)
     {
-        fiber_switch();
+        fiber_yield();
     }
 }
 
-void stop_fiber(Fiber *fiber)
+void fiber_stop(Fiber *fiber)
 {
     fiber->state = FIBER_MUST_BE_DELETED;
 
     delete_free_fiber();
 }
 
-Fiber *fiber_self()
+Fiber *fiber_self(void)
 {
     return curr_fiber;
 }
