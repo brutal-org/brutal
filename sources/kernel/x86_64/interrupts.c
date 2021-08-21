@@ -5,6 +5,7 @@
 #include "kernel/context.h"
 #include "kernel/cpu.h"
 #include "kernel/global.h"
+#include "kernel/interrupts.h"
 #include "kernel/sched.h"
 #include "kernel/x86_64/apic.h"
 #include "kernel/x86_64/asm.h"
@@ -128,6 +129,11 @@ uint64_t interrupt_handler(uint64_t rsp)
     auto regs = (Regs *)rsp;
 
     cpu_begin_interrupt();
+
+    if (regs->int_no >= 32 && regs->int_no <= 48)
+    {
+        irq_handler_update(regs->int_no - 32);
+    }
 
     if (regs->int_no < 32)
     {
