@@ -1,11 +1,10 @@
 
 
-global fibers_switch_context
-fibers_switch_context:
-
+global fibers_switch
+fibers_switch:
     mov r8, [rsp]
     mov [rdi] , r8
-    
+
     lea r8, [rsp+8]
     mov [rdi+8], r8
 
@@ -20,14 +19,14 @@ fibers_switch_context:
     fnstcw [rdi+68]
 
     mov rsp, [rsi+8]
-    
+
     mov rbx, [rsi+16]
     mov rbp, [rsi+24]
     mov r12, [rsi+32]
     mov r13, [rsi+40]
     mov r14, [rsi+48]
     mov r15, [rsi+56]
- 
+
     ldmxcsr [rsi+64]
     fldcw [rsi+68]
     mov r8, [rsi]
