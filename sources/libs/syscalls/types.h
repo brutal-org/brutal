@@ -127,6 +127,7 @@ typedef enum
     BR_OBJECT_DOMAIN,
     BR_OBJECT_SPACE,
     BR_OBJECT_TASK,
+    BR_OBJECT_IRQ,
 } BrObjectType;
 
 typedef uint64_t BrArg;
@@ -209,11 +210,15 @@ _Static_assert(sizeof(BrMsg) == 64, "");
 
 typedef uint32_t BrIpcFlags;
 
-typedef uint64_t BrIrq;
+typedef uint32_t BrIrqId;
+
+typedef BrHandle BrIrq;
 
 #define BR_IRQ_NONE (0)
 #define BR_IRQ_BIND (1 << 0)
 #define BR_IRQ_UNBIND (1 << 1)
+#define BR_IRQ_ACK (1 << 2)
+#define BR_IRQ_BIND_ONCE (1 << 3) // will be disabled after the irq reception
 
 typedef uint64_t BrIrqFlags;
 

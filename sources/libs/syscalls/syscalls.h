@@ -62,6 +62,11 @@ typedef struct
 
 typedef struct
 {
+    BrIrqId irq;
+} BrCreateIrqArgs;
+
+typedef struct
+{
     BrObjectType type;
 
     BrHandle handle;
@@ -71,6 +76,7 @@ typedef struct
         BrCreateTaskArgs task;
         BrCreateMemObjArgs mem_obj;
         BrCreateSpaceArgs space;
+        BrCreateIrqArgs irq;
     };
 } BrCreateArgs;
 
@@ -106,10 +112,11 @@ SYSCALL(ipc) (BrIpcArgs* args);
 
 typedef struct
 {
-    BrTask task;
-    BrIrq irq;
+    BrIrq IrqHandle;
     BrIrqFlags flags;
-} BrIrqArgs;
+    BrMsg msg; // (irq bind) the message to send 
+    BrTask task; // (irq bind) the task that will receive it (may be task_self)
+} BrIrqArgs ;
 
 SYSCALL(irq) (BrIrqArgs* args);
 
