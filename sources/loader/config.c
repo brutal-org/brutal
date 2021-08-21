@@ -1,19 +1,9 @@
 #include <brutal/alloc.h>
-#include <brutal/io/buffer.h>
+#include <brutal/io.h>
 #include <brutal/log.h>
-#include "brutal/alloc/global.h"
-#include "brutal/io/write.h"
-#include "brutal/text/str.h"
-#include "config.h"
-
-#define JSON_MEMBER_GET(_object, _type, _name)                      \
-    (                                                               \
-        {                                                           \
-            JsonValue _res = {};                                    \
-            assert_truth(map_get(&_object.object, _name, &(_res))); \
-            assert_equal((int)_res.type, (int)_type);               \
-            _res;                                                   \
-        })
+#include <brutal/text.h>
+#include <json/json.h>
+#include "loader/config.h"
 
 LoaderEntry config_get_entry(Str name, Str path, Buffer *buffer)
 {
@@ -25,9 +15,9 @@ LoaderEntry config_get_entry(Str name, Str path, Buffer *buffer)
 
     reader = io_file_read(&file);
 
-    *buffer = io_readall(base_cast(&reader), alloc_global());
+    *buffer = io_readall(base$(&reader), alloc_global());
 
-    Str base = str_cast((char *)buffer->data);
+    Str base = str$((char *)buffer->data);
 
     Scan scanner = {};
 
@@ -35,18 +25,18 @@ LoaderEntry config_get_entry(Str name, Str path, Buffer *buffer)
 
     JsonValue json = json_parse(&scanner, alloc_global());
 
-    JsonValue res = JSON_MEMBER_GET(json, JSON_ARRAY, str_cast("entries"));
+    JsonValue res = JSON_MEMBER_GET(json, JSON_ARRAY, str$("entries"));
 
     int i = 0;
-    JsonValue entry_name = JSON_MEMBER_GET(res.array.data[i], JSON_STRING, str_cast("name"));
+    JsonValue entry_name = JSON_MEMBER_GET(res.array.data[i], JSON_STRING, str$("name"));
 
     while (str_eq(entry_name.string, name) != true)
     {
-        entry_name = JSON_MEMBER_GET(res.array.data[i], JSON_STRING, str_cast("name"));
+        entry_name = JSON_MEMBER_GET(res.array.data[i], JSON_STRING, str$("name"));
         i++;
     }
 
-    ret.kernel = JSON_MEMBER_GET(res.array.data[i], JSON_STRING, str_cast("kernel")).string;
+    ret.kernel = JSON_MEMBER_GET(res.array.data[i], JSON_STRING, str$("kernel")).string;
 
     return ret;
 }

@@ -2,7 +2,6 @@
 
 #include <brutal/ds.h>
 #include <brutal/text.h>
-#include <json/json.h>
 
 typedef struct
 {
@@ -15,4 +14,4 @@ typedef struct
     Vec(LoaderModule) modules;
 } LoaderEntry;
 
-LoaderEntry config_get_entry(Str name, Str path, Buffer* buffer);
+LoaderEntry config_get_entry(Str name, Str path, Buffer *buffer);
