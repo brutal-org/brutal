@@ -35,6 +35,15 @@ struct json_value
     };
 };
 
+#define JSON_MEMBER_GET(_object, _type, _name)                      \
+    (                                                               \
+        {                                                           \
+            JsonValue _res = {};                                    \
+            assert_truth(map_get(&_object.object, _name, &(_res))); \
+            assert_equal((int)_res.type, (int)_type);               \
+            _res;                                                   \
+        })
+
 JsonValue json_parse(Scan *scan, Alloc *alloc);
 
 static inline JsonValue json_null(void)
