@@ -51,7 +51,6 @@ void arch_entry_main(Handover *handover)
     syscall_initialize();
     sched_initialize();
     tasking_initialize();
-    interrupt_routing_initialize();
 
     other_ready++;
     arch_boot_other();

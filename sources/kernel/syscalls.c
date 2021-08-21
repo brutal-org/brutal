@@ -195,9 +195,9 @@ BrResult sys_create_space(BrSpace *handle, BrCreateSpaceArgs *args)
     return BR_SUCCESS;
 }
 
-BrResult sys_create_irq(BrSpace *handle, BrCreateIrqArgs *args)
+BrResult sys_create_irq(BrIrq *handle, BrCreateIrqArgs *args)
 {
-    auto irq = irq_handler_create(args->irq);
+    auto irq = irq_create(args->irq);
 
     domain_add(task_self()->domain, base$(irq));
     *handle = irq->handle;
@@ -226,6 +226,10 @@ BrResult sys_create(BrCreateArgs *args)
         return sys_create_mem_obj(&args->handle, &args->mem_obj);
 
     case BR_OBJECT_IRQ:
+        if (!(task_self()->caps & BR_CAP_IRQ))
+        {
+            return BR_BAD_CAPABILITY;
+        }
         return sys_create_irq(&args->handle, &args->irq);
 
     default:
@@ -355,7 +359,12 @@ BrResult sys_irq(BrIrqArgs *args)
         task = (Task *)domain_lookup(task_self()->domain, args->task, BR_OBJECT_TASK);
     }
 
-    auto irq = (IrqHandler *)domain_lookup(task->domain, args->IrqHandle, BR_OBJECT_IRQ);
+    if (!task)
+    {
+        return BR_BAD_HANDLE;
+    }
+
+    auto irq = (Irq *)domain_lookup(task->domain, args->IrqHandle, BR_OBJECT_IRQ);
 
     if (!irq)
     {

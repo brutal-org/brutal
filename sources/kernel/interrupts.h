@@ -8,23 +8,32 @@ typedef struct
 {
     OBJECT_HEADER;
     BrIrq irq;
+} Irq;
+
+typedef struct irq_binding IrqBinding;
+
+typedef struct irq_binding
+{
+    Irq *irq;
     BrIrqFlags flags;
     Task *target_task;
-    Task *from_task;
+    Task *from;
     BrMsg message;
     bool ack;
-} IrqHandler;
+    IrqBinding *next;
+    IrqBinding *prev;
+} IrqBinding;
 
-BrResult irq_handler_bind(Task *task, BrIrqFlags flags, IrqHandler *irq, BrMsg *message);
-BrResult irq_handler_unbind(BrIrqFlags flags, IrqHandler *irq);
-BrResult irq_handler_ack(IrqHandler *irq);
+BrResult irq_bindings_destroy_task(const Task *from);
+
+BrResult irq_handler_bind(Task *task, BrIrqFlags flags, Irq *irq, BrMsg *message);
+BrResult irq_handler_unbind(BrIrqFlags flags, Irq *irq);
+BrResult irq_handler_ack(Irq *irq);
 
 void irq_handler_update(BrIrq interrupt_id); // called by the arch
 
-IrqHandler *irq_handler_create(BrIrqId interrupt_id);
+Irq *irq_create(BrIrqId interrupt_id);
 
-void irq_handler_ref(IrqHandler *self);
+void irq_handler_ref(Irq *self);
 
-void irq_handler_deref(IrqHandler *self);
-
-void interrupt_routing_initialize();
+void irq_handler_deref(Irq *self);

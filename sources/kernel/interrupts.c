@@ -5,51 +5,78 @@
 #include <brutal/log.h>
 #include <syscalls/types.h>
 #include "kernel/interrupts.h"
+#include "kernel/task.h"
 
-static Vec(IrqHandler *) interrupts = {};
+static IrqBinding *interrupts = nullptr;
+static size_t interrupt_count = 0;
+static Lock lock = {};
 
-bool loaded = false;
-
-void interrupt_routing_initialize()
+static IrqBinding *irq_binding_get(Irq id)
 {
-    log("Initializing interrupt routing...");
-    vec_init(&interrupts, alloc_global());
-}
-void interrupt_destroy(IrqHandler *handler)
-{
-    log(" destroying interrupt {}", handler->irq);
-    alloc_free(alloc_global(), handler);
-};
+    IrqBinding *binding = interrupts;
+    size_t i = 0;
+    while (i < interrupt_count)
+    {
 
-BrResult irq_handler_bind(Task *task, BrIrqFlags flags, IrqHandler *irq, BrMsg *message)
-{
-    log(" binding interrupt {}", irq->irq);
-    irq_handler_ref(irq);
-    irq->target_task = task;
-    irq->from_task = task_self();
-    irq->flags = flags;
-    irq->message = *message;
-    vec_push(&interrupts, irq);
-    return BR_SUCCESS;
+        if (binding->irq->handle == id.handle)
+        {
+            return binding;
+        }
+        binding = binding->next;
+        i++;
+    }
+    return nullptr;
 }
 
-BrResult irq_handler_unbind(BrIrqFlags flags, IrqHandler *irq)
+static void interrupt_binding_destroy(IrqBinding *handler)
 {
-    log(" unbinding interrupt {}", irq->irq);
-    irq->target_task = nullptr;
-    irq->flags = flags;
-    irq_handler_deref(irq);
-    vec_remove(&interrupts, irq);
-    return BR_SUCCESS;
+    IrqBinding *save = handler;
+
+    handler->next->prev = handler->prev;
+    handler->prev->next = handler->next;
+
+    alloc_free(alloc_global(), save);
+
+    interrupt_count--;
+    // handle the case were all interrupts are being deleted
+    if (interrupt_count == 0)
+    {
+        interrupts = nullptr;
+    }
 }
 
-BrResult irq_handler_ack(IrqHandler *irq)
+static void irq_destroy(Irq *handler)
 {
-    irq->ack = true;
-    return BR_SUCCESS;
+    auto binding = irq_binding_get(*handler);
+    if (binding)
+    {
+        interrupt_binding_destroy(binding);
+    }
 }
 
-BrResult send_irq_handled(IrqHandler *self)
+static IrqBinding *irq_alloc()
+{
+    interrupt_count++;
+
+    IrqBinding *self = alloc_make(alloc_global(), IrqBinding);
+    if (interrupts == nullptr)
+    {
+        self->prev = self;
+        self->next = self;
+        interrupts = self;
+    }
+    else
+    {
+        self->next = interrupts;
+        self->prev = interrupts->prev;
+        interrupts->prev->next = self;
+        interrupts->prev = self;
+    }
+
+    return self;
+}
+
+static BrResult send_irq_handled(IrqBinding *self)
 {
     BrMsg msg = self->message;
     BrTask to = self->target_task->handle;
@@ -57,7 +84,7 @@ BrResult send_irq_handled(IrqHandler *self)
 
     Envelope envelope CLEANUP(envelope_cleanup) = {};
 
-    msg.from = self->from_task->handle;
+    msg.from = self->from->handle;
     task = (Task *)global_lookup(to, BR_OBJECT_TASK);
 
     if (!task)
@@ -66,7 +93,7 @@ BrResult send_irq_handled(IrqHandler *self)
         return BR_BAD_HANDLE;
     }
 
-    BrResult result = envelope_send(&envelope, &msg, task_self()->domain);
+    BrResult result = envelope_send(&envelope, &msg, self->from->domain);
 
     if (result != BR_SUCCESS)
     {
@@ -77,39 +104,107 @@ BrResult send_irq_handled(IrqHandler *self)
     return channel_send(task->channel, &envelope, 0, BR_IPC_SEND);
 }
 
+BrResult irq_bindings_destroy_task(const Task *from)
+{
+    IrqBinding *binding = interrupts;
+
+    while (binding != NULL)
+    {
+        if (binding->from == from)
+        {
+            interrupt_binding_destroy(binding);
+        }
+    }
+    return BR_SUCCESS;
+}
+
+BrResult irq_handler_bind(Task *task, BrIrqFlags flags, Irq *irq, BrMsg *message)
+{
+    LOCK_RETAINER(&lock);
+    log(" binding interrupt {}", irq->irq);
+    auto binding = irq_binding_get(*irq);
+    if (binding == nullptr)
+    {
+        binding = irq_alloc();
+    }
+    irq_handler_ref(irq);
+    binding->target_task = task;
+    binding->from = task_self();
+    binding->flags = flags;
+    binding->message = *message;
+    binding->ack = true;
+    binding->irq = irq;
+    return BR_SUCCESS;
+}
+
+BrResult irq_handler_unbind(BrIrqFlags flags, Irq *irq)
+{
+    LOCK_RETAINER(&lock);
+    log(" unbinding interrupt {}", irq->irq);
+
+    auto binding = irq_binding_get(*irq);
+    if (binding == nullptr)
+    {
+        log(" already unbinded interrupt {}", irq->irq);
+        return BR_BAD_HANDLE;
+    }
+    binding->flags = flags;
+    interrupt_binding_destroy(binding);
+    irq_handler_deref(irq);
+    return BR_SUCCESS;
+}
+
+BrResult irq_handler_ack(Irq *irq)
+{
+    LOCK_RETAINER(&lock);
+    auto binding = irq_binding_get(*irq);
+
+    if (binding == nullptr)
+    {
+        return BR_BAD_HANDLE;
+    }
+
+    binding->ack = true;
+    return BR_SUCCESS;
+}
+
 void irq_handler_update(BrIrq interrupt)
 {
-    vec_foreach(interr, &interrupts)
+    LOCK_RETAINER(&lock);
+    IrqBinding *binding = interrupts;
+    size_t i = 0;
+    while (i < interrupt_count)
     {
-        if (interr->irq == interrupt && interr->ack)
+        if (binding->irq->irq == interrupt && binding->ack)
         {
-            send_irq_handled(interr);
+            send_irq_handled(binding);
 
-            if (interr->flags & BR_IRQ_BIND_ONCE)
+            if (binding->flags & BR_IRQ_BIND_ONCE)
             {
-                irq_handler_unbind(interr->flags, interr);
+                irq_handler_unbind(binding->flags, binding->irq);
             }
 
-            interr->ack = false;
+            binding->ack = false;
         }
+
+        binding = binding->next;
+        i++;
     }
 }
 
-IrqHandler *irq_handler_create(BrIrqId id)
+Irq *irq_create(BrIrqId id)
 {
-    auto intt = alloc_make(alloc_global(), IrqHandler);
-    intt->flags = BR_IRQ_BIND;
+    auto intt = alloc_make(alloc_global(), Irq);
     intt->irq = id;
-    intt->ack = true;
-    object_init(base$(intt), BR_OBJECT_IRQ, (ObjectDtor *)interrupt_destroy);
+    object_init(base$(intt), BR_OBJECT_IRQ, (ObjectDtor *)irq_destroy);
     return intt;
 }
 
-void irq_handler_ref(IrqHandler *self)
+void irq_handler_ref(Irq *self)
 {
     object_ref(base$(self));
 }
-void irq_handler_deref(IrqHandler *self)
+void irq_handler_deref(Irq *self)
 {
     object_deref(base$(self));
 }
