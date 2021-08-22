@@ -175,6 +175,7 @@ typedef BrHandle BrTask;
 #define BR_TASK_ERROR ((BrTask)-1)
 #define BR_TASK_SELF ((BrTask)-2)
 #define BR_TASK_INIT ((BrTask)-3)
+#define BR_TASK_IRQ ((BrTask)-4)
 
 #define BR_TASK_NONE (BrTaskFlags)(0)
 #define BR_TASK_USER (BrTaskFlags)(1 << 0)
@@ -188,6 +189,7 @@ typedef uint64_t BrTimeout;
 
 #define BR_MSG_NONE (0)
 #define BR_MSG_HND(I) (1 << (I))
+#define BR_MSG_ANY_HND (5 << 0)
 
 typedef uint32_t BrMsgFlags;
 
