@@ -112,7 +112,7 @@ SYSCALL(ipc) (BrIpcArgs* args);
 
 typedef struct
 {
-    BrIrq IrqHandle;
+    BrIrq handle;
     BrIrqFlags flags;
     BrMsg msg; // (irq bind) the message to send 
     BrTask task; // (irq bind) the task that will receive it (may be task_self)

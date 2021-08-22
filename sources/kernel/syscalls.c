@@ -364,7 +364,7 @@ BrResult sys_irq(BrIrqArgs *args)
         return BR_BAD_HANDLE;
     }
 
-    auto irq = (Irq *)domain_lookup(task->domain, args->IrqHandle, BR_OBJECT_IRQ);
+    auto irq = (Irq *)domain_lookup(task->domain, args->handle, BR_OBJECT_IRQ);
 
     if (!irq)
     {
@@ -377,7 +377,7 @@ BrResult sys_irq(BrIrqArgs *args)
     }
     else if (args->flags & BR_IRQ_BIND)
     {
-        return irq_handler_bind(task, args->flags, irq, &args->msg);
+        return irq_handler_bind(task->handle, args->flags, irq, &args->msg);
     }
     else if (args->flags & BR_IRQ_UNBIND)
     {
