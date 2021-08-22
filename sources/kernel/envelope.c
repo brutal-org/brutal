@@ -22,6 +22,21 @@ BrResult envelope_send(Envelope *self, BrMsg const *msg, Domain *domain)
     return BR_SUCCESS;
 }
 
+BrResult envelope_send_without_object(Envelope *self, BrMsg const *msg)
+{
+    self->msg = *msg;
+
+    for (size_t i = 0; i < BR_MSG_ARG_COUNT; i++)
+    {
+        if (msg->flags & BR_MSG_HND(i))
+        {
+            return BR_BAD_HANDLE; // check if the message ask to pass an object
+        }
+    }
+
+    return BR_SUCCESS;
+}
+
 BrResult envelope_recv(Envelope *self, BrMsg *msg, Domain *domain)
 {
     *msg = self->msg;
