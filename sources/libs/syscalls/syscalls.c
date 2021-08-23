@@ -50,11 +50,6 @@ BrResult br_ipc(BrIpcArgs *args)
     return br_syscall(BR_SC_IPC, (BrArg)args, 0, 0, 0, 0);
 }
 
-BrResult br_irq(BrIrqArgs *args)
-{
-    return br_syscall(BR_SC_IRQ, (BrArg)args, 0, 0, 0, 0);
-}
-
 BrResult br_drop(BrDropArgs *args)
 {
     return br_syscall(BR_SC_DROP, (BrArg)args, 0, 0, 0, 0);
@@ -63,4 +58,19 @@ BrResult br_drop(BrDropArgs *args)
 BrResult br_close(BrCloseArgs *args)
 {
     return br_syscall(BR_SC_CLOSE, (BrArg)args, 0, 0, 0, 0);
+}
+
+BrResult br_bind(BrBindArgs *args)
+{
+    return br_syscall(BR_SC_BIND, (BrArg)args, 0, 0, 0, 0);
+}
+
+BrResult br_unbind(BrUnbindArgs *args)
+{
+    return br_syscall(BR_SC_UNBIND, (BrArg)args, 0, 0, 0, 0);
+}
+
+BrResult br_ack(BrAckArgs *args)
+{
+    return br_syscall(BR_SC_ACK, (BrArg)args, 0, 0, 0, 0);
 }

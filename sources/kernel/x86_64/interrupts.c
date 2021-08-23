@@ -132,7 +132,7 @@ uint64_t interrupt_handler(uint64_t rsp)
 
     if (regs->int_no >= 32 && regs->int_no <= 48)
     {
-        irq_handler_update(regs->int_no - 32);
+        irq_dispatch(regs->int_no - 32);
     }
 
     if (regs->int_no < 32)

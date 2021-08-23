@@ -13,7 +13,7 @@ static Lock lock = {};
 
 static IrqBindingEntry *irq_binding_get(Irq id)
 {
-    linked_list_loop(&interrupts, binding)
+    linked_list_loop(binding, &interrupts)
     {
         if (binding->data->irq->handle == id.handle)
         {
@@ -53,8 +53,10 @@ static IrqBindingEntry *irq_alloc()
 
 static BrResult send_irq_handled(IrqBinding *self)
 {
-    BrMsg msg = self->message;
+    BrMsg msg = {0};
     msg.from = BR_TASK_IRQ;
+    msg.arg[0] = self->irq->irq; // set arg0 to the irq we handled
+
     BrTask to = self->target_task;
     Task *task CLEANUP(object_cleanup) = nullptr;
 
@@ -73,9 +75,9 @@ static BrResult send_irq_handled(IrqBinding *self)
     return channel_send(task->channel, &envelope, 0, BR_IPC_SEND);
 }
 
-BrResult irq_bindings_destroy_task(const Task *target_task)
+BrResult irq_unbind_all(const Task *target_task)
 {
-    linked_list_loop(&interrupts, binding)
+    linked_list_loop(binding, &interrupts)
     {
         if (binding->data->target_task == target_task->handle)
         {
@@ -86,16 +88,10 @@ BrResult irq_bindings_destroy_task(const Task *target_task)
     return BR_SUCCESS;
 }
 
-BrResult irq_handler_bind(BrTask task, BrIrqFlags flags, Irq *irq, BrMsg *message)
+BrResult irq_bind(BrTask task, BrIrqFlags flags, Irq *irq)
 {
     LOCK_RETAINER(&lock);
     log(" binding interrupt {}", irq->irq);
-
-    if (message->flags & BR_MSG_ANY_HND)
-    {
-        log(" can't bind interrupts with a message containing an object");
-        return BR_BAD_ARGUMENTS;
-    }
 
     auto binding = irq_binding_get(*irq);
 
@@ -104,18 +100,17 @@ BrResult irq_handler_bind(BrTask task, BrIrqFlags flags, Irq *irq, BrMsg *messag
         binding = irq_alloc();
     }
 
-    irq_handler_ref(irq);
+    irq_ref(irq);
 
     binding->data->target_task = task;
     binding->data->flags = flags;
-    binding->data->message = *message;
     binding->data->ack = true;
     binding->data->irq = irq;
 
     return BR_SUCCESS;
 }
 
-BrResult irq_handler_unbind(BrIrqFlags flags, Irq *irq)
+BrResult irq_unbind(BrIrqFlags flags, Irq *irq)
 {
     LOCK_RETAINER(&lock);
     log(" unbinding interrupt {}", irq->irq);
@@ -129,11 +124,11 @@ BrResult irq_handler_unbind(BrIrqFlags flags, Irq *irq)
     binding->data->flags = flags;
 
     interrupt_binding_destroy(binding);
-    irq_handler_deref(irq);
+    irq_deref(irq);
     return BR_SUCCESS;
 }
 
-BrResult irq_handler_ack(Irq *irq)
+BrResult irq_ack(Irq *irq)
 {
     LOCK_RETAINER(&lock);
     auto binding = irq_binding_get(*irq);
@@ -147,11 +142,11 @@ BrResult irq_handler_ack(Irq *irq)
     return BR_SUCCESS;
 }
 
-void irq_handler_update(BrIrq interrupt)
+void irq_dispatch(BrIrq interrupt)
 {
     LOCK_RETAINER(&lock);
 
-    linked_list_loop(&interrupts, binding)
+    linked_list_loop(binding, &interrupts)
     {
         if (binding->data->irq->irq == interrupt && binding->data->ack)
         {
@@ -161,7 +156,7 @@ void irq_handler_update(BrIrq interrupt)
 
             if (binding->data->flags & BR_IRQ_BIND_ONCE)
             {
-                irq_handler_unbind(binding->data->flags, binding->data->irq);
+                irq_unbind(binding->data->flags, binding->data->irq);
             }
         }
     }
@@ -175,12 +170,12 @@ Irq *irq_create(BrIrqId id)
     return intt;
 }
 
-void irq_handler_ref(Irq *self)
+void irq_ref(Irq *self)
 {
     object_ref(base$(self));
 }
 
-void irq_handler_deref(Irq *self)
+void irq_deref(Irq *self)
 {
     object_deref(base$(self));
 }

@@ -110,15 +110,6 @@ typedef struct
 
 SYSCALL(ipc) (BrIpcArgs* args);
 
-typedef struct
-{
-    BrIrq handle;
-    BrIrqFlags flags;
-    BrMsg msg; // (irq bind) the message to send 
-    BrTask task; // (irq bind) the task that will receive it (may be task_self)
-} BrIrqArgs ;
-
-SYSCALL(irq) (BrIrqArgs* args);
 
 typedef struct
 {
@@ -134,5 +125,30 @@ typedef struct
 } BrCloseArgs;
 
 SYSCALL(close) (BrCloseArgs* args);
+
+typedef struct
+{
+    BrIrq handle;
+    BrIrqFlags flags;
+} BrBindArgs;
+
+SYSCALL(bind) (BrBindArgs* args);
+
+typedef struct
+{
+    BrIrq handle;
+    BrIrqFlags flags;
+} BrUnbindArgs;
+
+SYSCALL(unbind) (BrUnbindArgs* args);
+
+
+typedef struct
+{
+    BrIrq handle;
+    BrIrqFlags flags;
+} BrAckArgs;
+
+SYSCALL(ack) (BrAckArgs* args);
 
 // clang-format on

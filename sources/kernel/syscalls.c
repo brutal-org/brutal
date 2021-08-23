@@ -202,7 +202,7 @@ BrResult sys_create_irq(BrIrq *handle, BrCreateIrqArgs *args)
     domain_add(task_self()->domain, base$(irq));
     *handle = irq->handle;
 
-    irq_handler_deref(irq);
+    irq_deref(irq);
 
     return BR_SUCCESS;
 }
@@ -340,53 +340,6 @@ BrResult sys_ipc(BrIpcArgs *args)
     return result;
 }
 
-BrResult sys_irq(BrIrqArgs *args)
-{
-    if (!(task_self()->caps & BR_CAP_IRQ))
-    {
-        return BR_BAD_CAPABILITY;
-    }
-
-    Task *task = nullptr;
-
-    if (args->task == BR_TASK_SELF)
-    {
-        task_ref(task_self());
-        task = task_self();
-    }
-    else
-    {
-        task = (Task *)domain_lookup(task_self()->domain, args->task, BR_OBJECT_TASK);
-    }
-
-    if (!task)
-    {
-        return BR_BAD_HANDLE;
-    }
-
-    auto irq = (Irq *)domain_lookup(task->domain, args->handle, BR_OBJECT_IRQ);
-
-    if (!irq)
-    {
-        return BR_BAD_HANDLE;
-    }
-
-    if (args->flags & BR_IRQ_ACK)
-    {
-        return irq_handler_ack(irq);
-    }
-    else if (args->flags & BR_IRQ_BIND)
-    {
-        return irq_handler_bind(task->handle, args->flags, irq, &args->msg);
-    }
-    else if (args->flags & BR_IRQ_UNBIND)
-    {
-        return irq_handler_unbind(args->flags, irq);
-    }
-
-    return BR_BAD_ARGUMENTS;
-}
-
 BrResult sys_drop(BrDropArgs *args)
 {
     Task *task = nullptr;
@@ -425,6 +378,81 @@ BrResult sys_close(BrCloseArgs *args)
     return BR_SUCCESS;
 }
 
+BrResult sys_bind(BrBindArgs *args)
+{
+    if (!(task_self()->caps & BR_CAP_IRQ))
+    {
+        return BR_BAD_CAPABILITY;
+    }
+
+    Task *task = nullptr;
+    task_ref(task_self());
+    task = task_self();
+
+    auto irq = (Irq *)domain_lookup(task->domain, args->handle, BR_OBJECT_IRQ);
+
+    if (!irq)
+    {
+        return BR_BAD_HANDLE;
+    }
+
+    return irq_bind(task->handle, args->flags, irq);
+}
+
+BrResult sys_unbind(BrUnbindArgs *args)
+{
+    if (!(task_self()->caps & BR_CAP_IRQ))
+    {
+        return BR_BAD_CAPABILITY;
+    }
+
+    Task *task = nullptr;
+
+    task_ref(task_self());
+    task = task_self();
+
+    if (!task)
+    {
+        return BR_BAD_HANDLE;
+    }
+
+    auto irq = (Irq *)domain_lookup(task->domain, args->handle, BR_OBJECT_IRQ);
+
+    if (!irq)
+    {
+        return BR_BAD_HANDLE;
+    }
+
+    return irq_unbind(args->flags, irq);
+}
+
+BrResult sys_ack(BrAckArgs *args)
+{
+    if (!(task_self()->caps & BR_CAP_IRQ))
+    {
+        return BR_BAD_CAPABILITY;
+    }
+
+    Task *task = nullptr;
+
+    task_ref(task_self());
+    task = task_self();
+
+    if (!task)
+    {
+        return BR_BAD_HANDLE;
+    }
+
+    auto irq = (Irq *)domain_lookup(task->domain, args->handle, BR_OBJECT_IRQ);
+
+    if (!irq)
+    {
+        return BR_BAD_HANDLE;
+    }
+
+    return irq_ack(irq);
+}
+
 typedef BrResult BrSyscallFn();
 
 BrSyscallFn *syscalls[BR_SYSCALL_COUNT] = {
@@ -435,9 +463,11 @@ BrSyscallFn *syscalls[BR_SYSCALL_COUNT] = {
     [BR_SC_START] = sys_start,
     [BR_SC_EXIT] = sys_exit,
     [BR_SC_IPC] = sys_ipc,
-    [BR_SC_IRQ] = sys_irq,
     [BR_SC_DROP] = sys_drop,
     [BR_SC_CLOSE] = sys_close,
+    [BR_SC_BIND] = sys_bind,
+    [BR_SC_UNBIND] = sys_unbind,
+    [BR_SC_ACK] = sys_ack,
 };
 
 BrResult syscall_dispatch(BrSyscall syscall, BrArg args)
