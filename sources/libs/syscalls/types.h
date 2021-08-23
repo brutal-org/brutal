@@ -10,9 +10,11 @@
     SYSCALL(START)                \
     SYSCALL(EXIT)                 \
     SYSCALL(IPC)                  \
-    SYSCALL(IRQ)                  \
     SYSCALL(DROP)                 \
-    SYSCALL(CLOSE)
+    SYSCALL(CLOSE)                \
+    SYSCALL(BIND)                 \
+    SYSCALL(UNBIND)               \
+    SYSCALL(ACK)
 
 typedef enum
 {
@@ -217,10 +219,7 @@ typedef uint32_t BrIrqId;
 typedef BrHandle BrIrq;
 
 #define BR_IRQ_NONE (0)
-#define BR_IRQ_BIND (1 << 0)
-#define BR_IRQ_UNBIND (1 << 1)
-#define BR_IRQ_ACK (1 << 2)
-#define BR_IRQ_BIND_ONCE (1 << 3) // will be disabled after the irq reception
+#define BR_IRQ_BIND_ONCE (1 << 0) // will be disabled after the irq reception
 
 typedef uint64_t BrIrqFlags;
 
