@@ -91,7 +91,7 @@ BrResult irq_unbind_all(const Task *target_task)
 BrResult irq_bind(BrTask task, BrIrqFlags flags, Irq *irq)
 {
     LOCK_RETAINER(&lock);
-    log(" binding interrupt {}", irq->irq);
+    log$(" binding interrupt {}", irq->irq);
 
     auto binding = irq_binding_get(*irq);
 
@@ -113,12 +113,12 @@ BrResult irq_bind(BrTask task, BrIrqFlags flags, Irq *irq)
 BrResult irq_unbind(BrIrqFlags flags, Irq *irq)
 {
     LOCK_RETAINER(&lock);
-    log(" unbinding interrupt {}", irq->irq);
+    log$(" unbinding interrupt {}", irq->irq);
 
     auto binding = irq_binding_get(*irq);
     if (binding == nullptr)
     {
-        log(" already unbinded interrupt {}", irq->irq);
+        log$(" already unbinded interrupt {}", irq->irq);
         return BR_BAD_HANDLE;
     }
     binding->data->flags = flags;

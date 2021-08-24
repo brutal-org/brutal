@@ -12,7 +12,7 @@ CpuidResult cpuid(uint32_t leaf, uint32_t subleaf)
 
     if (leaf > cpuid_max)
     {
-        log("CPUID failled leaf:{} subleaf:{}", leaf, subleaf);
+        log$("CPUID failled leaf:{} subleaf:{}", leaf, subleaf);
         return (CpuidResult){.succ = false};
     }
 

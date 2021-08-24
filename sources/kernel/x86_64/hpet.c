@@ -24,7 +24,7 @@ void hpet_initialize(Handover *handover)
 
     if (hpet_table->address_space_id == HPET_ADDRESS_SPACE_IO)
     {
-        log("hpet address io id is not supported");
+        log$("hpet address io id is not supported");
         return;
     }
 

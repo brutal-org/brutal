@@ -47,7 +47,7 @@
                                            \
         if (!__expr.succ)                  \
         {                                  \
-            panic(MESSAGE);                \
+            panic$(MESSAGE);               \
         }                                  \
                                            \
         __expr.ok;                         \

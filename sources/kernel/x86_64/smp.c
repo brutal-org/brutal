@@ -26,8 +26,8 @@ static size_t smp_trampoline_size(void)
 
 static void smp_trampoline_map(void)
 {
-    log("Initializing cpu trampoline");
-    log("trampoline is {x} bytes in size", smp_trampoline_size());
+    log$("Initializing cpu trampoline");
+    log$("trampoline is {x} bytes in size", smp_trampoline_size());
 
     uint64_t trampoline_len = (uintptr_t)&trampoline_end - (uintptr_t)&trampoline_start + MEM_PAGE_SIZE;
 
@@ -45,7 +45,7 @@ static void smp_trampoline_map(void)
 
 static void smp_trampoline_unmap(void)
 {
-    log("Cleaning up cpu trampoline");
+    log$("Cleaning up cpu trampoline");
 
     vmm_unmap(vmm_kernel_space(),
               (VmmRange){
@@ -87,7 +87,7 @@ void smp_boot_other(void)
 {
     smp_trampoline_map();
 
-    log("Booting other CPUs...");
+    log$("Booting other CPUs...");
 
     for (int cpu = 0; cpu < cpu_count(); cpu++)
     {
@@ -96,7 +96,7 @@ void smp_boot_other(void)
             continue; // don't init current cpu
         }
 
-        log("Bootings CPU N°{}...", cpu);
+        log$("Bootings CPU N°{}...", cpu);
 
         cpu_ready = false;
 

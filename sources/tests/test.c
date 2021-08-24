@@ -61,8 +61,8 @@ int test_run_all(void)
     int pass_count = 0;
     int fail_count = 0;
 
-    log("Running {} tests...", tests_count);
-    log("");
+    log$("Running {} tests...", tests_count);
+    log$("");
 
     for (size_t i = 0; i < tests_count; i++)
     {
@@ -72,19 +72,19 @@ int test_run_all(void)
 
         if (result == TEST_PASS)
         {
-            log("[ PASS ] {}", test.name);
+            log$("[ PASS ] {}", test.name);
             pass_count++;
         }
         else
         {
-            log("[ FAIL ] {}", test.name);
+            log$("[ FAIL ] {}", test.name);
             fail_count++;
         }
     }
 
-    log("");
-    log("{} tests run, {} pass, {} fail", tests_count, pass_count, fail_count);
-    log("");
+    log$("");
+    log$("{} tests run, {} pass, {} fail", tests_count, pass_count, fail_count);
+    log$("");
 
     if (fail_count != 0)
     {
@@ -102,14 +102,14 @@ TEST(should_run)
 
 TEST_WITH_FLAGS(should_fail, TEST_EXPECTED_TO_FAIL)
 {
-    panic("this test should fail");
+    panic$("this test should fail");
 }
 
 int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char const *argv[])
 {
     for (int i = 0; i < argc; i++)
     {
-        log("argc[{}]='{}'", i, str$(argv[i]));
+        log$("argc[{}]='{}'", i, str$(argv[i]));
     }
 
     if (argc == 3 && str_eq(str$(argv[1]), str$("-t")))

@@ -18,66 +18,66 @@ void handover_dump(Handover const *handover)
 {
     if (handover->tag != HANDOVER_TAG)
     {
-        log("not valid handover tag: {}", handover->tag);
+        log$("not valid handover tag: {}", handover->tag);
     }
 
     switch (handover->boolloader_from)
     {
     case HANDOVER_BOOT_SRC_STIVALE2:
-        log("converted from stivale2");
+        log$("converted from stivale2");
         break;
     case HANDOVER_BOOT_SRC_BRUTAL_LOADER:
-        log("booted from brutal loader");
+        log$("booted from brutal loader");
         break;
     default:
-        log("booted from an unknown loader");
+        log$("booted from an unknown loader");
         break;
     }
 
-    log("Memory Map:");
+    log$("Memory Map:");
 
     for (size_t i = 0; i < handover->mmap.size; i++)
     {
         auto entry = handover->mmap.entries[i];
 
-        log("\t{#p}-{#p} {}", entry.base, entry.base + entry.length - 1, entry.type);
+        log$("\t{#p}-{#p} {}", entry.base, entry.base + entry.length - 1, entry.type);
     }
 
-    log("Framebuffer:");
+    log$("Framebuffer:");
 
     if (handover->framebuffer.present)
     {
-        log("\tAddress: {#p}", handover->framebuffer.addr);
-        log("\tWidth: {}", handover->framebuffer.width);
-        log("\tHeight: {}", handover->framebuffer.height);
-        log("\tPitch: {}", handover->framebuffer.pitch);
-        log("\tBpp: {}", handover->framebuffer.bpp);
+        log$("\tAddress: {#p}", handover->framebuffer.addr);
+        log$("\tWidth: {}", handover->framebuffer.width);
+        log$("\tHeight: {}", handover->framebuffer.height);
+        log$("\tPitch: {}", handover->framebuffer.pitch);
+        log$("\tBpp: {}", handover->framebuffer.bpp);
     }
     else
     {
-        log("\tNot found!");
+        log$("\tNot found!");
     }
 
-    log("Modules:");
+    log$("Modules:");
 
     for (size_t i = 0; i < handover->modules.size; i++)
     {
         auto entry = handover->modules.module[i];
 
-        log("\t{#p}-{#p} {#}", entry.addr, entry.addr + entry.size, str$(&entry.module_name));
+        log$("\t{#p}-{#p} {#}", entry.addr, entry.addr + entry.size, str$(&entry.module_name));
     }
 
-    log("Rsdp:");
-    log("\tAddress: {#p}", handover->rsdp);
+    log$("Rsdp:");
+    log$("\tAddress: {#p}", handover->rsdp);
 
-    log("Cmd lines:");
+    log$("Cmd lines:");
 
     if (handover->cmd_lines.present)
     {
-        log("\t value: '{}'", str$(&handover->cmd_lines.cmd_line));
+        log$("\t value: '{}'", str$(&handover->cmd_lines.cmd_line));
     }
     else
     {
-        log("\tNot found!");
+        log$("\tNot found!");
     }
 }

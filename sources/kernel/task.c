@@ -13,7 +13,7 @@ Task *task_self(void)
 
 void task_destroy(Task *task)
 {
-    log("Destroying task {}({})", str$(&task->name), task->handle);
+    log$("Destroying task {}({})", str$(&task->name), task->handle);
 
     irq_unbind_all(task);
     context_destroy(task->context);
@@ -27,7 +27,7 @@ void task_destroy(Task *task)
 
 TaskCreateResult task_create(Str name, Space *space, BrCap caps, BrTaskFlags flags)
 {
-    log("Creating Task {}...", name);
+    log$("Creating Task {}...", name);
 
     auto task = alloc_make(alloc_global(), Task);
 
@@ -47,7 +47,7 @@ TaskCreateResult task_create(Str name, Space *space, BrCap caps, BrTaskFlags fla
 
     object_init(base$(task), BR_OBJECT_TASK, (ObjectDtor *)task_destroy);
 
-    log("Task {}({}) created...", str$(&task->name), task->handle);
+    log$("Task {}({}) created...", str$(&task->name), task->handle);
 
     return OK(TaskCreateResult, task);
 }

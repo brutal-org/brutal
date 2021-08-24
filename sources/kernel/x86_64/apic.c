@@ -83,7 +83,7 @@ void lapic_timer_initialize(void)
 void lapic_initialize(Handover const *handover)
 {
     lapic_base = mmap_phys_to_io(acpi_find_lapic(handover->rsdp));
-    log("Lapic found at {p}", lapic_base);
+    log$("Lapic found at {p}", lapic_base);
 
     auto lapics = acpi_find_lapic_table(handover->rsdp);
 
@@ -131,11 +131,11 @@ void ioapic_initialize(Handover const *handover)
 
         auto version = ioapic_get_version(i);
 
-        log("Ioapic {} found:", i);
-        log(" - Address: {#p}", ioapic->address);
-        log(" - Interrupt base: {}", ioapic->interrupt_base);
-        log(" - Version: {}", version.version);
-        log(" - Max redirection: {}", version.max_redirect);
+        log$("Ioapic {} found:", i);
+        log$(" - Address: {#p}", ioapic->address);
+        log$(" - Interrupt base: {}", ioapic->interrupt_base);
+        log$(" - Version: {}", version.version);
+        log$(" - Max redirection: {}", version.max_redirect);
     }
 }
 
@@ -156,7 +156,7 @@ static int ioapic_from_gsi(uint32_t interrupt_base)
         }
     }
 
-    panic("Ioapic interrupt base not founded for base {}", interrupt_base);
+    panic$("Ioapic interrupt base not founded for base {}", interrupt_base);
 }
 
 static void ioapic_create_redirect(
@@ -201,13 +201,13 @@ void ioapic_redirect_irq_to_cpu(CpuId id, uint8_t irq, bool enable, uintptr_t rs
 {
     struct iso_record_table iso_table = acpi_find_iso_table(rsdp);
 
-    log("- apic: setting ipi {#p} redirection for cpu: {}", irq, id);
+    log$("- apic: setting ipi {#p} redirection for cpu: {}", irq, id);
 
     for (size_t i = 0; i < iso_table.count; i++)
     {
         if (iso_table.table[i]->irq == irq)
         {
-            log("   - apic: using iso: {} with interrupt base: {}", i, iso_table.table[i]->interrupt_base);
+            log$("   - apic: using iso: {} with interrupt base: {}", i, iso_table.table[i]->interrupt_base);
 
             ioapic_create_redirect(iso_table.table[i]->irq + 0x20, iso_table.table[i]->interrupt_base, iso_table.table[i]->flags, id, enable);
 
@@ -220,7 +220,7 @@ void ioapic_redirect_irq_to_cpu(CpuId id, uint8_t irq, bool enable, uintptr_t rs
 
 void ioapic_redirect_legacy_irq(Handover const *handover)
 {
-    log("IOApic: Setup irq redirection");
+    log$("IOApic: Setup irq redirection");
 
     for (size_t i = 0; i < 16; i++) // set interrupt 32 to 48
     {

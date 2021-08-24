@@ -7,7 +7,7 @@ int main(int argc, char const *argv[])
 {
     if (argc < 2)
     {
-        log("{} [files]", str$(argv[0]));
+        log$("{} [files]", str$(argv[0]));
         return 0;
     }
 

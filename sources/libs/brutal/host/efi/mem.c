@@ -9,7 +9,7 @@ Error host_mem_acquire(size_t size, void **out_result, MAYBE_UNUSED enum host_me
 
     if (status != EFI_SUCCESS)
     {
-        panic("Failed to allocate {} bytes of memory: {}", size, status);
+        panic$("Failed to allocate {} bytes of memory: {}", size, status);
         return ERR_UNDEFINED;
     }
 

@@ -7,11 +7,11 @@ int main(int argc, char const *argv[])
 {
     if (argc < 3)
     {
-        log("bid usage [bid input] [c output]");
+        log$("bid usage [bid input] [c output]");
         return 0;
     }
 
-    log("converting {} to {}", str$(argv[1]), str$(argv[2]));
+    log$("converting {} to {}", str$(argv[1]), str$(argv[2]));
 
     IoFile source_file;
     io_file_open(&source_file, str$(argv[1]));

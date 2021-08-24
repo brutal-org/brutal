@@ -10,7 +10,7 @@ static _Atomic Tick tick = 0;
 
 void sched_initialize(void)
 {
-    log("Initializing scheduling...");
+    log$("Initializing scheduling...");
     vec_init(&tasks, alloc_global());
 }
 
@@ -37,7 +37,7 @@ void sched_start(Task *task, uintptr_t ip, uintptr_t sp, BrTaskArgs args)
 
     assert_truth(!task->is_started);
 
-    log("Starting task {}({})", str$(&task->name), task->handle);
+    log$("Starting task {}({})", str$(&task->name), task->handle);
 
     context_start(task->context, ip, sp, range_end(task->stack), args, task->flags);
     task->is_started = true;
@@ -349,7 +349,7 @@ void sched_ensure_no_duplicated(void)
             if (cpu(i)->next == cpu(j)->next)
             {
                 sched_dump();
-                panic("sched_ensure_no_duplicated failled (CPU{} and CPU{})!", i, j);
+                panic$("sched_ensure_no_duplicated failled (CPU{} and CPU{})!", i, j);
             }
         }
     }
@@ -369,10 +369,10 @@ void sched_ensure_no_cpu_jump(void)
             if (cpu(i)->current == cpu(j)->next)
             {
                 sched_dump();
-                panic("sched_ensure_no_cpu_jump() failled {}:{#p}({}) jumped from CPU{} to CPU{} taking the place of {}:{#p}({})!",
-                      str$(&cpu(i)->current->name), (uintptr_t)cpu(i)->next, cpu(i)->current->handle,
-                      i, j,
-                      str$(&cpu(j)->next->name), (uintptr_t)cpu(j)->next, cpu(j)->next->handle);
+                panic$("sched_ensure_no_cpu_jump() failled {}:{#p}({}) jumped from CPU{} to CPU{} taking the place of {}:{#p}({})!",
+                       str$(&cpu(i)->current->name), (uintptr_t)cpu(i)->next, cpu(i)->current->handle,
+                       i, j,
+                       str$(&cpu(j)->next->name), (uintptr_t)cpu(j)->next, cpu(j)->next->handle);
             }
         }
     }
@@ -430,7 +430,7 @@ void sched_finalize(void)
 
         if (task->is_stopped && !sched_runnable(task) && !sched_running(task))
         {
-            log("Finalizing task({}) {}", task->handle, str$(&task->name));
+            log$("Finalizing task({}) {}", task->handle, str$(&task->name));
             sched_dequeue(task);
             i--;
         }

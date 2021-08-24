@@ -483,12 +483,12 @@ BrResult syscall_dispatch(BrSyscall syscall, BrArg args)
 
     if (result != BR_SUCCESS)
     {
-        log("Syscall: {}({}): {}({#p}) -> {}",
-            str$(&task_self()->name),
-            task_self()->handle,
-            str$(br_syscall_to_string(syscall)),
-            args,
-            str$(br_result_to_string(result)));
+        log$("Syscall: {}({}): {}({#p}) -> {}",
+             str$(&task_self()->name),
+             task_self()->handle,
+             str$(br_syscall_to_string(syscall)),
+             args,
+             str$(br_result_to_string(result)));
     }
 
     task_end_syscall();
