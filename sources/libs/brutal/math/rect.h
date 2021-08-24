@@ -1,6 +1,7 @@
 #pragma once
 
 #include <brutal/base.h>
+#include <brutal/math/vec2.h>
 
 #define Rect(T) \
     struct      \
@@ -13,6 +14,7 @@
 
 typedef Rect(int) Recti;
 typedef Rect(float) Rectf;
+typedef Rect(double) Rectd;
 
 #define rect_create(T, x, y, w, h) \
     ((T){(x), (y), (w), (h)})
@@ -35,3 +37,18 @@ typedef Rect(float) Rectf;
             }                                         \
             _result;                                  \
         })
+
+#define rect_collide_point(RECT, VEC) (      \
+    {                                        \
+        bool _result = false;                \
+        auto _rect = (RECTA);                \
+        auto _point = (VEC);                 \
+        if (_rect.x + _rect.w <= _point.x && \
+            _rect.x >= _point.x &&           \
+            _rect.y + _rect.h <= _point.y && \
+            _rect.y >= _point.y)             \
+        {                                    \
+            result = true;                   \
+        }                                    \
+        _result;                             \
+    })
