@@ -117,14 +117,14 @@ BrTask srv_run(Handover const *handover, Str name)
 
     brh_close(elf_obj.handle);
 
-    log("Service '{}' created!", name);
+    log$("Service '{}' created!", name);
 
     return task_handle;
 }
 
 int br_entry(Handover const *handover)
 {
-    log("Handover at {#p}", (void *)handover);
+    log$("Handover at {#p}", (void *)handover);
 
     handover_dump(handover);
 
@@ -153,7 +153,7 @@ int br_entry(Handover const *handover)
             },
         });
 
-        log("Got message");
+        log$("Got message");
     }
 
     return 0;

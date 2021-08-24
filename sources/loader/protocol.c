@@ -148,7 +148,7 @@ HandoverFramebuffer get_framebuffer(EFIBootServices *bs)
 
     if (status != EFI_SUCCESS)
     {
-        panic("Couldn't get framebuffer native mode");
+        panic$("Couldn't get framebuffer native mode");
     }
 
     else

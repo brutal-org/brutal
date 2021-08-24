@@ -48,13 +48,13 @@ void simd_initialize(void)
 
     if (cpuid_has_xsave())
     {
-        log("XSAVE detected");
+        log$("XSAVE detected");
 
         simd_enable_xsave();
         simd_initialize_xcr0();
     }
 
-    log("SIMD save buffer size = {}", simd_context_size());
+    log$("SIMD save buffer size = {}", simd_context_size());
 }
 
 size_t simd_context_size(void)

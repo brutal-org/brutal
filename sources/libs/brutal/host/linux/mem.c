@@ -12,7 +12,7 @@ Error error_from_errno(void)
     }
     else
     {
-        log("{}", strerror(errno));
+        log$("{}", strerror(errno));
         return make_error(ERR_KIND_UNDEFINED, strerror(errno));
     }
 }

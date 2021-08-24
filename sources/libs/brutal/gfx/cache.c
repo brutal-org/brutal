@@ -36,19 +36,19 @@ void gfx_cache_end(GfxCache *self, MAYBE_UNUSED GfxRast *rast, MAYBE_UNUSED GfxS
         switch (command->type)
         {
         case GFX_COMMAND_RECT:
-            todo("Implement RECT command.");
+            todo$("Implement RECT command.");
             break;
 
         case GFX_COMMAND_LINE:
-            todo("Implement LINE command.");
+            todo$("Implement LINE command.");
             break;
 
         case GFX_COMMAND_TEXT:
-            todo("Implement TEXT command.");
+            todo$("Implement TEXT command.");
             break;
 
         case GFX_COMMAND_POLY:
-            todo("Implement POLY command.");
+            todo$("Implement POLY command.");
             break;
 
         default:

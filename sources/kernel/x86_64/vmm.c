@@ -71,9 +71,9 @@ static VmmResult vmm_get_pml_or_alloc(struct pml *table, size_t idx, size_t flag
 
 static void vmm_load_memory_map(VmmSpace target, HandoverMmap const *memory_map)
 {
-    log("Loading kernel memory map...");
+    log$("Loading kernel memory map...");
 
-    log("Mapping I/O space...");
+    log$("Mapping I/O space...");
     vmm_map(target,
             (VmmRange){
                 .base = mmap_phys_to_io(0),
@@ -85,21 +85,21 @@ static void vmm_load_memory_map(VmmSpace target, HandoverMmap const *memory_map)
             },
             BR_MEM_WRITABLE);
 
-    log("Mapping Memory Map...");
+    log$("Mapping Memory Map...");
 
     for (size_t i = 0; i < memory_map->size; i++)
     {
         auto entry = memory_map->entries[i];
 
-        log("Loading kernel memory map {}/{} ({x} - {x})",
-            i + 1,
-            memory_map->size,
-            entry.base,
-            entry.base + entry.length);
+        log$("Loading kernel memory map {}/{} ({x} - {x})",
+             i + 1,
+             memory_map->size,
+             entry.base,
+             entry.base + entry.length);
 
         if (entry.type == HANDOVER_MMAP_KERNEL_MODULE)
         {
-            log(" - Mapped to kernel");
+            log$(" - Mapped to kernel");
             vmm_map(target,
                     (VmmRange){
                         .base = mmap_phys_to_kernel(ALIGN_DOWN(entry.base, MEM_PAGE_SIZE)),
@@ -112,7 +112,7 @@ static void vmm_load_memory_map(VmmSpace target, HandoverMmap const *memory_map)
 
         if (entry.base >= GiB(4)) // The bottom 4Gio are already mapped
         {
-            log(" - Mapped to IO");
+            log$(" - Mapped to IO");
             vmm_map(target,
                     (VmmRange){
                         .base = mmap_phys_to_io(ALIGN_DOWN(entry.base, MEM_PAGE_SIZE)),
@@ -137,7 +137,7 @@ void vmm_initialize(Handover const *handover)
     vmm_load_memory_map(kernel_pml, &handover->mmap);
     vmm_space_switch(kernel_pml);
 
-    log("Loaded kernel memory map!");
+    log$("Loaded kernel memory map!");
 }
 
 VmmSpace vmm_space_create(void)
@@ -216,7 +216,7 @@ static VmmResult vmm_map_page(struct pml *pml4, uintptr_t virtual_page, uintptr_
 
     if (pml1->entries[PML1_GET_INDEX(virtual_page)].present)
     {
-        panic("{#p} is already mapped to {#p}", virtual_page, (uint64_t)pml2->entries[PML1_GET_INDEX(virtual_page)].physical << 12);
+        panic$("{#p} is already mapped to {#p}", virtual_page, (uint64_t)pml2->entries[PML1_GET_INDEX(virtual_page)].physical << 12);
     }
 
     pml1->entries[PML1_GET_INDEX(virtual_page)] = pml_make_entry(physical_page, flags);
@@ -254,7 +254,7 @@ VmmResult vmm_map(VmmSpace space, VmmRange virtual_range, PmmRange physical_rang
 
     if (virtual_range.size != physical_range.size)
     {
-        panic("virtual_range.size must be equal to physical_range.size");
+        panic$("virtual_range.size must be equal to physical_range.size");
         return ERR(VmmResult, BR_BAD_ARGUMENTS);
     }
 

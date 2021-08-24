@@ -74,7 +74,7 @@ entry_point_func loader_load_kernel(Str path)
     IoFileReader reader;
     Buffer buffer;
 
-    log("Loading elf file...");
+    log$("Loading elf file...");
     io_file_open(&file, path);
     reader = io_file_read(&file);
     buffer = io_readall(base$(&reader), alloc_global());
@@ -84,10 +84,10 @@ entry_point_func loader_load_kernel(Str path)
     if (buffer.used < sizeof(Elf64Header) ||
         !elf_validate(header))
     {
-        panic("Invalid elf file!");
+        panic$("Invalid elf file!");
     }
 
-    log("Elf file loaded in memory, mapping it...");
+    log$("Elf file loaded in memory, mapping it...");
 
     loader_load(header, buffer.data);
 
@@ -95,20 +95,20 @@ entry_point_func loader_load_kernel(Str path)
 
     buffer_deinit(&buffer);
 
-    log("Entry is {#x}", entry);
+    log$("Entry is {#x}", entry);
 
     return (entry_point_func)entry;
 }
 
 void loader_boot(LoaderEntry *entry, Buffer *config_buf)
 {
-    log("Loading kernel...");
+    log$("Loading kernel...");
 
     auto entry_point = loader_load_kernel(entry->kernel);
 
     buffer_deinit(config_buf);
 
-    log("Kernel loaded, jumping in to it...");
+    log$("Kernel loaded, jumping in to it...");
 
     Handover handover = get_handover();
 

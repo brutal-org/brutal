@@ -138,24 +138,24 @@ void space_dump(Space *self)
 {
     LOCK_RETAINER(&self->lock);
 
-    log("MemorySpace({})", self->handle);
+    log$("MemorySpace({})", self->handle);
 
     vec_foreach(mapping, &self->mappings)
     {
         auto vmm_range = mapping->range;
 
-        log("\trange:{#p}-{#p} offset:{} size:{}",
-            vmm_range.base, vmm_range.base + vmm_range.size - 1, mapping->offset, vmm_range.size);
+        log$("\trange:{#p}-{#p} offset:{} size:{}",
+             vmm_range.base, vmm_range.base + vmm_range.size - 1, mapping->offset, vmm_range.size);
 
         if (mapping->object->type == MEM_OBJ_HEAP)
         {
             auto heap_range = mapping->object->heap;
-            log("\t  ->  handle:{} range:{#p}-{#p} size:{}", mapping->object->handle, heap_range.base, heap_range.base + heap_range.size - 1, heap_range.size);
+            log$("\t  ->  handle:{} range:{#p}-{#p} size:{}", mapping->object->handle, heap_range.base, heap_range.base + heap_range.size - 1, heap_range.size);
         }
         else
         {
             auto pmm_range = mapping->object->pmm;
-            log("\t  ->  handle:{} range:{#p}-{#p} size:{}", mapping->object->handle, pmm_range.base, pmm_range.base + pmm_range.size - 1, pmm_range.size);
+            log$("\t  ->  handle:{} range:{#p}-{#p} size:{}", mapping->object->handle, pmm_range.base, pmm_range.base + pmm_range.size - 1, pmm_range.size);
         }
     }
 }

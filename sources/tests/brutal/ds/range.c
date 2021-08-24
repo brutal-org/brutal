@@ -12,7 +12,7 @@ TEST(ds_range_alloc_used_start)
 
     auto higher_half = (USizeRange){0x1000, 0x4000};
 
-    log("After test");
+    log$("After test");
     range_alloc_dump(&alloc);
 
     assert_equal(alloc.length, 1);
@@ -32,7 +32,7 @@ TEST(ds_range_alloc_used_center)
     auto lower_half = (USizeRange){0x0, 0x2000};
     auto higher_half = (USizeRange){0x3000, 0x2000};
 
-    log("After test");
+    log$("After test");
     range_alloc_dump(&alloc);
 
     assert_equal(alloc.length, 2);
@@ -52,7 +52,7 @@ TEST(ds_range_alloc_used_end)
 
     auto lower_half = (USizeRange){0x0, 0x4000};
 
-    log("After test");
+    log$("After test");
     range_alloc_dump(&alloc);
 
     assert_equal(alloc.length, 1);
@@ -71,7 +71,7 @@ TEST(ds_range_alloc_unused_begin)
 
     auto final_range = (USizeRange){0x0, 0x2000};
 
-    log("After test");
+    log$("After test");
     range_alloc_dump(&alloc);
 
     assert_equal(alloc.length, 1);
@@ -91,7 +91,7 @@ TEST(ds_range_alloc_unused_middle)
 
     auto final_range = (USizeRange){0x0, 0x3000};
 
-    log("After test");
+    log$("After test");
     range_alloc_dump(&alloc);
 
     assert_equal(alloc.length, 1);
@@ -111,7 +111,7 @@ TEST(ds_range_alloc_unused_end)
 
     auto final_range = (USizeRange){0x0, 0x3000};
 
-    log("After test");
+    log$("After test");
     range_alloc_dump(&alloc);
 
     assert_equal(alloc.length, 1);

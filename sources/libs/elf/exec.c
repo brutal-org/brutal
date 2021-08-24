@@ -12,7 +12,7 @@ void elf_load(BrSpace space, Elf64Header const *elf_header, BrMemObj elf_obj)
     {
         if (prog_header->type != ELF_PROGRAM_HEADER_LOAD)
         {
-            log("Ignoring segment with type={#0x}", prog_header->type);
+            log$("Ignoring segment with type={#0x}", prog_header->type);
             continue;
         }
 

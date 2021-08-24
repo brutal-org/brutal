@@ -2,6 +2,6 @@
 
 void kernel_splash(void)
 {
-    log("BRUTAL - Milestone 2");
-    log("\"Long live the UNIX utopia!\"");
+    log$("BRUTAL - Milestone 2");
+    log$("\"Long live the UNIX utopia!\"");
 }

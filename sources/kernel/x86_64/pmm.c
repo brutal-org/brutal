@@ -21,11 +21,11 @@ static uintptr_t memory_map_get_highest_address(HandoverMmap const *memory_map)
 
 static void pmm_bitmap_initialize(HandoverMmap const *memory_map)
 {
-    log("Allocating memory bitmap...");
+    log$("Allocating memory bitmap...");
 
     size_t bitmap_target_size = memory_map_get_highest_address(memory_map) / MEM_PAGE_SIZE / 8;
 
-    log("A bitmap {}kib long is needed", bitmap_target_size / 1024);
+    log$("A bitmap {}kib long is needed", bitmap_target_size / 1024);
 
     for (size_t i = 0; i < memory_map->size; i++)
     {
@@ -38,7 +38,7 @@ static void pmm_bitmap_initialize(HandoverMmap const *memory_map)
 
         if (entry->length > bitmap_target_size)
         {
-            log("Allocated memory bitmap at {x}-{x}", entry->base, entry->base + bitmap_target_size - 1);
+            log$("Allocated memory bitmap at {x}-{x}", entry->base, entry->base + bitmap_target_size - 1);
 
             bitmap_init(&pmm_bitmap, (void *)mmap_phys_to_io(entry->base), bitmap_target_size);
             break;
@@ -50,7 +50,7 @@ static void pmm_bitmap_initialize(HandoverMmap const *memory_map)
 
 static void pmm_load_memory_map(HandoverMmap const *memory_map)
 {
-    log("Memory map:");
+    log$("Memory map:");
 
     size_t available_memory = 0;
 
@@ -59,7 +59,7 @@ static void pmm_load_memory_map(HandoverMmap const *memory_map)
         size_t base = ALIGN_UP(memory_map->entries[i].base, MEM_PAGE_SIZE);
         size_t size = ALIGN_DOWN(memory_map->entries[i].length, MEM_PAGE_SIZE);
 
-        log("    type: {x} {x}-{x}", memory_map->entries[i].type, base, base + size - 1);
+        log$("    type: {x} {x}-{x}", memory_map->entries[i].type, base, base + size - 1);
 
         if (memory_map->entries[i].type != HANDOVER_MMAP_FREE)
         {
@@ -71,7 +71,7 @@ static void pmm_load_memory_map(HandoverMmap const *memory_map)
         available_memory += size;
     }
 
-    log("Available Memory: {}kib", available_memory / 1024);
+    log$("Available Memory: {}kib", available_memory / 1024);
 }
 
 void pmm_initialize(Handover const *handover)
@@ -104,7 +104,7 @@ PmmResult pmm_alloc(size_t size)
 
     if (!range_any(page_range))
     {
-        log("pmm_alloc({}): out of memory!", size);
+        log$("pmm_alloc({}): out of memory!", size);
         return ERR(PmmResult, BR_OUT_OF_MEMORY);
     }
 

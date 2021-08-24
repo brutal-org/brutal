@@ -16,7 +16,7 @@ static EFILoadedImage *efi_image_loader(void)
         return image_loader;
     }
 
-    log("Opening image loader...");
+    log$("Opening image loader...");
 
     EFIGUID guid = EFI_LOADED_IMAGE_PROTOCOL_GUID;
 
@@ -28,7 +28,7 @@ static EFILoadedImage *efi_image_loader(void)
         NULL,
         EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL);
 
-    log("Opening image loader... ok");
+    log$("Opening image loader... ok");
 
     assert_truth(status == EFI_SUCCESS);
 
@@ -42,7 +42,7 @@ static EFISimpleFileSystemProtocol *efi_rootfs(void)
         return rootfs;
     }
 
-    log("Opening rootfs...");
+    log$("Opening rootfs...");
 
     EFIGUID guid = EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID;
 
@@ -54,7 +54,7 @@ static EFISimpleFileSystemProtocol *efi_rootfs(void)
         NULL,
         EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL);
 
-    log("Opening rootfs...ok");
+    log$("Opening rootfs...ok");
 
     assert_truth(status == EFI_SUCCESS);
 
@@ -68,11 +68,11 @@ EFIFileProtocol *efi_rootdir(void)
         return rootdir;
     }
 
-    log("Opening rootdir...");
+    log$("Opening rootdir...");
 
     EFIStatus status = efi_rootfs()->open_volume(efi_rootfs(), &rootdir);
 
-    log("Opening rootdir...ok");
+    log$("Opening rootdir...ok");
 
     assert_truth(status == EFI_SUCCESS);
 

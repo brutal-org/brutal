@@ -18,7 +18,7 @@ struct ubsan_type_descriptor
 
 static void ubsan_print_location(char *message, struct ubsan_source_location loc)
 {
-    panic("ubsan: {} at file {}, line {}, column {}", message, str$(loc.file), loc.line, loc.column);
+    panic$("ubsan: {} at file {}, line {}, column {}", message, str$(loc.file), loc.line, loc.column);
 }
 
 struct ubsan_overflow_data

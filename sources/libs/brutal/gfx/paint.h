@@ -50,6 +50,6 @@ static inline GfxColor gfx_paint_sample(GfxPaint *paint, MAYBE_UNUSED float x, M
         return paint->fill;
 
     default:
-        panic_todo("Implement other paint types.");
+        panic_todo$("Implement other paint types.");
     }
 }

@@ -61,7 +61,7 @@ static struct alloc_major *major_block_create(size_t size)
     struct alloc_major *maj;
     if (host_mem_acquire(st * MEM_PAGE_SIZE, (void **)&maj, HOST_MEM_NONE).kind != ERR_KIND_SUCCESS)
     {
-        panic("Failled to allocate memory!");
+        panic$("Failled to allocate memory!");
     }
 
     maj->prev = nullptr;
@@ -86,16 +86,16 @@ static bool check_minor_magic(struct alloc_minor *min, void *ptr)
         ((min->magic & 0xFFFF) == (ALLOC_HEAP_MAGIC & 0xFFFF)) ||
         ((min->magic & 0xFF) == (ALLOC_HEAP_MAGIC & 0xFF)))
     {
-        panic("Possible 1-3 byte overrun for magic {08x} != {08x}.", min->magic, ALLOC_HEAP_MAGIC);
+        panic$("Possible 1-3 byte overrun for magic {08x} != {08x}.", min->magic, ALLOC_HEAP_MAGIC);
     }
 
     if (min->magic == ALLOC_HEAP_DEAD)
     {
-        panic("Multiple free({p}).", ptr);
+        panic$("Multiple free({p}).", ptr);
     }
     else
     {
-        panic("Bad free({p})", ptr);
+        panic$("Bad free({p})", ptr);
     }
 
     return false;
@@ -110,7 +110,7 @@ void *alloc_heap_acquire(struct alloc_heap *alloc, size_t req_size)
 
     if (size == 0)
     {
-        log("alloc(0) called");
+        log$("alloc(0) called");
         return alloc_heap_acquire(alloc, 1);
     }
 
@@ -317,7 +317,7 @@ void *alloc_heap_acquire(struct alloc_heap *alloc, size_t req_size)
         maj = maj->next;
     } // while (maj != nullptr)
 
-    log("All cases exhausted. No memory available.");
+    log$("All cases exhausted. No memory available.");
 
     return nullptr;
 }
@@ -326,7 +326,7 @@ void alloc_heap_release(struct alloc_heap *alloc, void *ptr)
 {
     if (ptr == nullptr)
     {
-        log("free( nullptr )");
+        log$("free( nullptr )");
         return;
     }
 

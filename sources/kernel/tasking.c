@@ -62,11 +62,11 @@ void tasking_create_finalizer(void)
 
 void tasking_initialize(void)
 {
-    log("Initializing tasking...");
+    log$("Initializing tasking...");
 
     for (int i = 0; i < cpu_count(); i++)
     {
-        log("Initializing tasking for cpu: {}", i);
+        log$("Initializing tasking for cpu: {}", i);
 
         cpu(i)->idle = tasking_create_idle();
         sched_current(tasking_create_boot(), cpu(i));
