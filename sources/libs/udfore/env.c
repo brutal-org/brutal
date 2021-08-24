@@ -53,10 +53,11 @@ UdExpr ud_env_default(Alloc *alloc)
 {
     UdExpr env = ud_nil();
 
-    env = ud_env_def_syntax(env, "bs-builtin-define", ud_builtin_define, alloc);
-    env = ud_env_def_syntax(env, "bs-builtin-lambda", ud_builtin_lambda, alloc);
-    env = ud_env_def_syntax(env, "bs-builtin-block", ud_builtin_block, alloc);
-    env = ud_env_def_syntax(env, "bs-builtin-quote", ud_builtin_quote, alloc);
+    env = ud_env_def_syntax(env, UD_BUILTIN_DEFINE, ud_builtin_define, alloc);
+    env = ud_env_def_syntax(env, UD_BUILTIN_LAMBDA, ud_builtin_lambda, alloc);
+    env = ud_env_def_syntax(env, UD_BUILTIN_BLOCK, ud_builtin_block, alloc);
+    env = ud_env_def_syntax(env, UD_BUILTIN_QUOTE, ud_builtin_quote, alloc);
+    env = ud_env_def_syntax(env, UD_BUILTIN_IF, ud_builtin_if, alloc);
 
     return env;
 }

@@ -218,7 +218,7 @@ static UdExpr parse_block(Scan *scan, Alloc *alloc)
 
     return ud_pair(
         alloc,
-        ud_atom(str$("bs-builtin-block")),
+        ud_atom(str$("ud-builtin-block")),
         body);
 }
 
@@ -258,7 +258,7 @@ static UdExpr parse_expression(Scan *scan, Alloc *alloc)
     {
         return ud_pair(
             alloc,
-            ud_atom(str$("bs-builtin-quote")),
+            ud_atom(str$("ud-builtin-quote")),
             parse_expression(scan, alloc));
     }
     else
@@ -293,7 +293,7 @@ static UdExpr parse_module(Scan *scan, Alloc *alloc)
 
     return ud_pair(
         alloc,
-        ud_atom(str$("bs-builtin-block")),
+        ud_atom(str$("ud-builtin-block")),
         body);
 }
 

@@ -49,7 +49,50 @@ UdExpr ud_builtin_block(UdExpr args, UdExpr *env, Alloc *alloc)
     return result;
 }
 
+UdExpr ud_builtin_if(UdExpr args, UdExpr *env, Alloc *alloc)
+{
+    UdExpr result = ud_nil();
+    UdExpr cond = ud_eval(ud_lhs(args), env, alloc);
+
+    if (ud_is_truth(cond))
+    {
+        result = ud_eval(ud_lrhs(args), env, alloc);
+    }
+    else if (ud_is_atom(ud_lrrhs(args), str$("else")))
+    {
+        result = ud_eval(ud_lrrrhs(args), env, alloc);
+    }
+
+    return result;
+}
+
+UdExpr ud_builtin_while(UdExpr args, UdExpr *env, Alloc *alloc)
+{
+    bool any = false;
+    UdExpr result = ud_bool(false);
+    UdExpr cond = ud_eval(ud_lhs(args), env, alloc);
+
+    while (ud_is_truth(cond))
+    {
+        any = true;
+        result = ud_eval(ud_lrhs(args), env, alloc);
+        cond = ud_eval(ud_lhs(args), env, alloc);
+    }
+
+    if (!any && ud_is_atom(ud_lrrhs(args), str$("else")))
+    {
+        result = ud_eval(ud_lrrrhs(args), env, alloc);
+    }
+
+    return result;
+}
+
 UdExpr ud_builtin_quote(UdExpr args, MAYBE_UNUSED UdExpr *env, MAYBE_UNUSED Alloc *alloc)
 {
     return args;
+}
+
+UdExpr ud_builtin_pair(UdExpr args, MAYBE_UNUSED UdExpr *env, Alloc *alloc)
+{
+    return ud_pair(alloc, ud_lhs(args), ud_lrhs(args));
 }
