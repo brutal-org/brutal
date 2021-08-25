@@ -10,18 +10,6 @@ typedef enum
     IO_STD_ERR,
 } IoStdChannel;
 
-typedef struct
-{
-    IoReader base;
-    IoStdChannel channel;
-} IoStdReader;
-
-typedef struct
-{
-    IoWriter base;
-    IoStdChannel channel;
-} IoStdWriter;
-
 IoReader *io_std_in(void);
 
 IoWriter *io_std_out(void);

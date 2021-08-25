@@ -1,4 +1,4 @@
-interface example
+interface Example
 {
     errors
     {

@@ -11,7 +11,7 @@ struct acpi_sdth *acpi_rsdt_child(struct acpi_rsdt *rsdt, Str signature)
     {
         auto sdth = mmap_io_ptr_from_phys(struct acpi_sdth *, rsdt->children[i]);
 
-        if (str_eq(signature, str$_n(4, sdth->signature)))
+        if (str_eq(signature, str_n$(4, sdth->signature)))
         {
             return sdth;
         }

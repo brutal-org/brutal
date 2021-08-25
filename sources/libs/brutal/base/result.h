@@ -31,7 +31,7 @@
 
 #define TRY(T, EXPR) (                 \
     {                                  \
-        auto __expr = (EXPR);          \
+        typeof(EXPR) __expr = (EXPR);  \
                                        \
         if (!__expr.succ)              \
         {                              \
@@ -43,7 +43,7 @@
 
 #define UNWRAP_OR_MESSAGE(EXPR, MESSAGE) ( \
     {                                      \
-        auto __expr = (EXPR);              \
+        typeof(EXPR) __expr = (EXPR);      \
                                            \
         if (!__expr.succ)                  \
         {                                  \
@@ -53,21 +53,21 @@
         __expr.ok;                         \
     })
 
-#define UNWRAP_OR(EXPR, VALUE) (    \
-    {                               \
-        auto __expr = (EXPR);       \
-        typeof(__expr.ok) __result; \
-                                    \
-        if (__expr.succ)            \
-        {                           \
-            __result = __expr.ok;   \
-        }                           \
-        else                        \
-        {                           \
-            __result = (VALUE);     \
-        }                           \
-                                    \
-        __result;                   \
+#define UNWRAP_OR(EXPR, VALUE) (      \
+    {                                 \
+        typeof(EXPR) __expr = (EXPR); \
+        typeof(__expr.ok) __result;   \
+                                      \
+        if (__expr.succ)              \
+        {                             \
+            __result = __expr.ok;     \
+        }                             \
+        else                          \
+        {                             \
+            __result = (VALUE);       \
+        }                             \
+                                      \
+        __result;                     \
     })
 
 #define UNWRAP(EXPR) \

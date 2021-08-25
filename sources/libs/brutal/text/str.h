@@ -72,6 +72,7 @@ typedef StrFix(128) StrFix128;
 static inline Str str_forward(Str str) { return str; }
 static inline Str str_make_from_inline_str(InlineStr *str) { return (Str){str->len, str->buffer}; }
 static inline Str str_make_from_cstr(char const *cstr) { return (Str){cstr_len(cstr), (char *)cstr}; }
+static inline Str str_make_from_cstr8(uint8_t const *cstr) { return (Str){cstr_len((char *)cstr), (char *)cstr}; }
 static inline Str str_make_from_str_fix1(StrFix1 const *str_fix) { return (Str){str_fix->len, (char *)str_fix->buffer}; }
 static inline Str str_make_from_str_fix8(StrFix8 const *str_fix) { return (Str){str_fix->len, (char *)str_fix->buffer}; }
 static inline Str str_make_from_str_fix16(StrFix16 const *str_fix) { return (Str){str_fix->len, (char *)str_fix->buffer}; }
@@ -82,12 +83,14 @@ static inline Str str_make_from_str_fix128(StrFix128 const *str_fix) { return (S
 // clang-format off
 
 // Create a new instance of a non owning string.
-#define str$(literal)                            \
+#define str$(literal)                                \
     _Generic((literal),                              \
         Str              : str_forward,              \
         InlineStr *      : str_make_from_inline_str, \
         char*            : str_make_from_cstr,       \
         char const*      : str_make_from_cstr,       \
+        uint8_t*         : str_make_from_cstr8,       \
+        uint8_t const*   : str_make_from_cstr8,       \
         StrFix1*         : str_make_from_str_fix1,   \
         StrFix1 const*   : str_make_from_str_fix1,   \
         StrFix8*         : str_make_from_str_fix8,   \
@@ -104,7 +107,7 @@ static inline Str str_make_from_str_fix128(StrFix128 const *str_fix) { return (S
 
 // clang-format on
 
-#define str$_n(n, str) \
+#define str_n$(n, str) \
     (Str) { n, str }
 
 // Create a new instance of a fix size string.
@@ -118,4 +121,4 @@ static inline Str str_make_from_str_fix128(StrFix128 const *str_fix) { return (S
     })
 
 #define str_sub(str, start, end) \
-    str$_n(end - start, (char *)str.buffer + start)
+    str_n$(end - start, (char *)str.buffer + start)

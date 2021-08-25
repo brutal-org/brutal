@@ -14,12 +14,12 @@ int main(int argc, char const *argv[])
     IoFile source_file;
     io_file_open(&source_file, str$(argv[1]));
 
-    IoFileReader source_file_reader = io_file_read(&source_file);
+    IoReader source_file_reader = io_file_read(&source_file);
 
     Buffer source_buffer;
     buffer_init(&source_buffer, 512, alloc_global());
 
-    IoBufferWriter source_buffer_writer = io_buffer_write(&source_buffer);
+    IoWriter source_buffer_writer = io_buffer_write(&source_buffer);
 
     io_copy(base$(&source_file_reader), base$(&source_buffer_writer));
 

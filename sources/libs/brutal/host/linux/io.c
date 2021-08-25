@@ -34,24 +34,24 @@ MaybeError host_io_file_close(HostIoFileHandle handle)
     return SUCCESS;
 }
 
-IoReadResult host_io_read_file(HostIoFileHandle handle, char *data, size_t size)
+IoReadResult host_io_read_file(HostIoFileHandle handle, uint8_t *data, size_t size)
 {
     return OK(IoReadResult, read(handle, data, size));
 }
 
-IoWriteResult host_io_write_file(HostIoFileHandle handle, char const *data, size_t size)
+IoWriteResult host_io_write_file(HostIoFileHandle handle, uint8_t const *data, size_t size)
 {
     return OK(IoWriteResult, write(handle, data, size));
 }
 
-IoReadResult host_io_read_std(IoStdChannel channel, char *data, size_t size)
+IoReadResult host_io_read_std(IoStdChannel channel, uint8_t *data, size_t size)
 {
     assert_equal((int)channel, IO_STD_IN);
 
     return OK(IoReadResult, write(0, data, size));
 }
 
-IoWriteResult host_io_write_std(IoStdChannel channel, char const *data, size_t size)
+IoWriteResult host_io_write_std(IoStdChannel channel, uint8_t const *data, size_t size)
 {
     assert_not_equal((int)channel, IO_STD_IN);
 

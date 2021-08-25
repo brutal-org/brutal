@@ -18,8 +18,8 @@ IoWriteResult tga_encode(IoWriter *writer, GfxSurface surface)
 
     size_t written = 0;
 
-    written = TRY(IoWriteResult, io_write(writer, &header, sizeof(TgaHeader)));
-    written += TRY(IoWriteResult, io_write(writer, surface.buffer, surface.size));
+    written = TRY(IoWriteResult, io_write(writer, (uint8_t *)&header, sizeof(TgaHeader)));
+    written += TRY(IoWriteResult, io_write(writer, (uint8_t *)surface.buffer, surface.size));
 
     return OK(IoWriteResult, written);
 }

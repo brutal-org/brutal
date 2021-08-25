@@ -16,14 +16,14 @@ int main(int argc, char const *argv[])
     IoFile source_file;
     io_file_open(&source_file, str$(argv[1]));
 
-    IoFileReader source_file_reader = io_file_read(&source_file);
+    IoReader source_file_reader = io_file_reader(&source_file);
 
     Buffer source_buffer;
     buffer_init(&source_buffer, 512, alloc_global());
 
-    IoBufferWriter source_buffer_writer = io_buffer_write(&source_buffer);
+    IoWriter source_buffer_writer = buffer_writer(&source_buffer);
 
-    io_copy(base$(&source_file_reader), base$(&source_buffer_writer));
+    io_copy(&source_file_reader, &source_buffer_writer);
 
     Scan scan;
     scan_init(&scan, buffer_str(&source_buffer));
@@ -38,9 +38,11 @@ int main(int argc, char const *argv[])
     IoFile output_file;
     io_file_create(&output_file, str$(argv[2]));
 
-    IoFileWriter output_file_writer = io_file_write(&output_file);
+    IoWriter output_file_writer = io_file_writer(&output_file);
+    Emit emit;
+    emit_init(&emit, &output_file_writer);
 
-    bid2c(&interface, base$(&output_file_writer));
+    bid2c(&interface, &emit);
 
     return 0;
 }

@@ -52,49 +52,43 @@ void buffer_push_impl(Buffer *self, uint8_t const *data, size_t size)
 
 Str buffer_str(Buffer *self)
 {
-    return str$_n(self->used, (char *)self->data);
+    return str_n$(self->used, (char *)self->data);
 }
 
-static IoReadResult io_buffer_read_impl(IoBufferReader *read, char *data, size_t size)
+static IoReadResult buffer_read_impl(Buffer *self, char *data, size_t offset, size_t size)
 {
-    size_t readed = MIN(size + read->cur, read->buf->used);
+    size_t read = MIN(size, self->used - offset);
 
-    for (size_t i = 0; i < readed; i++)
+    for (size_t i = 0; i < read; i++)
     {
-        data[i] = read->buf->data[i + read->cur];
+        data[i] = self->data[offset + i];
     }
 
-    read->cur += readed;
-
-    return OK(IoReadResult, readed);
+    return OK(IoReadResult, read);
 }
 
-IoBufferReader io_buffer_read(Buffer const *self)
+IoReader buffer_reader(Buffer *self)
 {
-    IoBufferReader reader = (IoBufferReader){
-        .base = {(IoRead *)io_buffer_read_impl},
-        .buf = self,
+    return (IoReader){
+        .read = (IoRead *)buffer_read_impl,
+        .context = self,
     };
-
-    return reader;
 }
 
-static IoWriteResult io_buffer_write_impl(IoBufferWriter *writer, char const *data, size_t size)
+static IoWriteResult buffer_write_impl(Buffer *self, char const *data, MAYBE_UNUSED size_t offset, size_t size)
 {
     for (size_t i = 0; i < size; i++)
     {
-        buffer_push(writer->buf, data[i]);
+        buffer_push(self, data[i]);
     }
 
     return OK(IoWriteResult, size);
 }
 
-IoBufferWriter io_buffer_write(Buffer *self)
+IoWriter buffer_writer(Buffer *self)
 {
-    IoBufferWriter writer = (IoBufferWriter){
-        .base = {(IoWrite *)io_buffer_write_impl},
-        .buf = self,
+    return (IoWriter){
+        .write = (IoWrite *)buffer_write_impl,
+        .context = self,
     };
-
-    return writer;
 }

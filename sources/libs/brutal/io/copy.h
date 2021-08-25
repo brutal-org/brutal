@@ -1,5 +1,6 @@
 #pragma once
 
+#include <brutal/io/buffer.h>
 #include <brutal/io/read.h>
 #include <brutal/io/write.h>
 
@@ -11,15 +12,15 @@ static inline IoCopyResult io_copy(IoReader *from, IoWriter *to)
 
     do
     {
-        char buffer[512];
-        auto read = TRY(IoCopyResult, io_read(from, buffer, 512));
+        uint8_t buffer[512];
+        size_t read = TRY(IoCopyResult, io_read(from, buffer, 512));
 
         if (read == 0)
         {
             return OK(IoCopyResult, total);
         }
 
-        auto written = TRY(IoCopyResult, io_write(to, buffer, read));
+        size_t written = TRY(IoCopyResult, io_write(to, buffer, read));
 
         if (written == 0)
         {
@@ -34,7 +35,7 @@ static inline Buffer io_readall(IoReader *from, Alloc *alloc)
 {
     Buffer buffer;
     buffer_init(&buffer, 512, alloc);
-    IoBufferWriter to = io_buffer_write(&buffer);
-    io_copy(from, base$(&to));
+    IoWriter to = buffer_writer(&buffer);
+    io_copy(from, &to);
     return buffer;
 }

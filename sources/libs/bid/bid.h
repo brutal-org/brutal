@@ -5,4 +5,4 @@
 
 BidInterface bid_parse(Scan *scan, Alloc *alloc);
 
-void bid2c(BidInterface const *interface, IoWriter *writer);
+void bid2c(BidInterface const *interface, Emit *emit);

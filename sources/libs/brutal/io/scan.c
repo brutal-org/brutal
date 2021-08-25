@@ -78,7 +78,7 @@ Str scan_skip_until(Scan *self, int (*callback)(int))
         scan_next(self);
     }
 
-    return str$_n(length, (char *)self->buffer + start);
+    return str_n$(length, (char *)self->buffer + start);
 }
 
 char scan_curr(Scan *self)
@@ -195,7 +195,7 @@ void scan_begin_token(Scan *self)
 
 Str scan_end_token(Scan *self)
 {
-    return str$_n(
+    return str_n$(
         self->head - self->token,
         (char *)self->buffer + self->token);
 }
@@ -226,7 +226,7 @@ bool scan_expect(Scan *self, char c)
 {
     if (!scan_skip(self, c))
     {
-        scan_throw(self, str$("expected character"), str$_n(1, &c));
+        scan_throw(self, str$("expected character"), str_n$(1, &c));
         return false;
     }
 
@@ -252,7 +252,7 @@ bool scan_dump_error(Scan *self, IoWriter *writer)
     }
 
     ScanError err = self->error;
-    Str src = str$_n(self->size, (char *)self->buffer);
+    Str src = str_n$(self->size, (char *)self->buffer);
 
     print(writer, "error: {}: {}\n", err.message, str$(&err.token));
 

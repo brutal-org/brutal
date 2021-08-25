@@ -43,19 +43,6 @@ Str buffer_str(Buffer *self);
 
 #define buffer_used(SELF) ((SELF)->used)
 
-typedef struct
-{
-    IoReader base;
-    Buffer const *buf;
-    size_t cur;
-} IoBufferReader;
+IoReader buffer_reader(Buffer *self);
 
-typedef struct
-{
-    IoWriter base;
-    Buffer *buf;
-} IoBufferWriter;
-
-IoBufferReader io_buffer_read(Buffer const *self);
-
-IoBufferWriter io_buffer_write(Buffer *self);
+IoWriter buffer_writer(Buffer *self);

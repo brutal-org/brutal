@@ -264,7 +264,7 @@ static UdExpr parse_expression(Scan *scan, Alloc *alloc)
     else
     {
         char c = scan_curr(scan);
-        scan_throw(scan, str$("unexpected-character"), str$_n(1, &c));
+        scan_throw(scan, str$("unexpected-character"), str_n$(1, &c));
         return ud_nil();
     }
 }

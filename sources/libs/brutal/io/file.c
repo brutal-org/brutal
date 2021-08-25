@@ -1,3 +1,4 @@
+#include <brutal/base/attributes.h>
 #include <brutal/host/io.h>
 #include <brutal/io/file.h>
 
@@ -13,29 +14,30 @@ MaybeError io_file_create(IoFile *self, Str path)
     return SUCCESS;
 }
 
-static IoReadResult io_file_read_impl(IoFileReader *reader, char *data, size_t size)
+static IoReadResult io_file_read_impl(IoFile *self, uint8_t *data, MAYBE_UNUSED size_t offset, size_t size)
 {
-    return host_io_read_file(reader->file->handle, data, size);
+
+    return host_io_read_file(self->handle, data, size);
 }
 
-IoFileReader io_file_read(IoFile *self)
+IoReader io_file_reader(IoFile *self)
 {
-    return (IoFileReader){
-        .base = {(IoRead *)io_file_read_impl},
-        .file = self,
+    return (IoReader){
+        .read = (IoRead *)io_file_read_impl,
+        .context = self,
     };
 }
 
-static IoWriteResult io_file_write_impl(IoFileWriter *reader, char const *data, size_t size)
+static IoWriteResult io_file_write_impl(IoFile *self, uint8_t const *data, MAYBE_UNUSED size_t offset, size_t size)
 {
-    return host_io_write_file(reader->file->handle, data, size);
+    return host_io_write_file(self->handle, data, size);
 }
 
-IoFileWriter io_file_write(IoFile *self)
+IoWriter io_file_writer(IoFile *self)
 {
-    return (IoFileWriter){
-        .base = {(IoWrite *)io_file_write_impl},
-        .file = self,
+    return (IoWriter){
+        .write = (IoWrite *)io_file_write_impl,
+        .context = self,
     };
 }
 

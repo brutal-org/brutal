@@ -5,20 +5,24 @@
 #include <brutal/base/std.h>
 #include <brutal/text/str.h>
 
-typedef struct io_writer IoWriter;
-
 typedef Result(Error, size_t) IoWriteResult;
 
-typedef IoWriteResult IoWrite(IoWriter *writer, char const *data, size_t size);
+typedef IoWriteResult IoWrite(void *context, uint8_t const *data, size_t offset, size_t size);
 
-struct io_writer
+typedef struct
 {
     IoWrite *write;
-};
+    void *context;
+    size_t offset;
+} IoWriter;
 
-#define io_write(writer, data, size) \
-    ((writer)->write((writer), (char const *)(data), (size)))
+static inline IoWriteResult io_write(IoWriter *self, uint8_t *data, size_t size)
+{
+    size_t written = TRY(IoWriteResult, self->write(self->context, data, self->offset, size));
+    self->offset += written;
+    return OK(IoWriteResult, written);
+}
 
-IoWriteResult io_put(IoWriter *writer, char c);
+IoWriteResult io_put(IoWriter *writer, uint8_t c);
 
 IoWriteResult io_print(IoWriter *writer, Str str);

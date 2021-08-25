@@ -10,7 +10,9 @@ HOST_CFLAGS= \
 	$(CFLAGS_STD) \
 	$(CFLAGS_OPT) \
 	$(CFLAGS_WARN) \
-	$(HOST_CFLAGS_INC)
+	$(HOST_CFLAGS_INC) \
+	-fsanitize=address \
+	-fsanitize=undefined
 
 HOST_LD=ld
 HOST_LDFLAGS=

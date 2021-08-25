@@ -238,7 +238,7 @@ IoWriteResult fmt_signed(struct fmt self, IoWriter *writer, long value)
 
 IoWriteResult fmt_unsigned(struct fmt self, IoWriter *writer, unsigned long value)
 {
-    char buffer[64] = {};
+    uint8_t buffer[64] = {};
     size_t i = 0;
 
     if (value == 0)
