@@ -49,6 +49,3 @@ jobs:
         run: |
           make CONFIG_TOOLCHAIN=${{matrix.toolchain}} run-bid
 
-      - name: Run UD
-        run: |
-          make CONFIG_TOOLCHAIN=${{matrix.toolchain}} run-ud
