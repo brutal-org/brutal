@@ -1,5 +1,5 @@
 #include <brutal/io/buffer.h>
-#include <brutal/io/scan.h>
+#include <brutal/parse/scan.h>
 #include <brutal/text/case.h>
 
 uint16_t *str_to_cstr_utf16(Str str, Alloc *alloc)
@@ -25,7 +25,7 @@ uint16_t *str_to_cstr_utf16_dos(Str str, Alloc *alloc)
     Scan scan;
     scan_init(&scan, str);
 
-    while (!scan_end(&scan))
+    while (!scan_ended(&scan))
     {
         if (scan_skip_word(&scan, str$("\r\n")))
         {

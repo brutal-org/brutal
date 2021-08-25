@@ -1,5 +1,5 @@
-#include <brutal/io/scan.h>
 #include <brutal/log/assert.h>
+#include <brutal/parse/scan.h>
 #include <brutal/text/case.h>
 #include <ctype.h>
 
@@ -108,7 +108,7 @@ Buffer case_to_no(Str str, Alloc *alloc)
 
     scan_eat(&scan, isblank);
 
-    while (!scan_end(&scan))
+    while (!scan_ended(&scan))
     {
         char c = scan_curr(&scan);
 
@@ -116,7 +116,7 @@ Buffer case_to_no(Str str, Alloc *alloc)
         {
             scan_eat(&scan, is_sep);
 
-            if (!scan_end(&scan))
+            if (!scan_ended(&scan))
             {
                 buffer_putc(&buf, ' ');
             }

@@ -10,4 +10,5 @@
 #include <brutal/base/macros.h>
 #include <brutal/base/range.h>
 #include <brutal/base/result.h>
+#include <brutal/base/slice.h>
 #include <brutal/base/std.h>

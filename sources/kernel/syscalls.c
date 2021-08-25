@@ -13,7 +13,7 @@ BrResult sys_log(BrLogArgs *args)
 {
     host_log_lock();
     print(host_log_writer(), "cpu{}: {}({}): ", cpu_self_id(), str$(&task_self()->name), task_self()->handle);
-    io_write(host_log_writer(), args->message, args->size);
+    io_write(host_log_writer(), (uint8_t *)args->message, args->size);
     host_log_unlock();
 
     return BR_SUCCESS;

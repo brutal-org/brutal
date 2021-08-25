@@ -182,7 +182,7 @@ struct fmt fmt_parse(Scan *scan)
     scan_skip(scan, '{');
 
     while (scan_curr(scan) != '}' &&
-           !scan_end(scan))
+           !scan_ended(scan))
     {
         scan_skip_space(scan);
 

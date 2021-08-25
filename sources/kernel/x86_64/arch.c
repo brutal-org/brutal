@@ -8,7 +8,7 @@
 static bool log_initialized = false;
 static IoWriter log;
 
-static IoWriteResult arch_debug_write(MAYBE_UNUSED IoWriter *writer, char const *data, size_t size)
+static IoWriteResult arch_debug_write(MAYBE_UNUSED void *context, uint8_t const *data, MAYBE_UNUSED size_t offset, size_t size)
 {
     com_write(COM1, data, size);
     return OK(IoWriteResult, size);

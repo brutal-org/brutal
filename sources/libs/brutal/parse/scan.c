@@ -1,7 +1,7 @@
 #include <brutal/alloc.h>
 #include <brutal/ds.h>
 #include <brutal/io/print.h>
-#include <brutal/io/scan.h>
+#include <brutal/parse/scan.h>
 
 void scan_init(Scan *self, Str str)
 {
@@ -12,9 +12,9 @@ void scan_init(Scan *self, Str str)
     };
 }
 
-bool scan_end(Scan *self)
+bool scan_ended(Scan *self)
 {
-    return self->head + 1 > self->size || self->has_error;
+    return self->head >= self->size || self->has_error;
 }
 
 char scan_peek(Scan *self, int offset)
@@ -44,14 +44,14 @@ char scan_next(Scan *self)
         return '\0';
     }
 
-    if (scan_end(self))
+    if (scan_ended(self))
     {
         scan_throw(self, str$("unexpected end of file"), str$("EOF"));
     }
 
     char c = scan_peek(self, 0);
 
-    if (!scan_end(self))
+    if (!scan_ended(self))
     {
         self->head++;
     }
@@ -61,7 +61,7 @@ char scan_next(Scan *self)
 
 void scan_scan_skip_space(Scan *self)
 {
-    while (isspace(scan_curr(self)) && !scan_end(self))
+    while (isspace(scan_curr(self)) && !scan_ended(self))
     {
         scan_next(self);
     }
@@ -72,7 +72,7 @@ Str scan_skip_until(Scan *self, int (*callback)(int))
     int start = self->head;
     int length = 0;
 
-    while (callback(scan_curr(self)) && !scan_end(self))
+    while (callback(scan_curr(self)) && !scan_ended(self))
     {
         length++;
         scan_next(self);
@@ -120,7 +120,7 @@ long scan_next_decimal(Scan *self)
         scan_next(self);
     }
 
-    while (!scan_end(self))
+    while (!scan_ended(self))
     {
         char v = scan_peek(self, 0);
         if (v >= '0' && v <= '9')
@@ -179,7 +179,7 @@ bool scan_eat(Scan *self, ScanMatch *match)
 {
     bool any = false;
 
-    while (match(scan_curr(self)) && !scan_end(self))
+    while (match(scan_curr(self)) && !scan_ended(self))
     {
         any = true;
         scan_next(self);
@@ -188,12 +188,12 @@ bool scan_eat(Scan *self, ScanMatch *match)
     return any;
 }
 
-void scan_begin_token(Scan *self)
+void scan_begin(Scan *self)
 {
     self->token = self->head;
 }
 
-Str scan_end_token(Scan *self)
+Str scan_end(Scan *self)
 {
     return str_n$(
         self->head - self->token,

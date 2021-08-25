@@ -1,6 +1,6 @@
 #include <brutal/io/fmt.h>
 #include <brutal/io/print.h>
-#include <brutal/io/scan.h>
+#include <brutal/parse/scan.h>
 
 struct print_value print_val_signed(long val)
 {
@@ -77,7 +77,7 @@ IoWriteResult print_impl(IoWriter *writer, Str format, struct print_args args)
     Scan scan;
     scan_init(&scan, format);
 
-    while (!scan_end(&scan))
+    while (!scan_ended(&scan))
     {
         if (scan_skip_word(&scan, str$("{{")))
         {

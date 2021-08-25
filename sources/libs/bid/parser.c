@@ -8,7 +8,7 @@ static bool parser_skip_comment(Scan *scan)
         return false;
     }
 
-    while (!scan_end(scan))
+    while (!scan_ended(scan))
     {
         if (scan_skip_word(scan, str$("*/")))
         {
@@ -63,7 +63,7 @@ static BidGeneric parse_generic(Scan *scan, Alloc *alloc)
 
     vec_init(&type.params, alloc);
 
-    while (scan_curr(scan) != '>' && !scan_end(scan))
+    while (scan_curr(scan) != '>' && !scan_ended(scan))
     {
         vec_push(&type.params, parse_type(scan, alloc));
 
@@ -87,7 +87,7 @@ static BidEnum parse_enum(Scan *scan, Alloc *alloc)
     scan_skip(scan, '{');
     skip_comment_and_space(scan);
 
-    while (scan_curr(scan) != '}' && !scan_end(scan))
+    while (scan_curr(scan) != '}' && !scan_ended(scan))
     {
         vec_push(&type.members, parse_identifier(scan));
 
@@ -109,7 +109,7 @@ static BidStruct parse_struct(Scan *scan, Alloc *alloc)
     scan_skip(scan, '{');
     skip_comment_and_space(scan);
 
-    while (scan_curr(scan) != '}' && !scan_end(scan))
+    while (scan_curr(scan) != '}' && !scan_ended(scan))
     {
         BidVar var = {};
         var.name = parse_identifier(scan);
@@ -229,7 +229,7 @@ BidInterface bid_parse(Scan *scan, Alloc *alloc)
 
     skip_comment_and_space(scan);
 
-    while (scan_curr(scan) != '}' && !scan_end(scan))
+    while (scan_curr(scan) != '}' && !scan_ended(scan))
     {
         if (scan_skip_word(scan, str$("errors")))
         {

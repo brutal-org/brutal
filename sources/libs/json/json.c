@@ -25,7 +25,7 @@ static JsonValue json_parse_array(Scan *scan, Alloc *alloc)
     ret.type = JSON_ARRAY;
     vec_init(&ret.array, alloc);
 
-    while (scan_curr(scan) != ']' && !scan_end(scan))
+    while (scan_curr(scan) != ']' && !scan_ended(scan))
     {
         JsonValue res;
 
@@ -52,7 +52,7 @@ static JsonValue json_parse_object(Scan *scan, Alloc *alloc)
     ret.type = JSON_OBJECT;
     map_init(&ret.object, alloc);
 
-    while (scan_curr(scan) != '}' && !scan_end(scan))
+    while (scan_curr(scan) != '}' && !scan_ended(scan))
     {
         Str name = json_parse_str(scan);
 

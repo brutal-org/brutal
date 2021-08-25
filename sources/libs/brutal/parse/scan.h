@@ -28,7 +28,7 @@ typedef struct
 
 void scan_init(Scan *self, Str str);
 
-bool scan_end(Scan *self);
+bool scan_ended(Scan *self);
 
 char scan_peek(Scan *self, int offset);
 
@@ -52,9 +52,9 @@ Str scan_skip_until(Scan *self, ScanMatch *match);
 
 bool scan_eat(Scan *self, ScanMatch *match);
 
-void scan_begin_token(Scan *self);
+void scan_begin(Scan *self);
 
-Str scan_end_token(Scan *self);
+Str scan_end(Scan *self);
 
 /* --- Error Handeling ------------------------------------------------------ */
 
