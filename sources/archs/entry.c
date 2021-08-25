@@ -1,4 +1,5 @@
 
+#include <brutal/fibers.h>
 #include <brutal/log.h>
 #include <syscalls/syscalls.h>
 
@@ -14,6 +15,8 @@ __attribute__((weak)) int br_entry(long arg1, long arg2, long arg3, MAYBE_UNUSED
 
 void _entry(long arg1, long arg2, long arg3, long arg4, long arg5)
 {
+    fiber_start(nullptr);
+
     br_exit(&(BrExitArgs){
         .task = BR_TASK_SELF,
         .exit_value = br_entry(arg1, arg2, arg3, arg4, arg5),

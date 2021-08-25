@@ -104,7 +104,7 @@ typedef struct
 {
     BrTask to;
     BrMsg msg;
-    BrTimeout timeout;
+    BrDeadline deadline;
     BrIpcFlags flags;
 } BrIpcArgs;
 

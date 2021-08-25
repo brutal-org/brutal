@@ -1,20 +1,14 @@
 #include <brutal/log.h>
+#include <syscalls/ev.h>
 #include <syscalls/syscalls.h>
 
-int main()
+void br_event(BrMsg const *msg)
 {
-    while (true)
-    {
-        BrIpcArgs args = {};
+    BrMsg resp = *msg;
+    br_ev_resp(msg, &resp);
+}
 
-        args.flags = BR_IPC_RECV | BR_IPC_BLOCK;
-        args.timeout = BR_TIMEOUT_INFINITY;
-
-        br_ipc(&args);
-
-        args.flags = BR_IPC_SEND;
-        args.to = args.msg.from;
-
-        br_ipc(&args);
-    }
+int br_entry()
+{
+    return br_ev_run();
 }

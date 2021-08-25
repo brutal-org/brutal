@@ -69,7 +69,7 @@ static bool channel_wait_recv(Channel *self)
     return true;
 }
 
-BrResult channel_send_blocking(Channel *self, Envelope const *msg, BrTimeout timeout)
+BrResult channel_send_blocking(Channel *self, Envelope const *msg, BrDeadline deadline)
 {
     BrResult result = BR_SUCCESS;
 
@@ -87,7 +87,7 @@ BrResult channel_send_blocking(Channel *self, Envelope const *msg, BrTimeout tim
     result = sched_block((Blocker){
         .function = (BlockerFn *)channel_wait_send,
         .context = self,
-        .deadline = sched_deadline(timeout),
+        .deadline = deadline,
     });
 
     if (result != BR_SUCCESS)
@@ -102,7 +102,7 @@ BrResult channel_send_blocking(Channel *self, Envelope const *msg, BrTimeout tim
     return result;
 }
 
-BrResult channel_recv_blocking(Channel *self, Envelope *msg, BrTimeout timeout)
+BrResult channel_recv_blocking(Channel *self, Envelope *msg, BrDeadline deadline)
 {
     BrResult result = BR_SUCCESS;
 
@@ -120,7 +120,7 @@ BrResult channel_recv_blocking(Channel *self, Envelope *msg, BrTimeout timeout)
     result = sched_block((Blocker){
         .function = (BlockerFn *)channel_wait_recv,
         .context = self,
-        .deadline = sched_deadline(timeout),
+        .deadline = deadline,
     });
 
     if (result != BR_SUCCESS)
@@ -147,11 +147,11 @@ BrResult channel_recv_non_blocking(Channel *self, Envelope *msg)
     return channel_recv_unlock(self, msg);
 }
 
-BrResult channel_send(Channel *self, Envelope const *msg, BrTimeout timeout, BrIpcFlags flags)
+BrResult channel_send(Channel *self, Envelope const *msg, BrDeadline deadline, BrIpcFlags flags)
 {
     if (flags & BR_IPC_BLOCK)
     {
-        return channel_send_blocking(self, msg, timeout);
+        return channel_send_blocking(self, msg, deadline);
     }
     else
     {
@@ -159,11 +159,11 @@ BrResult channel_send(Channel *self, Envelope const *msg, BrTimeout timeout, BrI
     }
 }
 
-BrResult channel_recv(Channel *self, Envelope *msg, BrTimeout timeout, BrIpcFlags flags)
+BrResult channel_recv(Channel *self, Envelope *msg, BrDeadline deadline, BrIpcFlags flags)
 {
     if (flags & BR_IPC_BLOCK)
     {
-        return channel_recv_blocking(self, msg, timeout);
+        return channel_recv_blocking(self, msg, deadline);
     }
     else
     {

@@ -25,17 +25,27 @@ typedef enum
     FIBER_CANCELING,
     FIBER_CANCELED,
     FIBER_BLOCKED,
+    FIBER_IDLE,
 
     FIBER_ERROR,
 } FiberState;
 
 typedef bool FiberBlockerFn(void *context);
 
+typedef enum
+{
+    FIBER_SUCCESS,
+    FIBER_TIMEOUT,
+    FIBER_INTERRUPTED,
+} FiberBlockResult;
+
 typedef struct
 {
     FiberBlockerFn *function;
     void *context;
-    Tick deadline;
+    Timeout deadline;
+
+    FiberBlockResult result;
 } FiberBlocker;
 
 typedef struct fiber Fiber;
@@ -59,10 +69,12 @@ void fiber_yield(void);
 
 Fiber *fiber_start(FiberFn call);
 
-void fiber_pause(FiberBlocker blocker);
+FiberBlockResult fiber_block(FiberBlocker blocker);
 
 void fiber_ret(void);
 
 void fiber_await(Fiber *fiber);
 
 Fiber *fiber_self(void);
+
+Tick fiber_deadline(void);

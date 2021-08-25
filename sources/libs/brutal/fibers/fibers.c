@@ -69,12 +69,14 @@ Fiber *fiber_start(FiberFn fn)
     return self;
 }
 
-void fiber_block(FiberBlocker blocker)
+FiberBlockResult fiber_block(FiberBlocker blocker)
 {
     current->state = FIBER_BLOCKED;
     current->blocker = blocker;
 
     fiber_yield();
+
+    return current->blocker.result;
 }
 
 void fiber_ret(void)
@@ -123,13 +125,20 @@ static bool fiber_try_unblock(Fiber *self)
     return false;
 }
 
-static Fiber *fiber_next(void)
+static Fiber *fiber_next(FiberState expected)
 {
     Fiber *next = current->next;
 
-    while (next != current && !fiber_try_unblock(next))
+    while (next != current &&
+           !fiber_try_unblock(next) &&
+           next->state != expected)
     {
         next = next->next;
+    }
+
+    if (next->state != expected)
+    {
+        return nullptr;
     }
 
     return next;
@@ -140,12 +149,19 @@ extern void fibers_switch(FibersContext *from, FibersContext *to);
 void fiber_yield(void)
 {
     Fiber *prev = current;
-    Fiber *next = fiber_next();
+    Fiber *next = fiber_next(FIBER_RUNNING);
+
+    if (next == nullptr)
+    {
+        next = fiber_next(FIBER_IDLE);
+    }
 
     if (next == prev)
     {
         return;
     }
+
+    assert_not_null(next);
 
     current = next;
 
@@ -155,4 +171,25 @@ void fiber_yield(void)
     {
         fiber_free(prev);
     }
+}
+
+Tick fiber_deadline(void)
+{
+    Tick min = -1;
+    Fiber *f = current;
+
+    do
+    {
+        if (f->state == FIBER_BLOCKED)
+        {
+            if (min > f->blocker.deadline)
+            {
+                min = f->blocker.deadline;
+            }
+        }
+
+        f = f->next;
+    } while (f != current);
+
+    return min;
 }

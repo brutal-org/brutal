@@ -141,7 +141,7 @@ int br_entry(Handover const *handover)
         br_ipc(&(BrIpcArgs){
             .to = echo_srv,
             .flags = BR_IPC_SEND | BR_IPC_RECV | BR_IPC_BLOCK,
-            .timeout = BR_TIMEOUT_INFINITY,
+            .deadline = BR_DEADLINE_INFINITY,
             .msg = {
                 .arg = {
                     0x1,

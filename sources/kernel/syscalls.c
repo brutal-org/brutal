@@ -279,7 +279,7 @@ BrResult sys_exit(BrExitArgs *args)
     return BR_SUCCESS;
 }
 
-static BrResult sys_ipc_send(BrTask to, BrMsg *msg, BrTimeout timeout, BrIpcFlags flags)
+static BrResult sys_ipc_send(BrTask to, BrMsg *msg, BrDeadline deadline, BrIpcFlags flags)
 {
     Task *task CLEANUP(object_cleanup) = nullptr;
     Envelope envelope CLEANUP(envelope_cleanup) = {};
@@ -299,14 +299,14 @@ static BrResult sys_ipc_send(BrTask to, BrMsg *msg, BrTimeout timeout, BrIpcFlag
         return result;
     }
 
-    return channel_send(task->channel, &envelope, timeout, flags);
+    return channel_send(task->channel, &envelope, deadline, flags);
 }
 
-static BrResult sys_ipc_recv(BrMsg *msg, BrTimeout timeout, BrIpcFlags flags)
+static BrResult sys_ipc_recv(BrMsg *msg, BrDeadline deadline, BrIpcFlags flags)
 {
     Envelope envelope CLEANUP(envelope_cleanup) = {};
 
-    BrResult result = channel_recv(task_self()->channel, &envelope, timeout, flags);
+    BrResult result = channel_recv(task_self()->channel, &envelope, deadline, flags);
 
     if (result != BR_SUCCESS)
     {
@@ -324,7 +324,7 @@ BrResult sys_ipc(BrIpcArgs *args)
 
     if (args->flags & BR_IPC_SEND)
     {
-        result = sys_ipc_send(args->to, &args->msg, args->timeout, args->flags);
+        result = sys_ipc_send(args->to, &args->msg, args->deadline, args->flags);
     }
 
     if (result != BR_SUCCESS)
@@ -334,7 +334,7 @@ BrResult sys_ipc(BrIpcArgs *args)
 
     if (args->flags & BR_IPC_RECV)
     {
-        result = sys_ipc_recv(&args->msg, args->timeout, args->flags);
+        result = sys_ipc_recv(&args->msg, args->deadline, args->flags);
     }
 
     return result;

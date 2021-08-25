@@ -5,6 +5,8 @@
 
 typedef uint64_t Tick;
 typedef uint64_t TimeStamp;
+typedef uint64_t Timeout;
+typedef uint64_t Deadline;
 
 typedef uint64_t Seconds;
 typedef uint64_t Minutes;

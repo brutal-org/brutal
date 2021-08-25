@@ -46,8 +46,7 @@ void linked_list_deinit_impl(LinkedListImpl *impl)
 
 LinkedListImpl *linked_list_insert_impl(LinkedListImpl *impl, int data_size)
 {
-    LinkedListImpl *final;
-    final = alloc_make(impl->alloc, LinkedListImpl);
+    LinkedListImpl *final = alloc_make(impl->alloc, LinkedListImpl);
     LinkedListImpl *current = impl;
 
     while (current->next != nullptr)

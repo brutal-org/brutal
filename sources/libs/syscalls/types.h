@@ -184,6 +184,9 @@ typedef BrHandle BrTask;
 
 typedef uint8_t BrTaskFlags;
 
+#define BR_DEADLINE_INFINITY ((BrDeadline)-1)
+typedef uint64_t BrDeadline;
+
 #define BR_TIMEOUT_INFINITY ((BrTimeout)-1)
 typedef uint64_t BrTimeout;
 
@@ -199,7 +202,7 @@ typedef struct
 {
     BrTask from;
     BrMsgFlags flags;
-    uint32_t udata;
+    uint32_t seq;
     uint32_t prot;
     uint32_t type;
     BrArg arg[BR_MSG_ARG_COUNT];
