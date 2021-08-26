@@ -7,13 +7,13 @@
 #include "kernel/interrupts.h"
 #include "kernel/task.h"
 
-typedef linked_list(IrqBinding) IrqBindingEntry;
+typedef list(IrqBinding) IrqBindingEntry;
 static IrqBindingEntry interrupts = {};
 static Lock lock = {};
 
 static IrqBindingEntry *irq_binding_get(Irq id)
 {
-    linked_list_loop(binding, &interrupts)
+    list_loop(binding, &interrupts)
     {
         if (binding->data->irq->handle == id.handle)
         {
@@ -26,12 +26,13 @@ static IrqBindingEntry *irq_binding_get(Irq id)
 
 static void interrupt_binding_destroy(IrqBindingEntry *handler)
 {
-    linked_list_remove(&interrupts, handler);
+    list_remove(&interrupts, handler);
 }
 
 static void irq_destroy(Irq *handler)
 {
     auto binding = irq_binding_get(*handler);
+
     if (binding)
     {
         interrupt_binding_destroy(binding);
@@ -43,10 +44,10 @@ static IrqBindingEntry *irq_alloc()
 
     if (interrupts.alloc == nullptr)
     {
-        linked_list_init(&interrupts, alloc_global());
+        list_init(&interrupts, alloc_global());
     }
 
-    IrqBindingEntry *res = linked_list_insert(&interrupts, (IrqBinding){});
+    IrqBindingEntry *res = list_insert(&interrupts, (IrqBinding){});
 
     return res;
 }
@@ -77,7 +78,7 @@ static BrResult send_irq_handled(IrqBinding *self)
 
 BrResult irq_unbind_all(const Task *target_task)
 {
-    linked_list_loop(binding, &interrupts)
+    list_loop(binding, &interrupts)
     {
         if (binding->data->target_task == target_task->handle)
         {
@@ -146,7 +147,7 @@ void irq_dispatch(BrIrq interrupt)
 {
     LOCK_RETAINER(&lock);
 
-    linked_list_loop(binding, &interrupts)
+    list_loop(binding, &interrupts)
     {
         if (binding->data->irq->irq == interrupt && binding->data->ack)
         {

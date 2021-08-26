@@ -1,6 +1,6 @@
-#include "double_linked_list.h"
+#include "list.h"
 
-static void linked_list_deinit_head(LinkedListImpl *entry)
+static void list_deinit_head(ListImpl *entry)
 {
     if (entry->data)
     {
@@ -9,7 +9,7 @@ static void linked_list_deinit_head(LinkedListImpl *entry)
     entry->data = nullptr;
 }
 
-static void linked_list_deinit_entry(LinkedListImpl *entry)
+static void list_deinit_entry(ListImpl *entry)
 {
     if (entry->data)
     {
@@ -18,7 +18,7 @@ static void linked_list_deinit_entry(LinkedListImpl *entry)
     alloc_release(entry->alloc, entry);
 }
 
-void linked_list_init_impl(LinkedListImpl *impl, Alloc *alloc)
+void list_init_impl(ListImpl *impl, Alloc *alloc)
 {
     impl->alloc = alloc;
     impl->data = nullptr;
@@ -26,17 +26,17 @@ void linked_list_init_impl(LinkedListImpl *impl, Alloc *alloc)
     impl->prev = nullptr;
 };
 
-void linked_list_deinit_impl(LinkedListImpl *impl)
+void list_deinit_impl(ListImpl *impl)
 {
     size_t i = 0;
 
-    LinkedListImpl *entry = impl->next;
+    ListImpl *entry = impl->next;
 
     while (entry != nullptr)
     {
-        LinkedListImpl *next = entry->next;
+        ListImpl *next = entry->next;
 
-        linked_list_deinit_entry(entry);
+        list_deinit_entry(entry);
 
         entry = next;
 
@@ -44,10 +44,10 @@ void linked_list_deinit_impl(LinkedListImpl *impl)
     }
 }
 
-LinkedListImpl *linked_list_insert_impl(LinkedListImpl *impl, int data_size)
+ListImpl *list_insert_impl(ListImpl *impl, int data_size)
 {
-    LinkedListImpl *final = alloc_make(impl->alloc, LinkedListImpl);
-    LinkedListImpl *current = impl;
+    ListImpl *final = alloc_make(impl->alloc, ListImpl);
+    ListImpl *current = impl;
 
     while (current->next != nullptr)
     {
@@ -63,16 +63,16 @@ LinkedListImpl *linked_list_insert_impl(LinkedListImpl *impl, int data_size)
     return final;
 }
 
-void linked_list_remove_impl(LinkedListImpl *head, LinkedListImpl *impl)
+void list_remove_impl(ListImpl *head, ListImpl *impl)
 {
 
     // impl -> [NEXT]
     if (impl == head)
     {
-        linked_list_deinit_head(head);
+        list_deinit_head(head);
     }
 
-    LinkedListImpl *self = impl;
+    ListImpl *self = impl;
     if (impl->prev && impl->next)
     {
         // [PREV] -> impl -> [NEXT]
@@ -85,5 +85,5 @@ void linked_list_remove_impl(LinkedListImpl *head, LinkedListImpl *impl)
         impl->prev->next = nullptr;
     }
 
-    linked_list_deinit_entry(self);
+    list_deinit_entry(self);
 }
