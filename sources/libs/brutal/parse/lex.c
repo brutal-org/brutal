@@ -1,3 +1,4 @@
+#include <brutal/log/locked.h>
 #include <brutal/parse/lex.h>
 
 Lex lex(Scan *scan, LexFn *fn, Alloc *alloc)
@@ -10,6 +11,7 @@ Lex lex(Scan *scan, LexFn *fn, Alloc *alloc)
         scan_begin(scan);
 
         LexemeType type = fn(scan);
+        Str str = scan_end(scan);
         Lexeme l = {type, scan_end(scan)};
 
         vec_push(&self.lexemes, l);
@@ -53,6 +55,14 @@ Lexeme lex_next(Lex *self)
     return l;
 }
 
+void lex_dump(Lex *self, LexToStrFn fn)
+{
+    vec_foreach(l, &self->lexemes)
+    {
+        log$("({case:param} {})", fn(l.type), l.str);
+    }
+}
+
 void lex_throw(Lex *self, Str message)
 {
     if (self->has_error)
@@ -63,7 +73,7 @@ void lex_throw(Lex *self, Str message)
     self->has_error = true;
     self->error = (LexError){
         .message = message,
-        lex_curr(self),
+        .lexeme = lex_curr(self),
     };
 }
 

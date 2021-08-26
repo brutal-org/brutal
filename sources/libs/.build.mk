@@ -34,7 +34,7 @@ LIBS_HOST_SRC = \
 	$(wildcard sources/libs/brutal/*.c)             \
 	$(wildcard sources/libs/brutal/*/*.c)           \
 	$(wildcard sources/libs/brutal/host/linux/*.c)  \
-	$(wildcard sources/libs/udfore/*.c)             \
+	$(wildcard sources/libs/cc/*.c)             \
 	$(wildcard sources/libs/json/*.c)             \
 	$(wildcard sources/libs/elf/*.c)                \
 	$(wildcard sources/libs/handover/*.c)           \

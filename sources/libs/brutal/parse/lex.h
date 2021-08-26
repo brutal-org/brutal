@@ -21,6 +21,8 @@ typedef struct
 
 typedef LexemeType LexFn(Scan *scan);
 
+typedef Str LexToStrFn(LexemeType type);
+
 Lex lex(Scan *scan, LexFn *fn, Alloc *alloc);
 
 void lex_deinit(Lex *self);
@@ -32,6 +34,8 @@ Lexeme lex_peek(Lex *self, int offset);
 Lexeme lex_curr(Lex *self);
 
 Lexeme lex_next(Lex *self);
+
+void lex_dump(Lex *self, LexToStrFn fn);
 
 void lex_throw(Lex *self, Str message);
 
