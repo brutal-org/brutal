@@ -48,14 +48,14 @@ static inline void gfx_pixel_store(GfxColor color, void *dst, GfxPixelFormat for
     {
     case GFX_PIXEL_FORMAT_GRAYSCALE_8:
     {
-        auto p = (GfxPixelGrayScale8 *)dst;
+        GfxPixelGrayScale8 *p = (GfxPixelGrayScale8 *)dst;
         p->v = 0.299 * color.r + 0.587 * color.g + 0.114 * color.b;
     }
     break;
 
     case GFX_PIXEL_FORMAT_RGB888:
     {
-        auto p = (GfxPixelRGB888 *)dst;
+        GfxPixelRGB888 *p = (GfxPixelRGB888 *)dst;
         p->r = color.r;
         p->g = color.g;
         p->b = color.b;
@@ -64,7 +64,7 @@ static inline void gfx_pixel_store(GfxColor color, void *dst, GfxPixelFormat for
 
     case GFX_PIXEL_FORMAT_RGBA8888:
     {
-        auto p = (GfxPixelRGBA8888 *)dst;
+        GfxPixelRGBA8888 *p = (GfxPixelRGBA8888 *)dst;
         p->r = color.r;
         p->g = color.g;
         p->b = color.b;
@@ -74,7 +74,7 @@ static inline void gfx_pixel_store(GfxColor color, void *dst, GfxPixelFormat for
 
     case GFX_PIXEL_FORMAT_BGRA8888:
     {
-        auto p = (GfxPixelBGRA8888 *)dst;
+        GfxPixelBGRA8888 *p = (GfxPixelBGRA8888 *)dst;
         p->r = color.r;
         p->g = color.g;
         p->b = color.b;
@@ -93,25 +93,25 @@ static inline GfxColor gfx_pixel_load(const void *src, GfxPixelFormat format)
     {
     case GFX_PIXEL_FORMAT_GRAYSCALE_8:
     {
-        auto p = *((GfxPixelGrayScale8 const *)src);
+        GfxPixelGrayScale8 p = *((GfxPixelGrayScale8 const *)src);
         return (GfxColor){p.v, p.v, p.v, 0};
     }
 
     case GFX_PIXEL_FORMAT_RGB888:
     {
-        auto p = *((GfxPixelRGB888 const *)src);
+        GfxPixelRGB888 p = *((GfxPixelRGB888 const *)src);
         return (GfxColor){p.r, p.g, p.b, 0};
     }
 
     case GFX_PIXEL_FORMAT_RGBA8888:
     {
-        auto p = *((GfxPixelRGBA8888 const *)src);
+        GfxPixelRGBA8888 p = *((GfxPixelRGBA8888 const *)src);
         return (GfxColor){p.r, p.g, p.b, p.a};
     }
 
     case GFX_PIXEL_FORMAT_BGRA8888:
     {
-        auto p = *((GfxPixelBGRA8888 const *)src);
+        GfxPixelBGRA8888 p = *((GfxPixelBGRA8888 const *)src);
         return (GfxColor){p.r, p.g, p.b, p.a};
     }
 

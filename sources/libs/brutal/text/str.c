@@ -5,7 +5,7 @@ void str_rvs(Str str)
 {
     for (int i = 0, j = str.len - 1; i < j; i++, j--)
     {
-        auto c = str.buffer[i];
+        char c = str.buffer[i];
         str.buffer[i] = str.buffer[j];
         str.buffer[j] = c;
     }
@@ -39,7 +39,7 @@ int str_count(Str const haystack, Str const needle)
     int count = 0;
     for (size_t i = 0; i < haystack.len - needle.len; i++)
     {
-        auto slice = str_n$(needle.len, haystack.buffer + i);
+        Str slice = str_n$(needle.len, haystack.buffer + i);
 
         if (str_eq(slice, needle))
         {
@@ -75,9 +75,9 @@ int str_last(Str const lStr, Str const rStr)
     int pos = -1;
     for (size_t i = 0; i < lStr.len - rStr.len; i++)
     {
-        auto offseted_lStr = str_n$(rStr.len, lStr.buffer + i);
+        Str substr = str_n$(rStr.len, lStr.buffer + i);
 
-        if (str_eq(offseted_lStr, rStr))
+        if (str_eq(substr, rStr))
         {
             pos = i;
         }
@@ -110,9 +110,9 @@ int str_first(Str const lStr, Str const rStr)
 
     for (size_t i = 0; i < lStr.len - rStr.len; i++)
     {
-        auto offseted_lStr = str_n$(rStr.len, lStr.buffer + i);
+        Str substr = str_n$(rStr.len, lStr.buffer + i);
 
-        if (str_eq(offseted_lStr, rStr))
+        if (str_eq(substr, rStr))
         {
             return i;
         }

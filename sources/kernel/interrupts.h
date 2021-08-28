@@ -10,7 +10,7 @@ typedef struct
     BrIrq irq;
 } Irq;
 
-typedef struct irq_binding
+typedef struct
 {
     Irq *irq;
     BrIrqFlags flags;

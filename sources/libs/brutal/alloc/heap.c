@@ -411,7 +411,7 @@ void *alloc_heap_resize(struct alloc_heap *alloc, void *ptr, size_t size)
         return alloc_heap_acquire(alloc, size);
     }
 
-    auto min = (struct alloc_minor *)((uintptr_t)ptr - MINOR_BLOCK_HEADER_SIZE);
+    struct alloc_minor *min = (struct alloc_minor *)((uintptr_t)ptr - MINOR_BLOCK_HEADER_SIZE);
 
     if (!check_minor_magic(min, ptr))
     {

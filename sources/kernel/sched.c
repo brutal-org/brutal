@@ -426,7 +426,7 @@ void sched_finalize(void)
 
     for (int i = 0; i < tasks.length; i++)
     {
-        auto task = tasks.data[i];
+        Task *task = tasks.data[i];
 
         if (task->is_stopped && !sched_runnable(task) && !sched_running(task))
         {

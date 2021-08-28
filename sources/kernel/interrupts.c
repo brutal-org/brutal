@@ -31,7 +31,7 @@ static void interrupt_binding_destroy(IrqBindingEntry *handler)
 
 static void irq_destroy(Irq *handler)
 {
-    auto binding = irq_binding_get(*handler);
+    IrqBindingEntry *binding = irq_binding_get(*handler);
 
     if (binding)
     {
@@ -92,9 +92,9 @@ BrResult irq_unbind_all(const Task *target_task)
 BrResult irq_bind(BrTask task, BrIrqFlags flags, Irq *irq)
 {
     LOCK_RETAINER(&lock);
-    log$(" binding interrupt {}", irq->irq);
+    log$("Binding interrupt {}", irq->irq);
 
-    auto binding = irq_binding_get(*irq);
+    IrqBindingEntry *binding = irq_binding_get(*irq);
 
     if (binding == nullptr)
     {
@@ -114,14 +114,16 @@ BrResult irq_bind(BrTask task, BrIrqFlags flags, Irq *irq)
 BrResult irq_unbind(BrIrqFlags flags, Irq *irq)
 {
     LOCK_RETAINER(&lock);
-    log$(" unbinding interrupt {}", irq->irq);
+    log$("Unbinding interrupt {}", irq->irq);
 
-    auto binding = irq_binding_get(*irq);
+    IrqBindingEntry *binding = irq_binding_get(*irq);
+
     if (binding == nullptr)
     {
-        log$(" already unbinded interrupt {}", irq->irq);
+        log$("Already unbinded interrupt {}", irq->irq);
         return BR_BAD_HANDLE;
     }
+
     binding->data->flags = flags;
 
     interrupt_binding_destroy(binding);
@@ -132,7 +134,8 @@ BrResult irq_unbind(BrIrqFlags flags, Irq *irq)
 BrResult irq_ack(Irq *irq)
 {
     LOCK_RETAINER(&lock);
-    auto binding = irq_binding_get(*irq);
+
+    IrqBindingEntry *binding = irq_binding_get(*irq);
 
     if (binding == nullptr)
     {
@@ -165,10 +168,11 @@ void irq_dispatch(BrIrq interrupt)
 
 Irq *irq_create(BrIrqId id)
 {
-    auto intt = alloc_make(alloc_global(), Irq);
-    intt->irq = id;
-    object_init(base$(intt), BR_OBJECT_IRQ, (ObjectDtor *)irq_destroy);
-    return intt;
+    Irq *self = alloc_make(alloc_global(), Irq);
+    self->irq = id;
+
+    object_init(base$(self), BR_OBJECT_IRQ, (ObjectDtor *)irq_destroy);
+    return self;
 }
 
 void irq_ref(Irq *self)

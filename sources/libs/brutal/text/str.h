@@ -114,7 +114,7 @@ static inline Str str_make_from_str_fix128(StrFix128 const *str_fix) { return (S
 #define str_fix$(T, str) (                                    \
     {                                                         \
         T dst_str = {};                                       \
-        auto src_str = str$(str);                             \
+        Str src_str = str$(str);                              \
         mem_cpy(dst_str.buffer, src_str.buffer, src_str.len); \
         dst_str.len = src_str.len;                            \
         dst_str;                                              \

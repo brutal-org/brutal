@@ -49,31 +49,31 @@
         range_from_start_and_end(typeof(LHS), __start, __end);  \
     })
 
-#define range_half_under(SELF, SPLIT) (      \
-    {                                        \
-        auto __self = (SELF);                \
-        auto __split = (SPLIT);              \
-                                             \
-        auto result = (typeof(SELF)){};      \
-                                             \
-        if (range_colide(__self, __split) && \
-            __self.base < __split.base)      \
-        {                                    \
-            result = (typeof(SELF)){         \
-                __self.base,                 \
-                __split.base - __self.base,  \
-            };                               \
-        }                                    \
-                                             \
-        result;                              \
+#define range_half_under(SELF, SPLIT) (         \
+    {                                           \
+        typeof(SELF) __self = (SELF);           \
+        typeof(SPLIT) __split = (SPLIT);        \
+                                                \
+        typeof(SELF) result = (typeof(SELF)){}; \
+                                                \
+        if (range_colide(__self, __split) &&    \
+            __self.base < __split.base)         \
+        {                                       \
+            result = (typeof(SELF)){            \
+                __self.base,                    \
+                __split.base - __self.base,     \
+            };                                  \
+        }                                       \
+                                                \
+        result;                                 \
     })
 
 #define range_half_over(SELF, SPLIT) (                  \
     {                                                   \
-        auto __self = (SELF);                           \
-        auto __split = (SPLIT);                         \
+        typeof(SELF) __self = (SELF);                   \
+        typeof(SPLIT) __split = (SPLIT);                \
                                                         \
-        auto result = (typeof(SELF)){};                 \
+        typeof(SELF) result = {};                       \
                                                         \
         if (range_colide(__self, __split) &&            \
             range_end(__self) > range_end(__split))     \

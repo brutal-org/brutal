@@ -79,7 +79,7 @@ struct stackframe
 
 void backtrace(uintptr_t rbp, uint64_t rip)
 {
-    auto stackframe = (struct stackframe *)(rbp);
+    struct stackframe *stackframe = (struct stackframe *)rbp;
 
     log_unlock("Backtrace:");
     log_unlock("{016x}", rip);
@@ -126,7 +126,7 @@ void interrupt_error_handler(Regs *regs, uintptr_t rsp)
 
 uint64_t interrupt_handler(uint64_t rsp)
 {
-    auto regs = (Regs *)rsp;
+    Regs *regs = (Regs *)rsp;
 
     cpu_begin_interrupt();
 

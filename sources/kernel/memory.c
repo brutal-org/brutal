@@ -21,7 +21,7 @@ void mem_obj_destroy(MemObj *self)
 
 MemObj *mem_obj_heap(HeapRange heap, MemObjFlags flags)
 {
-    auto self = alloc_make(alloc_global(), MemObj);
+    MemObj *self = alloc_make(alloc_global(), MemObj);
 
     self->type = MEM_OBJ_HEAP;
     self->flags = flags;
@@ -34,7 +34,7 @@ MemObj *mem_obj_heap(HeapRange heap, MemObjFlags flags)
 
 MemObj *mem_obj_pmm(PmmRange pmm, MemObjFlags flags)
 {
-    auto self = alloc_make(alloc_global(), MemObj);
+    MemObj *self = alloc_make(alloc_global(), MemObj);
 
     self->type = MEM_OBJ_PMM;
     self->flags = flags;

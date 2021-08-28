@@ -9,7 +9,7 @@
 static Bitmap pmm_bitmap = {};
 static size_t best_bet = 0;
 static size_t used_memory = 0;
-static Lock pmm_lock;
+static Lock pmm_lock = {};
 
 static uintptr_t memory_map_get_highest_address(HandoverMmap const *memory_map)
 {
@@ -29,7 +29,7 @@ static void pmm_bitmap_initialize(HandoverMmap const *memory_map)
 
     for (size_t i = 0; i < memory_map->size; i++)
     {
-        auto entry = &memory_map->entries[i];
+        HandoverMmapEntry const *entry = &memory_map->entries[i];
 
         if (entry->type != HANDOVER_MMAP_FREE)
         {
@@ -93,8 +93,8 @@ PmmResult pmm_alloc(size_t size)
 
     used_memory += size;
 
-    auto page_size = size / MEM_PAGE_SIZE;
-    auto page_range = bitmap_find_range(&pmm_bitmap, best_bet, page_size, PMM_UNUSED);
+    size_t page_size = size / MEM_PAGE_SIZE;
+    USizeRange page_range = bitmap_find_range(&pmm_bitmap, best_bet, page_size, PMM_UNUSED);
 
     if (range_empty(page_range))
     {
@@ -112,7 +112,7 @@ PmmResult pmm_alloc(size_t size)
 
     bitmap_set_range(&pmm_bitmap, page_range, PMM_USED);
 
-    auto pmm_range = range$(PmmRange, page_range);
+    PmmRange pmm_range = range$(PmmRange, page_range);
 
     pmm_range.base *= MEM_PAGE_SIZE;
     pmm_range.size *= MEM_PAGE_SIZE;
@@ -129,7 +129,7 @@ PmmResult pmm_used(PmmRange range)
     size_t page_base = range.base / MEM_PAGE_SIZE;
     size_t page_size = range.size / MEM_PAGE_SIZE;
 
-    auto page_range = (USizeRange){page_base, page_size};
+    USizeRange page_range = {page_base, page_size};
 
     bitmap_set_range(&pmm_bitmap, page_range, PMM_USED);
 
@@ -151,7 +151,7 @@ PmmResult pmm_unused(PmmRange range)
 
     size_t page_base = range.base / MEM_PAGE_SIZE;
     size_t page_size = range.size / MEM_PAGE_SIZE;
-    auto page_range = (USizeRange){page_base, page_size};
+    USizeRange page_range = {page_base, page_size};
 
     bitmap_set_range(&pmm_bitmap, page_range, PMM_UNUSED);
 

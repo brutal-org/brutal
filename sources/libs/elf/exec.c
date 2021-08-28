@@ -6,7 +6,7 @@
 
 void elf_load(BrSpace space, Elf64Header const *elf_header, BrMemObj elf_obj)
 {
-    auto prog_header = (Elf64ProgramHeader *)((uint8_t *)elf_header + elf_header->program_header_table_file_offset);
+    Elf64ProgramHeader *prog_header = (Elf64ProgramHeader *)((uint8_t *)elf_header + elf_header->program_header_table_file_offset);
 
     for (size_t i = 0; i < elf_header->program_header_table_entry_count; i++)
     {
@@ -16,7 +16,7 @@ void elf_load(BrSpace space, Elf64Header const *elf_header, BrMemObj elf_obj)
             continue;
         }
 
-        auto size = ALIGN_UP(MAX(prog_header->memory_size, prog_header->file_size), MEM_PAGE_SIZE);
+        size_t size = ALIGN_UP(MAX(prog_header->memory_size, prog_header->file_size), MEM_PAGE_SIZE);
 
         if (!(prog_header->flags & ELF_PROGRAM_HEADER_WRITABLE) &&
             prog_header->file_size == prog_header->memory_size)

@@ -32,7 +32,7 @@ struct print_value print_val_pointer(void *ptr)
     return (struct print_value){nullstr, PRINT_POINTER, {._pointer = ptr}};
 }
 
-IoWriteResult print_dispatch(IoWriter *writer, struct fmt fmt, struct print_value value)
+IoWriteResult print_dispatch(IoWriter *writer, Fmt fmt, struct print_value value)
 {
     switch (value.type)
     {
@@ -69,7 +69,7 @@ IoWriteResult print_dispatch(IoWriter *writer, struct fmt fmt, struct print_valu
     return OK(IoWriteResult, 0);
 }
 
-IoWriteResult print_impl(IoWriter *writer, Str format, struct print_args args)
+IoWriteResult print_impl(IoWriter *writer, Str format, PrintArgs args)
 {
     size_t current = 0;
     size_t written = 0;
@@ -93,7 +93,7 @@ IoWriteResult print_impl(IoWriter *writer, Str format, struct print_args args)
         {
             if (current < args.count)
             {
-                auto fmt = fmt_parse(&scan);
+                Fmt fmt = fmt_parse(&scan);
                 written += TRY(IoWriteResult, print_dispatch(writer, fmt, args.values[current]));
             }
 

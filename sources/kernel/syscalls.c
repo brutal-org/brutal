@@ -56,7 +56,7 @@ BrResult sys_map(BrMapArgs *args)
         goto cleanup_and_return;
     }
 
-    auto map_result = space_map(space, mem_obj, args->offset, args->size, args->vaddr);
+    SpaceResult map_result = space_map(space, mem_obj, args->offset, args->size, args->vaddr);
 
     if (!map_result.succ)
     {
@@ -102,7 +102,7 @@ BrResult sys_unmap(BrUnmapArgs *args)
         goto cleanup_and_return;
     }
 
-    auto unmap_result = space_unmap(space, (VmmRange){args->vaddr, args->size});
+    SpaceResult unmap_result = space_unmap(space, (VmmRange){args->vaddr, args->size});
 
     if (!unmap_result.succ)
     {
@@ -135,7 +135,7 @@ BrResult sys_create_task(BrTask *handle, BrCreateTaskArgs *args)
         return BR_BAD_HANDLE;
     }
 
-    auto task = UNWRAP(task_create(
+    Task *task = UNWRAP(task_create(
         str$(&args->name),
         space,
         args->caps & task_self()->caps,
@@ -167,7 +167,7 @@ BrResult sys_create_mem_obj(BrMemObj *handle, BrCreateMemObjArgs *args)
     }
     else
     {
-        auto pmm_result = pmm_alloc(args->size);
+        PmmResult pmm_result = pmm_alloc(args->size);
 
         if (!pmm_result.succ)
         {
@@ -186,7 +186,7 @@ BrResult sys_create_mem_obj(BrMemObj *handle, BrCreateMemObjArgs *args)
 
 BrResult sys_create_space(BrSpace *handle, BrCreateSpaceArgs *args)
 {
-    auto space = space_create(args->flags);
+    Space *space = space_create(args->flags);
 
     domain_add(task_self()->domain, base$(space));
     *handle = space->handle;
@@ -197,7 +197,7 @@ BrResult sys_create_space(BrSpace *handle, BrCreateSpaceArgs *args)
 
 BrResult sys_create_irq(BrIrq *handle, BrCreateIrqArgs *args)
 {
-    auto irq = irq_create(args->irq);
+    Irq *irq = irq_create(args->irq);
 
     domain_add(task_self()->domain, base$(irq));
     *handle = irq->handle;
@@ -389,7 +389,7 @@ BrResult sys_bind(BrBindArgs *args)
     task_ref(task_self());
     task = task_self();
 
-    auto irq = (Irq *)domain_lookup(task->domain, args->handle, BR_OBJECT_IRQ);
+    Irq *irq = (Irq *)domain_lookup(task->domain, args->handle, BR_OBJECT_IRQ);
 
     if (!irq)
     {
@@ -416,7 +416,7 @@ BrResult sys_unbind(BrUnbindArgs *args)
         return BR_BAD_HANDLE;
     }
 
-    auto irq = (Irq *)domain_lookup(task->domain, args->handle, BR_OBJECT_IRQ);
+    Irq *irq = (Irq *)domain_lookup(task->domain, args->handle, BR_OBJECT_IRQ);
 
     if (!irq)
     {
@@ -443,7 +443,7 @@ BrResult sys_ack(BrAckArgs *args)
         return BR_BAD_HANDLE;
     }
 
-    auto irq = (Irq *)domain_lookup(task->domain, args->handle, BR_OBJECT_IRQ);
+    Irq *irq = (Irq *)domain_lookup(task->domain, args->handle, BR_OBJECT_IRQ);
 
     if (!irq)
     {
@@ -479,7 +479,7 @@ BrResult syscall_dispatch(BrSyscall syscall, BrArg args)
 
     task_begin_syscall();
 
-    auto result = syscalls[syscall](args);
+    BrResult result = syscalls[syscall](args);
 
     if (result != BR_SUCCESS)
     {

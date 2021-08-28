@@ -38,7 +38,7 @@ static bool elf_supported(Elf64Header const *header, size_t data_size)
 
 static void elf_load_program(Task *task, Elf64Header const *elf_header, MemObj *elf_obj)
 {
-    auto prog_header = (Elf64ProgramHeader *)((uint8_t *)elf_header + elf_header->program_header_table_file_offset);
+    Elf64ProgramHeader *prog_header = (Elf64ProgramHeader *)((uint8_t *)elf_header + elf_header->program_header_table_file_offset);
 
     for (size_t i = 0; i < elf_header->program_header_table_entry_count; i++)
     {
@@ -48,7 +48,7 @@ static void elf_load_program(Task *task, Elf64Header const *elf_header, MemObj *
             continue;
         }
 
-        auto size = ALIGN_UP(MAX(prog_header->memory_size, prog_header->file_size), MEM_PAGE_SIZE);
+        size_t size = ALIGN_UP(MAX(prog_header->memory_size, prog_header->file_size), MEM_PAGE_SIZE);
 
         if (!(prog_header->flags & ELF_PROGRAM_HEADER_WRITABLE) &&
             prog_header->file_size == prog_header->memory_size)
@@ -76,18 +76,18 @@ static BrTask init = BR_TASK_ERROR;
 
 void init_stack(Task *task)
 {
-    auto heap = UNWRAP(heap_alloc(KERNEL_STACK_SIZE));
-    auto obj = mem_obj_heap(heap, MEM_OBJ_OWNING);
+    HeapRange heap = UNWRAP(heap_alloc(KERNEL_STACK_SIZE));
+    MemObj *obj = mem_obj_heap(heap, MEM_OBJ_OWNING);
     space_map(task->space, obj, 0, 0, USER_STACK_BASE - KERNEL_STACK_SIZE);
     mem_obj_deref(obj);
 }
 
 static uintptr_t init_pass(Task *task, Handover const *handover)
 {
-    auto heap = UNWRAP(heap_alloc(ALIGN_UP(sizeof(Handover), MEM_PAGE_SIZE)));
+    HeapRange heap = UNWRAP(heap_alloc(ALIGN_UP(sizeof(Handover), MEM_PAGE_SIZE)));
     mem_cpy((void *)heap.base, handover, sizeof(Handover));
-    auto obj = mem_obj_heap(heap, MEM_OBJ_OWNING);
-    auto addr = UNWRAP(space_map(task->space, obj, 0, 0, 0)).base;
+    MemObj *obj = mem_obj_heap(heap, MEM_OBJ_OWNING);
+    uintptr_t addr = UNWRAP(space_map(task->space, obj, 0, 0, 0)).base;
     mem_obj_deref(obj);
 
     return addr;
@@ -95,22 +95,22 @@ static uintptr_t init_pass(Task *task, Handover const *handover)
 
 void init_start(Handover const *handover)
 {
-    auto name = str$("init");
+    Str name = str$("init");
 
-    auto elf_module = handover_find_module(handover, name);
-    auto elf_header = (Elf64Header *)mmap_phys_to_io(elf_module->addr);
-    auto elf_obj = mem_obj_pmm((HeapRange){elf_module->addr, elf_module->size}, MEM_OBJ_NONE);
+    HandoverModule const *elf_module = handover_find_module(handover, name);
+    Elf64Header *elf_header = (Elf64Header *)mmap_phys_to_io(elf_module->addr);
+    MemObj *elf_obj = mem_obj_pmm((HeapRange){elf_module->addr, elf_module->size}, MEM_OBJ_NONE);
 
     assert_truth(elf_supported(elf_header, elf_module->size));
 
-    auto space = space_create(BR_SPACE_NONE);
+    Space *space = space_create(BR_SPACE_NONE);
     Task *task = UNWRAP(task_create(name, space, BR_CAP_ALL, BR_TASK_USER));
     space_deref(space);
 
     elf_load_program(task, elf_header, elf_obj);
 
     init_stack(task);
-    auto hoaddr = init_pass(task, handover);
+    uintptr_t hoaddr = init_pass(task, handover);
 
     init = task->handle;
 

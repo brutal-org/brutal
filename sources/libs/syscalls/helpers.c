@@ -15,7 +15,7 @@ BrGlobalInfo *brh_global_info(void)
 {
     if (global_infos == nullptr)
     {
-        auto g_map = (BrMapArgs){
+        BrMapArgs g_map = {
             .space = BR_SPACE_SELF,
             .mem_obj = BR_MEM_OBJ_GINFO,
         };
@@ -33,7 +33,7 @@ BrLocalInfo *brh_local_info(void)
 {
     if (global_infos == nullptr)
     {
-        auto l_map = (BrMapArgs){
+        BrMapArgs l_map = {
             .space = BR_SPACE_SELF,
             .mem_obj = BR_MEM_OBJ_LINFO,
         };

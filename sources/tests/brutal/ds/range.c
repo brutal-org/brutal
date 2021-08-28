@@ -10,7 +10,7 @@ TEST(ds_range_alloc_used_start)
     range_alloc_unused(&alloc, (USizeRange){0x0, 0x5000});
     range_alloc_used(&alloc, (USizeRange){0x0, 0x1000});
 
-    auto higher_half = (USizeRange){0x1000, 0x4000};
+    USizeRange higher_half = (USizeRange){0x1000, 0x4000};
 
     log$("After test");
     range_alloc_dump(&alloc);
@@ -29,8 +29,8 @@ TEST(ds_range_alloc_used_center)
     range_alloc_unused(&alloc, (USizeRange){0x0, 0x5000});
     range_alloc_used(&alloc, (USizeRange){0x2000, 0x1000});
 
-    auto lower_half = (USizeRange){0x0, 0x2000};
-    auto higher_half = (USizeRange){0x3000, 0x2000};
+    USizeRange lower_half = (USizeRange){0x0, 0x2000};
+    USizeRange higher_half = (USizeRange){0x3000, 0x2000};
 
     log$("After test");
     range_alloc_dump(&alloc);
@@ -50,7 +50,7 @@ TEST(ds_range_alloc_used_end)
     range_alloc_unused(&alloc, (USizeRange){0x0, 0x5000});
     range_alloc_used(&alloc, (USizeRange){0x4000, 0x1000});
 
-    auto lower_half = (USizeRange){0x0, 0x4000};
+    USizeRange lower_half = (USizeRange){0x0, 0x4000};
 
     log$("After test");
     range_alloc_dump(&alloc);
@@ -69,7 +69,7 @@ TEST(ds_range_alloc_unused_begin)
     range_alloc_unused(&alloc, (USizeRange){0x0, 0x1000});
     range_alloc_unused(&alloc, (USizeRange){0x1000, 0x1000});
 
-    auto final_range = (USizeRange){0x0, 0x2000};
+    USizeRange final_range = (USizeRange){0x0, 0x2000};
 
     log$("After test");
     range_alloc_dump(&alloc);
@@ -89,7 +89,7 @@ TEST(ds_range_alloc_unused_middle)
     range_alloc_unused(&alloc, (USizeRange){0x2000, 0x1000});
     range_alloc_unused(&alloc, (USizeRange){0x1000, 0x1000});
 
-    auto final_range = (USizeRange){0x0, 0x3000};
+    USizeRange final_range = (USizeRange){0x0, 0x3000};
 
     log$("After test");
     range_alloc_dump(&alloc);
@@ -109,7 +109,7 @@ TEST(ds_range_alloc_unused_end)
     range_alloc_unused(&alloc, (USizeRange){0x1000, 0x1000});
     range_alloc_unused(&alloc, (USizeRange){0x2000, 0x1000});
 
-    auto final_range = (USizeRange){0x0, 0x3000};
+    USizeRange final_range = (USizeRange){0x0, 0x3000};
 
     log$("After test");
     range_alloc_dump(&alloc);

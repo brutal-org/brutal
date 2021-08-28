@@ -21,7 +21,7 @@ void linear_buffer_push_impl(LinearBufferImpl *impl, uint8_t const *data, size_t
 
 void linear_buffer_attach_impl(LinearBufferImpl *impl, uint8_t const *data, size_t size)
 {
-    auto current = (LinearBufferNode *)buffer_begin(&impl->buffer) + impl->current;
+    LinearBufferNode *current = (LinearBufferNode *)buffer_begin(&impl->buffer) + impl->current;
     current->size += size;
     buffer_write(&impl->buffer, data, size);
 }

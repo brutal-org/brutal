@@ -26,8 +26,8 @@ static inline void finalizer(void)
 
 Task *tasking_create_idle(void)
 {
-    auto space = space_create(BR_SPACE_NONE);
-    auto task = UNWRAP(task_create(str$("idle"), space, BR_CAP_NONE, BR_TASK_NONE));
+    Space *space = space_create(BR_SPACE_NONE);
+    Task *task = UNWRAP(task_create(str$("idle"), space, BR_CAP_NONE, BR_TASK_NONE));
 
     context_start(task->context, (uintptr_t)idle, task->sp, task->sp, (BrTaskArgs){}, task->flags);
 
@@ -38,8 +38,8 @@ Task *tasking_create_idle(void)
 
 Task *tasking_create_boot(void)
 {
-    auto space = space_create(BR_SPACE_NONE);
-    auto task = UNWRAP(task_create(str$("boot"), space, BR_CAP_NONE, BR_TASK_NONE));
+    Space *space = space_create(BR_SPACE_NONE);
+    Task *task = UNWRAP(task_create(str$("boot"), space, BR_CAP_NONE, BR_TASK_NONE));
 
     sched_start(task, 0, 0, (BrTaskArgs){});
 
@@ -51,8 +51,8 @@ Task *tasking_create_boot(void)
 
 void tasking_create_finalizer(void)
 {
-    auto space = space_create(BR_SPACE_NONE);
-    auto task = UNWRAP(task_create(str$("finalizer"), space, BR_CAP_NONE, BR_TASK_NONE));
+    Space *space = space_create(BR_SPACE_NONE);
+    Task *task = UNWRAP(task_create(str$("finalizer"), space, BR_CAP_NONE, BR_TASK_NONE));
 
     sched_start(task, (uintptr_t)finalizer, task->sp, (BrTaskArgs){});
 

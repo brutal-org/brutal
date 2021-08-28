@@ -3,128 +3,128 @@
 #include <brutal/io/print.h>
 #include <brutal/log/locked.h>
 
-#define assert_not_null(expr) (                      \
+#define assert_not_null(EXPR) (                      \
     {                                                \
-        if (expr == nullptr)                         \
+        if (EXPR == nullptr)                         \
         {                                            \
-            panic$("{} is equal to nullptr", #expr); \
+            panic$("{} is equal to nullptr", #EXPR); \
         }                                            \
     })
 
-#define assert_truth(expr) (              \
+#define assert_truth(EXPR) (              \
     {                                     \
-        auto __value = (expr);            \
+        typeof(EXPR) __value = (EXPR);    \
                                           \
         if (!__value)                     \
         {                                 \
-            panic$("{} is false", #expr); \
+            panic$("{} is false", #EXPR); \
         }                                 \
     })
 
-#define assert_falsity(expr) (           \
+#define assert_falsity(EXPR) (           \
     {                                    \
-        auto __value = (expr);           \
+        typeof(EXPR) __value = (EXPR);   \
                                          \
         if (__value)                     \
         {                                \
-            panic$("{} is true", #expr); \
+            panic$("{} is true", #EXPR); \
         }                                \
     })
 
-#define assert_equal(lhs_expr, rhs_expr) (                          \
-    {                                                               \
-        auto __lhs_value = lhs_expr;                                \
-        auto __rhs_value = rhs_expr;                                \
-                                                                    \
-        if (__lhs_value != __rhs_value)                             \
-        {                                                           \
-            panic$("{} == {}: {} is not equal to {}",               \
-                   #lhs_expr, #rhs_expr, __lhs_value, __rhs_value); \
-        }                                                           \
+#define assert_equal(LHS, RHS) (                      \
+    {                                                 \
+        typeof(LHS) __lhs = LHS;                      \
+        typeof(RHS) __rhs = RHS;                      \
+                                                      \
+        if (__lhs != __rhs)                           \
+        {                                             \
+            panic$("{} == {}: {} is not equal to {}", \
+                   #LHS, #RHS, __lhs, __rhs);         \
+        }                                             \
     })
 
-#define assert_not_equal(lhs_expr, rhs_expr) (                      \
-    {                                                               \
-        auto __lhs_value = lhs_expr;                                \
-        auto __rhs_value = rhs_expr;                                \
-                                                                    \
-        if (__lhs_value == __rhs_value)                             \
-        {                                                           \
-            panic$("{} != {}: {} is equal to {}",                   \
-                   #lhs_expr, #rhs_expr, __lhs_value, __rhs_value); \
-        }                                                           \
+#define assert_not_equal(LHS, RHS) (              \
+    {                                             \
+        typeof(LHS) __lhs = LHS;                  \
+        typeof(RHS) __rhs = RHS;                  \
+                                                  \
+        if (__lhs == __rhs)                       \
+        {                                         \
+            panic$("{} != {}: {} is equal to {}", \
+                   #LHS, #RHS, __lhs, __rhs);     \
+        }                                         \
     })
 
-#define assert_str_equal(lhs_expr, rhs_expr) (                      \
-    {                                                               \
-        auto __lhs_value = lhs_expr;                                \
-        auto __rhs_value = rhs_expr;                                \
-                                                                    \
-        if (!str_eq(__lhs_value, __rhs_value))                      \
-        {                                                           \
-            panic$("{} == {}: '{}' is not equal to '{}'",           \
-                   #lhs_expr, #rhs_expr, __lhs_value, __rhs_value); \
-        }                                                           \
+#define assert_str_equal(LHS, RHS) (                      \
+    {                                                     \
+        typeof(LHS) __lhs = LHS;                          \
+        typeof(RHS) __rhs = RHS;                          \
+                                                          \
+        if (!str_eq(__lhs, __rhs))                        \
+        {                                                 \
+            panic$("{} == {}: '{}' is not equal to '{}'", \
+                   #LHS, #RHS, __lhs, __rhs);             \
+        }                                                 \
     })
 
-#define assert_str_not_equal(lhs_expr, rhs_expr) (                  \
-    {                                                               \
-        auto __lhs_value = lhs_expr;                                \
-        auto __rhs_value = rhs_expr;                                \
-                                                                    \
-        if (str_eq(__lhs_value, __rhs_value))                       \
-        {                                                           \
-            panic$("{} != {}: '{}' is equal to '{}'",               \
-                   #lhs_expr, #rhs_expr, __lhs_value, __rhs_value); \
-        }                                                           \
+#define assert_str_not_equal(LHS, RHS) (              \
+    {                                                 \
+        typeof(LHS) __lhs = LHS;                      \
+        typeof(RHS) __rhs = RHS;                      \
+                                                      \
+        if (str_eq(__lhs, __rhs))                     \
+        {                                             \
+            panic$("{} != {}: '{}' is equal to '{}'", \
+                   #LHS, #RHS, __lhs, __rhs);         \
+        }                                             \
     })
 
-#define assert_greater_than(lhs_expr, rhs_expr) (                   \
-    {                                                               \
-        auto __lhs_value = lhs_expr;                                \
-        auto __rhs_value = rhs_expr;                                \
-                                                                    \
-        if (!(__lhs_value > __rhs_value))                           \
-        {                                                           \
-            panic$("{} > {}: {} is not greater than {}",            \
-                   #lhs_expr, #rhs_expr, __lhs_value, __rhs_value); \
-        }                                                           \
+#define assert_greater_than(LHS, RHS) (                  \
+    {                                                    \
+        typeof(LHS) __lhs = LHS;                         \
+        typeof(RHS) __rhs = RHS;                         \
+                                                         \
+        if (!(__lhs > __rhs))                            \
+        {                                                \
+            panic$("{} > {}: {} is not greater than {}", \
+                   #LHS, #RHS, __lhs, __rhs);            \
+        }                                                \
     })
 
-#define assert_greater_equal(lhs_expr, rhs_expr) (                  \
-    {                                                               \
-        auto __lhs_value = lhs_expr;                                \
-        auto __rhs_value = rhs_expr;                                \
-                                                                    \
-        if (!(__lhs_value >= __rhs_value))                          \
-        {                                                           \
-            panic$("{} >= {}: {} is not greater or equal than {}",  \
-                   #lhs_expr, #rhs_expr, __lhs_value, __rhs_value); \
-        }                                                           \
+#define assert_greater_equal(LHS, RHS) (                           \
+    {                                                              \
+        typeof(LHS) __lhs = LHS;                                   \
+        typeof(RHS) __rhs = RHS;                                   \
+                                                                   \
+        if (!(__lhs >= __rhs))                                     \
+        {                                                          \
+            panic$("{} >= {}: {} is not greater or equal than {}", \
+                   #LHS, #RHS, __lhs, __rhs);                      \
+        }                                                          \
     })
 
-#define assert_lower_than(lhs_expr, rhs_expr) (                     \
-    {                                                               \
-        auto __lhs_value = lhs_expr;                                \
-        auto __rhs_value = rhs_expr;                                \
-                                                                    \
-        if (!(__lhs_value < __rhs_value))                           \
-        {                                                           \
-            panic$("{} < {}: {} is not lower than {}",              \
-                   #lhs_expr, #rhs_expr, __lhs_value, __rhs_value); \
-        }                                                           \
+#define assert_lower_than(LHS, RHS) (                  \
+    {                                                  \
+        typeof(LHS) __lhs = LHS;                       \
+        typeof(RHS) __rhs = RHS;                       \
+                                                       \
+        if (!(__lhs < __rhs))                          \
+        {                                              \
+            panic$("{} < {}: {} is not lower than {}", \
+                   #LHS, #RHS, __lhs, __rhs);          \
+        }                                              \
     })
 
-#define assert_lower_equal(lhs_expr, rhs_expr) (                    \
-    {                                                               \
-        auto __lhs_value = lhs_expr;                                \
-        auto __rhs_value = rhs_expr;                                \
-                                                                    \
-        if (!(__lhs_value <= __rhs_value))                          \
-        {                                                           \
-            panic$("{} <= {}: {} is not lower or equal than {}",    \
-                   #lhs_expr, #rhs_expr, __lhs_value, __rhs_value); \
-        }                                                           \
+#define assert_lower_equal(LHS, RHS) (                           \
+    {                                                            \
+        typeof(LHS) __lhs = LHS;                                 \
+        typeof(RHS) __rhs = RHS;                                 \
+                                                                 \
+        if (!(__lhs <= __rhs))                                   \
+        {                                                        \
+            panic$("{} <= {}: {} is not lower or equal than {}", \
+                   #LHS, #RHS, __lhs, __rhs);                    \
+        }                                                        \
     })
 
 #define assert_unreachable() ({ panic$("We reach the unreachable"); })

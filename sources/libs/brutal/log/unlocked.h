@@ -6,7 +6,7 @@
 
 /* --- Unlocked log functions ----------------------------------------------- */
 
-void log_unlock_impl(enum log_level level, SourceLocation location, Str fmt, struct print_args args);
+void log_unlock_impl(LogLevel level, SourceLocation location, Str fmt, PrintArgs args);
 
 #define log_unlock(fmt, ...) \
     log_unlock_impl(LOG_DEFAULT, source_location_current, str$(fmt), PRINT_ARGS(__VA_ARGS__))

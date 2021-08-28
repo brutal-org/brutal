@@ -17,7 +17,7 @@ void host_mem_unlock(void)
 
 Error host_mem_acquire(size_t size, void **out_result, MAYBE_UNUSED enum host_mem_flag flags)
 {
-    auto alloc_result = heap_alloc(size);
+    HeapResult alloc_result = heap_alloc(size);
 
     if (!alloc_result.succ)
     {

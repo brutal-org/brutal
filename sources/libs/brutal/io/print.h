@@ -30,11 +30,11 @@ struct print_value
     };
 };
 
-struct print_args
+typedef struct
 {
     size_t count;
     struct print_value *values;
-};
+} PrintArgs;
 
 struct print_value print_val_signed(long);
 
@@ -79,15 +79,15 @@ struct print_value print_val_pointer(void *);
 // clang-format on
 
 #define PRINT_ARGS_(...) \
-    (struct print_args) { .count = 0, }
+    (PrintArgs) { .count = 0, }
 
 #define PRINT_ARGS_N(...) \
-    (struct print_args) { COUNT(__VA_ARGS__), (struct print_value[]){MAP(PRINT_MATCH, __VA_ARGS__)}, }
+    (PrintArgs) { COUNT(__VA_ARGS__), (struct print_value[]){MAP(PRINT_MATCH, __VA_ARGS__)}, }
 
 #define PRINT_ARGS(...) \
     PRINT_ARGS_##__VA_OPT__(N)(__VA_ARGS__)
 
-IoWriteResult print_impl(IoWriter *writer, Str format, struct print_args args);
+IoWriteResult print_impl(IoWriter *writer, Str format, PrintArgs args);
 
 #define print(writer, fmt, ...) \
     print_impl(writer, str$(fmt), PRINT_ARGS(__VA_ARGS__))

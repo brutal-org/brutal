@@ -58,7 +58,7 @@ Error host_mem_acquire(size_t size, void **out_result, MAYBE_UNUSED enum host_me
 
 Error host_mem_release(void *addr, size_t size)
 {
-    auto result = br_unmap(&(BrUnmapArgs){
+    BrResult result = br_unmap(&(BrUnmapArgs){
         .space = BR_SPACE_SELF,
         .vaddr = (uintptr_t)addr,
         .size = size,

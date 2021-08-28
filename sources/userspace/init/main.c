@@ -10,7 +10,7 @@ static void display_bootimage(Handover const *handover)
 {
     // Open the framebuffer
 
-    auto fb = &handover->framebuffer;
+    HandoverFramebuffer const *fb = &handover->framebuffer;
 
     size_t fb_size = fb->height * fb->pitch;
 
@@ -44,7 +44,7 @@ static void display_bootimage(Handover const *handover)
 
     // Open the bootimage
 
-    auto img = handover_find_module(handover, str$("bootimg"));
+    HandoverModule const *img = handover_find_module(handover, str$("bootimg"));
     assert_not_null(img);
 
     BrCreateArgs img_obj = {
@@ -98,7 +98,7 @@ static void display_bootimage(Handover const *handover)
 
 BrTask srv_run(Handover const *handover, Str name)
 {
-    auto elf = handover_find_module(handover, name);
+    HandoverModule const *elf = handover_find_module(handover, name);
 
     assert_not_null(elf);
 
@@ -113,7 +113,7 @@ BrTask srv_run(Handover const *handover, Str name)
 
     assert_truth(br_create(&elf_obj) == BR_SUCCESS);
 
-    auto task_handle = elf_exec(elf_obj.handle, name);
+    BrTask task_handle = elf_exec(elf_obj.handle, name);
 
     brh_close(elf_obj.handle);
 

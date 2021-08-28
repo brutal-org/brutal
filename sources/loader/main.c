@@ -123,7 +123,7 @@ void loader_menu(void)
 
     Buffer buffer;
 
-    auto entry = config_get_entry(str$("Brutal"), str$("/config.json"), &buffer);
+    LoaderEntry entry = config_get_entry(str$("Brutal"), str$("/config.json"), &buffer);
 
     while (key.scan_code != SCAN_ESC)
     {

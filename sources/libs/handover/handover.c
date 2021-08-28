@@ -38,7 +38,7 @@ void handover_dump(Handover const *handover)
 
     for (size_t i = 0; i < handover->mmap.size; i++)
     {
-        auto entry = handover->mmap.entries[i];
+        HandoverMmapEntry entry = handover->mmap.entries[i];
 
         log$("\t{#p}-{#p} {}", entry.base, entry.base + entry.length - 1, entry.type);
     }
@@ -62,7 +62,7 @@ void handover_dump(Handover const *handover)
 
     for (size_t i = 0; i < handover->modules.size; i++)
     {
-        auto entry = handover->modules.module[i];
+        HandoverModule entry = handover->modules.module[i];
 
         log$("\t{#p}-{#p} {#}", entry.addr, entry.addr + entry.size, str$(&entry.module_name));
     }

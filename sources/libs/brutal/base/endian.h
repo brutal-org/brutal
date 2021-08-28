@@ -6,7 +6,7 @@
 
 #define bswap(VALUE) (                       \
     {                                        \
-        auto _v = (VALUE);                   \
+        typeof(VALUE) _v = (VALUE);          \
         typeof(VALUE) _result = 0;           \
         if (sizeof(_v) == 8)                 \
             _result = __builtin_bswap64(_v); \

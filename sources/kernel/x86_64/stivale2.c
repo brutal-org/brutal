@@ -78,7 +78,7 @@ static void fill_handover_mmap(Handover *target, struct stivale2_struct_tag_memm
 
     for (size_t i = 0; i < memory_map->entries; i++)
     {
-        auto entry = &target->mmap.entries[i];
+        HandoverMmapEntry *entry = &target->mmap.entries[i];
 
         entry->length = memory_map->memmap[i].length;
         entry->base = memory_map->memmap[i].base;
@@ -129,35 +129,35 @@ void stivale2_entry(struct stivale2_struct const *info)
     handover.tag = HANDOVER_TAG;
     handover.boolloader_from = HANDOVER_BOOT_SRC_STIVALE2;
 
-    auto memory_map = stivale2_get_tag(info, STIVALE2_STRUCT_TAG_MEMMAP_ID);
+    void *memory_map = stivale2_get_tag(info, STIVALE2_STRUCT_TAG_MEMMAP_ID);
 
     if (memory_map)
     {
         fill_handover_mmap(&handover, (struct stivale2_struct_tag_memmap const *)memory_map);
     }
 
-    auto rsdp = stivale2_get_tag(info, STIVALE2_STRUCT_TAG_RSDP_ID);
+    void *rsdp = stivale2_get_tag(info, STIVALE2_STRUCT_TAG_RSDP_ID);
 
     if (rsdp)
     {
         fill_handover_rsdp(&handover, (struct stivale2_struct_tag_rsdp const *)rsdp);
     }
 
-    auto framebuffer = stivale2_get_tag(info, STIVALE2_STRUCT_TAG_FRAMEBUFFER_ID);
+    void *framebuffer = stivale2_get_tag(info, STIVALE2_STRUCT_TAG_FRAMEBUFFER_ID);
 
     if (framebuffer)
     {
         fill_handover_framebuffer(&handover, (struct stivale2_struct_tag_framebuffer const *)framebuffer);
     }
 
-    auto modules = stivale2_get_tag(info, STIVALE2_STRUCT_TAG_MODULES_ID);
+    void *modules = stivale2_get_tag(info, STIVALE2_STRUCT_TAG_MODULES_ID);
 
     if (modules)
     {
         fill_handover_modules(&handover, (struct stivale2_struct_tag_modules const *)modules);
     }
 
-    auto cmd_line = stivale2_get_tag(info, STIVALE2_STRUCT_TAG_CMDLINE_ID);
+    void *cmd_line = stivale2_get_tag(info, STIVALE2_STRUCT_TAG_CMDLINE_ID);
 
     if (cmd_line)
     {

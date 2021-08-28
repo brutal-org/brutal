@@ -29,7 +29,7 @@ TaskCreateResult task_create(Str name, Space *space, BrCap caps, BrTaskFlags fla
 {
     log$("Creating Task {}...", name);
 
-    auto task = alloc_make(alloc_global(), Task);
+    Task *task = alloc_make(alloc_global(), Task);
 
     task->name = str_fix$(StrFix128, name);
     task->flags = flags;

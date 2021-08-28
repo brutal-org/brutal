@@ -8,7 +8,7 @@
 
 Context *context_create(void)
 {
-    auto self = (Context *)alloc_malloc(alloc_global(), sizeof(Context) + simd_context_size());
+    Context *self = (Context *)alloc_malloc(alloc_global(), sizeof(Context) + simd_context_size());
     simd_context_init(self->simd);
     return self;
 }

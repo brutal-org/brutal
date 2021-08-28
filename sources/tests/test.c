@@ -25,7 +25,7 @@ enum test_result test_run(struct test test)
     }
     else
     {
-        auto result = UNWRAP(task_wait(&runner));
+        int result = UNWRAP(task_wait(&runner));
 
         if (result == TASK_EXIT_SUCCESS)
         {
@@ -66,9 +66,9 @@ int test_run_all(void)
 
     for (size_t i = 0; i < tests_count; i++)
     {
-        auto test = tests[i];
+        struct test test = tests[i];
 
-        auto result = test_run(test);
+        enum test_result result = test_run(test);
 
         if (result == TEST_PASS)
         {

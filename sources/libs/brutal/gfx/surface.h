@@ -52,8 +52,8 @@ static inline void gfx_surface_store(GfxSurface self, int x, int y, GfxColor col
 
 static inline void gfx_surface_blend(GfxSurface self, int x, int y, GfxColor color)
 {
-    auto bg = gfx_surface_load(self, x, y);
-    auto blend = gfx_color_blend(color, bg);
+    GfxColor bg = gfx_surface_load(self, x, y);
+    GfxColor blend = gfx_color_blend(color, bg);
     gfx_surface_store(self, x, y, blend);
 }
 
@@ -63,7 +63,7 @@ static inline void gfx_surface_copy(GfxSurface dst, GfxSurface src, int x, int y
     {
         for (int xx = 0; xx < src.width; xx++)
         {
-            auto c = gfx_surface_load(src, xx, yy);
+            GfxColor c = gfx_surface_load(src, xx, yy);
             gfx_surface_blend(dst, x + xx, y + yy, c);
         }
     }

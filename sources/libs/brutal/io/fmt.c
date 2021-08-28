@@ -6,7 +6,7 @@
 #include <brutal/text/utf8.h>
 #include <brutal/text/vals.h>
 
-static int fmt_base(struct fmt self)
+static int fmt_base(Fmt self)
 {
     switch (self.type)
     {
@@ -23,12 +23,12 @@ static int fmt_base(struct fmt self)
     }
 }
 
-static char fmt_digit(struct fmt self, int d)
+static char fmt_digit(Fmt self, int d)
 {
     return STR_LOWERCASE_XDIGITS[d % fmt_base(self)];
 }
 
-static char fmt_prefix(struct fmt self)
+static char fmt_prefix(Fmt self)
 {
     switch (self.type)
     {
@@ -45,7 +45,7 @@ static char fmt_prefix(struct fmt self)
     }
 }
 
-static void fmt_pase_case(struct fmt *fmt, Scan *scan)
+static void fmt_pase_case(Fmt *fmt, Scan *scan)
 {
     if (scan_skip_word(scan, str$("default")))
     {
@@ -125,7 +125,7 @@ static void fmt_pase_case(struct fmt *fmt, Scan *scan)
     }
 }
 
-static void fmt_parse_type(struct fmt *fmt, Scan *scan)
+static void fmt_parse_type(Fmt *fmt, Scan *scan)
 {
 
     switch (scan_curr(scan))
@@ -160,7 +160,7 @@ static void fmt_parse_type(struct fmt *fmt, Scan *scan)
     }
 }
 
-static void fmt_parse_min_width(struct fmt *fmt, Scan *scan)
+static void fmt_parse_min_width(Fmt *fmt, Scan *scan)
 {
     if (scan_curr(scan) == '0')
     {
@@ -175,9 +175,9 @@ static void fmt_parse_min_width(struct fmt *fmt, Scan *scan)
     fmt->min_width = scan_next_decimal(scan);
 }
 
-struct fmt fmt_parse(Scan *scan)
+Fmt fmt_parse(Scan *scan)
 {
-    struct fmt fmt = {};
+    Fmt fmt = {};
 
     scan_skip(scan, '{');
 
@@ -211,7 +211,7 @@ struct fmt fmt_parse(Scan *scan)
     return fmt;
 }
 
-size_t fmt_write_length(struct fmt self, unsigned long value)
+size_t fmt_write_length(Fmt self, unsigned long value)
 {
     size_t length = 0;
     for (; value != 0; length++)
@@ -221,7 +221,7 @@ size_t fmt_write_length(struct fmt self, unsigned long value)
     return length;
 }
 
-IoWriteResult fmt_signed(struct fmt self, IoWriter *writer, long value)
+IoWriteResult fmt_signed(Fmt self, IoWriter *writer, long value)
 {
     size_t written = 0;
 
@@ -236,7 +236,7 @@ IoWriteResult fmt_signed(struct fmt self, IoWriter *writer, long value)
     return OK(IoWriteResult, written);
 }
 
-IoWriteResult fmt_unsigned(struct fmt self, IoWriter *writer, unsigned long value)
+IoWriteResult fmt_unsigned(Fmt self, IoWriter *writer, unsigned long value)
 {
     uint8_t buffer[64] = {};
     size_t i = 0;
@@ -282,18 +282,18 @@ IoWriteResult fmt_unsigned(struct fmt self, IoWriter *writer, unsigned long valu
     return io_write(writer, buffer, i);
 }
 
-IoWriteResult fmt_char(MAYBE_UNUSED struct fmt self, IoWriter *writer, unsigned int character)
+IoWriteResult fmt_char(MAYBE_UNUSED Fmt self, IoWriter *writer, unsigned int character)
 {
     size_t written = 0;
 
-    auto utf8 = rune_to_utf8((Rune)character);
+    StrFix8 utf8 = rune_to_utf8((Rune)character);
 
     written += TRY(IoWriteResult, io_print(writer, str$(&utf8)));
 
     return OK(IoWriteResult, written);
 }
 
-IoWriteResult fmt_string(struct fmt self, IoWriter *writer, Str value)
+IoWriteResult fmt_string(Fmt self, IoWriter *writer, Str value)
 {
     if (self.casing == CASE_DEFAULT)
     {
@@ -302,7 +302,7 @@ IoWriteResult fmt_string(struct fmt self, IoWriter *writer, Str value)
     else
     {
         Buffer buffer = case_change(self.casing, value, alloc_global());
-        auto result = io_print(writer, buffer_str(&buffer));
+        IoWriteResult result = io_print(writer, buffer_str(&buffer));
         buffer_deinit(&buffer);
         return result;
     }

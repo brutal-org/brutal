@@ -18,7 +18,7 @@ enum fmt_type
     FMT_POINTER,
 };
 
-struct fmt
+typedef struct
 {
     enum fmt_type type;
     Case casing;
@@ -26,14 +26,14 @@ struct fmt
     size_t min_width;
     bool fill_with_zero;
     bool prefix;
-};
+} Fmt;
 
-struct fmt fmt_parse(Scan *scan);
+Fmt fmt_parse(Scan *scan);
 
-IoWriteResult fmt_signed(struct fmt self, IoWriter *writer, long value);
+IoWriteResult fmt_signed(Fmt self, IoWriter *writer, long value);
 
-IoWriteResult fmt_unsigned(struct fmt self, IoWriter *writer, unsigned long value);
+IoWriteResult fmt_unsigned(Fmt self, IoWriter *writer, unsigned long value);
 
-IoWriteResult fmt_string(struct fmt self, IoWriter *writer, Str string);
+IoWriteResult fmt_string(Fmt self, IoWriter *writer, Str string);
 
-IoWriteResult fmt_char(struct fmt self, IoWriter *writer, unsigned int character);
+IoWriteResult fmt_char(Fmt self, IoWriter *writer, unsigned int character);

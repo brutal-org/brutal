@@ -225,8 +225,8 @@ void kmain(Handover *handover)
 
     printf("%x\n", handover->rsdp);
 
-    auto fb = handover->framebuffer;
-    auto mmap = handover->mmap;
+    HandoverFramebuffer fb = handover->framebuffer;
+    HandoverMmap mmap = handover->mmap;
 
     uint64_t size = 0;
 
@@ -234,10 +234,13 @@ void kmain(Handover *handover)
 
     for (int i = 0; i < mmap.size; i++)
     {
-        auto entry = mmap.entries[i];
+        HandoverMmapEntry entry = mmap.entries[i];
 
         if (entry.type == HANDOVER_MMAP_FREE)
+        {
             free_pages += entry.length;
+        }
+
         size += entry.length;
     }
 

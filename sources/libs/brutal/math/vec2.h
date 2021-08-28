@@ -21,34 +21,34 @@ typedef Vec2(double) Vec2d;
 
 #define vec2_add(a, b) ( \
     {                    \
-        auto c = (a);    \
-        c.x += (b).x;    \
-        c.y += (b).y;    \
-        c;               \
+        auto __v = (a);  \
+        __v.x += (b).x;  \
+        __v.y += (b).y;  \
+        __v;             \
     })
 
 #define vec2_sub(a, b) ( \
     {                    \
-        auto c = (a);    \
-        c.x -= (b).x;    \
-        c.y -= (b).y;    \
-        c;               \
+        auto __v = (a);  \
+        __v.x -= (b).x;  \
+        __v.y -= (b).y;  \
+        __v;             \
     })
 
 #define vec2_mul(a, b) ( \
     {                    \
-        auto c = (a);    \
-        c.x *= (b).x;    \
-        c.y *= (b).y;    \
-        c;               \
+        auto __v = (a);  \
+        __v.x *= (b).x;  \
+        __v.y *= (b).y;  \
+        __v;             \
     })
 
 #define vec2_div(a, b) ( \
     {                    \
-        auto c = (a);    \
-        c.x /= (b).x;    \
-        c.y /= (b).y;    \
-        c;               \
+        auto __v = (a);  \
+        __v.x /= (b).x;  \
+        __v.y /= (b).y;  \
+        __v;             \
     })
 
 #define vec2_distance(a, b) (                                          \

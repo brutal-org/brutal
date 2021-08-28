@@ -5,7 +5,7 @@
 #    include "kernel/cpu.h"
 #endif
 
-static Str log_color(enum log_level level)
+static Str log_color(LogLevel level)
 {
     switch (level)
     {
@@ -27,7 +27,7 @@ static Str log_color(enum log_level level)
     }
 }
 
-static Str log_prefix(enum log_level level)
+static Str log_prefix(LogLevel level)
 {
     switch (level)
     {
@@ -49,7 +49,7 @@ static Str log_prefix(enum log_level level)
     }
 }
 
-void log_unlock_impl(enum log_level level, SourceLocation location, Str fmt, struct print_args args)
+void log_unlock_impl(LogLevel level, SourceLocation location, Str fmt, PrintArgs args)
 {
 #ifdef __kernel__
     print(host_log_writer(), "cpu{}: ", cpu_self_id());
@@ -66,14 +66,14 @@ void log_unlock_impl(enum log_level level, SourceLocation location, Str fmt, str
     print(host_log_writer(), "\n");
 }
 
-void log_impl(enum log_level level, SourceLocation location, Str fmt, struct print_args args)
+void log_impl(LogLevel level, SourceLocation location, Str fmt, PrintArgs args)
 {
     host_log_lock();
     log_unlock_impl(level, location, fmt, args);
     host_log_unlock();
 }
 
-noreturn void panic_impl(enum log_level level, SourceLocation location, Str fmt, struct print_args args)
+noreturn void panic_impl(LogLevel level, SourceLocation location, Str fmt, PrintArgs args)
 {
     log_unlock_impl(level, location, fmt, args);
 

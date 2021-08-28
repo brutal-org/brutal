@@ -85,7 +85,7 @@ void lapic_initialize(Handover const *handover)
     lapic_base = mmap_phys_to_io(acpi_find_lapic(handover->rsdp));
     log$("Lapic found at {p}", lapic_base);
 
-    auto lapics = acpi_find_lapic_table(handover->rsdp);
+    struct lapic_record_table lapics = acpi_find_lapic_table(handover->rsdp);
 
     for (size_t i = 0; i < lapics.count; i++)
     {
@@ -100,7 +100,7 @@ struct ioapic_record_table ioapic_table = {};
 
 static inline uint32_t ioapic_read(int index, uint32_t reg)
 {
-    auto base = mmap_phys_to_io(ioapic_table.table[index]->address);
+    uintptr_t base = mmap_phys_to_io(ioapic_table.table[index]->address);
 
     volatile_write32(base + IOAPIC_REG_OFFSET, reg);
     return volatile_read32(base + IOAPIC_VALUE_OFFSET);
@@ -108,7 +108,7 @@ static inline uint32_t ioapic_read(int index, uint32_t reg)
 
 static inline void ioapic_write(int index, uint32_t reg, uint32_t value)
 {
-    auto base = mmap_phys_to_io(ioapic_table.table[index]->address);
+    uintptr_t base = mmap_phys_to_io(ioapic_table.table[index]->address);
 
     volatile_write32(base + IOAPIC_REG_OFFSET, reg);
     volatile_write32(base + IOAPIC_VALUE_OFFSET, value);

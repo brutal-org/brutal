@@ -139,7 +139,7 @@ HandoverFramebuffer get_framebuffer(EFIBootServices *bs)
 
     uint64_t size_of_info, num_modes, native_mode;
 
-    auto status = gop->query_mode(gop, gop->mode == NULL ? 0 : gop->mode->mode, &size_of_info, &info);
+    EFIStatus status = gop->query_mode(gop, gop->mode == NULL ? 0 : gop->mode->mode, &size_of_info, &info);
 
     if (status == EFI_NOT_STARTED)
     {
@@ -157,20 +157,20 @@ HandoverFramebuffer get_framebuffer(EFIBootServices *bs)
         num_modes = gop->mode->max_mode;
     }
 
-    auto addr = gop->mode->framebuffer_base;
-    auto width = gop->mode->info->horizontal_resolution;
-    auto height = gop->mode->info->vertical_resolution;
-    auto pitch = gop->mode->info->pixels_per_scan_line * gop->mode->info->pixel_format;
+    uint64_t addr = gop->mode->framebuffer_base;
+    uint32_t width = gop->mode->info->horizontal_resolution;
+    uint32_t height = gop->mode->info->vertical_resolution;
+    uint32_t pitch = gop->mode->info->pixels_per_scan_line * gop->mode->info->pixel_format;
 
     return (HandoverFramebuffer){true, addr, width, height, pitch, gop->mode->info->pixel_format};
 }
 
 Handover get_handover(void)
 {
-    auto bs = efi_st()->boot_services;
-    auto fb = get_framebuffer(bs);
-    auto rsdp = get_rsdp();
-    auto mmap = get_mmap(bs);
+    EFIBootServices *bs = efi_st()->boot_services;
+    HandoverFramebuffer fb = get_framebuffer(bs);
+    uintptr_t rsdp = get_rsdp();
+    HandoverMmap mmap = get_mmap(bs);
 
     return (Handover){
         .framebuffer = fb,

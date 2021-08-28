@@ -77,7 +77,7 @@ void vec_swap_impl(VecImpl *impl, int idx1, int idx2);
 
 #define vec_swap(v, idx1, idx2) vec_swap_impl(impl$(v), idx1, idx2)
 
-#define Vecruncate(v, len) \
+#define vec_truncate(v, len) \
     ((v)->length = (len) < (v)->length ? (len) : (v)->length)
 
 #define vec_clear(v) ((v)->length = 0)

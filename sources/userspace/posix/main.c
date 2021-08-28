@@ -9,7 +9,7 @@ int br_entry()
 {
     log$("Hello from the posix server!");
 
-    auto dt = timestamp_to_datetime(brh_global_info()->time);
+    DateTime dt = timestamp_to_datetime(brh_global_info()->time);
     log$("Time is {}/{}/{}", dt.day, dt.month, dt.year);
 
     return 0;
