@@ -15,4 +15,4 @@ $(TEST_BIN): $(TEST_OBJ) $(LIBS_HOSTED_BIN)
 	$(HOST_CC) -o $@ $^ $(HOST_CFLAGS) $(HOST_LDFLAGS)
 
 run-test: $(TEST_BIN)
-	$(TEST_BIN)
+	cd $(BUILDDIR_HOST); ./test.elf
