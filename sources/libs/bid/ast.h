@@ -73,6 +73,7 @@ typedef struct
 typedef struct
 {
     Str name;
+    uint32_t id;
 
     BidEnum errors;
     Vec(BidAlias) aliases;

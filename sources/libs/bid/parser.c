@@ -235,6 +235,9 @@ BidInterface bid_parse(Scan *scan, Alloc *alloc)
         {
             skip_comment_and_space(scan);
             interface.errors = parse_enum(scan, alloc);
+            vec_push(&interface.errors.members, str$("UNEXPECTED_MESSAGE"));
+            vec_push(&interface.errors.members, str$("BAD_COMMUNICATION"));
+            vec_push(&interface.errors.members, str$("SUCCESS"));
         }
         else if (scan_skip_word(scan, str$("type")))
         {
@@ -250,6 +253,23 @@ BidInterface bid_parse(Scan *scan, Alloc *alloc)
         {
             skip_comment_and_space(scan);
             vec_push(&interface.methods, parse_method(scan, alloc));
+        }
+        else if (scan_skip_word(scan, str$("id")))
+        {
+            skip_comment_and_space(scan);
+            scan_expect(scan, '=');
+            skip_comment_and_space(scan);
+            scan_expect_word(scan, str$("0x"));
+
+            uint32_t id = 0;
+
+            while (isxdigit(scan_curr(scan)))
+            {
+                id *= 0x10;
+                id += scan_next_digit(scan);
+            }
+
+            interface.id = id;
         }
         else
         {

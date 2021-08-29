@@ -148,6 +148,7 @@ int tolower(int c)
         c -= 'A';
         c += 'a';
     }
+
     return c;
 }
 

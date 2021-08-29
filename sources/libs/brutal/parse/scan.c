@@ -98,7 +98,7 @@ long scan_next_digit(Scan *self)
 {
     char c = tolower(scan_next(self));
 
-    if (isalnum(c))
+    if (isalpha(c))
     {
         return c - 'a' + 10;
     }

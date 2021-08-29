@@ -1,5 +1,7 @@
 interface Example
 {
+    id = 0xce89fdca;
+
     errors
     {
         PC_LOAD_LETTER,
