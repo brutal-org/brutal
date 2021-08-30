@@ -6,7 +6,7 @@
 
 Channel *channel_create(void)
 {
-    Channel* self = alloc_make(alloc_global(), Channel);
+    Channel *self = alloc_make(alloc_global(), Channel);
     ring_init(&self->msgs, IPC_CHANNEL_SIZE, alloc_global());
     return self;
 }
