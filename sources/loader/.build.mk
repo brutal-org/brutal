@@ -1,5 +1,5 @@
 LOADER_CC = clang-12
-LOADER_LD = lld-link
+LOADER_LD = clang-12
 
 BUILDDIR_LOADER=build/loader
 
@@ -7,16 +7,17 @@ LOADER_CFLAGS= \
 	$(CROSS_CFLAGS) \
 	-D__x86_64__ \
 	-D__efi__ \
-	-target x86_64-pc-win32-coff \
+	-target x86_64-unknown-windows \
 	-fno-stack-protector \
 	-fshort-wchar \
 	-mno-red-zone
 
 LOADER_LDFLAGS= \
-	-entry:efi_main \
-	-subsystem:efi_application \
-	-nodefaultlib \
-	-dll
+	-target x86_64-unknown-windows \
+	-nostdlib \
+	-Wl,-entry:efi_main \
+	-Wl,-subsystem:efi_application \
+	-fuse-ld=lld-link
 
 LOADER_LIBS_SRC = \
 	sources/libs/brutal/io/buffer.c                 \
@@ -24,14 +25,14 @@ LOADER_LIBS_SRC = \
 	sources/libs/brutal/io/file.c                   \
 	sources/libs/brutal/io/std.c                    \
 	sources/libs/brutal/io/print.c                  \
-	sources/libs/brutal/parse/scan.c                   \
-	sources/libs/brutal/parse/lex.c                   \
+	sources/libs/brutal/parse/scan.c                \
+	sources/libs/brutal/parse/lex.c                 \
 	sources/libs/brutal/io/write.c                  \
-	sources/libs/ansi/string.c			\
-	$(wildcard sources/libs/json/*.c)		\
-	$(wildcard sources/libs/brutal/alloc/*.c)	\
-	$(wildcard sources/libs/brutal/ds/*.c) 		\
-	$(wildcard sources/libs/brutal/hash/*.c)	\
+	sources/libs/ansi/string.c			            \
+	$(wildcard sources/libs/json/*.c)		        \
+	$(wildcard sources/libs/brutal/alloc/*.c)	    \
+	$(wildcard sources/libs/brutal/ds/*.c) 		    \
+	$(wildcard sources/libs/brutal/hash/*.c)	    \
 	$(wildcard sources/libs/brutal/host/efi/*.c)	\
 	$(wildcard sources/libs/brutal/log/*.c)         \
 	$(wildcard sources/libs/brutal/mem/*.c)         \
@@ -53,7 +54,7 @@ LOADER=$(BUILDDIR_CROSS)/BOOTX64.EFI
 
 $(LOADER): $(LOADER_OBJS)
 	$(MKCWD)
-	$(LOADER_LD) -out:$@ $^  $(LOADER_LDFLAGS)
+	$(LOADER_LD) -o $@ $^ $(LOADER_LDFLAGS)
 
 $(BUILDDIR_LOADER)/%.c.o: sources/%.c
 	$(MKCWD)

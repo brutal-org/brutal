@@ -15,4 +15,4 @@ git submodule update --init --recursive
 
 sudo apt install -y make build-essential bison flex texinfo nasm mtools wget \
                     unzip fuse libfuse-dev uuid-dev gcc binutils parted \
-                    clang-12 llvm-12 lld lld-linker
+                    clang-12 llvm-12 lld
