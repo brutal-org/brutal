@@ -3,8 +3,7 @@
 
 # We need clang 12
 # https://apt.llvm.org/
-deb http://apt.llvm.org/groovy/ llvm-toolchain-groovy-12 main
-deb-src http://apt.llvm.org/groovy/ llvm-toolchain-groovy-12 main
+bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
 
 sudo apt update
 
