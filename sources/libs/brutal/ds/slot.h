@@ -17,7 +17,11 @@ typedef struct
 #define Slot(T)         \
     union               \
     {                   \
-        T *data;        \
+        struct          \
+        {               \
+            T *data;    \
+            bool *used; \
+        };              \
         SlotImpl _impl; \
     }
 
@@ -46,8 +50,14 @@ void slot_release_impl(SlotImpl *impl, SlotIndex index);
 #define slot_release(self, index) \
     slot_release_impl(impl$(self), index)
 
+#define slot_capacity(self) \
+    impl$(self)->capacity
+
+#define slot_used(self, index) \
+    ({ (self)->used[index]; })
+
 #define slot_at(self, index) \
-    ({ &self->data[index]; })
+    ({ &(self)->data[index]; })
 
 #define slot_foreach(v, self)                                        \
     if ((self)->impl.capacity > 0)                                   \
