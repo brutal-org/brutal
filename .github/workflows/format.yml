@@ -1,4 +1,4 @@
-name: test-clang-format
+name: Check Formatting
 
 on:
   push:
