@@ -40,14 +40,14 @@ jobs:
   kernel:
     needs: setup
     runs-on: ubuntu-latest
-    steps:
-      - name: Build Kernel
-        run: |
-          make CONFIG_TOOLCHAIN=${{matrix.toolchain}} all
     strategy:
       fail-fast: false
       matrix:
         toolchain: [gnu, llvm]
+    steps:
+      - name: Build Kernel
+        run: |
+          make CONFIG_TOOLCHAIN=${{matrix.toolchain}} all
 
   loader: 
     needs: setup
@@ -60,30 +60,29 @@ jobs:
   tests:
     needs: setup
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        toolchain: [gnu, llvm]
     steps:
       - name: Run Tests
         run: |
           make CONFIG_TOOLCHAIN=${{matrix.toolchain}} run-test
-    strategy:
-      fail-fast: false
-      matrix:
-        toolchain: [gnu, llvm]
 
   bid:
     needs: setup
     runs-on: ubuntu-latest
-    steps:
-      - name: Run BID
-        run: |
-          make CONFIG_TOOLCHAIN=${{matrix.toolchain}} run-bid
     strategy:
       fail-fast: false
       matrix:
         toolchain: [gnu, llvm]
-  
+    steps:
+      - name: Run BID
+        run: |
+          make CONFIG_TOOLCHAIN=${{matrix.toolchain}} run-bid
+
   format:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - uses: DoozyX/clang-format-lint-action@v0.12
