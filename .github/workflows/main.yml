@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Install dependencies
-        run: echo "installed depe"
+        run: .github/workflows/setup.sh
 
       - name: Cache Toolchain (${{matrix.toolchain}})
         uses: actions/cache@v2
