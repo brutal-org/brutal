@@ -23,7 +23,7 @@ struct print_value
     union
     {
         long _signed;
-        unsigned long _unsigned;
+        unsigned long long _unsigned;
         Str _string;
         void *_pointer;
         char _char;
@@ -38,7 +38,7 @@ typedef struct
 
 struct print_value print_val_signed(long);
 
-struct print_value print_val_unsigned(unsigned long);
+struct print_value print_val_unsigned(unsigned long long);
 
 struct print_value print_val_string(Str);
 

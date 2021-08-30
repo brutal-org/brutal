@@ -7,7 +7,7 @@ struct print_value print_val_signed(long val)
     return (struct print_value){nullstr, PRINT_SIGNED, {._signed = val}};
 }
 
-struct print_value print_val_unsigned(unsigned long val)
+struct print_value print_val_unsigned(unsigned long long val)
 {
     return (struct print_value){nullstr, PRINT_UNSIGNED, {._unsigned = val}};
 }

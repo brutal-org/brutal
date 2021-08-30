@@ -32,7 +32,7 @@ Fmt fmt_parse(Scan *scan);
 
 IoWriteResult fmt_signed(Fmt self, IoWriter *writer, long value);
 
-IoWriteResult fmt_unsigned(Fmt self, IoWriter *writer, unsigned long value);
+IoWriteResult fmt_unsigned(Fmt self, IoWriter *writer, unsigned long long value);
 
 IoWriteResult fmt_string(Fmt self, IoWriter *writer, Str string);
 

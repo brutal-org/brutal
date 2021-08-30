@@ -236,7 +236,7 @@ IoWriteResult fmt_signed(Fmt self, IoWriter *writer, long value)
     return OK(IoWriteResult, written);
 }
 
-IoWriteResult fmt_unsigned(Fmt self, IoWriter *writer, unsigned long value)
+IoWriteResult fmt_unsigned(Fmt self, IoWriter *writer, unsigned long long value)
 {
     uint8_t buffer[64] = {};
     size_t i = 0;
