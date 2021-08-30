@@ -1,7 +1,6 @@
 #include <brutal/alloc.h>
 #include <brutal/log.h>
 #include <efi/lib.h>
-#include <efi/protos.h>
 #include <efi/srvs.h>
 #include <handover/handover.h>
 #include "loader/protocol.h"
@@ -23,27 +22,16 @@ static HandoverMmapType efi_mmap_type_to_handover[] = {
     [EFI_ACPI_MEMORY_NVS] = HANDOVER_MMAP_RESERVED,
 };
 
-HandoverMmap get_mmap(EFIBootServices *bs)
+HandoverMmap get_mmap()
 {
-    uint8_t tmp_mmap[1];
-    uint64_t mmap_size = sizeof(tmp_mmap);
-    uint64_t map_key = 0;
-    uint64_t descriptor_size = 0;
-    uint32_t descriptor_version = 0;
 
-    bs->get_memory_map(&mmap_size, (EFIMemoryDescriptor *)tmp_mmap, &map_key, &descriptor_size, &descriptor_version);
+    size_t entry_count = 0;
+    size_t descriptor_size = 0;
+    EFIMemoryDescriptor *mmap = get_efi_memory_map(&entry_count, &descriptor_size);
 
-    mmap_size += 4096;
+    HandoverMmap *h_mmap = alloc_malloc(alloc_global(), (sizeof(HandoverMmap) + (entry_count) * sizeof(HandoverMmapEntry)));
 
-    EFIMemoryDescriptor *mmap = alloc_malloc(alloc_global(), mmap_size);
-
-    bs->get_memory_map(&mmap_size, mmap, &map_key, &descriptor_size, &descriptor_version);
-
-    uint64_t entry_count = (mmap_size / descriptor_size);
-
-    HandoverMmap *h_mmap = alloc_malloc(alloc_global(), (sizeof(HandoverMmap) + (mmap_size / descriptor_size) * sizeof(HandoverMmapEntry)));
-
-    mem_set(h_mmap, 0, sizeof(HandoverMmap) + (mmap_size / descriptor_size) * sizeof(HandoverMmapEntry));
+    mem_set(h_mmap, 0, sizeof(HandoverMmap) + (entry_count) * sizeof(HandoverMmapEntry));
 
     HandoverMmapEntry *start_from = h_mmap->entries;
 
@@ -90,8 +78,6 @@ HandoverMmap get_mmap(EFIBootServices *bs)
     }
 
     h_mmap->size = entries;
-
-    bs->exit_boot_services(efi_handle(), map_key);
 
     return *h_mmap;
 }
@@ -170,7 +156,7 @@ Handover get_handover(void)
     EFIBootServices *bs = efi_st()->boot_services;
     HandoverFramebuffer fb = get_framebuffer(bs);
     uintptr_t rsdp = get_rsdp();
-    HandoverMmap mmap = get_mmap(bs);
+    HandoverMmap mmap = get_mmap();
 
     return (Handover){
         .framebuffer = fb,

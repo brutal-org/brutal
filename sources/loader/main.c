@@ -6,6 +6,7 @@
 #include <efi/tty.h>
 #include <elf/elf.h>
 #include "loader/config.h"
+#include "loader/memory.h"
 #include "loader/protocol.h"
 
 typedef void (*entry_point_func)(Handover *handover, uint64_t t) __attribute__((sysv_abi));
@@ -51,17 +52,19 @@ void loader_load(Elf64Header const *elf_header, void *base)
         if (prog_header->type == ELF_PROGRAM_HEADER_LOAD)
         {
             void *file_segment = (void *)((uint64_t)base + prog_header->file_offset);
-            void *mem_segment = (void *)prog_header->virtual_address;
+            /* don't care about extra zero as loader_phys_alloc_page memset the page to zero by default */
+            void *mem_phys_segment = (void *)loader_phys_alloc_page(ALIGN_UP(prog_header->memory_size, PAGE_SIZE) / PAGE_SIZE);
 
-            mem_cpy(mem_segment, file_segment, prog_header->file_size);
+            mem_cpy(mem_phys_segment, file_segment, prog_header->file_size);
 
-            void *extra_zeroes = mem_segment + prog_header->file_size;
-            uint64_t extra_zeroes_count = prog_header->memory_size - prog_header->file_size;
-
-            if (extra_zeroes_count > 0)
-            {
-                mem_set(extra_zeroes, 0x00, extra_zeroes_count);
-            }
+            memory_map_range((VmmRange){
+                                 .base = prog_header->virtual_address,
+                                 .size = ALIGN_UP(prog_header->memory_size, PAGE_SIZE),
+                             },
+                             (PmmRange){
+                                 .base = (uintptr_t)mem_phys_segment,
+                                 .size = ALIGN_UP(prog_header->memory_size, PAGE_SIZE),
+                             });
         }
 
         prog_header = (Elf64ProgramHeader *)((void *)prog_header + elf_header->program_header_table_entry_size);
@@ -112,6 +115,8 @@ void loader_boot(LoaderEntry *entry, Buffer *config_buf)
 
     Handover handover = get_handover();
 
+    efi_deinit();
+
     entry_point(&handover, 0xC001B001);
 
     assert_unreachable();
@@ -147,6 +152,8 @@ EFIStatus efi_main(EFIHandle handle, EFISystemTable *st)
 
     efi_tty_reset();
     efi_tty_clear();
+
+    memory_init();
 
     loader_splash();
 

@@ -82,7 +82,7 @@ typedef struct EFI_OPEN_PROTOCOL_INFORMATION_ENTRY
 
 DEF_EFI_FUNC(RAISE_TPL, uint64_t);
 DEF_EFI_FUNC(RESTORE_TPL, uint64_t);
-DEF_EFI_FUNC(ALLOCATE_PAGES, EFIAllocateType, uint64_t, uint64_t, uint64_t *);
+DEF_EFI_FUNC(ALLOCATE_PAGES, uint64_t, uint64_t, uint64_t, uint64_t *);
 DEF_EFI_FUNC(FREE_PAGES, uint64_t, uint64_t);
 DEF_EFI_FUNC(GET_MEMORY_MAP, uint64_t *, EFIMemoryDescriptor *, uint64_t *, uint64_t *, uint32_t *);
 DEF_EFI_FUNC(ALLOCATE_POOL, uint64_t, uint64_t, void **);
