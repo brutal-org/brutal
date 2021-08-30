@@ -1,4 +1,4 @@
-LOADER_CC = clang
+LOADER_CC = clang-12
 LOADER_LD = lld-link
 
 BUILDDIR_LOADER=build/loader
@@ -24,7 +24,8 @@ LOADER_LIBS_SRC = \
 	sources/libs/brutal/io/file.c                   \
 	sources/libs/brutal/io/std.c                    \
 	sources/libs/brutal/io/print.c                  \
-	sources/libs/brutal/io/scan.c                   \
+	sources/libs/brutal/parse/scan.c                   \
+	sources/libs/brutal/parse/lex.c                   \
 	sources/libs/brutal/io/write.c                  \
 	sources/libs/ansi/string.c			\
 	$(wildcard sources/libs/json/*.c)		\

@@ -41,6 +41,10 @@ jobs:
         run: |
           make CONFIG_TOOLCHAIN=${{matrix.toolchain}} all
 
+      - name: Build Loader
+        run: |
+          make CONFIG_TOOLCHAIN=${{matrix.toolchain}} loader
+
       - name: Run Tests
         run: |
           make CONFIG_TOOLCHAIN=${{matrix.toolchain}} run-test

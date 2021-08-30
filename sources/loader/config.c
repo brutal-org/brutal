@@ -8,14 +8,14 @@
 LoaderEntry config_get_entry(Str name, Str path, Buffer *buffer)
 {
     IoFile file;
-    IoFileReader reader;
+    IoReader reader;
     LoaderEntry ret;
 
     io_file_open(&file, path);
 
-    reader = io_file_read(&file);
+    reader = io_file_reader(&file);
 
-    *buffer = io_readall(base$(&reader), alloc_global());
+    *buffer = io_readall((&reader), alloc_global());
 
     Str base = str$((char *)buffer->data);
 

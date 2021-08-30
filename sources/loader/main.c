@@ -71,13 +71,13 @@ void loader_load(Elf64Header const *elf_header, void *base)
 entry_point_func loader_load_kernel(Str path)
 {
     IoFile file;
-    IoFileReader reader;
+    IoReader reader;
     Buffer buffer;
 
     log$("Loading elf file...");
     io_file_open(&file, path);
-    reader = io_file_read(&file);
-    buffer = io_readall(base$(&reader), alloc_global());
+    reader = io_file_reader(&file);
+    buffer = io_readall((&reader), alloc_global());
 
     Elf64Header *header = (Elf64Header *)buffer.data;
 

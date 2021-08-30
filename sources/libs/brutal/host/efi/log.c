@@ -5,11 +5,10 @@
 
 static IoWriter writer;
 
-IoWriteResult host_log_write(IoWriter *writer, char const *text, size_t size)
+static IoWriteResult host_log_write(MAYBE_UNUSED void *context, uint8_t const *data, MAYBE_UNUSED size_t offset, size_t size)
 {
-    UNUSED(writer);
 
-    uint16_t *cstr = str_to_cstr_utf16_dos(str_n$(size, (char *)text), alloc_global());
+    uint16_t *cstr = str_to_cstr_utf16_dos(str_n$(size, (char *)data), alloc_global());
 
     efi_st()->console_out->output_string(efi_st()->console_out, cstr);
 
@@ -20,6 +19,7 @@ IoWriteResult host_log_write(IoWriter *writer, char const *text, size_t size)
 
 IoWriter *host_log_writer(void)
 {
+
     writer.write = host_log_write;
 
     return &writer;
