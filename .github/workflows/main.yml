@@ -6,20 +6,20 @@ on:
   pull_request:
     branches: [ main ]
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
 
+jobs:
+  
+  setup:
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         toolchain: [gnu, llvm]
-
     steps:
       - uses: actions/checkout@v2
 
       - name: Install dependencies
-        run: .github/workflows/setup.sh
+        run: echo "installed depe"
 
       - name: Cache Toolchain (${{matrix.toolchain}})
         uses: actions/cache@v2
@@ -36,20 +36,58 @@ jobs:
       - name: Build Toolchain
         run: |
           meta/toolchain/${{matrix.toolchain}}/build.sh
-
+  
+  kernel:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
       - name: Build Kernel
         run: |
           make CONFIG_TOOLCHAIN=${{matrix.toolchain}} all
+    strategy:
+      fail-fast: false
+      matrix:
+        toolchain: [gnu, llvm]
 
+  loader: 
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
       - name: Build Loader
         run: |
-          make CONFIG_TOOLCHAIN=${{matrix.toolchain}} loader
+          make loader
 
+  tests:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
       - name: Run Tests
         run: |
           make CONFIG_TOOLCHAIN=${{matrix.toolchain}} run-test
+    strategy:
+      fail-fast: false
+      matrix:
+        toolchain: [gnu, llvm]
 
+  bid:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
       - name: Run BID
         run: |
           make CONFIG_TOOLCHAIN=${{matrix.toolchain}} run-bid
+    strategy:
+      fail-fast: false
+      matrix:
+        toolchain: [gnu, llvm]
+  
+  format:
+    runs-on: ubuntu-latest
 
+    steps:
+    - uses: actions/checkout@v2
+    - uses: DoozyX/clang-format-lint-action@v0.12
+      with:
+        source: '.'
+        exclude: './thirdparty ./sources/libs/proto ./sources/utils/test.c' 
+        clangFormatVersion: 12
