@@ -45,6 +45,7 @@ jobs:
       matrix:
         toolchain: [gnu, llvm]
     steps:
+      - uses: actions/checkout@v2
       - name: Build Kernel
         run: |
           make CONFIG_TOOLCHAIN=${{matrix.toolchain}} all
@@ -53,6 +54,7 @@ jobs:
     needs: setup
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: Build Loader
         run: |
           make loader
@@ -65,6 +67,7 @@ jobs:
       matrix:
         toolchain: [gnu, llvm]
     steps:
+      - uses: actions/checkout@v2
       - name: Run Tests
         run: |
           make CONFIG_TOOLCHAIN=${{matrix.toolchain}} run-test
@@ -77,6 +80,7 @@ jobs:
       matrix:
         toolchain: [gnu, llvm]
     steps:
+      - uses: actions/checkout@v2
       - name: Run BID
         run: |
           make CONFIG_TOOLCHAIN=${{matrix.toolchain}} run-bid
