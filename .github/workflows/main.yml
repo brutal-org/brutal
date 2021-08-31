@@ -6,21 +6,25 @@ on:
   pull_request:
     branches: [ main ]
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
 
+jobs:
+  
+  dependencies-setup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: .github/workflows/setup.sh
+
+  toolchain-setup:
+    needs: dependencies-setup
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         toolchain: [gnu, llvm]
-
     steps:
       - uses: actions/checkout@v2
-
-      - name: Install dependencies
-        run: .github/workflows/setup.sh
-
       - name: Cache Toolchain (${{matrix.toolchain}})
         uses: actions/cache@v2
         env:
@@ -29,27 +33,68 @@ jobs:
           path: |
             **/meta/toolchain/${{matrix.toolchain}}/local
           key: |
-            v2-${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/meta/toolchain/${{matrix.toolchain}}/build.sh') }}
+            v3-${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/meta/toolchain/${{matrix.toolchain}}/build.sh') }}
           restore-keys: |
-            v2-${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/meta/toolchain/${{matrix.toolchain}}/build.sh') }}
+            v3-${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/meta/toolchain/${{matrix.toolchain}}/build.sh') }}
 
       - name: Build Toolchain
         run: |
           meta/toolchain/${{matrix.toolchain}}/build.sh
-
+  
+  kernel:
+    needs: toolchain-setup
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        toolchain: [gnu, llvm]
+    steps:
+      - uses: actions/checkout@v2
       - name: Build Kernel
         run: |
           make CONFIG_TOOLCHAIN=${{matrix.toolchain}} all
 
+  loader: 
+    needs: toolchain-setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
       - name: Build Loader
         run: |
-          make CONFIG_TOOLCHAIN=${{matrix.toolchain}} loader
+          make loader
 
+  tests:
+    needs: dependencies-setup
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        toolchain: [gnu, llvm]
+    steps:
+      - uses: actions/checkout@v2
       - name: Run Tests
         run: |
           make CONFIG_TOOLCHAIN=${{matrix.toolchain}} run-test
 
+  bid:
+    needs: dependencies-setup
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        toolchain: [gnu, llvm]
+    steps:
+      - uses: actions/checkout@v2
       - name: Run BID
         run: |
           make CONFIG_TOOLCHAIN=${{matrix.toolchain}} run-bid
 
+  format:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: DoozyX/clang-format-lint-action@v0.12
+      with:
+        source: '.'
+        exclude: './thirdparty ./sources/libs/proto ./sources/utils/test.c' 
+        clangFormatVersion: 12
