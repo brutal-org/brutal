@@ -30,12 +30,7 @@ struct idt_entry idt_entry(uintptr_t handler, uint8_t ist, uint8_t idt_flags)
 
 void idt_initialize(void)
 {
-    for (int i = 0; i < 48; i++)
-    {
-        idt.entries[i] = idt_entry(__interrupt_vector[i], 0, IDT_GATE);
-    }
-
-    for (int i = 48; i < 256; i++)
+    for (int i = 0; i < 256; i++)
     {
         idt.entries[i] = idt_entry(__interrupt_vector[i], 0, IDT_GATE);
     }
