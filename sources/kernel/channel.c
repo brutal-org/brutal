@@ -17,9 +17,17 @@ void channel_destroy(Channel *self)
     alloc_free(alloc_global(), self);
 }
 
-static BrResult channel_send_unlock(Channel *self, Envelope const *msg)
+static BrResult channel_send_unlock(Channel *self, Domain *domaine, BrMsg const *msg)
 {
-    if (!ring_push(&self->msgs, msg))
+    Envelope env = {};
+    BrResult res = envelope_send(&env, msg, domaine);
+
+    if (res != BR_SUCCESS)
+    {
+        return res;
+    }
+
+    if (!ring_push(&self->msgs, &env))
     {
         return BR_CHANNEL_FULL;
     }
@@ -27,12 +35,15 @@ static BrResult channel_send_unlock(Channel *self, Envelope const *msg)
     return BR_SUCCESS;
 }
 
-static BrResult channel_recv_unlock(Channel *self, Envelope *msg)
+static BrResult channel_recv_unlock(Channel *self, Domain *domaine, BrMsg *msg)
 {
-    if (!ring_pop(&self->msgs, msg))
+    Envelope env = {};
+    if (!ring_pop(&self->msgs, &env))
     {
         return BR_CHANNEL_EMPTY;
     }
+
+    envelope_recv(&env, msg, domaine);
 
     return BR_SUCCESS;
 }
@@ -69,13 +80,13 @@ static bool channel_wait_recv(Channel *self)
     return true;
 }
 
-BrResult channel_send_blocking(Channel *self, Envelope const *msg, BrDeadline deadline)
+BrResult channel_send_blocking(Channel *self, Domain *domaine, BrMsg const *msg, BrDeadline deadline)
 {
     BrResult result = BR_SUCCESS;
 
     if (lock_try_acquire(&self->lock))
     {
-        result = channel_send_unlock(self, msg);
+        result = channel_send_unlock(self, domaine, msg);
         lock_release(&self->lock);
     }
 
@@ -95,20 +106,20 @@ BrResult channel_send_blocking(Channel *self, Envelope const *msg, BrDeadline de
         return result;
     }
 
-    result = channel_send_unlock(self, msg);
+    result = channel_send_unlock(self, domaine, msg);
 
     lock_release(&self->lock);
 
     return result;
 }
 
-BrResult channel_recv_blocking(Channel *self, Envelope *msg, BrDeadline deadline)
+BrResult channel_recv_blocking(Channel *self, Domain *domaine, BrMsg *msg, BrDeadline deadline)
 {
     BrResult result = BR_SUCCESS;
 
     if (lock_try_acquire(&self->lock))
     {
-        result = channel_recv_unlock(self, msg);
+        result = channel_recv_unlock(self, domaine, msg);
         lock_release(&self->lock);
     }
 
@@ -128,45 +139,55 @@ BrResult channel_recv_blocking(Channel *self, Envelope *msg, BrDeadline deadline
         return result;
     }
 
-    result = channel_recv_unlock(self, msg);
+    result = channel_recv_unlock(self, domaine, msg);
 
     lock_release(&self->lock);
 
     return result;
 }
 
-BrResult channel_send_non_blocking(Channel *self, Envelope const *msg)
+BrResult channel_send_non_blocking(Channel *self, Domain *domaine, BrMsg const *msg)
 {
     LOCK_RETAINER(&self->lock);
-    return channel_send_unlock(self, msg);
+    return channel_send_unlock(self, domaine, msg);
 }
 
-BrResult channel_recv_non_blocking(Channel *self, Envelope *msg)
+BrResult channel_recv_non_blocking(Channel *self, Domain *domaine, BrMsg *msg)
 {
     LOCK_RETAINER(&self->lock);
-    return channel_recv_unlock(self, msg);
+    return channel_recv_unlock(self, domaine, msg);
 }
 
-BrResult channel_send(Channel *self, Envelope const *msg, BrDeadline deadline, BrIpcFlags flags)
+BrResult channel_send(
+    Channel *self,
+    Domain *domaine,
+    BrMsg const *msg,
+    BrDeadline deadline,
+    BrIpcFlags flags)
 {
     if (flags & BR_IPC_BLOCK)
     {
-        return channel_send_blocking(self, msg, deadline);
+        return channel_send_blocking(self, domaine, msg, deadline);
     }
     else
     {
-        return channel_send_non_blocking(self, msg);
+        return channel_send_non_blocking(self, domaine, msg);
     }
 }
 
-BrResult channel_recv(Channel *self, Envelope *msg, BrDeadline deadline, BrIpcFlags flags)
+BrResult channel_recv(
+    Channel *self,
+    Domain *domaine,
+    BrMsg *msg,
+    BrDeadline deadline,
+    BrIpcFlags flags)
 {
     if (flags & BR_IPC_BLOCK)
     {
-        return channel_recv_blocking(self, msg, deadline);
+        return channel_recv_blocking(self, domaine, msg, deadline);
     }
     else
     {
-        return channel_recv_non_blocking(self, msg);
+        return channel_recv_non_blocking(self, domaine, msg);
     }
 }

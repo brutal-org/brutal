@@ -13,6 +13,6 @@ Channel *channel_create(void);
 
 void channel_destroy(Channel *channel);
 
-BrResult channel_send(Channel *self, Envelope const *msg, BrDeadline deadline, BrIpcFlags flags);
+BrResult channel_send(Channel *self, Domain *domaine, BrMsg const *msg, BrDeadline deadline, BrIpcFlags flags);
 
-BrResult channel_recv(Channel *self, Envelope *msg, BrDeadline deadline, BrIpcFlags flags);
+BrResult channel_recv(Channel *self, Domain *domaine, BrMsg *msg, BrDeadline deadline, BrIpcFlags flags);

@@ -11,9 +11,6 @@ typedef struct
 
 BrResult envelope_send(Envelope *self, BrMsg const *msg, Domain *domain);
 
-// maybe used for interrupts or other things
-BrResult envelope_send_without_object(Envelope *self, BrMsg const *msg);
-
 BrResult envelope_recv(Envelope *self, BrMsg *msg, Domain *domain);
 
 void envelope_deinit(Envelope *self);

@@ -1,7 +1,7 @@
 #include <brutal/fibers.h>
 #include <syscalls/syscalls.h>
 
-struct ipc_job
+typedef struct ipc_job
 {
     uint32_t seq;
     bool ok;
@@ -9,10 +9,10 @@ struct ipc_job
 
     struct ipc_job *next;
     struct ipc_job *prev;
-};
+} IpcJob;
 
 static Fiber *dispatcher = nullptr;
-static struct ipc_job *jobs = nullptr;
+static IpcJob *jobs = nullptr;
 
 __attribute__((weak)) void br_event(MAYBE_UNUSED BrMsg const *msg)
 {
@@ -31,24 +31,26 @@ static void req_dispatch(void)
 
         if (result == BR_SUCCESS)
         {
-            struct ipc_job *j = jobs;
+            bool message_handeled = false;
 
-            while (j)
+            for (IpcJob *j = jobs; j; j = j->next)
             {
                 if (j->seq == ipc.msg.seq)
                 {
                     *j->resp = ipc.msg;
                     j->ok = true;
-                    goto done;
-                }
 
-                j = j->next;
+                    message_handeled = true;
+                    break;
+                }
             }
 
-            br_event(&ipc.msg);
+            if (!message_handeled)
+            {
+                br_event(&ipc.msg);
+            }
         }
 
-    done:
         fiber_yield();
     }
 }
@@ -62,7 +64,7 @@ static void ensure_dispatcher(void)
     }
 }
 
-static void queue_job(struct ipc_job *job)
+static void queue_job(IpcJob *job)
 {
     if (jobs)
     {
@@ -80,7 +82,7 @@ static void queue_job(struct ipc_job *job)
     }
 }
 
-static void dequeue_job(struct ipc_job *job)
+static void dequeue_job(IpcJob *job)
 {
     if (job == job->next)
     {
@@ -93,7 +95,7 @@ static void dequeue_job(struct ipc_job *job)
     }
 }
 
-static bool req_wait(struct ipc_job *job)
+static bool req_wait(IpcJob *job)
 {
     if (!job->ok)
     {
@@ -119,7 +121,7 @@ BrResult br_ev_req(BrTask to, BrMsg *req, BrMsg *resp)
         .flags = BR_IPC_SEND,
     });
 
-    struct ipc_job job = {};
+    IpcJob job = {};
     job.seq = req->seq;
     job.resp = resp;
 

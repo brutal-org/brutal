@@ -39,7 +39,7 @@ static void irq_destroy(Irq *handler)
     }
 }
 
-static IrqBindingEntry *irq_alloc()
+static IrqBindingEntry *irq_alloc(void)
 {
 
     if (interrupts.alloc == nullptr)
@@ -54,16 +54,8 @@ static IrqBindingEntry *irq_alloc()
 
 static BrResult send_irq_handled(IrqBinding *self)
 {
-    BrMsg msg = {0};
-    msg.from = BR_TASK_IRQ;
-    msg.arg[0] = self->irq->irq; // set arg0 to the irq we handled
-
     BrTask to = self->target_task;
     Task *task CLEANUP(object_cleanup) = nullptr;
-
-    Envelope envelope CLEANUP(envelope_cleanup) = {};
-
-    envelope_send_without_object(&envelope, &msg);
 
     task = (Task *)global_lookup(to, BR_OBJECT_TASK);
 
@@ -73,7 +65,14 @@ static BrResult send_irq_handled(IrqBinding *self)
         return BR_BAD_HANDLE;
     }
 
-    return channel_send(task->channel, &envelope, 0, BR_IPC_SEND);
+    return channel_send(
+        task->channel,
+        nullptr,
+        &(BrMsg){
+            .from = BR_TASK_IRQ,
+            .arg[0] = self->irq->irq,
+        },
+        0, BR_IPC_SEND);
 }
 
 BrResult irq_unbind_all(const Task *target_task)

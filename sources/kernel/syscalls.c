@@ -3,6 +3,7 @@
 #include <syscalls/syscalls.h>
 #include "kernel/domain.h"
 #include "kernel/global.h"
+#include "kernel/init.h"
 #include "kernel/interrupts.h"
 #include "kernel/memory.h"
 #include "kernel/sched.h"
@@ -22,8 +23,6 @@ BrResult sys_log(BrLogArgs *args)
 BrResult sys_map(BrMapArgs *args)
 {
     Space *space = nullptr;
-    MemObj *mem_obj = nullptr;
-    BrResult result = BR_SUCCESS;
 
     if (args->space == BR_SPACE_SELF)
     {
@@ -37,9 +36,10 @@ BrResult sys_map(BrMapArgs *args)
 
     if (space == nullptr)
     {
-        result = BR_BAD_HANDLE;
-        goto cleanup_and_return;
+        return BR_BAD_HANDLE;
     }
+
+    MemObj *mem_obj = nullptr;
 
     if (args->mem_obj == BR_MEM_OBJ_GINFO)
     {
@@ -52,39 +52,29 @@ BrResult sys_map(BrMapArgs *args)
 
     if (mem_obj == nullptr)
     {
-        result = BR_BAD_HANDLE;
-        goto cleanup_and_return;
+        space_deref(space);
+        return BR_BAD_HANDLE;
     }
 
     SpaceResult map_result = space_map(space, mem_obj, args->offset, args->size, args->vaddr);
 
     if (!map_result.succ)
     {
-        result = map_result.err;
-        goto cleanup_and_return;
+        space_deref(space);
+        mem_obj_deref(mem_obj);
+
+        return map_result.err;
     }
 
     args->vaddr = UNWRAP(map_result).base;
     args->size = UNWRAP(map_result).size;
 
-cleanup_and_return:
-    if (space)
-    {
-        space_deref(space);
-    }
-
-    if (mem_obj)
-    {
-        mem_obj_deref(mem_obj);
-    }
-
-    return result;
+    return BR_SUCCESS;
 }
 
 BrResult sys_unmap(BrUnmapArgs *args)
 {
     Space *space = nullptr;
-    BrResult result = BR_SUCCESS;
 
     if (args->space == BR_SPACE_SELF)
     {
@@ -98,22 +88,18 @@ BrResult sys_unmap(BrUnmapArgs *args)
 
     if (space == nullptr)
     {
-        result = BR_BAD_HANDLE;
-        goto cleanup_and_return;
+        return BR_BAD_HANDLE;
     }
 
     SpaceResult unmap_result = space_unmap(space, (VmmRange){args->vaddr, args->size});
 
     if (!unmap_result.succ)
     {
-        result = unmap_result.err;
-        goto cleanup_and_return;
+        space_deref(space);
+        return unmap_result.err;
     }
 
-cleanup_and_return:
-    space_deref(space);
-
-    return result;
+    return BR_SUCCESS;
 }
 
 BrResult sys_create_task(BrTask *handle, BrCreateTaskArgs *args)
@@ -279,52 +265,32 @@ BrResult sys_exit(BrExitArgs *args)
     return BR_SUCCESS;
 }
 
-static BrResult sys_ipc_send(BrTask to, BrMsg *msg, BrDeadline deadline, BrIpcFlags flags)
-{
-    Task *task CLEANUP(object_cleanup) = nullptr;
-    Envelope envelope CLEANUP(envelope_cleanup) = {};
-
-    msg->from = task_self()->handle;
-    task = (Task *)global_lookup(to, BR_OBJECT_TASK);
-
-    if (!task)
-    {
-        return BR_BAD_HANDLE;
-    }
-
-    BrResult result = envelope_send(&envelope, msg, task_self()->domain);
-
-    if (result != BR_SUCCESS)
-    {
-        return result;
-    }
-
-    return channel_send(task->channel, &envelope, deadline, flags);
-}
-
-static BrResult sys_ipc_recv(BrMsg *msg, BrDeadline deadline, BrIpcFlags flags)
-{
-    Envelope envelope CLEANUP(envelope_cleanup) = {};
-
-    BrResult result = channel_recv(task_self()->channel, &envelope, deadline, flags);
-
-    if (result != BR_SUCCESS)
-    {
-        return result;
-    }
-
-    envelope_recv(&envelope, msg, task_self()->domain);
-
-    return result;
-}
-
 BrResult sys_ipc(BrIpcArgs *args)
 {
     BrResult result = BR_SUCCESS;
 
+    if (args->to == BR_TASK_INIT)
+    {
+        args->to = init_handle();
+    }
+
     if (args->flags & BR_IPC_SEND)
     {
-        result = sys_ipc_send(args->to, &args->msg, args->deadline, args->flags);
+        args->msg.from = task_self()->handle;
+
+        Task *task CLEANUP(object_cleanup) = (Task *)global_lookup(args->to, BR_OBJECT_TASK);
+
+        if (!task)
+        {
+            return BR_BAD_HANDLE;
+        }
+
+        result = channel_send(
+            task->channel,
+            task_self()->domain,
+            &args->msg,
+            args->deadline,
+            args->flags);
     }
 
     if (result != BR_SUCCESS)
@@ -334,7 +300,12 @@ BrResult sys_ipc(BrIpcArgs *args)
 
     if (args->flags & BR_IPC_RECV)
     {
-        result = sys_ipc_recv(&args->msg, args->deadline, args->flags);
+        result = channel_recv(
+            task_self()->channel,
+            task_self()->domain,
+            &args->msg,
+            args->deadline,
+            args->flags);
     }
 
     return result;
@@ -396,7 +367,11 @@ BrResult sys_bind(BrBindArgs *args)
         return BR_BAD_HANDLE;
     }
 
-    return irq_bind(task->handle, args->flags, irq);
+    BrResult result = irq_bind(task->handle, args->flags, irq);
+
+    irq_deref(irq);
+
+    return result;
 }
 
 BrResult sys_unbind(BrUnbindArgs *args)
@@ -423,7 +398,11 @@ BrResult sys_unbind(BrUnbindArgs *args)
         return BR_BAD_HANDLE;
     }
 
-    return irq_unbind(args->flags, irq);
+    BrResult result = irq_unbind(args->flags, irq);
+
+    irq_deref(irq);
+
+    return result;
 }
 
 BrResult sys_ack(BrAckArgs *args)
@@ -450,7 +429,11 @@ BrResult sys_ack(BrAckArgs *args)
         return BR_BAD_HANDLE;
     }
 
-    return irq_ack(irq);
+    BrResult result = irq_ack(irq);
+
+    irq_deref(irq);
+
+    return result;
 }
 
 typedef BrResult BrSyscallFn();
