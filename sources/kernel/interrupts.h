@@ -14,13 +14,13 @@ typedef struct
 {
     Irq *irq;
     BrIrqFlags flags;
-    BrTask target_task;
+    Task *task;
     bool ack;
 } IrqBinding;
 
 BrResult irq_unbind_all(const Task *target_task);
 
-BrResult irq_bind(BrTask task, BrIrqFlags flags, Irq *irq);
+BrResult irq_bind(Task *task, BrIrqFlags flags, Irq *irq);
 
 BrResult irq_unbind(BrIrqFlags flags, Irq *irq);
 

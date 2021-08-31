@@ -4,19 +4,23 @@
 
 void domain_destroy(Domain *self)
 {
-    vec_foreach(object, &self->objects)
+    for (int i = 0; i < slot_count(&self->objects); i++)
     {
-        object_deref(object);
+        if (slot_used(&self->objects, i))
+        {
+            object_deref(slot_at(&self->objects, i));
+            slot_release(&self->objects, i);
+        }
     }
 
-    vec_deinit(&self->objects);
+    slot_deinit(&self->objects);
     alloc_free(alloc_global(), self);
 }
 
 Domain *domain_create(void)
 {
     Domain *self = alloc_make(alloc_global(), Domain);
-    vec_init(&self->objects, alloc_global());
+    slot_init(&self->objects, alloc_global());
 
     object_init(base$(self), BR_OBJECT_DOMAIN, (ObjectDtor *)domain_destroy);
     return self;
@@ -32,49 +36,49 @@ void domain_deref(Domain *self)
     object_deref(base$(self));
 }
 
-void domain_add(Domain *self, Object *new_object)
+BrHandle domain_add(Domain *self, Object *object)
 {
     LOCK_RETAINER(&self->lock);
 
-    vec_foreach(object, &self->objects)
-    {
-        if (object == new_object)
-        {
-            return;
-        }
-    }
+    BrHandle handle = slot_alloc(&self->objects);
+    object_ref(object);
+    slot_at(&self->objects, handle) = object;
 
-    object_ref(new_object);
-    vec_push(&self->objects, new_object);
+    return handle;
 }
 
-void domain_remove(Domain *self, BrHandle handle)
+BrResult domain_remove(Domain *self, BrHandle handle)
 {
     LOCK_RETAINER(&self->lock);
 
-    vec_foreach(object, &self->objects)
+    if (!slot_used(&self->objects, handle))
     {
-        if (object->handle == handle)
-        {
-            object_deref(object);
-            vec_remove(&self->objects, object);
-            return;
-        }
+        return BR_BAD_HANDLE;
     }
+
+    object_deref(slot_at(&self->objects, handle));
+    slot_release(&self->objects, handle);
+
+    return BR_SUCCESS;
 }
 
 Object *domain_lookup(Domain *self, BrHandle handle, BrObjectType type)
 {
     LOCK_RETAINER(&self->lock);
 
-    vec_foreach(object, &self->objects)
+    if (!slot_used(&self->objects, handle))
     {
-        if (object->handle == handle && (object->type == type || type == BR_OBJECT_ANY))
-        {
-            object_ref(object);
-            return object;
-        }
+        return nullptr;
     }
 
-    return nullptr;
+    Object *object = slot_at(&self->objects, handle);
+
+    if (object->type != type && type != BR_OBJECT_ANY)
+    {
+        return nullptr;
+    }
+
+    object_deref(slot_at(&self->objects, handle));
+
+    return slot_at(&self->objects, handle);
 }

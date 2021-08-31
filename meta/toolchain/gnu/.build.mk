@@ -32,6 +32,8 @@ CROSS_CFLAGS= \
 	$(CFLAGS_OPT) \
 	$(CFLAGS_WARN) \
 	$(CROSS_CFLAGS_INC) \
+	-fsanitize=undefined \
+	-fanalyzer \
 	-ffreestanding \
 	-D__brutal__=1
 

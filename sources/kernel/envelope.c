@@ -35,7 +35,7 @@ BrResult envelope_recv(Envelope *self, BrMsg *msg, Domain *domain)
         {
             if (self->objs[i])
             {
-                domain_add(domain, self->objs[i]);
+                self->msg.arg[i] = domain_add(domain, self->objs[i]);
             }
         }
     }

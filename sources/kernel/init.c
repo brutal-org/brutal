@@ -72,7 +72,7 @@ static void elf_load_program(Task *task, Elf64Header const *elf_header, MemObj *
     }
 }
 
-static BrTask init = BR_TASK_ERROR;
+static Task *init_task = nullptr;
 
 void init_stack(Task *task)
 {
@@ -112,7 +112,8 @@ void init_start(Handover const *handover)
     init_stack(task);
     uintptr_t hoaddr = init_pass(task, handover);
 
-    init = task->handle;
+    task_ref(task);
+    init_task = task;
 
     sched_start(task, elf_header->entry, USER_STACK_BASE, (BrTaskArgs){.arg1 = hoaddr});
 
@@ -120,8 +121,9 @@ void init_start(Handover const *handover)
     mem_obj_deref(elf_obj);
 }
 
-BrTask init_handle(void)
+Task *init_get_task(void)
 {
-    assert_not_equal(init, BR_TASK_ERROR);
-    return init;
+    assert_not_null(init_task);
+    task_ref(init_task);
+    return init_task;
 }

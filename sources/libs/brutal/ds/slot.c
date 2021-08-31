@@ -1,5 +1,6 @@
 #include <brutal/alloc/base.h>
 #include <brutal/ds/slot.h>
+#include <brutal/log/assert.h>
 
 void slot_capacity_impl(SlotImpl *impl, int new_capacity)
 {
@@ -13,8 +14,8 @@ void slot_capacity_impl(SlotImpl *impl, int new_capacity)
 
     if (impl->data)
     {
-        mem_cpy(new_data, impl->data, impl->data_size * new_capacity);
-        mem_cpy(new_used, impl->used, sizeof(bool) * new_capacity);
+        mem_cpy(new_data, impl->data, impl->data_size * impl->capacity);
+        mem_cpy(new_used, impl->used, sizeof(bool) * impl->capacity);
 
         alloc_release(impl->alloc, impl->data);
         alloc_release(impl->alloc, impl->used);
@@ -69,7 +70,7 @@ SlotIndex slot_alloc_impl(SlotImpl *impl)
 
     SlotIndex found_index = slot_find_impl(impl);
 
-    if (found_index < 0)
+    if (found_index >= 0)
     {
         return found_index;
     }
@@ -81,10 +82,12 @@ SlotIndex slot_alloc_impl(SlotImpl *impl)
 
 void slot_acquire_impl(SlotImpl *impl, size_t index)
 {
+    assert_falsity(impl->used[index]);
     impl->used[index] = true;
 }
 
 void slot_release_impl(SlotImpl *impl, SlotIndex index)
 {
+    assert_truth(impl->used[index]);
     impl->used[index] = false;
 }

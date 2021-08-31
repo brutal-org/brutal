@@ -68,7 +68,7 @@ typedef struct
 typedef struct
 {
     BrObjectType type;
-
+    BrId id;
     BrHandle handle;
 
     union
@@ -102,7 +102,7 @@ SYSCALL(exit) (BrExitArgs* args);
 
 typedef struct
 {
-    BrTask to;
+    BrId to;
     BrMsg msg;
     BrDeadline deadline;
     BrIpcFlags flags;

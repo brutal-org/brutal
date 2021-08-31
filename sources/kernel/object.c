@@ -1,15 +1,16 @@
 #include <brutal/alloc.h>
 #include "kernel/object.h"
 
-static _Atomic BrHandle handles = 1;
 static bool initialized = false;
 static VecObject global = {};
 static Lock lock = {};
+static _Atomic BrHandle id = 1;
 
 void object_init(Object *self, BrObjectType type, ObjectDtor *dtor)
 {
     refcount_init(&self->refcount);
-    self->handle = handles++;
+
+    self->id = id++;
     self->type = type;
     self->dtor = dtor;
 
@@ -52,7 +53,7 @@ void object_deref(Object *self)
     }
 }
 
-Object *global_lookup(BrHandle handle, BrObjectType type)
+Object *global_lookup(BrId id, BrObjectType type)
 {
     LOCK_RETAINER(&lock);
 
@@ -63,7 +64,7 @@ Object *global_lookup(BrHandle handle, BrObjectType type)
 
     vec_foreach(object, &global)
     {
-        if (object->handle == handle && (object->type == type || type == BR_OBJECT_ANY))
+        if (object->id == id && (object->type == type || type == BR_OBJECT_ANY))
         {
             object_ref(object);
             return object;

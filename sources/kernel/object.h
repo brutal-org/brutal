@@ -6,16 +6,16 @@
 
 typedef void ObjectDtor(void *object);
 
-#define OBJECT_HEADER    \
-    union                \
-    {                    \
-        BrHandle handle; \
-        Object base;     \
+#define OBJECT_HEADER \
+    union             \
+    {                 \
+        BrId id;      \
+        Object base;  \
     }
 
 typedef struct
 {
-    BrHandle handle;
+    BrId id;
     RefCount refcount;
     BrObjectType type;
 
@@ -23,6 +23,7 @@ typedef struct
 } Object;
 
 typedef Vec(Object *) VecObject;
+typedef Slot(Object *) SlotObject;
 
 void object_init(Object *self, BrObjectType type, ObjectDtor *dtor);
 
@@ -30,7 +31,7 @@ void object_ref(Object *self);
 
 void object_deref(Object *self);
 
-Object *global_lookup(BrHandle handle, BrObjectType type);
+Object *global_lookup(BrId id, BrObjectType type);
 
 static inline void object_cleanup(void *object)
 {

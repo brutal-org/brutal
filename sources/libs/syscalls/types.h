@@ -49,6 +49,7 @@ static inline const char *br_syscall_to_string(BrSyscall syscall)
     RESULT(BAD_ARGUMENTS)       \
     RESULT(BAD_CAPABILITY)      \
     RESULT(BAD_HANDLE)          \
+    RESULT(BAD_ID)              \
     RESULT(BAD_SYSCALL)         \
     RESULT(NOT_IMPLEMENTED)     \
     RESULT(OUT_OF_MEMORY)       \
@@ -136,6 +137,8 @@ typedef uint64_t BrArg;
 
 #define BR_HANDLE_NIL ((BrHandle)0)
 
+typedef uint64_t BrId;
+
 typedef uint64_t BrHandle;
 
 typedef BrHandle BrSpace;
@@ -200,7 +203,7 @@ typedef uint32_t BrMsgFlags;
 
 typedef struct
 {
-    BrTask from;
+    BrId from;
     BrMsgFlags flags;
     uint32_t seq;
     uint32_t prot;

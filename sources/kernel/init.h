@@ -5,4 +5,4 @@
 
 void init_start(Handover const *handover);
 
-BrTask init_handle(void);
+Task *init_get_task(void);

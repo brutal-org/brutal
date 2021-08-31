@@ -13,7 +13,7 @@
 BrResult sys_log(BrLogArgs *args)
 {
     host_log_lock();
-    print(host_log_writer(), "cpu{}: {}({}): ", cpu_self_id(), str$(&task_self()->name), task_self()->handle);
+    print(host_log_writer(), "cpu{}: {}({}): ", cpu_self_id(), str$(&task_self()->name), task_self()->id);
     io_write(host_log_writer(), (uint8_t *)args->message, args->size);
     host_log_unlock();
 
@@ -53,6 +53,7 @@ BrResult sys_map(BrMapArgs *args)
     if (mem_obj == nullptr)
     {
         space_deref(space);
+
         return BR_BAD_HANDLE;
     }
 
@@ -102,7 +103,7 @@ BrResult sys_unmap(BrUnmapArgs *args)
     return BR_SUCCESS;
 }
 
-BrResult sys_create_task(BrTask *handle, BrCreateTaskArgs *args)
+BrResult sys_create_task(BrId *id, BrTask *handle, BrCreateTaskArgs *args)
 {
     Space *space = nullptr;
 
@@ -127,18 +128,17 @@ BrResult sys_create_task(BrTask *handle, BrCreateTaskArgs *args)
         args->caps & task_self()->caps,
         args->flags | BR_TASK_USER));
 
-    domain_add(task_self()->domain, base$(task));
+    *id = task->id;
+    *handle = domain_add(task_self()->domain, base$(task));
 
     space_deref(space);
-
-    *handle = task->handle;
 
     task_deref(task);
 
     return BR_SUCCESS;
 }
 
-BrResult sys_create_mem_obj(BrMemObj *handle, BrCreateMemObjArgs *args)
+BrResult sys_create_mem_obj(BrId *id, BrMemObj *handle, BrCreateMemObjArgs *args)
 {
     MemObj *mem_obj = nullptr;
 
@@ -163,30 +163,37 @@ BrResult sys_create_mem_obj(BrMemObj *handle, BrCreateMemObjArgs *args)
         mem_obj = mem_obj_pmm(UNWRAP(pmm_result), MEM_OBJ_OWNING);
     }
 
-    domain_add(task_self()->domain, base$(mem_obj));
-    *handle = mem_obj->handle;
+    *id = mem_obj->id;
+    *handle = domain_add(task_self()->domain, base$(mem_obj));
+
     mem_obj_deref(mem_obj);
 
     return BR_SUCCESS;
 }
 
-BrResult sys_create_space(BrSpace *handle, BrCreateSpaceArgs *args)
+BrResult sys_create_space(BrId *id, BrSpace *handle, BrCreateSpaceArgs *args)
 {
     Space *space = space_create(args->flags);
 
-    domain_add(task_self()->domain, base$(space));
-    *handle = space->handle;
+    *id = space->id;
+    *handle = domain_add(task_self()->domain, base$(space));
+
     space_deref(space);
 
     return BR_SUCCESS;
 }
 
-BrResult sys_create_irq(BrIrq *handle, BrCreateIrqArgs *args)
+BrResult sys_create_irq(BrId *id, BrIrq *handle, BrCreateIrqArgs *args)
 {
+    if (!(task_self()->caps & BR_CAP_IRQ))
+    {
+        return BR_BAD_CAPABILITY;
+    }
+
     Irq *irq = irq_create(args->irq);
 
-    domain_add(task_self()->domain, base$(irq));
-    *handle = irq->handle;
+    *id = irq->id;
+    *handle = domain_add(task_self()->domain, base$(irq));
 
     irq_deref(irq);
 
@@ -203,20 +210,16 @@ BrResult sys_create(BrCreateArgs *args)
     switch (args->type)
     {
     case BR_OBJECT_TASK:
-        return sys_create_task(&args->handle, &args->task);
+        return sys_create_task(&args->id, &args->handle, &args->task);
 
     case BR_OBJECT_SPACE:
-        return sys_create_space(&args->handle, &args->space);
+        return sys_create_space(&args->id, &args->handle, &args->space);
 
     case BR_OBJECT_MEMORY:
-        return sys_create_mem_obj(&args->handle, &args->mem_obj);
+        return sys_create_mem_obj(&args->id, &args->handle, &args->mem_obj);
 
     case BR_OBJECT_IRQ:
-        if (!(task_self()->caps & BR_CAP_IRQ))
-        {
-            return BR_BAD_CAPABILITY;
-        }
-        return sys_create_irq(&args->handle, &args->irq);
+        return sys_create_irq(&args->id, &args->handle, &args->irq);
 
     default:
         return BR_BAD_ARGUMENTS;
@@ -269,20 +272,25 @@ BrResult sys_ipc(BrIpcArgs *args)
 {
     BrResult result = BR_SUCCESS;
 
-    if (args->to == BR_TASK_INIT)
-    {
-        args->to = init_handle();
-    }
-
     if (args->flags & BR_IPC_SEND)
     {
-        args->msg.from = task_self()->handle;
+        args->msg.from = task_self()->id;
 
-        Task *task CLEANUP(object_cleanup) = (Task *)global_lookup(args->to, BR_OBJECT_TASK);
+        Task *task CLEANUP(object_cleanup) = nullptr;
+
+        if (args->to == BR_TASK_INIT)
+        {
+            task = init_get_task();
+        }
+        else
+        {
+            // FIXME: We should use handle instead of id for IPCs.
+            task = (Task *)global_lookup(args->to, BR_OBJECT_TASK);
+        }
 
         if (!task)
         {
-            return BR_BAD_HANDLE;
+            return BR_BAD_ID;
         }
 
         result = channel_send(
@@ -356,18 +364,14 @@ BrResult sys_bind(BrBindArgs *args)
         return BR_BAD_CAPABILITY;
     }
 
-    Task *task = nullptr;
-    task_ref(task_self());
-    task = task_self();
-
-    Irq *irq = (Irq *)domain_lookup(task->domain, args->handle, BR_OBJECT_IRQ);
+    Irq *irq = (Irq *)domain_lookup(task_self()->domain, args->handle, BR_OBJECT_IRQ);
 
     if (!irq)
     {
         return BR_BAD_HANDLE;
     }
 
-    BrResult result = irq_bind(task->handle, args->flags, irq);
+    BrResult result = irq_bind(task_self(), args->flags, irq);
 
     irq_deref(irq);
 
@@ -381,17 +385,7 @@ BrResult sys_unbind(BrUnbindArgs *args)
         return BR_BAD_CAPABILITY;
     }
 
-    Task *task = nullptr;
-
-    task_ref(task_self());
-    task = task_self();
-
-    if (!task)
-    {
-        return BR_BAD_HANDLE;
-    }
-
-    Irq *irq = (Irq *)domain_lookup(task->domain, args->handle, BR_OBJECT_IRQ);
+    Irq *irq = (Irq *)domain_lookup(task_self()->domain, args->handle, BR_OBJECT_IRQ);
 
     if (!irq)
     {
@@ -468,7 +462,7 @@ BrResult syscall_dispatch(BrSyscall syscall, BrArg args)
     {
         log$("Syscall: {}({}): {}({#p}) -> {}",
              str$(&task_self()->name),
-             task_self()->handle,
+             task_self()->id,
              str$(br_syscall_to_string(syscall)),
              args,
              str$(br_result_to_string(result)));

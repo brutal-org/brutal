@@ -11,11 +11,11 @@ typedef list(IrqBinding) IrqBindingEntry;
 static IrqBindingEntry interrupts = {};
 static Lock lock = {};
 
-static IrqBindingEntry *irq_binding_get(Irq id)
+static IrqBindingEntry *irq_binding_get(Irq *irq)
 {
     list_loop(binding, &interrupts)
     {
-        if (binding->data->irq->handle == id.handle)
+        if (binding->data->irq == irq)
         {
             return binding;
         }
@@ -31,7 +31,7 @@ static void interrupt_binding_destroy(IrqBindingEntry *handler)
 
 static void irq_destroy(Irq *handler)
 {
-    IrqBindingEntry *binding = irq_binding_get(*handler);
+    IrqBindingEntry *binding = irq_binding_get(handler);
 
     if (binding)
     {
@@ -54,19 +54,8 @@ static IrqBindingEntry *irq_alloc(void)
 
 static BrResult send_irq_handled(IrqBinding *self)
 {
-    BrTask to = self->target_task;
-    Task *task CLEANUP(object_cleanup) = nullptr;
-
-    task = (Task *)global_lookup(to, BR_OBJECT_TASK);
-
-    if (!task)
-    {
-        log_unlock("error: can't send interrupt message (invalid task)");
-        return BR_BAD_HANDLE;
-    }
-
     return channel_send(
-        task->channel,
+        self->task->channel,
         nullptr,
         &(BrMsg){
             .from = BR_TASK_IRQ,
@@ -75,11 +64,11 @@ static BrResult send_irq_handled(IrqBinding *self)
         0, BR_IPC_SEND);
 }
 
-BrResult irq_unbind_all(const Task *target_task)
+BrResult irq_unbind_all(Task const *task)
 {
     list_loop(binding, &interrupts)
     {
-        if (binding->data->target_task == target_task->handle)
+        if (binding->data->task == task)
         {
             interrupt_binding_destroy(binding);
         }
@@ -88,12 +77,12 @@ BrResult irq_unbind_all(const Task *target_task)
     return BR_SUCCESS;
 }
 
-BrResult irq_bind(BrTask task, BrIrqFlags flags, Irq *irq)
+BrResult irq_bind(Task *task, BrIrqFlags flags, Irq *irq)
 {
     LOCK_RETAINER(&lock);
     log$("Binding interrupt {}", irq->irq);
 
-    IrqBindingEntry *binding = irq_binding_get(*irq);
+    IrqBindingEntry *binding = irq_binding_get(irq);
 
     if (binding == nullptr)
     {
@@ -102,7 +91,7 @@ BrResult irq_bind(BrTask task, BrIrqFlags flags, Irq *irq)
 
     irq_ref(irq);
 
-    binding->data->target_task = task;
+    binding->data->task = task;
     binding->data->flags = flags;
     binding->data->ack = true;
     binding->data->irq = irq;
@@ -115,7 +104,7 @@ BrResult irq_unbind(BrIrqFlags flags, Irq *irq)
     LOCK_RETAINER(&lock);
     log$("Unbinding interrupt {}", irq->irq);
 
-    IrqBindingEntry *binding = irq_binding_get(*irq);
+    IrqBindingEntry *binding = irq_binding_get(irq);
 
     if (binding == nullptr)
     {
@@ -134,7 +123,7 @@ BrResult irq_ack(Irq *irq)
 {
     LOCK_RETAINER(&lock);
 
-    IrqBindingEntry *binding = irq_binding_get(*irq);
+    IrqBindingEntry *binding = irq_binding_get(irq);
 
     if (binding == nullptr)
     {

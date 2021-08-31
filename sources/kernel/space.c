@@ -113,11 +113,14 @@ SpaceResult space_map(Space *self, MemObj *mem_obj, size_t offset, size_t size, 
 
     memory_mapping_create(self, mem_obj, offset, range);
 
+    log$("MAP({#x}, {})", range.base, range.size);
+
     return OK(SpaceResult, range);
 }
 
 SpaceResult space_unmap(Space *self, VmmRange range)
 {
+    log$("UNMAP({#x}, {})", range.base, range.size);
     LOCK_RETAINER(&self->lock);
 
     vec_foreach(mapping, &self->mappings)
@@ -138,7 +141,7 @@ void space_dump(Space *self)
 {
     LOCK_RETAINER(&self->lock);
 
-    log$("MemorySpace({})", self->handle);
+    log$("MemorySpace({})", self->id);
 
     vec_foreach(mapping, &self->mappings)
     {
@@ -150,12 +153,12 @@ void space_dump(Space *self)
         if (mapping->object->type == MEM_OBJ_HEAP)
         {
             HeapRange heap_range = mapping->object->heap;
-            log$("\t  ->  handle:{} range:{#p}-{#p} size:{}", mapping->object->handle, heap_range.base, heap_range.base + heap_range.size - 1, heap_range.size);
+            log$("\t  ->  id:{} range:{#p}-{#p} size:{}", mapping->object->id, heap_range.base, heap_range.base + heap_range.size - 1, heap_range.size);
         }
         else
         {
             PmmRange pmm_range = mapping->object->pmm;
-            log$("\t  ->  handle:{} range:{#p}-{#p} size:{}", mapping->object->handle, pmm_range.base, pmm_range.base + pmm_range.size - 1, pmm_range.size);
+            log$("\t  ->  id:{} range:{#p}-{#p} size:{}", mapping->object->id, pmm_range.base, pmm_range.base + pmm_range.size - 1, pmm_range.size);
         }
     }
 }

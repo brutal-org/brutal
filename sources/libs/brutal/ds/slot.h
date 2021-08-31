@@ -54,10 +54,13 @@ void slot_release_impl(SlotImpl *impl, SlotIndex index);
     impl$(self)->capacity
 
 #define slot_used(self, index) \
-    ({ (self)->used[index]; })
+    (self)->used[index]
 
 #define slot_at(self, index) \
-    ({ &(self)->data[index]; })
+    (self)->data[index]
+
+#define slot_count(self) \
+    impl$(self)->capacity
 
 #define slot_foreach(v, self)                                        \
     if ((self)->impl.capacity > 0)                                   \
