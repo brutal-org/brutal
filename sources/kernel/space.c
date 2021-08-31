@@ -58,7 +58,7 @@ Space *space_create(BrSpaceFlags flags)
     vec_init(&self->mappings, alloc_global());
 
     range_alloc_init(&self->alloc, alloc_global());
-    range_alloc_unused(&self->alloc, (USizeRange){0x400000, 0x7fffffffffff});
+    range_alloc_unused(&self->alloc, (USizeRange){0x400000, 0x800000000000});
 
     object_init(base$(self), BR_OBJECT_SPACE, (ObjectDtor *)space_destroy);
 
@@ -114,14 +114,17 @@ SpaceResult space_map(Space *self, MemObj *mem_obj, size_t offset, size_t size, 
     memory_mapping_create(self, mem_obj, offset, range);
 
     log$("MAP({#x}, {})", range.base, range.size);
+    space_dump(self);
 
     return OK(SpaceResult, range);
 }
 
 SpaceResult space_unmap(Space *self, VmmRange range)
 {
-    log$("UNMAP({#x}, {})", range.base, range.size);
     LOCK_RETAINER(&self->lock);
+
+    log$("UNMAP({#x}, {})", range.base, range.size);
+    space_dump(self);
 
     vec_foreach(mapping, &self->mappings)
     {
@@ -139,8 +142,6 @@ SpaceResult space_unmap(Space *self, VmmRange range)
 
 void space_dump(Space *self)
 {
-    LOCK_RETAINER(&self->lock);
-
     log$("MemorySpace({})", self->id);
 
     vec_foreach(mapping, &self->mappings)

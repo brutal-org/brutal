@@ -36,7 +36,7 @@ void slot_acquire_impl(SlotImpl *impl, size_t index);
 void slot_release_impl(SlotImpl *impl, SlotIndex index);
 
 #define slot_init(self, alloc) \
-    slot_init_impl(impl$(self), sizeof(&(self)->data), (alloc))
+    slot_init_impl(impl$(self), sizeof(*(self)->data), (alloc))
 
 #define slot_deinit(self) \
     slot_deinit_impl(impl$(self))

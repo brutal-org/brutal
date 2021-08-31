@@ -13,7 +13,7 @@ typedef void (*entry_point_func)(Handover *handover, uint64_t t) __attribute__((
 
 void __chkstk() { return; }
 
-char *logo[] = {
+static char const *logo[] = {
     "/yyyyo:yyyys  `:osys/.",
     "  -hMMd .yMMN oNMMNmMMMh.",
     "   -hd   .yNyMMy.  `+MMm`",

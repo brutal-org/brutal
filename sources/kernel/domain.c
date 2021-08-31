@@ -78,7 +78,7 @@ Object *domain_lookup(Domain *self, BrHandle handle, BrObjectType type)
         return nullptr;
     }
 
-    object_deref(slot_at(&self->objects, handle));
+    object_ref(slot_at(&self->objects, handle));
 
     return slot_at(&self->objects, handle);
 }

@@ -15,7 +15,7 @@ void range_alloc_used(RangeAlloc *self, USizeRange range)
 {
     for (int i = 0; i < self->length; i++)
     {
-        auto curr = self->data[i];
+        USizeRange curr = self->data[i];
 
         if (range_eq(curr, range))
         {
@@ -25,8 +25,8 @@ void range_alloc_used(RangeAlloc *self, USizeRange range)
 
         if (range_colide(curr, range))
         {
-            auto lower_half = range_half_under(curr, range);
-            auto upper_half = range_half_over(curr, range);
+            USizeRange lower_half = range_half_under(curr, range);
+            USizeRange upper_half = range_half_over(curr, range);
 
             if (lower_half.size != 0)
             {
@@ -51,7 +51,7 @@ USizeRange range_alloc_alloc(RangeAlloc *self, size_t size)
     {
         if (self->data[i].size == size)
         {
-            auto result = self->data[i];
+            USizeRange result = self->data[i];
 
             vec_splice(self, i, 1);
 
@@ -60,7 +60,7 @@ USizeRange range_alloc_alloc(RangeAlloc *self, size_t size)
 
         if (self->data[i].size > size)
         {
-            auto result = (USizeRange){self->data[i].base, size};
+            USizeRange result = {self->data[i].base, size};
 
             self->data[i].base += size;
             self->data[i].size -= size;

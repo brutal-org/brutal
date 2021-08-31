@@ -1,7 +1,6 @@
 #include <brutal/base.h>
 #include <brutal/host/log.h>
 #include <errno.h>
-#include <execinfo.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -41,30 +40,7 @@ IoWriter *host_log_writer(void)
     return &log;
 }
 
-void host_log_backtrace(void)
-{
-    void *array[256];
-
-    int size = backtrace(array, 256);
-    char **strings = backtrace_symbols(array, size);
-
-    if (strings != NULL)
-    {
-
-        fprintf(stderr, "Obtained %d stack frames.\n", size);
-        for (int i = 0; i < size; i++)
-        {
-            fprintf(stderr, "%s\n", strings[i]);
-        }
-
-        fflush(stderr);
-    }
-
-    free(strings);
-}
-
 void host_log_panic(void)
 {
-    host_log_backtrace();
     abort();
 }

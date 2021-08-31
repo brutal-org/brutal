@@ -9,8 +9,8 @@ void slot_capacity_impl(SlotImpl *impl, int new_capacity)
         return;
     }
 
-    auto new_data = alloc_calloc(impl->alloc, impl->data_size, new_capacity);
-    auto new_used = alloc_make_array(impl->alloc, bool, new_capacity);
+    void *new_data = alloc_calloc(impl->alloc, impl->data_size, new_capacity);
+    void *new_used = alloc_make_array(impl->alloc, bool, new_capacity);
 
     if (impl->data)
     {
