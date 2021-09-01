@@ -1,15 +1,17 @@
 BUILDDIR_HOST=$(BUILDDIR)/host
 
 LIBS_HOST_SRC = \
-	$(wildcard sources/host/linux/*.c)    		      \
+	$(wildcard sources/host/linux/*.c)    \
 	$(wildcard sources/host/linux/$(CONFIG_ARCH)/*.s) \
 	$(wildcard sources/host/linux/$(CONFIG_ARCH)/*.c) \
-	$(wildcard sources/libs/brutal/*.c)               \
-	$(wildcard sources/libs/brutal/*/*.c)             \
-	$(wildcard sources/libs/cc/*.c)                   \
-	$(wildcard sources/libs/json/*.c)                 \
-	$(wildcard sources/libs/elf/*.c)                  \
-	$(wildcard sources/libs/handover/*.c)             \
+	$(wildcard sources/host/sysv/$(CONFIG_ARCH)/*.s) \
+	$(wildcard sources/host/sysv/$(CONFIG_ARCH)/*.c) \
+	$(wildcard sources/libs/brutal/*.c)   \
+	$(wildcard sources/libs/brutal/*/*.c) \
+	$(wildcard sources/libs/cc/*.c)       \
+	$(wildcard sources/libs/json/*.c)     \
+	$(wildcard sources/libs/elf/*.c)      \
+	$(wildcard sources/libs/handover/*.c) \
 	$(wildcard sources/libs/bid/*.c)
 
 LIBS_HOST_OBJ = \
@@ -56,14 +58,14 @@ endef
 
 $(foreach bin, $(HOST_BINS), $(eval $(call HOST_TEMPLATE,$(bin))))
 
+.PHONY: run-bid
 run-bid: $(BID_HOST_BIN)
 	$(BID_HOST_BIN) sources/libs/proto/exemple.bid sources/libs/proto/exemple.h
 
+.PHONY: run-cc
 run-cc: $(CC_HOST_BIN)
 	$(CC_HOST_BIN) sources/bins/test.c
 
+.PHONY: run-test
 run-test: $(TEST_HOST_BIN)
 	cd $(BUILDDIR_HOST); ./test
-
-
-

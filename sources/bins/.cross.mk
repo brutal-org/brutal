@@ -4,6 +4,8 @@ LIBS_SRC = \
 	$(wildcard sources/host/brutal/*.c)   \
 	$(wildcard sources/host/brutal/$(CONFIG_ARCH)/*.s) \
 	$(wildcard sources/host/brutal/$(CONFIG_ARCH)/*.c) \
+	$(wildcard sources/host/sysv/$(CONFIG_ARCH)/*.s)   \
+	$(wildcard sources/host/sysv/$(CONFIG_ARCH)/*.c)   \
 	$(wildcard sources/libs/ansi/*.c)     \
 	$(wildcard sources/libs/brutal/*.c)   \
 	$(wildcard sources/libs/brutal/*/*.c) \

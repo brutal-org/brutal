@@ -48,7 +48,7 @@ LOADER_SRCS = $(wildcard sources/loader/*.c)
 
 LOADER_OBJS = \
 	$(patsubst sources/%.c, $(BUILDDIR_LOADER)/%.c.o, $(LOADER_SRCS)) \
-	$(patsubst sources/%.c, $(BUILDDIR_LOADER)/%.c.o, $(LOADER_LIBS_SRC)) \
+	$(patsubst sources/%.c, $(BUILDDIR_LOADER)/%.c.o, $(LOADER_LIBS_SRC))
 
 LOADER=$(BUILDDIR_LOADER)/BOOTX64.EFI
 

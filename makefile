@@ -43,12 +43,12 @@ include meta/config/default.mk
 include meta/toolchain/$(CONFIG_TOOLCHAIN)/.build.mk
 
 include sources/kernel/.build.mk
-include sources/libs/.build.mk
-include sources/bins/.cross.mk
 include sources/bins/.host.mk
+include sources/bins/.cross.mk
 include sources/loader/.build.mk
 include sysroot/.build.mk
 
+.PHONY: all
 all: $(ISO)
 
 run: $(ISO)
@@ -63,9 +63,11 @@ run: $(ISO)
 		-no-shutdown \
 		-cdrom $(ISO)
 
+.PHONY: bochs
 bochs: $(ISO)
 	bochs
 
+.PHONY: clean
 clean:
 	rm -rf build/
 
