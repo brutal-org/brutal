@@ -12,7 +12,7 @@ struct print_value print_val_unsigned(unsigned long long val)
     return (struct print_value){nullstr, PRINT_UNSIGNED, {._unsigned = val}};
 }
 
-struct print_value print_val_cstring(char *val)
+struct print_value print_val_cstring(char const *val)
 {
     return (struct print_value){nullstr, PRINT_STRING, {._string = str$(val)}};
 }

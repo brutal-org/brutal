@@ -20,17 +20,17 @@ LIBS_HOST_OBJ = \
 LIBS_HOST_BIN=$(BUILDDIR_HOST)/libbrutal.a
 
 $(BUILDDIR_HOST)/%.c.o: sources/%.c
-	@echo -e "\e[37m[host]   \e[92mCC\e[m" $<
+	$(ECHO) "\e[37mhost   \e[92mCC\e[m" $<
 	@$(MKCWD)
 	@$(HOST_CC) -c -o $@ $^ $(HOST_CFLAGS)
 
 $(BUILDDIR_HOST)/%.s.o: sources/%.s
-	@echo -e "\e[37m[host]   \e[92mAS\e[m" $<
+	$(ECHO) "\e[37mhost   \e[92mAS\e[m" $<
 	@$(MKCWD)
 	@$(CROSS_AS) -o $@ $^ $(CROSS_ASFLAGS)
 
 $(LIBS_HOST_BIN): $(LIBS_HOST_OBJ)
-	@echo -e "\e[37m[host]   \e[92mAR\e[m" $@
+	$(ECHO) "\e[37mhost   \e[92mAR\e[m" $@
 	@$(MKCWD)
 	@$(HOST_AR) $(HOST_ARFLAGS) $@ $^
 
@@ -50,7 +50,7 @@ $(1)_HOST_BIN  = $(BUILDDIR_HOST)/$($(1)_NAME)
 DEPENDENCIES += $$($(1)_OBJ:.o=.d)
 
 $$($(1)_HOST_BIN): $$($(1)_HOST_OBJ) $(LIBS_HOST_BIN)
-	@echo -e "\e[37m[host]   \e[92mLD\e[m" $$@
+	$$(ECHO) "\e[37mhost   \e[92mLD\e[m" $$@
 	@$$(MKCWD)
 	$(HOST_CC) -o $$@ $$^ $(HOST_LDFLAGS) $(HOST_CFLAGS)
 

@@ -42,7 +42,7 @@ struct print_value print_val_unsigned(unsigned long long);
 
 struct print_value print_val_string(Str);
 
-struct print_value print_val_cstring(char *);
+struct print_value print_val_cstring(char const *);
 
 struct print_value print_val_char(char);
 
@@ -64,6 +64,7 @@ struct print_value print_val_pointer(void *);
         unsigned long: print_val_unsigned,      \
 	    unsigned long long: print_val_unsigned, \
         char*: print_val_cstring,               \
+        char const*: print_val_cstring,               \
         char: print_val_char,                   \
         Str: print_val_string,                  \
         void*: print_val_pointer                \

@@ -2,7 +2,7 @@ CC = clang
 LD = ld.lld
 
 KERNEL_CFLAGS := \
-	-D__brutal__ -I../../libs -ffreestanding -MMD -mno-red-zone -std=gnu2x \
+	-D__brutal__ -I../../libs -I../.. -ffreestanding -MMD -mno-red-zone -std=gnu2x \
 	-target x86_64-unknown-gnu -Wall -Werror
 
 KERNEL_LDFLAGS := -e kmain -T ./link.ld

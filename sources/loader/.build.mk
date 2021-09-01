@@ -4,7 +4,12 @@ LOADER_LD = clang-12
 BUILDDIR_LOADER=build/loader
 
 LOADER_CFLAGS= \
-	$(CROSS_CFLAGS) \
+	-MD \
+	$(CFLAGS_STD) \
+	$(CFLAGS_OPT) \
+	$(CFLAGS_WARN) \
+	$(CROSS_CFLAGS_INC) \
+	-ffreestanding \
 	-D__x86_64__ \
 	-D__efi__ \
 	-target x86_64-unknown-windows \

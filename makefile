@@ -2,6 +2,22 @@
 .DEFAULT_GOAL := all
 export LC_ALL=C
 
+ifneq ($(words $(MAKECMDGOALS)),1)
+%:
+        @$(MAKE) $@ --no-print-directory -rRf $(firstword $(MAKEFILE_LIST))
+else
+ifndef ECHO
+T := $(shell $(MAKE) $(MAKECMDGOALS) --no-print-directory \
+      -nrRf $(firstword $(MAKEFILE_LIST)) \
+      ECHO="COUNTTHIS" | grep -c "COUNTTHIS")
+
+N := x
+C = $(words $N)$(eval N := x $N)
+
+ECHO = @echo -e "`printf "\e[1m %3d%%\e[m" $$(expr $C '*' 100 / $T)`"
+endif
+endif
+
 CFLAGS_STD ?= \
 	-std=gnu2x
 
@@ -43,8 +59,8 @@ include meta/config/default.mk
 include meta/toolchain/$(CONFIG_TOOLCHAIN)/.build.mk
 
 include sources/kernel/.build.mk
-include sources/bins/.host.mk
 include sources/bins/.cross.mk
+include sources/bins/.host.mk
 include sources/loader/.build.mk
 include sysroot/.build.mk
 
