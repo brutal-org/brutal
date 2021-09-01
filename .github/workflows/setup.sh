@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 # We need clang 12
 # https://apt.llvm.org/
 bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"

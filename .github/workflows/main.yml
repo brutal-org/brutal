@@ -8,16 +8,18 @@ on:
 
 
 jobs:
-  
-  dependencies-setup:
+  dump-toolchain:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
       - name: Install dependencies
         run: .github/workflows/setup.sh
 
-  toolchain-setup:
-    needs: dependencies-setup
+      - name: Dump dependencies
+        run: .github/workflows/dump.sh
+
+  build-toolchain:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -25,6 +27,10 @@ jobs:
         toolchain: [gnu, llvm]
     steps:
       - uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: .github/workflows/setup.sh
+
       - name: Cache Toolchain (${{matrix.toolchain}})
         uses: actions/cache@v2
         env:
@@ -33,16 +39,16 @@ jobs:
           path: |
             **/meta/toolchain/${{matrix.toolchain}}/local
           key: |
-            v3-${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/meta/toolchain/${{matrix.toolchain}}/build.sh') }}
+            ${{ runner.os }}-${{matrix.toolchain}}-${{ hashFiles('**/meta/toolchain/${{matrix.toolchain}}/build.sh') }}
           restore-keys: |
-            v3-${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/meta/toolchain/${{matrix.toolchain}}/build.sh') }}
+            ${{ runner.os }}-${{matrix.toolchain}}-${{ hashFiles('**/meta/toolchain/${{matrix.toolchain}}/build.sh') }}
 
       - name: Build Toolchain
         run: |
           meta/toolchain/${{matrix.toolchain}}/build.sh
-  
-  kernel:
-    needs: toolchain-setup
+
+  build-system:
+    needs: build-toolchain
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -50,21 +56,40 @@ jobs:
         toolchain: [gnu, llvm]
     steps:
       - uses: actions/checkout@v2
-      - name: Build Kernel
+
+      - name: Install dependencies
+        run: .github/workflows/setup.sh
+
+      - name: Cache Toolchain (${{matrix.toolchain}})
+        uses: actions/cache@v2
+        env:
+          cache-name: cached-cross-compiler
+        with:
+          path: |
+            **/meta/toolchain/${{matrix.toolchain}}/local
+          key: |
+            ${{ runner.os }}-${{matrix.toolchain}}-${{ hashFiles('**/meta/toolchain/${{matrix.toolchain}}/build.sh') }}
+          restore-keys: |
+            ${{ runner.os }}-${{matrix.toolchain}}-${{ hashFiles('**/meta/toolchain/${{matrix.toolchain}}/build.sh') }}
+
+      - name: Build System
         run: |
           make CONFIG_TOOLCHAIN=${{matrix.toolchain}} all
 
-  loader: 
-    needs: toolchain-setup
+  build-loader:
+    needs: build-toolchain
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: .github/workflows/setup.sh
+
       - name: Build Loader
         run: |
           make loader
 
-  tests:
-    needs: dependencies-setup
+  build-tests:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -72,12 +97,15 @@ jobs:
         toolchain: [gnu, llvm]
     steps:
       - uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: .github/workflows/setup.sh
+
       - name: Run Tests
         run: |
           make CONFIG_TOOLCHAIN=${{matrix.toolchain}} run-test
 
-  bid:
-    needs: dependencies-setup
+  build-bid:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -85,6 +113,10 @@ jobs:
         toolchain: [gnu, llvm]
     steps:
       - uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: .github/workflows/setup.sh
+
       - name: Run BID
         run: |
           make CONFIG_TOOLCHAIN=${{matrix.toolchain}} run-bid
@@ -93,6 +125,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: .github/workflows/setup.sh
+
     - uses: DoozyX/clang-format-lint-action@v0.12
       with:
         source: '.'
