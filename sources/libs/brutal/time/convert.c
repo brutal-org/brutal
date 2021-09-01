@@ -17,15 +17,14 @@ Date timestamp_to_date(TimeStamp timestamp)
 
     date.month = 0;
 
-    while (days - DAYS_PER_MONTH[is_leap_year(date.year)][date.month] > 0)
+    while (days - DAYS_PER_MONTH[is_leap_year(date.year)][date.month] >= 0)
     {
         days -= DAYS_PER_MONTH[is_leap_year(date.year)][date.month];
         date.month++;
     }
 
-    date.month++;
-
     date.day = days + 1;
+    date.month++;
 
     return date;
 }

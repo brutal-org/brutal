@@ -77,6 +77,7 @@ run: $(ISO)
 		-serial mon:stdio \
 		-no-reboot \
 		-no-shutdown \
+		-rtc base=localtime \
 		-cdrom $(ISO)
 
 .PHONY: bochs
