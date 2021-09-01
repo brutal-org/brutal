@@ -78,13 +78,11 @@ $(BUILDDIR_LOADER)/tools/OVMF.fd:
 
 loader: $(LOADER)
 
-run-loader: $(LOADER) $(BUILDDIR_LOADER)/tools/OVMF.fd
-	$(MAKE) -C sources/loader/test clean
-	$(MAKE) -C sources/loader/test
+run-loader: $(LOADER) $(KERNEL) $(BUILDDIR_LOADER)/tools/OVMF.fd
 
 	mkdir -p $(BUILDDIR_LOADER)/image/EFI/BOOT/
-	cp sources/loader/test/kernel.elf $(BUILDDIR_LOADER)/image/
-	cp sources/loader/test/config.json $(BUILDDIR_LOADER)/image/
+	cp $(KERNEL) $(BUILDDIR_LOADER)/image/kernel.elf
+	cp sources/loader/config.json $(BUILDDIR_LOADER)/image/config.json
 	cp $(LOADER) $(BUILDDIR_LOADER)/image/EFI/BOOT/BOOTX64.EFI
 
 	qemu-system-x86_64 \
