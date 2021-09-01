@@ -33,7 +33,7 @@ LOADER_LIBS_SRC = \
 	$(wildcard sources/libs/brutal/alloc/*.c)	    \
 	$(wildcard sources/libs/brutal/ds/*.c) 		    \
 	$(wildcard sources/libs/brutal/hash/*.c)	    \
-	$(wildcard sources/libs/brutal/host/efi/*.c)	\
+	$(wildcard sources/host/efi/*.c)	\
 	$(wildcard sources/libs/brutal/log/*.c)         \
 	$(wildcard sources/libs/brutal/mem/*.c)         \
 	$(wildcard sources/libs/brutal/text/*.c)        \
@@ -50,7 +50,7 @@ LOADER_OBJS = \
 	$(patsubst sources/%.c, $(BUILDDIR_LOADER)/%.c.o, $(LOADER_SRCS)) \
 	$(patsubst sources/%.c, $(BUILDDIR_LOADER)/%.c.o, $(LOADER_LIBS_SRC)) \
 
-LOADER=$(BUILDDIR_CROSS)/BOOTX64.EFI
+LOADER=$(BUILDDIR_LOADER)/BOOTX64.EFI
 
 $(LOADER): $(LOADER_OBJS)
 	$(MKCWD)

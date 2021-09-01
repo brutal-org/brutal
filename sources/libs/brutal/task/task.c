@@ -1,5 +1,5 @@
-#include <brutal/host/task.h>
 #include <brutal/task/task.h>
+#include <host/task.h>
 
 static bool task_initialized = false;
 static struct task task;

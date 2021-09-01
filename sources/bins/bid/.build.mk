@@ -1,0 +1,3 @@
+BID_NAME = bid
+
+HOST_BINS += BID

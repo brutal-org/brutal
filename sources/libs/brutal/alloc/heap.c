@@ -1,6 +1,6 @@
 #include <brutal/alloc/heap.h>
-#include <brutal/host/mem.h>
 #include <brutal/log.h>
+#include <host/mem.h>
 
 #define ALLOC_HEAP_ALIGN (64)
 #define ALLOC_HEAP_REQUEST (16)

@@ -2,8 +2,8 @@
 
 #include <brutal/base.h>
 /* --- */
-#include <brutal/host/io.h>
-#include <brutal/host/log.h>
-#include <brutal/host/mem.h>
-#include <brutal/host/task.h>
-#include <brutal/host/time.h>
+#include <host/io.h>
+#include <host/log.h>
+#include <host/mem.h>
+#include <host/task.h>
+#include <host/time.h>

@@ -25,29 +25,28 @@ INC_LIBBRUTAL= \
 
 HOST_CFLAGS_INC ?= \
 	$(INC_LIBBRUTAL) \
+	-Isources/bins \
 	-Isources/ \
 	-Ithirdparty
 
 CROSS_CFLAGS_INC ?= \
 	$(INC_LIBS) \
 	$(INC_LIBBRUTAL) \
+	-Isources/bins \
 	-Isources/ \
 	-Ithirdparty
 
 BUILDDIR=build/$(CONFIG_ARCH)-$(CONFIG_TOOLCHAIN)
-BUILDDIR_HOST=$(BUILDDIR)/host
-BUILDDIR_CROSS=$(BUILDDIR)/cross
 MKCWD=mkdir -p $(@D)
 
 include meta/config/default.mk
 include meta/toolchain/$(CONFIG_TOOLCHAIN)/.build.mk
 
-include sources/archs/.build.mk
 include sources/kernel/.build.mk
 include sources/libs/.build.mk
-include sources/bins/.build.mk
+include sources/bins/.cross.mk
+include sources/bins/.host.mk
 include sources/loader/.build.mk
-include sources/tests/.build.mk
 include sysroot/.build.mk
 
 all: $(ISO)

@@ -1,3 +1,3 @@
 POSIX_NAME = posix
 
-BINS += POSIX
+CROSS_BINS += POSIX

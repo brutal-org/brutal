@@ -1,0 +1,3 @@
+CC_NAME = cc
+
+HOST_BINS += CC

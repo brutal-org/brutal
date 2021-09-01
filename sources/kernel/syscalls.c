@@ -1,5 +1,5 @@
-#include <brutal/host/log.h>
 #include <brutal/log.h>
+#include <host/log.h>
 #include <syscalls/syscalls.h>
 #include "kernel/domain.h"
 #include "kernel/global.h"

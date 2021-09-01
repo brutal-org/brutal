@@ -1,5 +1,5 @@
-#include <brutal/host/log.h>
 #include <brutal/log.h>
+#include <host/log.h>
 
 #ifdef __kernel__
 #    include "kernel/cpu.h"

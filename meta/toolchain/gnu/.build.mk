@@ -55,12 +55,12 @@ CROSS_UCFLAGS= \
 
 CROSS_LD=$(CONFIG_ARCH)-elf-ld
 CROSS_KLDFLAGS= \
-	-Tsources/archs/$(CONFIG_ARCH)/kernel.ld \
+	-Tsources/host/kernel/$(CONFIG_ARCH)/link.ld \
 	-z max-page-size=0x1000
 
 CROSS_ULDFLAGS= \
-	-Tsources/archs/$(CONFIG_ARCH)/userspace.ld \
+	-Tsources/host/brutal/$(CONFIG_ARCH)/link.ld \
 	-z max-page-size=0x1000
 
 CROSS_AR=$(CONFIG_ARCH)-elf-ar
-CROSS_ARFLAGS=rcsv
+CROSS_ARFLAGS=rcs

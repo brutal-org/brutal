@@ -1,3 +1,3 @@
 ECHO_NAME = echo
 
-BINS += ECHO
+CROSS_BINS += ECHO

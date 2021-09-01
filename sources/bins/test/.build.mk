@@ -1,0 +1,3 @@
+TEST_NAME = test
+
+HOST_BINS += TEST

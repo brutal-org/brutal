@@ -1,7 +1,8 @@
 -std=gnu2x
 -Isources/
+-Isources/bins
+-Isources/libs
 -Isources/libs/ansi
 -Isources/libs/posix
 -Isources/libs/gnu
 -Isources/libs/bsd
--Isources/libs

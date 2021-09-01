@@ -1,6 +1,6 @@
 LIMINE=thirdparty/limine/limine-install
-SYSROOT=$(BUILDDIR_CROSS)/sysroot
-ISO=$(BUILDDIR_CROSS)/sysroot.iso
+SYSROOT=$(BUILDDIR)/sysroot
+ISO=$(BUILDDIR)/sysroot.iso
 
 $(LIMINE):
 	make -C thirdparty/limine all

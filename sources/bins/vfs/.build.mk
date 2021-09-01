@@ -1,3 +1,3 @@
 VFS_NAME = vfs
 
-BINS += VFS
+CROSS_BINS += VFS

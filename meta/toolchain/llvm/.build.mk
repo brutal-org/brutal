@@ -11,7 +11,9 @@ HOST_CFLAGS= \
 	$(CFLAGS_STD) \
 	$(CFLAGS_OPT) \
 	$(CFLAGS_WARN) \
-	$(HOST_CFLAGS_INC)
+	$(HOST_CFLAGS_INC) \
+	-fsanitize=address \
+	-fsanitize=undefined
 
 HOST_LD=ld
 HOST_LDFLAGS=
@@ -53,12 +55,12 @@ CROSS_UCFLAGS= \
 
 CROSS_LD=ld.lld
 CROSS_KLDFLAGS= \
-	-Tsources/archs/$(CONFIG_ARCH)/kernel.ld \
+	-Tsources/host/kernel/$(CONFIG_ARCH)/link.ld \
 	-z max-page-size=0x1000
 
 CROSS_ULDFLAGS= \
-	-Tsources/archs/$(CONFIG_ARCH)/userspace.ld \
+	-Tsources/host/brutal/$(CONFIG_ARCH)/link.ld \
 	-z max-page-size=0x1000
 
 CROSS_AR=ar
-CROSS_ARFLAGS=rcsv
+CROSS_ARFLAGS=rcs

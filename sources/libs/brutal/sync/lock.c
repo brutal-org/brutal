@@ -1,5 +1,5 @@
-#include <brutal/host/sync.h>
 #include <brutal/sync/lock.h>
+#include <host/sync.h>
 
 static bool lock_try_acquire_impl(Lock *lock)
 {

@@ -1,9 +1,9 @@
-#include "loader/memory.h"
-#include <brutal/host/mem.h>
 #include <brutal/log.h>
 #include <brutal/mem.h>
 #include <efi/lib.h>
 #include <efi/srvs/bs.h>
+#include <host/mem.h>
+#include "loader/memory.h"
 
 static Pages *pages;
 
