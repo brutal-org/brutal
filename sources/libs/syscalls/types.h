@@ -240,15 +240,6 @@ typedef uint32_t BrCap;
 
 typedef struct
 {
-    uintptr_t arg1;
-    uintptr_t arg2;
-    uintptr_t arg3;
-    uintptr_t arg4;
-    uintptr_t arg5;
-} BrTaskArgs;
-
-typedef struct
-{
     Tick tick;
     TimeStamp time;
 } BrGlobalInfo;
@@ -259,9 +250,21 @@ typedef struct
     StrFix128 name;
 } BrLocalInfo;
 
+typedef enum
+{
+    BR_START_INVALID,
+    BR_START_CMAIN,
+    BR_START_ARGS,
+    BR_START_HANDOVER,
+} BrStartType;
+
 typedef struct
 {
-    BrGlobalInfo *global_info;
-    BrLocalInfo *local_info;
-    BrTaskArgs args;
-} BrStartInfo;
+    BrStartType type;
+
+    uintptr_t arg1;
+    uintptr_t arg2;
+    uintptr_t arg3;
+    uintptr_t arg4;
+    uintptr_t arg5;
+} BrTaskArgs;

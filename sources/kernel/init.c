@@ -115,7 +115,14 @@ void init_start(Handover const *handover)
     task_ref(task);
     init_task = task;
 
-    sched_start(task, elf_header->entry, USER_STACK_BASE, (BrTaskArgs){.arg1 = hoaddr});
+    sched_start(
+        task,
+        elf_header->entry,
+        USER_STACK_BASE,
+        (BrTaskArgs){
+            .type = BR_START_HANDOVER,
+            .arg1 = hoaddr,
+        });
 
     task_deref(task);
     mem_obj_deref(elf_obj);

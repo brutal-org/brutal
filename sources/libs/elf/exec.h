@@ -5,4 +5,3 @@
 
 void elf_load(BrSpace space, Elf64Header const *elf_header, BrMemObj elf_obj);
 
-BrTask elf_exec(BrMemObj elf_obj, Str name);

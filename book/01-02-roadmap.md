@@ -38,7 +38,7 @@
 ## Milestone 3 - ACPI, PCIe, VirtIO
 
 - [X] Fibers
-- [ ] Event loop
+- [x] Event loop
 - [X] IRQ routing to userspace
 - [ ] ACPI Server
   - [ ] MCFG

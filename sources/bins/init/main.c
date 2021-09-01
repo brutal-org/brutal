@@ -3,6 +3,7 @@
 #include <brutal/log.h>
 #include <elf/exec.h>
 #include <handover/handover.h>
+#include <syscalls/exec.h>
 #include <syscalls/helpers.h>
 #include <syscalls/syscalls.h>
 
@@ -96,7 +97,7 @@ static void display_bootimage(Handover const *handover)
                  }) == BR_SUCCESS);
 }
 
-BrTask srv_run(Handover const *handover, Str name)
+BrResult srv_run(Handover const *handover, Str name, BrExecArgs const *args, BrTaskInfos *infos)
 {
     HandoverModule const *elf = handover_find_module(handover, name);
 
@@ -113,16 +114,16 @@ BrTask srv_run(Handover const *handover, Str name)
 
     assert_truth(br_create(&elf_obj) == BR_SUCCESS);
 
-    BrTask task_handle = elf_exec(elf_obj.handle, name);
+    BrResult result = br_exec(elf_obj.handle, name, args, infos);
 
     brh_close(elf_obj.handle);
 
     log$("Service '{}' created!", name);
 
-    return task_handle;
+    return result;
 }
 
-int br_entry(Handover const *handover)
+int br_entry_handover(Handover *handover)
 {
     log$("Handover at {#p}", (void *)handover);
 
@@ -133,27 +134,41 @@ int br_entry(Handover const *handover)
         display_bootimage(handover);
     }
 
-    srv_run(handover, str$("posix"));
-    BrTask echo_srv = srv_run(handover, str$("echo"));
+    BrTaskInfos posix_server = {};
+    srv_run(
+        handover,
+        str$("posix"),
+        &(BrExecArgs){
+            .type = BR_START_CMAIN,
+            .cmain = {
+                .argc = 5,
+                .argv = (Str[]){
+                    str$("Hello"),
+                    str$("world"),
+                    str$("my"),
+                    str$("friend"),
+                    str$(":^)"),
+                },
+            },
+        },
+        &posix_server);
+    /*
+    BrTaskInfos echo_server = {};
+    srv_run(
+        handover,
+        str$("echo"),
+        &(BrExecArgs){
+            .type = BR_START_ARGS,
+        },
+        &echo_server);
+        */
 
     while (true)
     {
         br_ipc(&(BrIpcArgs){
-            .to = echo_srv,
-            .flags = BR_IPC_SEND | BR_IPC_RECV | BR_IPC_BLOCK,
+            .flags = BR_IPC_RECV | BR_IPC_BLOCK,
             .deadline = BR_DEADLINE_INFINITY,
-            .msg = {
-                .arg = {
-                    0x1,
-                    0x2,
-                    0x3,
-                    0x4,
-                    0x5,
-                },
-            },
         });
-
-        log$("Got message");
     }
 
     return 0;
