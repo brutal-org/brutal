@@ -1,3 +1,5 @@
+#include <acpi/hpet.h>
+#include <acpi/rsdt.h>
 #include <brutal/log.h>
 #include <brutal/mem.h>
 #include "brutal/mem/volatile.h"
@@ -17,15 +19,15 @@ uint64_t hpet_read(uintptr_t reg)
     return volatile_read64(reg + hpet_base);
 }
 
-void hpet_initialize(Handover *handover)
+void hpet_initialize(Acpi *acpi)
 {
-    struct acpi_hpet *hpet_table = acpi_find_hpet(handover->rsdp);
+    AcpiHpet *hpet_table = (AcpiHpet *)acpi_rsdt_lookup_first(acpi, ACPI_HPET_SIG);
+
     hpet_base = mmap_phys_to_io(hpet_table->address);
 
     if (hpet_table->address_space_id == HPET_ADDRESS_SPACE_IO)
     {
-        log$("hpet address io id is not supported");
-        return;
+        panic$("Unsupported Hpet address space");
     }
 
     hpet_clock = hpet_read(HPET_GENERAL_CAPABILITIES) >> HPET_CAP_COUNTER_CLOCK_OFFSET;

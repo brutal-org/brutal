@@ -1,7 +1,6 @@
 #pragma once
 
 #include <handover/handover.h>
-#include "kernel/x86_64/acpi.h"
 
 #define HPET_ADDRESS_SPACE_MEMORY 0
 #define HPET_ADDRESS_SPACE_IO 1
@@ -18,6 +17,6 @@ enum hpet_registers
     HPET_MAIN_COUNTER_VALUE = 240,
 };
 
-void hpet_initialize(Handover *handover);
+void hpet_initialize(Acpi *acpi);
 
 void hpet_sleep(int ms);

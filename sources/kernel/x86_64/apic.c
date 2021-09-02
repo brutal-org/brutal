@@ -1,7 +1,8 @@
+#include <acpi/madt.h>
+#include <acpi/rsdt.h>
 #include <brutal/log.h>
 #include <brutal/mem.h>
 #include "kernel/mmap.h"
-#include "kernel/x86_64/acpi.h"
 #include "kernel/x86_64/apic.h"
 #include "kernel/x86_64/asm.h"
 #include "kernel/x86_64/cpu.h"
@@ -80,74 +81,51 @@ void lapic_timer_initialize(void)
     lapic_write(LAPIC_REG_TIMER_INITCNT, tick_in_10ms / 10);
 }
 
-void lapic_initialize(Handover const *handover)
+static Iter lapic_iterate(AcpiMadtLapicRecord *lapic, MAYBE_UNUSED void *ctx)
 {
-    lapic_base = mmap_phys_to_io(acpi_find_lapic(handover->rsdp));
-    log$("Lapic found at {p}", lapic_base);
-
-    struct lapic_record_table lapics = acpi_find_lapic_table(handover->rsdp);
-
-    for (size_t i = 0; i < lapics.count; i++)
-    {
-        auto lapic = lapics.table[i];
-        cpu_found(lapic->processor_id, lapic->id);
-    }
+    cpu_found(lapic->processor_id, lapic->id);
+    return ITER_CONTINUE;
 }
 
 /* --- Ioapic --------------------------------------------------------------- */
 
-struct ioapic_record_table ioapic_table = {};
+typedef struct
+{
+    uintptr_t base;
+    uint32_t interrupt_base;
+    uint32_t max_redirect;
+} Ioapic;
+
+#define IOAPIC_MAX_COUNT (256)
+
+int _ioapic_count = 0;
+Ioapic _ioapic[IOAPIC_MAX_COUNT] = {};
 
 static inline uint32_t ioapic_read(int index, uint32_t reg)
 {
-    uintptr_t base = mmap_phys_to_io(ioapic_table.table[index]->address);
-
-    volatile_write32(base + IOAPIC_REG_OFFSET, reg);
-    return volatile_read32(base + IOAPIC_VALUE_OFFSET);
+    volatile_write32(_ioapic[index].base + IOAPIC_REG_OFFSET, reg);
+    return volatile_read32(_ioapic[index].base + IOAPIC_VALUE_OFFSET);
 }
 
 static inline void ioapic_write(int index, uint32_t reg, uint32_t value)
 {
-    uintptr_t base = mmap_phys_to_io(ioapic_table.table[index]->address);
-
-    volatile_write32(base + IOAPIC_REG_OFFSET, reg);
-    volatile_write32(base + IOAPIC_VALUE_OFFSET, value);
+    volatile_write32(_ioapic[index].base + IOAPIC_REG_OFFSET, reg);
+    volatile_write32(_ioapic[index].base + IOAPIC_VALUE_OFFSET, value);
 }
 
-struct ioapic_version ioapic_get_version(int index)
+IoapicVersion ioapic_version(int index)
 {
     uint32_t raw = ioapic_read(index, IOAPIC_REG_VERSION);
-
-    return union$(struct ioapic_version, raw);
+    return union$(IoapicVersion, raw);
 }
-
-void ioapic_initialize(Handover const *handover)
-{
-    ioapic_table = acpi_find_ioapic_table(handover->rsdp);
-
-    for (size_t i = 0; i < ioapic_table.count; i++)
-    {
-        auto ioapic = ioapic_table.table[i];
-
-        auto version = ioapic_get_version(i);
-
-        log$("Ioapic {} found:", i);
-        log$(" - Address: {#p}", ioapic->address);
-        log$(" - Interrupt base: {}", ioapic->interrupt_base);
-        log$(" - Version: {}", version.version);
-        log$(" - Max redirection: {}", version.max_redirect);
-    }
-}
-
-typedef Range(uint8_t) IoapicRange;
 
 static int ioapic_from_gsi(uint32_t interrupt_base)
 {
-    for (size_t i = 0; i < ioapic_table.count; i++)
+    for (int i = 0; i < _ioapic_count; i++)
     {
-        IoapicRange interrupt_range = {
-            .base = ioapic_table.table[i]->interrupt_base,
-            .size = ioapic_get_version(i).max_redirect,
+        U8Range interrupt_range = {
+            .base = _ioapic[i].interrupt_base,
+            .size = _ioapic[i].max_redirect,
         };
 
         if (range_contain(interrupt_range, interrupt_base))
@@ -168,7 +146,7 @@ static void ioapic_create_redirect(
 {
     int ioapic_target = ioapic_from_gsi(interrupt_base);
 
-    struct ioapic_redirect entry = {};
+    IoapicRedirect entry = {};
 
     entry.interrupt = interrupt_id;
 
@@ -189,54 +167,101 @@ static void ioapic_create_redirect(
 
     entry.destination = cpu_impl(cpu)->lapic;
 
-    uint32_t ioapic_table_interrupt_offset = interrupt_base - ioapic_table.table[ioapic_target]->interrupt_base;
+    uint32_t interrupt_offset = interrupt_base - _ioapic[ioapic_target].interrupt_base;
 
-    uint32_t target_io_offset = ioapic_table_interrupt_offset * 2;
+    uint32_t target_io_offset = interrupt_offset * 2;
 
     ioapic_write(ioapic_target, IOAPIC_REG_REDIRECT_BASE + target_io_offset, entry._low_byte);
     ioapic_write(ioapic_target, IOAPIC_REG_REDIRECT_BASE + target_io_offset + 1, entry._high_byte);
 }
 
-void ioapic_redirect_irq_to_cpu(CpuId id, uint8_t irq, bool enable, uintptr_t rsdp)
+typedef struct
 {
-    struct iso_record_table iso_table = acpi_find_iso_table(rsdp);
+    CpuId id;
+    uint8_t irq;
+    bool enable;
+} IrqRedirectCtx;
 
-    log$("- apic: setting ipi {#p} redirection for cpu: {}", irq, id);
-
-    for (size_t i = 0; i < iso_table.count; i++)
+Iter iso_iterate(AcpiMadtIsoRecord *record, IrqRedirectCtx *ctx)
+{
+    if (record->irq == ctx->irq)
     {
-        if (iso_table.table[i]->irq == irq)
-        {
-            log$("   - apic: using iso: {} with interrupt base: {}", i, iso_table.table[i]->interrupt_base);
+        log$("   - apic: using iso interrupt base: {}", record->gsi);
 
-            ioapic_create_redirect(iso_table.table[i]->irq + 0x20, iso_table.table[i]->interrupt_base, iso_table.table[i]->flags, id, enable);
+        ioapic_create_redirect(
+            record->irq + 0x20,
+            record->gsi,
+            record->flags,
+            ctx->id,
+            ctx->enable);
 
-            return;
-        }
+        return ITER_STOP;
+    }
+
+    return ITER_CONTINUE;
+}
+
+void ioapic_redirect_irq_to_cpu(Acpi *acpi, CpuId id, uint8_t irq, bool enable)
+{
+    log$(" - apic: setting ipi {#p} redirection for cpu: {}", irq, id);
+
+    IrqRedirectCtx ctx = {id, irq, enable};
+    Iter iter = acpi_madt_lookup(
+        acpi,
+        ACPI_MADT_RECORD_ISO,
+        (IterFn *)iso_iterate,
+        &ctx);
+
+    if (iter == ITER_STOP)
+    {
+        return;
     }
 
     ioapic_create_redirect(irq + 0x20, irq, 0, id, enable);
 }
 
-void ioapic_redirect_legacy_irq(Handover const *handover)
+void ioapic_redirect_legacy_irq(Acpi *acpi)
 {
     log$("IOApic: Setup irq redirection");
 
     for (size_t i = 0; i < 16; i++) // set interrupt 32 to 48
     {
-        ioapic_redirect_irq_to_cpu(lapic_current_cpu(), i, true, handover->rsdp);
+        ioapic_redirect_irq_to_cpu(acpi, lapic_current_cpu(), i, true);
     }
+}
+
+static Iter ioapic_iterate(AcpiMadtIoapicRecord *ioapic, MAYBE_UNUSED void *ctx)
+{
+    int index = _ioapic_count++;
+    _ioapic[index].base = mmap_phys_to_io(ioapic->address);
+    _ioapic[index].interrupt_base = ioapic->interrupt_base;
+    _ioapic[index].max_redirect = ioapic_version(index).max_redirect;
+
+    return ITER_CONTINUE;
 }
 
 /* --- Apic ----------------------------------------------------------------- */
 
-void apic_initalize(Handover const *handover)
+void apic_initalize(Acpi *acpi)
 {
-    lapic_initialize(handover);
-    ioapic_initialize(handover);
+    // Setup local apics
+    AcpiMadt *madt = (AcpiMadt *)acpi_rsdt_lookup_first(acpi, ACPI_MADT_SIG);
+    lapic_base = mmap_phys_to_io(madt->lapic);
+    acpi_madt_lookup(
+        acpi,
+        ACPI_MADT_RECORD_LAPIC,
+        (IterFn *)lapic_iterate,
+        nullptr);
+
+    // Setup io apics
+    acpi_madt_lookup(
+        acpi,
+        ACPI_MADT_RECORD_IOAPIC,
+        (IterFn *)ioapic_iterate,
+        nullptr);
 
     lapic_enable();
 
-    ioapic_redirect_legacy_irq(handover);
+    ioapic_redirect_legacy_irq(acpi);
     lapic_timer_initialize();
 }

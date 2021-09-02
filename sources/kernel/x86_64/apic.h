@@ -1,6 +1,6 @@
 #pragma once
 
-#include <handover/handover.h>
+#include <acpi/acpi.h>
 #include "kernel/cpu.h"
 
 /* --- LApic ---------------------------------------------------------------- */
@@ -82,52 +82,42 @@ enum ioapic_reg
     IOAPIC_REG_REDIRECT_BASE = 0x10,
 };
 
-struct PACKED ioapic_version
+typedef struct PACKED
 {
     uint8_t version;
     uint8_t reserved;
     uint8_t max_redirect;
     uint8_t reserved2;
-};
+} IoapicVersion;
 
 #define IOAPIC_ACTIVE_HIGH_LOW (1 << 1)
 #define IOAPIC_TRIGGER_EDGE_LOW (1 << 3)
 
-struct PACKED ioapic_redirect
+typedef union PACKED
 {
-    union
+    struct PACKED
     {
-
-        struct PACKED
-        {
-            uint8_t interrupt;
-            uint8_t delivery_mode : 3;
-            uint8_t destination_mode : 1;
-            uint8_t delivery_status : 1;
-            uint8_t pin_polarity : 1;
-            uint8_t remote_irr : 1;
-            uint8_t trigger_mode : 1;
-            uint8_t mask : 1;
-            uint64_t _reserved : 39;
-            uint8_t destination;
-        };
-
-        struct PACKED
-        {
-            uint32_t _low_byte;
-            uint32_t _high_byte;
-        };
+        uint8_t interrupt;
+        uint8_t delivery_mode : 3;
+        uint8_t destination_mode : 1;
+        uint8_t delivery_status : 1;
+        uint8_t pin_polarity : 1;
+        uint8_t remote_irr : 1;
+        uint8_t trigger_mode : 1;
+        uint8_t mask : 1;
+        uint64_t _reserved : 39;
+        uint8_t destination;
     };
-};
 
-static_assert(sizeof(struct ioapic_redirect) == sizeof(uint64_t), "");
+    struct PACKED
+    {
+        uint32_t _low_byte;
+        uint32_t _high_byte;
+    };
+} IoapicRedirect;
 
-struct ioapic_version ioapic_get_version(int ioapic_id);
-
-void ioapic_redirect_irq_to_cpu(CpuId id, uint8_t irq, bool enable, uintptr_t rsdp);
-
-void ioapic_redirect_legacy_irq(Handover const *handover);
+static_assert(sizeof(IoapicRedirect) == sizeof(uint64_t), "");
 
 /* --- Apic ----------------------------------------------------------------- */
 
-void apic_initalize(Handover const *handover);
+void apic_initalize(Acpi *acpi);

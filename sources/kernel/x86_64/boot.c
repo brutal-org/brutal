@@ -3,6 +3,7 @@
 #include "kernel/init.h"
 #include "kernel/interrupts.h"
 #include "kernel/kernel.h"
+#include "kernel/mmap.h"
 #include "kernel/pmm.h"
 #include "kernel/sched.h"
 #include "kernel/tasking.h"
@@ -45,8 +46,12 @@ void arch_entry_main(Handover *handover)
     simd_initialize();
     pmm_initialize(handover);
     vmm_initialize(handover);
-    hpet_initialize(handover);
-    apic_initalize(handover);
+
+    Acpi acpi = {};
+    acpi_init(&acpi, MMAP_IO_BASE, handover->rsdp);
+
+    hpet_initialize(&acpi);
+    apic_initalize(&acpi);
     cpu_initialize();
     syscall_initialize();
     sched_initialize();
