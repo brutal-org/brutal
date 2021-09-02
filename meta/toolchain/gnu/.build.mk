@@ -18,7 +18,7 @@ HOST_LD=ld
 HOST_LDFLAGS=
 
 HOST_AR=ar
-HOST_ARFLAGS=rcsv
+HOST_ARFLAGS=rcs
 
 # --- Cross-Compiler --------------------------------------------------------- #
 

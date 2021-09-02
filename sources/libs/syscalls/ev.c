@@ -107,7 +107,7 @@ static bool req_wait(IpcJob *job)
     return true;
 }
 
-BrResult br_ev_req(BrTask to, BrMsg *req, BrMsg *resp)
+BrResult br_ev_req(BrId to, BrMsg *req, BrMsg *resp)
 {
     ensure_dispatcher();
 

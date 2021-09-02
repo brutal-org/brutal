@@ -2,7 +2,7 @@
 
 #include <syscalls/types.h>
 
-BrResult br_ev_req(BrTask to, BrMsg *req, BrMsg *resp);
+BrResult br_ev_req(BrId to, BrMsg *req, BrMsg *resp);
 
 BrResult br_ev_resp(BrMsg const *req, BrMsg *resp);
 

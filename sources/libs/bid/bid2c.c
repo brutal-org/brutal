@@ -15,7 +15,7 @@ static bool type_in_interface(BidInterface const *interface, Str name)
     return false;
 }
 
-static void emit_generic(BidInterface const *interface, BidGeneric const *type, Emit *emit)
+static void emit_primitive(BidInterface const *interface, BidPrimitive const *type, Emit *emit)
 {
     if (type_in_interface(interface, type->name))
     {
@@ -23,23 +23,6 @@ static void emit_generic(BidInterface const *interface, BidGeneric const *type, 
     }
 
     emit_fmt(emit, "{}", type->name);
-
-    if (type->params.length)
-    {
-        emit_fmt(emit, str$("("));
-
-        for (int i = 0; i < type->params.length; i++)
-        {
-            emit_type(interface, &type->params.data[i], emit);
-
-            if (i + 1 != type->params.length)
-            {
-                emit_fmt(emit, str$(","));
-            }
-        }
-
-        emit_fmt(emit, str$(")"));
-    }
 }
 
 static void emit_enum(BidInterface const *interface, BidEnum const *type, Emit *emit, bool error)
@@ -82,8 +65,8 @@ static void emit_type(BidInterface const *interface, BidType const *type, Emit *
 {
     switch (type->type)
     {
-    case BID_TYPE_GENERIC:
-        emit_generic(interface, &type->generic_, emit);
+    case BID_TYPE_PRIMITIVE:
+        emit_primitive(interface, &type->primitive_, emit);
         break;
 
     case BID_TYPE_ENUM:
@@ -99,6 +82,20 @@ static void emit_type(BidInterface const *interface, BidType const *type, Emit *
     }
 }
 
+static bool is_handle(BidType *type)
+{
+    if (type->type != BID_TYPE_PRIMITIVE)
+    {
+        return false;
+    }
+
+    return str_eq(type->primitive_.name, str$("BrHandle")) ||
+           str_eq(type->primitive_.name, str$("BrSpace")) ||
+           str_eq(type->primitive_.name, str$("BrMemObj")) ||
+           str_eq(type->primitive_.name, str$("BrTask")) ||
+           str_eq(type->primitive_.name, str$("BrIrq"));
+}
+
 static void emit_methode(BidInterface const *interface, BidMethod const *methode, Emit *emit)
 {
     emit_fmt(emit, "static inline {case:pascal}Error {case:lower}_{case:lower}(BrTask task, {case:pascal}{case:pascal}Request const* req, {case:pascal}{case:pascal}Response *resp)\n",
@@ -111,6 +108,73 @@ static void emit_methode(BidInterface const *interface, BidMethod const *methode
     emit_ident(emit);
     emit_fmt(emit, ".prot = {case:upper}_PROTOCOL_ID,\n", interface->name);
     emit_fmt(emit, ".type = {case:upper}_{case:upper}_REQUEST,\n", interface->name, methode->name);
+    emit_fmt(emit, ".arg = ", interface->name, methode->name);
+    emit_fmt(emit, "{{\n");
+    emit_ident(emit);
+
+    BidType request_type = methode->request;
+
+    switch (request_type.type)
+    {
+    case BID_TYPE_PRIMITIVE:
+    case BID_TYPE_ENUM:
+        emit_fmt(emit, "(BrArg)req,\n");
+        break;
+
+    case BID_TYPE_STRUCT:
+        vec_foreach(member, &request_type.struct_.members)
+        {
+            emit_fmt(emit, "(BrArg)req->{},\n", member.name);
+        }
+        break;
+
+    default:
+        break;
+    }
+
+    emit_deident(emit);
+    emit_fmt(emit, "}},\n");
+
+    emit_fmt(emit, ".flags = ");
+
+    switch (request_type.type)
+    {
+    case BID_TYPE_PRIMITIVE:
+        if (is_handle(&request_type))
+        {
+            emit_fmt(emit, "BR_MSG_HND(0),\n");
+        }
+        else
+        {
+            emit_fmt(emit, "0,\n");
+        }
+        break;
+
+    case BID_TYPE_ENUM:
+        emit_fmt(emit, "0,\n");
+        break;
+
+    case BID_TYPE_STRUCT:
+    {
+
+        emit_fmt(emit, "0");
+        int index = 0;
+        vec_foreach(member, &request_type.struct_.members)
+        {
+            if (is_handle(&member.type))
+            {
+                emit_fmt(emit, "| BR_MSG_HND({})", index);
+            }
+            index++;
+        }
+        emit_fmt(emit, ",\n");
+    }
+    break;
+
+    default:
+        break;
+    }
+
     emit_deident(emit);
     emit_fmt(emit, "}};\n");
 
@@ -121,6 +185,31 @@ static void emit_methode(BidInterface const *interface, BidMethod const *methode
              interface->name, interface->name, methode->name, interface->name, interface->name);
     emit_fmt(emit, "if (resp_msg.type == {case:upper}_ERROR) return resp_msg.arg[0];\n",
              interface->name);
+
+    BidType response_type = methode->response;
+
+    switch (response_type.type)
+    {
+    case BID_TYPE_PRIMITIVE:
+    case BID_TYPE_ENUM:
+        emit_fmt(emit, "*resp = resp_msg.arg[0];\n");
+        break;
+
+    case BID_TYPE_STRUCT:
+    {
+        int index = 0;
+        vec_foreach(member, &response_type.struct_.members)
+        {
+            emit_fmt(emit, "resp->{} = resp_msg.arg[{}];\n", member.name, index);
+            index++;
+        }
+    }
+    break;
+
+    default:
+        break;
+    }
+
     emit_fmt(emit, "return ERR_{case:upper}_SUCCESS;\n",
              interface->name);
     emit_deident(emit);

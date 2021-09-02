@@ -47,35 +47,10 @@ static Str parse_identifier(Scan *scan)
     return name;
 }
 
-static BidGeneric parse_generic(Scan *scan, Alloc *alloc)
+static BidPrimitive parse_primitive(Scan *scan)
 {
-    BidGeneric type = {};
+    BidPrimitive type = {};
     type.name = parse_identifier(scan);
-
-    skip_comment_and_space(scan);
-
-    if (!scan_skip(scan, '<'))
-    {
-        return type;
-    }
-
-    skip_comment_and_space(scan);
-
-    vec_init(&type.params, alloc);
-
-    while (scan_curr(scan) != '>' && !scan_ended(scan))
-    {
-        vec_push(&type.params, parse_type(scan, alloc));
-
-        skip_comment_and_space(scan);
-
-        scan_expect(scan, ',');
-
-        skip_comment_and_space(scan);
-    }
-
-    scan_expect(scan, '>');
-
     return type;
 }
 
@@ -111,16 +86,16 @@ static BidStruct parse_struct(Scan *scan, Alloc *alloc)
 
     while (scan_curr(scan) != '}' && !scan_ended(scan))
     {
-        BidVar var = {};
-        var.name = parse_identifier(scan);
+        BidMember member = {};
+        member.name = parse_identifier(scan);
 
         skip_comment_and_space(scan);
         scan_expect(scan, ':');
         skip_comment_and_space(scan);
 
-        var.type = parse_type(scan, alloc);
+        member.type = parse_type(scan, alloc);
 
-        vec_push(&type.members, var);
+        vec_push(&type.members, member);
 
         skip_comment_and_space(scan);
         scan_skip(scan, ',');
@@ -151,8 +126,8 @@ static BidType parse_type(Scan *scan, Alloc *alloc)
     else
     {
         skip_comment_and_space(scan);
-        type.type = BID_TYPE_GENERIC;
-        type.generic_ = parse_generic(scan, alloc);
+        type.type = BID_TYPE_PRIMITIVE;
+        type.primitive_ = parse_primitive(scan);
     }
 
     return type;

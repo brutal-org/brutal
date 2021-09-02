@@ -2,10 +2,10 @@
 
 #include <acpi/stdh.h>
 
-typedef struct
+typedef struct PACKED
 {
     uint64_t address;
-    uint16_t segment_gouble;
+    uint16_t segment_groupe;
     uint8_t bus_start;
     uint8_t bus_end;
     uint32_t reserved;
