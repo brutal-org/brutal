@@ -152,6 +152,16 @@ int br_entry_handover(Handover *handover)
             },
         },
         &posix_server);
+
+    BrTaskInfos acpi_server = {};
+    srv_run(
+        handover,
+        str$("acpi"),
+        &(BrExecArgs){
+            .type = BR_START_HANDOVER,
+            .handover = handover,
+        },
+        &acpi_server);
     /*
     BrTaskInfos echo_server = {};
     srv_run(

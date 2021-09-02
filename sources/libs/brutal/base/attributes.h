@@ -1,11 +1,11 @@
 #pragma once
 
-#define PACKED [[gnu::packed]]
+#define PACKED __attribute__((packed))
 
-#define ALIGNED(ALIGN) [[gnu::aligned(ALIGN)]]
+#define ALIGNED(ALIGN) __attribute__((aligned(ALIGN)))
 
 #define UNUSED(EXPR) ((void)(EXPR))
 
 #define MAYBE_UNUSED [[maybe_unused]]
 
-#define CLEANUP(func) [[gnu::cleanup(func)]]
+#define CLEANUP(FUNC) __attribute__((cleanup(FUNC)))

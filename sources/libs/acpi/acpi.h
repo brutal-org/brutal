@@ -13,8 +13,11 @@ typedef struct PACKED
 
 typedef struct
 {
-    AcpiSdth stdh;
-    uint32_t children[];
-} AcpiRsdt;
+    uintptr_t base;
+    AcpiRsdp *rsdp;
+    struct acpi_rsdt *rsdt;
+} Acpi;
 
-t
+void acpi_init(Acpi *acpi, uintptr_t base, uintptr_t rsdp);
+
+uintptr_t acpi_phys_to_virt(Acpi *acpi, uintptr_t addr);

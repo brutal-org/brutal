@@ -1,5 +1,6 @@
 #pragma once
 
+#include <acpi/acpi.h>
 #include <acpi/stdh.h>
 
 typedef enum
@@ -17,6 +18,8 @@ typedef struct
     uint8_t len;
 } AcpiMadtRecord;
 
+#define ACPI_MADT_SIG str$("APIC")
+
 typedef struct PACKED
 {
     AcpiSdth sdth;
@@ -29,18 +32,12 @@ typedef struct PACKED
 
 typedef struct PACKED
 {
-    uint8_t type;
-    uint8_t len;
-} AcpiMadtRecord;
-
-typedef struct PACKED
-{
     AcpiMadtRecord record;
 
     uint8_t processor_id;
     uint8_t id;
     uint32_t flags;
-};
+} AcpiMadtLapicRecord;
 
 typedef struct PACKED
 {
@@ -61,3 +58,7 @@ typedef struct PACKED
     uint32_t gsi;
     uint16_t flags;
 } AcpiMadtIsoRecord;
+
+Iter acpi_madt_iterate(Acpi *acpi, IterFn *fn, void *ctx);
+
+Iter acpi_madt_lookup(Acpi *acpi, AcpiMadtRecordType type, IterFn *fn, void *ctx);

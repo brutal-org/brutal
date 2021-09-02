@@ -2,6 +2,8 @@
 
 #include <acpi/stdh.h>
 
+#define ACPI_HPET_SIG str$("HPET")
+
 typedef struct PACKED
 {
     AcpiSdth stdh;

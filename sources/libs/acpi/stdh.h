@@ -1,6 +1,7 @@
 #pragma once
 
 #include <brutal/base.h>
+#include <brutal/text.h>
 
 typedef struct PACKED
 {
@@ -14,3 +15,8 @@ typedef struct PACKED
     uint32_t creator_id;
     uint32_t creator_revision;
 } AcpiSdth;
+
+static inline Str acpi_sdth_sig(AcpiSdth *sdth)
+{
+    return str_n$(4, sdth->signature);
+}
