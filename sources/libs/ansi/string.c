@@ -2,6 +2,7 @@
 
 /* --- 7.24 - String handling ----------------------------------------------- */
 
+#include <brutal/alloc.h>
 #include <brutal/mem.h>
 #include <string.h>
 
@@ -12,7 +13,35 @@ void *memcpy(void *restrict s1, void const *restrict s2, size_t n)
     return mem_cpy(s1, s2, n);
 }
 
-// void *memmove(void *s1,  void const *s2, size_t n) {}
+void *memmove(void *s1, void const *s2, size_t n)
+{
+    uint8_t may_buf[32];
+
+    uint8_t *copy = (uint8_t *)may_buf;
+
+    /* avoid an alloc for a tiny memmove */
+    if (n >= 32)
+    {
+        copy = (uint8_t *)alloc_malloc(alloc_global(), n);
+    }
+
+    for (size_t i = 0; i < n; i++)
+    {
+        copy[i] = ((uint8_t *)s2)[i];
+    }
+
+    for (size_t i = 0; i < n; i++)
+    {
+        ((uint8_t *)s1)[i] = copy[i];
+    }
+
+    if (n >= 32)
+    {
+
+        alloc_free(alloc_global(), copy);
+    }
+    return s1;
+}
 
 char *strcpy(char *restrict s1, char const *restrict s2)
 {
@@ -27,7 +56,18 @@ char *strcpy(char *restrict s1, char const *restrict s2)
     return s1;
 }
 
-// char *strncpy(char *restrict s1,  char const *restrict s2, size_t n) {}
+char *strncpy(char *restrict s1, char const *restrict s2, size_t n)
+{
+    size_t i = 0;
+
+    while (s2[i] != 0 && i < n)
+    {
+        s1[i] = s2[i];
+        i++;
+    }
+
+    return s1;
+}
 
 /* --- 7.24.3 - Concatenation functions ------------------------------------- */
 
