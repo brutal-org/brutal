@@ -1,3 +1,6 @@
+#include <brutal/alloc.h>
+#include <brutal/host.h>
+#include <brutal/mem.h>
 #include <stdlib.h>
 
 /* --- 7.22 - General utilities --------------------------------------------- */
@@ -53,33 +56,66 @@
 
 /* --- 7.22.2 - Pseudo-random sequence generation functions ----------------- */
 
-// int rand();
+static unsigned long next_n = 1;
 
-// int srand(unsigned int seed);
+int rand()
+{
+    next_n = next_n * 1103515245 + 12345;
+    return ((unsigned)(next_n / 65536) % 32768);
+}
+
+void srand(unsigned int seed)
+{
+    next_n = seed;
+}
 
 /* --- 7.22.3 - Memory management functions --------------------------------- */
 
 // void *aligned_alloc(size_t alignment, size_t size);
 
-// void *calloc(size_t nmemb, size_t size);
+void *
+calloc(size_t nmemb, size_t size)
+{
+    return alloc_calloc(alloc_global(), nmemb, size);
+}
 
-// void free(void *ptr);
+void free(void *ptr)
+{
+    alloc_free(alloc_global(), ptr);
+}
 
-// void *malloc(size_t size);
+void *malloc(size_t size)
+{
+    return alloc_malloc(alloc_global(), size);
+}
 
-// void *realloc(void *ptr, size_t size);
+void *realloc(void *ptr, size_t size)
+{
+    return alloc_resize(alloc_global(), ptr, size);
+}
 
 /* --- 7.22.4 - Communication with the environment -------------------------- */
 
-// _Noreturn void abort(void);
+_Noreturn void abort(void)
+{
+    host_log_panic();
+}
 
 // int atexit(void (*func)(void));
 
 // int at_quick_exit(void (*func)(void));
 
-// _Noreturn void exit(int status);
+_Noreturn void exit(int status)
+{
+    host_task_exit(host_task_self(), status);
+    host_log_panic();
+}
 
-// _Noreturn void _Exit(int status);
+_Noreturn void _Exit(int status)
+{
+    host_task_exit(host_task_self(), status);
+    host_log_panic();
+}
 
 // char *getenv(char const *name);
 
@@ -102,11 +138,32 @@
 
 /* --- 7.22.6 - Integer arithmetic functions -------------------------------- */
 
-// int abs(int j);
+int abs(int j)
+{
+    if (j < 0)
+    {
+        return -j;
+    }
+    return j;
+}
 
-// long labs(long j);
+long labs(long j)
+{
+    if (j < 0)
+    {
+        return -j;
+    }
+    return j;
+}
 
-// long long llabs(long long j);
+long long llabs(long long j)
+{
+    if (j < 0)
+    {
+        return -j;
+    }
+    return j;
+}
 
 // div_t div(int number, int denom);
 

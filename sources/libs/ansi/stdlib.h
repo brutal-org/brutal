@@ -67,7 +67,7 @@ int strfroml(char *restricts, size_t n, char const *restrict format, long double
 
 int rand();
 
-int srand(unsigned int seed);
+void srand(unsigned int seed);
 
 /* --- 7.22.3 - Memory management functions --------------------------------- */
 
