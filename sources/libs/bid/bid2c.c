@@ -96,24 +96,6 @@ static bool is_handle(BidType *type)
            str_eq(type->primitive_.name, str$("BrIrq"));
 }
 
-static void
-emit_method_function(Str interface_name, Str method_name, bool has_request, bool has_response, Emit *emit)
-{
-    emit_fmt(emit, "static inline {case:pascal}Error {case:lower}_{case:lower}", interface_name, interface_name, method_name);
-
-    emit_fmt(emit, "(BrTask task");
-
-    if (has_request)
-    {
-        emit_fmt(emit, ", {case:pascal}{case:pascal}Request const* req", interface_name, method_name);
-    }
-    if (has_response)
-    {
-        emit_fmt(emit, ", {case:pascal}{case:pascal}Response * resp", interface_name, method_name);
-    }
-    emit_fmt(emit, ")");
-}
-
 static void emit_method_flags(BidType request_type, Emit *emit)
 {
     emit_fmt(emit, ".flags = ");
@@ -189,11 +171,13 @@ static void emit_msg_args(BidType request_type, Emit *emit)
 
 static void emit_msg_create(Str interface_name, Str request_name, BidType request_type, Emit *emit)
 {
+    PrintTrans protocol_id = print_trans("{case:upper}_PROTOCOL_ID", interface_name);
+    PrintTrans request = print_trans("{case:upper}_{case:upper}_REQUEST", interface_name, request_name);
 
     emit_fmt(emit, "BrMsg req_msg = {{\n");
     emit_ident(emit);
-    emit_fmt(emit, ".prot = {case:upper}_PROTOCOL_ID,\n", interface_name);
-    emit_fmt(emit, ".type = {case:upper}_{case:upper}_REQUEST,\n", interface_name, request_name);
+    emit_fmt(emit, ".prot = {},\n", protocol_id);
+    emit_fmt(emit, ".type = {},\n", request);
 
     if (request_type.type != BID_TYPE_NONE)
     {
@@ -203,12 +187,64 @@ static void emit_msg_create(Str interface_name, Str request_name, BidType reques
     emit_deident(emit);
     emit_fmt(emit, "}};\n");
 }
+static void
+emit_function(PrintTrans ret, PrintTrans name, PrintTrans *args, int count, Emit *emit)
+{
+    emit_fmt(emit, "static inline {} {}", ret, name);
+
+    emit_fmt(emit, "(BrTask task");
+
+    for (int i = 0; i < count; i++)
+    {
+        emit_fmt(emit, ", {}", args[i]);
+    }
+    emit_fmt(emit, ")");
+}
+
+/* there are too many arg in this function, maybe put it in a struct ? */
+static void emit_method_function(PrintTrans err_type, PrintTrans name_str, PrintTrans request, bool has_request, PrintTrans response, bool has_response, Emit *emit)
+{
+    PrintTrans func_args[3] = {0};
+    int arg_count = 0;
+
+    if (has_request)
+    {
+        func_args[arg_count] = request;
+        arg_count++;
+    }
+    if (has_response)
+    {
+        func_args[arg_count] = response;
+        arg_count++;
+    }
+
+    emit_function(err_type, name_str, func_args, arg_count, emit);
+}
 static void emit_method(BidInterface const *interface, BidMethod const *method, Emit *emit)
 {
 
-    emit_method_function(interface->name, method->name,
-                         (method->request.type != BID_TYPE_NONE),
-                         (method->response.type != BID_TYPE_NONE),
+    PrintTrans protocol_id = print_trans("{case:upper}_PROTOCOL_ID", interface->name);
+
+    PrintTrans response_id = print_trans(" {case:upper}_{case:upper}_RESPONSE", interface->name, method->name);
+    PrintTrans err_type = print_trans(" {case:pascal}Error", interface->name);
+    PrintTrans err_id = print_trans(" {case:upper}_ERROR", interface->name);
+    PrintTrans request_type = {0};
+    PrintTrans response_type = {0};
+    PrintTrans func_name = print_trans("{case:lower}_{case:lower}", interface->name, method->name);
+
+    if (method->request.type != BID_TYPE_NONE)
+    {
+        request_type = print_trans("{case:pascal}{case:pascal}Request const * req", interface->name, method->name);
+    }
+
+    if (method->response.type != BID_TYPE_NONE)
+    {
+        response_type = print_trans("{case:pascal}{case:pascal}Response* resp", interface->name, method->name);
+    }
+
+    emit_method_function(err_type, func_name,
+                         request_type, (method->request.type != BID_TYPE_NONE),
+                         response_type, (method->response.type != BID_TYPE_NONE),
                          emit);
 
     emit_fmt(emit, "{{\n");
@@ -226,23 +262,23 @@ static void emit_method(BidInterface const *interface, BidMethod const *method, 
                     }\n",
              interface->name);
 
-    emit_fmt(emit, "if (resp_msg.prot != {case:upper}_PROTOCOL_ID || \
-                    (resp_msg.type != {case:upper}_{case:upper}_RESPONSE && resp_msg.type != {case:upper}_ERROR))\n\
+    emit_fmt(emit, "if (resp_msg.prot != {} || \
+                    (resp_msg.type != {} && resp_msg.type != {}))\n\
                     {{ \n\
                         return ERR_{case:upper}_UNEXPECTED_MESSAGE;\n\
                     }} \n",
-             interface->name,
-             interface->name, method->name, interface->name, interface->name);
+             protocol_id,
+             response_id, err_id, interface->name, interface->name);
 
-    emit_fmt(emit, "if (resp_msg.type == {case:upper}_ERROR) \n\
+    emit_fmt(emit, "if (resp_msg.type == {}) \n\
                     {{\n\
-                        return  ({case:pascal}Error)resp_msg.arg[0];\n\
+                        return  ({})resp_msg.arg[0];\n\
                     }}\n",
-             interface->name, interface->name);
+             err_id, err_type);
 
-    BidType response_type = method->response;
+    BidType response = method->response;
 
-    switch (response_type.type)
+    switch (response.type)
     {
     case BID_TYPE_PRIMITIVE:
     case BID_TYPE_ENUM:
@@ -253,7 +289,7 @@ static void emit_method(BidInterface const *interface, BidMethod const *method, 
     case BID_TYPE_STRUCT:
     {
         int index = 0;
-        vec_foreach(member, &response_type.struct_.members)
+        vec_foreach(member, &response.struct_.members)
         {
             emit_fmt(emit, "resp->{} = (typeof(resp->{}))resp_msg.arg[{}];\n", member.name, member.name, index);
             index++;
