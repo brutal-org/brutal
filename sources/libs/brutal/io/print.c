@@ -32,10 +32,18 @@ struct print_value print_val_pointer(void *ptr)
     return (struct print_value){nullstr, PRINT_POINTER, {._pointer = ptr}};
 }
 
+struct print_value print_val_trans(PrintTrans trans)
+{
+    return (struct print_value){nullstr, PRINT_TRANS, {._trans = trans}};
+}
+
 IoWriteResult print_dispatch(IoWriter *writer, Fmt fmt, struct print_value value)
 {
     switch (value.type)
     {
+
+    case PRINT_TRANS:
+        return print_impl(writer, value._trans.fmt, value._trans.args);
     case PRINT_SIGNED:
         if (fmt.type == FMT_CHAR)
         {
@@ -91,10 +99,15 @@ IoWriteResult print_impl(IoWriter *writer, Str format, PrintArgs args)
         }
         else if (scan_curr(&scan) == '{' && !skip_fmt)
         {
+            Fmt fmt = fmt_parse(&scan);
+
             if (current < args.count)
             {
-                Fmt fmt = fmt_parse(&scan);
                 written += TRY(IoWriteResult, print_dispatch(writer, fmt, args.values[current]));
+            }
+            else
+            {
+                written += TRY(IoWriteResult, io_print(writer, str$("{}")));
             }
 
             current++;
