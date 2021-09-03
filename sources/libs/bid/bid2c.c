@@ -96,45 +96,26 @@ static bool is_handle(BidType *type)
            str_eq(type->primitive_.name, str$("BrIrq"));
 }
 
-static void emit_methode(BidInterface const *interface, BidMethod const *methode, Emit *emit)
+static void
+emit_method_function(Str interface_name, Str method_name, bool has_request, bool has_response, Emit *emit)
 {
-    emit_fmt(emit, "static inline {case:pascal}Error {case:lower}_{case:lower}(BrTask task, {case:pascal}{case:pascal}Request const* req, {case:pascal}{case:pascal}Response *resp)\n",
-             interface->name, interface->name, methode->name, interface->name, methode->name, interface->name, methode->name);
-    emit_fmt(emit, "{{\n");
+    emit_fmt(emit, "static inline {case:pascal}Error {case:lower}_{case:lower}", interface_name, interface_name, method_name);
 
-    emit_ident(emit);
+    emit_fmt(emit, "(BrTask task");
 
-    emit_fmt(emit, "BrMsg req_msg = {{\n");
-    emit_ident(emit);
-    emit_fmt(emit, ".prot = {case:upper}_PROTOCOL_ID,\n", interface->name);
-    emit_fmt(emit, ".type = {case:upper}_{case:upper}_REQUEST,\n", interface->name, methode->name);
-    emit_fmt(emit, ".arg = ", interface->name, methode->name);
-    emit_fmt(emit, "{{\n");
-    emit_ident(emit);
-
-    BidType request_type = methode->request;
-
-    switch (request_type.type)
+    if (has_request)
     {
-    case BID_TYPE_PRIMITIVE:
-    case BID_TYPE_ENUM:
-        emit_fmt(emit, "(BrArg)req,\n");
-        break;
-
-    case BID_TYPE_STRUCT:
-        vec_foreach(member, &request_type.struct_.members)
-        {
-            emit_fmt(emit, "(BrArg)req->{},\n", member.name);
-        }
-        break;
-
-    default:
-        break;
+        emit_fmt(emit, ", {case:pascal}{case:pascal}Request const* req", interface_name, method_name);
     }
+    if (has_response)
+    {
+        emit_fmt(emit, ", {case:pascal}{case:pascal}Response * resp", interface_name, method_name);
+    }
+    emit_fmt(emit, ")");
+}
 
-    emit_deident(emit);
-    emit_fmt(emit, "}},\n");
-
+static void emit_method_flags(BidType request_type, Emit *emit)
+{
     emit_fmt(emit, ".flags = ");
 
     switch (request_type.type)
@@ -174,25 +155,99 @@ static void emit_methode(BidInterface const *interface, BidMethod const *methode
     default:
         break;
     }
+}
+static void emit_msg_args(BidType request_type, Emit *emit)
+{
+    emit_fmt(emit, ".arg = ");
+    emit_fmt(emit, "{{\n");
+    emit_ident(emit);
+
+    if (request_type.type != BID_TYPE_NONE)
+    {
+    }
+    switch (request_type.type)
+    {
+    case BID_TYPE_PRIMITIVE:
+    case BID_TYPE_ENUM:
+        emit_fmt(emit, "(BrArg)req,\n");
+        break;
+
+    case BID_TYPE_STRUCT:
+        vec_foreach(member, &request_type.struct_.members)
+        {
+            emit_fmt(emit, "(BrArg)req->{},\n", member.name);
+        }
+        break;
+
+    default:
+        break;
+    }
 
     emit_deident(emit);
+    emit_fmt(emit, "}},\n");
+}
+
+static void emit_msg_create(Str interface_name, Str request_name, BidType request_type, Emit *emit)
+{
+
+    emit_fmt(emit, "BrMsg req_msg = {{\n");
+    emit_ident(emit);
+    emit_fmt(emit, ".prot = {case:upper}_PROTOCOL_ID,\n", interface_name);
+    emit_fmt(emit, ".type = {case:upper}_{case:upper}_REQUEST,\n", interface_name, request_name);
+
+    if (request_type.type != BID_TYPE_NONE)
+    {
+        emit_msg_args(request_type, emit);
+        emit_method_flags(request_type, emit);
+    }
+    emit_deident(emit);
     emit_fmt(emit, "}};\n");
+}
+static void emit_method(BidInterface const *interface, BidMethod const *method, Emit *emit)
+{
+
+    emit_method_function(interface->name, method->name,
+                         (method->request.type != BID_TYPE_NONE),
+                         (method->response.type != BID_TYPE_NONE),
+                         emit);
+
+    emit_fmt(emit, "{{\n");
+
+    emit_ident(emit);
+
+    emit_msg_create(interface->name, method->name, method->request, emit);
 
     emit_fmt(emit, "BrMsg resp_msg = {{}};\n");
     emit_fmt(emit, "BrResult result = br_ev_req(task, &req_msg, &resp_msg);\n");
-    emit_fmt(emit, "if (result != BR_SUCCESS) return ERR_{case:upper}_BAD_COMMUNICATION;\n", interface->name);
-    emit_fmt(emit, "if (resp_msg.prot != {case:upper}_PROTOCOL_ID || (resp_msg.type != {case:upper}_{case:upper}_RESPONSE && resp_msg.type != {case:upper}_ERROR)) return ERR_{case:upper}_UNEXPECTED_MESSAGE;\n",
-             interface->name, interface->name, methode->name, interface->name, interface->name);
-    emit_fmt(emit, "if (resp_msg.type == {case:upper}_ERROR) return resp_msg.arg[0];\n",
+
+    emit_fmt(emit, "if (result != BR_SUCCESS)\n\
+                    {{\n\
+                        return ERR_{case:upper}_BAD_COMMUNICATION;\n\
+                    }\n",
              interface->name);
 
-    BidType response_type = methode->response;
+    emit_fmt(emit, "if (resp_msg.prot != {case:upper}_PROTOCOL_ID || \
+                    (resp_msg.type != {case:upper}_{case:upper}_RESPONSE && resp_msg.type != {case:upper}_ERROR))\n\
+                    {{ \n\
+                        return ERR_{case:upper}_UNEXPECTED_MESSAGE;\n\
+                    }} \n",
+             interface->name,
+             interface->name, method->name, interface->name, interface->name);
+
+    emit_fmt(emit, "if (resp_msg.type == {case:upper}_ERROR) \n\
+                    {{\n\
+                        return  ({case:pascal}Error)resp_msg.arg[0];\n\
+                    }}\n",
+             interface->name, interface->name);
+
+    BidType response_type = method->response;
 
     switch (response_type.type)
     {
     case BID_TYPE_PRIMITIVE:
     case BID_TYPE_ENUM:
-        emit_fmt(emit, "*resp = resp_msg.arg[0];\n");
+
+        emit_fmt(emit, "*resp = (BrHandle)resp_msg.arg[0];", interface->name, method->name);
         break;
 
     case BID_TYPE_STRUCT:
@@ -200,7 +255,7 @@ static void emit_methode(BidInterface const *interface, BidMethod const *methode
         int index = 0;
         vec_foreach(member, &response_type.struct_.members)
         {
-            emit_fmt(emit, "resp->{} = resp_msg.arg[{}];\n", member.name, index);
+            emit_fmt(emit, "resp->{} = (typeof(resp->{}))resp_msg.arg[{}];\n", member.name, member.name, index);
             index++;
         }
     }
@@ -224,6 +279,7 @@ void bid2c(BidInterface const *interface, Emit *emit)
                    "\n"
                    "// This is file is auto generated by BID, don't edit it!\n"
                    "\n"
+
                    "#include <syscalls/types.h>\n"
                    "#include <syscalls/ev.h>\n"
                    "\n");
@@ -250,17 +306,22 @@ void bid2c(BidInterface const *interface, Emit *emit)
 
     vec_foreach(method, &interface->methods)
     {
-        emit_fmt(emit, "typedef ");
-        emit_type(interface, &method.request, emit);
-        emit_fmt(emit, " {case:pascal}{case:pascal}Request;\n", interface->name, method.name);
+        if (method.request.type != BID_TYPE_NONE)
+        {
+            emit_fmt(emit, "typedef ");
+            emit_type(interface, &method.request, emit);
 
-        emit_fmt(emit, "\n");
+            emit_fmt(emit, " {case:pascal}{case:pascal}Request;\n", interface->name, method.name);
+            emit_fmt(emit, "\n");
+        }
 
-        emit_fmt(emit, "typedef ");
-        emit_type(interface, &method.response, emit);
-        emit_fmt(emit, " {case:pascal}{case:pascal}Response;\n", interface->name, method.name);
-
-        emit_fmt(emit, "\n");
+        if (method.response.type != BID_TYPE_NONE)
+        {
+            emit_fmt(emit, "typedef ");
+            emit_type(interface, &method.response, emit);
+            emit_fmt(emit, " {case:pascal}{case:pascal}Response;\n", interface->name, method.name);
+            emit_fmt(emit, "\n");
+        }
     }
 
     vec_foreach(event, &interface->events)
@@ -297,6 +358,6 @@ void bid2c(BidInterface const *interface, Emit *emit)
 
     vec_foreach(method, &interface->methods)
     {
-        emit_methode(interface, &method, emit);
+        emit_method(interface, &method, emit);
     }
 }

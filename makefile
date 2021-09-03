@@ -63,6 +63,7 @@ include sources/bins/.cross.mk
 include sources/bins/.host.mk
 include sources/loader/.build.mk
 include sysroot/.build.mk
+include sources/libs/proto/.build.mk
 
 .PHONY: all
 all: $(ISO)

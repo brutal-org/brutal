@@ -1,5 +1,9 @@
 interface Acpi {
     id = 0x8583038e;
 
-    method get_pci_config {} -> BrMemObj;
+    method get_pci_config -> BrMemObj;
+    errors 
+    {
+        
+    };
 }

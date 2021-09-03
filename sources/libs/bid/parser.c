@@ -111,6 +111,8 @@ static BidType parse_type(Scan *scan, Alloc *alloc)
 {
     BidType type = {};
 
+    type.type = BID_TYPE_NONE;
+
     if (scan_skip_word(scan, str$("struct")) || scan_curr(scan) == '{')
     {
         skip_comment_and_space(scan);
@@ -123,7 +125,7 @@ static BidType parse_type(Scan *scan, Alloc *alloc)
         type.type = BID_TYPE_ENUM;
         type.enum_ = parse_enum(scan, alloc);
     }
-    else
+    else if (is_identifier(scan_curr(scan)))
     {
         skip_comment_and_space(scan);
         type.type = BID_TYPE_PRIMITIVE;
