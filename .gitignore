@@ -60,4 +60,3 @@ meta/toolchain/gnu/local
 meta/toolchain/gnu/tarballs
 
 docs/brutal.pdf
-sources/libs/virtio/virtio-1.1-spec.pdf
