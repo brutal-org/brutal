@@ -69,3 +69,7 @@ run-cc: $(CC_HOST_BIN)
 .PHONY: run-test
 run-test: $(TEST_HOST_BIN)
 	cd $(BUILDDIR_HOST); ./test
+
+.PHONY: run-demo
+run-demo: $(DEMO_HOST_BIN)
+	$(DEMO_HOST_BIN)

@@ -1,4 +1,4 @@
 #pragma once
 #include <stdint.h>
 
-typedef uint64_t HostIoFileHandle;
+typedef uint64_t HostIoFile;

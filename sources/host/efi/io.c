@@ -115,13 +115,13 @@ HostIoOpenFileResult host_io_file_create(Str path)
     assert_unreachable();
 }
 
-MaybeError host_io_file_close(HostIoFileHandle handle)
+MaybeError host_io_file_close(HostIoFile handle)
 {
     rootdir->close((EFIFileProtocol *)handle);
     return SUCCESS;
 }
 
-IoReadResult host_io_read_file(HostIoFileHandle handle, uint8_t *data, size_t size)
+IoReadResult host_io_read_file(HostIoFile handle, uint8_t *data, size_t size)
 {
     EFIFileProtocol *file = handle;
     uint64_t read_write_size = size;
@@ -137,7 +137,7 @@ IoReadResult host_io_read_file(HostIoFileHandle handle, uint8_t *data, size_t si
     }
 }
 
-IoWriteResult host_io_write_file(HostIoFileHandle handle, uint8_t const *data, size_t size)
+IoWriteResult host_io_write_file(HostIoFile handle, uint8_t const *data, size_t size)
 {
     UNUSED(handle);
     UNUSED(data);

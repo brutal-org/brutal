@@ -15,7 +15,7 @@ HOST_CFLAGS= \
 	-fsanitize=undefined
 
 HOST_LD=ld
-HOST_LDFLAGS=
+HOST_LDFLAGS=-lSDL2
 
 HOST_AR=ar
 HOST_ARFLAGS=rcs

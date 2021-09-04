@@ -6,7 +6,7 @@
 
 typedef struct
 {
-    HostIoFileHandle handle;
+    HostIoFile handle;
 } IoFile;
 
 MaybeError io_file_open(IoFile *self, Str path);

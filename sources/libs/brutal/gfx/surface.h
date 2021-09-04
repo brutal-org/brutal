@@ -80,7 +80,7 @@ static inline void gfx_surface_clear(GfxSurface self, GfxColor color)
     }
 }
 
-static inline Recti gfx_surface_bound(GfxSurface surface)
+static inline Recti gfx_surface_bound(GfxSurface self)
 {
-    return (Recti){0, 0, surface.width, surface.height};
+    return (Recti){0, 0, self.width, self.height};
 }

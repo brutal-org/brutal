@@ -1,0 +1,3 @@
+DEMO_NAME = demo
+
+HOST_BINS += DEMO

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <math/math.h>
+#include <math.h>
 
 #define Vec2(T) \
     struct      \

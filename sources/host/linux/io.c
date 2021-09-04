@@ -11,7 +11,7 @@ HostIoOpenFileResult host_io_file_open(Str path)
 {
     char *cstr = (char *)str_to_cstr_utf8(path, alloc_global());
 
-    HostIoFileHandle handle = open(cstr, O_RDONLY);
+    HostIoFile handle = open(cstr, O_RDONLY);
 
     alloc_free(alloc_global(), cstr);
     return OK(HostIoOpenFileResult, handle);
@@ -21,25 +21,25 @@ HostIoOpenFileResult host_io_file_create(Str path)
 {
     char *cstr = (char *)str_to_cstr_utf8(path, alloc_global());
 
-    HostIoFileHandle handle = open(cstr, O_CREAT | O_WRONLY | O_TRUNC, 0666);
+    HostIoFile handle = open(cstr, O_CREAT | O_WRONLY | O_TRUNC, 0666);
 
     alloc_free(alloc_global(), cstr);
 
     return OK(HostIoOpenFileResult, handle);
 }
 
-MaybeError host_io_file_close(HostIoFileHandle handle)
+MaybeError host_io_file_close(HostIoFile handle)
 {
     close(handle);
     return SUCCESS;
 }
 
-IoReadResult host_io_read_file(HostIoFileHandle handle, uint8_t *data, size_t size)
+IoReadResult host_io_read_file(HostIoFile handle, uint8_t *data, size_t size)
 {
     return OK(IoReadResult, read(handle, data, size));
 }
 
-IoWriteResult host_io_write_file(HostIoFileHandle handle, uint8_t const *data, size_t size)
+IoWriteResult host_io_write_file(HostIoFile handle, uint8_t const *data, size_t size)
 {
     return OK(IoWriteResult, write(handle, data, size));
 }

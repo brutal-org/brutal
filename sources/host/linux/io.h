@@ -1,3 +1,3 @@
 #pragma once
 
-typedef int HostIoFileHandle;
+typedef int HostIoFile;
