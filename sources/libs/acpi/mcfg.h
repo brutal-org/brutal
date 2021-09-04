@@ -15,4 +15,5 @@ typedef struct PACKED
 {
     AcpiSdth stdh;
     uint64_t reserved;
+    AcpiMcfgRecord records[];
 } AcpiMcfg;
