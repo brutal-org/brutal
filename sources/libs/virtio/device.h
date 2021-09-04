@@ -2,19 +2,18 @@
 
 #include <brutal/base.h>
 
-#define VIRTIO_STATUS_ACKNOWLEDGE 0b00000001      // Indicates that the guest OS has found the device and recognized it as a valid virtio device.
-#define VIRTIO_STATUS_DRIVER_AVAILABLE 0b00000010 // Indicates that the guest OS knows how to drive the device.
-#define VIRTIO_STATUS_FAILURE 0b10000000          // Indicates that something went wrong in the guest, and it has given up on the device.
-#define VIRTIO_STATUS_FEATURES_OK 0b00001000      // Indicates that the driver has acknowledged all the features it understands, and feature negotiation is complete.
-#define VIRTIO_STATUS_DRIVER_OK 0b00000100        // Indicates that the driver is set up and ready to drive the device.
-#define VIRTIO_STATUS_NEEDS_RESET 0b01000000      // Indicates that the device has experienced an error from which it can’t recover.
+#define VIRTIO_STATUS_ACKNOWLEDGE (1 << 0)      // Indicates that the guest OS has found the device and recognized it as a valid virtio device.
+#define VIRTIO_STATUS_DRIVER_AVAILABLE (1 << 1) // Indicates that the guest OS knows how to drive the device.
+#define VIRTIO_STATUS_FAILURE (1 << 7)          // Indicates that something went wrong in the guest, and it has given up on the device.
+#define VIRTIO_STATUS_FEATURES_OK (1 << 3)      // Indicates that the driver has acknowledged all the features it understands, and feature negotiation is complete.
+#define VIRTIO_STATUS_DRIVER_OK (1 << 2)        // Indicates that the driver is set up and ready to drive the device.
+#define VIRTIO_STATUS_NEEDS_RESET (1 << 6)      // Indicates that the device has experienced an error from which it can’t recover.
 
 // Represents a VirtIO device
 typedef struct PACKED
 {
     uint8_t device_status;
     uint64_t device_features;
-
 } VirtioDevice;
 
 // Values returned for each operation made on `VirtioDevice`
