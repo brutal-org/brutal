@@ -1,8 +1,8 @@
 #pragma once
 
 #include <brutal/base.h>
-#include <brutal/math.h>
 #include <brutal/gfx.h>
+#include <brutal/math.h>
 
 #if defined(__linux__)
 #    include <host/linux/ui.h>
