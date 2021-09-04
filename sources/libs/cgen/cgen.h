@@ -2,13 +2,13 @@
 #include <brutal/base.h>
 #include <brutal/ds.h>
 
-enum DeclarationType
-{
-    CG_DECL_NONE,
-    CG_DECL_VAR,
-    CG_DECL_IDENTIFIER,
-    CG_DECL_FUNCTION,
-};
+
+
+
+typedef struct cg_initializer CGInitializer;
+typedef struct cg_declarator CGDeclarator;
+typedef struct cg_constant_expression CGConstExpr;
+typedef Str CGIdentifier;
 
 enum DeclarationSpecifiers
 {
@@ -25,19 +25,68 @@ enum DeclarationSpecifiers
     CG_DS_VOLATILE = 1 << 11,
 };
 
-typedef Str CGIdentifier;
+enum DeclarationType 
+{
+    CG_DECL_ARRAY,      // int vvvv[...]
+    CG_DECL_DIRECT,     // int vvvv = 0;
+    CG_DECL_FUNC,       // int vvvv(...)
+    CG_DECL_FUNC_TYPE,  // int (*vvv) (...)
+};
+
 typedef struct
 {
-
+    
     CGIdentifier identifier;
-} CG_Type;
+} CGType;
 
-typedef struct
+typedef struct 
 {
-    CG_Type type;
+    bool has_initializer ;
+    CGInitializer* initializer;
+    CGDeclarator* declarator;
+} CGInitDeclarator;
 
-} DeclarationSpecifier;
-typedef struct
+typedef struct cg_pointer
 {
+    enum DeclarationSpecifiers specifier;
+    struct cg_pointer* pointer;
+    bool is_leaf;
+} CGPointer;
+
+typedef struct 
+{
+    CGDeclarator* declarator;
+    CGConstExpr* array_size; 
+} CGArrayDeclarator;
+
+typedef struct 
+{
+    enum DeclarationSpecifiers attributes;
+    CGDeclarator* declaration;
+    bool is_triple_dot; // ... 
+} CGParameterDeclaration;
+
+typedef struct 
+{
+    Vec(CGParameterDeclaration) parameters;
+} CGParameterTypeList;
+
+typedef struct 
+{
+    CGDeclarator* declarator; // for *funcname*(....)
+    CGParameterTypeList parameter_list;
+} CGFuncDeclarator;
+
+struct cg_declarator 
+{
+    CGPointer* pointer;
     enum DeclarationType type;
-} Declaration;
+    enum DeclarationSpecifiers specifier;
+    union 
+    {
+        CGInitDeclarator direct_variable;
+        CGDeclarator* func_type_decl; 
+        CGFuncDeclarator func_declaration;
+        CGArrayDeclarator array_declarator;
+    } declaration;
+};
