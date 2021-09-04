@@ -44,6 +44,7 @@ IoWriteResult print_dispatch(IoWriter *writer, Fmt fmt, struct print_value value
 
     case PRINT_TRANS:
         return print_impl(writer, value._trans.fmt, value._trans.args);
+
     case PRINT_SIGNED:
         if (fmt.type == FMT_CHAR)
         {

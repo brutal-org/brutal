@@ -187,12 +187,12 @@ static void emit_msg_create(Str interface_name, Str request_name, BidType reques
     emit_deident(emit);
     emit_fmt(emit, "}};\n");
 }
-static void
-emit_function(PrintTrans ret, PrintTrans name, PrintTrans *args, int count, Emit *emit)
+
+static void emit_function(PrintTrans ret, PrintTrans name, PrintTrans *args, int count, Emit *emit)
 {
     emit_fmt(emit, "static inline {} {}", ret, name);
 
-    emit_fmt(emit, "(BrTask task");
+    emit_fmt(emit, "(BrId task");
 
     for (int i = 0; i < count; i++)
     {
@@ -220,6 +220,7 @@ static void emit_method_function(PrintTrans err_type, PrintTrans name_str, Print
 
     emit_function(err_type, name_str, func_args, arg_count, emit);
 }
+
 static void emit_method(BidInterface const *interface, BidMethod const *method, Emit *emit)
 {
 
@@ -228,19 +229,9 @@ static void emit_method(BidInterface const *interface, BidMethod const *method, 
     PrintTrans response_id = print_trans(" {case:upper}_{case:upper}_RESPONSE", interface->name, method->name);
     PrintTrans err_type = print_trans(" {case:pascal}Error", interface->name);
     PrintTrans err_id = print_trans(" {case:upper}_ERROR", interface->name);
-    PrintTrans request_type = {0};
-    PrintTrans response_type = {0};
+    PrintTrans request_type = print_trans("{case:pascal}{case:pascal}Request const * req", interface->name, method->name);
+    PrintTrans response_type = print_trans("{case:pascal}{case:pascal}Response* resp", interface->name, method->name);
     PrintTrans func_name = print_trans("{case:lower}_{case:lower}", interface->name, method->name);
-
-    if (method->request.type != BID_TYPE_NONE)
-    {
-        request_type = print_trans("{case:pascal}{case:pascal}Request const * req", interface->name, method->name);
-    }
-
-    if (method->response.type != BID_TYPE_NONE)
-    {
-        response_type = print_trans("{case:pascal}{case:pascal}Response* resp", interface->name, method->name);
-    }
 
     emit_method_function(err_type, func_name,
                          request_type, (method->request.type != BID_TYPE_NONE),
@@ -256,24 +247,24 @@ static void emit_method(BidInterface const *interface, BidMethod const *method, 
     emit_fmt(emit, "BrMsg resp_msg = {{}};\n");
     emit_fmt(emit, "BrResult result = br_ev_req(task, &req_msg, &resp_msg);\n");
 
-    emit_fmt(emit, "if (result != BR_SUCCESS)\n\
-                    {{\n\
-                        return ERR_{case:upper}_BAD_COMMUNICATION;\n\
-                    }\n",
+    emit_fmt(emit, "if (result != BR_SUCCESS)\n"
+                   "{{\n"
+                   "return ERR_{case:upper}_BAD_COMMUNICATION;\n"
+                   "}}\n",
              interface->name);
 
-    emit_fmt(emit, "if (resp_msg.prot != {} || \
-                    (resp_msg.type != {} && resp_msg.type != {}))\n\
-                    {{ \n\
-                        return ERR_{case:upper}_UNEXPECTED_MESSAGE;\n\
-                    }} \n",
+    emit_fmt(emit, "if (resp_msg.prot != {} || "
+                   "(resp_msg.type != {} && resp_msg.type != {}))\n"
+                   "{{ \n"
+                   "return ERR_{case:upper}_UNEXPECTED_MESSAGE;\n"
+                   "}} \n",
              protocol_id,
              response_id, err_id, interface->name, interface->name);
 
-    emit_fmt(emit, "if (resp_msg.type == {}) \n\
-                    {{\n\
-                        return  ({})resp_msg.arg[0];\n\
-                    }}\n",
+    emit_fmt(emit, "if (resp_msg.type == {}) \n"
+                   "{{\n"
+                   "return  ({})resp_msg.arg[0];\n"
+                   "}}\n",
              err_id, err_type);
 
     BidType response = method->response;
@@ -283,7 +274,7 @@ static void emit_method(BidInterface const *interface, BidMethod const *method, 
     case BID_TYPE_PRIMITIVE:
     case BID_TYPE_ENUM:
 
-        emit_fmt(emit, "*resp = (BrHandle)resp_msg.arg[0];", interface->name, method->name);
+        emit_fmt(emit, "*resp = (typeof(*resp))resp_msg.arg[0];", interface->name, method->name);
         break;
 
     case BID_TYPE_STRUCT:
@@ -307,6 +298,28 @@ static void emit_method(BidInterface const *interface, BidMethod const *method, 
 
     emit_fmt(emit, "}}\n");
     emit_fmt(emit, "\n");
+}
+
+static void emit_callback(BidInterface const *interface, BidMethod const *method, Emit *emit)
+{
+    PrintTrans err_type = print_trans("{case:pascal}Error", interface->name);
+    PrintTrans request_type = print_trans("{case:pascal}{case:pascal}Request", interface->name, method->name);
+    PrintTrans response_type = print_trans("{case:pascal}{case:pascal}Response", interface->name, method->name);
+    PrintTrans func_name = print_trans("{case:pascal}{case:pascal}Fn", interface->name, method->name);
+
+    emit_fmt(emit, "typedef {} {}(BrId from, ", err_type, func_name);
+
+    if (method->request.type != BID_TYPE_NONE)
+    {
+        emit_fmt(emit, "{} const* req, ", request_type);
+    }
+
+    if (method->request.type != BID_TYPE_NONE)
+    {
+        emit_fmt(emit, "{}* res, ", response_type);
+    }
+
+    emit_fmt(emit, "void* ctx);\n");
 }
 
 void bid2c(BidInterface const *interface, Emit *emit)
@@ -396,4 +409,94 @@ void bid2c(BidInterface const *interface, Emit *emit)
     {
         emit_method(interface, &method, emit);
     }
+
+    vec_foreach(method, &interface->methods)
+    {
+        emit_callback(interface, &method, emit);
+    }
+
+    emit_fmt(emit, "typedef void {case:pascal}ErrorFn(BrId from, BrResult error, void* ctx);\n", interface->name);
+
+    emit_fmt(emit, "\n");
+
+    emit_fmt(emit, "typedef struct {{\n");
+    emit_ident(emit);
+
+    emit_fmt(emit, "void* ctx;\n");
+
+    vec_foreach(method, &interface->methods)
+    {
+        PrintTrans func_type = print_trans("{case:pascal}{case:pascal}Fn", interface->name, method.name);
+        emit_fmt(emit, "{}* handle_{};\n", func_type, method.name);
+    }
+
+    emit_fmt(emit, "{case:pascal}ErrorFn* handle_error;\n", interface->name);
+
+    emit_deident(emit);
+    emit_fmt(emit, "}} {case:pascal}Server;\n", interface->name);
+
+    emit_fmt(emit, "\n");
+
+    emit_fmt(emit, "static inline void {case:lower}_server_dispatch({case:pascal}Server* server, BrMsg const* req_msg)\n", interface->name, interface->name);
+    emit_fmt(emit, "{{\n");
+    emit_ident(emit);
+
+    emit_fmt(emit, "BrMsg resp_msg = {{}};\n\n");
+
+    emit_fmt(emit, "switch (req_msg->type) {{\n");
+    emit_ident(emit);
+
+    vec_foreach(method, &interface->methods)
+    {
+        emit_fmt(emit, "case {case:upper}_{case:upper}_REQUEST:\n", interface->name, method.name);
+        emit_fmt(emit, "{{\n");
+        emit_ident(emit);
+
+        PrintTrans request_type = print_trans("{case:pascal}{case:pascal}Request", interface->name, method.name);
+        PrintTrans response_type = print_trans("{case:pascal}{case:pascal}Response", interface->name, method.name);
+
+        emit_fmt(emit, "{} req = {{}};\n", request_type);
+
+        BidType response = method.request;
+
+        switch (response.type)
+        {
+        case BID_TYPE_PRIMITIVE:
+        case BID_TYPE_ENUM:
+
+            emit_fmt(emit, "req = (typeof(req))req_msg->arg[0];\n", interface->name, method.name);
+            break;
+
+        case BID_TYPE_STRUCT:
+        {
+            int index = 0;
+            vec_foreach(member, &response.struct_.members)
+            {
+                emit_fmt(emit, "req.{} = (typeof(req.{}))req_msg->arg[{}];\n", member.name, member.name, index);
+                index++;
+            }
+        }
+        break;
+
+        default:
+            break;
+        }
+
+        emit_fmt(emit, "{} resp = {{}};\n", response_type);
+
+        PrintTrans err_type = print_trans("{case:pascal}Error", interface->name);
+
+        emit_fmt(emit, "{} error = server->handle_{case:lower}(from, &req, &resp);\n", err_type, method.name);
+
+        emit_deident(emit);
+        emit_fmt(emit, "}}\n");
+        emit_fmt(emit, "break;\n");
+        emit_fmt(emit, "\n");
+    }
+
+    emit_deident(emit);
+    emit_fmt(emit, "}}\n");
+
+    emit_deident(emit);
+    emit_fmt(emit, "}}\n");
 }
