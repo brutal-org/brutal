@@ -25,21 +25,14 @@ static void emit_primitive(BidInterface const *interface, BidPrimitive const *ty
     emit_fmt(emit, "{}", type->name);
 }
 
-static void emit_enum(BidInterface const *interface, BidEnum const *type, Emit *emit, bool error)
+static void emit_enum(BidInterface const *interface, BidEnum const *type, Emit *emit)
 {
     emit_fmt(emit, "enum {{\n");
     emit_ident(emit);
 
     vec_foreach(member, &type->members)
     {
-        if (error)
-        {
-            emit_fmt(emit, "ERR_{case:upper}_{case:upper},\n", interface->name, member);
-        }
-        else
-        {
-            emit_fmt(emit, "{case:upper}_{case:upper},\n", interface->name, member);
-        }
+        emit_fmt(emit, "{case:upper}_{case:upper},\n", interface->name, member);
     }
 
     emit_deident(emit);
@@ -70,7 +63,7 @@ static void emit_type(BidInterface const *interface, BidType const *type, Emit *
         break;
 
     case BID_TYPE_ENUM:
-        emit_enum(interface, &type->enum_, emit, false);
+        emit_enum(interface, &type->enum_, emit);
         break;
 
     case BID_TYPE_STRUCT:
@@ -249,14 +242,14 @@ static void emit_method(BidInterface const *interface, BidMethod const *method, 
 
     emit_fmt(emit, "if (result != BR_SUCCESS)\n"
                    "{{\n"
-                   "return ERR_{case:upper}_BAD_COMMUNICATION;\n"
+                   "return {case:upper}_BAD_COMMUNICATION;\n"
                    "}}\n",
              interface->name);
 
     emit_fmt(emit, "if (resp_msg.prot != {} || "
                    "(resp_msg.type != {} && resp_msg.type != {}))\n"
                    "{{ \n"
-                   "return ERR_{case:upper}_UNEXPECTED_MESSAGE;\n"
+                   "return {case:upper}_UNEXPECTED_MESSAGE;\n"
                    "}} \n",
              protocol_id,
              response_id, err_id, interface->name, interface->name);
@@ -292,7 +285,7 @@ static void emit_method(BidInterface const *interface, BidMethod const *method, 
         break;
     }
 
-    emit_fmt(emit, "return ERR_{case:upper}_SUCCESS;\n",
+    emit_fmt(emit, "return {case:upper}_SUCCESS;\n",
              interface->name);
     emit_deident(emit);
 
@@ -336,7 +329,7 @@ void bid2c(BidInterface const *interface, Emit *emit)
     emit_fmt(emit, "#define {case:upper}_PROTOCOL_ID ({#0x})\n\n", interface->name, interface->id);
 
     emit_fmt(emit, "typedef ");
-    emit_enum(interface, &interface->errors, emit, true);
+    emit_enum(interface, &interface->errors, emit);
     emit_fmt(emit, " {case:pascal}Error;\n", interface->name);
 
     emit_fmt(emit, "\n");
@@ -486,7 +479,7 @@ void bid2c(BidInterface const *interface, Emit *emit)
 
         PrintTrans err_type = print_trans("{case:pascal}Error", interface->name);
 
-        emit_fmt(emit, "{} error = server->handle_{case:lower}(from, &req, &resp);\n", err_type, method.name);
+        emit_fmt(emit, "{} error = server->handle_{case:lower}(req_msg->from, &req, &resp, server->ctx);\n", err_type, method.name);
 
         emit_deident(emit);
         emit_fmt(emit, "}}\n");
