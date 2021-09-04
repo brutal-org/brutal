@@ -1,3 +1,5 @@
+#pragma once
+
 #include <brutal/base.h>
 #include <virtio/device.h>
 #include <virtio/virtqueue.h>
