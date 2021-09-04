@@ -26,25 +26,22 @@ typedef struct PACKED
     le_uint32_t size_max;
     le_uint32_t seg_max;
 
-    struct PACKED virtio_blk_geometry
-    {
-        le_uint16_t cylinders;
-        uint8_t heads;
-        uint8_t sectors;
-    } geometry;
+    // Geometry of the block device
+    le_uint16_t geometry_cylinders;
+    uint8_t geometry_heads;
+    uint8_t geometry_sectors;
 
     le_uint32_t block_size;
 
-    struct PACKED virtio_blk_topology
-    {
-        uint8_t physical_block_exp;
-        uint8_t alignment_offset;
-        le_uint16_t minimal_io_size;
-        le_uint32_t optimal_io_size;
-    } topology;
+    // Topology of the block device
+    uint8_t topology_physical_block_exp;
+    uint8_t topology_alignment_offset;
+    le_uint16_t topology_minimal_io_size;
+    le_uint32_t topology_optimal_io_size;
 
     uint8_t writeback;
     uint8_t unused0[3];
+
     le_uint32_t max_discard_sectors;
     le_uint32_t max_discard_seg;
     le_uint32_t discard_sector_alignment;
