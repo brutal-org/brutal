@@ -12,10 +12,11 @@ HOST_CFLAGS= \
 	$(CFLAGS_WARN) \
 	$(HOST_CFLAGS_INC) \
 	-fsanitize=address \
-	-fsanitize=undefined
+	-fsanitize=undefined \
+	`pkg-config  sdl2 --cflags`
 
 HOST_LD=ld
-HOST_LDFLAGS=-lSDL2
+HOST_LDFLAGS=`pkg-config  sdl2 --libs`
 
 HOST_AR=ar
 HOST_ARFLAGS=rcs
