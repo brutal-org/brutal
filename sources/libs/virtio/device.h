@@ -54,15 +54,11 @@ typedef enum
     VIRTIO_MEMORY,
 } VirtioDeviceType;
 
-// The setup function pointer. This must be passed as a parameter by the device-specific handler
-typedef VirtioDeviceResult (*SetupFunc)(VirtioDevice *device);
-
 // A type representing a virtio device class. This must be passed as a parameter by the device-specific handler
 typedef struct
 {
     VirtioDeviceType device_type;
     uint64_t needed_features;
-    SetupFunc setup_func;
 } VirtioDeviceInit;
 
 typedef uint64_t VirtioDriverFeatures;
@@ -74,8 +70,13 @@ bool virtio_in_status(VirtioDevice *device, uint8_t status);
 VirtioDeviceResult virtio_set_status(VirtioDevice *device, uint8_t status);
 
 // Initializes the virtio device at `base_address`
+// This function doesn't setup the device-specific needings
+// After this the `device` must be set in VIRTIO_STATUS_DRIVER_OK
 VirtioDeviceResult virtio_device_init(VirtioDevice *device, VirtioDeviceInit *device_class);
 
 // Negociates features with the virtio device for the caller.
 // Returns VIRTIO_DEVICE_FEATURES_NEGOCIATE_FAILED the driver cannot negociate any feature with the virtio device
 VirtioDeviceResult virtio_device_negociate_features(VirtioDevice *device, VirtioDeviceInit *init);
+
+// TODO: #include <pci/device.h>
+// VirtioDevice virtio_device_create(PciDevice pci_device);

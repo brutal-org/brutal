@@ -86,12 +86,6 @@ VirtioDeviceResult virtio_device_init(VirtioDevice *device, VirtioDeviceInit *de
     if (!virtio_in_status(device, VIRTIO_STATUS_FEATURES_OK))
         return VIRTIO_DEVICE_FEATURES_NEGOCIATE_FAILED;
 
-    // Step 7: Device-specific setup
-    result = device_init->setup_func(device);
-
-    // Step 8: Set the DRIVER_OK status
-    virtio_set_status(device, VIRTIO_STATUS_DRIVER_OK);
-
     return result;
 }
 

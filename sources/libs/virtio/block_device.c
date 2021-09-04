@@ -1,5 +1,6 @@
 #include <virtio/block_device.h>
 #include <virtio/device.h>
+#include <virtio/virtqueue.h>
 
 VirtioDeviceResult block_setup(VirtioDevice *device)
 {
@@ -9,11 +10,12 @@ VirtioDeviceResult block_setup(VirtioDevice *device)
 
 VirtioBlockDevice virtio_block_init(VirtioDevice *device, uint64_t needed_features)
 {
-    VirtioDeviceInit init = {
+    VirtioDeviceInit device_init = {
         .device_type = VIRTIO_BLOCK,
         .needed_features = needed_features,
-        .setup_func = (SetupFunc)block_setup,
     };
+
+    virtio_device_init(device, &device_init);
 
     return (VirtioBlockDevice){};
 }
