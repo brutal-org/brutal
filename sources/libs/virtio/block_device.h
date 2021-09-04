@@ -52,11 +52,14 @@ typedef struct PACKED
 } VirtioBlockConfig;
 
 // VirtIO block device request types
-#define REQUEST_IN 0            // Read
-#define REQUEST_OUT 1           // Write
-#define REQUEST_FLUSH 4         // Flush
-#define REQUEST_DISCARD 11      // Discard
-#define REQUEST_WRITE_ZEROES 13 // Write zeroes
+typedef enum
+{
+    REQUEST_IN = 0,            // Read
+    REQUEST_OUT = 1,           // Write
+    REQUEST_FLUSH = 4,         // Flush
+    REQUEST_DISCARD = 11,      // Discard
+    REQUEST_WRITE_ZEROES = 13, // Write zeroes
+} VirtioBlkRequest;
 
 // A VirtIO block device request.
 struct PACKED blk_request
