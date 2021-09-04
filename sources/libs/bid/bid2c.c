@@ -248,13 +248,13 @@ static void emit_method(BidInterface const *interface, BidMethod const *method, 
 
     emit_fmt(emit, "if (resp_msg.prot != {} || "
                    "(resp_msg.type != {} && resp_msg.type != {}))\n"
-                   "{{ \n"
+                   "{{\n"
                    "return {case:upper}_UNEXPECTED_MESSAGE;\n"
-                   "}} \n",
+                   "}}\n",
              protocol_id,
              response_id, err_id, interface->name, interface->name);
 
-    emit_fmt(emit, "if (resp_msg.type == {}) \n"
+    emit_fmt(emit, "if (resp_msg.type == {})\n"
                    "{{\n"
                    "return  ({})resp_msg.arg[0];\n"
                    "}}\n",
@@ -450,9 +450,10 @@ void bid2c(BidInterface const *interface, Emit *emit)
 
         emit_fmt(emit, "{} req = {{}};\n", request_type);
 
-        BidType response = method.request;
+        BidType request = method.request;
+        BidType response = method.response;
 
-        switch (response.type)
+        switch (request.type)
         {
         case BID_TYPE_PRIMITIVE:
         case BID_TYPE_ENUM:
@@ -463,7 +464,7 @@ void bid2c(BidInterface const *interface, Emit *emit)
         case BID_TYPE_STRUCT:
         {
             int index = 0;
-            vec_foreach(member, &response.struct_.members)
+            vec_foreach(member, &request.struct_.members)
             {
                 emit_fmt(emit, "req.{} = (typeof(req.{}))req_msg->arg[{}];\n", member.name, member.name, index);
                 index++;
@@ -481,6 +482,49 @@ void bid2c(BidInterface const *interface, Emit *emit)
 
         emit_fmt(emit, "{} error = server->handle_{case:lower}(req_msg->from, &req, &resp, server->ctx);\n", err_type, method.name);
 
+        emit_fmt(emit, "if (error == {case:upper}_SUCCESS)\n", interface->name);
+        emit_fmt(emit, "{{\n");
+        emit_ident(emit);
+
+        emit_fmt(emit, "resp_msg.prot = {case:upper}_PROTOCOL_ID;\n", interface->name);
+        emit_fmt(emit, "resp_msg.type = {case:upper}_{case:upper}_RESPONSE;\n", interface->name, method.name);
+
+        switch (request.type)
+        {
+        case BID_TYPE_PRIMITIVE:
+        case BID_TYPE_ENUM:
+
+            emit_fmt(emit, "resp_msg.arg[0] = resp;\n");
+            break;
+
+        case BID_TYPE_STRUCT:
+        {
+            int index = 0;
+            vec_foreach(member, &response.struct_.members)
+            {
+                emit_fmt(emit, "resp_msg.arg[{}] = (BrArg)resp.{};\n", index, member.name);
+                index++;
+            }
+        }
+        break;
+
+        default:
+            break;
+        }
+
+        emit_deident(emit);
+        emit_fmt(emit, "}}\n");
+        emit_fmt(emit, "else\n");
+        emit_fmt(emit, "{{\n");
+        emit_ident(emit);
+
+        emit_fmt(emit, "resp_msg.prot = {case:upper}_PROTOCOL_ID;\n", interface->name);
+        emit_fmt(emit, "resp_msg.type = {case:upper}_ERROR;\n", interface->name);
+        emit_fmt(emit, "resp_msg.arg[0] = error;\n");
+
+        emit_deident(emit);
+        emit_fmt(emit, "}}\n");
+
         emit_deident(emit);
         emit_fmt(emit, "}}\n");
         emit_fmt(emit, "break;\n");
@@ -489,6 +533,10 @@ void bid2c(BidInterface const *interface, Emit *emit)
 
     emit_deident(emit);
     emit_fmt(emit, "}}\n");
+
+    emit_fmt(emit, "\n");
+    emit_fmt(emit, "BrResult result = br_ev_resp(req_msg, &resp_msg);\n"
+                   "if (result != BR_SUCCESS) {{ server->handle_error(req_msg->from, result, server->ctx); }}\n");
 
     emit_deident(emit);
     emit_fmt(emit, "}}\n");
