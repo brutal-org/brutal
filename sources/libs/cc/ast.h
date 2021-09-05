@@ -2,7 +2,6 @@
 
 #include <brutal/base.h>
 #include <brutal/ds.h>
-#include <wchar.h>
 
 typedef struct cg_initializer CGInitializer;
 typedef struct cg_declarator CGDeclarator;
@@ -10,13 +9,15 @@ typedef struct cg_constant_expression CGConstExpr;
 typedef struct cg_expression CGExpression;
 typedef struct cg_declaration_specifier CGDeclarationSpecifier;
 typedef struct cg_type_specifier_qualifier CGTypeSpecifierQualifier;
+
+typedef struct cg_type_name CGTypeName;
+typedef struct cg_abstract_declarator CGAbstractDeclarator;
+
+// expression
 typedef struct cg_assignment_expression CGAssignExpression;
 typedef struct cg_unary_expression CGUnaryExpression;
 typedef struct cg_postfix_expression CGPostfixExpression;
 typedef struct cg_primary_expression CGPrimaryExpression;
-typedef struct cg_type_name CGTypeName;
-typedef struct cg_abstract_declarator CGAbstractDeclarator;
-
 typedef struct cg_cast_expression CGCastExpression;
 typedef struct cg_multiplicative_expression CGMultiplicativeExpresssion;
 typedef struct cg_additive_expression CGAddExpression;
@@ -29,7 +30,12 @@ typedef struct cg_inclusive_or_expression CGInclusiveOrExpression;
 typedef struct cg_logical_and_expression CGLogicalAndExpression;
 typedef struct cg_logical_or_expression CGLogicalOrExpression;
 typedef struct cg_conditional_expression CGConditionalExpression;
+
+// 6.4.2 identifier
+
 typedef Str CGIdentifier;
+
+// 6.4.4 constant
 
 typedef enum
 {
@@ -38,6 +44,7 @@ typedef enum
     CG_CONST_ENUMERATION,
     CG_CONST_CHAR
 } CGConstantType;
+
 typedef struct
 {
     CGConstantType type;
@@ -49,6 +56,11 @@ typedef struct
         char character;
     };
 } CGConstant;
+
+// 6.7.3 type-qualifier 
+// + 6.7.4 function-specifier 
+// + 6.7.5 alignment-specifier
+// i combined some qualifier because this simplify some part of the code
 
 typedef enum
 {
@@ -64,6 +76,7 @@ typedef enum
     CG_DS_RESTRICT = 1 << 10,
     CG_DS_VOLATILE = 1 << 11,
 } CGQualifier;
+
 typedef enum
 {
     CG_DECL_ARRAY,     // int vvvv[...]
@@ -73,6 +86,7 @@ typedef enum
 } CGDeclarationType;
 
 // 6.7.2 type specifiers
+
 typedef enum
 {
     CG_T_VOID,
@@ -134,6 +148,7 @@ typedef struct
 } CGEnumSpecifier;
 
 // 6.7.2 type specifier qualifier
+
 struct cg_type_specifier_qualifier
 {
     // type-specifier
@@ -147,6 +162,7 @@ struct cg_type_specifier_qualifier
     // type-qualifier
 };
 
+// 6.7 declaration
 typedef struct
 {
     bool has_initializer;
@@ -156,10 +172,17 @@ typedef struct
 
 struct cg_declaration_specifier
 {
-    // implement declaration-specifier
     CGTypeSpecifierQualifier type_specifier;
     CGQualifier qualifier;
 };
+
+typedef struct
+{
+    Vec(CGDeclarationSpecifier) specifier;
+    Vec(CGInitDeclarator) init_declarator_list;
+} CGDeclaration;
+
+// 6.7.6 declarator 
 typedef struct
 {
     CGDeclarator *declarator;
@@ -183,8 +206,6 @@ typedef struct
     CGDeclarator *declarator; // for *funcname*(....)
     CGParameterTypeList parameter_list;
 } CGFuncDeclarator;
-
-// 6.7.6 Declarator
 
 typedef struct
 {
@@ -212,11 +233,6 @@ struct cg_declarator
     CGDirectDeclarator *direct_declarator;
 };
 
-typedef struct
-{
-    Vec(CGDeclarationSpecifier) specifier;
-    Vec(CGInitDeclarator) init_declarator_list;
-} CGDeclaration;
 
 // 6.7.7 type-name
 
