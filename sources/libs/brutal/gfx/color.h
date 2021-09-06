@@ -19,32 +19,32 @@ typedef struct
 #define gfx_colori$(COLORF) \
     ((GfxColor){(COLORF).r * 255, (COLORF).g * 255, (COLORF).b * 255, (COLORF).a * 255})
 
-#define color_create_rgba(T, R, G, B, A) \
+#define gfx_rgba(T, R, G, B, A) \
     ((T){.r = (R), .g = (G), .b = (B), .a = (A)})
 
-#define color_create_rgb(T, r, g, b) \
-    color_create_rgba(T, r, g, b, 0xff)
+#define gfx_rgb(T, r, g, b) \
+    gfx_rgba(T, r, g, b, 0xff)
 
-#define color_create_from_hex(hex) \
-    color_create_rgba(GfxColor, (uint8_t)(hex >> 16), (uint8_t)(hex >> 8)), (uint8_t) hex, 0xff)
+#define gfx_hex(hex) \
+    gfx_rgba(GfxColor, (uint8_t)(hex >> 16), (uint8_t)(hex >> 8)), (uint8_t) hex, 0xff)
 
 #define GFX_COLOR_WHITE \
-    color_create_rgb(GfxColor, 0xff, 0xff, 0xff)
+    gfx_rgb(GfxColor, 0xff, 0xff, 0xff)
 
 #define GFX_COLOR_BLACK \
-    color_create_rgb(GfxColor, 0x00, 0x00, 0x00)
+    gfx_rgb(GfxColor, 0x00, 0x00, 0x00)
 
 #define GFX_COLOR_RED \
-    color_create_rgb(GfxColor, 0xff, 0x00, 0x00)
+    gfx_rgb(GfxColor, 0xff, 0x00, 0x00)
 
 #define GFX_COLOR_GREEN \
-    color_create_rgb(GfxColor, 0x00, 0xff, 0x00)
+    gfx_rgb(GfxColor, 0x00, 0xff, 0x00)
 
 #define GFX_COLOR_BLUE \
-    color_create_rgb(GfxColor, 0x00, 0x00, 0xff)
+    gfx_rgb(GfxColor, 0x00, 0x00, 0xff)
 
 #define GFX_COLOR_MAGENTA \
-    color_create_rgb(GfxColor, 0xff, 0x00, 0xff)
+    gfx_rgb(GfxColor, 0xff, 0x00, 0xff)
 
 static_assert(sizeof(GfxColor) == sizeof(uint32_t), "GfxColor should fit in an uint32_t");
 
@@ -70,7 +70,7 @@ static inline GfxColor gfx_color_blend(GfxColor fg, GfxColor bg)
         uint8_t g = (uint8_t)((alpha * fg.g + inv_alpha * bg.g) / 256);
         uint8_t b = (uint8_t)((alpha * fg.b + inv_alpha * bg.b) / 256);
 
-        return color_create_rgba(GfxColor, r, g, b, 0xff);
+        return gfx_rgba(GfxColor, r, g, b, 0xff);
     }
 
     GfxColorf fgf = gfx_colorf$(fg);
