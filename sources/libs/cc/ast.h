@@ -48,6 +48,7 @@ typedef enum
 typedef struct
 {
     CGConstantType type;
+
     union
     {
         long integer;
@@ -55,12 +56,13 @@ typedef struct
         Str enumeration;
         char character;
     };
+
 } CGConstant;
 
-// 6.7.3 type-qualifier 
-// + 6.7.4 function-specifier 
+// 6.7.3 type-qualifier
+// + 6.7.4 function-specifier
 // + 6.7.5 alignment-specifier
-// i combined some qualifier because this simplify some part of the code
+// I combined some qualifier because this simplify some part of the code
 
 typedef enum
 {
@@ -153,19 +155,25 @@ struct cg_type_specifier_qualifier
 {
     // type-specifier
     CGBuiltinTypeSpecifier specifier;
+
     union
     {
         CGTypeStructOrUnion struct_or_union;
         CGEnumSpecifier enumeration;
         CGIdentifier typedef_name;
     };
+
     // type-qualifier
+
+    CGQualifier qualifier;
 };
 
 // 6.7 declaration
+
 typedef struct
 {
     bool has_initializer;
+
     CGInitializer *initializer;
     CGDeclarator *declarator;
 } CGInitDeclarator;
@@ -182,7 +190,7 @@ typedef struct
     Vec(CGInitDeclarator) init_declarator_list;
 } CGDeclaration;
 
-// 6.7.6 declarator 
+// 6.7.6 declarator
 typedef struct
 {
     CGDeclarator *declarator;
@@ -211,6 +219,7 @@ typedef struct
 {
     CGDeclarationType type;
     CGDeclarationSpecifier specifier;
+
     union
     {
         CGDeclarator *func_type_decl;      // like void (*hello);
@@ -218,6 +227,7 @@ typedef struct
         CGArrayDeclarator array_declarator;
         CGIdentifier direct;
     } declaration;
+
 } CGDirectDeclarator;
 
 typedef struct cg_pointer
@@ -232,7 +242,6 @@ struct cg_declarator
     Vec(CGPointer) pointer;
     CGDirectDeclarator *direct_declarator;
 };
-
 
 // 6.7.7 type-name
 
@@ -261,10 +270,12 @@ struct cg_type_name
     Vec(CGTypeSpecifierQualifier) qualifier;
     CGAbstractDeclarator *abstract_declarator;
 };
+
 // 6.7.9 Initialization
 
 // [xx] = 10;
 // .xx = 10
+
 typedef struct
 {
     CGConstExpr *constant_expression;
@@ -272,12 +283,14 @@ typedef struct
 } CGDesignator;
 
 // x =
+
 typedef struct
 {
     Vec(CGDesignator) designators;
 } CGDesignation;
 
 // { [10] = 1, .x = 10,}
+
 typedef struct
 {
     CGDesignation designation;
@@ -332,9 +345,11 @@ typedef enum
 struct cg_postfix_expression
 {
     CGPostFixExpressionType type;
+
     union
     {
         CGPrimaryExpression *primary_expression;
+
         struct
         {
 
@@ -361,6 +376,7 @@ struct cg_postfix_expression
         } structure;
     };
 };
+
 // 6.5.3 unary expression
 
 typedef enum
@@ -372,6 +388,7 @@ typedef enum
     CG_UNARY_OP_NOT,     // !
     CG_UNARy_OP_NOT_BIT, // ~
 } CGUnaryOperator;
+
 typedef enum
 {
     CG_UNARY_POSTFIX,
@@ -385,14 +402,16 @@ typedef enum
 struct cg_unary_expression
 {
     CGUnaryExpressionType type;
+
     union
     {
         CGUnaryExpression *unary_expr;
         CGPostfixExpression *postfix_expr;
         CGTypeName type_name;
+
         struct
         {
-            CGUnaryOperator operator;
+            CGUnaryOperator unary_op;
             CGCastExpression *cast_expr;
         } cast_expression;
     };
@@ -532,10 +551,12 @@ typedef enum
 struct cg_assignment_expression
 {
     bool is_assignement;
+
     union
     {
 
         CGConditionalExpression *cond_expression;
+
         struct
         {
             CGUnaryExpression *unary_expr;
@@ -543,7 +564,6 @@ struct cg_assignment_expression
             CGAssignExpression *expression;
         } assignement;
     };
-
 };
 
 // 6.5.17 Expression
