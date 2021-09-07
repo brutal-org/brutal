@@ -33,16 +33,16 @@ KERNEL_OBJ= \
 DEPENDENCIES += $(KERNEL_OBJ:.o=.d)
 
 $(BUILDDIR_KERNEL)/%.c.o: sources/%.c
-	$(ECHO) "\e[37mkernel \e[92mCC\e[m" $<
+	$(ECHO) "\033[37mkernel \033[92mCC\033[m" $<
 	@$(MKCWD)
 	@$(CROSS_CC) -c -o $@ $< $(CROSS_KCFLAGS)
 
 $(BUILDDIR_KERNEL)/%.s.o: sources/%.s
-	$(ECHO) "\e[37mkernel \e[92mAS\e[m" $<
+	$(ECHO) "\033[37mkernel \033[92mAS\033[m" $<
 	@$(MKCWD)
 	@$(CROSS_AS) -o $@ $< $(CROSS_ASFLAGS)
 
 $(KERNEL): $(KERNEL_OBJ)
-	$(ECHO) "\e[37mkernel \e[92mLD\e[m" $@
+	$(ECHO) "\033[37mkernel \033[92mLD\033[m" $@
 	@$(MKCWD)
 	@$(CROSS_LD) -o $@ $^ $(CROSS_KLDFLAGS)
