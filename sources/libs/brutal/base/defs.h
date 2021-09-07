@@ -11,6 +11,6 @@
 #        undef COMPILER_GCC
 #        define COMPILER_GCC 1
 #    endif
-#elif
+#else
 #    error "Unsupported compiler!"
 #endif
