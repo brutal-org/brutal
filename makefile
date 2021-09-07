@@ -83,6 +83,10 @@ bochs: $(ISO)
 
 .PHONY: clean
 clean:
+	rm -rf $(BUILDDIR)
+
+.PHONY: clean
+clean-all:
 	rm -rf build/
 
 -include $(DEPENDENCIES)

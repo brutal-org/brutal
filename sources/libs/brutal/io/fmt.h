@@ -1,11 +1,20 @@
 #pragma once
 
+#include <brutal/base/ints.h>
 #include <brutal/io/write.h>
 #include <brutal/parse/scan.h>
 #include <brutal/text/case.h>
 #include <brutal/text/str.h>
 
-enum fmt_type
+#if COMPILER_GCC
+typedef Int128 FmtInt;
+typedef UInt128 FmtUInt;
+#else
+typedef int64_t FmtInt;
+typedef uint64_t FmtUInt;
+#endif
+
+typedef enum
 {
     FMT_NONE,
 
@@ -16,11 +25,11 @@ enum fmt_type
     FMT_DECIMAL,
     FMT_HEXADECIMAL,
     FMT_POINTER,
-};
+} FmtType;
 
 typedef struct
 {
-    enum fmt_type type;
+    FmtType type;
     Case casing;
 
     size_t min_width;
@@ -30,9 +39,9 @@ typedef struct
 
 Fmt fmt_parse(Scan *scan);
 
-IoWriteResult fmt_signed(Fmt self, IoWriter *writer, long value);
+IoWriteResult fmt_signed(Fmt self, IoWriter *writer, FmtInt value);
 
-IoWriteResult fmt_unsigned(Fmt self, IoWriter *writer, unsigned long long value);
+IoWriteResult fmt_unsigned(Fmt self, IoWriter *writer, FmtUInt value);
 
 IoWriteResult fmt_string(Fmt self, IoWriter *writer, Str string);
 

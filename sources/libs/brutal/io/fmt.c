@@ -221,7 +221,7 @@ size_t fmt_write_length(Fmt self, unsigned long value)
     return length;
 }
 
-IoWriteResult fmt_signed(Fmt self, IoWriter *writer, long value)
+IoWriteResult fmt_signed(Fmt self, IoWriter *writer, FmtInt value)
 {
     size_t written = 0;
 
@@ -236,9 +236,9 @@ IoWriteResult fmt_signed(Fmt self, IoWriter *writer, long value)
     return OK(IoWriteResult, written);
 }
 
-IoWriteResult fmt_unsigned(Fmt self, IoWriter *writer, unsigned long long value)
+IoWriteResult fmt_unsigned(Fmt self, IoWriter *writer, FmtUInt value)
 {
-    uint8_t buffer[64] = {};
+    uint8_t buffer[sizeof(FmtUInt) * 8] = {};
     size_t i = 0;
 
     if (value == 0)
@@ -277,14 +277,45 @@ IoWriteResult fmt_unsigned(Fmt self, IoWriter *writer, unsigned long long value)
         buffer[i++] = '0';
     }
 
-    str_rvs(str$(buffer));
+    str_rvs(str_n$(i, (char *)buffer));
 
     return io_write(writer, buffer, i);
 }
 
-IoWriteResult fmt_char(MAYBE_UNUSED Fmt self, IoWriter *writer, unsigned int character)
+IoWriteResult fmt_char(Fmt self, IoWriter *writer, unsigned int character)
 {
     size_t written = 0;
+
+    switch (self.casing)
+    {
+    case CASE_CAPITAL:
+    case CASE_CONSTANT:
+    case CASE_UPPER_FIRST:
+    case CASE_UPPER:
+        character = toupper(character);
+        break;
+
+    case CASE_NO:
+    case CASE_CAMEL:
+    case CASE_LOWER_FIRST:
+    case CASE_LOWER:
+        character = tolower(character);
+        break;
+
+    case CASE_SWAP:
+        if (isupper(character))
+        {
+            character = tolower(character);
+        }
+        else
+        {
+            character = toupper(character);
+        }
+        break;
+
+    default:
+        break;
+    }
 
     StrFix8 utf8 = rune_to_utf8((Rune)character);
 

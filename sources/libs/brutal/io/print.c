@@ -2,12 +2,12 @@
 #include <brutal/io/print.h>
 #include <brutal/parse/scan.h>
 
-struct print_value print_val_signed(long val)
+struct print_value print_val_signed(FmtInt val)
 {
     return (struct print_value){nullstr, PRINT_SIGNED, {._signed = val}};
 }
 
-struct print_value print_val_unsigned(unsigned long long val)
+struct print_value print_val_unsigned(FmtUInt val)
 {
     return (struct print_value){nullstr, PRINT_UNSIGNED, {._unsigned = val}};
 }
