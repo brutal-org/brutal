@@ -489,7 +489,7 @@ void bid2c(BidInterface const *interface, Emit *emit)
         emit_fmt(emit, "resp_msg.prot = {case:upper}_PROTOCOL_ID;\n", interface->name);
         emit_fmt(emit, "resp_msg.type = {case:upper}_{case:upper}_RESPONSE;\n", interface->name, method.name);
 
-        switch (request.type)
+        switch (response.type)
         {
         case BID_TYPE_PRIMITIVE:
         case BID_TYPE_ENUM:
