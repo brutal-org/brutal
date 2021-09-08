@@ -1,6 +1,8 @@
 .SUFFIXES:
 
 .DEFAULT_GOAL := all
+SHELL := /bin/bash
+
 export LC_ALL=C
 
 ifndef ECHO
