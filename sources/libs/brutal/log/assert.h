@@ -21,6 +21,16 @@
         }                                 \
     })
 
+#define assert_br_success(EXPR) (                                                                                  \
+    {                                                                                                              \
+        BrResult __value = (EXPR);                                                                                 \
+                                                                                                                   \
+        if (__value != BR_SUCCESS)                                                                                 \
+        {                                                                                                          \
+            panic$("{} is not equal to BR_SUCCESS (but is equal to: '{}') ", #EXPR, br_result_to_string(__value)); \
+        }                                                                                                          \
+    })
+
 #define assert_falsity(EXPR) (           \
     {                                    \
         typeof(EXPR) __value = (EXPR);   \

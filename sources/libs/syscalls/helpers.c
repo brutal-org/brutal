@@ -20,7 +20,7 @@ BrGlobalInfo *brh_global_info(void)
             .mem_obj = BR_MEM_OBJ_GINFO,
         };
 
-        assert_truth(br_map(&g_map) == BR_SUCCESS);
+        assert_br_success(br_map(&g_map));
         global_infos = (BrGlobalInfo *)g_map.vaddr;
     }
 
@@ -38,7 +38,7 @@ BrLocalInfo *brh_local_info(void)
             .mem_obj = BR_MEM_OBJ_LINFO,
         };
 
-        assert_truth(br_map(&l_map) == BR_SUCCESS);
+        assert_br_success(br_map(&l_map));
         local_infos = (BrLocalInfo *)l_map.vaddr;
     }
 

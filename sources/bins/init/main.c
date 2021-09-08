@@ -24,7 +24,7 @@ static void display_bootimage(Handover const *handover)
         },
     };
 
-    assert_truth(br_create(&fb_obj) == BR_SUCCESS);
+    assert_br_success(br_create(&fb_obj));
 
     BrMapArgs fb_map = {
         .space = BR_SPACE_SELF,
@@ -32,7 +32,7 @@ static void display_bootimage(Handover const *handover)
         .flags = BR_MEM_WRITABLE,
     };
 
-    assert_truth(br_map(&fb_map) == BR_SUCCESS);
+    assert_br_success(br_map(&fb_map));
 
     GfxSurface fb_surface = {
         .width = fb->width,
@@ -57,7 +57,7 @@ static void display_bootimage(Handover const *handover)
         },
     };
 
-    assert_truth(br_create(&img_obj) == BR_SUCCESS);
+    assert_br_success(br_create(&img_obj));
 
     BrMapArgs img_map = {
         .space = BR_SPACE_SELF,
@@ -65,7 +65,7 @@ static void display_bootimage(Handover const *handover)
         .flags = BR_MEM_WRITABLE,
     };
 
-    assert_truth(br_map(&img_map) == BR_SUCCESS);
+    assert_br_success(br_map(&img_map));
 
     GfxSurface img_surface = tga_decode_in_memory((void *)img_map.vaddr, img_map.size);
 
@@ -84,17 +84,17 @@ static void display_bootimage(Handover const *handover)
     brh_close(img_obj.handle);
     brh_close(fb_obj.handle);
 
-    assert_truth(br_unmap(&(BrUnmapArgs){
-                     .space = BR_SPACE_SELF,
-                     .vaddr = fb_map.vaddr,
-                     .size = fb_map.size,
-                 }) == BR_SUCCESS);
+    assert_br_success(br_unmap(&(BrUnmapArgs){
+        .space = BR_SPACE_SELF,
+        .vaddr = fb_map.vaddr,
+        .size = fb_map.size,
+    }));
 
-    assert_truth(br_unmap(&(BrUnmapArgs){
-                     .space = BR_SPACE_SELF,
-                     .vaddr = img_map.vaddr,
-                     .size = img_map.size,
-                 }) == BR_SUCCESS);
+    assert_br_success(br_unmap(&(BrUnmapArgs){
+        .space = BR_SPACE_SELF,
+        .vaddr = img_map.vaddr,
+        .size = img_map.size,
+    }));
 }
 
 BrResult srv_run(Handover const *handover, Str name, BrExecArgs const *args, BrTaskInfos *infos)
@@ -112,7 +112,7 @@ BrResult srv_run(Handover const *handover, Str name, BrExecArgs const *args, BrT
         },
     };
 
-    assert_truth(br_create(&elf_obj) == BR_SUCCESS);
+    assert_br_success(br_create(&elf_obj));
 
     BrResult result = br_exec(elf_obj.handle, name, args, infos);
 

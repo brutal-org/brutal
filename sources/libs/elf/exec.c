@@ -30,7 +30,7 @@ void elf_load(BrSpace space, Elf64Header const *elf_header, BrMemObj elf_obj)
                 .flags = BR_MEM_NONE,
             };
 
-            assert_truth(br_map(&prog_map) == BR_SUCCESS);
+            assert_br_success(br_map(&prog_map));
         }
         else
         {
@@ -42,7 +42,7 @@ void elf_load(BrSpace space, Elf64Header const *elf_header, BrMemObj elf_obj)
                 },
             };
 
-            assert_truth(br_create(&prog_obj) == BR_SUCCESS);
+            assert_br_success(br_create(&prog_obj));
 
             BrMapArgs prog_local_map = {
                 .space = BR_SPACE_SELF,
@@ -50,7 +50,7 @@ void elf_load(BrSpace space, Elf64Header const *elf_header, BrMemObj elf_obj)
                 .flags = BR_MEM_WRITABLE,
             };
 
-            assert_truth(br_map(&prog_local_map) == BR_SUCCESS);
+            assert_br_success(br_map(&prog_local_map));
 
             uint8_t *ptr = (uint8_t *)prog_local_map.vaddr;
 
@@ -66,15 +66,15 @@ void elf_load(BrSpace space, Elf64Header const *elf_header, BrMemObj elf_obj)
                 .flags = BR_MEM_WRITABLE,
             };
 
-            assert_truth(br_map(&prog_map) == BR_SUCCESS);
+            assert_br_success(br_map(&prog_map));
 
-            assert_truth(br_unmap(&(BrUnmapArgs){
-                             .space = BR_SPACE_SELF,
-                             .vaddr = prog_local_map.vaddr,
-                             .size = size,
-                         }) == BR_SUCCESS);
+            assert_br_success(br_unmap(&(BrUnmapArgs){
+                .space = BR_SPACE_SELF,
+                .vaddr = prog_local_map.vaddr,
+                .size = size,
+            }));
 
-            assert_truth(brh_close(prog_obj.handle) == BR_SUCCESS);
+            assert_br_success(brh_close(prog_obj.handle));
         }
 
         prog_header = (Elf64ProgramHeader *)((uint8_t *)prog_header + elf_header->program_header_table_entry_size);

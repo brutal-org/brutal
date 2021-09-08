@@ -15,7 +15,7 @@ static uintptr_t exec_stack(BrSpace space, BrExecArgs const *exec_args, BrTaskAr
         },
     };
 
-    assert_truth(br_create(&stack_obj) == BR_SUCCESS);
+    assert_br_success(br_create(&stack_obj));
 
     BrMapArgs local_stack_map = {
         .space = BR_SPACE_SELF,
@@ -23,7 +23,7 @@ static uintptr_t exec_stack(BrSpace space, BrExecArgs const *exec_args, BrTaskAr
         .flags = BR_MEM_WRITABLE,
     };
 
-    assert_truth(br_map(&local_stack_map) == BR_SUCCESS);
+    assert_br_success(br_map(&local_stack_map));
 
     uint8_t *base = (uint8_t *)local_stack_map.vaddr + 0x4000;
     uint8_t *head = base;
@@ -88,7 +88,7 @@ static uintptr_t exec_stack(BrSpace space, BrExecArgs const *exec_args, BrTaskAr
         .flags = BR_MEM_WRITABLE,
     };
 
-    assert_truth(br_map(&stack_map) == BR_SUCCESS);
+    assert_br_success(br_map(&stack_map));
 
     BrUnmapArgs local_stack_unmap = {
         .space = BR_SPACE_SELF,
@@ -96,9 +96,9 @@ static uintptr_t exec_stack(BrSpace space, BrExecArgs const *exec_args, BrTaskAr
         .size = local_stack_map.size,
     };
 
-    assert_truth(br_unmap(&local_stack_unmap) == BR_SUCCESS);
+    assert_br_success(br_unmap(&local_stack_unmap));
 
-    assert_truth(brh_close(stack_obj.handle) == BR_SUCCESS);
+    assert_br_success(brh_close(stack_obj.handle));
 
     return sp;
 }
@@ -111,7 +111,7 @@ BrResult br_exec(BrMemObj elf_obj, Str name, BrExecArgs const *args, BrTaskInfos
         .flags = BR_MEM_WRITABLE,
     };
 
-    assert_truth(br_map(&elf_map) == BR_SUCCESS);
+    assert_br_success(br_map(&elf_map));
 
     BrCreateArgs elf_space = {
         .type = BR_OBJECT_SPACE,
@@ -120,7 +120,7 @@ BrResult br_exec(BrMemObj elf_obj, Str name, BrExecArgs const *args, BrTaskInfos
         },
     };
 
-    assert_truth(br_create(&elf_space) == BR_SUCCESS);
+    assert_br_success(br_create(&elf_space));
 
     BrCreateArgs elf_task = {
         .type = BR_OBJECT_TASK,
@@ -131,7 +131,7 @@ BrResult br_exec(BrMemObj elf_obj, Str name, BrExecArgs const *args, BrTaskInfos
         },
     };
 
-    assert_truth(br_create(&elf_task) == BR_SUCCESS);
+    assert_br_success(br_create(&elf_task));
 
     Elf64Header *elf_header = (Elf64Header *)elf_map.vaddr;
 
@@ -147,9 +147,9 @@ BrResult br_exec(BrMemObj elf_obj, Str name, BrExecArgs const *args, BrTaskInfos
         .sp = sp,
     };
 
-    assert_truth(br_start(&elf_start) == BR_SUCCESS);
+    assert_br_success(br_start(&elf_start));
 
-    assert_truth(brh_close(elf_space.handle) == BR_SUCCESS);
+    assert_br_success(brh_close(elf_space.handle));
 
     BrUnmapArgs elf_unmap = {
         .space = BR_SPACE_SELF,
@@ -157,7 +157,7 @@ BrResult br_exec(BrMemObj elf_obj, Str name, BrExecArgs const *args, BrTaskInfos
         .size = elf_map.size,
     };
 
-    assert_truth(br_unmap(&elf_unmap) == BR_SUCCESS);
+    assert_br_success(br_unmap(&elf_unmap));
 
     infos->handle = elf_task.handle;
     infos->tid = elf_task.id;
