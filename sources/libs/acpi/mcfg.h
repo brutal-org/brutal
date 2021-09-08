@@ -2,6 +2,8 @@
 
 #include <acpi/stdh.h>
 
+#define ACPI_MCFG_SIG str$("MCFG")
+
 typedef struct PACKED
 {
     uint64_t address;
@@ -17,3 +19,8 @@ typedef struct PACKED
     uint64_t reserved;
     AcpiMcfgRecord records[];
 } AcpiMcfg;
+
+static inline int acpi_mcfg_record_count(AcpiMcfg *mcfg)
+{
+    return (mcfg->stdh.length - sizeof(AcpiMcfg)) / sizeof(AcpiMcfgRecord);
+}

@@ -1,6 +1,11 @@
 #pragma once
 
 #include <brutal/base.h>
+#ifndef __kernel__
+#    include <syscalls/mmio.h>
+#endif
+
+#define ACPI_WINDOW_SIZE
 
 typedef struct PACKED
 {
@@ -13,11 +18,22 @@ typedef struct PACKED
 
 typedef struct
 {
+#ifdef __kernel__
     uintptr_t base;
+#else
+    BrMmio mmio;
+#endif
+
     AcpiRsdp *rsdp;
     struct acpi_rsdt *rsdt;
 } Acpi;
 
+#ifdef __kernel__
 void acpi_init(Acpi *acpi, uintptr_t base, uintptr_t rsdp);
+#else
+void acpi_init(Acpi *acpi, uintptr_t rsdp);
+#endif
+
+void acpi_deinit(Acpi *acpi);
 
 uintptr_t acpi_phys_to_virt(Acpi *acpi, uintptr_t addr);

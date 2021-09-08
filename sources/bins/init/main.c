@@ -162,6 +162,16 @@ int br_entry_handover(Handover *handover)
             .handover = handover,
         },
         &acpi_server);
+
+    BrTaskInfos pci_server = {};
+    srv_run(
+        handover,
+        str$("pci"),
+        &(BrExecArgs){
+            .type = BR_START_HANDOVER,
+            .handover = handover,
+        },
+        &pci_server);
     /*
     BrTaskInfos echo_server = {};
     srv_run(
