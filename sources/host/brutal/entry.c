@@ -4,7 +4,7 @@
 #include <handover/handover.h>
 #include <syscalls/syscalls.h>
 
-__attribute__((weak)) int br_entry_args(
+WEAK int br_entry_args(
     MAYBE_UNUSED long arg1,
     MAYBE_UNUSED long arg2,
     MAYBE_UNUSED long arg3,
@@ -15,7 +15,7 @@ __attribute__((weak)) int br_entry_args(
     return 0;
 }
 
-__attribute__((weak)) int main(
+WEAK int main(
     MAYBE_UNUSED int argc,
     MAYBE_UNUSED char **argv,
     MAYBE_UNUSED char **envp)
@@ -24,7 +24,7 @@ __attribute__((weak)) int main(
     return 0;
 }
 
-__attribute__((weak)) int br_entry_cmain(
+WEAK int br_entry_cmain(
     int argc,
     char **argv,
     char **envp)
@@ -32,7 +32,7 @@ __attribute__((weak)) int br_entry_cmain(
     return main(argc, argv, envp);
 }
 
-__attribute__((weak)) int br_entry_handover(
+WEAK int br_entry_handover(
     MAYBE_UNUSED Handover *handover)
 {
     panic$("HANDOVER start protocol is unsupported!");

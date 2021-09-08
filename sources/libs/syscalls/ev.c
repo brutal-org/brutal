@@ -14,7 +14,7 @@ typedef struct ipc_job
 static Fiber *dispatcher = nullptr;
 static IpcJob *jobs = nullptr;
 
-__attribute__((weak)) void br_event(MAYBE_UNUSED BrMsg const *msg)
+WEAK void br_event(MAYBE_UNUSED BrMsg const *msg)
 {
 }
 

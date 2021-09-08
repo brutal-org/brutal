@@ -9,3 +9,5 @@
 #define MAYBE_UNUSED [[maybe_unused]]
 
 #define CLEANUP(FUNC) __attribute__((cleanup(FUNC)))
+
+#define WEAK __attribute__((weak))
