@@ -430,6 +430,76 @@ BrResult sys_ack(BrAckArgs *args)
     return result;
 }
 
+BrResult sys_stat_memobj(BrInfoMemObj *args, MemObj *obj)
+{
+    args->range = obj->pmm;
+    return BR_SUCCESS;
+}
+
+BrResult sys_stat_domain(BrInfoDomain *args, Domain *domain)
+{
+    args->domain_object_count = slot_count(&domain->objects);
+    return BR_SUCCESS;
+}
+
+BrResult sys_stat_space(BrInfoSpace *args, Space *space)
+{
+    args->flags = space->flags;
+    return BR_SUCCESS;
+}
+
+BrResult sys_stat_task(BrInfoTask *args, Task *task)
+{
+    args->blocked = task->is_blocked;
+    args->started = task->is_started;
+    args->stopped = task->is_stopped;
+    args->capabilities = task->caps;
+    args->name = task->name;
+    args->id = task->id;
+
+    return BR_SUCCESS;
+}
+
+BrResult sys_stat_irq(BrInfoIrq *args, Irq *irq)
+{
+    args->id = irq->irq;
+    return BR_SUCCESS;
+}
+BrResult sys_stat(BrStatArgs *args)
+{
+
+    Object *object;
+    if (args->handle == BR_TASK_SELF)
+    {
+        object = (Object *)task_self();
+    }
+    else
+    {
+        object = domain_lookup(task_self()->domain, args->handle, BR_OBJECT_ANY);
+    }
+
+    if (object == nullptr)
+    {
+        return BR_BAD_HANDLE;
+    }
+
+    args->info.type = object->type;
+    switch (object->type)
+    {
+    case BR_OBJECT_MEMORY:
+        return sys_stat_memobj(&args->info.memobj, (MemObj *)object);
+    case BR_OBJECT_DOMAIN:
+        return sys_stat_domain(&args->info.domainobj, (Domain *)object);
+    case BR_OBJECT_SPACE:
+        return sys_stat_space(&args->info.spaceobj, (Space *)object);
+    case BR_OBJECT_TASK:
+        return sys_stat_task(&args->info.taskobj, (Task *)object);
+    case BR_OBJECT_IRQ:
+        return sys_stat_irq(&args->info.irqobj, (Irq *)object);
+    default:
+        return BR_BAD_HANDLE;
+    }
+}
 typedef BrResult BrSyscallFn();
 
 BrSyscallFn *syscalls[BR_SYSCALL_COUNT] = {
@@ -445,6 +515,7 @@ BrSyscallFn *syscalls[BR_SYSCALL_COUNT] = {
     [BR_SC_BIND] = sys_bind,
     [BR_SC_UNBIND] = sys_unbind,
     [BR_SC_ACK] = sys_ack,
+    [BR_SC_STAT] = sys_stat,
 };
 
 BrResult syscall_dispatch(BrSyscall syscall, BrArg args)

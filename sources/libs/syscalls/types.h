@@ -1,5 +1,6 @@
 #pragma once
 
+#include <brutal/base/range.h>
 #include <brutal/time.h>
 
 #define FOREACH_SYSCALLS(SYSCALL) \
@@ -14,7 +15,8 @@
     SYSCALL(CLOSE)                \
     SYSCALL(BIND)                 \
     SYSCALL(UNBIND)               \
-    SYSCALL(ACK)
+    SYSCALL(ACK)                  \
+    SYSCALL(STAT)
 
 typedef enum
 {
@@ -268,3 +270,46 @@ typedef struct
     uintptr_t arg4;
     uintptr_t arg5;
 } BrTaskArgs;
+
+typedef struct
+{
+    BrIrqId id;
+} BrInfoIrq;
+
+typedef struct
+{
+    StrFix128 name;
+    BrCap capabilities;
+    bool stopped;
+    bool started;
+    bool blocked;
+    BrTask id;
+} BrInfoTask;
+
+typedef struct
+{
+    size_t domain_object_count;
+} BrInfoDomain;
+
+typedef struct
+{
+    USizeRange range;
+} BrInfoMemObj;
+
+typedef struct
+{
+    BrSpaceFlags flags;
+} BrInfoSpace;
+
+typedef struct
+{
+    BrObjectType type;
+    union
+    {
+        BrInfoMemObj memobj;
+        BrInfoDomain domainobj;
+        BrInfoSpace spaceobj;
+        BrInfoTask taskobj;
+        BrInfoIrq irqobj;
+    };
+} BrHandleInfo;
