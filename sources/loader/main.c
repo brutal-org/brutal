@@ -9,7 +9,7 @@
 #include "loader/memory.h"
 #include "loader/protocol.h"
 
-typedef void (*entry_point_func)(Handover *handover, uint64_t t) __attribute__((sysv_abi));
+typedef void (*EntryPointFn)(Handover *handover, uint64_t t) __attribute__((sysv_abi));
 
 void __chkstk() { return; }
 
@@ -71,7 +71,7 @@ void loader_load(Elf64Header const *elf_header, void *base)
     }
 }
 
-entry_point_func loader_load_kernel(Str path)
+EntryPointFn loader_load_kernel(Str path)
 {
     IoFile file;
     IoReader reader;
@@ -100,14 +100,14 @@ entry_point_func loader_load_kernel(Str path)
 
     log$("Entry is {#x}", entry);
 
-    return (entry_point_func)entry;
+    return (EntryPointFn)entry;
 }
 
 void loader_boot(LoaderEntry *entry, Buffer *config_buf)
 {
     log$("Loading kernel...");
 
-    auto entry_point = loader_load_kernel(entry->kernel);
+    EntryPointFn entry_point = loader_load_kernel(entry->kernel);
 
     buffer_deinit(config_buf);
 

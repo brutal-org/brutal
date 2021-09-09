@@ -6,7 +6,7 @@
 #include "kernel/x86_64/asm.h"
 #include "kernel/x86_64/paging.h"
 
-static struct pml *kernel_pml = nullptr;
+static Pml *kernel_pml = nullptr;
 static Lock vmm_lock;
 
 static void flush_tlb(uintptr_t addr)
@@ -27,9 +27,9 @@ VmmResult vmm_flush(VmmSpace space, VmmRange virtual_range)
     return OK(VmmResult, virtual_range);
 }
 
-static VmmResult vmm_get_pml(struct pml *table, size_t idx)
+static VmmResult vmm_get_pml(Pml *table, size_t idx)
 {
-    auto entry = table->entries[idx];
+    PmlEntry entry = table->entries[idx];
 
     if (!entry.present)
     {
@@ -44,9 +44,9 @@ static VmmResult vmm_get_pml(struct pml *table, size_t idx)
     return OK(VmmResult, range);
 }
 
-static VmmResult vmm_get_pml_or_alloc(struct pml *table, size_t idx, size_t flags)
+static VmmResult vmm_get_pml_or_alloc(Pml *table, size_t idx, size_t flags)
 {
-    auto entry = table->entries[idx];
+    PmlEntry entry = table->entries[idx];
 
     if (entry.present)
     {
@@ -89,7 +89,7 @@ static void vmm_load_memory_map(VmmSpace target, HandoverMmap const *memory_map)
 
     for (size_t i = 0; i < memory_map->size; i++)
     {
-        auto entry = memory_map->entries[i];
+        HandoverMmapEntry entry = memory_map->entries[i];
 
         log$("Loading kernel memory map {}/{} ({x} - {x})",
              i + 1,
@@ -129,9 +129,9 @@ static void vmm_load_memory_map(VmmSpace target, HandoverMmap const *memory_map)
 
 void vmm_initialize(Handover const *handover)
 {
-    auto heap_result = heap_alloc(MEM_PAGE_SIZE);
+    HeapResult heap_result = heap_alloc(MEM_PAGE_SIZE);
 
-    kernel_pml = (struct pml *)UNWRAP(heap_result).base;
+    kernel_pml = (Pml *)UNWRAP(heap_result).base;
     mem_set(kernel_pml, 0, MEM_PAGE_SIZE);
 
     vmm_load_memory_map(kernel_pml, &handover->mmap);
@@ -144,12 +144,12 @@ VmmSpace vmm_space_create(void)
 {
     LOCK_RETAINER(&vmm_lock);
 
-    auto heap_result = heap_alloc(MEM_PAGE_SIZE);
+    HeapResult heap_result = heap_alloc(MEM_PAGE_SIZE);
 
     VmmSpace vmm_address_space = (VmmSpace)UNWRAP(heap_result).base;
     mem_set(vmm_address_space, 0, MEM_PAGE_SIZE);
 
-    struct pml *pml_table = (struct pml *)vmm_address_space;
+    Pml *pml_table = (Pml *)vmm_address_space;
 
     for (size_t i = 0; i < 255; i++)
     {
@@ -164,7 +164,7 @@ VmmSpace vmm_space_create(void)
     return vmm_address_space;
 }
 
-static void vmm_space_destroy_pml(int level, struct pml *pml, size_t start, size_t end)
+static void vmm_space_destroy_pml(int level, Pml *pml, size_t start, size_t end)
 {
     if (level < 1)
     {
@@ -173,14 +173,14 @@ static void vmm_space_destroy_pml(int level, struct pml *pml, size_t start, size
 
     for (size_t i = start; i < end; i++)
     {
-        auto vmm_result = vmm_get_pml(pml, i);
+        VmmResult vmm_result = vmm_get_pml(pml, i);
 
         if (!vmm_result.succ)
         {
             continue;
         }
 
-        vmm_space_destroy_pml(level - 1, (struct pml *)UNWRAP(vmm_result).base, 0, 512);
+        vmm_space_destroy_pml(level - 1, (Pml *)UNWRAP(vmm_result).base, 0, 512);
     }
 
     heap_free((HeapRange){(uintptr_t)pml, MEM_PAGE_SIZE});
@@ -188,7 +188,7 @@ static void vmm_space_destroy_pml(int level, struct pml *pml, size_t start, size
 
 void vmm_space_destroy(VmmSpace space)
 {
-    vmm_space_destroy_pml(4, (struct pml *)space, 0, 255);
+    vmm_space_destroy_pml(4, (Pml *)space, 0, 255);
 }
 
 void vmm_space_switch(VmmSpace space)
@@ -203,16 +203,16 @@ VmmSpace vmm_kernel_space(void)
     return (VmmSpace)kernel_pml;
 }
 
-static VmmResult vmm_map_page(struct pml *pml4, uintptr_t virtual_page, uintptr_t physical_page, BrMemFlags flags)
+static VmmResult vmm_map_page(Pml *pml4, uintptr_t virtual_page, uintptr_t physical_page, BrMemFlags flags)
 {
-    auto pml3_range = TRY(VmmResult, vmm_get_pml_or_alloc(pml4, PML4_GET_INDEX(virtual_page), flags | BR_MEM_WRITABLE | BR_MEM_USER));
-    struct pml *pml3 = (struct pml *)(pml3_range.base);
+    VmmRange pml3_range = TRY(VmmResult, vmm_get_pml_or_alloc(pml4, PML4_GET_INDEX(virtual_page), flags | BR_MEM_WRITABLE | BR_MEM_USER));
+    Pml *pml3 = (Pml *)(pml3_range.base);
 
-    auto pml2_range = TRY(VmmResult, vmm_get_pml_or_alloc(pml3, PML3_GET_INDEX(virtual_page), flags | BR_MEM_WRITABLE | BR_MEM_USER));
-    struct pml *pml2 = (struct pml *)(pml2_range.base);
+    VmmRange pml2_range = TRY(VmmResult, vmm_get_pml_or_alloc(pml3, PML3_GET_INDEX(virtual_page), flags | BR_MEM_WRITABLE | BR_MEM_USER));
+    Pml *pml2 = (Pml *)(pml2_range.base);
 
-    auto pml1_range = TRY(VmmResult, vmm_get_pml_or_alloc(pml2, PML2_GET_INDEX(virtual_page), flags | BR_MEM_WRITABLE | BR_MEM_USER));
-    struct pml *pml1 = (struct pml *)(pml1_range.base);
+    VmmRange pml1_range = TRY(VmmResult, vmm_get_pml_or_alloc(pml2, PML2_GET_INDEX(virtual_page), flags | BR_MEM_WRITABLE | BR_MEM_USER));
+    Pml *pml1 = (Pml *)(pml1_range.base);
 
     if (pml1->entries[PML1_GET_INDEX(virtual_page)].present)
     {
@@ -226,16 +226,16 @@ static VmmResult vmm_map_page(struct pml *pml4, uintptr_t virtual_page, uintptr_
     return OK(VmmResult, range);
 }
 
-static VmmResult vmm_unmap_page(struct pml *pml4, uintptr_t virtual_page)
+static VmmResult vmm_unmap_page(Pml *pml4, uintptr_t virtual_page)
 {
-    auto pml3_range = TRY(VmmResult, vmm_get_pml(pml4, PML4_GET_INDEX(virtual_page)));
-    struct pml *pml3 = (struct pml *)(pml3_range.base);
+    VmmRange pml3_range = TRY(VmmResult, vmm_get_pml(pml4, PML4_GET_INDEX(virtual_page)));
+    Pml *pml3 = (Pml *)(pml3_range.base);
 
-    auto pml2_range = TRY(VmmResult, vmm_get_pml(pml3, PML3_GET_INDEX(virtual_page)));
-    struct pml *pml2 = (struct pml *)(pml2_range.base);
+    VmmRange pml2_range = TRY(VmmResult, vmm_get_pml(pml3, PML3_GET_INDEX(virtual_page)));
+    Pml *pml2 = (Pml *)(pml2_range.base);
 
-    auto pml1_range = TRY(VmmResult, vmm_get_pml(pml2, PML2_GET_INDEX(virtual_page)));
-    struct pml *pml1 = (struct pml *)(pml1_range.base);
+    VmmRange pml1_range = TRY(VmmResult, vmm_get_pml(pml2, PML2_GET_INDEX(virtual_page)));
+    Pml *pml1 = (Pml *)(pml1_range.base);
 
     assert_truth(pml1->entries[PML1_GET_INDEX(virtual_page)].present == 1);
 
@@ -261,7 +261,7 @@ VmmResult vmm_map(VmmSpace space, VmmRange virtual_range, PmmRange physical_rang
     for (size_t i = 0; i < (virtual_range.size / MEM_PAGE_SIZE); i++)
     {
         vmm_map_page(
-            (struct pml *)space,
+            (Pml *)space,
             i * MEM_PAGE_SIZE + ALIGN_DOWN(virtual_range.base, MEM_PAGE_SIZE),
             i * MEM_PAGE_SIZE + ALIGN_DOWN(physical_range.base, MEM_PAGE_SIZE),
             flags);
@@ -278,7 +278,7 @@ VmmResult vmm_unmap(VmmSpace space, VmmRange virtual_range)
 
     for (size_t i = 0; i < (virtual_range.size / MEM_PAGE_SIZE); i++)
     {
-        vmm_unmap_page((struct pml *)space, i * MEM_PAGE_SIZE + ALIGN_DOWN(virtual_range.base, MEM_PAGE_SIZE));
+        vmm_unmap_page((Pml *)space, i * MEM_PAGE_SIZE + ALIGN_DOWN(virtual_range.base, MEM_PAGE_SIZE));
     }
 
     return OK(VmmResult, virtual_range);
@@ -288,18 +288,18 @@ PmmResult vmm_virt2phys(VmmSpace space, VmmRange virtual_range)
 {
     LOCK_RETAINER(&vmm_lock);
 
-    struct pml *pml4 = (struct pml *)space;
+    Pml *pml4 = (Pml *)space;
 
-    auto pml3_range = TRY(PmmResult, vmm_get_pml(pml4, PML4_GET_INDEX(virtual_range.base)));
-    struct pml *pml3 = (struct pml *)(pml3_range.base);
+    VmmRange pml3_range = TRY(PmmResult, vmm_get_pml(pml4, PML4_GET_INDEX(virtual_range.base)));
+    Pml *pml3 = (Pml *)(pml3_range.base);
 
-    auto pml2_range = TRY(PmmResult, vmm_get_pml(pml3, PML3_GET_INDEX(virtual_range.base)));
-    struct pml *pml2 = (struct pml *)(pml2_range.base);
+    VmmRange pml2_range = TRY(PmmResult, vmm_get_pml(pml3, PML3_GET_INDEX(virtual_range.base)));
+    Pml *pml2 = (Pml *)(pml2_range.base);
 
-    auto pml1_range = TRY(PmmResult, vmm_get_pml(pml2, PML2_GET_INDEX(virtual_range.base)));
-    struct pml *pml1 = (struct pml *)(pml1_range.base);
+    VmmRange pml1_range = TRY(PmmResult, vmm_get_pml(pml2, PML2_GET_INDEX(virtual_range.base)));
+    Pml *pml1 = (Pml *)(pml1_range.base);
 
-    auto entry = pml1->entries[PML1_GET_INDEX(virtual_range.base)];
+    PmlEntry entry = pml1->entries[PML1_GET_INDEX(virtual_range.base)];
     PmmRange range = {entry.physical << 12, virtual_range.size};
 
     return OK(PmmResult, range);

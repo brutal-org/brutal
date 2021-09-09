@@ -35,7 +35,7 @@ static MapBucket *map_bucket(MapImpl *impl, uint32_t hash)
 
 static MapNode *map_node(MapImpl *impl, Str key, uint32_t hash)
 {
-    auto bucket = map_bucket(impl, hash);
+    MapBucket *bucket = map_bucket(impl, hash);
 
     vec_foreach(node, bucket)
     {
@@ -83,8 +83,8 @@ void map_deinit_impl(MapImpl *impl)
 
 bool map_put_impl(MapImpl *impl, Str key, const void *data)
 {
-    auto hash = map_hash(key);
-    auto node = map_node(impl, key, hash);
+    uint32_t hash = map_hash(key);
+    MapNode *node = map_node(impl, key, hash);
 
     if (node)
     {
@@ -92,7 +92,7 @@ bool map_put_impl(MapImpl *impl, Str key, const void *data)
     }
     else
     {
-        auto bucket = map_bucket(impl, hash);
+        MapBucket *bucket = map_bucket(impl, hash);
         node = map_node_create(impl->alloc, key, data, impl->data_size);
         vec_push(bucket, node);
     }
@@ -102,8 +102,8 @@ bool map_put_impl(MapImpl *impl, Str key, const void *data)
 
 bool map_get_impl(MapImpl *impl, Str key, void *data)
 {
-    auto hash = map_hash(key);
-    auto node = map_node(impl, key, hash);
+    uint32_t hash = map_hash(key);
+    MapNode *node = map_node(impl, key, hash);
 
     if (node)
     {

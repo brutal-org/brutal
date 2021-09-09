@@ -64,7 +64,7 @@ void vec_swap_impl(VecImpl *impl, int idx1, int idx2);
 
 #define vec_insert(v, idx, val) (                     \
     {                                                 \
-        auto result = vec_insert_impl(impl$(v), idx); \
+        bool result = vec_insert_impl(impl$(v), idx); \
         if (result)                                   \
         {                                             \
             (v)->data[idx] = (val);                   \

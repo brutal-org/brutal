@@ -2,42 +2,42 @@
 #include <brutal/io/print.h>
 #include <brutal/parse/scan.h>
 
-struct print_value print_val_signed(FmtInt val)
+PrintValue print_val_signed(FmtInt val)
 {
-    return (struct print_value){nullstr, PRINT_SIGNED, {._signed = val}};
+    return (PrintValue){nullstr, PRINT_SIGNED, {._signed = val}};
 }
 
-struct print_value print_val_unsigned(FmtUInt val)
+PrintValue print_val_unsigned(FmtUInt val)
 {
-    return (struct print_value){nullstr, PRINT_UNSIGNED, {._unsigned = val}};
+    return (PrintValue){nullstr, PRINT_UNSIGNED, {._unsigned = val}};
 }
 
-struct print_value print_val_cstring(char const *val)
+PrintValue print_val_cstring(char const *val)
 {
-    return (struct print_value){nullstr, PRINT_STRING, {._string = str$(val)}};
+    return (PrintValue){nullstr, PRINT_STRING, {._string = str$(val)}};
 }
 
-struct print_value print_val_char(char val)
+PrintValue print_val_char(char val)
 {
-    return (struct print_value){nullstr, PRINT_CHAR, {._char = val}};
+    return (PrintValue){nullstr, PRINT_CHAR, {._char = val}};
 }
 
-struct print_value print_val_string(Str val)
+PrintValue print_val_string(Str val)
 {
-    return (struct print_value){nullstr, PRINT_STRING, {._string = val}};
+    return (PrintValue){nullstr, PRINT_STRING, {._string = val}};
 }
 
-struct print_value print_val_pointer(void *ptr)
+PrintValue print_val_pointer(void *ptr)
 {
-    return (struct print_value){nullstr, PRINT_POINTER, {._pointer = ptr}};
+    return (PrintValue){nullstr, PRINT_POINTER, {._pointer = ptr}};
 }
 
-struct print_value print_val_trans(PrintTrans trans)
+PrintValue print_val_trans(PrintTrans trans)
 {
-    return (struct print_value){nullstr, PRINT_TRANS, {._trans = trans}};
+    return (PrintValue){nullstr, PRINT_TRANS, {._trans = trans}};
 }
 
-IoWriteResult print_dispatch(IoWriter *writer, Fmt fmt, struct print_value value)
+IoWriteResult print_dispatch(IoWriter *writer, Fmt fmt, PrintValue value)
 {
     switch (value.type)
     {

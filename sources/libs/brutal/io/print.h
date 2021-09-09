@@ -9,7 +9,7 @@
 #include <brutal/io/write.h>
 #include <brutal/text/str.h>
 
-enum print_type
+typedef enum
 {
     PRINT_SIGNED,
     PRINT_UNSIGNED,
@@ -17,12 +17,14 @@ enum print_type
     PRINT_POINTER,
     PRINT_CHAR,
     PRINT_TRANS,
-};
+} PrintType;
+
+typedef struct print_value PrintValue;
 
 typedef struct
 {
     size_t count;
-    struct print_value *values;
+    PrintValue *values;
 } PrintArgs;
 
 typedef struct
@@ -34,7 +36,7 @@ typedef struct
 struct print_value
 {
     Str name;
-    enum print_type type;
+    PrintType type;
 
     union
     {
@@ -47,19 +49,19 @@ struct print_value
     };
 };
 
-struct print_value print_val_signed(FmtInt);
+PrintValue print_val_signed(FmtInt);
 
-struct print_value print_val_unsigned(FmtUInt);
+PrintValue print_val_unsigned(FmtUInt);
 
-struct print_value print_val_string(Str);
+PrintValue print_val_string(Str);
 
-struct print_value print_val_cstring(char const *);
+PrintValue print_val_cstring(char const *);
 
-struct print_value print_val_char(char);
+PrintValue print_val_char(char);
 
-struct print_value print_val_pointer(void *);
+PrintValue print_val_pointer(void *);
 
-struct print_value print_val_trans(PrintTrans);
+PrintValue print_val_trans(PrintTrans);
 
 // clang-format off
 
@@ -85,7 +87,7 @@ struct print_value print_val_trans(PrintTrans);
     )(VALUE),
 
 #define named$(NAME, VALUE) ({                  \
-       auto pv = PRINT_MATCH(VALUE);            \
+       PrintValue pv = PRINT_MATCH(VALUE);            \
        pv.name = str$(NAME);                    \
        pv;                                      \
     })
@@ -96,7 +98,7 @@ struct print_value print_val_trans(PrintTrans);
     (PrintArgs) { .count = 0, }
 
 #define PRINT_ARGS_N(...) \
-    (PrintArgs) { COUNT(__VA_ARGS__), (struct print_value[]){MAP(PRINT_MATCH, __VA_ARGS__)}, }
+    (PrintArgs) { COUNT(__VA_ARGS__), (PrintValue[]){MAP(PRINT_MATCH, __VA_ARGS__)}, }
 
 #define PRINT_ARGS(...) \
     PRINT_ARGS_##__VA_OPT__(N)(__VA_ARGS__)
