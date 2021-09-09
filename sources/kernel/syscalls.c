@@ -161,6 +161,7 @@ BrResult sys_create_mem_obj(BrId *id, BrMemObj *handle, BrCreateMemObjArgs *args
         }
 
         mem_obj = mem_obj_pmm(UNWRAP(pmm_result), MEM_OBJ_OWNING);
+        args->addr = UNWRAP(pmm_result).base;
     }
 
     *id = mem_obj->id;
