@@ -52,16 +52,24 @@ static void pmm_load_memory_map(HandoverMmap const *memory_map)
 {
     log$("Memory map:");
 
-    size_t available_memory = 0;
+    size_t available_memory = 0, prev_base = 0, prev_size = 0;
 
     for (size_t i = 0; i < memory_map->size; i++)
     {
         size_t base = ALIGN_UP(memory_map->entries[i].base, MEM_PAGE_SIZE);
         size_t size = ALIGN_DOWN(memory_map->entries[i].length, MEM_PAGE_SIZE);
+            
+        /* Avoid duplicate base or top addresses in the bitmap (i.e. unusable entries which have a size of zero) */
+        if ((base + size) - 1 != prev_size || base == prev_base)
+        {
+            log$("    type: {x} {x}-{x}", memory_map->entries[i].type, base, base + size - 1);
+            if (memory_map->entries[i].type != HANDOVER_MMAP_FREE)
+            {
+                continue;
+            }
+        }
 
-        log$("    type: {x} {x}-{x}", memory_map->entries[i].type, base, base + size - 1);
-
-        if (memory_map->entries[i].type != HANDOVER_MMAP_FREE)
+        else if (memory_map->entries[i].type != HANDOVER_MMAP_FREE)
         {
             continue;
         }
@@ -69,6 +77,8 @@ static void pmm_load_memory_map(HandoverMmap const *memory_map)
         pmm_unused((PmmRange){base, size});
 
         available_memory += size;
+        prev_size = base + size - 1;
+        prev_base = base;
     }
 
     log$("Available Memory: {}kib", available_memory / 1024);
