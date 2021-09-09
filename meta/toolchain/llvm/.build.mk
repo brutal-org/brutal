@@ -8,6 +8,7 @@ CFLAGS_WARN += \
 HOST_CC=clang-12
 
 HOST_CFLAGS= \
+	-MD \
 	$(CFLAGS_STD) \
 	$(CFLAGS_OPT) \
 	$(CFLAGS_WARN) \

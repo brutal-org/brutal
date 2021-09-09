@@ -22,12 +22,12 @@ LIBS_HOST_BIN=$(BUILDDIR_HOST)/libbrutal.a
 $(BUILDDIR_HOST)/%.c.o: sources/%.c
 	$(ECHO) "\e[37mhost   \e[92mCC\e[m" $<
 	@$(MKCWD)
-	@$(HOST_CC) -c -o $@ $^ $(HOST_CFLAGS)
+	@$(HOST_CC) -c -o $@ $< $(HOST_CFLAGS)
 
 $(BUILDDIR_HOST)/%.s.o: sources/%.s
 	$(ECHO) "\e[37mhost   \e[92mAS\e[m" $<
 	@$(MKCWD)
-	@$(CROSS_AS) -o $@ $^ $(CROSS_ASFLAGS)
+	@$(CROSS_AS) -o $@ $< $(CROSS_ASFLAGS)
 
 $(LIBS_HOST_BIN): $(LIBS_HOST_OBJ)
 	$(ECHO) "\e[37mhost   \e[92mAR\e[m" $@
@@ -47,7 +47,7 @@ $(1)_HOST_OBJ = $$(patsubst sources/%, $(BUILDDIR_HOST)/%.o, $$($(1)_HOST_SRC))
 
 $(1)_HOST_BIN  = $(BUILDDIR_HOST)/$($(1)_NAME)
 
-DEPENDENCIES += $$($(1)_OBJ:.o=.d)
+DEPENDENCIES += $$($(1)_HOST_OBJ:.o=.d)
 
 $$($(1)_HOST_BIN): $$($(1)_HOST_OBJ) $(LIBS_HOST_BIN)
 	$$(ECHO) "\e[37mhost   \e[92mLD\e[m" $$@

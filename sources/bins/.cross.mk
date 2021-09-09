@@ -37,7 +37,7 @@ $(BUILDDIR_CROSS)/%.c.o: sources/%.c
 $(BUILDDIR_CROSS)/%.s.o: sources/%.s
 	$(ECHO) "\e[37mbrutal \e[92mAS\e[m" $<
 	@$(MKCWD)
-	@$(CROSS_AS) -o $@ $^ $(CROSS_ASFLAGS)
+	@$(CROSS_AS) -o $@ $< $(CROSS_ASFLAGS)
 
 $(LIBS_BIN): $(LIBS_OBJ)
 	$(ECHO) "\e[37mbrutal \e[92mAR\e[m" $@

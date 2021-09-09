@@ -7,6 +7,7 @@ CFLAGS_WARN+=-Wc++-compat
 HOST_CC=cc
 
 HOST_CFLAGS= \
+	-MD \
 	$(CFLAGS_STD) \
 	$(CFLAGS_OPT) \
 	$(CFLAGS_WARN) \
