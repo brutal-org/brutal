@@ -212,7 +212,7 @@ static inline CType ctype_array(Str name, CType subtype, int size, Alloc *alloc)
         .name = str_dup(name, alloc),
         .array_ = {
             .subtype = alloc_move(alloc, subtype),
-            size = size,
+            .size = size,
         },
     };
 }
