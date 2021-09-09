@@ -1,5 +1,6 @@
 #pragma once
 
+#include <brutal/base/defs.h>
 #include <brutal/base/ints.h>
 #include <brutal/io/write.h>
 #include <brutal/parse/scan.h>
