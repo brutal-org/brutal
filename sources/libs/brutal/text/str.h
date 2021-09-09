@@ -1,5 +1,6 @@
 #pragma once
 
+#include <brutal/alloc/base.h>
 #include <brutal/base/macros.h>
 #include <brutal/base/std.h>
 
@@ -36,6 +37,8 @@ typedef struct
 #define nullstr str$("")
 
 void str_rvs(Str str);
+
+Str str_dup(Str const str, Alloc *alloc);
 
 bool str_eq(Str const lhs, Str const rhs);
 

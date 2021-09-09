@@ -12,18 +12,18 @@
 
 typedef enum
 {
-#define ITER(LEXEME) C_LEXEME_##LEXEME,
+#define ITER(LEXEME) CLEX_##LEXEME,
     FOREACH_LEXEMES(ITER)
 #undef ITER
 
-    C_LEXEME_COUNT,
+    CLEX_COUNT,
 } CLexemeType;
 
 // clang-format on
 
 static inline Str c_lex_to_str(LexemeType type)
 {
-    if (type >= 0 && type < C_LEXEME_COUNT)
+    if (type >= 0 && type < CLEX_COUNT)
     {
         static const char *LEXEME_NAMES[] = {
 #define ITER(LEXEME) #LEXEME,

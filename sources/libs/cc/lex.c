@@ -11,7 +11,7 @@ static LexemeType c_lex_impl(Scan *scan)
             scan_next(scan);
         }
 
-        return C_LEXEME_IDENTIFIER;
+        return CLEX_IDENTIFIER;
     }
     else if (isspace(c))
     {
@@ -20,7 +20,7 @@ static LexemeType c_lex_impl(Scan *scan)
             scan_next(scan);
         }
 
-        return C_LEXEME_WHITESPACE;
+        return CLEX_WHITESPACE;
     }
     else if (scan_skip_word(scan, str$("/*")))
     {
@@ -29,7 +29,7 @@ static LexemeType c_lex_impl(Scan *scan)
             scan_next(scan);
         }
 
-        return C_LEXEME_COMMENT;
+        return CLEX_COMMENT;
     }
     else if (scan_skip_word(scan, str$("//")))
     {
@@ -38,7 +38,7 @@ static LexemeType c_lex_impl(Scan *scan)
             scan_next(scan);
         }
 
-        return C_LEXEME_COMMENT;
+        return CLEX_COMMENT;
     }
     else
     {

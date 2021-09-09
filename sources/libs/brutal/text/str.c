@@ -11,6 +11,13 @@ void str_rvs(Str str)
     }
 }
 
+Str str_dup(Str const str, Alloc *alloc)
+{
+    char *buffer = (char *)alloc_malloc(alloc, str.len);
+    mem_cpy(buffer, str.buffer, str.len);
+    return str_n$(str.len, buffer);
+}
+
 bool str_eq(Str const lhs, Str const rhs)
 {
     if (lhs.len != rhs.len)

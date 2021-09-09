@@ -1,3 +1,4 @@
+#include <brutal/base/attributes.h>
 #include <brutal/io/emit.h>
 #include <brutal/log/assert.h>
 

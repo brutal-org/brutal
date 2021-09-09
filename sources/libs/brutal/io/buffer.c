@@ -1,5 +1,6 @@
+#include <brutal/base/attributes.h>
+#include <brutal/base/macros.h>
 #include <brutal/io/buffer.h>
-#include "brutal/base/macros.h"
 
 void buffer_init(Buffer *self, size_t capacity, Alloc *alloc)
 {

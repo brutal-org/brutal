@@ -1,4 +1,4 @@
-#include <brutal/mem.h>
+#include <brutal/mem/funcs.h>
 
 void *mem_move(void *dest, void const *src, size_t n)
 {

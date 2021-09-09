@@ -2,7 +2,8 @@
 
 #include <brutal/base/macros.h>
 #include <brutal/base/std.h>
-#include <brutal/mem.h>
+#include <brutal/mem/const.h>
+#include <brutal/mem/funcs.h>
 
 typedef struct alloc Alloc;
 

@@ -1,4 +1,4 @@
-#include <brutal/mem.h>
+#include <brutal/mem/funcs.h>
 
 #if defined(__x86_64__) || defined(__x86_32__)
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <brutal/base.h>
-#include <brutal/time.h>
+#include <brutal/mem/units.h>
+#include <brutal/time/types.h>
 
 #define FIBER_STACK_SIZE KiB(16)
 
