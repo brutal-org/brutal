@@ -43,6 +43,21 @@ CDecl cdecl_func(Str name, CType type, CStmt body, Alloc *alloc)
 
 /* --- CExpr ---------------------------------------------------------------- */
 
+CExpr cexpr_empty(void)
+{
+    return (CExpr){
+        .type = CEXPR_EMPTY,
+    };
+}
+
+CExpr cexpr_constant(CVal val)
+{
+    return (CExpr){
+        .type = CEXPR_CONSTANT,
+        .constant_ = val,
+    };
+}
+
 /* --- CStmt ---------------------------------------------------------------- */
 
 CStmt cstmt_empty(void)
@@ -79,6 +94,90 @@ CStmt cstmt_block(Alloc *alloc)
     return stmt;
 }
 
+CStmt cstmt_if(CExpr expr, CStmt stmt_true, CStmt stmt_false, Alloc *alloc)
+{
+    return (CStmt){
+        .type = CSTMT_IF,
+        .if_ = {
+            .expr = expr,
+            .stmt_true = alloc_move(alloc, stmt_true),
+            .stmt_false = alloc_move(alloc, stmt_false),
+        },
+    };
+}
+
+CStmt cstmt_for(CStmt init_stmt, CExpr cond_expr, CExpr iter_expr, CStmt stmt, Alloc *alloc)
+{
+    return (CStmt){
+        .type = CSTMT_FOR,
+        .for_ = {
+            .init_stmt = alloc_move(alloc, init_stmt),
+            .cond_expr = cond_expr,
+            .iter_expr = iter_expr,
+            .stmt = alloc_move(alloc, stmt),
+        },
+    };
+}
+
+CStmt cstmt_while(CExpr expr, CStmt stmt, Alloc *alloc)
+{
+    return (CStmt){
+        .type = CSTMT_WHILE,
+        .while_ = {
+            .expr = expr,
+            .stmt = alloc_move(alloc, stmt),
+        },
+    };
+}
+
+CStmt cstmt_do(CExpr expr, CStmt stmt, Alloc *alloc)
+{
+    return (CStmt){
+        .type = CSTMT_DO,
+        .while_ = {
+            .expr = expr,
+            .stmt = alloc_move(alloc, stmt),
+        },
+    };
+}
+
+CStmt cstmt_switch(CExpr expr, CStmt stmt, Alloc *alloc)
+{
+    return (CStmt){
+        .type = CSTMT_SWITCH,
+        .while_ = {
+            .expr = expr,
+            .stmt = alloc_move(alloc, stmt),
+        },
+    };
+}
+
+CStmt cstmt_return(CExpr expr)
+{
+    return (CStmt){
+        .type = CSTMT_RETURN,
+        .return_ = {
+            .expr = expr,
+        },
+    };
+}
+
+CStmt cstmt_goto(Str str, Alloc *alloc)
+{
+    return (CStmt){
+        .type = CSTMT_GOTO,
+        .goto_.label = str_dup(str, alloc),
+    };
+}
+
+CStmt cstmt_case(CExpr expr)
+{
+    return (CStmt){
+        .type = CSTMT_CASE,
+        .case_.expr = expr,
+    };
+}
+
 /* --- CType ---------------------------------------------------------------- */
 
 static inline CType ctype_void(Str name, Alloc *alloc)
@@ -106,12 +205,15 @@ static inline CType ctype_ptr(Str name, CType subtype, Alloc *alloc)
     };
 }
 
-static inline CType ctype_array(Str name, int size, Alloc *alloc)
+static inline CType ctype_array(Str name, CType subtype, int size, Alloc *alloc)
 {
     return (CType){
         .type = CTYPE_ARRAY,
         .name = str_dup(name, alloc),
-        .array_.size = size,
+        .array_ = {
+            .subtype = alloc_move(alloc, subtype),
+            size = size,
+        },
     };
 }
 

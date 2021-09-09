@@ -52,6 +52,7 @@ struct ctype
 
         struct
         {
+            CType *subtype;
             int size;
         } array_;
 

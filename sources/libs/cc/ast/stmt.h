@@ -61,7 +61,7 @@ struct cstmt
 
         struct
         {
-            CExpr init_expr;
+            CStmt *init_stmt;
             CExpr cond_expr;
             CExpr iter_expr;
 
@@ -95,4 +95,3 @@ struct cstmt
         } case_;
     };
 };
-

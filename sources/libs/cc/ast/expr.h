@@ -19,8 +19,6 @@ typedef enum
     CEXPR_CALL,
     CEXPR_CAST,
     CEXPR_TERNARY,
-    CEXPR_SIZEOF,
-    CEXPR_ALIGNOF,
 } CExprType;
 
 typedef enum
@@ -100,5 +98,24 @@ struct cexpr
             CExpr *lhs;
             CExpr *rhs;
         } infix_;
+
+        struct
+        {
+            CExpr *expr;
+            Vec(CExpr) args;
+        } call_;
+
+        struct
+        {
+            CType type;
+            CExpr *expr;
+        } cast_;
+
+        struct
+        {
+            CExpr *expr_cond;
+            CExpr *expr_true;
+            CExpr *expr_false;
+        } ternary_;
     };
 };
