@@ -119,3 +119,5 @@ struct cexpr
         } ternary_;
     };
 };
+
+Str cop_to_str(COp type);

@@ -87,3 +87,5 @@ struct ctype_constant
 };
 
 typedef Slice(CType) CTypeSlice;
+
+Str ctype_to_str(CTypeType type);

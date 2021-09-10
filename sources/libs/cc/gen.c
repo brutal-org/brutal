@@ -2,21 +2,13 @@
 #include <cc/gen.h>
 
 void c_emit_type(Emit *target, CType type);
+void c_emit_expr(Emit* target, CExpr expr);
+/* not all of them are here like a[b] */
 
-const char *ctype_type_to_str[] = {
-    [CTYPE_INVALID] = "invalid",
-    [CTYPE_VOID] = "void",
-    [CTYPE_BOOL] = "bool",
-    [CTYPE_PTR] = "",
-    [CTYPE_ARRAY] = "",
-    [CTYPE_SIGNED] = "signed ",
-    [CTYPE_UNSIGNED] = "unsigned ",
-    [CTYPE_FLOAT] = "float",
-    [CTYPE_STRUCT] = "struct",
-    [CTYPE_UNION] = "union",
-    [CTYPE_ENUM] = "enum",
-    [CTYPE_FUNC] = ""};
-
+void c_emit_op_fix(Emit* target, COp op)
+{
+    emit_fmt(target, "{}", cop_to_str(op));
+}
 void c_emit_decl_attribute(Emit *target, CDeclAttr attrib)
 {
     if (attrib & CDECL_AUTO)
@@ -109,7 +101,7 @@ void c_emit_func_type(Emit *target, CType type, Str name)
 
 void c_emit_type(Emit *target, CType type)
 {
-    emit_fmt(target, "{} ", ctype_type_to_str[type.type]);
+    emit_fmt(target, "{} ", ctype_to_str(type.type));
 
     if (type.type == CTYPE_PTR)
     {
@@ -151,6 +143,93 @@ void c_emit_type(Emit *target, CType type)
     emit_fmt(target, "{} ", type.name);
 }
 
+void c_emit_expr(Emit* target, CExpr expr)
+{
+
+    switch(expr.type)
+    {
+    case CEXPR_CONSTANT:
+        c_emit_value(target, expr.constant_);
+        break;
+    case CEXPR_IDENTIFIER:
+        emit_fmt(target, "{}", expr.identifier_);
+        break;
+    case CEXPR_PREFIX:
+    {
+        c_emit_op_fix(target, expr.prefix_.op); 
+        if(expr.prefix_.expr != NULL)
+        {
+            c_emit_expr(target, *expr.prefix_.expr);
+        }
+        break;
+    }
+    case CEXPR_POSTFIX:
+    {
+        if(expr.prefix_.expr != NULL)
+        {
+            c_emit_expr(target, *expr.prefix_.expr);
+        } 
+        c_emit_op_fix(target, expr.prefix_.op);
+        break; 
+    }
+    case CEXPR_INFIX:
+    {
+
+        c_emit_expr(target, *expr.infix_.lhs);
+        if(expr.infix_.op == COP_INDEX)
+        {
+            emit_fmt(target, "[");
+        }
+
+        c_emit_op_fix(target, expr.prefix_.op); 
+        c_emit_expr(target, *expr.infix_.rhs);
+        if(expr.infix_.op == COP_INDEX)
+        {
+            emit_fmt(target, "]");
+        }
+        break;
+    }
+    case CEXPR_CALL:
+    {
+        c_emit_expr(target, *expr.call_.expr);
+        emit_fmt(target, "(");
+        bool first = true;
+        vec_foreach(v,& expr.call_.args)
+        {
+            if(first)
+            {
+                first = !first;
+            }
+            else{
+                emit_fmt(target, ", ");
+            }
+
+            c_emit_expr(target, v);
+        }
+        break;
+    }
+    case CEXPR_CAST:
+    {
+        emit_fmt(target, " (");
+
+        c_emit_type(target, expr.cast_.type);
+        emit_fmt(target, ")");
+        c_emit_expr(target,*expr.cast_.expr);
+        break;
+    }
+    case CEXPR_TERNARY:
+    {
+        c_emit_expr(target, *expr.ternary_.expr_cond);
+        emit_fmt(target ," ? ");
+        c_emit_expr(target, *expr.ternary_.expr_true);
+        emit_fmt(target, " : ");
+        c_emit_expr(target, *expr.ternary_.expr_false);
+        break;
+    }
+    default: 
+        break;
+    }
+}
 void c_emit_decl(Emit *target, CDecl declaration)
 {
 
@@ -170,7 +249,14 @@ void c_emit_decl(Emit *target, CDecl declaration)
             emit_fmt(target, "{}", declaration.name);
         }
     }
-
+    if(declaration.type == CDECL_VAR)
+    {
+        c_emit_type(target, declaration.var_.type);
+        if(declaration.var_.expr.type != CEXPR_INVALID)
+        {
+            c_emit_expr(target, declaration.var_.expr);
+        } 
+    }
     emit_fmt(target, ";\n");
 }
 
