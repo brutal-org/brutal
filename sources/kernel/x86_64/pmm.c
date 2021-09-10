@@ -58,7 +58,8 @@ static void pmm_load_memory_map(HandoverMmap const *memory_map)
     {
         size_t base = ALIGN_UP(memory_map->entries[i].base, MEM_PAGE_SIZE);
         size_t size = ALIGN_DOWN(memory_map->entries[i].length, MEM_PAGE_SIZE);
-            
+
+
         /* Avoid duplicate base or top addresses in the bitmap (i.e. unusable entries which have a size of zero) */
         if ((base + size) - 1 != prev_size || base == prev_base)
         {
