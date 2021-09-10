@@ -1,6 +1,7 @@
 #include <brutal/log.h>
 #include <host/log.h>
 #include <syscalls/syscalls.h>
+#include "kernel/arch.h"
 #include "kernel/domain.h"
 #include "kernel/global.h"
 #include "kernel/init.h"
@@ -464,12 +465,14 @@ BrResult sys_stat_task(BrInfoTask *args, Task *task)
 BrResult sys_stat_irq(BrInfoIrq *args, Irq *irq)
 {
     args->id = irq->irq;
+
     return BR_SUCCESS;
 }
+
 BrResult sys_stat(BrStatArgs *args)
 {
+    Object *object = nullptr;
 
-    Object *object;
     if (args->handle == BR_TASK_SELF)
     {
         object = (Object *)task_self();
@@ -485,22 +488,53 @@ BrResult sys_stat(BrStatArgs *args)
     }
 
     args->info.type = object->type;
+
     switch (object->type)
     {
     case BR_OBJECT_MEMORY:
         return sys_stat_memobj(&args->info.memobj, (MemObj *)object);
+
     case BR_OBJECT_DOMAIN:
         return sys_stat_domain(&args->info.domainobj, (Domain *)object);
+
     case BR_OBJECT_SPACE:
         return sys_stat_space(&args->info.spaceobj, (Space *)object);
+
     case BR_OBJECT_TASK:
         return sys_stat_task(&args->info.taskobj, (Task *)object);
+
     case BR_OBJECT_IRQ:
         return sys_stat_irq(&args->info.irqobj, (Irq *)object);
+
     default:
         return BR_BAD_HANDLE;
     }
 }
+
+BrResult sys_in(BrIoArgs *args)
+{
+    if (!(task_self()->caps & BR_CAP_IO))
+    {
+        return BR_BAD_CAPABILITY;
+    }
+
+    args->data = arch_in(args->port, args->size);
+
+    return BR_SUCCESS;
+}
+
+BrResult sys_out(BrIoArgs *args)
+{
+    if (!(task_self()->caps & BR_CAP_IO))
+    {
+        return BR_BAD_CAPABILITY;
+    }
+
+    arch_out(args->port, args->size, args->data);
+
+    return BR_SUCCESS;
+}
+
 typedef BrResult BrSyscallFn();
 
 BrSyscallFn *syscalls[BR_SYSCALL_COUNT] = {

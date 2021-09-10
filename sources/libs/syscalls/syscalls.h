@@ -151,11 +151,23 @@ typedef struct
 
 SYSCALL(ack) (BrAckArgs* args);
 
-typedef struct 
+typedef struct
 {
     BrHandle handle;
     BrHandleInfo info;
 } BrStatArgs;
 
 SYSCALL(stat)(BrStatArgs* args);
+
+typedef struct
+{
+    uint16_t port;
+    uint32_t data;
+    int size;
+}BrIoArgs;
+
+SYSCALL(in)(BrIoArgs* args);
+
+SYSCALL(out)(BrIoArgs* args);
+
 // clang-format on

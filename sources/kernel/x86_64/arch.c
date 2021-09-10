@@ -45,3 +45,39 @@ void arch_yield(void)
 {
     asm("int $100");
 }
+
+uint32_t arch_in(uint16_t port, int size)
+{
+    if (size == 1)
+    {
+        return asm_in8(port);
+    }
+    else if (size == 2)
+    {
+        return asm_in16(port);
+    }
+    else if (size == 4)
+    {
+        return asm_in32(port);
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+void arch_out(uint16_t port, int size, uint32_t data)
+{
+    if (size == 1)
+    {
+        asm_out8(port, data);
+    }
+    else if (size == 2)
+    {
+        asm_out16(port, data);
+    }
+    else if (size == 4)
+    {
+        asm_out32(port, data);
+    }
+}

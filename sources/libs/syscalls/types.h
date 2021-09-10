@@ -16,7 +16,9 @@
     SYSCALL(BIND)                 \
     SYSCALL(UNBIND)               \
     SYSCALL(ACK)                  \
-    SYSCALL(STAT)
+    SYSCALL(STAT)                 \
+    SYSCALL(IN)                   \
+    SYSCALL(OU)
 
 typedef enum
 {
@@ -236,6 +238,7 @@ typedef uint64_t BrIrqFlags;
 #define BR_CAP_PMM (1 << 1)
 #define BR_CAP_LOG (1 << 2)
 #define BR_CAP_TASK (1 << 3)
+#define BR_CAP_IO (1 << 4)
 #define BR_CAP_ALL (0xffffffff)
 
 typedef uint32_t BrCap;

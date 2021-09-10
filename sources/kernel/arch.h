@@ -15,3 +15,7 @@ void arch_idle(void);
 void arch_stop(void);
 
 void arch_yield(void);
+
+uint32_t arch_in(uint16_t port, int size);
+
+void arch_out(uint16_t port, int size, uint32_t data);
