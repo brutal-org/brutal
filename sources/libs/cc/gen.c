@@ -2,10 +2,10 @@
 #include <cc/gen.h>
 
 void c_emit_type(Emit *target, CType type);
-void c_emit_expr(Emit* target, CExpr expr);
+void c_emit_expr(Emit *target, CExpr expr);
 /* not all of them are here like a[b] */
 
-void c_emit_op_fix(Emit* target, COp op)
+void c_emit_op_fix(Emit *target, COp op)
 {
     emit_fmt(target, "{}", cop_to_str(op));
 }
@@ -143,10 +143,10 @@ void c_emit_type(Emit *target, CType type)
     emit_fmt(target, "{} ", type.name);
 }
 
-void c_emit_expr(Emit* target, CExpr expr)
+void c_emit_expr(Emit *target, CExpr expr)
 {
 
-    switch(expr.type)
+    switch (expr.type)
     {
     case CEXPR_CONSTANT:
         c_emit_value(target, expr.constant_);
@@ -156,8 +156,8 @@ void c_emit_expr(Emit* target, CExpr expr)
         break;
     case CEXPR_PREFIX:
     {
-        c_emit_op_fix(target, expr.prefix_.op); 
-        if(expr.prefix_.expr != NULL)
+        c_emit_op_fix(target, expr.prefix_.op);
+        if (expr.prefix_.expr != NULL)
         {
             c_emit_expr(target, *expr.prefix_.expr);
         }
@@ -165,25 +165,25 @@ void c_emit_expr(Emit* target, CExpr expr)
     }
     case CEXPR_POSTFIX:
     {
-        if(expr.prefix_.expr != NULL)
+        if (expr.prefix_.expr != NULL)
         {
             c_emit_expr(target, *expr.prefix_.expr);
-        } 
+        }
         c_emit_op_fix(target, expr.prefix_.op);
-        break; 
+        break;
     }
     case CEXPR_INFIX:
     {
 
         c_emit_expr(target, *expr.infix_.lhs);
-        if(expr.infix_.op == COP_INDEX)
+        if (expr.infix_.op == COP_INDEX)
         {
             emit_fmt(target, "[");
         }
 
-        c_emit_op_fix(target, expr.prefix_.op); 
+        c_emit_op_fix(target, expr.prefix_.op);
         c_emit_expr(target, *expr.infix_.rhs);
-        if(expr.infix_.op == COP_INDEX)
+        if (expr.infix_.op == COP_INDEX)
         {
             emit_fmt(target, "]");
         }
@@ -194,13 +194,14 @@ void c_emit_expr(Emit* target, CExpr expr)
         c_emit_expr(target, *expr.call_.expr);
         emit_fmt(target, "(");
         bool first = true;
-        vec_foreach(v,& expr.call_.args)
+        vec_foreach(v, &expr.call_.args)
         {
-            if(first)
+            if (first)
             {
                 first = !first;
             }
-            else{
+            else
+            {
                 emit_fmt(target, ", ");
             }
 
@@ -214,19 +215,19 @@ void c_emit_expr(Emit* target, CExpr expr)
 
         c_emit_type(target, expr.cast_.type);
         emit_fmt(target, ")");
-        c_emit_expr(target,*expr.cast_.expr);
+        c_emit_expr(target, *expr.cast_.expr);
         break;
     }
     case CEXPR_TERNARY:
     {
         c_emit_expr(target, *expr.ternary_.expr_cond);
-        emit_fmt(target ," ? ");
+        emit_fmt(target, " ? ");
         c_emit_expr(target, *expr.ternary_.expr_true);
         emit_fmt(target, " : ");
         c_emit_expr(target, *expr.ternary_.expr_false);
         break;
     }
-    default: 
+    default:
         break;
     }
 }
@@ -249,13 +250,13 @@ void c_emit_decl(Emit *target, CDecl declaration)
             emit_fmt(target, "{}", declaration.name);
         }
     }
-    if(declaration.type == CDECL_VAR)
+    if (declaration.type == CDECL_VAR)
     {
         c_emit_type(target, declaration.var_.type);
-        if(declaration.var_.expr.type != CEXPR_INVALID)
+        if (declaration.var_.expr.type != CEXPR_INVALID)
         {
             c_emit_expr(target, declaration.var_.expr);
-        } 
+        }
     }
     emit_fmt(target, ";\n");
 }

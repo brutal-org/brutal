@@ -15,7 +15,6 @@ const char *ctype_type_to_str[] = {
     [CTYPE_FUNC] = "",
 };
 
-
 Str ctype_to_str(CTypeType type)
 {
     return str$(ctype_type_to_str[type]);

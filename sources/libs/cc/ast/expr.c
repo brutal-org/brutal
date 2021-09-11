@@ -1,7 +1,6 @@
 #include <cc/ast/expr.h>
 
-
-const char* cop_type_to_str[] = {
+const char *cop_type_to_str[] = {
     [COP_INC] = "++",
     [COP_DEC] = "--",
     [COP_ASSIGN] = "=",
