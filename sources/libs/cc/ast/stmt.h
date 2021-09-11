@@ -22,7 +22,7 @@ typedef enum
     CSTMT_RETURN,
     CSTMT_GOTO,
     CSTMT_BREAK,
-    CSTMT_CONTINE,
+    CSTMT_CONTINUE,
 
     CSTMT_LABEL,
     CSTMT_CASE,

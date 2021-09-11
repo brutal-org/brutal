@@ -3,6 +3,7 @@
 
 void c_emit_type(Emit *target, CType type);
 void c_emit_expr(Emit *target, CExpr expr);
+void c_emit_statement(Emit *target, CStmt statement);
 /* not all of them are here like a[b] */
 
 void c_emit_op_fix(Emit *target, COp op)
@@ -112,6 +113,7 @@ void c_emit_type(Emit *target, CType type)
     else if (type.type == CTYPE_FUNC)
     {
         c_emit_func_type(target, type, type.name);
+        return;
     }
     else if ((type.type == CTYPE_STRUCT || type.type == CTYPE_UNION) && type.struct_.members.length != 0)
     {
@@ -126,7 +128,6 @@ void c_emit_type(Emit *target, CType type)
         emit_deident(target);
         emit_fmt(target, "\n}}");
     }
-
     else if (type.type == CTYPE_ENUM)
     {
         emit_fmt(target, "\n{{\n");
@@ -139,7 +140,13 @@ void c_emit_type(Emit *target, CType type)
         emit_deident(target);
         emit_fmt(target, "\n}}");
     }
-    // need to implement array ...
+    else if (type.type == CTYPE_ARRAY)
+    {
+        c_emit_type(target, *type.array_.subtype);
+        emit_fmt(target, "{}[{}]", type.name, type.array_.size);
+        return;
+    }
+
     emit_fmt(target, "{} ", type.name);
 }
 
@@ -231,6 +238,7 @@ void c_emit_expr(Emit *target, CExpr expr)
         break;
     }
 }
+
 void c_emit_decl(Emit *target, CDecl declaration)
 {
 
@@ -250,7 +258,7 @@ void c_emit_decl(Emit *target, CDecl declaration)
             emit_fmt(target, "{}", declaration.name);
         }
     }
-    if (declaration.type == CDECL_VAR)
+    else if (declaration.type == CDECL_VAR)
     {
         c_emit_type(target, declaration.var_.type);
         if (declaration.var_.expr.type != CEXPR_INVALID)
@@ -258,7 +266,158 @@ void c_emit_decl(Emit *target, CDecl declaration)
             c_emit_expr(target, declaration.var_.expr);
         }
     }
+    else if (declaration.type == CDECL_FUNC)
+    {
+
+        c_emit_type(target, declaration.func_.type);
+
+        if (declaration.func_.body.type != CSTMT_INVALID)
+        {
+            c_emit_statement(target, declaration.func_.body);
+        }
+    }
+
     emit_fmt(target, ";\n");
+}
+
+bool c_emit_should_statement_endline(CStmtType type)
+{
+    if (type == CSTMT_BLOCK || type == CSTMT_DEFAULT || type == CSTMT_LABEL || type == CSTMT_CASE)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+void c_emit_statement(Emit *target, CStmt statement)
+{
+    switch (statement.type)
+    {
+
+    case CSTMT_DECL:
+        c_emit_decl(target, *statement.decl_.decl);
+        return;
+
+    case CSTMT_EXPR:
+        c_emit_expr(target, statement.expr_.expr);
+        return;
+
+    case CSTMT_BLOCK:
+    {
+        emit_fmt(target, "\n{{\n");
+        emit_ident(target);
+        vec_foreach(v, &statement.block_.stmts)
+        {
+            c_emit_statement(target, v);
+            if (c_emit_should_statement_endline(v.type))
+            {
+                emit_fmt(target, ";");
+            }
+            emit_fmt(target, "\n");
+        }
+        emit_deident(target);
+        emit_fmt(target, "\n}}\n");
+        return;
+    }
+    case CSTMT_IF:
+    {
+        emit_fmt(target, "if (");
+        c_emit_expr(target, statement.if_.expr);
+        emit_fmt(target, ") \n");
+        c_emit_statement(target, *statement.if_.stmt_true);
+
+        if (statement.if_.stmt_false != nullptr)
+        {
+            emit_fmt(target, "else ");
+            c_emit_statement(target, *statement.if_.stmt_false);
+        }
+
+        return;
+    }
+    case CSTMT_FOR:
+    {
+        emit_fmt(target, "for (");
+        c_emit_statement(target, *statement.for_.init_stmt);
+
+        emit_fmt(target, "; ");
+        c_emit_expr(target, statement.for_.cond_expr);
+
+        emit_fmt(target, "; ");
+        c_emit_expr(target, statement.for_.iter_expr);
+
+        emit_fmt(target, ")\n");
+        c_emit_statement(target, *statement.for_.stmt);
+        return;
+    }
+    case CSTMT_WHILE:
+    {
+        emit_fmt(target, "while (");
+        c_emit_expr(target, statement.while_.expr);
+        emit_fmt(target, ") \n");
+
+        c_emit_statement(target, *statement.while_.stmt);
+        return;
+    }
+    case CSTMT_DO:
+    {
+        emit_fmt(target, "do \n ");
+
+        c_emit_statement(target, *statement.do_.stmt);
+
+        emit_fmt(target, "while (");
+        c_emit_expr(target, statement.do_.expr);
+        emit_fmt(target, ") \n");
+        return;
+    }
+    case CSTMT_SWITCH:
+    {
+        emit_fmt(target, "switch (");
+        c_emit_expr(target, statement.while_.expr);
+        emit_fmt(target, ") \n");
+        c_emit_statement(target, *statement.while_.stmt);
+        return;
+    }
+
+    case CSTMT_RETURN:
+    {
+        emit_fmt(target, "return ");
+
+        c_emit_expr(target, statement.return_.expr);
+        return;
+    }
+
+    case CSTMT_GOTO:
+        emit_fmt(target, "goto {}", statement.goto_.label);
+        return;
+
+    case CSTMT_BREAK:
+        emit_fmt(target, "break");
+        return;
+
+    case CSTMT_CONTINUE:
+        emit_fmt(target, "continue");
+        return;
+
+    case CSTMT_LABEL:
+        emit_fmt(target, "{}:", statement.label_.label);
+        return;
+
+    case CSTMT_CASE:
+    {
+        emit_fmt(target, "case ");
+        c_emit_expr(target, statement.case_.expr);
+        emit_fmt(target, ":");
+        return;
+    }
+
+    case CSTMT_DEFAULT:
+        emit_fmt(target, "default:");
+        return;
+
+    default:
+        return;
+    }
 }
 
 void c_emit_include(Emit *target, CInclude path)
