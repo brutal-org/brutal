@@ -1,6 +1,8 @@
 #include <cc/gen.h>
 
-void c2c_type(Emit *target, CType type);
+void c2c_type_start(Emit *target, CType type);
+void c2c_type_end(Emit *target, CType type);
+void c2c_type_abstract(Emit *target, CType type);
 void c2c_expr(Emit *target, CExpr expr);
 void c2c_stmt(Emit *target, CStmt statement);
 
@@ -42,6 +44,23 @@ void c2c_decl_attribute(Emit *target, CDeclAttr attrib)
     }
 }
 
+void c2c_type_attribute(Emit *target, CTypeAttr attrib)
+{
+    if (attrib & CTYPE_CONST)
+    {
+        emit_fmt(target, "const ");
+    }
+
+    if (attrib & CTYPE_RESTRICT)
+    {
+        emit_fmt(target, "restrict ");
+    }
+
+    if (attrib & CTYPE_VOLATILE)
+    {
+        emit_fmt(target, "volatile ");
+    }
+}
 void c2c_value(Emit *target, CVal value)
 {
     switch (value.type)
@@ -66,8 +85,9 @@ void c2c_value(Emit *target, CVal value)
 
 void c2c_member(Emit *target, CTypeMember type)
 {
-    c2c_type(target, type.type);
+    c2c_type_start(target, type.type);
     emit_fmt(target, " {}", type.name);
+    c2c_type_end(target, type.type);
 }
 
 void c2c_func_type(Emit *target, CType type, Str name)
@@ -80,7 +100,7 @@ void c2c_func_type(Emit *target, CType type, Str name)
         ptr_count++;
     }
 
-    c2c_type(target, *type.func_.ret);
+    c2c_type_abstract(target, *type.func_.ret);
 
     emit_fmt(target, "(");
 
@@ -110,44 +130,31 @@ void c2c_constant(Emit *target, CTypeConstant member)
     c2c_value(target, member.value);
 }
 
-bool c2c_is_func(CType type)
-{
-    int ptr_count = 0;
-
-    while (type.type == CTYPE_PTR)
-    {
-        type = *type.ptr_.subtype;
-        ptr_count++;
-    }
-
-    return type.type == CTYPE_FUNC;
-}
-
-void c2c_type(Emit *target, CType type)
+void c2c_type_start(Emit *target, CType type)
 {
     emit_fmt(target, "{} ", ctype_to_str(type.type));
 
     if (type.type == CTYPE_PTR)
     {
-        if (c2c_is_func(type))
-        {
-            c2c_func_type(target, type, type.name);
-        }
-        else
-        {
-            c2c_type(target, *type.ptr_.subtype);
-            emit_fmt(target, "* ");
-        }
-        return;
+
+        c2c_type_start(target, *type.ptr_.subtype);
+        emit_fmt(target, "* ");
+        c2c_type_attribute(target, type.attr);
     }
     else if (type.type == CTYPE_FUNC)
     {
-        c2c_func_type(target, type, type.name);
-        return;
+        c2c_type_abstract(target, *type.func_.ret); // return
+
+        emit_fmt(target, "(");
+
+        c2c_type_attribute(target, type.attr);
     }
     else if ((type.type == CTYPE_STRUCT || type.type == CTYPE_UNION) &&
              type.struct_.members.length != 0)
     {
+        emit_fmt(target, "{} ", type.name);
+        
+        c2c_type_attribute(target, type.attr);
         emit_fmt(target, "\n{{\n");
         emit_ident(target);
 
@@ -162,6 +169,7 @@ void c2c_type(Emit *target, CType type)
     }
     else if (type.type == CTYPE_ENUM)
     {
+        c2c_type_attribute(target, type.attr);
         emit_fmt(target, "\n{{\n");
         emit_ident(target);
 
@@ -173,15 +181,47 @@ void c2c_type(Emit *target, CType type)
 
         emit_deident(target);
         emit_fmt(target, "\n}}");
+
+        emit_fmt(target, "{} ", type.name);
     }
     else if (type.type == CTYPE_ARRAY)
     {
-        c2c_type(target, *type.array_.subtype);
-        emit_fmt(target, "{}[{}]", type.name, type.array_.size);
-        return;
+        c2c_type_attribute(target, type.attr);
+        c2c_type_start(target, *type.array_.subtype);
     }
+}
 
-    emit_fmt(target, "{} ", type.name);
+void c2c_type_end(Emit *target, CType type)
+{
+    if (type.type == CTYPE_PTR)
+    {
+        c2c_type_end(target, type);
+    }
+    else if (type.type == CTYPE_FUNC)
+    {
+        emit_fmt(target, ")(");
+
+        int first = 0;
+        vec_foreach(v, &type.func_.params)
+        {
+            if (first != 0)
+            {
+                emit_fmt(target, ", ");
+            }
+            first++;
+            c2c_member(target, v);
+        }
+    }
+    else if (type.type == CTYPE_ARRAY)
+    {
+        emit_fmt(target, "[{}]", type.array_.size);
+    }
+}
+
+void c2c_abstract_type(Emit *target, CType type)
+{
+    c2c_type_start(target, type);
+    c2c_type_end(target, type);
 }
 
 void c2c_expr(Emit *target, CExpr expr)
@@ -250,8 +290,7 @@ void c2c_expr(Emit *target, CExpr expr)
 
     case CEXPR_CAST:
         emit_fmt(target, " (");
-
-        c2c_type(target, expr.cast_.type);
+        c2c_type_abstract(target, expr.cast_.type);
         emit_fmt(target, ")");
         c2c_expr(target, *expr.cast_.expr);
         break;
@@ -284,17 +323,22 @@ void c2c_decl(Emit *target, CDecl declaration)
             emit_fmt(target, "typedef ");
         }
 
-        c2c_type(target, declaration.type_.type);
+        c2c_type_start(target, declaration.type_.type);
 
         if (is_typedef)
         {
             emit_fmt(target, "{}", declaration.name);
         }
+
+        c2c_type_end(target, declaration.type_.type);
     }
     else if (declaration.type == CDECL_VAR)
     {
-        c2c_type(target, declaration.var_.type);
+        c2c_type_start(target, declaration.var_.type);
 
+        emit_fmt(target, "{}", declaration.name);
+
+        c2c_type_end(target, declaration.var_.type);
         if (declaration.var_.expr.type != CEXPR_INVALID)
         {
             c2c_expr(target, declaration.var_.expr);
@@ -302,12 +346,30 @@ void c2c_decl(Emit *target, CDecl declaration)
     }
     else if (declaration.type == CDECL_FUNC)
     {
-        c2c_type(target, declaration.func_.type);
+        // need to do (int) cast because gcc is not good :(
+        assert_equal((int)declaration.func_.type.type, (int)CTYPE_FUNC);
 
-        if (declaration.func_.body.type != CSTMT_INVALID)
+        auto func_type = declaration.func_.type;
+
+        // return:
+        c2c_type_abstract(target, *func_type.func_.ret);
+
+        // name
+        emit_fmt(target, " {}", declaration.name);
+
+        // args
+        int first = 0;
+        vec_foreach(v, &func_type.func_.params)
         {
-            c2c_stmt(target, declaration.func_.body);
+            if (first != 0)
+            {
+                emit_fmt(target, ", ");
+            }
+            first++;
+            c2c_member(target, v);
         }
+
+        c2c_stmt(target, declaration.func_.body);
     }
 
     emit_fmt(target, ";\n");
