@@ -12,6 +12,7 @@ LIBS_SRC = \
 	$(wildcard sources/libs/brutal/*/*.c) \
 	$(wildcard sources/libs/bsd/*.c)      \
 	$(wildcard sources/libs/cc/*.c)       \
+	$(wildcard sources/libs/cc/*/*.c)       \
 	$(wildcard sources/libs/elf/*.c)      \
 	$(wildcard sources/libs/gnu/*.c)      \
 	$(wildcard sources/libs/pci/*.c)      \

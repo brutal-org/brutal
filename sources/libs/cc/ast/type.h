@@ -20,6 +20,7 @@ typedef enum
     CTYPE_UNION,
     CTYPE_ENUM,
     CTYPE_FUNC,
+    CTYPE_NAME,
 } CTypeType;
 
 #define CTYPE_CONST (1 << 0)

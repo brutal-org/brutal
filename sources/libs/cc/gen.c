@@ -132,13 +132,17 @@ void c2c_constant(Emit *target, CTypeConstant member)
 
 void c2c_type_start(Emit *target, CType type)
 {
-    emit_fmt(target, "{} ", ctype_to_str(type.type));
+    emit_fmt(target, "{}", ctype_to_str(type.type));
 
-    if (type.type == CTYPE_PTR)
+    if (type.type == CTYPE_NAME)
+    {
+        emit_fmt(target, type.name);
+    }
+    else if (type.type == CTYPE_PTR)
     {
 
         c2c_type_start(target, *type.ptr_.subtype);
-        emit_fmt(target, "* ");
+        emit_fmt(target, "*");
         c2c_type_attribute(target, type.attr);
     }
     else if (type.type == CTYPE_FUNC)
@@ -195,7 +199,7 @@ void c2c_type_end(Emit *target, CType type)
 {
     if (type.type == CTYPE_PTR)
     {
-        c2c_type_end(target, type);
+        c2c_type_end(target, *type.ptr_.subtype);
     }
     else if (type.type == CTYPE_FUNC)
     {
@@ -218,7 +222,7 @@ void c2c_type_end(Emit *target, CType type)
     }
 }
 
-void c2c_abstract_type(Emit *target, CType type)
+void c2c_type_abstract(Emit *target, CType type)
 {
     c2c_type_start(target, type);
     c2c_type_end(target, type);
@@ -226,7 +230,6 @@ void c2c_abstract_type(Emit *target, CType type)
 
 void c2c_expr(Emit *target, CExpr expr)
 {
-    emit_fmt(target, "(");
     switch (expr.type)
     {
     case CEXPR_CONSTANT:
@@ -238,22 +241,28 @@ void c2c_expr(Emit *target, CExpr expr)
         break;
 
     case CEXPR_PREFIX:
+
+        emit_fmt(target, "(");
         c2c_op_fix(target, expr.prefix_.op);
         if (expr.prefix_.expr != NULL)
         {
             c2c_expr(target, *expr.prefix_.expr);
         }
+        emit_fmt(target, ")");
         break;
 
     case CEXPR_POSTFIX:
+        emit_fmt(target, "(");
         if (expr.prefix_.expr != NULL)
         {
             c2c_expr(target, *expr.prefix_.expr);
         }
         c2c_op_fix(target, expr.prefix_.op);
+        emit_fmt(target, ")");
         break;
 
     case CEXPR_INFIX:
+        emit_fmt(target, "(");
         c2c_expr(target, *expr.infix_.lhs);
         if (expr.infix_.op == COP_INDEX)
         {
@@ -267,6 +276,7 @@ void c2c_expr(Emit *target, CExpr expr)
         {
             emit_fmt(target, "]");
         }
+        emit_fmt(target, ")");
         break;
 
     case CEXPR_CALL:
@@ -286,6 +296,7 @@ void c2c_expr(Emit *target, CExpr expr)
 
             c2c_expr(target, v);
         }
+        emit_fmt(target, ")");
         break;
 
     case CEXPR_CAST:
@@ -306,8 +317,6 @@ void c2c_expr(Emit *target, CExpr expr)
     default:
         break;
     }
-
-    emit_fmt(target, ")");
 }
 
 void c2c_decl(Emit *target, CDecl declaration)
@@ -331,6 +340,7 @@ void c2c_decl(Emit *target, CDecl declaration)
         }
 
         c2c_type_end(target, declaration.type_.type);
+        emit_fmt(target, ";\n");
     }
     else if (declaration.type == CDECL_VAR)
     {
@@ -343,6 +353,7 @@ void c2c_decl(Emit *target, CDecl declaration)
         {
             c2c_expr(target, declaration.var_.expr);
         }
+        emit_fmt(target, ";\n");
     }
     else if (declaration.type == CDECL_FUNC)
     {
@@ -355,7 +366,7 @@ void c2c_decl(Emit *target, CDecl declaration)
         c2c_type_abstract(target, *func_type.func_.ret);
 
         // name
-        emit_fmt(target, " {}", declaration.name);
+        emit_fmt(target, " {}(", declaration.name);
 
         // args
         int first = 0;
@@ -369,10 +380,9 @@ void c2c_decl(Emit *target, CDecl declaration)
             c2c_member(target, v);
         }
 
+        emit_fmt(target, ")");
         c2c_stmt(target, declaration.func_.body);
     }
-
-    emit_fmt(target, ";\n");
 }
 
 bool c2c_should_statement_endline(CStmtType type)
@@ -416,7 +426,7 @@ void c2c_stmt(Emit *target, CStmt statement)
         }
 
         emit_deident(target);
-        emit_fmt(target, "\n}}\n");
+        emit_fmt(target, "}}\n");
         return;
 
     case CSTMT_IF:
@@ -513,11 +523,11 @@ void c2c_include(Emit *target, CInclude path)
 
     if (path.is_q_char)
     {
-        emit_fmt(target, "\"{}\"", path.path);
+        emit_fmt(target, "\"{}\"\n", path.path);
     }
     else
     {
-        emit_fmt(target, "<{}>", path.path);
+        emit_fmt(target, "<{}>\n", path.path);
     }
 }
 

@@ -32,7 +32,7 @@ static inline CDecl cdecl_var(Str name, CType type, CExpr expr, Alloc *alloc)
 static inline CDecl cdecl_func(Str name, CType type, CStmt body, Alloc *alloc)
 {
     return (CDecl){
-        .type = CDECL_VAR,
+        .type = CDECL_FUNC,
         .name = str_dup(name, alloc),
         .func_ = {
             .type = type,
@@ -58,6 +58,34 @@ static inline CExpr cexpr_constant(CVal val)
     };
 }
 
+static inline CExpr cexpr_identifier(Str ident, Alloc *alloc)
+{
+    return (CExpr){
+        .type = CEXPR_IDENTIFIER,
+        .identifier_ = str_dup(ident, alloc)};
+}
+
+static inline CExpr cexpr_call(Alloc *alloc, CExpr name)
+{
+    CExpr call;
+    call.type = CEXPR_CALL;
+    call.call_.expr = alloc_move(alloc, name);
+
+    vec_init(&call.call_.args, alloc);
+
+    return call;
+}
+
+static inline void cexpr_add_arg(CExpr *self, CExpr arg)
+{
+    if (self->type != CEXPR_CALL)
+    {
+        panic$("cexpr add arg should only be called with a call expression");
+    }
+
+    vec_push(&self->call_.args, arg);
+}
+
 /* --- CStmt ---------------------------------------------------------------- */
 
 static inline CStmt cstmt_empty(void)
@@ -78,7 +106,7 @@ static inline CStmt cstmt_decl(CDecl decl, Alloc *alloc)
 static inline CStmt cstmt_expr(CExpr expr)
 {
     return (CStmt){
-        .type = CSTMT_BLOCK,
+        .type = CSTMT_EXPR,
         .expr_.expr = expr,
     };
 }
@@ -92,6 +120,16 @@ static inline CStmt cstmt_block(Alloc *alloc)
     vec_init(&stmt.block_.stmts, alloc);
 
     return stmt;
+}
+
+static inline void cstmt_block_add(CStmt *self, CStmt statement)
+{
+    if (self->type != CSTMT_BLOCK)
+    {
+        panic$("cstmt_block_add should only be called with block");
+    }
+
+    vec_push(&self->block_.stmts, statement);
 }
 
 static inline CStmt cstmt_if(CExpr expr, CStmt stmt_true, CStmt stmt_false, Alloc *alloc)
@@ -316,6 +354,36 @@ static inline void ctype_constant(CType *self, Str name, CVal val, Alloc *alloc)
     {
         panic$("Only enums can have constants!");
     }
+}
+
+static inline CType ctype_func(CType ret, Str name, Alloc *alloc)
+{
+    CType type = {
+        .type = CTYPE_FUNC,
+        .name = str_dup(name, alloc),
+    };
+
+    type.func_.ret = alloc_move(alloc, ret);
+
+    vec_init(&type.func_.params, alloc);
+    return type;
+}
+
+static inline CType ctype_name(Str name, Alloc *alloc)
+{
+    CType type =
+        {
+            .type = CTYPE_NAME,
+            .name = str_dup(name, alloc),
+        };
+
+    return type;
+}
+
+static inline CType ctype_attr(CType type, CTypeAttr attr)
+{
+    type.attr |= attr;
+    return type;
 }
 
 /* --- CVal  ---------------------------------------------------------------- */

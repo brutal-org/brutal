@@ -13,6 +13,7 @@ const char *ctype_type_to_str[] = {
     [CTYPE_UNION] = "union",
     [CTYPE_ENUM] = "enum",
     [CTYPE_FUNC] = "",
+    [CTYPE_NAME] = "",
 };
 
 Str ctype_to_str(CTypeType type)
