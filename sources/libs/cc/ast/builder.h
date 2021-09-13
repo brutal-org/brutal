@@ -8,7 +8,7 @@
 
 /* --- CDecl ---------------------------------------------------------------- */
 
-CDecl cdecl_type(Str name, CType type, Alloc *alloc)
+static inline CDecl cdecl_type(Str name, CType type, Alloc *alloc)
 {
     return (CDecl){
         .type = CDECL_TYPE,
@@ -17,7 +17,7 @@ CDecl cdecl_type(Str name, CType type, Alloc *alloc)
     };
 }
 
-CDecl cdecl_var(Str name, CType type, CExpr expr, Alloc *alloc)
+static inline CDecl cdecl_var(Str name, CType type, CExpr expr, Alloc *alloc)
 {
     return (CDecl){
         .type = CDECL_VAR,
@@ -29,7 +29,7 @@ CDecl cdecl_var(Str name, CType type, CExpr expr, Alloc *alloc)
     };
 }
 
-CDecl cdecl_func(Str name, CType type, CStmt body, Alloc *alloc)
+static inline CDecl cdecl_func(Str name, CType type, CStmt body, Alloc *alloc)
 {
     return (CDecl){
         .type = CDECL_VAR,
@@ -43,14 +43,14 @@ CDecl cdecl_func(Str name, CType type, CStmt body, Alloc *alloc)
 
 /* --- CExpr ---------------------------------------------------------------- */
 
-CExpr cexpr_empty(void)
+static inline CExpr cexpr_empty(void)
 {
     return (CExpr){
         .type = CEXPR_EMPTY,
     };
 }
 
-CExpr cexpr_constant(CVal val)
+static inline CExpr cexpr_constant(CVal val)
 {
     return (CExpr){
         .type = CEXPR_CONSTANT,
@@ -60,14 +60,14 @@ CExpr cexpr_constant(CVal val)
 
 /* --- CStmt ---------------------------------------------------------------- */
 
-CStmt cstmt_empty(void)
+static inline CStmt cstmt_empty(void)
 {
     return (CStmt){
         .type = CSTMT_EMPTY,
     };
 }
 
-CStmt cstmt_decl(CDecl decl, Alloc *alloc)
+static inline CStmt cstmt_decl(CDecl decl, Alloc *alloc)
 {
     return (CStmt){
         .type = CSTMT_EMPTY,
@@ -75,7 +75,7 @@ CStmt cstmt_decl(CDecl decl, Alloc *alloc)
     };
 }
 
-CStmt cstmt_expr(CExpr expr)
+static inline CStmt cstmt_expr(CExpr expr)
 {
     return (CStmt){
         .type = CSTMT_BLOCK,
@@ -83,7 +83,7 @@ CStmt cstmt_expr(CExpr expr)
     };
 }
 
-CStmt cstmt_block(Alloc *alloc)
+static inline CStmt cstmt_block(Alloc *alloc)
 {
     CStmt stmt = {
         .type = CSTMT_BLOCK,
@@ -94,7 +94,7 @@ CStmt cstmt_block(Alloc *alloc)
     return stmt;
 }
 
-CStmt cstmt_if(CExpr expr, CStmt stmt_true, CStmt stmt_false, Alloc *alloc)
+static inline CStmt cstmt_if(CExpr expr, CStmt stmt_true, CStmt stmt_false, Alloc *alloc)
 {
     return (CStmt){
         .type = CSTMT_IF,
@@ -106,7 +106,7 @@ CStmt cstmt_if(CExpr expr, CStmt stmt_true, CStmt stmt_false, Alloc *alloc)
     };
 }
 
-CStmt cstmt_for(CStmt init_stmt, CExpr cond_expr, CExpr iter_expr, CStmt stmt, Alloc *alloc)
+static inline CStmt cstmt_for(CStmt init_stmt, CExpr cond_expr, CExpr iter_expr, CStmt stmt, Alloc *alloc)
 {
     return (CStmt){
         .type = CSTMT_FOR,
@@ -119,7 +119,7 @@ CStmt cstmt_for(CStmt init_stmt, CExpr cond_expr, CExpr iter_expr, CStmt stmt, A
     };
 }
 
-CStmt cstmt_while(CExpr expr, CStmt stmt, Alloc *alloc)
+static inline CStmt cstmt_while(CExpr expr, CStmt stmt, Alloc *alloc)
 {
     return (CStmt){
         .type = CSTMT_WHILE,
@@ -130,7 +130,7 @@ CStmt cstmt_while(CExpr expr, CStmt stmt, Alloc *alloc)
     };
 }
 
-CStmt cstmt_do(CExpr expr, CStmt stmt, Alloc *alloc)
+static inline CStmt cstmt_do(CExpr expr, CStmt stmt, Alloc *alloc)
 {
     return (CStmt){
         .type = CSTMT_DO,
@@ -141,7 +141,7 @@ CStmt cstmt_do(CExpr expr, CStmt stmt, Alloc *alloc)
     };
 }
 
-CStmt cstmt_switch(CExpr expr, CStmt stmt, Alloc *alloc)
+static inline CStmt cstmt_switch(CExpr expr, CStmt stmt, Alloc *alloc)
 {
     return (CStmt){
         .type = CSTMT_SWITCH,
@@ -152,7 +152,7 @@ CStmt cstmt_switch(CExpr expr, CStmt stmt, Alloc *alloc)
     };
 }
 
-CStmt cstmt_return(CExpr expr)
+static inline CStmt cstmt_return(CExpr expr)
 {
     return (CStmt){
         .type = CSTMT_RETURN,
@@ -162,7 +162,7 @@ CStmt cstmt_return(CExpr expr)
     };
 }
 
-CStmt cstmt_goto(Str str, Alloc *alloc)
+static inline CStmt cstmt_goto(Str str, Alloc *alloc)
 {
     return (CStmt){
         .type = CSTMT_GOTO,
@@ -170,7 +170,7 @@ CStmt cstmt_goto(Str str, Alloc *alloc)
     };
 }
 
-CStmt cstmt_case(CExpr expr)
+static inline CStmt cstmt_case(CExpr expr)
 {
     return (CStmt){
         .type = CSTMT_CASE,

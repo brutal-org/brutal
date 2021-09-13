@@ -153,7 +153,7 @@ void c2c_type_start(Emit *target, CType type)
              type.struct_.members.length != 0)
     {
         emit_fmt(target, "{} ", type.name);
-        
+
         c2c_type_attribute(target, type.attr);
         emit_fmt(target, "\n{{\n");
         emit_ident(target);
