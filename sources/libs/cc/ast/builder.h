@@ -132,7 +132,19 @@ static inline void cstmt_block_add(CStmt *self, CStmt statement)
     vec_push(&self->block_.stmts, statement);
 }
 
-static inline CStmt cstmt_if(CExpr expr, CStmt stmt_true, CStmt stmt_false, Alloc *alloc)
+static inline CStmt cstmt_if(CExpr expr, CStmt stmt_true, Alloc *alloc)
+{
+    return (CStmt){
+        .type = CSTMT_IF,
+        .if_ = {
+            .expr = expr,
+            .stmt_true = alloc_move(alloc, stmt_true),
+            .stmt_false = cstmt_empty(),
+        },
+    };
+}
+
+static inline CStmt cstmt_if_else(CExpr expr, CStmt stmt_true, CStmt stmt_false, Alloc *alloc)
 {
     return (CStmt){
         .type = CSTMT_IF,

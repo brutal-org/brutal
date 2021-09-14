@@ -11,5 +11,5 @@ typedef struct
 typedef struct
 {
     Vec(CInclude) includes;
-    Vec(CDecl) declarations;
-} CTransUnit;
+    Vec(CDecl) decls;
+} CUnit;

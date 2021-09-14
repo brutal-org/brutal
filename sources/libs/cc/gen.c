@@ -1,287 +1,224 @@
 #include <cc/gen.h>
 
-void c2c_type_start(Emit *target, CType type);
-void c2c_type_end(Emit *target, CType type);
-void c2c_type_abstract(Emit *target, CType type);
-void c2c_expr(Emit *target, CExpr expr);
-void c2c_stmt(Emit *target, CStmt statement);
+/* --- CVal ----------------------------------------------------------------- */
 
-void c2c_op_fix(Emit *target, COp op)
-{
-    emit_fmt(target, "{}", cop_to_str(op));
-}
-
-void c2c_decl_attribute(Emit *target, CDeclAttr attrib)
-{
-    if (attrib & CDECL_AUTO)
-    {
-        emit_fmt(target, "auto ");
-    }
-
-    if (attrib & CDECL_STATIC)
-    {
-        emit_fmt(target, "static ");
-    }
-
-    if (attrib & CDECL_REGISTER)
-    {
-        emit_fmt(target, "register ");
-    }
-
-    if (attrib & CDECL_INLINE)
-    {
-        emit_fmt(target, "inline ");
-    }
-
-    if (attrib & CDECL_EXTERN)
-    {
-        emit_fmt(target, "extern ");
-    }
-
-    if (attrib & CDECL_THREAD)
-    {
-        emit_fmt(target, "thread ");
-    }
-}
-
-void c2c_type_attribute(Emit *target, CTypeAttr attrib)
-{
-    if (attrib & CTYPE_CONST)
-    {
-        emit_fmt(target, "const ");
-    }
-
-    if (attrib & CTYPE_RESTRICT)
-    {
-        emit_fmt(target, "restrict ");
-    }
-
-    if (attrib & CTYPE_VOLATILE)
-    {
-        emit_fmt(target, "volatile ");
-    }
-}
-void c2c_value(Emit *target, CVal value)
+void c2c_value(Emit *emit, CVal value)
 {
     switch (value.type)
     {
     case CVAL_SIGNED:
-        emit_fmt(target, "{}", value.signed_);
+        emit_fmt(emit, "{}", value.signed_);
         break;
 
     case CVAL_UNSIGNED:
-        emit_fmt(target, "{}", value.unsigned_);
+        emit_fmt(emit, "{}", value.unsigned_);
         break;
 
     case CVAL_STRING:
-        emit_fmt(target, "\"{}\"", value.string_);
+        emit_fmt(emit, "\"{}\"", value.string_);
         break;
 
     default:
-        emit_fmt(target, "");
+        emit_fmt(emit, "");
         break;
     }
 }
 
-void c2c_member(Emit *target, CTypeMember type)
+/* --- CType ---------------------------------------------------------------- */
+
+static void c2c_type_start(Emit *emit, CType type);
+static void c2c_type_end(Emit *emit, CType type);
+
+static void c2c_member(Emit *emit, CTypeMember type)
 {
-    c2c_type_start(target, type.type);
-    emit_fmt(target, " {}", type.name);
-    c2c_type_end(target, type.type);
+    c2c_type_start(emit, type.type);
+    emit_fmt(emit, " {}", type.name);
+    c2c_type_end(emit, type.type);
 }
 
-void c2c_func_type(Emit *target, CType type, Str name)
+static void c2c_constant(Emit *emit, CTypeConstant member)
 {
-    int ptr_count = 0;
+    emit_fmt(emit, "{}", member.name);
+    emit_fmt(emit, " = ");
+    c2c_value(emit, member.value);
+}
 
-    while (type.type == CTYPE_PTR)
+static void c2c_type_attr(Emit *emit, CTypeAttr attr)
+{
+    if (attr & CTYPE_CONST)
     {
-        type = *type.ptr_.subtype;
-        ptr_count++;
+        emit_fmt(emit, "const ");
     }
 
-    c2c_type_abstract(target, *type.func_.ret);
-
-    emit_fmt(target, "(");
-
-    for (int i = 0; i < ptr_count; i++)
+    if (attr & CTYPE_RESTRICT)
     {
-        emit_fmt(target, "*");
+        emit_fmt(emit, "restrict ");
     }
 
-    emit_fmt(target, "{})", name);
-
-    int first = 0;
-    vec_foreach(v, &type.func_.params)
+    if (attr & CTYPE_VOLATILE)
     {
-        if (first != 0)
-        {
-            emit_fmt(target, ", ");
-        }
-        first++;
-        c2c_member(target, v);
+        emit_fmt(emit, "volatile ");
     }
 }
 
-void c2c_constant(Emit *target, CTypeConstant member)
+void c2c_type(Emit *emit, CType type)
 {
-    emit_fmt(target, "{}", member.name);
-    emit_fmt(target, " = ");
-    c2c_value(target, member.value);
+    c2c_type_start(emit, type);
+    c2c_type_end(emit, type);
 }
 
-void c2c_type_start(Emit *target, CType type)
+static void c2c_type_start(Emit *emit, CType type)
 {
-    emit_fmt(target, "{}", ctype_to_str(type.type));
+    emit_fmt(emit, "{}", ctype_to_str(type.type));
 
     if (type.type == CTYPE_NAME)
     {
-        emit_fmt(target, type.name);
+        emit_fmt(emit, type.name);
     }
     else if (type.type == CTYPE_PTR)
     {
-
-        c2c_type_start(target, *type.ptr_.subtype);
-        emit_fmt(target, "*");
-        c2c_type_attribute(target, type.attr);
+        c2c_type_start(emit, *type.ptr_.subtype);
+        emit_fmt(emit, "*");
+        c2c_type_attr(emit, type.attr);
     }
     else if (type.type == CTYPE_FUNC)
     {
-        c2c_type_abstract(target, *type.func_.ret); // return
+        c2c_type(emit, *type.func_.ret); // return
 
-        emit_fmt(target, "(");
+        emit_fmt(emit, "(");
 
-        c2c_type_attribute(target, type.attr);
+        c2c_type_attr(emit, type.attr);
     }
     else if ((type.type == CTYPE_STRUCT || type.type == CTYPE_UNION) &&
              type.struct_.members.length != 0)
     {
-        emit_fmt(target, "{} ", type.name);
+        emit_fmt(emit, "{} ", type.name);
 
-        c2c_type_attribute(target, type.attr);
-        emit_fmt(target, "\n{{\n");
-        emit_ident(target);
+        c2c_type_attr(emit, type.attr);
+        emit_fmt(emit, "\n{{\n");
+        emit_ident(emit);
 
         vec_foreach(v, &type.struct_.members)
         {
-            c2c_member(target, v);
-            emit_fmt(target, ";\n");
+            c2c_member(emit, v);
+            emit_fmt(emit, ";\n");
         }
 
-        emit_deident(target);
-        emit_fmt(target, "\n}}");
+        emit_deident(emit);
+        emit_fmt(emit, "\n}}");
     }
     else if (type.type == CTYPE_ENUM)
     {
-        c2c_type_attribute(target, type.attr);
-        emit_fmt(target, "\n{{\n");
-        emit_ident(target);
+        c2c_type_attr(emit, type.attr);
+        emit_fmt(emit, "\n{{\n");
+        emit_ident(emit);
 
         vec_foreach(v, &type.enum_.constants)
         {
-            c2c_constant(target, v);
-            emit_fmt(target, ", \n");
+            c2c_constant(emit, v);
+            emit_fmt(emit, ", \n");
         }
 
-        emit_deident(target);
-        emit_fmt(target, "\n}}");
+        emit_deident(emit);
+        emit_fmt(emit, "\n}}");
 
-        emit_fmt(target, "{} ", type.name);
+        emit_fmt(emit, "{} ", type.name);
     }
     else if (type.type == CTYPE_ARRAY)
     {
-        c2c_type_attribute(target, type.attr);
-        c2c_type_start(target, *type.array_.subtype);
+        c2c_type_attr(emit, type.attr);
+        c2c_type_start(emit, *type.array_.subtype);
     }
 }
 
-void c2c_type_end(Emit *target, CType type)
+static void c2c_type_end(Emit *emit, CType type)
 {
     if (type.type == CTYPE_PTR)
     {
-        c2c_type_end(target, *type.ptr_.subtype);
+        c2c_type_end(emit, *type.ptr_.subtype);
     }
     else if (type.type == CTYPE_FUNC)
     {
-        emit_fmt(target, ")(");
+        emit_fmt(emit, ")(");
 
         int first = 0;
         vec_foreach(v, &type.func_.params)
         {
             if (first != 0)
             {
-                emit_fmt(target, ", ");
+                emit_fmt(emit, ", ");
             }
             first++;
-            c2c_member(target, v);
+            c2c_member(emit, v);
         }
     }
     else if (type.type == CTYPE_ARRAY)
     {
-        emit_fmt(target, "[{}]", type.array_.size);
+        emit_fmt(emit, "[{}]", type.array_.size);
     }
 }
 
-void c2c_type_abstract(Emit *target, CType type)
+/* --- CExpr ---------------------------------------------------------------- */
+
+static void c2c_op_fix(Emit *emit, COp op)
 {
-    c2c_type_start(target, type);
-    c2c_type_end(target, type);
+    emit_fmt(emit, "{}", cop_to_str(op));
 }
 
-void c2c_expr(Emit *target, CExpr expr)
+void c2c_expr(Emit *emit, CExpr expr)
 {
     switch (expr.type)
     {
     case CEXPR_CONSTANT:
-        c2c_value(target, expr.constant_);
+        c2c_value(emit, expr.constant_);
         break;
 
     case CEXPR_IDENTIFIER:
-        emit_fmt(target, "{}", expr.identifier_);
+        emit_fmt(emit, "{}", expr.identifier_);
         break;
 
     case CEXPR_PREFIX:
 
-        emit_fmt(target, "(");
-        c2c_op_fix(target, expr.prefix_.op);
+        emit_fmt(emit, "(");
+        c2c_op_fix(emit, expr.prefix_.op);
         if (expr.prefix_.expr != NULL)
         {
-            c2c_expr(target, *expr.prefix_.expr);
+            c2c_expr(emit, *expr.prefix_.expr);
         }
-        emit_fmt(target, ")");
+        emit_fmt(emit, ")");
         break;
 
     case CEXPR_POSTFIX:
-        emit_fmt(target, "(");
+        emit_fmt(emit, "(");
         if (expr.prefix_.expr != NULL)
         {
-            c2c_expr(target, *expr.prefix_.expr);
+            c2c_expr(emit, *expr.prefix_.expr);
         }
-        c2c_op_fix(target, expr.prefix_.op);
-        emit_fmt(target, ")");
+        c2c_op_fix(emit, expr.prefix_.op);
+        emit_fmt(emit, ")");
         break;
 
     case CEXPR_INFIX:
-        emit_fmt(target, "(");
-        c2c_expr(target, *expr.infix_.lhs);
+        emit_fmt(emit, "(");
+        c2c_expr(emit, *expr.infix_.lhs);
         if (expr.infix_.op == COP_INDEX)
         {
-            emit_fmt(target, "[");
+            emit_fmt(emit, "[");
         }
 
-        c2c_op_fix(target, expr.prefix_.op);
-        c2c_expr(target, *expr.infix_.rhs);
+        c2c_op_fix(emit, expr.prefix_.op);
+        c2c_expr(emit, *expr.infix_.rhs);
 
         if (expr.infix_.op == COP_INDEX)
         {
-            emit_fmt(target, "]");
+            emit_fmt(emit, "]");
         }
-        emit_fmt(target, ")");
+        emit_fmt(emit, ")");
         break;
 
     case CEXPR_CALL:
-        c2c_expr(target, *expr.call_.expr);
-        emit_fmt(target, "(");
+        c2c_expr(emit, *expr.call_.expr);
+        emit_fmt(emit, "(");
         bool first = true;
         vec_foreach(v, &expr.call_.args)
         {
@@ -291,27 +228,27 @@ void c2c_expr(Emit *target, CExpr expr)
             }
             else
             {
-                emit_fmt(target, ", ");
+                emit_fmt(emit, ", ");
             }
 
-            c2c_expr(target, v);
+            c2c_expr(emit, v);
         }
-        emit_fmt(target, ")");
+        emit_fmt(emit, ")");
         break;
 
     case CEXPR_CAST:
-        emit_fmt(target, " (");
-        c2c_type_abstract(target, expr.cast_.type);
-        emit_fmt(target, ")");
-        c2c_expr(target, *expr.cast_.expr);
+        emit_fmt(emit, " (");
+        c2c_type(emit, expr.cast_.type);
+        emit_fmt(emit, ")");
+        c2c_expr(emit, *expr.cast_.expr);
         break;
 
     case CEXPR_TERNARY:
-        c2c_expr(target, *expr.ternary_.expr_cond);
-        emit_fmt(target, " ? ");
-        c2c_expr(target, *expr.ternary_.expr_true);
-        emit_fmt(target, " : ");
-        c2c_expr(target, *expr.ternary_.expr_false);
+        c2c_expr(emit, *expr.ternary_.expr_cond);
+        emit_fmt(emit, " ? ");
+        c2c_expr(emit, *expr.ternary_.expr_true);
+        emit_fmt(emit, " : ");
+        c2c_expr(emit, *expr.ternary_.expr_false);
         break;
 
     default:
@@ -319,73 +256,9 @@ void c2c_expr(Emit *target, CExpr expr)
     }
 }
 
-void c2c_decl(Emit *target, CDecl declaration)
-{
-    c2c_decl_attribute(target, declaration.attr);
+/* --- CStmt ---------------------------------------------------------------- */
 
-    if (declaration.type == CDECL_TYPE)
-    {
-        bool is_typedef = declaration.name.len != 0;
-
-        if (is_typedef)
-        {
-            emit_fmt(target, "typedef ");
-        }
-
-        c2c_type_start(target, declaration.type_.type);
-
-        if (is_typedef)
-        {
-            emit_fmt(target, "{}", declaration.name);
-        }
-
-        c2c_type_end(target, declaration.type_.type);
-        emit_fmt(target, ";\n");
-    }
-    else if (declaration.type == CDECL_VAR)
-    {
-        c2c_type_start(target, declaration.var_.type);
-
-        emit_fmt(target, "{}", declaration.name);
-
-        c2c_type_end(target, declaration.var_.type);
-        if (declaration.var_.expr.type != CEXPR_INVALID)
-        {
-            c2c_expr(target, declaration.var_.expr);
-        }
-        emit_fmt(target, ";\n");
-    }
-    else if (declaration.type == CDECL_FUNC)
-    {
-        // need to do (int) cast because gcc is not good :(
-        assert_equal((int)declaration.func_.type.type, (int)CTYPE_FUNC);
-
-        auto func_type = declaration.func_.type;
-
-        // return:
-        c2c_type_abstract(target, *func_type.func_.ret);
-
-        // name
-        emit_fmt(target, " {}(", declaration.name);
-
-        // args
-        int first = 0;
-        vec_foreach(v, &func_type.func_.params)
-        {
-            if (first != 0)
-            {
-                emit_fmt(target, ", ");
-            }
-            first++;
-            c2c_member(target, v);
-        }
-
-        emit_fmt(target, ")");
-        c2c_stmt(target, declaration.func_.body);
-    }
-}
-
-bool c2c_should_statement_endline(CStmtType type)
+static bool c2c_should_stmt_endline(CStmtType type)
 {
     if (type == CSTMT_BLOCK ||
         type == CSTMT_DEFAULT ||
@@ -398,118 +271,118 @@ bool c2c_should_statement_endline(CStmtType type)
     return true;
 }
 
-void c2c_stmt(Emit *target, CStmt statement)
+void c2c_stmt(Emit *emit, CStmt stmt)
 {
-    switch (statement.type)
+    switch (stmt.type)
     {
 
     case CSTMT_DECL:
-        c2c_decl(target, *statement.decl_.decl);
+        c2c_decl(emit, *stmt.decl_.decl);
         return;
 
     case CSTMT_EXPR:
-        c2c_expr(target, statement.expr_.expr);
+        c2c_expr(emit, stmt.expr_.expr);
         return;
 
     case CSTMT_BLOCK:
-        emit_fmt(target, "\n{{\n");
-        emit_ident(target);
+        emit_fmt(emit, "\n{{\n");
+        emit_ident(emit);
 
-        vec_foreach(v, &statement.block_.stmts)
+        vec_foreach(v, &stmt.block_.stmts)
         {
-            c2c_stmt(target, v);
-            if (c2c_should_statement_endline(v.type))
+            c2c_stmt(emit, v);
+            if (c2c_should_stmt_endline(v.type))
             {
-                emit_fmt(target, ";");
+                emit_fmt(emit, ";");
             }
-            emit_fmt(target, "\n");
+            emit_fmt(emit, "\n");
         }
 
-        emit_deident(target);
-        emit_fmt(target, "}}\n");
+        emit_deident(emit);
+        emit_fmt(emit, "}}\n");
         return;
 
     case CSTMT_IF:
-        emit_fmt(target, "if (");
-        c2c_expr(target, statement.if_.expr);
-        emit_fmt(target, ") \n");
-        c2c_stmt(target, *statement.if_.stmt_true);
+        emit_fmt(emit, "if (");
+        c2c_expr(emit, stmt.if_.expr);
+        emit_fmt(emit, ") \n");
+        c2c_stmt(emit, *stmt.if_.stmt_true);
 
-        if (statement.if_.stmt_false->type != CSTMT_EMPTY)
+        if (stmt.if_.stmt_false->type != CSTMT_EMPTY)
         {
-            emit_fmt(target, "else ");
-            c2c_stmt(target, *statement.if_.stmt_false);
+            emit_fmt(emit, "else ");
+            c2c_stmt(emit, *stmt.if_.stmt_false);
         }
         return;
 
     case CSTMT_FOR:
-        emit_fmt(target, "for (");
-        c2c_stmt(target, *statement.for_.init_stmt);
+        emit_fmt(emit, "for (");
+        c2c_stmt(emit, *stmt.for_.init_stmt);
 
-        emit_fmt(target, "; ");
-        c2c_expr(target, statement.for_.cond_expr);
+        emit_fmt(emit, "; ");
+        c2c_expr(emit, stmt.for_.cond_expr);
 
-        emit_fmt(target, "; ");
-        c2c_expr(target, statement.for_.iter_expr);
+        emit_fmt(emit, "; ");
+        c2c_expr(emit, stmt.for_.iter_expr);
 
-        emit_fmt(target, ")\n");
-        c2c_stmt(target, *statement.for_.stmt);
+        emit_fmt(emit, ")\n");
+        c2c_stmt(emit, *stmt.for_.stmt);
         return;
 
     case CSTMT_WHILE:
-        emit_fmt(target, "while (");
-        c2c_expr(target, statement.while_.expr);
-        emit_fmt(target, ") \n");
+        emit_fmt(emit, "while (");
+        c2c_expr(emit, stmt.while_.expr);
+        emit_fmt(emit, ") \n");
 
-        c2c_stmt(target, *statement.while_.stmt);
+        c2c_stmt(emit, *stmt.while_.stmt);
         return;
 
     case CSTMT_DO:
-        emit_fmt(target, "do \n ");
+        emit_fmt(emit, "do \n ");
 
-        c2c_stmt(target, *statement.do_.stmt);
+        c2c_stmt(emit, *stmt.do_.stmt);
 
-        emit_fmt(target, "while (");
-        c2c_expr(target, statement.do_.expr);
-        emit_fmt(target, ") \n");
+        emit_fmt(emit, "while (");
+        c2c_expr(emit, stmt.do_.expr);
+        emit_fmt(emit, ") \n");
         return;
 
     case CSTMT_SWITCH:
-        emit_fmt(target, "switch (");
-        c2c_expr(target, statement.while_.expr);
-        emit_fmt(target, ") \n");
-        c2c_stmt(target, *statement.while_.stmt);
+        emit_fmt(emit, "switch (");
+        c2c_expr(emit, stmt.while_.expr);
+        emit_fmt(emit, ") \n");
+        c2c_stmt(emit, *stmt.while_.stmt);
         return;
 
     case CSTMT_RETURN:
-        emit_fmt(target, "return ");
-        c2c_expr(target, statement.return_.expr);
+        emit_fmt(emit, "return ");
+        c2c_expr(emit, stmt.return_.expr);
         return;
 
     case CSTMT_GOTO:
-        emit_fmt(target, "goto {}", statement.goto_.label);
+        emit_fmt(emit, "goto {}", stmt.goto_.label);
         return;
 
     case CSTMT_BREAK:
-        emit_fmt(target, "break");
+        emit_fmt(emit, "break");
         return;
 
     case CSTMT_CONTINUE:
-        emit_fmt(target, "continue");
+        emit_fmt(emit, "continue");
         return;
 
     case CSTMT_LABEL:
-        emit_fmt(target, "{}:", statement.label_.label);
+        emit_fmt(emit, "{}:", stmt.label_.label);
         return;
 
     case CSTMT_CASE:
-        emit_fmt(target, "case ");
-        c2c_expr(target, statement.case_.expr);
-        emit_fmt(target, ":");
+        emit_fmt(emit, "case ");
+        c2c_expr(emit, stmt.case_.expr);
+        emit_fmt(emit, ":");
         return;
 
     case CSTMT_DEFAULT:
-        emit_fmt(target, "default:");
+        emit_fmt(emit, "default:");
         return;
 
     default:
@@ -517,29 +390,132 @@ void c2c_stmt(Emit *target, CStmt statement)
     }
 }
 
-void c2c_include(Emit *target, CInclude path)
-{
-    emit_fmt(target, "#include ");
+/* --- CDecl ---------------------------------------------------------------- */
 
-    if (path.is_q_char)
+static void c2c_decl_attr(Emit *emit, CDeclAttr attr)
+{
+    if (attr & CDECL_AUTO)
     {
-        emit_fmt(target, "\"{}\"\n", path.path);
+        emit_fmt(emit, "auto ");
     }
-    else
+
+    if (attr & CDECL_STATIC)
     {
-        emit_fmt(target, "<{}>\n", path.path);
+        emit_fmt(emit, "static ");
+    }
+
+    if (attr & CDECL_REGISTER)
+    {
+        emit_fmt(emit, "register ");
+    }
+
+    if (attr & CDECL_INLINE)
+    {
+        emit_fmt(emit, "inline ");
+    }
+
+    if (attr & CDECL_EXTERN)
+    {
+        emit_fmt(emit, "extern ");
+    }
+
+    if (attr & CDECL_THREAD)
+    {
+        emit_fmt(emit, "thread ");
     }
 }
 
-void c2c(Emit *target, CTransUnit unit)
+void c2c_decl(Emit *emit, CDecl decl)
+{
+    c2c_decl_attr(emit, decl.attr);
+
+    if (decl.type == CDECL_TYPE)
+    {
+        bool is_typedef = decl.name.len != 0;
+
+        if (is_typedef)
+        {
+            emit_fmt(emit, "typedef ");
+        }
+
+        c2c_type_start(emit, decl.type_.type);
+
+        if (is_typedef)
+        {
+            emit_fmt(emit, "{}", decl.name);
+        }
+
+        c2c_type_end(emit, decl.type_.type);
+        emit_fmt(emit, ";\n");
+    }
+    else if (decl.type == CDECL_VAR)
+    {
+        c2c_type_start(emit, decl.var_.type);
+
+        emit_fmt(emit, "{}", decl.name);
+
+        c2c_type_end(emit, decl.var_.type);
+        if (decl.var_.expr.type != CEXPR_INVALID)
+        {
+            c2c_expr(emit, decl.var_.expr);
+        }
+        emit_fmt(emit, ";\n");
+    }
+    else if (decl.type == CDECL_FUNC)
+    {
+        // need to do (int) cast because gcc is not good :(
+        assert_equal((int)decl.func_.type.type, (int)CTYPE_FUNC);
+
+        auto func_type = decl.func_.type;
+
+        // return:
+        c2c_type(emit, *func_type.func_.ret);
+
+        // name
+        emit_fmt(emit, " {}(", decl.name);
+
+        // args
+        int first = 0;
+        vec_foreach(v, &func_type.func_.params)
+        {
+            if (first != 0)
+            {
+                emit_fmt(emit, ", ");
+            }
+            first++;
+            c2c_member(emit, v);
+        }
+
+        emit_fmt(emit, ")");
+        c2c_stmt(emit, decl.func_.body);
+    }
+}
+
+/* --- CUnit ---------------------------------------------------------------- */
+
+static void c2c_include(Emit *emit, CInclude path)
+{
+    emit_fmt(emit, "#include ");
+
+    if (path.is_q_char)
+    {
+        emit_fmt(emit, "\"{}\"\n", path.path);
+    }
+    else
+    {
+        emit_fmt(emit, "<{}>\n", path.path);
+    }
+}
+
+void c2c_unit(Emit *emit, CUnit unit)
 {
     vec_foreach(v, &unit.includes)
     {
-        c2c_include(target, v);
+        c2c_include(emit, v);
     }
 
-    vec_foreach(v, &unit.declarations)
+    vec_foreach(v, &unit.decls)
     {
-        c2c_decl(target, v);
+        c2c_decl(emit, v);
     }
 }
