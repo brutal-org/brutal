@@ -58,7 +58,7 @@ bool map_get_impl(MapImpl *impl, Str key, void *data);
     vec_foreach(__bucket, &((MAP)->buckets))                 \
         vec_foreach(__kv, &(__b))                            \
             for (bool __map_once = true; __map_once;)        \
-            for (Str KEY = str$(&_kv->key); __map_once;) \
+            for (Str KEY = str$(&__kv->key); __map_once;) \
             for (typeof(*(MAP)->_T) DATA = *(typeof(impl$(MAP)->_T))__kv->data; __map_once; __map_once = false)
 
 // clang-format on

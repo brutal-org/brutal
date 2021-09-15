@@ -62,9 +62,9 @@ void slot_release_impl(SlotImpl *impl, SlotIndex index);
 #define slot_count(self) \
     impl$(self)->capacity
 
-#define slot_foreach(v, self)                                        \
-    if ((self)->impl.capacity > 0)                                   \
-        for (int i = 0, typeof((self)->data[0]) v = (self)->data[i]; \
-             i < (self)->impl.capacity;                              \
-             i++, v = (self)->data[i])                               \
-            if ((self)->impl.used[i])
+#define slot_foreach(v, self)                                            \
+    if ((self)->impl.capacity > 0)                                       \
+        for (int __i = 0, typeof((self)->data[0]) v = (self)->data[__i]; \
+             __i < (self)->impl.capacity;                                \
+             __i++, v = (self)->data[__i])                               \
+            if ((self)->impl.used[__i])

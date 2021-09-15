@@ -62,15 +62,15 @@ void vec_swap_impl(VecImpl *impl, int idx1, int idx2);
 #define vec_swapsplice(v, start, count) \
     (vec_swapsplice_impl(impl$(v), start, count), (v)->length -= (count))
 
-#define vec_insert(v, idx, val) (                     \
-    {                                                 \
-        bool result = vec_insert_impl(impl$(v), idx); \
-        if (result)                                   \
-        {                                             \
-            (v)->data[idx] = (val);                   \
-            (v)->length++;                            \
-        }                                             \
-        result;                                       \
+#define vec_insert(v, idx, val) (                       \
+    {                                                   \
+        bool __result = vec_insert_impl(impl$(v), idx); \
+        if (__result)                                   \
+        {                                               \
+            (v)->data[idx] = (val);                     \
+            (v)->length++;                              \
+        }                                               \
+        __result;                                       \
     })
 
 #define vec_sort(v, fn) qsort((v)->data, (v)->length, sizeof(*(v)->data), fn)
@@ -109,22 +109,22 @@ void vec_swap_impl(VecImpl *impl, int idx1, int idx2);
 #define vec_remove(v, val)           \
     do                               \
     {                                \
-        int idx__;                   \
-        vec_find(v, val, idx__);     \
+        int __idx;                   \
+        vec_find(v, val, __idx);     \
                                      \
-        if (idx__ != -1)             \
+        if (__idx != -1)             \
         {                            \
-            vec_splice(v, idx__, 1); \
+            vec_splice(v, __idx, 1); \
         }                            \
     } while (0)
 
 #define vec_reverse(v)                                   \
     do                                                   \
     {                                                    \
-        int i__ = (v)->length / 2;                       \
-        while (i__--)                                    \
+        int __i = (v)->length / 2;                       \
+        while (__i--)                                    \
         {                                                \
-            vec_swap((v), i__, (v)->length - (i__ + 1)); \
+            vec_swap((v), __i, (v)->length - (__i + 1)); \
         }                                                \
     } while (0)
 
