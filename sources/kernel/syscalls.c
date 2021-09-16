@@ -551,6 +551,8 @@ BrSyscallFn *syscalls[BR_SYSCALL_COUNT] = {
     [BR_SC_UNBIND] = sys_unbind,
     [BR_SC_ACK] = sys_ack,
     [BR_SC_STAT] = sys_stat,
+    [BR_SC_IN] = sys_in,
+    [BR_SC_OUT] = sys_out,
 };
 
 BrResult syscall_dispatch(BrSyscall syscall, BrArg args)

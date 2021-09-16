@@ -1,0 +1,3 @@
+PS2_NAME = ps2
+
+CROSS_BINS += PS2

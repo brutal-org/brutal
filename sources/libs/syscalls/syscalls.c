@@ -79,3 +79,13 @@ BrResult br_stat(BrStatArgs *args)
 {
     return br_syscall(BR_SC_STAT, (BrArg)args, 0, 0, 0, 0);
 }
+
+BrResult br_in(BrIoArgs *args)
+{
+    return br_syscall(BR_SC_IN, (BrArg)args, 0, 0, 0, 0);
+}
+
+BrResult br_out(BrIoArgs *args)
+{
+    return br_syscall(BR_SC_OUT, (BrArg)args, 0, 0, 0, 0);
+}

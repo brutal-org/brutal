@@ -18,7 +18,7 @@
     SYSCALL(ACK)                  \
     SYSCALL(STAT)                 \
     SYSCALL(IN)                   \
-    SYSCALL(OU)
+    SYSCALL(OUT)
 
 typedef enum
 {
