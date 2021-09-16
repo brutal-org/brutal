@@ -4,6 +4,7 @@
 #include <cc/ast/expr.h>
 #include <cc/ast/stmt.h>
 #include <cc/ast/type.h>
+#include <cc/ast/unit.h>
 #include <cc/ast/val.h>
 
 /* --- CDecl ---------------------------------------------------------------- */
@@ -431,4 +432,53 @@ static inline CVal cval_string(Str str, Alloc *alloc)
         .type = CVAL_STRING,
         .string_ = str_dup(str, alloc),
     };
+}
+
+/* --- CUnit ---------------------------------------------------------------- */
+
+static inline CUnit cunit(Alloc *alloc)
+{
+    CUnit unit;
+    vec_init(&unit.units, alloc);
+    return unit;
+}
+
+static inline void cunit_member(CUnit *unit, CUnitEntry entry)
+{
+    vec_push(&unit->units, entry);
+}
+
+static inline CUnitEntry cunit_decl(CDecl decl)
+{
+    return (CUnitEntry){
+        .type = CUNIT_DECLARATION,
+        ._decl = decl,
+    };
+}
+
+static inline CUnitEntry cunit_pragma(Alloc *alloc)
+{
+    CPragma pragma;
+    vec_init(&pragma.args, alloc);
+
+    return (CUnitEntry){
+        .type = CUNIT_PRAGMA,
+        ._pragma = pragma,
+    };
+}
+
+static inline CUnitEntry cunit_pragma_once(Alloc *alloc)
+{
+    CUnitEntry entry = cunit_pragma(alloc);
+    vec_push(&entry._pragma.args, str_dup(str$("once"), alloc));
+    return entry;
+}
+
+static inline CUnitEntry cunit_include(bool qchar, Str path, Alloc *alloc)
+{
+    return (CUnitEntry){
+        .type = CUNIT_INCLUDE,
+        ._include = (CInclude){
+            .is_q_char = qchar,
+            .path = str_dup(path, alloc)}};
 }
