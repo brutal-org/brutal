@@ -134,12 +134,13 @@ static inline void cstmt_block_add(CStmt *self, CStmt statement)
 
 static inline CStmt cstmt_if(CExpr expr, CStmt stmt_true, Alloc *alloc)
 {
+    CStmt stmt_false = cstmt_empty();
     return (CStmt){
         .type = CSTMT_IF,
         .if_ = {
             .expr = expr,
             .stmt_true = alloc_move(alloc, stmt_true),
-            .stmt_false = cstmt_empty(),
+            .stmt_false = alloc_move(alloc, stmt_false),
         },
     };
 }

@@ -507,15 +507,38 @@ static void c2c_include(Emit *emit, CInclude path)
     }
 }
 
+void c2c_pragma(Emit *emit, CPragma pragma)
+{
+    emit_fmt(emit, "#pragma ");
+    vec_foreach(v, &pragma.args)
+    {
+        emit_fmt(emit, "{} ", v);
+    }
+    emit_fmt(emit, "\n");
+}
+
+void c2c_unit_entry(Emit *emit, CUnitEntry entry)
+{
+    switch (entry.type)
+    {
+    case CUNIT_INCLUDE:
+        c2c_include(emit, entry._include);
+        break;
+    case CUNIT_PRAGMA:
+        c2c_pragma(emit, entry._pragma);
+        break;
+    case CUNIT_DECLARATION:
+        c2c_decl(emit, entry._decl);
+        break;
+    default:
+        break;
+    }
+}
+
 void c2c_unit(Emit *emit, CUnit unit)
 {
-    vec_foreach(v, &unit.includes)
+    vec_foreach(v, &unit.units)
     {
-        c2c_include(emit, v);
-    }
-
-    vec_foreach(v, &unit.decls)
-    {
-        c2c_decl(emit, v);
+        c2c_unit_entry(emit, v);
     }
 }
