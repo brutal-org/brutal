@@ -46,3 +46,9 @@ Str buffer_str(Buffer *self);
 IoReader buffer_reader(Buffer *self);
 
 IoWriter buffer_writer(Buffer *self);
+
+#define buffer_fmt(BUFFER, FMT, ...) (                             \
+    {                                                              \
+        IoWriter __writer = buffer_writer(BUFFER);                 \
+        print_impl(&__writer, str$(FMT), PRINT_ARGS(__VA_ARGS__)); \
+    })

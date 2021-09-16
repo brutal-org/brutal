@@ -116,12 +116,3 @@ IoWriteResult print_impl(IoWriter *writer, Str format, PrintArgs args);
 
 #define empty_trans() \
     print_trans("")
-
-#define print_buf(_alloc, _fmt, ...) (                             \
-    {                                                              \
-        Buffer _buf;                                               \
-        buffer_init(&_buf, str$(_fmt).len + 1, _alloc);            \
-        IoWriter _writer = buffer_writer(&_buf);                   \
-        print_impl(&_writer, str$(_fmt), PRINT_ARGS(__VA_ARGS__)); \
-        _buf;                                                      \
-    })
