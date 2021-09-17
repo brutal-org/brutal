@@ -39,8 +39,12 @@ static void c2c_member(Emit *emit, CTypeMember type)
 static void c2c_constant(Emit *emit, CTypeConstant member)
 {
     emit_fmt(emit, "{}", member.name);
-    emit_fmt(emit, " = ");
-    c2c_value(emit, member.value);
+
+    if (member.value.type != CVAL_INVALID)
+    {
+        emit_fmt(emit, " = ");
+        c2c_value(emit, member.value);
+    }
 }
 
 static void c2c_type_attr(Emit *emit, CTypeAttr attr)

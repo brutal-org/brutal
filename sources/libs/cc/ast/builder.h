@@ -87,6 +87,65 @@ static inline void cexpr_add_arg(CExpr *self, CExpr arg)
     vec_push(&self->call_.args, arg);
 }
 
+static inline CExpr cexpr_infix(CExpr left, COp type, CExpr right, Alloc *alloc)
+{
+    return (CExpr){
+        .type = CEXPR_INFIX,
+        .infix_ = {
+            .op = type,
+            .lhs = alloc_move(alloc, left),
+            .rhs = alloc_move(alloc, right),
+        },
+    };
+}
+
+static inline CExpr cexpr_prefix(COp type, CExpr left, Alloc *alloc)
+{
+    return (CExpr){
+        .type = CEXPR_PREFIX,
+        .prefix_ = {
+            .op = type,
+            .expr = alloc_move(alloc, left),
+        },
+    };
+}
+
+static inline CExpr cexpr_postfix(CExpr left, COp type, Alloc *alloc)
+{
+    return (CExpr){
+        .type = CEXPR_POSTFIX,
+        .postfix_ = {
+            .op = type,
+            .expr = alloc_move(alloc, left),
+        },
+    };
+}
+
+static inline CExpr cexpr_cast(CExpr expr, CType type, Alloc *alloc)
+{
+    return (CExpr){
+        .type = CEXPR_CAST,
+        .cast_ =
+            {
+                .type = type,
+                .expr = alloc_move(alloc, expr),
+            },
+    };
+}
+
+static inline CExpr cexpr_ternary(CExpr cond, CExpr etrue, CExpr efalse, Alloc *alloc)
+{
+    return (CExpr){
+        .type = CEXPR_TERNARY,
+        .ternary_ =
+            {
+                .expr_cond = alloc_move(alloc, cond),
+                .expr_true = alloc_move(alloc, etrue),
+                .expr_false = alloc_move(alloc, efalse),
+            },
+    };
+}
+
 /* --- CStmt ---------------------------------------------------------------- */
 
 static inline CStmt cstmt_empty(void)
@@ -186,7 +245,7 @@ static inline CStmt cstmt_do(CExpr expr, CStmt stmt, Alloc *alloc)
 {
     return (CStmt){
         .type = CSTMT_DO,
-        .while_ = {
+        .do_ = {
             .expr = expr,
             .stmt = alloc_move(alloc, stmt),
         },
@@ -197,7 +256,7 @@ static inline CStmt cstmt_switch(CExpr expr, CStmt stmt, Alloc *alloc)
 {
     return (CStmt){
         .type = CSTMT_SWITCH,
-        .while_ = {
+        .switch_ = {
             .expr = expr,
             .stmt = alloc_move(alloc, stmt),
         },
@@ -248,11 +307,10 @@ static inline CType ctype_bool(Str name, Alloc *alloc)
     };
 }
 
-static inline CType ctype_ptr(Str name, CType subtype, Alloc *alloc)
+static inline CType ctype_ptr(CType subtype, Alloc *alloc)
 {
     return (CType){
         .type = CTYPE_PTR,
-        .name = str_dup(name, alloc),
         .ptr_.subtype = alloc_move(alloc, subtype),
     };
 }
@@ -359,6 +417,22 @@ static inline void ctype_constant(CType *self, Str name, CVal val, Alloc *alloc)
         .name = str_dup(name, alloc),
         .value = val,
     };
+
+    if (self->type == CTYPE_ENUM)
+    {
+        vec_push(&self->enum_.constants, constant);
+    }
+    else
+    {
+        panic$("Only enums can have constants!");
+    }
+}
+
+static inline void ctype_constant_no_value(CType *self, Str name, Alloc *alloc)
+{
+    CTypeConstant constant = {
+        .name = str_dup(name, alloc),
+        .value = {.type = CVAL_INVALID}};
 
     if (self->type == CTYPE_ENUM)
     {
