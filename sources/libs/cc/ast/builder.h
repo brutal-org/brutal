@@ -146,6 +146,41 @@ static inline CExpr cexpr_ternary(CExpr cond, CExpr etrue, CExpr efalse, Alloc *
     };
 }
 
+static inline CExpr cexpr_array_initializer(Alloc *alloc)
+{
+    CExpr result = {
+        .type = CEXPR_ARRAY_INITIALIZER,
+    };
+
+    vec_init(&result.array_initializer_.initializer, alloc);
+
+    return result;
+}
+
+static inline CExpr cexpr_struct_initializer(Alloc *alloc)
+{
+    CExpr result = {
+        .type = CEXPR_STRUCT_INITIALIZER,
+    };
+
+    vec_init(&result.struct_initializer_.initializer, alloc);
+
+    return result;
+}
+
+static inline void cexpr_initializer_push_element(CExpr *target, CExpr designator, CExpr expr, Alloc *alloc)
+{
+    if (target->type == CEXPR_STRUCT_INITIALIZER || target->type == CEXPR_ARRAY_INITIALIZER)
+    {
+        CInitializer initializer = {.designator = alloc_move(alloc, designator), .initializer = alloc_move(alloc, expr)};
+        vec_push(&target->struct_initializer_.initializer, initializer);
+    }
+    else
+    {
+        panic$("cepxr_initializer_push_element must be used with array initializer or struct initializer");
+    }
+}
+
 /* --- CStmt ---------------------------------------------------------------- */
 
 static inline CStmt cstmt_empty(void)

@@ -255,6 +255,46 @@ void c2c_expr(Emit *emit, CExpr expr)
         c2c_expr(emit, *expr.ternary_.expr_false);
         break;
 
+    case CEXPR_STRUCT_INITIALIZER:
+        emit_fmt(emit, "{\n");
+        emit_ident(emit);
+
+        vec_foreach(v, &expr.array_initializer_.initializer)
+        {
+            if (v.designator->type != CEXPR_EMPTY)
+            {
+                emit_fmt(emit, ".");
+                c2c_expr(emit, *v.designator);
+                emit_fmt(emit, " = ");
+            }
+            c2c_expr(emit, *v.initializer);
+            emit_fmt(emit, ",\n");
+        }
+
+        emit_deident(emit);
+        emit_fmt(emit, "\n}");
+        break;
+
+    case CEXPR_ARRAY_INITIALIZER:
+        emit_fmt(emit, "{\n");
+        emit_ident(emit);
+
+        vec_foreach(v, &expr.array_initializer_.initializer)
+        {
+            if (v.designator->type != CEXPR_EMPTY)
+            {
+                emit_fmt(emit, "[");
+                c2c_expr(emit, *v.designator);
+                emit_fmt(emit, "] = ");
+            }
+            c2c_expr(emit, *v.initializer);
+            emit_fmt(emit, ",\n");
+        }
+
+        emit_deident(emit);
+        emit_fmt(emit, "\n}");
+        break;
+
     default:
         break;
     }

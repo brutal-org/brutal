@@ -19,6 +19,8 @@ typedef enum
     CEXPR_CALL,
     CEXPR_CAST,
     CEXPR_TERNARY,
+    CEXPR_ARRAY_INITIALIZER,  // { [0] = 1, [1] = 2, }
+    CEXPR_STRUCT_INITIALIZER, // { .a = 1, .b = 2, }
 } CExprType;
 
 typedef enum
@@ -77,6 +79,12 @@ typedef struct
 
 typedef struct cexpr CExpr;
 
+typedef struct
+{
+    CExpr *designator;
+    CExpr *initializer;
+} CInitializer;
+
 struct cexpr
 {
     CExprType type;
@@ -117,6 +125,11 @@ struct cexpr
             CExpr *expr_true;
             CExpr *expr_false;
         } ternary_;
+
+        struct
+        {
+            Vec(CInitializer) initializer;
+        } array_initializer_, struct_initializer_;
     };
 };
 
