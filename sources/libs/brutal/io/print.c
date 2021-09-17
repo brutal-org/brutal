@@ -127,3 +127,17 @@ IoWriteResult print_impl(IoWriter *writer, Str format, PrintArgs args)
 
     return OK(IoWriteResult, written);
 }
+
+Str fmt_str_impl(Alloc *alloc, PrintTrans trans)
+{
+    Buffer buf;
+
+    buffer_init(&buf, 1, alloc);
+
+    Str temp = buffer_fmt(&buf, "{}", trans); // need to use a variable here because we need an rvalue
+    Str res = str_dup(temp, alloc);
+
+    buffer_deinit(&buf);
+
+    return res;
+}

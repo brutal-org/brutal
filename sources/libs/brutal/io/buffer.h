@@ -51,4 +51,5 @@ IoWriter buffer_writer(Buffer *self);
     {                                                              \
         IoWriter __writer = buffer_writer(BUFFER);                 \
         print_impl(&__writer, str$(FMT), PRINT_ARGS(__VA_ARGS__)); \
+        buffer_str(BUFFER);                                        \
     })

@@ -116,3 +116,8 @@ IoWriteResult print_impl(IoWriter *writer, Str format, PrintArgs args);
 
 #define empty_trans() \
     print_trans("")
+
+Str fmt_str_impl(Alloc *alloc, PrintTrans trans);
+
+#define str_fmt(alloc, _fmt, ...) \
+    fmt_str_impl(alloc, print_trans((_fmt), __VA_ARGS__))
