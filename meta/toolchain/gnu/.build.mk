@@ -27,7 +27,12 @@ HOST_ARFLAGS=rcs
 CROSS_AS=nasm
 CROSS_ASFLAGS=-f elf64
 
-CROSS_CC=$(CONFIG_ARCH)-elf-gcc
+ifneq ($(CONFIG_BOARD), 'no-board')
+	CROSS_CC=$(CONFIG_ARCH)-$(CONFIG_BOARD)-elf-gcc
+else 
+	CROSS_CC=$(CONFIG_ARCH)-elf-gcc
+endif
+
 CROSS_CFLAGS= \
 	-MD \
 	$(CFLAGS_STD) \
@@ -40,14 +45,8 @@ CROSS_CFLAGS= \
 
 CROSS_KCFLAGS= \
 	$(CROSS_CFLAGS) \
+	$(ARCH_KCFLAGS) \
 	-fno-stack-protector \
-	-mno-80387 \
-	-mno-mmx \
-	-mno-3dnow \
-	-mno-sse \
-	-mno-sse2 \
-	-mno-red-zone \
-	-mcmodel=kernel \
 	-D__kernel__=1
 
 CROSS_UCFLAGS= \

@@ -54,6 +54,7 @@ BUILDDIR=build/$(CONFIG_ARCH)-$(CONFIG_TOOLCHAIN)
 MKCWD=mkdir -p $(@D)
 
 include meta/config/default.mk
+include meta/toolchain/archs/$(CONFIG_ARCH).mk
 include meta/toolchain/$(CONFIG_TOOLCHAIN)/.build.mk
 
 include sources/kernel/.build.mk

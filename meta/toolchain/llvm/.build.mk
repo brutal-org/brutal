@@ -39,15 +39,7 @@ CROSS_CFLAGS= \
 
 CROSS_KCFLAGS= \
 	$(CROSS_CFLAGS) \
-	-fsanitize=undefined \
-	-fno-stack-protector \
-	-mno-80387 \
-	-mno-mmx \
-	-mno-3dnow \
-	-mno-sse \
-	-mno-sse2 \
-	-mno-red-zone \
-	-mcmodel=kernel \
+	$(ARCH_KCFLAGS) \
 	-D__kernel__=1
 
 CROSS_UCFLAGS= \
