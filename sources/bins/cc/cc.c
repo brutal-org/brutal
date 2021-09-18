@@ -13,7 +13,7 @@ int main(int argc, char const *argv[])
     }
 
     IoFile source_file;
-    io_file_open(&source_file, str$(argv[1]));
+    UNWRAP_OR_PANIC(io_file_open(&source_file, str$(argv[1])), "File not found!");
 
     IoReader source_file_reader = io_file_reader(&source_file);
 

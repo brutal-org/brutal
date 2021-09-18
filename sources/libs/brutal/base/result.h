@@ -41,16 +41,16 @@
         __expr.ok;                     \
     })
 
-#define UNWRAP_OR_MESSAGE(EXPR, MESSAGE) ( \
-    {                                      \
-        typeof(EXPR) __expr = (EXPR);      \
-                                           \
-        if (!__expr.succ)                  \
-        {                                  \
-            panic$(MESSAGE);               \
-        }                                  \
-                                           \
-        __expr.ok;                         \
+#define UNWRAP_OR_PANIC(EXPR, MESSAGE) ( \
+    {                                    \
+        typeof(EXPR) __expr = (EXPR);    \
+                                         \
+        if (!__expr.succ)                \
+        {                                \
+            panic$(MESSAGE);             \
+        }                                \
+                                         \
+        __expr.ok;                       \
     })
 
 #define UNWRAP_OR(EXPR, VALUE) (      \
@@ -71,4 +71,4 @@
     })
 
 #define UNWRAP(EXPR) \
-    UNWRAP_OR_MESSAGE(EXPR, "UNWRAP(" #EXPR ") failled")
+    UNWRAP_OR_PANIC(EXPR, "UNWRAP(" #EXPR ") failled")

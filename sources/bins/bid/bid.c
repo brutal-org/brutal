@@ -11,10 +11,8 @@ int main(int argc, char const *argv[])
         return 0;
     }
 
-    log$("converting {} to {}", str$(argv[1]), str$(argv[2]));
-
     IoFile source_file;
-    io_file_open(&source_file, str$(argv[1]));
+    UNWRAP_OR_PANIC(io_file_open(&source_file, str$(argv[1])), "File not found!");
 
     IoReader source_file_reader = io_file_reader(&source_file);
 
