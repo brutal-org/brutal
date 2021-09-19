@@ -3,6 +3,17 @@ set -e
 
 # ----- Configs -------------------------------------------------------------- #
 
+if [ $# == 0 ]
+then 
+    echo "use build.sh <target>"
+    echo "target may be: "
+    echo "  - x86_64"
+    echo "  - riscv64"
+    exit -1
+fi
+
+TARGET=$1-elf
+
 BINUTILS_VERSION=2.36
 BINUTILS_DIRECTORY="binutils-$BINUTILS_VERSION"
 BINUTILS_FILENAME="$BINUTILS_DIRECTORY.tar.gz"
@@ -19,7 +30,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 PREFIX="$DIR/local"
 
-if [ -e "$PREFIX/build-ok" ]; then
+if [ -e "$PREFIX/$TARGET/build-ok" ]; then
     echo "The toolchain is built and ready :)"
     exit 0
 fi
@@ -76,9 +87,6 @@ fi
 
 # Build GCC and binutils for the x86_64 target
 # ---------------------------------------------------------------------------- #
-
-TARGET=riscv64-elf
-
 mkdir -p "$DIR/build/$TARGET/binutils"
 mkdir -p "$DIR/build/$TARGET/gcc"
 
@@ -110,39 +118,4 @@ pushd "$DIR/build/$TARGET"
     popd
 popd
 
-touch $PREFIX/build-ok
-
-TARGET=x86_64-elf
-
-mkdir -p "$DIR/build/$TARGET/binutils"
-mkdir -p "$DIR/build/$TARGET/gcc"
-
-pushd "$DIR/build/$TARGET"
-    unset PKG_CONFIG_LIBDIR # Just in case
-
-    pushd binutils
-        "$DIR/tarballs/$BINUTILS_DIRECTORY/configure" \
-            --target=$TARGET \
-            --prefix=$PREFIX \
-            --with-sysroot \
-            --disable-werror || exit 1
-
-        make -j $MAKEJOBS || exit 1
-        make install || exit 1
-    popd
-
-    pushd gcc
-        "$DIR/tarballs/$GCC_DIRECTORY/configure" \
-            --target=$TARGET \
-            --prefix=$PREFIX \
-            --disable-nls \
-            --with-newlib \
-            --with-sysroot \
-            --enable-languages=c|| exit 1
-
-        make -j $MAKEJOBS all-gcc all-target-libgcc || exit 1
-        make install-gcc install-target-libgcc || exit 1
-    popd
-popd
-
-touch $PREFIX/build-ok
+touch $PREFIX/$TARGET/build-ok

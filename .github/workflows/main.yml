@@ -45,7 +45,7 @@ jobs:
 
       - name: Build Toolchain
         run: |
-          meta/toolchain/${{matrix.toolchain}}/build.sh
+          meta/toolchain/${{matrix.toolchain}}/build.sh x86_64
 
   build-system:
     needs: build-toolchain
