@@ -1,4 +1,4 @@
-#include <brutal/alloc/global.h>
+#include <brutal/alloc.h>
 #include <brutal/log/assert.h>
 #include <brutal/text/utf16.h>
 #include <efi/lib.h>
@@ -81,7 +81,7 @@ EFIFileProtocol *efi_rootdir(void)
 
 HostIoOpenFileResult host_io_file_open(Str path)
 {
-    uint16_t *cstr = str_to_cstr_utf16(path, test_alloc());
+    uint16_t *cstr = str_to_cstr_utf16(path, alloc_global());
 
     // HACK: EFI expect \ instead of /.
     for (size_t i = 0; cstr[i]; i++)
@@ -96,7 +96,7 @@ HostIoOpenFileResult host_io_file_open(Str path)
 
     EFIStatus status = efi_rootdir()->open(efi_rootdir(), &file, cstr, EFI_FILE_MODE_READ, EFI_FILE_READ_ONLY);
 
-    alloc_free(test_alloc(), cstr);
+    alloc_free(alloc_global(), cstr);
 
     if (status != EFI_SUCCESS)
     {
