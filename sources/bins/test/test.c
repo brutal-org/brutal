@@ -19,17 +19,17 @@ enum test_result test_run(struct test test)
 
     if (task_child(&runner))
     {
+        test_alloc_begin_test();
         test.func();
         task_exit(&runner, TASK_EXIT_SUCCESS);
+        test_alloc_end_test();
         assert_unreachable();
     }
     else
     {
-        test_alloc_begin_test();
 
         int result = UNWRAP(task_wait(&runner));
 
-        test_alloc_end_test();
 
         if (result == TASK_EXIT_SUCCESS)
         {
