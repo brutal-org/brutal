@@ -1,6 +1,4 @@
-#include <cc/ast/builder.h>
-
-/* --- CDecl ---------------------------------------------------------------- */
+#include <cc/builder/decl.h>
 
 CDecl cdecl_type(Str name, CType type, Alloc *alloc)
 {

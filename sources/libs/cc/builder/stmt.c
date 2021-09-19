@@ -1,6 +1,4 @@
-#include <cc/ast/builder.h>
-
-/* --- CStmt ---------------------------------------------------------------- */
+#include <cc/builder/stmt.h>
 
 CStmt cstmt_empty(void)
 {
@@ -135,6 +133,14 @@ CStmt cstmt_goto(Str str, Alloc *alloc)
     };
 }
 
+CStmt cstmt_label(Str label, Alloc *alloc)
+{
+    return (CStmt){
+        .type = CSTMT_LABEL,
+        .label_.label = str_dup(label, alloc),
+    };
+}
+
 CStmt cstmt_case(CExpr expr)
 {
     return (CStmt){
@@ -143,10 +149,7 @@ CStmt cstmt_case(CExpr expr)
     };
 }
 
-CStmt cstmt_label(Str label, Alloc *alloc)
+CStmt cstmt_default(void)
 {
-    return (CStmt){
-        .type = CSTMT_LABEL,
-        .label_.label = str_dup(label, alloc),
-    };
+    return (CStmt){.type = CSTMT_DEFAULT};
 }

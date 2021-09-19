@@ -1,6 +1,4 @@
-#include <cc/ast/builder.h>
-
-/* --- CVal  ---------------------------------------------------------------- */
+#include <cc/builder/val.h>
 
 CVal cval_signed(CSigned v)
 {

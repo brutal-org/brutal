@@ -1,6 +1,4 @@
-#include <cc/ast/builder.h>
-
-/* --- CType ---------------------------------------------------------------- */
+#include <cc/builder/type.h>
 
 CType ctype_void(Str name, Alloc *alloc)
 {
