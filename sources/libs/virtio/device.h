@@ -76,6 +76,3 @@ VirtioDeviceResult virtio_device_init(VirtioDevice *device, VirtioDeviceInit *de
 // Negociates features with the virtio device for the caller.
 // Returns VIRTIO_DEVICE_FEATURES_NEGOCIATE_FAILED the driver cannot negociate any feature with the virtio device
 VirtioDeviceResult virtio_device_negociate_features(VirtioDevice *device, VirtioDeviceInit *init);
-
-// TODO: #include <pci/device.h>
-// VirtioDevice virtio_device_create(PciDevice pci_device);
