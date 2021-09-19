@@ -10,6 +10,7 @@ typedef enum
     CTYPE_INVALID,
 
     CTYPE_VOID,
+    CTYPE_AUTO,
     CTYPE_BOOL,
     CTYPE_PTR,
     CTYPE_ARRAY,

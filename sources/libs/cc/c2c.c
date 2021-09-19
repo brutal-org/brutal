@@ -1,4 +1,4 @@
-#include <cc/gen.h>
+#include <cc/c2c.h>
 
 /* --- CVal ----------------------------------------------------------------- */
 
@@ -554,10 +554,7 @@ static void c2c_include(Emit *emit, CInclude path)
 void c2c_pragma(Emit *emit, CPragma pragma)
 {
     emit_fmt(emit, "#pragma ");
-    vec_foreach(v, &pragma.args)
-    {
-        emit_fmt(emit, "{} ", v);
-    }
+    emit_fmt(emit, pragma.text);
     emit_fmt(emit, "\n");
 }
 

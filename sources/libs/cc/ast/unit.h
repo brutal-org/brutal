@@ -10,7 +10,7 @@ typedef struct
 
 typedef struct
 {
-    Vec(Str) args;
+    Str text;
 } CPragma;
 
 typedef enum
