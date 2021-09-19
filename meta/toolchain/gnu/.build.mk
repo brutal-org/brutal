@@ -27,11 +27,7 @@ HOST_ARFLAGS=rcs
 CROSS_AS=nasm
 CROSS_ASFLAGS=-f elf64
 
-ifneq ($(CONFIG_BOARD), 'no-board')
-	CROSS_CC=$(CONFIG_ARCH)-$(CONFIG_BOARD)-elf-gcc
-else 
-	CROSS_CC=$(CONFIG_ARCH)-elf-gcc
-endif
+CROSS_CC=$(CONFIG_ARCH)-elf-gcc
 
 CROSS_CFLAGS= \
 	-MD \
