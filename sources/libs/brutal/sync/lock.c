@@ -1,5 +1,6 @@
 #include <brutal/sync/lock.h>
 #include <host/sync.h>
+#include <host/asm.h>
 
 static bool lock_try_acquire_impl(Lock *lock)
 {
@@ -31,7 +32,7 @@ void lock_acquire(Lock *lock)
 
     while (!lock_try_acquire_impl(lock))
     {
-        asm("pause");
+        asm_pause(); 
     }
 
     atomic_thread_fence(memory_order_seq_cst);

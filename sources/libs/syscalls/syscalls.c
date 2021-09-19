@@ -1,18 +1,9 @@
 #include <syscalls/syscalls.h>
+#include <host/asm.h>
 
 BrResult br_syscall(BrSyscall syscall, BrArg arg1, BrArg arg2, BrArg arg3, BrArg arg4, BrArg arg5)
 {
-    BrResult result;
-
-    register uint64_t r8 asm("r8") = arg4;
-    register uint64_t r9 asm("r9") = arg5;
-
-    asm volatile("syscall"
-                 : "=a"(result)
-                 : "a"(syscall), "b"(arg1), "d"(arg2), "S"(arg3), "r"(r8), "r"(r9)
-                 : "memory", "r11", "rcx");
-
-    return result;
+    return (BrResult)asm_syscall(syscall, arg1, arg2, arg3, arg4, arg5);
 }
 
 BrResult br_log(BrLogArgs *args)
