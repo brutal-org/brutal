@@ -2,15 +2,15 @@
 #include "test/test.h"
 
 #define JSON_TEST_START()                              \
-    struct alloc_heap heap;                            \
-    alloc_heap_init(&heap);                            \
+    HeapAlloc heap;                                    \
+    heap_alloc_init(&heap);                            \
     Scan scanner = {};                                 \
     scan_init(&scanner, base);                         \
     JsonValue json = json_parse(&scanner, &heap.base); \
     assert_equal((int)json.type, (int)JSON_OBJECT)
 
 #define JSON_TEST_END() \
-    alloc_heap_deinit(&heap);
+    heap_alloc_deinit(&heap);
 
 TEST(json_parse_test)
 {

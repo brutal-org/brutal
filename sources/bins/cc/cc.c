@@ -12,13 +12,16 @@ int main(int argc, char const *argv[])
         return 0;
     }
 
+    HeapAlloc heap;
+    heap_alloc_init(&heap);
+
     IoFile source_file;
     UNWRAP_OR_PANIC(io_file_open(&source_file, str$(argv[1])), "File not found!");
 
     IoReader source_file_reader = io_file_reader(&source_file);
 
     Buffer source_buffer;
-    buffer_init(&source_buffer, 512, alloc_global());
+    buffer_init(&source_buffer, 512, base$(&heap));
 
     IoWriter source_buffer_writer = buffer_writer(&source_buffer);
 
@@ -27,7 +30,7 @@ int main(int argc, char const *argv[])
     Scan scan;
     scan_init(&scan, buffer_str(&source_buffer));
 
-    Lex lex = c_lex(&scan, alloc_global());
+    Lex lex = c_lex(&scan, base$(&heap));
 
     if (scan_dump_error(&scan, io_std_err()))
     {
@@ -35,6 +38,8 @@ int main(int argc, char const *argv[])
     }
 
     lex_dump(&lex, c_lex_to_str);
+
+    heap_alloc_deinit(&heap);
 
     return 0;
 }

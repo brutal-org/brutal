@@ -23,6 +23,12 @@ struct test
     TestFunc *func;
 };
 
+void test_alloc_begin_test(void);
+
+void test_alloc_end_test(void);
+
+Alloc *test_alloc(void);
+
 void test_register(struct test test);
 
 #define TEST_FUNCTION_NAME(name) test_##name

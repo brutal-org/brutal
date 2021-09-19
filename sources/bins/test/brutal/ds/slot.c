@@ -5,7 +5,7 @@
 TEST(slot_acquire_release)
 {
     Slot(int) slot;
-    slot_init(&slot, alloc_global());
+    slot_init(&slot, test_alloc());
 
     slot_alloc(&slot);
 

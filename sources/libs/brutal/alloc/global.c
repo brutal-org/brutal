@@ -3,15 +3,16 @@
 
 static Alloc *heap(void)
 {
-    static bool initialized = false;
-    static struct alloc_heap memory;
+    static HeapAlloc heap;
+    static bool init = false;
 
-    if (!initialized)
+    if (!init)
     {
-        alloc_heap_init(&memory);
+        heap_alloc_init(&heap);
+        init = true;
     }
 
-    return (Alloc *)&memory;
+    return (Alloc *)&heap;
 }
 
 void *alloc_global_acquire(MAYBE_UNUSED Alloc *alloc, size_t size)

@@ -1,5 +1,6 @@
 #include <brutal/alloc.h>
 #include <brutal/host.h>
+#include <brutal/log.h>
 #include <brutal/mem.h>
 #include <stdlib.h>
 
@@ -71,27 +72,48 @@ void srand(unsigned int seed)
 
 /* --- 7.22.3 - Memory management functions --------------------------------- */
 
-// void *aligned_alloc(size_t alignment, size_t size);
+static HeapAlloc _heap;
+static bool _heap_init = false;
 
-void *
-calloc(size_t nmemb, size_t size)
+static Alloc *heap(void)
 {
-    return alloc_calloc(alloc_global(), nmemb, size);
+    if (!_heap_init)
+    {
+        heap_alloc_init(&_heap);
+        _heap_init = true;
+    }
+
+    return base$(&_heap);
+}
+
+void *aligned_alloc(size_t alignment, size_t size)
+{
+    if (alignment > 16)
+    {
+        panic$("aligned_alloc: alignment = {} is not supported!", alignment);
+    }
+
+    return malloc(size);
+}
+
+void *calloc(size_t nmemb, size_t size)
+{
+    return alloc_calloc(heap(), nmemb, size);
 }
 
 void free(void *ptr)
 {
-    alloc_free(alloc_global(), ptr);
+    alloc_free(heap(), ptr);
 }
 
 void *malloc(size_t size)
 {
-    return alloc_malloc(alloc_global(), size);
+    return alloc_malloc(heap(), size);
 }
 
 void *realloc(void *ptr, size_t size)
 {
-    return alloc_resize(alloc_global(), ptr, size);
+    return alloc_resize(heap(), ptr, size);
 }
 
 /* --- 7.22.4 - Communication with the environment -------------------------- */

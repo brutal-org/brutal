@@ -81,7 +81,7 @@ EFIFileProtocol *efi_rootdir(void)
 
 HostIoOpenFileResult host_io_file_open(Str path)
 {
-    uint16_t *cstr = str_to_cstr_utf16(path, alloc_global());
+    uint16_t *cstr = str_to_cstr_utf16(path, test_alloc());
 
     // HACK: EFI expect \ instead of /.
     for (size_t i = 0; cstr[i]; i++)
@@ -96,7 +96,7 @@ HostIoOpenFileResult host_io_file_open(Str path)
 
     EFIStatus status = efi_rootdir()->open(efi_rootdir(), &file, cstr, EFI_FILE_MODE_READ, EFI_FILE_READ_ONLY);
 
-    alloc_free(alloc_global(), cstr);
+    alloc_free(test_alloc(), cstr);
 
     if (status != EFI_SUCCESS)
     {

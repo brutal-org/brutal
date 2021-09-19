@@ -8,7 +8,7 @@ TEST(gfx_draw_rectangle)
 {
     GfxCanvas canvas;
 
-    gfx_canvas_init(&canvas, alloc_global(), 512, 512, GFX_PIXEL_FORMAT_RGBA8888);
+    gfx_canvas_init(&canvas, test_alloc(), 512, 512, GFX_PIXEL_FORMAT_RGBA8888);
     gfx_canvas_begin(&canvas);
 
     gfx_canvas_fill(&canvas, gfx_paint_fill(GFX_COLOR_BLACK));

@@ -25,7 +25,11 @@ enum test_result test_run(struct test test)
     }
     else
     {
+        test_alloc_begin_test();
+
         int result = UNWRAP(task_wait(&runner));
+
+        test_alloc_end_test();
 
         if (result == TASK_EXIT_SUCCESS)
         {

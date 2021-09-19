@@ -15,31 +15,24 @@ void *memcpy(void *restrict s1, void const *restrict s2, size_t n)
 
 void *memmove(void *s1, void const *s2, size_t n)
 {
-    uint8_t may_buf[32];
+    char const *usrc = (char const *)s2;
+    char *udest = (char *)s1;
 
-    uint8_t *copy = (uint8_t *)may_buf;
-
-    /* avoid an alloc for a tiny memmove */
-    if (n >= 32)
+    if (udest < usrc)
     {
-        copy = (uint8_t *)alloc_malloc(alloc_global(), n);
+        for (size_t i = 0; i < n; i++)
+        {
+            udest[i] = usrc[i];
+        }
+    }
+    else if (udest > usrc)
+    {
+        for (size_t i = n; i > 0; i--)
+        {
+            udest[i - 1] = usrc[i - 1];
+        }
     }
 
-    for (size_t i = 0; i < n; i++)
-    {
-        copy[i] = ((uint8_t *)s2)[i];
-    }
-
-    for (size_t i = 0; i < n; i++)
-    {
-        ((uint8_t *)s1)[i] = copy[i];
-    }
-
-    if (n >= 32)
-    {
-
-        alloc_free(alloc_global(), copy);
-    }
     return s1;
 }
 

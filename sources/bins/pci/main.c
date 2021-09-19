@@ -17,16 +17,21 @@ static Iter iter_pci(void *data, void *ctx)
 
 int br_entry_handover(Handover *handover)
 {
+    HeapAlloc heap;
+    heap_alloc_init(&heap);
+
     Acpi acpi;
     acpi_init(&acpi, handover->rsdp);
 
     Pci pci;
-    pci_init(&pci, &acpi, alloc_global());
+    pci_init(&pci, &acpi, base$(&heap));
 
     pci_iter(&pci, iter_pci, &pci);
 
     pci_deinit(&pci);
     acpi_deinit(&acpi);
+
+    heap_alloc_deinit(&heap);
 
     return 0;
 }

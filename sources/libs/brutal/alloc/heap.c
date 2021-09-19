@@ -101,7 +101,7 @@ static bool check_minor_magic(struct alloc_minor *min, void *ptr)
     return false;
 }
 
-void *alloc_heap_acquire(struct alloc_heap *alloc, size_t req_size)
+void *heap_alloc_acquire(HeapAlloc *alloc, size_t req_size)
 {
     req_size = ALIGN_UP(req_size, ALLOC_HEAP_ALIGN);
 
@@ -111,7 +111,7 @@ void *alloc_heap_acquire(struct alloc_heap *alloc, size_t req_size)
     if (size == 0)
     {
         log$("alloc(0) called");
-        return alloc_heap_acquire(alloc, 1);
+        return heap_alloc_acquire(alloc, 1);
     }
 
     // Is this the first time we are being used?
@@ -322,7 +322,7 @@ void *alloc_heap_acquire(struct alloc_heap *alloc, size_t req_size)
     return nullptr;
 }
 
-void alloc_heap_release(struct alloc_heap *alloc, void *ptr)
+void heap_alloc_release(HeapAlloc *alloc, void *ptr)
 {
     if (ptr == nullptr)
     {
@@ -396,19 +396,19 @@ void alloc_heap_release(struct alloc_heap *alloc, void *ptr)
     }
 }
 
-void *alloc_heap_resize(struct alloc_heap *alloc, void *ptr, size_t size)
+void *heap_alloc_resize(HeapAlloc *alloc, void *ptr, size_t size)
 {
     size = ALIGN_UP(size, ALLOC_HEAP_ALIGN);
 
     if (size == 0)
     {
-        alloc_heap_release(alloc, ptr);
+        heap_alloc_release(alloc, ptr);
         return nullptr;
     }
 
     if (ptr == nullptr)
     {
-        return alloc_heap_acquire(alloc, size);
+        return heap_alloc_acquire(alloc, size);
     }
 
     struct alloc_minor *min = (struct alloc_minor *)((uintptr_t)ptr - MINOR_BLOCK_HEADER_SIZE);
@@ -424,27 +424,27 @@ void *alloc_heap_resize(struct alloc_heap *alloc, void *ptr, size_t size)
         return ptr;
     }
 
-    void *new_ptr = alloc_heap_acquire(alloc, size);
+    void *new_ptr = heap_alloc_acquire(alloc, size);
     mem_cpy(new_ptr, ptr, min->req_size);
-    alloc_heap_release(alloc, ptr);
+    heap_alloc_release(alloc, ptr);
 
     return new_ptr;
 }
 
-void alloc_heap_init(struct alloc_heap *alloc)
+void heap_alloc_init(HeapAlloc *alloc)
 {
-    *alloc = (struct alloc_heap){
+    *alloc = (HeapAlloc){
         .base = {
-            .acquire = (AllocAcquire *)alloc_heap_acquire,
-            .resize = (AllocResize *)alloc_heap_resize,
-            .release = (AllocRelease *)alloc_heap_release,
+            .acquire = (AllocAcquire *)heap_alloc_acquire,
+            .resize = (AllocResize *)heap_alloc_resize,
+            .release = (AllocRelease *)heap_alloc_release,
         },
         .best = nullptr,
         .root = nullptr,
     };
 }
 
-void alloc_heap_deinit(struct alloc_heap *alloc)
+void heap_alloc_deinit(HeapAlloc *alloc)
 {
     struct alloc_major *current = alloc->root;
     while (current)
@@ -454,5 +454,5 @@ void alloc_heap_deinit(struct alloc_heap *alloc)
         current = next;
     }
 
-    *alloc = (struct alloc_heap){};
+    *alloc = (HeapAlloc){};
 }

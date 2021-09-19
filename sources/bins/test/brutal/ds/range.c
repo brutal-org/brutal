@@ -5,7 +5,7 @@
 TEST(ds_range_alloc_used_start)
 {
     RangeAlloc alloc;
-    range_alloc_init(&alloc, alloc_global());
+    range_alloc_init(&alloc, test_alloc());
 
     range_alloc_unused(&alloc, (USizeRange){0x0, 0x5000});
     range_alloc_used(&alloc, (USizeRange){0x0, 0x1000});
@@ -24,7 +24,7 @@ TEST(ds_range_alloc_used_start)
 TEST(ds_range_alloc_used_center)
 {
     RangeAlloc alloc;
-    range_alloc_init(&alloc, alloc_global());
+    range_alloc_init(&alloc, test_alloc());
 
     range_alloc_unused(&alloc, (USizeRange){0x0, 0x5000});
     range_alloc_used(&alloc, (USizeRange){0x2000, 0x1000});
@@ -45,7 +45,7 @@ TEST(ds_range_alloc_used_center)
 TEST(ds_range_alloc_used_end)
 {
     RangeAlloc alloc;
-    range_alloc_init(&alloc, alloc_global());
+    range_alloc_init(&alloc, test_alloc());
 
     range_alloc_unused(&alloc, (USizeRange){0x0, 0x5000});
     range_alloc_used(&alloc, (USizeRange){0x4000, 0x1000});
@@ -64,7 +64,7 @@ TEST(ds_range_alloc_used_end)
 TEST(ds_range_alloc_unused_begin)
 {
     RangeAlloc alloc;
-    range_alloc_init(&alloc, alloc_global());
+    range_alloc_init(&alloc, test_alloc());
 
     range_alloc_unused(&alloc, (USizeRange){0x0, 0x1000});
     range_alloc_unused(&alloc, (USizeRange){0x1000, 0x1000});
@@ -83,7 +83,7 @@ TEST(ds_range_alloc_unused_begin)
 TEST(ds_range_alloc_unused_middle)
 {
     RangeAlloc alloc;
-    range_alloc_init(&alloc, alloc_global());
+    range_alloc_init(&alloc, test_alloc());
 
     range_alloc_unused(&alloc, (USizeRange){0x0, 0x1000});
     range_alloc_unused(&alloc, (USizeRange){0x2000, 0x1000});
@@ -103,7 +103,7 @@ TEST(ds_range_alloc_unused_middle)
 TEST(ds_range_alloc_unused_end)
 {
     RangeAlloc alloc;
-    range_alloc_init(&alloc, alloc_global());
+    range_alloc_init(&alloc, test_alloc());
 
     range_alloc_unused(&alloc, (USizeRange){0x0, 0x1000});
     range_alloc_unused(&alloc, (USizeRange){0x1000, 0x1000});

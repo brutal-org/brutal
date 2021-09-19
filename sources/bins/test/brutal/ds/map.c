@@ -7,7 +7,7 @@ TEST(map_put_get)
     Map(uint32_t) map;
     uint32_t value;
 
-    map_init(&map, alloc_global());
+    map_init(&map, test_alloc());
 
     map_put(&map, "test0", 0xfefefefe);
     map_put(&map, "test1", 0xfafafafa);

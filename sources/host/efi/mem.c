@@ -25,10 +25,8 @@ Error host_mem_release(void *addr, MAYBE_UNUSED size_t size)
 
 void host_mem_lock(void)
 {
-    return;
 }
 
 void host_mem_unlock(void)
 {
-    return;
 }
