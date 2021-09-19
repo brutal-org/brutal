@@ -77,12 +77,47 @@ fi
 # Build GCC and binutils for the x86_64 target
 # ---------------------------------------------------------------------------- #
 
+TARGET=riscv64-elf
+
+mkdir -p "$DIR/build/$TARGET/binutils"
+mkdir -p "$DIR/build/$TARGET/gcc"
+
+pushd "$DIR/build/$TARGET"
+    unset PKG_CONFIG_LIBDIR # Just in case
+
+    pushd binutils
+        "$DIR/tarballs/$BINUTILS_DIRECTORY/configure" \
+            --target=$TARGET \
+            --prefix=$PREFIX \
+            --with-sysroot \
+            --disable-werror || exit 1
+
+        make -j $MAKEJOBS || exit 1
+        make install || exit 1
+    popd
+
+    pushd gcc
+        "$DIR/tarballs/$GCC_DIRECTORY/configure" \
+            --target=$TARGET \
+            --prefix=$PREFIX \
+            --disable-nls \
+            --with-newlib \
+            --with-sysroot \
+            --enable-languages=c|| exit 1
+
+        make -j $MAKEJOBS all-gcc all-target-libgcc || exit 1
+        make install-gcc install-target-libgcc || exit 1
+    popd
+popd
+
+touch $PREFIX/build-ok
+
 TARGET=x86_64-elf
 
-mkdir -p "$DIR/build/binutils"
-mkdir -p "$DIR/build/gcc"
+mkdir -p "$DIR/build/$TARGET/binutils"
+mkdir -p "$DIR/build/$TARGET/gcc"
 
-pushd "$DIR/build/"
+pushd "$DIR/build/$TARGET"
     unset PKG_CONFIG_LIBDIR # Just in case
 
     pushd binutils

@@ -21,8 +21,8 @@ void *mem_cpy(void *s1, void const *s2, size_t n)
 #if defined(__x86_64__) || defined(__x86_32__)
     __movsb_copy(s1, s2, n);
 #else
-    uint8_t *dest = s1;
-    uint8_t const *src = s2;
+    uint8_t *dest = (uint8_t*)s1;
+    uint8_t const *src = (uint8_t const*)s2;
 
     for (size_t i = 0; i < n; i++)
     {
