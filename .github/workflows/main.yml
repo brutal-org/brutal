@@ -39,9 +39,9 @@ jobs:
           path: |
             **/meta/toolchain/${{matrix.toolchain}}/local
           key: |
-            ${{ runner.os }}-${{matrix.toolchain}}-${{ hashFiles('**/meta/toolchain/${{matrix.toolchain}}/build.sh') }}
+            ${{ runner.os }}-${{matrix.toolchain}}-${{hashFiles(format('meta/toolchain/{0}/build.sh', matrix.toolchain)) }}
           restore-keys: |
-            ${{ runner.os }}-${{matrix.toolchain}}-${{ hashFiles('**/meta/toolchain/${{matrix.toolchain}}/build.sh') }}
+            ${{ runner.os }}-${{matrix.toolchain}}-${{hashFiles(format('meta/toolchain/{0}/build.sh', matrix.toolchain)) }}
 
       - name: Build Toolchain
         run: |
@@ -68,9 +68,9 @@ jobs:
           path: |
             **/meta/toolchain/${{matrix.toolchain}}/local
           key: |
-            ${{ runner.os }}-${{matrix.toolchain}}-${{ hashFiles('**/meta/toolchain/${{matrix.toolchain}}/build.sh') }}
+            ${{ runner.os }}-${{matrix.toolchain}}-${{hashFiles(format('meta/toolchain/{0}/build.sh', matrix.toolchain)) }}
           restore-keys: |
-            ${{ runner.os }}-${{matrix.toolchain}}-${{ hashFiles('**/meta/toolchain/${{matrix.toolchain}}/build.sh') }}
+            ${{ runner.os }}-${{matrix.toolchain}}-${{hashFiles(format('meta/toolchain/{0}/build.sh', matrix.toolchain)) }}
 
       - name: Build System
         run: |
@@ -132,5 +132,5 @@ jobs:
     - uses: DoozyX/clang-format-lint-action@v0.12
       with:
         source: '.'
-        exclude: './thirdparty ./sources/libs/proto ./sources/utils/test.c' 
+        exclude: './thirdparty ./sources/libs/proto ./sources/utils/test.c'
         clangFormatVersion: 12
