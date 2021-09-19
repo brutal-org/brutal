@@ -1,8 +1,7 @@
 #include <brutal/alloc.h>
 #include <brutal/io.h>
 #include <brutal/log.h>
-#include <cc/builder.h>
-#include <cc/lex.h>
+#include <cc/parse.h>
 
 int main(int argc, char const *argv[])
 {
