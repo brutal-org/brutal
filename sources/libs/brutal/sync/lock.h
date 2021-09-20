@@ -5,7 +5,7 @@
 
 typedef struct
 {
-    atomic_bool locked;
+    atomic_int locked;
 } Lock;
 
 bool lock_try_acquire(Lock *lock);

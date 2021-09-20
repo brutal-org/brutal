@@ -25,9 +25,6 @@ HOST_ARFLAGS=rcs
 
 # --- Cross-Compiler --------------------------------------------------------- #
 
-CROSS_AS=nasm
-CROSS_ASFLAGS=-f elf64
-
 CROSS_CC=clang-12 -target $(CONFIG_ARCH)-none-elf
 CROSS_CFLAGS= \
 	-MD \
@@ -50,11 +47,13 @@ CROSS_UCFLAGS= \
 CROSS_LD=ld.lld
 CROSS_KLDFLAGS= \
 	-Tsources/host/kernel/$(CONFIG_ARCH)/link.ld \
-	-z max-page-size=0x1000
+	-z max-page-size=0x1000 \
+	$(ARCH_LDFLAGS)
 
 CROSS_ULDFLAGS= \
 	-Tsources/host/brutal/$(CONFIG_ARCH)/link.ld \
-	-z max-page-size=0x1000
+	-z max-page-size=0x1000 \
+	$(ARCH_LDFLAGS)
 
 CROSS_AR=ar
 CROSS_ARFLAGS=rcs

@@ -7,7 +7,7 @@
 #include <brutal/text/case.h>
 #include <brutal/text/str.h>
 
-#if __SIZEOF_INT128__ == 16 && COMPILER_GCC
+#if __SIZEOF_INT128__ == 16 && COMPILER_GCC && defined(__x86_64__)
 typedef Int128 FmtInt;
 typedef UInt128 FmtUInt;
 #else

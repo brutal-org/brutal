@@ -4,8 +4,8 @@
 
 static bool lock_try_acquire_impl(Lock *lock)
 {
-    bool expected = false;
-    bool result = atomic_compare_exchange_strong(&lock->locked, &expected, true);
+    int expected = false;
+    int result = atomic_compare_exchange_strong(&lock->locked, &expected, true);
 
     atomic_thread_fence(memory_order_seq_cst);
 
@@ -16,7 +16,7 @@ bool lock_try_acquire(Lock *lock)
 {
     host_enter_critical_section();
 
-    bool result = lock_try_acquire_impl(lock);
+    int result = lock_try_acquire_impl(lock);
 
     if (!result)
     {

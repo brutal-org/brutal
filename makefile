@@ -68,16 +68,11 @@ include sources/libs/proto/.build.mk
 all: $(ISO)
 
 run: $(ISO)
-	qemu-system-x86_64 \
-		-M q35 \
-		-cpu host \
-		-smp 4 \
-		-m 256M \
-		-enable-kvm \
+	qemu-system-$(CONFIG_ARCH) \
+		$(QEMU_ARGS) \
 		-serial mon:stdio \
 		-no-reboot \
 		-no-shutdown \
-		-rtc base=localtime \
 		-cdrom $(ISO)
 
 .PHONY: bochs

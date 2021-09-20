@@ -23,10 +23,6 @@ HOST_AR=ar
 HOST_ARFLAGS=rcs
 
 # --- Cross-Compiler --------------------------------------------------------- #
-
-CROSS_AS=nasm
-CROSS_ASFLAGS=-f elf64
-
 CROSS_CC=$(CONFIG_ARCH)-elf-gcc
 
 CROSS_CFLAGS= \
@@ -34,6 +30,7 @@ CROSS_CFLAGS= \
 	$(CFLAGS_STD) \
 	$(CFLAGS_OPT) \
 	$(CFLAGS_WARN) \
+	$(ARCH_CFLAGS) \
 	$(CROSS_CFLAGS_INC) \
 	-fsanitize=undefined \
 	-ffreestanding \
@@ -53,12 +50,14 @@ CROSS_LD=$(CONFIG_ARCH)-elf-ld
 CROSS_KLDFLAGS= \
 	-Tsources/host/kernel/$(CONFIG_ARCH)/link.ld \
 	-z max-page-size=0x1000 \
-	meta/toolchain/gnu/local/lib/gcc/x86_64-elf/11.1.0/libgcc.a
+	meta/toolchain/gnu/local/lib/gcc/x86_64-elf/11.1.0/libgcc.a \
+	$(ARCH_LDFLAGS)
 
 CROSS_ULDFLAGS= \
 	-Tsources/host/brutal/$(CONFIG_ARCH)/link.ld \
 	-z max-page-size=0x1000 \
-	meta/toolchain/gnu/local/lib/gcc/x86_64-elf/11.1.0/libgcc.a
+	meta/toolchain/gnu/local/lib/gcc/x86_64-elf/11.1.0/libgcc.a \
+	$(ARCH_LDFLAGS)
 
 CROSS_AR=$(CONFIG_ARCH)-elf-ar
 CROSS_ARFLAGS=rcs
