@@ -67,6 +67,19 @@ include sources/libs/proto/.build.mk
 .PHONY: all
 all: $(ISO)
 
+ifeq ($(QEMU_BOOT_METHOD), kernel)
+
+run: $(ISO)
+	qemu-system-$(CONFIG_ARCH) \
+		 $(QEMU_ARGS) \
+		-serial mon:stdio \
+		-no-reboot \
+		-no-shutdown \
+		-kernel $(KERNEL)
+		-hda $(ISO) \
+		
+else ifeq ($(QEMU_BOOT_METHOD), iso)
+
 run: $(ISO)
 	qemu-system-$(CONFIG_ARCH) \
 		$(QEMU_ARGS) \
@@ -74,6 +87,8 @@ run: $(ISO)
 		-no-reboot \
 		-no-shutdown \
 		-cdrom $(ISO)
+
+endif
 
 .PHONY: bochs
 bochs: $(ISO)

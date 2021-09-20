@@ -32,7 +32,6 @@ CROSS_CFLAGS= \
 	$(CFLAGS_WARN) \
 	$(ARCH_CFLAGS) \
 	$(CROSS_CFLAGS_INC) \
-	-fsanitize=undefined \
 	-ffreestanding \
 	-D__brutal__=1
 
