@@ -4,6 +4,8 @@
 
 #ifdef __x86_64__
 #    include "kernel/x86_64/context.h"
+#elif defined(__riscv)
+#    include "kernel/riscv64/context.h"
 #else
 #    error "Arch not supported"
 #endif
