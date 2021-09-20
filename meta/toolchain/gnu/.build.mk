@@ -48,15 +48,13 @@ CROSS_UCFLAGS= \
 
 CROSS_LD=$(CONFIG_ARCH)-elf-ld
 CROSS_KLDFLAGS= \
-	-Tsources/host/kernel/$(CONFIG_ARCH)/link.ld \
+	-Tsources/host/kernel/$(CONFIG_ARCH)/$(CONFIG_BOARD)/link.ld \
 	-z max-page-size=0x1000 \
-	meta/toolchain/gnu/local/lib/gcc/x86_64-elf/11.1.0/libgcc.a \
 	$(ARCH_LDFLAGS)
 
 CROSS_ULDFLAGS= \
 	-Tsources/host/brutal/$(CONFIG_ARCH)/link.ld \
 	-z max-page-size=0x1000 \
-	meta/toolchain/gnu/local/lib/gcc/x86_64-elf/11.1.0/libgcc.a \
 	$(ARCH_LDFLAGS)
 
 CROSS_AR=$(CONFIG_ARCH)-elf-ar

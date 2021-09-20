@@ -13,6 +13,9 @@ ARCH_KCFLAGS = \
 CROSS_AS=nasm
 CROSS_ASFLAGS=-f elf64
 
+ARCH_LDFLAGS = \
+	meta/toolchain/gnu/local/lib/gcc/x86_64-elf/11.1.0/libgcc.a
+
 QEMU_ARGS= \
 		-M q35 \
 		-cpu host \
