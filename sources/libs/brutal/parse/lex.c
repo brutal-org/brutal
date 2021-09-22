@@ -54,6 +54,34 @@ Lexeme lex_next(Lex *self)
     return l;
 }
 
+LexemeType lex_peek_type(Lex *self, int offset)
+{
+    return lex_peek(self, offset).type;
+}
+
+LexemeType lex_curr_type(Lex *self)
+{
+    return lex_curr(self).type;
+}
+
+LexemeType lex_next_type(Lex *self)
+{
+    return lex_next(self).type;
+}
+
+bool lex_skip_type(Lex *lex, LexemeType type)
+{
+    if (lex_curr_type(lex) == type)
+    {
+        lex_next(lex);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 void lex_dump(Lex *self, LexToStrFn fn)
 {
     vec_foreach(l, &self->lexemes)
@@ -76,16 +104,16 @@ void lex_throw(Lex *self, Str message)
     };
 }
 
-bool lex_expect(Lex *self, int lexeme)
+bool lex_expect(Lex *self, LexemeType type)
 {
-    if (lex_curr(self).type != lexeme)
+    if (lex_skip_type(self, type))
     {
-        lex_throw(self, str$("unexpected-lexeme"));
-        return false;
+        return true;
     }
     else
     {
-        return true;
+        lex_throw(self, str$("unexpected-lexeme"));
+        return false;
     }
 }
 

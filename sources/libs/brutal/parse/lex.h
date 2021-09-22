@@ -35,10 +35,18 @@ Lexeme lex_curr(Lex *self);
 
 Lexeme lex_next(Lex *self);
 
+LexemeType lex_peek_type(Lex *self, int offset);
+
+LexemeType lex_curr_type(Lex *self);
+
+LexemeType lex_next_type(Lex *self);
+
+bool lex_skip_type(Lex *lex, LexemeType type);
+
 void lex_dump(Lex *self, LexToStrFn fn);
 
 void lex_throw(Lex *self, Str message);
 
-bool lex_expect(Lex *self, int lexeme);
+bool lex_expect(Lex *self, LexemeType type);
 
 bool lex_ok(Lex *self);
