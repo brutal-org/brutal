@@ -40,10 +40,10 @@
 - [X] Fibers
 - [x] Event loop
 - [X] IRQ routing to userspace
-- [ ] ACPI Server
-  - [ ] MCFG
-- [ ] PCIe Server
-  - [ ] Device enumeration
+- [x] ACPI Server
+  - [x] MCFG
+- [x] PCIe Server
+  - [x] Device enumeration
 - [ ] Virtio
   - [ ] Device Configuration
   - [ ] Virt Queues
