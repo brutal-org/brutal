@@ -142,7 +142,6 @@ typedef struct
 
 SYSCALL(unbind) (BrUnbindArgs* args);
 
-
 typedef struct
 {
     BrIrq handle;
