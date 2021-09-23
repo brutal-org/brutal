@@ -1,5 +1,6 @@
 #pragma once
 
+#include <acpi/acpi.h>
 #include <handover/handover.h>
 
 #define HPET_ADDRESS_SPACE_MEMORY 0

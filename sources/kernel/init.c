@@ -7,6 +7,8 @@
 #include "kernel/mmap.h"
 #include "kernel/sched.h"
 
+static Task *init_task = nullptr;
+
 static bool elf_supported(Elf64Header const *header, size_t data_size)
 {
     if (data_size < sizeof(Elf64Header))
@@ -71,8 +73,6 @@ static void elf_load_program(Task *task, Elf64Header const *elf_header, MemObj *
         prog_header = (Elf64ProgramHeader *)((uint8_t *)prog_header + elf_header->program_header_table_entry_size);
     }
 }
-
-static Task *init_task = nullptr;
 
 void init_stack(Task *task)
 {

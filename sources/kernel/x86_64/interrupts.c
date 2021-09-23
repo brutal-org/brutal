@@ -53,7 +53,7 @@ static char *_exception_messages[32] = {
     "Reserved",
 };
 
-void dump_register(Regs const *regs)
+static void dump_register(Regs const *regs)
 {
     log_unlock("RIP: {#016p} | RSP: {#016p}", regs->rip, regs->rsp);
     log_unlock("CR2: {#016p} | CR3: {#016p} ", asm_read_cr2(), asm_read_cr3());
@@ -77,12 +77,13 @@ struct stackframe
     uint64_t rip;
 };
 
-void backtrace(uintptr_t rbp, uint64_t rip)
+static void backtrace(uintptr_t rbp, uint64_t rip)
 {
     struct stackframe *stackframe = (struct stackframe *)rbp;
 
     log_unlock("Backtrace:");
     log_unlock("{016x}", rip);
+
     while (stackframe)
     {
         log_unlock("{016x}", stackframe->rip);
@@ -90,7 +91,7 @@ void backtrace(uintptr_t rbp, uint64_t rip)
     }
 }
 
-void interrupt_error_handler(Regs *regs, uintptr_t rsp)
+static void interrupt_error_handler(Regs *regs, uintptr_t rsp)
 {
     lock_acquire(&error_lock);
 

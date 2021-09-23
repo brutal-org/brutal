@@ -89,14 +89,14 @@ static Iter lapic_iterate(AcpiMadtLapicRecord *lapic, MAYBE_UNUSED void *ctx)
 
 /* --- Ioapic --------------------------------------------------------------- */
 
+#define IOAPIC_MAX_COUNT (256)
+
 typedef struct
 {
     uintptr_t base;
     uint32_t interrupt_base;
     uint32_t max_redirect;
 } Ioapic;
-
-#define IOAPIC_MAX_COUNT (256)
 
 int _ioapic_count = 0;
 Ioapic _ioapic[IOAPIC_MAX_COUNT] = {};
@@ -113,7 +113,7 @@ static inline void ioapic_write(int index, uint32_t reg, uint32_t value)
     volatile_write32(_ioapic[index].base + IOAPIC_VALUE_OFFSET, value);
 }
 
-IoapicVersion ioapic_version(int index)
+static IoapicVersion ioapic_version(int index)
 {
     uint32_t raw = ioapic_read(index, IOAPIC_REG_VERSION);
     return union$(IoapicVersion, raw);
@@ -182,7 +182,7 @@ typedef struct
     bool enable;
 } IrqRedirectCtx;
 
-Iter iso_iterate(AcpiMadtIsoRecord *record, IrqRedirectCtx *ctx)
+static Iter iso_iterate(AcpiMadtIsoRecord *record, IrqRedirectCtx *ctx)
 {
     if (record->irq == ctx->irq)
     {
@@ -201,18 +201,17 @@ Iter iso_iterate(AcpiMadtIsoRecord *record, IrqRedirectCtx *ctx)
     return ITER_CONTINUE;
 }
 
-void ioapic_redirect_irq_to_cpu(Acpi *acpi, CpuId id, uint8_t irq, bool enable)
+static void ioapic_redirect_irq_to_cpu(Acpi *acpi, CpuId id, uint8_t irq, bool enable)
 {
     log$(" - apic: setting ipi {#p} redirection for cpu: {}", irq, id);
 
     IrqRedirectCtx ctx = {id, irq, enable};
-    Iter iter = acpi_madt_lookup(
-        acpi,
-        ACPI_MADT_RECORD_ISO,
-        (IterFn *)iso_iterate,
-        &ctx);
 
-    if (iter == ITER_STOP)
+    if (acpi_madt_lookup(
+            acpi,
+            ACPI_MADT_RECORD_ISO,
+            (IterFn *)iso_iterate,
+            &ctx) == ITER_STOP)
     {
         return;
     }
@@ -220,7 +219,7 @@ void ioapic_redirect_irq_to_cpu(Acpi *acpi, CpuId id, uint8_t irq, bool enable)
     ioapic_create_redirect(irq + 0x20, irq, 0, id, enable);
 }
 
-void ioapic_redirect_legacy_irq(Acpi *acpi)
+static void ioapic_redirect_legacy_irq(Acpi *acpi)
 {
     log$("IOApic: Setup irq redirection");
 
@@ -246,7 +245,9 @@ void apic_initalize(Acpi *acpi)
 {
     // Setup local apics
     AcpiMadt *madt = (AcpiMadt *)acpi_rsdt_lookup_first(acpi, ACPI_MADT_SIG);
+
     lapic_base = mmap_phys_to_io(madt->lapic);
+
     acpi_madt_lookup(
         acpi,
         ACPI_MADT_RECORD_LAPIC,
