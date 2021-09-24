@@ -10,12 +10,13 @@ static Iter iter_pci(void *data, void *ctx)
     Pci *pci = (Pci *)ctx;
     PciConfig *config = pci_config(pci, *addr);
 
-    log$("VENDOR:{#04x} DEVICE:{#04x}", config->vendor, config->device);
+    log$("Seg: {} Bus: {} Slot: {} Func: {]", addr->seg, addr->bus, addr->slot, addr->func);
+    log$("    VENDOR:{#04x} DEVICE:{#04x}", config->vendor, config->device);
 
     if ((config->header_type & 0x7f) == 0)
     {
         PciConfigType0 *v = (PciConfigType0 *)config;
-        log$(" - subsytem:  VENDOR: {#04x} DEVICE: {#04x}", v->subsystem_vendor, v->subsystem_id);
+        log$("    Subsytem:  {#04x} VENDOR: {#04x}", v->subsystem_id, v->subsystem_vendor);
     }
 
     return ITER_CONTINUE;
