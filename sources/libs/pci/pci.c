@@ -125,7 +125,7 @@ Iter pci_iter_group(PciGroup *group, PciAddr addr, IterFn fn, void *ctx)
 {
     PciConfig *config = pci_group_config(group, addr);
 
-    if (config->header_type & 0x80)
+    if ((config->header_type & 0x80) == 0)
     {
         return pci_iter_bus(group, addr, fn, ctx);
     }
