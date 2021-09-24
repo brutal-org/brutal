@@ -34,14 +34,14 @@ CStmt cstmt_block(Alloc *alloc)
     return stmt;
 }
 
-void cstmt_block_add(CStmt *self, CStmt statement)
+void cstmt_block_add(CStmt *self, CStmt stmt)
 {
     if (self->type != CSTMT_BLOCK)
     {
         panic$("cstmt_block_add should only be called with block");
     }
 
-    vec_push(&self->block_.stmts, statement);
+    vec_push(&self->block_.stmts, stmt);
 }
 
 CStmt cstmt_if(CExpr expr, CStmt stmt_true, Alloc *alloc)
