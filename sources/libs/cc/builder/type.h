@@ -10,6 +10,8 @@ CType ctype_bool(Str name, Alloc *alloc);
 
 CType ctype_ptr(CType subtype, Alloc *alloc);
 
+CType ctype_parent(CType subtype, Alloc *alloc);
+
 CType ctype_array(Str name, CType subtype, int size, Alloc *alloc);
 
 CType ctype_signed(Str name, int precision, Alloc *alloc);

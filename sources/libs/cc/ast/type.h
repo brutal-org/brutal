@@ -13,6 +13,7 @@ typedef enum
     CTYPE_AUTO,
     CTYPE_BOOL,
     CTYPE_PTR,
+    CTYPE_PARENT,
     CTYPE_ARRAY,
     CTYPE_SIGNED,
     CTYPE_UNSIGNED,
@@ -50,7 +51,7 @@ struct ctype
         struct
         {
             CType *subtype;
-        } ptr_;
+        } ptr_, parent_;
 
         struct
         {

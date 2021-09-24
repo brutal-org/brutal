@@ -32,6 +32,14 @@ CType ctype_ptr(CType subtype, Alloc *alloc)
     };
 }
 
+CType ctype_parent(CType subtype, Alloc *alloc)
+{
+    return (CType){
+        .type = CTYPE_PARENT,
+        .parent_.subtype = alloc_move(alloc, subtype),
+    };
+}
+
 CType ctype_array(Str name, CType subtype, int size, Alloc *alloc)
 {
     return (CType){
@@ -176,11 +184,10 @@ CType ctype_func(CType ret, Str name, Alloc *alloc)
 
 CType ctype_name(Str name, Alloc *alloc)
 {
-    CType type =
-        {
-            .type = CTYPE_NAME,
-            .name = str_dup(name, alloc),
-        };
+    CType type = {
+        .type = CTYPE_NAME,
+        .name = str_dup(name, alloc),
+    };
 
     return type;
 }
