@@ -72,7 +72,7 @@ ifeq ($(QEMU_BOOT_METHOD), kernel)
 run: $(ISO)
 	qemu-system-$(CONFIG_ARCH) \
 		 $(QEMU_ARGS) \
-		-serial stdio \
+		-serial mon:stdio \
 		-no-reboot \
 		-no-shutdown \
 		-kernel $(KERNEL)
@@ -83,7 +83,7 @@ else ifeq ($(QEMU_BOOT_METHOD), iso)
 run: $(ISO)
 	qemu-system-$(CONFIG_ARCH) \
 		$(QEMU_ARGS) \
-		-serial stdio \
+		-serial mon:stdio \
 		-no-reboot \
 		-no-shutdown \
 		-cdrom $(ISO)
