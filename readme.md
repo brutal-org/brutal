@@ -39,6 +39,16 @@
 <br/>
 <br/>
 
+## Features
+
+- Rich and modern C library
+  - Custome allocators
+  - Generic data structures
+  - Fibers
+- Capability based micro-kernel
+- IDL compiler
+- C compiler
+
 ## Build Instructions
 
 You can find instructions about building BRUTAL [here](book/01-04-build.md).
@@ -63,4 +73,4 @@ See [credits.md](book/01-03-credits.md)
 
 The brutal operating system and its core components are licensed under the **MIT License**.
 
-The full text of the license can be accessed via [this link](https://opensource.org/licenses/MIT) and is also included in the [license](License) file of this software package.
+The full text of the license can be accessed via [this link](https://opensource.org/licenses/MIT) and is also included in the [license](license) file of this software package.
