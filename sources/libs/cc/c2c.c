@@ -85,13 +85,14 @@ static void c2c_type_start(Emit *emit, CType type)
         emit_fmt(emit, "*");
         c2c_type_attr(emit, type.attr);
     }
+    else if (type.type == CTYPE_PARENT)
+    {
+        c2c_type_start(emit, *type.ptr_.subtype);
+        emit_fmt(emit, "(");
+    }
     else if (type.type == CTYPE_FUNC)
     {
         c2c_type(emit, *type.func_.ret); // return
-
-        emit_fmt(emit, "(");
-
-        c2c_type_attr(emit, type.attr);
     }
     else if ((type.type == CTYPE_STRUCT || type.type == CTYPE_UNION) &&
              type.struct_.members.length != 0)
@@ -113,7 +114,7 @@ static void c2c_type_start(Emit *emit, CType type)
     }
     else if (type.type == CTYPE_ENUM)
     {
-        c2c_type_attr(emit, type.attr);
+        emit_fmt(emit, "{} ", type.name);
         emit_fmt(emit, "\n{{\n");
         emit_ident(emit);
 
@@ -126,7 +127,7 @@ static void c2c_type_start(Emit *emit, CType type)
         emit_deident(emit);
         emit_fmt(emit, "\n}}");
 
-        emit_fmt(emit, "{} ", type.name);
+        c2c_type_attr(emit, type.attr);
     }
     else if (type.type == CTYPE_ARRAY)
     {
@@ -141,24 +142,33 @@ static void c2c_type_end(Emit *emit, CType type)
     {
         c2c_type_end(emit, *type.ptr_.subtype);
     }
+    else if (type.type == CTYPE_PARENT)
+    {
+        emit_fmt(emit, ")");
+        c2c_type_end(emit, *type.ptr_.subtype);
+    }
     else if (type.type == CTYPE_FUNC)
     {
-        emit_fmt(emit, ")(");
+        emit_fmt(emit, "(");
 
-        int first = 0;
+        bool first = true;
         vec_foreach(v, &type.func_.params)
         {
-            if (first != 0)
+            if (!first)
             {
                 emit_fmt(emit, ", ");
             }
-            first++;
+            first = false;
             c2c_member(emit, v);
         }
+        emit_fmt(emit, ")");
+
+        c2c_type_attr(emit, type.attr);
     }
     else if (type.type == CTYPE_ARRAY)
     {
         emit_fmt(emit, "[{}]", type.array_.size);
+        c2c_type_end(emit, *type.ptr_.subtype);
     }
 }
 
