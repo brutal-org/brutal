@@ -6,6 +6,48 @@
     LEXEME(WHITESPACE)          \
     LEXEME(COMMENT)             \
     LEXEME(ATOM)                \
+    LEXEME(AUTO)                \
+    LEXEME(BREAK)               \
+    LEXEME(CASE)                \
+    LEXEME(CHAR)                \
+    LEXEME(CONST)               \
+    LEXEME(CONTINUE)            \
+    LEXEME(DEFAULT)             \
+    LEXEME(DO)                  \
+    LEXEME(DOUBLE)              \
+    LEXEME(ELSE)                \
+    LEXEME(ENUM)                \
+    LEXEME(EXTERN)              \
+    LEXEME(FLOAT)               \
+    LEXEME(FOR)                 \
+    LEXEME(GOTO)                \
+    LEXEME(IF)                  \
+    LEXEME(INLINE)              \
+    LEXEME(INT)                 \
+    LEXEME(LONG)                \
+    LEXEME(REGISTER)            \
+    LEXEME(RESTRICT)            \
+    LEXEME(RETURN)              \
+    LEXEME(SHORT)               \
+    LEXEME(SIGNED)              \
+    LEXEME(SIZEOF)              \
+    LEXEME(STATIC)              \
+    LEXEME(STRUCT)              \
+    LEXEME(SWITCH)              \
+    LEXEME(TYPEDEF)             \
+    LEXEME(UNION)               \
+    LEXEME(UNSIGNED)            \
+    LEXEME(VOID)                \
+    LEXEME(VOLATILE)            \
+    LEXEME(WHILE)               \
+    LEXEME(ALIGNAS)             \
+    LEXEME(ALIGNOF)             \
+    LEXEME(ATOMIC)              \
+    LEXEME(BOOL)                \
+    LEXEME(GENERIC)             \
+    LEXEME(NORETURN)            \
+    LEXEME(STATIC_ASSERT)       \
+    LEXEME(THREAD_LOCAL)        \
     LEXEME(LPARENT)             \
     LEXEME(RPARENT)             \
     LEXEME(LBRACKET)            \
@@ -16,17 +58,23 @@
     LEXEME(RCHEVRON)            \
     LEXEME(POUND)               \
     LEXEME(PLUS)                \
+    LEXEME(PLUSPLUS)            \
     LEXEME(MINUS)               \
+    LEXEME(MINUSMINUS)          \
+    LEXEME(EQUALEQUAL)          \
     LEXEME(EQUAL)               \
     LEXEME(STAR)                \
     LEXEME(SLASH)               \
     LEXEME(PERCENT)             \
+    LEXEME(AMPERSANDAMPERSAND)  \
     LEXEME(AMPERSAND)           \
     LEXEME(BAR)                 \
     LEXEME(CIRCUMFLEX)          \
     LEXEME(TILDE)               \
     LEXEME(EXCLAMATION)         \
-    LEXEME(DOT)
+    LEXEME(DOT)                 \
+    LEXEME(ARROW)               \
+    LEXEME(SEMICOLON)
 
 // clang-format off
 
@@ -41,7 +89,7 @@ typedef enum
 
 // clang-format on
 
-static inline Str c_lex_to_str(LexemeType type)
+static inline Str clex_to_str(LexemeType type)
 {
     if (type >= 0 && type < CLEX_COUNT)
     {
@@ -57,4 +105,5 @@ static inline Str c_lex_to_str(LexemeType type)
     return lexeme_to_str(type);
 }
 
-Lex c_lex(Scan *scan, Alloc *alloc);
+Lex clex(Scan *scan, Alloc *alloc);
+

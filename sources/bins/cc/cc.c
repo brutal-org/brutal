@@ -29,14 +29,14 @@ int main(int argc, char const *argv[])
     Scan scan;
     scan_init(&scan, buffer_str(&source_buffer));
 
-    Lex lex = c_lex(&scan, base$(&heap));
+    Lex lex = clex(&scan, base$(&heap));
 
     if (scan_dump_error(&scan, io_std_err()))
     {
         return -1;
     }
 
-    lex_dump(&lex, c_lex_to_str);
+    lex_dump(&lex, clex_to_str);
 
     heap_alloc_deinit(&heap);
 
