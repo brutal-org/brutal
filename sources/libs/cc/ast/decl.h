@@ -14,15 +14,16 @@ typedef enum
     CDECL_FUNC,
 } CDeclType;
 
-#define CDECL_AUTO        (1 << 0)
-#define CDECL_STATIC      (1 << 1)
-#define CDECL_REGISTER    (1 << 2)
-#define CDECL_INLINE      (1 << 3)
-#define CDECL_EXTERN      (1 << 4)
-#define CDECL_THREAD      (1 << 5)
-#define CDECL_NO_RETURN   (1 << 6)
-
-typedef unsigned int CDeclAttr;
+typedef enum
+{
+    CDECL_AUTO = (1 << 0),
+    CDECL_STATIC = (1 << 1),
+    CDECL_REGISTER = (1 << 2),
+    CDECL_INLINE = (1 << 3),
+    CDECL_EXTERN = (1 << 4),
+    CDECL_THREAD = (1 << 5),
+    CDECL_NO_RETURN = (1 << 6),
+} CDeclAttr;
 
 typedef struct cdecl CDecl;
 

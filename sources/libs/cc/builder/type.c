@@ -194,6 +194,6 @@ CType ctype_name(Str name, Alloc *alloc)
 
 CType ctype_attr(CType type, CTypeAttr attr)
 {
-    type.attr |= attr;
+    type.attr = (CTypeAttr)(type.attr | attr);
     return type;
 }

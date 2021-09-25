@@ -25,11 +25,12 @@ typedef enum
     CTYPE_NAME,
 } CTypeType;
 
-#define CTYPE_CONST (1 << 0)
-#define CTYPE_RESTRICT (1 << 1)
-#define CTYPE_VOLATILE (1 << 2)
-
-typedef unsigned int CTypeAttr;
+typedef enum
+{
+    CTYPE_CONST = (1 << 0),
+    CTYPE_RESTRICT = (1 << 1),
+    CTYPE_VOLATILE = (1 << 2),
+} CTypeAttr;
 
 typedef struct ctype CType;
 typedef struct ctype_member CTypeMember;
