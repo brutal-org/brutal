@@ -1,6 +1,7 @@
 #pragma once
 
 #include <math.h>
+#include <brutal/math/angle.h>
 
 #define Vec2(T) \
     struct      \
@@ -43,6 +44,14 @@ typedef Vec2(double) Vec2d;
         __v;             \
     })
 
+#define vec2_mul_v(a, v) ( \
+    {                      \
+        auto __v = (a);    \
+        __v.x *= v;        \
+        __v.y *= v;        \
+        __v;               \
+    })
+
 #define vec2_div(a, b) ( \
     {                    \
         auto __v = (a);  \
@@ -51,9 +60,22 @@ typedef Vec2(double) Vec2d;
         __v;             \
     })
 
-#define vec2_distance(a, b) (                                          \
-    {                                                                  \
-        auto root = pow(((a).x - (b).x), 2) + pow(((a).y - (b).y), 2); \
-        root = sqrt(root);                                             \
-        root;                                                          \
+#define vec2_div_v(a, v) ( \
+    {                      \
+        auto __v = (a);    \
+        __v.x /= v;        \
+        __v.y /= v;        \
+        __v;               \
     })
+
+#define vec2_length_squared(a) \
+    ((a).x * (a).x + (a).y * (a).y)
+
+#define vec2_length(a) \
+    sqrt(vec2_length_squared(a))
+
+#define vec2_distance(a, b) \
+    vec2_length(vec2_sub(b, a))
+
+#define vec2_angle(a) \
+    deg2rad(atan2f((a).y, (a).x)) 
