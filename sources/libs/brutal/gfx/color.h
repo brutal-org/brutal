@@ -2,6 +2,7 @@
 
 #include <brutal/base/keywords.h>
 #include <brutal/base/std.h>
+#include <math.h>
 
 typedef struct
 {
@@ -86,3 +87,30 @@ static inline GfxColor gfx_color_blend(GfxColor fg, GfxColor bg)
     GfxColorf res = (GfxColorf){r, g, b, a};
     return gfx_colori$(res);
 }
+
+static inline GfxColorf gfx_color_gamma_correct(GfxColorf col)
+{
+    col.r = sqrtf(col.r);
+    col.g = sqrtf(col.g);
+    col.b = sqrtf(col.b);
+    return col;
+}
+
+static inline GfxColorf gfx_color_lerpf(GfxColorf a, GfxColorf b, float t)
+{
+    return gfx_rgba(GfxColorf,
+                    a.r + (b.r - a.r) * t, 
+                    a.g + (b.g - a.g) * t, 
+                    a.b + (b.b - a.b) * t, 
+                    a.a + (b.a - a.a) * t);
+}
+
+static inline GfxColor gfx_color_lerpi(GfxColor a, GfxColor b, float t)
+{
+    return gfx_rgba(GfxColor,
+                    a.r + (b.r - a.r) * t, 
+                    a.g + (b.g - a.g) * t, 
+                    a.b + (b.b - a.b) * t, 
+                    a.a + (b.a - a.a) * t);
+}
+
