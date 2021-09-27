@@ -64,9 +64,36 @@ char *strncpy(char *restrict s1, char const *restrict s2, size_t n)
 
 /* --- 7.24.3 - Concatenation functions ------------------------------------- */
 
-// char *strcat(char *restrict s1,  char const *restrict s2) {}
+char *strcat(char *restrict s1,  char const *restrict s2) 
+{
+    size_t l2 = strlen(s2);
+    s1 = s1 + strlen(s1); // append to the last
+    
+    for(size_t i = 0; i < l2; i++)
+    {
+        s1[i] = s2[i];
+    }
 
-//char *strncat(char *restrict s1,  char const *restrict s2, size_t n) {}
+    s1[l2] = 0;
+
+    return s1;
+}
+
+char *strncat(char *restrict s1,  char const *restrict s2, size_t n) 
+{
+    size_t l2 = strlen(s2);
+    size_t i = 0;
+    s1 = s1 + strlen(s1);
+
+    for(i = 0; i < l2 && i < n; i++)
+    {
+        s1[i] = s2[i];
+    }
+
+    s1[i] = 0;
+
+    return s1;
+}
 
 /* --- 7.24.4 - Comparison functions ---------------------------------------- */
 
@@ -120,7 +147,19 @@ int strncmp(char const *s1, char const *s2, size_t n)
 
 // void *memchr(void const *s, int c, size_t n) {}
 
-// char *strchr(char const *s, int c) {}
+char *strchr(char const *s, int c) 
+{
+    size_t length = strlen(s);
+    for(size_t i = 0; i < length; i++)
+    {
+        if(s[i] == c)
+        {
+            return (char*)s + i;
+        }
+    }
+
+    return NULL;
+}
 
 // size_t strcspn(char const *s1,  char const *s2) {}
 
