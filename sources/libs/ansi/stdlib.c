@@ -79,7 +79,7 @@ static Alloc *heap(void)
 {
     if (!_heap_init)
     {
-        heap_alloc_init(&_heap);
+        heap_alloc_init(&_heap, NODE_DEFAULT);
         _heap_init = true;
     }
 
@@ -153,10 +153,27 @@ _Noreturn void _Exit(int status)
 //               size_t size,
 //               int (*compar)(void const *, void const *));
 
-// void *qsort(void *base,
-//             size_t nmemb,
-//             size_t size,
-//             int (*compar)(void const *, void const *));
+void qsort(void *base, size_t nmemb, size_t size, int (*compar)(void const *, void const *))
+{
+    // FIXME: Write real quick sort
+
+    for (size_t i = 0; i + 1 < nmemb; i++)
+    {
+        for (size_t j = i + 1; i < nmemb; i++)
+        {
+            void *a = base + (i * size);
+            void *b = base + (j * size);
+
+            if (compar(a, b) < 0)
+            {
+                char tmp[size];
+                mem_cpy(tmp, a, size);
+                mem_cpy(a, b, size);
+                mem_cpy(b, tmp, size);
+            }
+        }
+    }
+}
 
 /* --- 7.22.6 - Integer arithmetic functions -------------------------------- */
 
