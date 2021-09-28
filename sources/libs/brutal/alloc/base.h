@@ -4,6 +4,7 @@
 #include <brutal/base/std.h>
 #include <brutal/mem/const.h>
 #include <brutal/mem/funcs.h>
+#include <brutal/mem/units.h>
 
 typedef struct alloc Alloc;
 
@@ -14,6 +15,13 @@ typedef void *AllocAcquire(Alloc *self, size_t size);
 typedef void *AllocResize(Alloc *self, void *ptr, size_t new_size);
 
 typedef void AllocRelease(Alloc *self, void *ptr);
+
+typedef enum
+{
+    NODE_SMALL = KiB(4),
+    NODE_DEFAULT = KiB(16),
+    NODE_LARGE = KiB(128),
+} NodeSize;
 
 struct alloc
 {

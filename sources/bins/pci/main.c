@@ -25,7 +25,7 @@ static Iter iter_pci(void *data, void *ctx)
 int br_entry_handover(Handover *handover)
 {
     HeapAlloc heap;
-    heap_alloc_init(&heap);
+    heap_alloc_init(&heap, NODE_DEFAULT);
 
     Acpi acpi;
     acpi_init(&acpi, handover->rsdp);

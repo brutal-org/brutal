@@ -6,7 +6,6 @@
 typedef struct
 {
     GfxBuffer buffer;
-    GfxRast rast;
     GfxCache cache;
 
     GfxStroke stroke;

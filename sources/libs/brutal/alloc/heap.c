@@ -3,43 +3,10 @@
 #include <host/mem.h>
 
 #define ALLOC_HEAP_ALIGN (64)
-#define ALLOC_HEAP_REQUEST (16)
 #define ALLOC_HEAP_MAGIC (0xc001c0de)
 #define ALLOC_HEAP_DEAD (0xdeaddead)
 
-struct alloc_minor;
-
-struct alloc_major
-{
-    size_t pages;
-
-    size_t size;
-    size_t usage;
-
-    struct alloc_major *prev;
-    struct alloc_major *next;
-
-    struct alloc_minor *first;
-};
-
-#define MAJOR_BLOCK_HEADER_SIZE (ALIGN_UP(sizeof(struct alloc_major), ALLOC_HEAP_ALIGN))
-
-struct alloc_minor
-{
-    size_t magic;
-
-    size_t size;
-    size_t req_size;
-
-    struct alloc_minor *prev;
-    struct alloc_minor *next;
-
-    struct alloc_major *block;
-};
-
-#define MINOR_BLOCK_HEADER_SIZE (ALIGN_UP(sizeof(struct alloc_minor), ALLOC_HEAP_ALIGN))
-
-static struct alloc_major *major_block_create(size_t size)
+static HeapMajor *major_block_create(size_t size, NodeSize node_size)
 {
     // This is how much space is required.
     size_t st = size + MAJOR_BLOCK_HEADER_SIZE;
@@ -56,9 +23,9 @@ static struct alloc_major *major_block_create(size_t size)
     }
 
     // Make sure it's >= the minimum size.
-    st = MAX(st, ALLOC_HEAP_REQUEST); // The number of pages to request per chunk.
+    st = MAX(st, node_size / MEM_PAGE_SIZE); // The number of pages to request per chunk.
 
-    struct alloc_major *maj;
+    HeapMajor *maj;
     if (host_mem_acquire(st * MEM_PAGE_SIZE, (void **)&maj, HOST_MEM_NONE).kind != ERR_KIND_SUCCESS)
     {
         panic$("Failled to allocate memory!");
@@ -74,7 +41,7 @@ static struct alloc_major *major_block_create(size_t size)
     return maj;
 }
 
-static bool check_minor_magic(struct alloc_minor *min, void *ptr)
+static bool check_minor_magic(HeapMinor *min, void *ptr)
 {
     if (min->magic == ALLOC_HEAP_MAGIC)
     {
@@ -105,8 +72,8 @@ void *heap_alloc_acquire(HeapAlloc *alloc, size_t req_size)
 {
     req_size = ALIGN_UP(req_size, ALLOC_HEAP_ALIGN);
 
-    unsigned long long bestSize = 0;
-    unsigned long size = req_size;
+    size_t bestSize = 0;
+    size_t size = req_size;
 
     if (size == 0)
     {
@@ -117,7 +84,7 @@ void *heap_alloc_acquire(HeapAlloc *alloc, size_t req_size)
     // Is this the first time we are being used?
     if (alloc->root == nullptr)
     {
-        alloc->root = major_block_create(size);
+        alloc->root = major_block_create(size, alloc->size);
 
         if (alloc->root == nullptr)
         {
@@ -126,7 +93,7 @@ void *heap_alloc_acquire(HeapAlloc *alloc, size_t req_size)
     }
 
     // Now we need to bounce through every major and find enough space....
-    struct alloc_major *maj = alloc->root;
+    HeapMajor *maj = alloc->root;
     bool started_with_bestbet = false;
 
     // Start at the best bet....
@@ -173,7 +140,7 @@ void *heap_alloc_acquire(HeapAlloc *alloc, size_t req_size)
             }
 
             // Create a new major block next to this one and...
-            maj->next = major_block_create(size);
+            maj->next = major_block_create(size, alloc->size);
 
             if (maj->next == nullptr)
             {
@@ -189,7 +156,7 @@ void *heap_alloc_acquire(HeapAlloc *alloc, size_t req_size)
         // CASE 2: It's a brand new block.
         if (maj->first == nullptr)
         {
-            maj->first = (struct alloc_minor *)((uintptr_t)maj + MAJOR_BLOCK_HEADER_SIZE);
+            maj->first = (HeapMinor *)((uintptr_t)maj + MAJOR_BLOCK_HEADER_SIZE);
 
             maj->first->magic = ALLOC_HEAP_MAGIC;
             maj->first->prev = nullptr;
@@ -211,7 +178,7 @@ void *heap_alloc_acquire(HeapAlloc *alloc, size_t req_size)
             if (diff >= (size + MINOR_BLOCK_HEADER_SIZE))
             {
                 // Yes, space in front. Squeeze in.
-                maj->first->prev = (struct alloc_minor *)((uintptr_t)maj + MAJOR_BLOCK_HEADER_SIZE);
+                maj->first->prev = (HeapMinor *)((uintptr_t)maj + MAJOR_BLOCK_HEADER_SIZE);
                 maj->first->prev->next = maj->first;
                 maj->first = maj->first->prev;
 
@@ -227,7 +194,7 @@ void *heap_alloc_acquire(HeapAlloc *alloc, size_t req_size)
         }
 
         // CASE 4: There is enough space in this block. But is it contiguous?
-        struct alloc_minor *min = maj->first;
+        HeapMinor *min = maj->first;
 
         // Looping within the block now...
         while (min != nullptr)
@@ -244,7 +211,7 @@ void *heap_alloc_acquire(HeapAlloc *alloc, size_t req_size)
 
                 if (diff >= (size + MINOR_BLOCK_HEADER_SIZE))
                 {
-                    min->next = (struct alloc_minor *)((uintptr_t)min + MINOR_BLOCK_HEADER_SIZE + min->size);
+                    min->next = (HeapMinor *)((uintptr_t)min + MINOR_BLOCK_HEADER_SIZE + min->size);
                     min->next->prev = min;
                     min = min->next;
                     min->next = nullptr;
@@ -270,7 +237,7 @@ void *heap_alloc_acquire(HeapAlloc *alloc, size_t req_size)
 
                 if (diff >= (size + MINOR_BLOCK_HEADER_SIZE))
                 {
-                    struct alloc_minor *new_min = (struct alloc_minor *)((uintptr_t)min + MINOR_BLOCK_HEADER_SIZE + min->size);
+                    HeapMinor *new_min = (HeapMinor *)((uintptr_t)min + MINOR_BLOCK_HEADER_SIZE + min->size);
 
                     new_min->magic = ALLOC_HEAP_MAGIC;
                     new_min->next = min->next;
@@ -303,7 +270,7 @@ void *heap_alloc_acquire(HeapAlloc *alloc, size_t req_size)
 
             // we've run out. we need more...
             // next one guaranteed to be okay
-            maj->next = major_block_create(size);
+            maj->next = major_block_create(size, alloc->size);
 
             if (maj->next == nullptr)
             {
@@ -330,14 +297,14 @@ void heap_alloc_release(HeapAlloc *alloc, void *ptr)
         return;
     }
 
-    struct alloc_minor *min = (struct alloc_minor *)((uintptr_t)ptr - MINOR_BLOCK_HEADER_SIZE);
+    HeapMinor *min = (HeapMinor *)((uintptr_t)ptr - MINOR_BLOCK_HEADER_SIZE);
 
     if (!check_minor_magic(min, ptr))
     {
         return;
     }
 
-    struct alloc_major *maj = min->block;
+    HeapMajor *maj = min->block;
 
     maj->usage -= (min->size + MINOR_BLOCK_HEADER_SIZE);
     min->magic = ALLOC_HEAP_DEAD;
@@ -411,7 +378,7 @@ void *heap_alloc_resize(HeapAlloc *alloc, void *ptr, size_t size)
         return heap_alloc_acquire(alloc, size);
     }
 
-    struct alloc_minor *min = (struct alloc_minor *)((uintptr_t)ptr - MINOR_BLOCK_HEADER_SIZE);
+    HeapMinor *min = (HeapMinor *)((uintptr_t)ptr - MINOR_BLOCK_HEADER_SIZE);
 
     if (!check_minor_magic(min, ptr))
     {
@@ -431,7 +398,7 @@ void *heap_alloc_resize(HeapAlloc *alloc, void *ptr, size_t size)
     return new_ptr;
 }
 
-void heap_alloc_init(HeapAlloc *alloc)
+void heap_alloc_init(HeapAlloc *alloc, NodeSize size)
 {
     *alloc = (HeapAlloc){
         .base = {
@@ -439,6 +406,7 @@ void heap_alloc_init(HeapAlloc *alloc)
             .resize = (AllocResize *)heap_alloc_resize,
             .release = (AllocRelease *)heap_alloc_release,
         },
+        .size = size,
         .best = nullptr,
         .root = nullptr,
     };
@@ -446,10 +414,10 @@ void heap_alloc_init(HeapAlloc *alloc)
 
 void heap_alloc_deinit(HeapAlloc *alloc)
 {
-    struct alloc_major *current = alloc->root;
+    HeapMajor *current = alloc->root;
     while (current)
     {
-        struct alloc_major *next = current->next;
+        HeapMajor *next = current->next;
         host_mem_release(current, current->pages * MEM_PAGE_SIZE);
         current = next;
     }

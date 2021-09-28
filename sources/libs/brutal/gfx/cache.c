@@ -29,7 +29,7 @@ void gfx_cache_begin(GfxCache *self, GfxSurface surface)
         MIN(surface.height / GFX_CACHE_CELL_SIZE, 1));
 }
 
-void gfx_cache_end(GfxCache *self, MAYBE_UNUSED GfxRast *rast, MAYBE_UNUSED GfxSurface surface)
+void gfx_cache_end(GfxCache *self, MAYBE_UNUSED GfxSurface surface)
 {
     linear_buffer_foreach(command, &self->commands)
     {
@@ -66,7 +66,7 @@ void gfx_cache_invalidate(GfxCache *self)
     grid_fill(&self->back_hashgrid, 0x0);
 }
 
-void gfx_cache_rect(GfxCache *self, Rectf rect, GfxStroke stroke, GfxPaint fill, GfxTransform transform)
+void gfx_cache_rect(GfxCache *self, Rectf rect, GfxStroke stroke, GfxPaint fill, Trans2 transform)
 {
     GfxRectCommand command = (GfxRectCommand){
         .base = (GfxCommand){
@@ -82,14 +82,14 @@ void gfx_cache_rect(GfxCache *self, Rectf rect, GfxStroke stroke, GfxPaint fill,
     linear_buffer_push(&self->commands, command);
 }
 
-// void gfx_cache_line(GfxCache *self, Edgef line, GfxStroke stroke, GfxTransform transform)
+// void gfx_cache_line(GfxCache *self, Edgef line, GfxStroke stroke, Trans2 transform)
 // {
 // }
 //
-// void gfx_cache_text(GfxCache *self, Str str, GfxPaint fill, GfxTransform transform)
+// void gfx_cache_text(GfxCache *self, Str str, GfxPaint fill, Trans2 transform)
 // {
 // }
 //
-// void gfx_cache_poly(GfxCache *self, GfxEdgeList edges, GfxStroke stroke, GfxPaint fill, GfxTransform transform)
+// void gfx_cache_poly(GfxCache *self, Edges edges, GfxStroke stroke, GfxPaint fill, Trans2 transform)
 // {
 // }

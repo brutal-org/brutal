@@ -8,7 +8,7 @@ static Alloc *heap(void)
 
     if (!init)
     {
-        heap_alloc_init(&heap);
+        heap_alloc_init(&heap, NODE_DEFAULT);
         init = true;
     }
 

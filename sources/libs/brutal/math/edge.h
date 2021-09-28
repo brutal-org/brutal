@@ -1,20 +1,48 @@
 #pragma once
 
+#include <brutal/math/min_max.h>
+#include <brutal/math/rect.h>
 #include <brutal/math/vec2.h>
 
-#define Edge(T)  \
-    struct       \
-    {            \
-        T start; \
-        T end;   \
+#define Edge(T) \
+    struct      \
+    {           \
+        T sx;   \
+        T sy;   \
+        T ex;   \
+        T ey;   \
     }
 
-typedef Edge(Vec2i) Edgei;
-typedef Edge(Vec2f) Edgef;
-typedef Edge(Vec2d) Edged;
+typedef Edge(int) Edgei;
+typedef Edge(float) Edgef;
 
-#define edge_create(T, start, end) \
-    ((T){start, end})
+typedef Slice(Edgei) Edgesi;
+typedef Slice(Edgef) Edgesf;
 
-#define edge$(T, from) \
-    edge_create(T, (from).start, (from).end)
+typedef InlineSlice(Edgei) InlineEdgesi;
+typedef InlineSlice(Edgef) InlineEdgesf;
+
+#define edge_min_y(EDGE) math_min((EDGE).sy, (EDGE).ey)
+#define edge_max_y(EDGE) math_max((EDGE).sy, (EDGE).ey)
+
+#define edges_bound(EDGES) (                           \
+    {                                                  \
+        float minx = 0, miny = 0, maxx = 0, maxy = 0;  \
+                                                       \
+        for (size_t i = 0; i < (EDGES).len; i++)       \
+        {                                              \
+            typeof(*edges.buffer) e = edges.buffer[i]; \
+                                                       \
+            minx = MIN(minx, e.sx);                    \
+            miny = MIN(miny, e.sy);                    \
+            maxx = MAX(maxx, e.sx);                    \
+            maxy = MAX(maxy, e.sy);                    \
+                                                       \
+            minx = MIN(minx, e.ex);                    \
+            miny = MIN(miny, e.ey);                    \
+            maxx = MAX(maxx, e.ex);                    \
+            maxy = MAX(maxy, e.ey);                    \
+        }                                              \
+                                                       \
+        (Rectf){minx, miny, maxx - minx, maxy - miny}; \
+    })

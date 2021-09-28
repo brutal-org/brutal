@@ -3,7 +3,7 @@
 
 #define JSON_TEST_START()                              \
     HeapAlloc heap;                                    \
-    heap_alloc_init(&heap);                            \
+    heap_alloc_init(&heap, NODE_DEFAULT);              \
     Scan scanner = {};                                 \
     scan_init(&scanner, base);                         \
     JsonValue json = json_parse(&scanner, &heap.base); \

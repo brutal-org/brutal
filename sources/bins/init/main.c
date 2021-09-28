@@ -1,3 +1,4 @@
+#include <brutal/alloc.h>
 #include <brutal/codec/tga.h>
 #include <brutal/gfx.h>
 #include <brutal/log.h>
@@ -72,6 +73,20 @@ static void display_bootimage(Handover const *handover)
     // Display the image
 
     gfx_surface_clear(fb_surface, GFX_COLOR_BLACK);
+
+    gfx_rast_fill(
+        fb_surface,
+        (Edgesf){
+            4,
+            (Edgef[]){
+                {0, 0, 32, 0},
+                {32, 0, 32, 32},
+                {32, 32, 0, 0},
+            },
+        },
+        (Recti){0, 0, 1024, 1024},
+        (GfxPaint){.type = GFX_PAINT_FILL, .fill = GFX_COLOR_BLUE},
+        alloc_global());
 
     gfx_surface_copy(
         fb_surface,

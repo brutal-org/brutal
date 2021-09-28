@@ -2,11 +2,11 @@
 
 #include <brutal/ds/grid.h>
 #include <brutal/ds/linear.h>
-#include <brutal/gfx/edge.h>
 #include <brutal/gfx/paint.h>
 #include <brutal/gfx/rast.h>
 #include <brutal/gfx/stroke.h>
 #include <brutal/hash/fnv.h>
+#include <brutal/math/edge.h>
 
 #define GFX_CACHE_CELL_SIZE (128)
 
@@ -28,7 +28,7 @@ typedef struct
     Rectf clip;
     GfxStroke stroke;
     GfxPaint fill;
-    GfxTransform transform;
+    Trans2 transform;
 } GfxCommand;
 
 typedef struct
@@ -56,7 +56,7 @@ typedef struct
 {
     GfxCommand base;
 
-    GfxEdgeListInline edges;
+    InlineEdgesf edges;
 } GfxPolyCommand;
 
 typedef LinearBuffer(GfxCommand) GfxCommandBuffer;
@@ -77,14 +77,14 @@ void gfx_cache_deinit(GfxCache *self);
 
 void gfx_cache_begin(GfxCache *self, GfxSurface surface);
 
-void gfx_cache_end(GfxCache *self, GfxRast *rast, GfxSurface surface);
+void gfx_cache_end(GfxCache *self, GfxSurface surface);
 
 void gfx_cache_invalidate(GfxCache *self);
 
-void gfx_cache_rect(GfxCache *self, Rectf rect, GfxStroke stroke, GfxPaint fill, GfxTransform transform);
+void gfx_cache_rect(GfxCache *self, Rectf rect, GfxStroke stroke, GfxPaint fill, Trans2 trans);
 
-void gfx_cache_line(GfxCache *self, Edgef line, GfxStroke stroke, GfxTransform transform);
+void gfx_cache_line(GfxCache *self, Edgef line, GfxStroke stroke, Trans2 trans);
 
-void gfx_cache_text(GfxCache *self, Str str, GfxPaint fill, GfxTransform transform);
+void gfx_cache_text(GfxCache *self, Str str, GfxPaint fill, Trans2 trans);
 
-void gfx_cache_poly(GfxCache *self, GfxEdgeList edges, GfxStroke stroke, GfxPaint fill, GfxTransform transform);
+void gfx_cache_poly(GfxCache *self, Edgesf edges, GfxStroke stroke, GfxPaint fill, Trans2 trans);

@@ -12,7 +12,7 @@ int main(int argc, char const *argv[])
     }
 
     HeapAlloc heap;
-    heap_alloc_init(&heap);
+    heap_alloc_init(&heap, NODE_DEFAULT);
 
     IoFile source_file;
     UNWRAP_OR_PANIC(io_file_open(&source_file, str$(argv[1])), "File not found!");

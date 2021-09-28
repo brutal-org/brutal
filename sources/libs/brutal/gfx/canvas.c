@@ -6,14 +6,12 @@ void gfx_canvas_init(GfxCanvas *self, Alloc *alloc, int width, int height, GfxPi
     *self = (GfxCanvas){};
 
     gfx_buffer_init(&self->buffer, alloc, width, height, format);
-    gfx_rast_init(&self->rast, alloc);
     gfx_cache_init(&self->cache, alloc);
 }
 
 void gfx_canvas_deinit(GfxCanvas *self)
 {
     gfx_cache_deinit(&self->cache);
-    gfx_rast_deinit(&self->rast);
     gfx_buffer_deinit(&self->buffer);
 }
 
@@ -24,7 +22,7 @@ void gfx_canvas_begin(GfxCanvas *self)
 
 void gfx_canvas_end(GfxCanvas *self)
 {
-    gfx_cache_end(&self->cache, &self->rast, gfx_buffer_surface(&self->buffer));
+    gfx_cache_end(&self->cache, gfx_buffer_surface(&self->buffer));
 }
 
 GfxSurface gfx_canvas_surface(GfxCanvas *self)
@@ -60,7 +58,7 @@ void gfx_canvas_clear(GfxCanvas *self)
         rect$(Rectf, surface_bound),
         gfx_stroke_none(),
         self->paint,
-        gfx_transform_identity());
+        TRANS2_IDENTITY);
 }
 
 void gfx_canvas_rect(GfxCanvas *self, Rectf rect)
@@ -70,5 +68,5 @@ void gfx_canvas_rect(GfxCanvas *self, Rectf rect)
         rect,
         self->stroke,
         self->paint,
-        gfx_transform_identity());
+        TRANS2_IDENTITY);
 }

@@ -42,12 +42,15 @@ typedef struct
 #define gfx_paint_fill(COLOR) \
     ((GfxPaint){.type = GFX_PAINT_FILL, .fill = (COLOR)})
 
-static inline GfxColor gfx_paint_sample(GfxPaint *paint, MAYBE_UNUSED float x, MAYBE_UNUSED float y)
+static inline GfxColor gfx_paint_sample(GfxPaint paint, float x, float y)
 {
-    switch (paint->type)
+    UNUSED(x);
+    UNUSED(y);
+
+    switch (paint.type)
     {
     case GFX_PAINT_FILL:
-        return paint->fill;
+        return paint.fill;
 
     default:
         panic_todo$("Implement other paint types.");
