@@ -1,7 +1,7 @@
 #pragma once
 
-#include <math.h>
 #include <brutal/math/angle.h>
+#include <math.h>
 
 #define Vec2(T) \
     struct      \
@@ -78,4 +78,4 @@ typedef Vec2(double) Vec2d;
     vec2_length(vec2_sub(b, a))
 
 #define vec2_angle(a) \
-    deg2rad(atan2f((a).y, (a).x)) 
+    deg2rad(atan2f((a).y, (a).x))

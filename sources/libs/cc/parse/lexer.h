@@ -106,4 +106,3 @@ static inline Str clex_to_str(LexemeType type)
 }
 
 Lex clex(Scan *scan, Alloc *alloc);
-

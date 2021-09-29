@@ -99,18 +99,17 @@ static inline GfxColorf gfx_color_gamma_correct(GfxColorf col)
 static inline GfxColorf gfx_color_lerpf(GfxColorf a, GfxColorf b, float t)
 {
     return gfx_rgba(GfxColorf,
-                    a.r + (b.r - a.r) * t, 
-                    a.g + (b.g - a.g) * t, 
-                    a.b + (b.b - a.b) * t, 
+                    a.r + (b.r - a.r) * t,
+                    a.g + (b.g - a.g) * t,
+                    a.b + (b.b - a.b) * t,
                     a.a + (b.a - a.a) * t);
 }
 
 static inline GfxColor gfx_color_lerpi(GfxColor a, GfxColor b, float t)
 {
     return gfx_rgba(GfxColor,
-                    a.r + (b.r - a.r) * t, 
-                    a.g + (b.g - a.g) * t, 
-                    a.b + (b.b - a.b) * t, 
+                    a.r + (b.r - a.r) * t,
+                    a.g + (b.g - a.g) * t,
+                    a.b + (b.b - a.b) * t,
                     a.a + (b.a - a.a) * t);
 }
-
