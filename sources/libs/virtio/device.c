@@ -21,35 +21,23 @@ VirtioDeviceResult virtio_set_status(VirtioDevice *device, uint8_t status)
 {
     switch (status)
     {
+    case VIRTIO_STATUS_NEEDS_RESET:
+    case VIRTIO_STATUS_FAILURE:
     case VIRTIO_STATUS_ACKNOWLEDGE:
         device->device_status |= status;
-        return VIRTIO_DEVICE_OK;
+        break;
 
     case VIRTIO_STATUS_DRIVER_AVAILABLE:
-        virtio_device_set_if_acknowledged(device, status);
-        return VIRTIO_DEVICE_OK;
-
-    case VIRTIO_STATUS_FAILURE:
-        device->device_status |= status;
-        return VIRTIO_DEVICE_OK;
-
     case VIRTIO_STATUS_FEATURES_OK:
-        virtio_device_set_if_acknowledged(device, status);
-        return VIRTIO_DEVICE_OK;
-
     case VIRTIO_STATUS_DRIVER_OK:
         virtio_device_set_if_acknowledged(device, status);
-        return VIRTIO_DEVICE_OK;
-
-    case VIRTIO_STATUS_NEEDS_RESET:
-        device->device_status |= status;
-        return VIRTIO_DEVICE_OK;
+        break;
 
     default:
         return VIRTIO_DEVICE_UNKNOWN_STATUS;
     }
 
-    assert_unreachable();
+        return VIRTIO_DEVICE_OK;
 }
 
 VirtioDeviceResult virtio_device_reset(VirtioDevice *device)

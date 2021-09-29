@@ -64,22 +64,19 @@ typedef enum
 // A VirtIO block device request.
 struct PACKED blk_request
 {
-    le_uint32_t type; // The type of the request. Check defines above
+    le_uint32_t type; // The type of the request. see: VirtioBlkRequest  
     le_uint32_t reserved;
     le_uint64_t sector; // The sector to perform request on.
-    uint8_t data[512];  // The buffer the device must read or write.
+    uint8_t data[512];  // FIXME: the size may vary
     uint8_t status;     // Status of the request.
 };
 
 // A VirtIO block device discard that writes zeroes on the discarded sectors
 struct PACKED blk_discard_write_zeroes
 {
-    le_uint64_t sectors;     // The first sector the device must write on
+    le_uint64_t sector;     // The first sector the device must write on
     le_uint32_t num_sectors; // The number of sectors the device must write on - 1
-    struct PACKED
-    {
-        le_uint32_t flags; // 0: unmap, 31: reservec
-    } flags;
+    le_uint32_t flags;       // 0: unmap, 31: reservec
 };
 
 // The representation of a VirtIO block device.
@@ -88,7 +85,6 @@ typedef struct
     VirtioDevice virt_device;
     VirtioBlockConfig device_config;
     // VirtioPackedVirtQ requests_queue;
-
 } VirtioBlockDevice;
 
 VirtioBlockDevice virtio_block_init(VirtioDevice *device, uint64_t needed_features);

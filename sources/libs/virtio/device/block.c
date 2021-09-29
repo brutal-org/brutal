@@ -1,4 +1,4 @@
-#include <virtio/block_device.h>
+#include <virtio/device/block.h>
 #include <virtio/device.h>
 #include <virtio/virtqueue.h>
 
