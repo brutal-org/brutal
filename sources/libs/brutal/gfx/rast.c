@@ -8,8 +8,8 @@
 
 int float_cmp(void const *lhs, void const *rhs)
 {
-    float const *lhsf = lhs;
-    float const *rhsf = rhs;
+    float const *lhsf = (float const *)lhs;
+    float const *rhsf = (float const *)rhs;
 
     if (*lhsf > *rhsf)
     {

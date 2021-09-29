@@ -1,7 +1,5 @@
 export PATH := $(shell meta/toolchain/gnu/use.sh):$(PATH)
 
-CFLAGS_WARN+=-Wc++-compat
-
 # --- Host compiler ---------------------------------------------------------- #
 
 HOST_CC=cc
