@@ -37,7 +37,7 @@ VirtioDeviceResult virtio_set_status(VirtioDevice *device, uint8_t status)
         return VIRTIO_DEVICE_UNKNOWN_STATUS;
     }
 
-        return VIRTIO_DEVICE_OK;
+    return VIRTIO_DEVICE_OK;
 }
 
 VirtioDeviceResult virtio_device_reset(VirtioDevice *device)

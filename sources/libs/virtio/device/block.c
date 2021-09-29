@@ -1,5 +1,5 @@
-#include <virtio/device/block.h>
 #include <virtio/device.h>
+#include <virtio/device/block.h>
 #include <virtio/virtqueue.h>
 
 VirtioDeviceResult block_setup(VirtioDevice *device)
