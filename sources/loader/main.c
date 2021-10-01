@@ -141,14 +141,14 @@ void loader_menu(void)
         key = efi_tty_get_key();
     }
 
-    efi_st()->runtime_services->reset_system(EFI_RESET_SHUTDOWN, 0, 0, NULL);
+    efi_st()->runtime_services->reset_system(EFI_RESET_SHUTDOWN, 0, 0, nullptr);
 }
 
 EFIStatus efi_main(EFIHandle handle, EFISystemTable *st)
 {
     efi_init(handle, st);
 
-    st->boot_services->set_watchdog_timer(0, 0, 0, NULL);
+    st->boot_services->set_watchdog_timer(0, 0, 0, nullptr);
 
     efi_tty_reset();
     efi_tty_clear();

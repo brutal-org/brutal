@@ -195,7 +195,7 @@ void c2c_expr(Emit *emit, CExpr expr)
 
         emit_fmt(emit, "(");
         c2c_op_fix(emit, expr.prefix_.op);
-        if (expr.prefix_.expr != NULL)
+        if (expr.prefix_.expr != nullptr)
         {
             c2c_expr(emit, *expr.prefix_.expr);
         }
@@ -204,7 +204,7 @@ void c2c_expr(Emit *emit, CExpr expr)
 
     case CEXPR_POSTFIX:
         emit_fmt(emit, "(");
-        if (expr.prefix_.expr != NULL)
+        if (expr.prefix_.expr != nullptr)
         {
             c2c_expr(emit, *expr.prefix_.expr);
         }

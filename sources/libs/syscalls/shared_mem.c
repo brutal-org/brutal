@@ -3,7 +3,7 @@
 
 void *shared_mem_map(SharedMem *self)
 {
-    if (self->data != NULL)
+    if (self->data != nullptr)
     {
         return self->data->data;
     }
@@ -52,7 +52,7 @@ void shared_mem_free(SharedMem *self)
     };
 
     br_unmap(&unmap_args);
-    self->data = NULL;
+    self->data = nullptr;
 }
 
 void shared_mem_destroy(SharedMem *self)

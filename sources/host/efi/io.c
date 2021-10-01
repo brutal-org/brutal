@@ -25,7 +25,7 @@ static EFILoadedImage *efi_image_loader(void)
         &guid,
         (void **)&image_loader,
         efi_handle(),
-        NULL,
+        nullptr,
         EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL);
 
     log$("Opening image loader... ok");
@@ -51,7 +51,7 @@ static EFISimpleFileSystemProtocol *efi_rootfs(void)
         &guid,
         (void **)&rootfs,
         efi_handle(),
-        NULL,
+        nullptr,
         EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL);
 
     log$("Opening rootfs...ok");

@@ -1,5 +1,6 @@
 #include <host/time.h>
 #include <time.h>
+#include <brutal/base.h>
 
 Tick host_time_current_tick(void)
 {
@@ -10,5 +11,5 @@ Tick host_time_current_tick(void)
 
 TimeStamp host_time_current_timestamp(void)
 {
-    return (TimeStamp)time(NULL);
+    return (TimeStamp)time(nullptr);
 }

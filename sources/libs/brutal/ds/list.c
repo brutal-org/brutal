@@ -81,7 +81,7 @@ void list_remove_impl(ListImpl *head, ListImpl *impl)
     }
     else if (impl->prev)
     {
-        // [PREV] -> impl -> NULL
+        // [PREV] -> impl -> nullptr
         impl->prev->next = nullptr;
     }
 

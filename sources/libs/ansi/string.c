@@ -158,7 +158,7 @@ char *strchr(char const *s, int c)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 // size_t strcspn(char const *s1,  char const *s2) {}
@@ -175,7 +175,7 @@ char *strrchr(char const *s, int c)
 
     if (pos == length)
     {
-        return NULL;
+        return nullptr;
     }
 
     return (char *)s + pos;

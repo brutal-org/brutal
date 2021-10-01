@@ -98,7 +98,7 @@ EFIStatus get_system_config_table(EFIGUID table_guid, void **table)
 
 uintptr_t get_rsdp()
 {
-    void *acpi_table = NULL;
+    void *acpi_table = nullptr;
 
     EFIGUID guid = ACPI_TABLE_GUID;
     EFIGUID guid2 = ACPI2_TABLE_GUID;
@@ -119,13 +119,13 @@ HandoverFramebuffer get_framebuffer(EFIBootServices *bs)
     EFIGUID gop_guid = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
     EFIGraphicsOutputProtocol *gop;
 
-    bs->locate_protocol(&gop_guid, NULL, (void **)&gop);
+    bs->locate_protocol(&gop_guid, nullptr, (void **)&gop);
 
     EFIGraphicsOutputModeInfo *info;
 
     uint64_t size_of_info, num_modes, native_mode;
 
-    EFIStatus status = gop->query_mode(gop, gop->mode == NULL ? 0 : gop->mode->mode, &size_of_info, &info);
+    EFIStatus status = gop->query_mode(gop, gop->mode == nullptr ? 0 : gop->mode->mode, &size_of_info, &info);
 
     if (status == EFI_NOT_STARTED)
     {
