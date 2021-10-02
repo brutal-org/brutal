@@ -1,4 +1,5 @@
 #pragma once
+#include <brutal/text/str.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <syscalls/syscalls.h>
@@ -29,3 +30,6 @@ void shared_mem_free(SharedMem *self);
 void *shared_mem_map(SharedMem *self);
 
 void shared_mem_unmap(SharedMem *self);
+
+#define shared_mem_to_str(MEM) \
+    (Str) { (MEM)->data->len, (char *)(MEM)->data->data }

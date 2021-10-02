@@ -11,15 +11,33 @@ void *shared_mem_map(SharedMem *self)
     BrMapArgs map_args = {
         .space = BR_SPACE_SELF,
         .mem_obj = self->obj,
-        .flags = BR_MEM_WRITABLE,
+        .flags = BR_MEM_WRITABLE | BR_MEM_USER,
+
     };
 
-    br_map(&map_args);
+    assert_br_success(br_map(&map_args));
 
     self->map = map_args;
     self->data = (SharedMemData *)self->map.vaddr;
 
     return self->data->data;
+}
+
+void shared_mem_unmap(SharedMem *self)
+{
+    if (self->data == nullptr)
+    {
+        return;
+    }
+
+    BrUnmapArgs unmap_args =
+        {
+            .space = BR_SPACE_SELF,
+            .size = self->map.size,
+            .vaddr = self->map.vaddr,
+        };
+
+    assert_br_success(br_unmap(&unmap_args));
 }
 
 SharedMem shared_mem_alloc(size_t size)
@@ -29,7 +47,9 @@ SharedMem shared_mem_alloc(size_t size)
     BrCreateArgs mem_obj_args = {
         .type = BR_OBJECT_MEMORY,
         .mem_obj = {
-            .size = size + sizeof(SharedMemData),
+            .addr = 0,
+            .size = ALIGN_UP(size + sizeof(SharedMemData), 4096),
+            .flags = BR_MEM_OBJ_PMM,
         },
     };
 
