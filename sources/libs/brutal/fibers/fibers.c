@@ -146,6 +146,24 @@ static Fiber *fiber_next(FiberState expected)
 
 extern void fibers_switch(FibersContext *from, FibersContext *to);
 
+Fiber *fiber_wait_unblocked(void)
+{
+
+    while (true)
+    {
+        Fiber *next = fiber_next(FIBER_RUNNING);
+
+        if (next == nullptr)
+        {
+            next = fiber_next(FIBER_IDLE);
+        }
+
+        if(next != nullptr)
+        {
+            return next;
+        }
+    }
+}
 void fiber_yield(void)
 {
     Fiber *prev = current;
@@ -156,13 +174,15 @@ void fiber_yield(void)
         next = fiber_next(FIBER_IDLE);
     }
 
-    if (next == prev)
+    if (next == nullptr)
+    {
+        next = (fiber_wait_unblocked());
+    }
+
+    if (next == prev || next == nullptr)
     {
         return;
     }
-
-    assert_not_null(next);
-
     current = next;
 
     fibers_switch(&prev->ctx, &next->ctx);
