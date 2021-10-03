@@ -1,6 +1,6 @@
+#include <brutal/base.h>
 #include <host/time.h>
 #include <time.h>
-#include <brutal/base.h>
 
 Tick host_time_current_tick(void)
 {
