@@ -6,30 +6,28 @@
 
 typedef struct
 {
-    size_t len;
-    uint8_t data[];
-} SharedMemData;
-
-typedef struct
-{
     BrMemObj obj;
     BrMapArgs map;
-    SharedMemData *data;
+    size_t size;
+    void *data;
 } SharedMem;
+
+typedef Result(BrResult, SharedMem) SharedMemResult;
 
 SharedMem memobj_to_shared(BrMemObj obj);
 
 BrMemObj shared_to_memobj(SharedMem from);
 
 // shared_mem_alloc also map <!>
-SharedMem shared_mem_alloc(size_t size);
+SharedMemResult shared_mem_alloc(size_t size);
 
-void shared_mem_free(SharedMem *self);
+BrResult shared_mem_free(SharedMem *self);
 
 // use only when you receive it, shared_mem_alloc already call it
-void *shared_mem_map(SharedMem *self);
+BrResult shared_mem_map(SharedMem *self);
 
-void shared_mem_unmap(SharedMem *self);
+BrResult shared_mem_unmap(SharedMem *self);
 
-#define shared_mem_to_str(MEM) \
-    (Str) { (MEM)->data->len, (char *)(MEM)->data->data }
+Str shared_mem_to_str(SharedMem *self);
+
+SharedMemResult shared_mem_from_str(Str str);

@@ -1,11 +1,11 @@
+#include <brutal/base.h>
 #include <brutal/log.h>
 #include <syscalls/shared_mem.h>
-
-void *shared_mem_map(SharedMem *self)
+BrResult shared_mem_map(SharedMem *self)
 {
     if (self->data != nullptr)
     {
-        return self->data->data;
+        return BR_SUCCESS;
     }
 
     BrMapArgs map_args = {
@@ -15,19 +15,24 @@ void *shared_mem_map(SharedMem *self)
 
     };
 
-    assert_br_success(br_map(&map_args));
+    BrResult r = br_map(&map_args);
+
+    if (r != BR_SUCCESS)
+    {
+        return r;
+    }
 
     self->map = map_args;
-    self->data = (SharedMemData *)self->map.vaddr;
-
-    return self->data->data;
+    self->data = (void *)self->map.vaddr;
+    self->size = map_args.size;
+    return BR_SUCCESS;
 }
 
-void shared_mem_unmap(SharedMem *self)
+BrResult shared_mem_unmap(SharedMem *self)
 {
     if (self->data == nullptr)
     {
-        return;
+        return BR_BAD_ARGUMENTS;
     }
 
     BrUnmapArgs unmap_args =
@@ -37,10 +42,10 @@ void shared_mem_unmap(SharedMem *self)
             .vaddr = self->map.vaddr,
         };
 
-    assert_br_success(br_unmap(&unmap_args));
+    return br_unmap(&unmap_args);
 }
 
-SharedMem shared_mem_alloc(size_t size)
+SharedMemResult shared_mem_alloc(size_t size)
 {
     SharedMem result = {};
 
@@ -48,41 +53,29 @@ SharedMem shared_mem_alloc(size_t size)
         .type = BR_OBJECT_MEMORY,
         .mem_obj = {
             .addr = 0,
-            .size = ALIGN_UP(size + sizeof(SharedMemData), 4096),
+            .size = ALIGN_UP(size, 4096),
             .flags = BR_MEM_OBJ_PMM,
         },
     };
 
-    assert_br_success(br_create(&mem_obj_args));
+    TRY_V(SharedMemResult, br_create(&mem_obj_args), BR_SUCCESS);
 
     result.obj = mem_obj_args.handle;
 
-    shared_mem_map(&result);
+    TRY_V(SharedMemResult, shared_mem_map(&result), BR_SUCCESS);
 
-    result.data->len = size;
-    return result;
+    return OK(SharedMemResult, result);
 }
 
-void shared_mem_free(SharedMem *self)
-{
-    BrUnmapArgs unmap_args = {
-        .space = BR_SPACE_SELF,
-        .size = self->map.size,
-        .vaddr = self->map.vaddr,
-    };
-
-    br_unmap(&unmap_args);
-    self->data = nullptr;
-}
-
-void shared_mem_destroy(SharedMem *self)
+BrResult shared_mem_free(SharedMem *self)
 {
     BrCloseArgs close_args = {
         .handle = self->obj,
     };
 
-    br_close(&close_args);
+    return br_close(&close_args);
 }
+
 SharedMem memobj_to_shared(BrMemObj obj)
 {
     SharedMem mem = {
@@ -95,4 +88,23 @@ SharedMem memobj_to_shared(BrMemObj obj)
 BrMemObj shared_to_memobj(SharedMem from)
 {
     return from.obj;
+}
+
+Str shared_mem_to_str(SharedMem *self)
+{
+    InlineStr *r = self->data;
+
+    return str$(r);
+}
+
+SharedMemResult shared_mem_from_str(Str str)
+{
+    SharedMem mem = TRY(SharedMemResult, shared_mem_alloc(str.len + sizeof(InlineStr)));
+
+    InlineStr *target = mem.data;
+
+    mem_cpy(target->buffer, str.buffer, str.len);
+    target->len = str.len;
+
+    return OK(SharedMemResult, mem);
 }
