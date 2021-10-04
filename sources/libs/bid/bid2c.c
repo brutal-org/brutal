@@ -117,7 +117,7 @@ static void emit_method_flags(BidType request_type, Emit *emit)
         int index = 0;
         vec_foreach(member, &request_type.struct_.members)
         {
-            if (is_handle(&member.type))
+            if (is_handle(&member.type) | member.kernel_handle)
             {
                 emit_fmt(emit, "| BR_MSG_HND({})", index);
             }
