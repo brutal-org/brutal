@@ -148,22 +148,17 @@ extern void fibers_switch(FibersContext *from, FibersContext *to);
 
 Fiber *fiber_wait_unblocked(void)
 {
-
+    Fiber *next = current->next;
     while (true)
     {
-        Fiber *next = fiber_next(FIBER_RUNNING);
-
-        if (next == nullptr)
-        {
-            next = fiber_next(FIBER_IDLE);
-        }
-
-        if(next != nullptr)
+        if (fiber_try_unblock(next) && (next->state == FIBER_RUNNING || next->state == FIBER_IDLE))
         {
             return next;
         }
+        next = next->next;
     }
 }
+
 void fiber_yield(void)
 {
     Fiber *prev = current;
@@ -176,10 +171,10 @@ void fiber_yield(void)
 
     if (next == nullptr)
     {
-        next = (fiber_wait_unblocked());
+        next = fiber_wait_unblocked();
     }
 
-    if (next == prev || next == nullptr)
+    if (next == prev)
     {
         return;
     }

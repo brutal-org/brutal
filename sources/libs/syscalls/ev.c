@@ -1,6 +1,6 @@
 #include <brutal/fibers.h>
+#include <brutal/log.h>
 #include <syscalls/syscalls.h>
-
 typedef struct ipc_job
 {
     uint32_t seq;
@@ -13,11 +13,17 @@ typedef struct ipc_job
 
 static Fiber *dispatcher = nullptr;
 static IpcJob *jobs = nullptr;
+static BrIpcArgs ev_arg;
 
 WEAK void br_event(MAYBE_UNUSED BrMsg const *msg)
 {
 }
 
+void br_ev_handle()
+{
+    BrMsg m = ev_arg.msg;
+    br_event(&m);
+}
 static void req_dispatch(void)
 {
     while (true)
@@ -47,7 +53,8 @@ static void req_dispatch(void)
 
             if (!message_handeled)
             {
-                br_event(&ipc.msg);
+                ev_arg = ipc;
+                fiber_start((FiberFn *)br_ev_handle);
             }
         }
 
@@ -97,6 +104,7 @@ static void dequeue_job(IpcJob *job)
 
 static bool req_wait(IpcJob *job)
 {
+    ensure_dispatcher();
     if (!job->ok)
     {
         return false;
@@ -160,6 +168,7 @@ static bool wait_exit(MAYBE_UNUSED void *context)
 
 int br_ev_run(void)
 {
+    dispatcher = nullptr;
     ensure_dispatcher();
 
     running = true;
