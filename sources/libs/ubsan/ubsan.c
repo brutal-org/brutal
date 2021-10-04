@@ -180,3 +180,8 @@ void __ubsan_handle_float$_overflow(struct ubsan_float$_overflow_data *data)
 {
     ubsan_print_location("float cast overflow", data->location);
 }
+
+void __ubsan_handle_float_cast_overflow(struct ubsan_float$_overflow_data *data)
+{
+    ubsan_print_location("float cast overflow", data->location);
+}
