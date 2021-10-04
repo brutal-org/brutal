@@ -7,11 +7,10 @@ BrResult shared_mem_map(SharedMem *self)
     {
         return BR_SUCCESS;
     }
-
     BrMapArgs map_args = {
         .space = BR_SPACE_SELF,
         .mem_obj = self->obj,
-        .flags = BR_MEM_WRITABLE | BR_MEM_USER,
+        .flags = BR_MEM_WRITABLE,
 
     };
 
@@ -42,6 +41,7 @@ BrResult shared_mem_unmap(SharedMem *self)
             .vaddr = self->map.vaddr,
         };
 
+    self->data = nullptr;
     return br_unmap(&unmap_args);
 }
 
@@ -52,9 +52,8 @@ SharedMemResult shared_mem_alloc(size_t size)
     BrCreateArgs mem_obj_args = {
         .type = BR_OBJECT_MEMORY,
         .mem_obj = {
-            .addr = 0,
             .size = ALIGN_UP(size, 4096),
-            .flags = BR_MEM_OBJ_PMM,
+            .flags = 0,
         },
     };
 
@@ -69,6 +68,7 @@ SharedMemResult shared_mem_alloc(size_t size)
 
 BrResult shared_mem_free(SharedMem *self)
 {
+    shared_mem_unmap(self);
     BrCloseArgs close_args = {
         .handle = self->obj,
     };
@@ -78,10 +78,9 @@ BrResult shared_mem_free(SharedMem *self)
 
 SharedMem memobj_to_shared(BrMemObj obj)
 {
-    SharedMem mem = {
-        .obj = obj,
-    };
+    SharedMem mem = {0};
 
+    mem.obj = obj;
     return mem;
 }
 
@@ -93,13 +92,12 @@ BrMemObj shared_to_memobj(SharedMem from)
 Str shared_mem_to_str(SharedMem *self)
 {
     InlineStr *r = self->data;
-
     return str$(r);
 }
 
 SharedMemResult shared_mem_from_str(Str str)
 {
-    SharedMem mem = TRY(SharedMemResult, shared_mem_alloc(str.len + sizeof(InlineStr)));
+    SharedMem mem = TRY(SharedMemResult, shared_mem_alloc(str.len + sizeof(InlineStr) + 1));
 
     InlineStr *target = mem.data;
 

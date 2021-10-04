@@ -26,8 +26,6 @@ BrResult shared_mem_free(SharedMem *self);
 // use only when you receive it, shared_mem_alloc already call it
 BrResult shared_mem_map(SharedMem *self);
 
-BrResult shared_mem_unmap(SharedMem *self);
-
 Str shared_mem_to_str(SharedMem *self);
 
 SharedMemResult shared_mem_from_str(Str str);
