@@ -115,7 +115,7 @@ VfsError write(VfsFileHandle handle, TaskId opener, BrMemObj obj, size_t off, si
         return VFS_INVALID_HANDLE;
     }
 
-    VfsFile* f = get_file(handle, t);
+    VfsFile *f = get_file(handle, t);
 
     if (f == nullptr)
     {

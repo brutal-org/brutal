@@ -1,0 +1,4 @@
+BOOTFS_NAME = bootfs
+
+CROSS_BINS += BOOTFS
+
