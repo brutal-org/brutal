@@ -1,0 +1,33 @@
+
+interface vfs
+{
+    id = 0x14f80c8f;
+
+    errors 
+    {
+        INVALID_PATH,
+        INVALID_DEV,
+        INVALID_HANDLE,
+    };
+
+    type FileHandle: long;
+    type FileSystemHandle: long;
+    type FsName: Str;
+    type Off: long;
+
+    method open { path: BrMemObj, flags: int } -> { handle: FileHandle};
+    method close { handle: FileHandle } -> { handle: FileHandle};
+
+    method read { handle: FileHandle, off: Off, data: BrMemObj } -> { readed: size_t};
+    method write { handle: FileHandle, off: Off, data: BrMemObj } -> { written: size_t};
+
+    method stat { handle: FileHandle } -> {
+        is_directory: bool,
+        size: size_t, 
+        devid: FileSystemHandle,
+    };
+
+    method mount { path: BrMemObj, fshandle: BrId } -> { devid: FileHandle };
+    
+    method umount { path: BrMemObj } -> { devid: FileHandle };
+}

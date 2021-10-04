@@ -1,0 +1,26 @@
+
+interface fsdev
+{
+    id = 0x96f6bbeb;
+
+    errors 
+    {
+        INVALID_PATH,
+    };
+
+    type Inode : long ;
+    
+    method open { path: BrMemObj } -> { handle: Inode };
+    method close { handle: Inode } -> { handle: Inode };
+
+    method read { handle: Inode, off: size_t, data: BrMemObj } -> { readed: size_t};
+    method write { handle: Inode, off: size_t, data: BrMemObj } -> { written: size_t};
+
+    method stat { handle: Inode } -> {
+        is_directory: bool,
+        size: size_t, 
+    };
+
+    method mount { path: BrMemObj } -> { accepted: bool };
+    
+}
