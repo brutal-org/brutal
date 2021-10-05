@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bal //types.h>
+#include <bal/types.h>
 #include <brutal/ds.h>
 #include <brutal/sync.h>
 

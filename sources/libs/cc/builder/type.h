@@ -30,6 +30,8 @@ CType ctype_enum(Str name, Alloc *alloc);
 
 void ctype_constant(CType *self, Str name, CVal val, Alloc *alloc);
 
+void ctype_constant_no_value(CType *self, Str name, Alloc *alloc);
+
 CType ctype_func(CType ret, Str name, Alloc *alloc);
 
 CType ctype_name(Str name, Alloc *alloc);
