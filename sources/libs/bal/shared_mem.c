@@ -1,6 +1,6 @@
+#include <bal/shared_mem.h>
 #include <brutal/base.h>
 #include <brutal/log.h>
-#include <syscalls/shared_mem.h>
 BrResult shared_mem_map(SharedMem *self)
 {
     if (self->data != nullptr)

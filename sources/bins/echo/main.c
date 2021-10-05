@@ -1,6 +1,6 @@
+#include <bal/ev.h>
+#include <bal/syscalls.h>
 #include <brutal/log.h>
-#include <syscalls/ev.h>
-#include <syscalls/syscalls.h>
 
 void br_event(BrMsg const *msg)
 {

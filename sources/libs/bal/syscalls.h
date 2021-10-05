@@ -1,6 +1,6 @@
 #pragma once
 
-#include <syscalls/types.h>
+#include <bal/types.h>
 
 // clang-format off
 
@@ -102,7 +102,7 @@ SYSCALL(exit) (BrExitArgs* args);
 
 typedef struct
 {
-    BrId to;
+    BrTask to;
     BrMsg msg;
     BrDeadline deadline;
     BrIpcFlags flags;

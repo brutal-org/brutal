@@ -1,8 +1,8 @@
 #pragma once
+#include <bal/syscalls.h>
 #include <brutal/text/str.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <syscalls/syscalls.h>
 
 typedef struct
 {

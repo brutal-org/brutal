@@ -1,5 +1,5 @@
+#include <bal/shared_mem.h>
 #include <brutal/log.h>
-#include <syscalls/shared_mem.h>
 #include "vfs/fs.h"
 #include "vfs/vfs.h"
 VfsServer server;

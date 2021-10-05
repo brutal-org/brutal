@@ -1,6 +1,6 @@
+#include <bal/helpers.h>
+#include <bal/syscalls.h>
 #include <brutal/log.h>
-#include <syscalls/helpers.h>
-#include <syscalls/syscalls.h>
 
 BrResult brh_close(BrHandle handle)
 {

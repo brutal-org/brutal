@@ -1,7 +1,7 @@
 #pragma once
 
+#include <bal/types.h>
 #include <handover/handover.h>
-#include <syscalls/types.h>
 
 #define PMM_USED (true)
 #define PMM_UNUSED (false)

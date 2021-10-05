@@ -1,7 +1,7 @@
+#include <bal/helpers.h>
+#include <bal/mmio.h>
+#include <bal/syscalls.h>
 #include <brutal/log.h>
-#include <syscalls/helpers.h>
-#include <syscalls/mmio.h>
-#include <syscalls/syscalls.h>
 
 void br_mmio_init(BrMmio *self, uintptr_t paddr, uintptr_t size)
 {

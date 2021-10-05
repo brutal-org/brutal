@@ -1,4 +1,4 @@
-#include <syscalls/syscalls.h>
+#include <bal/syscalls.h>
 
 uint8_t br_in8(uint16_t port)
 {

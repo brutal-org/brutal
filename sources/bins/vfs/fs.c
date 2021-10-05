@@ -1,9 +1,9 @@
 #include "vfs/fs.h"
 #include <ansi/string.h>
+#include <bal/shared_mem.h>
 #include <brutal/alloc.h>
 #include <brutal/ds.h>
 #include <brutal/log.h>
-#include <syscalls/shared_mem.h>
 
 VfsFileSystemHandle fs_next_handle = 1;
 Vec(VfsFileSystem) devices;

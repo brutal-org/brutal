@@ -1,7 +1,7 @@
 #pragma once
 
+#include <bal/types.h>
 #include <brutal/mem.h>
-#include <syscalls/types.h>
 
 typedef struct
 {

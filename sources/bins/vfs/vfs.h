@@ -1,9 +1,9 @@
 #pragma once
+#include <bal/shared_mem.h>
 #include <brutal/ds.h>
 #include <brutal/task.h>
 #include <proto/fs_dev.h>
 #include <proto/vfs.h>
-#include <syscalls/shared_mem.h>
 typedef enum
 {
     FS_FREE = 0,

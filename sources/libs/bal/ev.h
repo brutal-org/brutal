@@ -1,6 +1,6 @@
 #pragma once
 
-#include <syscalls/types.h>
+#include <bal/types.h>
 
 BrResult br_ev_req(BrId to, BrMsg *req, BrMsg *resp);
 

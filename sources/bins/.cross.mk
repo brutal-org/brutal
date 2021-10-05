@@ -20,7 +20,7 @@ LIBS_SRC = \
 	$(wildcard sources/libs/json/*.c)     \
 	$(wildcard sources/libs/math/*.c)     \
 	$(wildcard sources/libs/posix/*.c)    \
-	$(wildcard sources/libs/syscalls/*.c) \
+	$(wildcard sources/libs/bal/*.c) \
 	$(wildcard sources/libs/ubsan/*.c)
 
 LIBS_OBJ = \

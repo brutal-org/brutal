@@ -1,8 +1,8 @@
+#include <bal/syscalls.h>
 #include <brutal/alloc/global.h>
 #include <brutal/io/buffer.h>
 #include <brutal/sync.h>
 #include <host/log.h>
-#include <syscalls/syscalls.h>
 
 static bool initialized = false;
 static Lock lock = {};

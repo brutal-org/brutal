@@ -1,3 +1,7 @@
+#include <bal/exec.h>
+#include <bal/helpers.h>
+#include <bal/shared_mem.h>
+#include <bal/syscalls.h>
 #include <brutal/alloc.h>
 #include <brutal/codec/tga.h>
 #include <brutal/gfx.h>
@@ -6,10 +10,6 @@
 #include <handover/handover.h>
 #include <proto/fs_dev.h>
 #include <proto/vfs.h>
-#include <syscalls/exec.h>
-#include <syscalls/helpers.h>
-#include <syscalls/shared_mem.h>
-#include <syscalls/syscalls.h>
 
 static void display_bootimage(Handover const *handover)
 {

@@ -1,7 +1,7 @@
 #pragma once
+#include <bal/shared_mem.h>
 #include <proto/fs_dev.h>
 #include <proto/vfs.h>
-#include <syscalls/shared_mem.h>
 typedef struct
 {
     VfsFileSystemHandle self_handle;

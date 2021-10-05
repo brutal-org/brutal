@@ -1,6 +1,6 @@
 #pragma once
 
-#include <syscalls/syscalls.h>
+#include <bal/syscalls.h>
 #include "kernel/heap.h"
 #include "kernel/memory.h"
 

@@ -1,7 +1,7 @@
+#include <bal/io.h>
+#include <bal/syscalls.h>
 #include <brutal/input.h>
 #include <brutal/log.h>
-#include <syscalls/io.h>
-#include <syscalls/syscalls.h>
 #include "ps2.h"
 
 static bool _kb_escaped = false;

@@ -1,9 +1,9 @@
 #pragma once
 
+#include <bal/types.h>
 #include <brutal/text.h>
 #include <brutal/time.h>
 #include <brutal/types.h>
-#include <syscalls/types.h>
 #include "kernel/channel.h"
 #include "kernel/context.h"
 #include "kernel/space.h"

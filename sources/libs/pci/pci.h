@@ -1,11 +1,11 @@
 #pragma once
 
 #include <acpi/acpi.h>
+#include <bal/mmio.h>
 #include <brutal/ds.h>
 #include <pci/addr.h>
 #include <pci/config.h>
 #include <pci/group.h>
-#include <syscalls/mmio.h>
 
 typedef struct
 {

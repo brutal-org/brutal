@@ -1,5 +1,5 @@
+#include <bal/syscalls.h>
 #include <host/asm.h>
-#include <syscalls/syscalls.h>
 
 BrResult br_syscall(BrSyscall syscall, BrArg arg1, BrArg arg2, BrArg arg3, BrArg arg4, BrArg arg5)
 {

@@ -1,9 +1,9 @@
 
+#include <bal/types.h>
 #include <brutal/alloc.h>
 #include <brutal/base.h>
 #include <brutal/ds.h>
 #include <brutal/log.h>
-#include <syscalls/types.h>
 #include "kernel/interrupts.h"
 #include "kernel/task.h"
 

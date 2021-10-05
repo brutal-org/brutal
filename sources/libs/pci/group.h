@@ -1,8 +1,8 @@
 #pragma once
 
+#include <bal/mmio.h>
 #include <pci/addr.h>
 #include <pci/config.h>
-#include <syscalls/mmio.h>
 
 typedef struct
 {

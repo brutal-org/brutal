@@ -1,10 +1,10 @@
+#include <bal/helpers.h>
+#include <bal/shared_mem.h>
 #include <brutal/base.h>
 #include <brutal/log.h>
 #include <brutal/task.h>
 #include <proto/fs_dev.h>
 #include <proto/vfs.h>
-#include <syscalls/helpers.h>
-#include <syscalls/shared_mem.h>
 
 FsdevServer server = {0};
 

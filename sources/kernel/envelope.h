@@ -1,6 +1,6 @@
 #pragma once
 
-#include <syscalls/types.h>
+#include <bal/types.h>
 #include "kernel/domain.h"
 
 typedef struct

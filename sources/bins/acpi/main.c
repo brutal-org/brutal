@@ -1,8 +1,8 @@
 #include <acpi/acpi.h>
 #include <acpi/rsdt.h>
+#include <bal/syscalls.h>
 #include <brutal/log.h>
 #include <handover/handover.h>
-#include <syscalls/syscalls.h>
 
 Iter dump_sdth(AcpiSdth *sdth, void *)
 {

@@ -1,6 +1,6 @@
+#include <bal/helpers.h>
+#include <bal/syscalls.h>
 #include <host/mem.h>
-#include <syscalls/helpers.h>
-#include <syscalls/syscalls.h>
 
 void host_mem_lock(void)
 {

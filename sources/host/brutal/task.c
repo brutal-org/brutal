@@ -1,6 +1,6 @@
+#include <bal/helpers.h>
+#include <bal/syscalls.h>
 #include <host/task.h>
-#include <syscalls/helpers.h>
-#include <syscalls/syscalls.h>
 
 TaskId host_task_self(void)
 {

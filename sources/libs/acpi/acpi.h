@@ -2,7 +2,7 @@
 
 #include <brutal/base.h>
 #ifndef __kernel__
-#    include <syscalls/mmio.h>
+#    include <bal/mmio.h>
 #endif
 
 #define ACPI_WINDOW_SIZE

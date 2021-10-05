@@ -1,9 +1,9 @@
+#include <bal/helpers.h>
+#include <bal/syscalls.h>
 #include <brutal/alloc.h>
 #include <brutal/io.h>
 #include <brutal/log.h>
 #include <brutal/time.h>
-#include <syscalls/helpers.h>
-#include <syscalls/syscalls.h>
 
 int main(int argc, char const *argv[])
 {

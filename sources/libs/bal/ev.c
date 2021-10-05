@@ -1,6 +1,6 @@
+#include <bal/syscalls.h>
 #include <brutal/fibers.h>
 #include <brutal/log.h>
-#include <syscalls/syscalls.h>
 typedef struct ipc_job
 {
     uint32_t seq;
