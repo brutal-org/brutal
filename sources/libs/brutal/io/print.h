@@ -4,6 +4,7 @@
 #include <brutal/base/ints.h>
 #include <brutal/base/map.h>
 #include <brutal/base/std.h>
+#include <brutal/base/vaopt.h>
 #include <brutal/io/buffer.h>
 #include <brutal/io/fmt.h>
 #include <brutal/io/write.h>
@@ -101,7 +102,8 @@ PrintValue print_val_trans(PrintTrans);
     (PrintArgs) { COUNT(__VA_ARGS__), (PrintValue[]){MAP(PRINT_MATCH, __VA_ARGS__)}, }
 
 #define PRINT_ARGS(...) \
-    PRINT_ARGS_##__VA_OPT__(N)(__VA_ARGS__)
+    IFNE(__VA_ARGS__)   \
+    (PRINT_ARGS_N, PRINT_ARGS_)(__VA_ARGS__)
 
 IoWriteResult print_impl(IoWriter *writer, Str format, PrintArgs args);
 

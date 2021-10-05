@@ -68,7 +68,7 @@ typedef struct
 
 struct _EFI_FILE_IO;
 
-#define DEF_FILE_EFI_FUNC(name, ...) typedef EFIStatus (*EFI_FILE_##name)(struct _EFI_FILE_IO * self __VA_OPT__(, ) __VA_ARGS__)
+#define DEF_FILE_EFI_FUNC(name, ...) typedef EFIStatus (*EFI_FILE_##name)(struct _EFI_FILE_IO * self IFN(__VA_ARGS__)(, ) __VA_ARGS__)
 
 DEF_FILE_EFI_FUNC(OPEN, struct _EFI_FILE_IO **, char16 *, uint64_t, uint64_t);
 DEF_FILE_EFI_FUNC(CLOSE);

@@ -36,7 +36,7 @@
 
 struct _EFI_SIMPLE_TEXT_INPUT;
 
-#define DEF_TEXTI_EFI_FUNC(name, ...) typedef EFIStatus (*EFI_TEXTI_##name)(struct _EFI_SIMPLE_TEXT_INPUT * self __VA_OPT__(, ) __VA_ARGS__)
+#define DEF_TEXTI_EFI_FUNC(name, ...) typedef EFIStatus (*EFI_TEXTI_##name)(struct _EFI_SIMPLE_TEXT_INPUT * self IFN(__VA_ARGS__)(, ) __VA_ARGS__)
 
 typedef struct
 {
