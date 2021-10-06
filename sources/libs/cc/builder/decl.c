@@ -32,3 +32,9 @@ CDecl cdecl_func(Str name, CType type, CStmt body, Alloc *alloc)
         },
     };
 }
+
+CDecl cdecl_attrib(CDecl decl, CDeclAttr attr)
+{
+    decl.attr |= attr;
+    return decl;
+}
