@@ -1,6 +1,14 @@
 #include <bid/bid.h>
+#include <cc/builder.h>
+#include <cc/builder/helper.h>
+static CType emit_type(BidInterface const *interface, BidType const *type, Alloc *alloc);
 
-static void emit_type(BidInterface const *interface, BidType const *type, Emit *emit);
+void bid_unit_add_typedef(CUnit *unit, BidInterface const *interface, Str s, BidType type, Alloc *alloc)
+{
+    CType t = emit_type(interface, &type, alloc);
+    CDecl type_def = cdecl_type(s, t, alloc);
+    cunit_member(unit, cunit_decl(type_def));
+}
 
 static bool type_in_interface(BidInterface const *interface, Str name)
 {
@@ -15,63 +23,66 @@ static bool type_in_interface(BidInterface const *interface, Str name)
     return false;
 }
 
-static void emit_primitive(BidInterface const *interface, BidPrimitive const *type, Emit *emit)
+static CType emit_primitive(BidInterface const *interface, BidPrimitive const *type, Alloc *alloc)
 {
+
+    Str res;
     if (type_in_interface(interface, type->name))
     {
-        emit_fmt(emit, "{case:pascal}", interface->name);
+        res = str_fmt(alloc, "{case:pascal}{}", interface->name, type->name);
+    }
+    else
+    {
+        res = str_fmt(alloc, "{}", type->name);
     }
 
-    emit_fmt(emit, "{}", type->name);
+    return ctype_name(res, alloc);
 }
 
-static void emit_enum(BidInterface const *interface, BidEnum const *type, Emit *emit)
+static CType emit_enum(BidInterface const *interface, BidEnum const *type, Alloc *alloc)
 {
-    emit_fmt(emit, "enum {{\n");
-    emit_ident(emit);
+    CType enum_type = ctype_enum(str$(""), alloc);
 
     vec_foreach(member, &type->members)
     {
-        emit_fmt(emit, "{case:upper}_{case:upper},\n", interface->name, member);
-    }
 
-    emit_deident(emit);
-    emit_fmt(emit, "}}");
+        Str s = str_fmt(alloc, "{case:upper}_{case:upper}", interface->name, member);
+        ctype_constant_no_value(&enum_type, s, alloc);
+
+        alloc_free(alloc, s.buffer);
+    }
+    return enum_type;
 }
 
-static void emit_struct(BidInterface const *interface, BidStruct const *type, Emit *emit)
+static CType emit_struct(BidInterface const *interface, BidStruct const *type, Alloc *alloc)
 {
-    emit_fmt(emit, "struct {{\n");
-    emit_ident(emit);
-
+    CType cstruct = ctype_struct(str$(""), alloc);
     vec_foreach(member, &type->members)
     {
-        emit_type(interface, &member.type, emit);
-        emit_fmt(emit, " {};\n", member.name);
+        ctype_member(&cstruct,
+                     member.name,
+                     emit_type(interface, &member.type, alloc),
+                     alloc);
     }
 
-    emit_deident(emit);
-    emit_fmt(emit, "}}");
+    return cstruct;
 }
 
-static void emit_type(BidInterface const *interface, BidType const *type, Emit *emit)
+static CType emit_type(BidInterface const *interface, BidType const *type, Alloc *alloc)
 {
     switch (type->type)
     {
     case BID_TYPE_PRIMITIVE:
-        emit_primitive(interface, &type->primitive_, emit);
-        break;
+        return emit_primitive(interface, &type->primitive_, alloc);
 
     case BID_TYPE_ENUM:
-        emit_enum(interface, &type->enum_, emit);
-        break;
+        return emit_enum(interface, &type->enum_, alloc);
 
     case BID_TYPE_STRUCT:
-        emit_struct(interface, &type->struct_, emit);
-        break;
+        return emit_struct(interface, &type->struct_, alloc);
 
     default:
-        break;
+        panic$("invalid type");
     }
 }
 
@@ -89,193 +100,266 @@ static bool is_handle(BidType *type)
            str_eq(type->primitive_.name, str$("BrIrq"));
 }
 
-static void emit_method_flags(BidType request_type, Emit *emit)
+static CExpr bid2c_method_flags(BidType request_type, Alloc *alloc)
 {
-    emit_fmt(emit, ".flags = ");
-
     switch (request_type.type)
     {
     case BID_TYPE_PRIMITIVE:
         if (is_handle(&request_type))
         {
-            emit_fmt(emit, "BR_MSG_HND(0),\n");
+            CExpr call = cexpr_call(alloc, cexpr_identifier(str$("BR_MSG_HND"), alloc));
+            cexpr_add_arg(&call, cexpr_constant(cval_signed(0)));
+            return (call);
         }
         else
         {
-            emit_fmt(emit, "0,\n");
+            return cexpr_constant(cval_signed(0));
         }
-        break;
 
     case BID_TYPE_ENUM:
-        emit_fmt(emit, "0,\n");
-        break;
+        return cexpr_constant(cval_signed(0));
 
     case BID_TYPE_STRUCT:
     {
+        CExpr v = cexpr_constant(cval_signed(0));
 
-        emit_fmt(emit, "0");
         int index = 0;
         vec_foreach(member, &request_type.struct_.members)
         {
             if (is_handle(&member.type) | member.kernel_handle)
             {
-                emit_fmt(emit, "| BR_MSG_HND({})", index);
+                // | BR_MSG_HND(index)
+                CExpr call = cexpr_call(alloc, cexpr_identifier(str$("BR_MSG_HND"), alloc));
+                cexpr_add_arg(&call, cexpr_constant(cval_signed(index)));
+                v = cexpr_bit_or(v, call, alloc);
             }
             index++;
         }
-        emit_fmt(emit, ",\n");
     }
-    break;
 
     default:
-        break;
+        return cexpr_constant(cval_signed(0));
     }
 }
-static void emit_msg_args(BidType request_type, Emit *emit)
+static CExpr bid2c_msg_args(BidType request_type, Alloc *alloc)
 {
-    emit_fmt(emit, ".arg = ");
-    emit_fmt(emit, "{{\n");
-    emit_ident(emit);
-
-    if (request_type.type != BID_TYPE_NONE)
-    {
-    }
+    CExpr arr_init = cexpr_struct_initializer(alloc);
     switch (request_type.type)
     {
     case BID_TYPE_PRIMITIVE:
     case BID_TYPE_ENUM:
-        emit_fmt(emit, "(BrArg)req,\n");
-        break;
+    {
+        // (BrArg)req
+        CExpr targ = cexpr_cast(
+            cexpr_identifier(str$("req"), alloc),
+            ctype_name(str$("BrArg"), alloc),
+            alloc);
+
+        cexpr_initializer_push_element(&arr_init, cexpr_empty(), targ, alloc);
+    }
 
     case BID_TYPE_STRUCT:
         vec_foreach(member, &request_type.struct_.members)
         {
-            emit_fmt(emit, "(BrArg)req->{},\n", member.name);
+            // (BrArg)req->{member.name}
+            CExpr targ = cexpr_cast(
+                cexpr_ptr_access(
+                    cexpr_identifier(str$("req"), alloc),
+                    cexpr_identifier(member.name, alloc),
+                    alloc),
+                ctype_name(str$("BrArg"), alloc),
+                alloc);
+
+            cexpr_initializer_push_element(&arr_init, cexpr_empty(), targ, alloc);
         }
         break;
 
     default:
+        return cexpr_empty();
         break;
     }
 
-    emit_deident(emit);
-    emit_fmt(emit, "}},\n");
+    return arr_init;
 }
 
-static void emit_msg_create(Str interface_name, Str request_name, BidType request_type, Emit *emit)
+static CStmt bid2c_msg_create(BidInterface const *interface, BidMethod const *method, Alloc *alloc)
 {
-    PrintTrans protocol_id = print_trans("{case:upper}_PROTOCOL_ID", interface_name);
-    PrintTrans request = print_trans("{case:upper}_{case:upper}_REQUEST", interface_name, request_name);
 
-    emit_fmt(emit, "BrMsg req_msg = {{\n");
-    emit_ident(emit);
-    emit_fmt(emit, ".prot = {},\n", protocol_id);
-    emit_fmt(emit, ".type = {},\n", request);
+    CExpr msg_init = cexpr_struct_initializer(alloc);
 
-    if (request_type.type != BID_TYPE_NONE)
+    Str protocol_id = str_fmt(alloc, "{case:upper}_PROTOCOL_ID", interface->name);
+    cc_push_initializer_member(&msg_init, str$("prot"), protocol_id, alloc);
+
+    Str request = str_fmt(alloc, "{case:upper}_{case:upper}_REQUEST", interface->name, method->name);
+    cc_push_initializer_member(&msg_init, str$("type"), request, alloc);
+
+    if (method->request.type != BID_TYPE_NONE)
     {
-        emit_msg_args(request_type, emit);
-        emit_method_flags(request_type, emit);
+        // .arg = {}
+        CExpr get = cexpr_access(cexpr_empty(), cexpr_identifier(str$("arg"), alloc), alloc);
+        CExpr args = bid2c_msg_args(method->request, alloc);
+        cexpr_initializer_push_element(&msg_init, get, args, alloc);
+
+        // .flags = {}
+        get = cexpr_access(cexpr_empty(), cexpr_identifier(str$("flags"), alloc), alloc);
+        CExpr flags = bid2c_method_flags(method->request, alloc);
+        cexpr_initializer_push_element(&msg_init, get, flags, alloc);
     }
-    emit_deident(emit);
-    emit_fmt(emit, "}};\n");
+    CStmt res = cc_var_decl_str(str$("BrMsg"), str$("req_msg"), msg_init, alloc);
+    return res;
 }
 
-static void emit_function(PrintTrans ret, PrintTrans name, PrintTrans *args, int count, Emit *emit)
+static CDecl bid2c_method_decl(BidInterface const *interface, BidMethod const *method, CStmt func_stmt, Alloc *alloc)
 {
-    emit_fmt(emit, "static inline {} {}", ret, name);
 
-    emit_fmt(emit, "(BrId task");
+    Str err_type = str_fmt(alloc, "{case:pascal}Error", interface->name);
+    Str func_name = str_fmt(alloc, "{case:lower}_{case:lower}", interface->name, method->name);
 
-    for (int i = 0; i < count; i++)
+    CType ret_type = ctype_name(err_type, alloc);
+    CType func_type = ctype_func(ret_type, func_name, alloc);
+
+    ctype_member(&func_type, str$("task"), ctype_name(str$("BrId"), alloc), alloc);
+    if (method->request.type != BID_TYPE_NONE)
     {
-        emit_fmt(emit, ", {}", args[i]);
+        Str request_type = str_fmt(alloc, "{case:pascal}{case:pascal}Request", interface->name, method->name);
+        CType req_type = ctype_ptr(ctype_attr(ctype_name(request_type, alloc), CTYPE_CONST), alloc);
+        ctype_member(&func_type, str$("req"), req_type, alloc);
     }
-    emit_fmt(emit, ")");
+
+    if (method->response.type != BID_TYPE_NONE)
+    {
+        Str response_type = str_fmt(alloc, "{case:pascal}{case:pascal}Response", interface->name, method->name);
+        CType res_type = ctype_ptr(ctype_name(response_type, alloc), alloc);
+        ctype_member(&func_type, str$("resp"), res_type, alloc);
+    }
+
+    CDecl func = cdecl_func(func_name, func_type, func_stmt, alloc);
+
+    return cdecl_attrib(func, CDECL_INLINE | CDECL_STATIC);
 }
 
-/* there are too many arg in this function, maybe put it in a struct ? */
-static void emit_method_function(PrintTrans err_type, PrintTrans name_str, PrintTrans request, bool has_request, PrintTrans response, bool has_response, Emit *emit)
+static CExpr bid2c_br_ev_eq_call(Alloc *alloc)
 {
-    PrintTrans func_args[3] = {0};
-    int arg_count = 0;
-
-    if (has_request)
-    {
-        func_args[arg_count] = request;
-        arg_count++;
-    }
-    if (has_response)
-    {
-        func_args[arg_count] = response;
-        arg_count++;
-    }
-
-    emit_function(err_type, name_str, func_args, arg_count, emit);
+    CExpr call = cc_func_call(str$("br_ev_req"), alloc);
+    cexpr_add_arg(&call, cexpr_identifier(str$("task"), alloc));
+    cexpr_add_arg(&call, cexpr_ref(cexpr_identifier(str$("req_msg"), alloc), alloc));
+    cexpr_add_arg(&call, cexpr_ref(cexpr_identifier(str$("resp_msg"), alloc), alloc));
+    return call;
 }
 
-static void emit_method(BidInterface const *interface, BidMethod const *method, Emit *emit)
+static void bid2c_msg_handle(CStmt *targ, BidInterface const *interface, BidMethod const *method, Alloc *alloc)
 {
 
-    PrintTrans protocol_id = print_trans("{case:upper}_PROTOCOL_ID", interface->name);
+    /*
+    if (result != BR_SUCCESS)
+    {
+        return {}_BAD_COMMUNICATION
+    }
+    */
 
-    PrintTrans response_id = print_trans(" {case:upper}_{case:upper}_RESPONSE", interface->name, method->name);
-    PrintTrans err_type = print_trans(" {case:pascal}Error", interface->name);
-    PrintTrans err_id = print_trans(" {case:upper}_ERROR", interface->name);
-    PrintTrans request_type = print_trans("{case:pascal}{case:pascal}Request const * req", interface->name, method->name);
-    PrintTrans response_type = print_trans("{case:pascal}{case:pascal}Response* resp", interface->name, method->name);
-    PrintTrans func_name = print_trans("{case:lower}_{case:lower}", interface->name, method->name);
+    Str bad_communication_str = str_fmt(alloc, "{case:upper}_BAD_COMMUNICATION", interface->name);
 
-    emit_method_function(err_type, func_name,
-                         request_type, (method->request.type != BID_TYPE_NONE),
-                         response_type, (method->response.type != BID_TYPE_NONE),
-                         emit);
+    CStmt stmt = cstmt_if(
+        cexpr_str_op(not_eq, str$("result"), str$("BR_SUCCESS"), alloc),
+        cstmt_return(cexpr_identifier(bad_communication_str, alloc)), // return bad communication str
+        alloc);
 
-    emit_fmt(emit, "{{\n");
+    cstmt_block_add(targ, stmt);
 
-    emit_ident(emit);
-
-    emit_msg_create(interface->name, method->name, method->request, emit);
-
-    emit_fmt(emit, "BrMsg resp_msg = {{}};\n");
-    emit_fmt(emit, "BrResult result = br_ev_req(task, &req_msg, &resp_msg);\n");
-
-    emit_fmt(emit, "if (result != BR_SUCCESS)\n"
+    /*
+    "if (resp_msg.prot != protocol_id || "
+                   "(resp_msg.type != response_id && resp_msg.type != error_id))\n"
                    "{{\n"
-                   "return {case:upper}_BAD_COMMUNICATION;\n"
+                   "return INTERFACE_UNEXPECTED_MESSAGE;\n"
                    "}}\n",
-             interface->name);
+    */
 
-    emit_fmt(emit, "if (resp_msg.prot != {} || "
-                   "(resp_msg.type != {} && resp_msg.type != {}))\n"
-                   "{{\n"
-                   "return {case:upper}_UNEXPECTED_MESSAGE;\n"
-                   "}}\n",
-             protocol_id,
-             response_id, err_id, interface->name, interface->name);
+    Str protocol_id_str = str_fmt(alloc, "{case:upper}_PROTOCOL_ID", interface->name);
+    Str response_id_str = str_fmt(alloc, "{case:upper}_WRITE_RESPONSE", interface->name);
+    Str error_id_str = str_fmt(alloc, "{case:upper}_ERROR", interface->name);
+    Str unexpected_str = str_fmt(alloc, "{case:upper}_UNEXPECTED_MESSAGE", interface->name);
 
-    emit_fmt(emit, "if (resp_msg.type == {})\n"
-                   "{{\n"
-                   "return  ({})resp_msg.arg[0];\n"
-                   "}}\n",
-             err_id, err_type);
+    CExpr cexpr_resp_access_type = cc_access_str(str$("resp_msg"), str$("type"), alloc); // resp_msg.type
+
+    CExpr resp_or_error_cond =
+        cexpr_or( // ||
+            cexpr_not_eq(
+                cc_access_str(str$("resp_msg"), str$("prot"), alloc), // resp_msg.prot
+                cexpr_identifier(protocol_id_str, alloc),
+                alloc),
+            cexpr_and( // &&
+                // resp_msg.type != response_id
+                cexpr_not_eq(
+                    cexpr_resp_access_type,
+                    cexpr_identifier(response_id_str, alloc), alloc),
+                // resp_msg.type != error_id
+                cexpr_not_eq(
+                    cexpr_resp_access_type,
+                    cexpr_identifier(error_id_str, alloc), alloc),
+                alloc),
+            alloc);
+
+    stmt = cstmt_if(resp_or_error_cond,
+                    cstmt_return(cexpr_identifier(unexpected_str, alloc)), // return bad communication str
+                    alloc);
+
+    /*
+    if (resp_msg.type == error)
+    {
+        return  (error_type)resp_msg.arg[0];
+    }
+    */
+    Str err_type = str_fmt(alloc, " {case:pascal}Error", interface->name);
+
+    CExpr ret_res = cexpr_cast(
+        cc_index_constant(cc_access_str(str$("resp_msg"), str$("arg"), alloc), 0, alloc), // resp_msg.arg[0]
+        ctype_name(err_type, alloc),
+        alloc);
+
+    stmt = cstmt_if(cexpr_eq(
+                        cc_access_str(str$("resp_msg"), str$("type"), alloc),
+                        cexpr_identifier(error_id_str, alloc),
+                        alloc),
+                    cstmt_return(ret_res), // return bad communication str
+                    alloc);
+
+    cstmt_block_add(targ, stmt);
+}
+
+static void bid2c_msg_resp_init(CStmt *targ, BidInterface const *interface, BidMethod const *method, Alloc *alloc)
+{
 
     BidType response = method->response;
 
+    Str request_type = str_fmt(alloc, "{case:pascal}{case:pascal}Request", interface->name, method->name);
     switch (response.type)
     {
     case BID_TYPE_PRIMITIVE:
     case BID_TYPE_ENUM:
+    {
+        CExpr set_expr = cexpr_assign(
+            cexpr_deref(cexpr_identifier(str$("resp"), alloc), alloc),
+            cexpr_cast(cc_access_str(str$("resp_msg"), str$("arg"), alloc), ctype_name(request_type, alloc), alloc), alloc);
 
-        emit_fmt(emit, "*resp = (typeof(*resp))resp_msg.arg[0];", interface->name, method->name);
+        cstmt_block_add(targ, cstmt_expr(set_expr));
         break;
-
+    }
     case BID_TYPE_STRUCT:
     {
         int index = 0;
         vec_foreach(member, &response.struct_.members)
         {
-            emit_fmt(emit, "resp->{} = (typeof(resp->{}))resp_msg.arg[{}];\n", member.name, member.name, index);
+            // resp->{} = (typeof(resp->{}))resp_msg.arg[{}]
+            CExpr set_expr = cexpr_assign(
+                cc_ptr_access_str(str$("resp"), member.name, alloc),
+                cexpr_cast(cc_index_constant(
+                               cc_access_str(str$("resp_msg"), str$("arg"), alloc),
+                               0, alloc),
+                           emit_type(interface, &member.type, alloc),
+                           alloc),
+                alloc);
+
+            cstmt_block_add(targ, cstmt_expr(set_expr));
             index++;
         }
     }
@@ -284,128 +368,143 @@ static void emit_method(BidInterface const *interface, BidMethod const *method, 
     default:
         break;
     }
-
-    emit_fmt(emit, "return {case:upper}_SUCCESS;\n",
-             interface->name);
-    emit_deident(emit);
-
-    emit_fmt(emit, "}}\n");
-    emit_fmt(emit, "\n");
 }
 
-static void emit_callback(BidInterface const *interface, BidMethod const *method, Emit *emit)
+static CDecl emit_method(BidInterface const *interface, BidMethod const *method, Alloc *alloc)
 {
-    PrintTrans err_type = print_trans("{case:pascal}Error", interface->name);
-    PrintTrans request_type = print_trans("{case:pascal}{case:pascal}Request", interface->name, method->name);
-    PrintTrans response_type = print_trans("{case:pascal}{case:pascal}Response", interface->name, method->name);
-    PrintTrans func_name = print_trans("{case:pascal}{case:pascal}Fn", interface->name, method->name);
 
-    emit_fmt(emit, "typedef {} {}(BrId from, ", err_type, func_name);
+    PrintTrans response_id = print_trans(" {case:upper}_{case:upper}_RESPONSE", interface->name, method->name);
+    PrintTrans err_id = print_trans(" {case:upper}_ERROR", interface->name);
+
+    CStmt statement = cstmt_block(alloc);
+
+    cstmt_block_add(&statement, bid2c_msg_create(interface, method, alloc));
+    // BrMsg resp_msg = {};
+    cstmt_block_add(&statement, cc_var_decl_str(str$("BrMsg"), str$("resp_msg"), cexpr_empty(), alloc));
+
+    // BrResult result = br_ev_req(task, &req_msg, &resp_msg);
+    cstmt_block_add(&statement, cc_var_decl_str(str$("BrResult"), str$("result"), bid2c_br_ev_eq_call(alloc), alloc));
+
+    bid2c_msg_handle(&statement, interface, method, alloc);
+
+    bid2c_msg_resp_init(&statement, interface, method, alloc);
+
+    Str success_str = str_fmt(alloc, "{case:upper}_SUCCESS",
+                              interface->name);
+
+    cstmt_block_add(&statement, cstmt_return(cexpr_identifier(success_str, alloc))); // return {case:upper}_SUCCESS;
+
+    CDecl func_decl = bid2c_method_decl(interface, method, statement, alloc);
+    return func_decl;
+}
+
+static CDecl emit_callback(BidInterface const *interface, BidMethod const *method, Alloc *alloc)
+{
+    Str err_type = str_fmt(alloc, "{case:pascal}Error", interface->name);
+    Str request_type = str_fmt(alloc, "{case:pascal}{case:pascal}Request", interface->name, method->name);
+    Str response_type = str_fmt(alloc, "{case:pascal}{case:pascal}Response", interface->name, method->name);
+    Str func_name = str_fmt(alloc, "{case:pascal}{case:pascal}Fn", interface->name, method->name);
+
+    CType ctype_fn = ctype_func(ctype_name(err_type, alloc), str$(""), alloc);
+
+    ctype_member(&ctype_fn, str$("from"), ctype_name(str$("BrId"), alloc), alloc); // BrId from
 
     if (method->request.type != BID_TYPE_NONE)
     {
-        emit_fmt(emit, "{} const* req, ", request_type);
+        ctype_member(&ctype_fn, str$("req"),
+                     ctype_ptr(ctype_attr(ctype_name(request_type, alloc), CTYPE_CONST), alloc), // request_type const *
+                     alloc);                                                                     // BrId from
     }
 
     if (method->request.type != BID_TYPE_NONE)
     {
-        emit_fmt(emit, "{}* res, ", response_type);
+        ctype_member(&ctype_fn, str$("res"),
+                     ctype_ptr(ctype_name(response_type, alloc), alloc), // request_type const *
+                     alloc);                                             // BrId from
     }
 
-    emit_fmt(emit, "void* ctx);\n");
+    ctype_member(&ctype_fn, str$("ctx"),
+                 ctype_ptr(ctype_name(str$("void"), alloc), alloc), // request_type const *
+                 alloc);
+
+    CDecl decl = cdecl_type(str$(func_name), ctype_fn, alloc);
 }
 
-void bid2c(BidInterface const *interface, Emit *emit)
+/* --- Types ---------------------------------------------------------------- */
+void bid2c_type(CUnit *unit, const BidInterface *interface, Alloc *alloc)
 {
-    emit_fmt(emit, "#pragma once\n"
-                   "\n"
-                   "// This is file is auto generated by BID, don't edit it!\n"
-                   "\n"
-
-                   "#include <bal/types.h>\n"
-                   "#include <bal/ev.h>\n"
-                   "\n");
-
-    emit_fmt(emit, "#define {case:upper}_PROTOCOL_ID ({#0x})\n\n", interface->name, interface->id);
-
-    emit_fmt(emit, "typedef ");
-    emit_enum(interface, &interface->errors, emit);
-    emit_fmt(emit, " {case:pascal}Error;\n", interface->name);
-
-    emit_fmt(emit, "\n");
-
-    emit_fmt(emit, "/* --- Types ---------------------------------------------------------------- */\n\n");
-
     vec_foreach(alias, &interface->aliases)
     {
-        emit_fmt(emit, "typedef ");
-        emit_type(interface, &alias.type, emit);
-        emit_fmt(emit, " {case:pascal}{case:pascal};\n", interface->name, alias.name);
-        emit_fmt(emit, "\n");
+        Str s = str_fmt(alloc, "{case:pascal}{case:pascal}", interface->name, alias.name);
+        CDecl type_def = cdecl_type(s, emit_type(interface, &alias.type, alloc), alloc);
+        cunit_member(unit, cunit_decl(type_def));
+    }
+}
+/* --- Messages ------------------------------------------------------------- */
+
+CType bid2c_method_message_type(BidInterface const *interface, Alloc *alloc)
+{
+
+    CType message_type_decl = ctype_enum(str$(""), alloc);
+
+#define bid2c_const_msg_type(S)                 \
+    ctype_constant_no_value(&message_type_decl, \
+                            S,                  \
+                            alloc);
+
+    bid2c_const_msg_type(str_fmt(alloc, "{case:upper}_INVALID,\n", interface->name));
+    bid2c_const_msg_type(str_fmt(alloc, "{case:upper}_ERROR,\n", interface->name));
+
+    vec_foreach(method, &interface->methods)
+    {
+        bid2c_const_msg_type(str_fmt(alloc, "{case:upper}_{case:upper}_RESPONSE,\n", interface->name, method.name));
+        bid2c_const_msg_type(str_fmt(alloc, "{case:upper}_{case:upper}_REQUEST,\n", interface->name, method.name));
     }
 
-    emit_fmt(emit, "/* --- Messages ------------------------------------------------------------- */\n\n");
+    vec_foreach(event, &interface->events)
+    {
+        bid2c_const_msg_type(str_fmt(alloc, "{case:upper}_{case:upper}_EVENT,\n", interface->name, event.name));
+    }
+
+    return message_type_decl;
+}
+void bid2c_methods(CUnit *unit, BidInterface const *interface, Alloc *alloc)
+{
+
+    Str m_type_str = str_fmt(alloc, "{case:pascal}MessageType", interface->name);
+
+    CDecl m_type_def = cdecl_type(m_type_str, bid2c_method_message_type(interface, alloc), alloc);
+    cunit_member(unit, cunit_decl(m_type_def));
 
     vec_foreach(method, &interface->methods)
     {
         if (method.request.type != BID_TYPE_NONE)
         {
-            emit_fmt(emit, "typedef ");
-            emit_type(interface, &method.request, emit);
-
-            emit_fmt(emit, " {case:pascal}{case:pascal}Request;\n", interface->name, method.name);
-            emit_fmt(emit, "\n");
+            Str s = str_fmt(alloc, "{case:pascal}{case:pascal}Request;", interface->name, method.name);
+            bid_unit_add_typedef(unit, interface, s, method.request, alloc);
         }
 
         if (method.response.type != BID_TYPE_NONE)
         {
-            emit_fmt(emit, "typedef ");
-            emit_type(interface, &method.response, emit);
-            emit_fmt(emit, " {case:pascal}{case:pascal}Response;\n", interface->name, method.name);
-            emit_fmt(emit, "\n");
+            Str s = str_fmt(alloc, "{case:pascal}{case:pascal}Response;", interface->name, method.name);
+            bid_unit_add_typedef(unit, interface, s, method.response, alloc);
         }
     }
 
     vec_foreach(event, &interface->events)
     {
-        emit_fmt(emit, "typedef ");
-        emit_type(interface, &event.data, emit);
-        emit_fmt(emit, " {case:pascal}{case:pascal}Event;\n", interface->name, event.name);
-        emit_fmt(emit, "\n");
-    }
-
-    emit_fmt(emit, "typedef enum {{\n");
-
-    emit_ident(emit);
-
-    emit_fmt(emit, "{case:upper}_INVALID,\n", interface->name);
-    emit_fmt(emit, "{case:upper}_ERROR,\n", interface->name);
-
-    vec_foreach(method, &interface->methods)
-    {
-        emit_fmt(emit, "{case:upper}_{case:upper}_REQUEST,\n", interface->name, method.name);
-        emit_fmt(emit, "{case:upper}_{case:upper}_RESPONSE,\n", interface->name, method.name);
-    }
-
-    vec_foreach(event, &interface->events)
-    {
-        emit_fmt(emit, "{case:upper}_{case:upper}_EVENT,\n", interface->name, event.name);
-    }
-
-    emit_deident(emit);
-
-    emit_fmt(emit, "}} {case:pascal}MessageType;\n", interface->name);
-
-    emit_fmt(emit, "\n");
-
-    vec_foreach(method, &interface->methods)
-    {
-        emit_method(interface, &method, emit);
+        Str s = str_fmt(alloc, "{case:pascal}{case:pascal}Event;", interface->name, event.name);
+        bid_unit_add_typedef(unit, interface, s, event.data, alloc);
     }
 
     vec_foreach(method, &interface->methods)
     {
-        emit_callback(interface, &method, emit);
+        cunit_member(unit, cunit_decl(emit_method(interface, &method, alloc)));
+    }
+
+    vec_foreach(method, &interface->methods)
+    {
+        cunit_member(unit, cunit_decl(emit_callback(interface, &method, alloc)));
     }
 
     emit_fmt(emit, "typedef void {case:pascal}ErrorFn(BrId from, BrResult error, void* ctx);\n", interface->name);
@@ -540,4 +639,22 @@ void bid2c(BidInterface const *interface, Emit *emit)
 
     emit_deident(emit);
     emit_fmt(emit, "}}\n");
+}
+void bid2c(BidInterface const *interface, Emit *emi, Alloc *alloc)
+{
+
+    CUnit unit;
+    unit = cunit(alloc);
+
+    cunit_member(&unit, cunit_pragma_once(alloc));
+    cunit_member(&unit, cunit_include(true, str$("bal/types"), alloc));
+    cunit_member(&unit, cunit_include(true, str$("bal/ev"), alloc));
+
+    // emit_fmt(emit, "#define {case:upper}_PROTOCOL_ID ({#0x})\n\n", interface->name, interface->id);
+
+    cunit_member(&unit, cunit_decl(cdecl_type(interface->name, emit_enum(interface, &interface->errors, alloc), alloc)));
+
+    bid2c_type(&unit, interface, alloc);
+
+    bid2c_methods(&unit, interface, alloc);
 }
