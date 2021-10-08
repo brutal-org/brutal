@@ -9,19 +9,11 @@
 static Pml *kernel_pml = nullptr;
 static Lock vmm_lock;
 
-static void flush_tlb(uintptr_t addr)
+VmmResult vmm_flush(MAYBE_UNUSED VmmSpace space, VmmRange virtual_range)
 {
-    asm volatile("invlpg (%0)" ::"r"(addr)
-                 : "memory");
-}
-
-VmmResult vmm_flush(VmmSpace space, VmmRange virtual_range)
-{
-    (void)space;
-
     for (size_t i = 0; i < (virtual_range.size / MEM_PAGE_SIZE); i++)
     {
-        flush_tlb(((virtual_range.base / MEM_PAGE_SIZE) + i) * MEM_PAGE_SIZE);
+        asm_invlpg(((virtual_range.base / MEM_PAGE_SIZE) + i) * MEM_PAGE_SIZE);
     }
 
     return OK(VmmResult, virtual_range);
@@ -37,7 +29,7 @@ static VmmResult vmm_get_pml(Pml *table, size_t idx)
     }
 
     VmmRange range = {
-        mmap_phys_to_io(entry.physical << 12),
+        mmap_phys_to_io(PML_GET_ADDR(entry)),
         MEM_PAGE_SIZE,
     };
 
@@ -51,7 +43,7 @@ static VmmResult vmm_get_pml_or_alloc(Pml *table, size_t idx, size_t flags)
     if (entry.present)
     {
         VmmRange range = {
-            mmap_phys_to_io(entry.physical << 12),
+            mmap_phys_to_io(PML_GET_ADDR(entry)),
             MEM_PAGE_SIZE,
         };
 
@@ -129,9 +121,9 @@ static void vmm_load_memory_map(VmmSpace target, HandoverMmap const *memory_map)
 
 void vmm_initialize(Handover const *handover)
 {
-    HeapResult heap_result = heap_alloc(MEM_PAGE_SIZE);
+    HeapRange heap_result = UNWRAP(heap_alloc(MEM_PAGE_SIZE));
 
-    kernel_pml = (Pml *)UNWRAP(heap_result).base;
+    kernel_pml = (Pml *)heap_result.base;
     mem_set(kernel_pml, 0, MEM_PAGE_SIZE);
 
     vmm_load_memory_map(kernel_pml, &handover->mmap);
@@ -144,9 +136,9 @@ VmmSpace vmm_space_create(void)
 {
     LOCK_RETAINER(&vmm_lock);
 
-    HeapResult heap_result = heap_alloc(MEM_PAGE_SIZE);
+    HeapRange heap_result = UNWRAP(heap_alloc(MEM_PAGE_SIZE));
 
-    VmmSpace vmm_address_space = (VmmSpace)UNWRAP(heap_result).base;
+    VmmSpace vmm_address_space = (VmmSpace)heap_result.base;
     mem_set(vmm_address_space, 0, MEM_PAGE_SIZE);
 
     Pml *pml_table = (Pml *)vmm_address_space;
@@ -214,12 +206,14 @@ static VmmResult vmm_map_page(Pml *pml4, uintptr_t virtual_page, uintptr_t physi
     VmmRange pml1_range = TRY(VmmResult, vmm_get_pml_or_alloc(pml2, PML2_GET_INDEX(virtual_page), flags | BR_MEM_WRITABLE | BR_MEM_USER));
     Pml *pml1 = (Pml *)(pml1_range.base);
 
-    if (pml1->entries[PML1_GET_INDEX(virtual_page)].present)
+    PmlEntry *entry = &pml1->entries[PML1_GET_INDEX(virtual_page)];
+
+    if (entry->present)
     {
-        panic$("{#p} is already mapped to {#p}", virtual_page, (uint64_t)pml2->entries[PML1_GET_INDEX(virtual_page)].physical << 12);
+        panic$("{#p} is already mapped to {#p}", virtual_page, PML_GET_ADDR(*entry));
     }
 
-    pml1->entries[PML1_GET_INDEX(virtual_page)] = pml_make_entry(physical_page, flags);
+    *entry = pml_make_entry(physical_page, flags);
 
     VmmRange range = {virtual_page, MEM_PAGE_SIZE};
 
@@ -237,9 +231,10 @@ static VmmResult vmm_unmap_page(Pml *pml4, uintptr_t virtual_page)
     VmmRange pml1_range = TRY(VmmResult, vmm_get_pml(pml2, PML2_GET_INDEX(virtual_page)));
     Pml *pml1 = (Pml *)(pml1_range.base);
 
-    assert_truth(pml1->entries[PML1_GET_INDEX(virtual_page)].present == 1);
+    PmlEntry *entry = &pml1->entries[PML1_GET_INDEX(virtual_page)];
+    assert_truth((bool)entry->present);
 
-    pml1->entries[PML1_GET_INDEX(virtual_page)] = pml_clean_entry();
+    *entry = pml_clean_entry();
 
     VmmRange range = {virtual_page, MEM_PAGE_SIZE};
     return OK(VmmResult, range);
@@ -300,7 +295,7 @@ PmmResult vmm_virt2phys(VmmSpace space, VmmRange virtual_range)
     Pml *pml1 = (Pml *)(pml1_range.base);
 
     PmlEntry entry = pml1->entries[PML1_GET_INDEX(virtual_range.base)];
-    PmmRange range = {entry.physical << 12, virtual_range.size};
+    PmmRange range = {PML_GET_ADDR(entry), virtual_range.size};
 
     return OK(PmmResult, range);
 }

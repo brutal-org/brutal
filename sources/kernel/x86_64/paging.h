@@ -1,5 +1,6 @@
 #pragma once
 
+#include <bal/types.h>
 #include <brutal/mem.h>
 
 typedef union PACKED
@@ -58,3 +59,5 @@ static_assert(sizeof(PmlEntry) == sizeof(uint64_t), "pml must be 64 bit");
 #define PML3_GET_INDEX(ADDR) PMLX_GET_INDEX(ADDR, 2)
 #define PML2_GET_INDEX(ADDR) PMLX_GET_INDEX(ADDR, 1)
 #define PML1_GET_INDEX(ADDR) PMLX_GET_INDEX(ADDR, 0)
+
+#define PML_GET_ADDR(PML) ((PML).physical << 12)

@@ -258,3 +258,9 @@ static inline void asm_write_msr(enum msr_registers msr, uint64_t value)
                  :
                  : "c"((uint64_t)msr), "a"(low), "d"(high));
 }
+
+static inline void asm_invlpg(uintptr_t addr)
+{
+    asm volatile("invlpg (%0)" ::"r"(addr)
+                 : "memory");
+}
