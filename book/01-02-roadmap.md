@@ -44,15 +44,6 @@
   - [x] MCFG
 - [x] PCIe Server
   - [x] Device enumeration
-- [ ] Virtio
-  - [ ] Device Configuration
-  - [ ] Virt Queues
-  - [ ] network device
-  - [ ] gpu device
-  - [ ] input device
-  - [ ] entropy device
-  - [ ] console device
-  - [ ] block device
 
 ## Milestone 4 - Filesystem and User Interfaces
 
@@ -75,3 +66,12 @@
 - [ ] Multiboot support
 - [ ] FAT32
 - [ ] In house bootloader
+- [ ] Virtio
+  - [ ] Device Configuration
+  - [ ] Virt Queues
+  - [ ] network device
+  - [ ] gpu device
+  - [ ] input device
+  - [ ] entropy device
+  - [ ] console device
+  - [ ] block device
