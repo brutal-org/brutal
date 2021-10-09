@@ -10,7 +10,7 @@ CStmt cstmt_empty(void)
 CStmt cstmt_decl(CDecl decl, Alloc *alloc)
 {
     return (CStmt){
-        .type = CSTMT_EMPTY,
+        .type = CSTMT_DECL,
         .decl_.decl = alloc_move(alloc, decl),
     };
 }
@@ -153,3 +153,9 @@ CStmt cstmt_default(void)
 {
     return (CStmt){.type = CSTMT_DEFAULT};
 }
+
+CStmt cstmt_break(void)
+{
+    return (CStmt){.type = CSTMT_BREAK};
+}
+

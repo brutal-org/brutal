@@ -34,3 +34,5 @@ CStmt cstmt_label(Str label, Alloc *alloc);
 CStmt cstmt_case(CExpr expr);
 
 CStmt cstmt_default(void);
+
+CStmt cstmt_break(void);
