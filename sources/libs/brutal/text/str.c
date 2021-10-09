@@ -13,6 +13,10 @@ void str_rvs(Str str)
 
 Str str_dup(Str const str, Alloc *alloc)
 {
+    if (str.len == 0)
+    {
+        return str_make_from_cstr("");
+    }
     char *buffer = (char *)alloc_malloc(alloc, str.len);
     mem_cpy(buffer, str.buffer, str.len);
     return str_n$(str.len, buffer);
