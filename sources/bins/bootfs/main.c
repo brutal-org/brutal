@@ -78,8 +78,5 @@ int br_entry_args(
     server.handle_open = bootfs_open;
     server.handle_write = bootfs_write;
     server.handle_mount = bfs_mounted;
-    while (true)
-    {
-        br_ev_run();
-    };
+    return br_ev_run();
 }
