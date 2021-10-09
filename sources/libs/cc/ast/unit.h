@@ -13,12 +13,20 @@ typedef struct
     Str text;
 } CPragma;
 
+typedef struct
+{
+    Str name;
+    Vec(Str) args;
+    CExpr expression;
+} CDefine;
+
 typedef enum
 {
     CUNIT_NONE,
     CUNIT_INCLUDE,
     CUNIT_PRAGMA,
-    CUNIT_DECLARATION
+    CUNIT_DECLARATION,
+    CUNIT_DEFINE
 } CUnitType;
 
 typedef struct
@@ -29,6 +37,7 @@ typedef struct
         CInclude _include;
         CDecl _decl;
         CPragma _pragma;
+        CDefine _define;
     };
 } CUnitEntry;
 

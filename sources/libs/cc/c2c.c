@@ -568,6 +568,33 @@ void c2c_pragma(Emit *emit, CPragma pragma)
     emit_fmt(emit, "\n");
 }
 
+void c2c_define(Emit *emit, CDefine define)
+{
+    emit_fmt(emit, "#define ");
+    emit_fmt(emit, define.name);
+    if (define.args.length != 0)
+    {
+        emit_fmt(emit, "(");
+
+        for (int i = 0; i < define.args.length; i++)
+        {
+            if (i != 0)
+            {
+                emit_fmt(emit, ", {}", define.args.data[i]);
+            }
+            else
+            {
+                emit_fmt(emit, "{}", define.args.data[i]);
+            }
+        }
+
+        emit_fmt(emit, ")");
+    }
+    emit_fmt(emit, " ");
+    c2c_expr(emit, define.expression);
+
+    emit_fmt(emit, "\n");
+}
 void c2c_unit_entry(Emit *emit, CUnitEntry entry)
 {
     switch (entry.type)
@@ -580,6 +607,10 @@ void c2c_unit_entry(Emit *emit, CUnitEntry entry)
         break;
     case CUNIT_DECLARATION:
         c2c_decl(emit, entry._decl);
+        emit_fmt(emit, ";\n\n");
+        break;
+    case CUNIT_DEFINE:
+        c2c_define(emit, entry._define);
         break;
     default:
         break;
