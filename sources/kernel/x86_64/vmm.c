@@ -210,7 +210,7 @@ static VmmResult vmm_map_page(Pml *pml4, uintptr_t virtual_page, uintptr_t physi
 
     if (entry->present)
     {
-        panic$("{#p} is already mapped to {#p}", virtual_page, PML_GET_ADDR(*entry));
+        panic$("{#x} is already mapped to {#x}", virtual_page, (uintptr_t)PML_GET_ADDR(*entry));
     }
 
     *entry = pml_make_entry(physical_page, flags);
