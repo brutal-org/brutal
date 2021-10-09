@@ -43,7 +43,7 @@ int main(int argc, char const *argv[])
     Emit emit;
     emit_init(&emit, &output_file_writer);
 
-    bid2c(&interface, &emit);
+    bid2c(&interface, &emit, alloc_global());
 
     heap_alloc_deinit(&heap);
 
