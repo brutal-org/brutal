@@ -48,12 +48,11 @@ CUnitEntry cunit_include(bool qchar, Str path, Alloc *alloc)
     };
 }
 
-CUnitEntry cunit_define(Str name, CExpr expression, Alloc* alloc)
+CUnitEntry cunit_define(Str name, CExpr expression, Alloc *alloc)
 {
     CUnitEntry def = {
         .type = CUNIT_DEFINE,
-        ._define = (CDefine)
-        {
+        ._define = (CDefine){
             .expression = expression,
             .name = str_dup(name, alloc),
         },

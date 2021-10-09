@@ -51,17 +51,17 @@ static void c2c_type_attr(Emit *emit, CTypeAttr attr)
 {
     if (attr & CTYPE_CONST)
     {
-        emit_fmt(emit, "const ");
+        emit_fmt(emit, " const");
     }
 
     if (attr & CTYPE_RESTRICT)
     {
-        emit_fmt(emit, "restrict ");
+        emit_fmt(emit, " restrict");
     }
 
     if (attr & CTYPE_VOLATILE)
     {
-        emit_fmt(emit, "volatile ");
+        emit_fmt(emit, " volatile");
     }
 }
 
@@ -78,6 +78,7 @@ static void c2c_type_start(Emit *emit, CType type)
     if (type.type == CTYPE_NAME)
     {
         emit_fmt(emit, type.name);
+        c2c_type_attr(emit, type.attr);
     }
     else if (type.type == CTYPE_PTR)
     {
@@ -174,64 +175,97 @@ static void c2c_type_end(Emit *emit, CType type)
 
 /* --- CExpr ---------------------------------------------------------------- */
 
+#define C2C_MAX_PRECEDENCE 16
 static void c2c_op_fix(Emit *emit, COp op)
 {
     emit_fmt(emit, "{}", cop_to_str(op));
 }
 
-void c2c_expr(Emit *emit, CExpr expr)
+static int get_precedence(CExpr *expr)
 {
+    switch (expr->type)
+    {
+    case CEXPR_PREFIX:
+    case CEXPR_POSTFIX:
+    case CEXPR_INFIX:
+        return cop_precedence(expr->infix_.op);
+
+    case CEXPR_IDENTIFIER:
+    case CEXPR_CONSTANT:
+        return 0;
+
+    case CEXPR_CALL:
+    case CEXPR_CAST:
+    case CEXPR_ARRAY_INITIALIZER:
+    case CEXPR_STRUCT_INITIALIZER:
+        return 1;
+
+    case CEXPR_TERNARY:
+        return 13;
+
+    default:
+        return 0;
+    }
+}
+static void c2c_expr_precedence(Emit *emit, CExpr expr, int parent_precedence)
+{
+    int precedence = get_precedence(&expr);
+    if (precedence > parent_precedence)
+    {
+        emit_fmt(emit, "(");
+    }
     switch (expr.type)
     {
     case CEXPR_CONSTANT:
+
         c2c_value(emit, expr.constant_);
         break;
 
     case CEXPR_IDENTIFIER:
+
         emit_fmt(emit, "{}", expr.identifier_);
         break;
 
     case CEXPR_PREFIX:
 
-        emit_fmt(emit, "(");
         c2c_op_fix(emit, expr.prefix_.op);
         if (expr.prefix_.expr != nullptr)
         {
-            c2c_expr(emit, *expr.prefix_.expr);
+            c2c_expr_precedence(emit, *expr.prefix_.expr, precedence);
         }
-        emit_fmt(emit, ")");
+
         break;
 
     case CEXPR_POSTFIX:
-        emit_fmt(emit, "(");
-        if (expr.prefix_.expr != nullptr)
+
+        if (expr.postfix_.expr != nullptr)
         {
-            c2c_expr(emit, *expr.prefix_.expr);
+            c2c_expr_precedence(emit, *expr.postfix_.expr, precedence);
         }
-        c2c_op_fix(emit, expr.prefix_.op);
-        emit_fmt(emit, ")");
+        c2c_op_fix(emit, expr.postfix_.op);
+
         break;
 
     case CEXPR_INFIX:
-        emit_fmt(emit, "(");
-        c2c_expr(emit, *expr.infix_.lhs);
+
+        c2c_expr_precedence(emit, *expr.infix_.lhs, precedence);
         if (expr.infix_.op == COP_INDEX)
         {
             emit_fmt(emit, "[");
         }
 
-        c2c_op_fix(emit, expr.prefix_.op);
-        c2c_expr(emit, *expr.infix_.rhs);
+        c2c_op_fix(emit, expr.infix_.op);
+        c2c_expr_precedence(emit, *expr.infix_.rhs, precedence);
 
         if (expr.infix_.op == COP_INDEX)
         {
             emit_fmt(emit, "]");
         }
-        emit_fmt(emit, ")");
         break;
 
     case CEXPR_CALL:
-        c2c_expr(emit, *expr.call_.expr);
+
+        c2c_expr_precedence(emit, *expr.call_.expr, precedence);
         emit_fmt(emit, "(");
         bool first = true;
         vec_foreach(v, &expr.call_.args)
@@ -245,48 +279,52 @@ void c2c_expr(Emit *emit, CExpr expr)
                 emit_fmt(emit, ", ");
             }
 
-            c2c_expr(emit, v);
+            c2c_expr_precedence(emit, v, C2C_MAX_PRECEDENCE);
         }
         emit_fmt(emit, ")");
         break;
 
     case CEXPR_CAST:
+
         emit_fmt(emit, " (");
         c2c_type(emit, expr.cast_.type);
         emit_fmt(emit, ")");
-        c2c_expr(emit, *expr.cast_.expr);
+        c2c_expr_precedence(emit, *expr.cast_.expr, precedence);
         break;
 
     case CEXPR_TERNARY:
-        c2c_expr(emit, *expr.ternary_.expr_cond);
+
+        c2c_expr_precedence(emit, *expr.ternary_.expr_cond, precedence);
         emit_fmt(emit, " ? ");
-        c2c_expr(emit, *expr.ternary_.expr_true);
+        c2c_expr_precedence(emit, *expr.ternary_.expr_true, precedence);
         emit_fmt(emit, " : ");
-        c2c_expr(emit, *expr.ternary_.expr_false);
+        c2c_expr_precedence(emit, *expr.ternary_.expr_false, precedence);
         break;
 
     case CEXPR_STRUCT_INITIALIZER:
-        emit_fmt(emit, "{\n");
+
+        emit_fmt(emit, "{{\n");
         emit_ident(emit);
 
-        vec_foreach(v, &expr.array_initializer_.initializer)
+        vec_foreach(v, &expr.struct_initializer_.initializer)
         {
-            if (v.designator->type != CEXPR_EMPTY)
+            if (v.designator->type != CEXPR_EMPTY && v.designator->type != CEXPR_INVALID)
             {
                 emit_fmt(emit, ".");
-                c2c_expr(emit, *v.designator);
+                c2c_expr_precedence(emit, *v.designator, cop_precedence(COP_ASSIGN));
                 emit_fmt(emit, " = ");
             }
-            c2c_expr(emit, *v.initializer);
+            c2c_expr_precedence(emit, *v.initializer, cop_precedence(COP_ASSIGN));
             emit_fmt(emit, ",\n");
         }
 
         emit_deident(emit);
-        emit_fmt(emit, "\n}");
+        emit_fmt(emit, "\n}}");
         break;
 
     case CEXPR_ARRAY_INITIALIZER:
-        emit_fmt(emit, "{\n");
+
+        emit_fmt(emit, "{{\n");
         emit_ident(emit);
 
         vec_foreach(v, &expr.array_initializer_.initializer)
@@ -294,22 +332,31 @@ void c2c_expr(Emit *emit, CExpr expr)
             if (v.designator->type != CEXPR_EMPTY)
             {
                 emit_fmt(emit, "[");
-                c2c_expr(emit, *v.designator);
+                c2c_expr_precedence(emit, *v.designator, cop_precedence(C2C_MAX_PRECEDENCE));
                 emit_fmt(emit, "] = ");
             }
-            c2c_expr(emit, *v.initializer);
+            c2c_expr_precedence(emit, *v.initializer, cop_precedence(COP_ASSIGN));
             emit_fmt(emit, ",\n");
         }
 
         emit_deident(emit);
-        emit_fmt(emit, "\n}");
+        emit_fmt(emit, "\n}}");
         break;
 
     default:
+        panic$("invalid !");
         break;
+    }
+    if (precedence > parent_precedence)
+    {
+        emit_fmt(emit, ")");
     }
 }
 
+void c2c_expr(Emit *emit, CExpr expr)
+{
+    c2c_expr_precedence(emit, expr, C2C_MAX_PRECEDENCE);
+}
 /* --- CStmt ---------------------------------------------------------------- */
 
 static bool c2c_should_stmt_endline(CStmtType type)
@@ -339,7 +386,7 @@ void c2c_stmt(Emit *emit, CStmt stmt)
         return;
 
     case CSTMT_BLOCK:
-        emit_fmt(emit, "\n{{\n");
+        emit_fmt(emit, "{{\n");
         emit_ident(emit);
 
         vec_foreach(v, &stmt.block_.stmts)
@@ -358,14 +405,34 @@ void c2c_stmt(Emit *emit, CStmt stmt)
 
     case CSTMT_IF:
         emit_fmt(emit, "if (");
+
         c2c_expr(emit, stmt.if_.expr);
         emit_fmt(emit, ") \n");
-        c2c_stmt(emit, *stmt.if_.stmt_true);
+
+        if (stmt.if_.stmt_true->type != CSTMT_BLOCK)
+        {
+            emit_ident(emit);
+            c2c_stmt(emit, *stmt.if_.stmt_true);
+            emit_deident(emit);
+        }
+        else
+        {
+            c2c_stmt(emit, *stmt.if_.stmt_true);
+        }
 
         if (stmt.if_.stmt_false->type != CSTMT_EMPTY)
         {
-            emit_fmt(emit, "else ");
-            c2c_stmt(emit, *stmt.if_.stmt_false);
+            emit_fmt(emit, "else\n");
+            if (stmt.if_.stmt_true->type != CSTMT_BLOCK)
+            {
+                emit_ident(emit);
+                c2c_stmt(emit, *stmt.if_.stmt_false);
+                emit_deident(emit);
+            }
+            else
+            {
+                c2c_stmt(emit, *stmt.if_.stmt_false);
+            }
         }
         return;
 
@@ -496,24 +563,23 @@ void c2c_decl(Emit *emit, CDecl decl)
 
         if (is_typedef)
         {
-            emit_fmt(emit, "{}", decl.name);
+            emit_fmt(emit, " {}", decl.name);
         }
 
         c2c_type_end(emit, decl.type_.type);
-        emit_fmt(emit, ";\n");
     }
     else if (decl.type == CDECL_VAR)
     {
         c2c_type_start(emit, decl.var_.type);
 
-        emit_fmt(emit, "{}", decl.name);
+        emit_fmt(emit, " {} ", decl.name);
 
         c2c_type_end(emit, decl.var_.type);
-        if (decl.var_.expr.type != CEXPR_INVALID)
+        if (decl.var_.expr.type != CEXPR_INVALID && decl.var_.expr.type != CEXPR_EMPTY)
         {
+            emit_fmt(emit, "=");
             c2c_expr(emit, decl.var_.expr);
         }
-        emit_fmt(emit, ";\n");
     }
     else if (decl.type == CDECL_FUNC)
     {
@@ -540,7 +606,7 @@ void c2c_decl(Emit *emit, CDecl decl)
             c2c_member(emit, v);
         }
 
-        emit_fmt(emit, ")");
+        emit_fmt(emit, ")\n");
         c2c_stmt(emit, decl.func_.body);
     }
 }

@@ -1,6 +1,6 @@
 #include <cc/ast/expr.h>
 
-const char *cop_type_to_str[] = {
+static const char *cop_type_to_str[] = {
     [COP_INC] = "++",
     [COP_DEC] = "--",
     [COP_ASSIGN] = "=",
@@ -34,7 +34,7 @@ const char *cop_type_to_str[] = {
     [COP_GT] = ">",
     [COP_LT_EQ] = "<=",
     [COP_GT_EQ] = ">=",
-    [COP_INDEX] = "[]",
+    [COP_INDEX] = "",
     [COP_DEREF] = "*",
     [COP_REF] = "&",
     [COP_ACCESS] = ".",
@@ -44,4 +44,50 @@ const char *cop_type_to_str[] = {
 Str cop_to_str(COp type)
 {
     return str$(cop_type_to_str[type]);
+}
+
+static int cop_precedence_table[] = {
+    [COP_INC] = 1,
+    [COP_DEC] = 1,
+    [COP_ASSIGN] = 14,
+    [COP_ASSIGN_ADD] = 14,
+    [COP_ASSIGN_SUB] = 14,
+    [COP_ASSIGN_MULT] = 14,
+    [COP_ASSIGN_DIV] = 14,
+    [COP_ASSIGN_MOD] = 14,
+    [COP_ASSIGN_BIT_AND] = 14,
+    [COP_ASSIGN_BIT_OR] = 14,
+    [COP_ASSIGN_BIT_XOR] = 14,
+    [COP_ASSIGN_LSHIFT] = 14,
+    [COP_ASSIGN_RSHIFT] = 14,
+    [COP_ADD] = 2,
+    [COP_SUB] = 2,
+    [COP_MULT] = 3,
+    [COP_DIV] = 3,
+    [COP_MOD] = 3,
+    [COP_BIT_NOT] = 2,
+    [COP_BIT_AND] = 8,
+    [COP_BIT_OR] = 10,
+    [COP_BIT_XOR] = 9,
+    [COP_LSHIFT] = 5,
+    [COP_RSHIFT] = 5,
+    [COP_NOT] = 2,
+    [COP_AND] = 12,
+    [COP_OR] = 11,
+    [COP_EQ] = 7,
+    [COP_NOT_EQ] = 7,
+    [COP_LT] = 6,
+    [COP_GT] = 6,
+    [COP_LT_EQ] = 6,
+    [COP_GT_EQ] = 6,
+    [COP_INDEX] = 1,
+    [COP_DEREF] = 2,
+    [COP_REF] = 2,
+    [COP_ACCESS] = 1,
+    [COP_PTR_ACCESS] = 1,
+};
+
+int cop_precedence(COp cop)
+{
+    return cop_precedence_table[cop];
 }
