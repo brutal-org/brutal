@@ -21,7 +21,7 @@ CExpr cc_access_str(Str from, Str targ, Alloc *alloc)
 
 CExpr cc_ptr_access_str(Str from, Str targ, Alloc *alloc)
 {
-    return cexpr_access(cexpr_identifier(from, alloc), cexpr_identifier(targ, alloc), alloc);
+    return cexpr_ptr_access(cexpr_identifier(from, alloc), cexpr_identifier(targ, alloc), alloc);
 }
 
 CExpr cc_index_constant(CExpr v, int idx, Alloc *alloc)
@@ -30,7 +30,7 @@ CExpr cc_index_constant(CExpr v, int idx, Alloc *alloc)
 }
 void cc_push_initializer_member(CExpr *targ, Str designator, Str value, Alloc *alloc)
 {
-    CExpr get = cexpr_access(cexpr_empty(), cexpr_identifier(designator, alloc), alloc);
+    CExpr get = cexpr_identifier(designator, alloc);
 
     CExpr set = cexpr_identifier(value, alloc);
     cexpr_initializer_push_element(targ, get, set, alloc);

@@ -158,4 +158,3 @@ CStmt cstmt_break(void)
 {
     return (CStmt){.type = CSTMT_BREAK};
 }
-

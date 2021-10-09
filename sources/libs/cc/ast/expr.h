@@ -134,3 +134,5 @@ struct cexpr
 };
 
 Str cop_to_str(COp type);
+
+int cop_precedence(COp cop);
