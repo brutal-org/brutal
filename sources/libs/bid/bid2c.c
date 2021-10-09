@@ -3,11 +3,11 @@
 #include <cc/builder/helper.h>
 #include <cc/c2c.h>
 
-static CType emit_type(BidInterface const *interface, BidType const *type, Alloc *alloc);
+static CType bid2c_type(BidInterface const *interface, BidType const *type, Alloc *alloc);
 
-void bid_unit_add_typedef(CUnit *unit, BidInterface const *interface, Str s, BidType type, Alloc *alloc)
+void bid2c_unit_add_typedef(CUnit *unit, BidInterface const *interface, Str s, BidType type, Alloc *alloc)
 {
-    CType t = emit_type(interface, &type, alloc);
+    CType t = bid2c_type(interface, &type, alloc);
     CDecl type_def = cdecl_type(s, t, alloc);
     cunit_member(unit, cunit_decl(type_def));
 }
@@ -25,7 +25,7 @@ static bool type_in_interface(BidInterface const *interface, Str name)
     return false;
 }
 
-static CType emit_primitive(BidInterface const *interface, BidPrimitive const *type, Alloc *alloc)
+static CType bid2c_primitive(BidInterface const *interface, BidPrimitive const *type, Alloc *alloc)
 {
 
     Str res;
@@ -41,7 +41,7 @@ static CType emit_primitive(BidInterface const *interface, BidPrimitive const *t
     return ctype_name(res, alloc);
 }
 
-static CType emit_enum(BidInterface const *interface, BidEnum const *type, Alloc *alloc)
+static CType bid2c_enum(BidInterface const *interface, BidEnum const *type, Alloc *alloc)
 {
     CType enum_type = ctype_enum(str$(""), alloc);
 
@@ -56,32 +56,32 @@ static CType emit_enum(BidInterface const *interface, BidEnum const *type, Alloc
     return enum_type;
 }
 
-static CType emit_struct(BidInterface const *interface, BidStruct const *type, Alloc *alloc)
+static CType bid2c_struct(BidInterface const *interface, BidStruct const *type, Alloc *alloc)
 {
     CType cstruct = ctype_struct(str$(""), alloc);
     vec_foreach(member, &type->members)
     {
         ctype_member(&cstruct,
                      member.name,
-                     emit_type(interface, &member.type, alloc),
+                     bid2c_type(interface, &member.type, alloc),
                      alloc);
     }
 
     return cstruct;
 }
 
-static CType emit_type(BidInterface const *interface, BidType const *type, Alloc *alloc)
+static CType bid2c_type(BidInterface const *interface, BidType const *type, Alloc *alloc)
 {
     switch (type->type)
     {
     case BID_TYPE_PRIMITIVE:
-        return emit_primitive(interface, &type->primitive_, alloc);
+        return bid2c_primitive(interface, &type->primitive_, alloc);
 
     case BID_TYPE_ENUM:
-        return emit_enum(interface, &type->enum_, alloc);
+        return bid2c_enum(interface, &type->enum_, alloc);
 
     case BID_TYPE_STRUCT:
-        return emit_struct(interface, &type->struct_, alloc);
+        return bid2c_struct(interface, &type->struct_, alloc);
 
     default:
         panic$("invalid type");
@@ -107,6 +107,7 @@ static CExpr bid2c_method_flags(BidType request_type, Alloc *alloc)
     switch (request_type.type)
     {
     case BID_TYPE_PRIMITIVE:
+    {
         if (is_handle(&request_type))
         {
             CExpr call = cexpr_call(alloc, cexpr_identifier(str$("BR_MSG_HND"), alloc));
@@ -118,9 +119,12 @@ static CExpr bid2c_method_flags(BidType request_type, Alloc *alloc)
             return cexpr_constant(cval_signed(0));
         }
         break;
+    }
 
     case BID_TYPE_ENUM:
+    {
         return cexpr_constant(cval_signed(0));
+    }
 
     case BID_TYPE_STRUCT:
     {
@@ -145,6 +149,7 @@ static CExpr bid2c_method_flags(BidType request_type, Alloc *alloc)
         return cexpr_constant(cval_signed(0));
     }
 }
+
 static CExpr bid2c_msg_args(BidType request_type, Alloc *alloc)
 {
     CExpr arr_init = cexpr_struct_initializer(alloc);
@@ -164,6 +169,7 @@ static CExpr bid2c_msg_args(BidType request_type, Alloc *alloc)
     }
 
     case BID_TYPE_STRUCT:
+    {
         vec_foreach(member, &request_type.struct_.members)
         {
             // (BrArg)req->{member.name}
@@ -178,6 +184,7 @@ static CExpr bid2c_msg_args(BidType request_type, Alloc *alloc)
             cexpr_initializer_push_element(&arr_init, cexpr_empty(), targ, alloc);
         }
         break;
+    }
 
     default:
         return cexpr_empty();
@@ -189,7 +196,6 @@ static CExpr bid2c_msg_args(BidType request_type, Alloc *alloc)
 
 static CStmt bid2c_msg_create(BidInterface const *interface, BidMethod const *method, Alloc *alloc)
 {
-
     CExpr msg_init = cexpr_struct_initializer(alloc);
 
     Str protocol_id = str_fmt(alloc, "{case:upper}_PROTOCOL_ID", interface->name);
@@ -224,6 +230,7 @@ static CDecl bid2c_method_decl(BidInterface const *interface, BidMethod const *m
     CType func_type = ctype_func(ret_type, func_name, alloc);
 
     ctype_member(&func_type, str$("task"), ctype_name(str$("BrId"), alloc), alloc);
+
     if (method->request.type != BID_TYPE_NONE)
     {
         Str request_type = str_fmt(alloc, "{case:pascal}{case:pascal}Request", interface->name, method->name);
@@ -254,7 +261,6 @@ static CExpr bid2c_br_ev_eq_call(Alloc *alloc)
 
 static void bid2c_msg_handle(CStmt *targ, BidInterface const *interface, BidMethod const *method, Alloc *alloc)
 {
-
     /*
     if (result != BR_SUCCESS)
     {
@@ -316,6 +322,7 @@ static void bid2c_msg_handle(CStmt *targ, BidInterface const *interface, BidMeth
         return  (error_type)resp_msg.arg[0];
     }
     */
+
     Str err_type = str_fmt(alloc, " {case:pascal}Error", interface->name);
 
     CExpr ret_res = cexpr_cast(
@@ -362,24 +369,23 @@ static void bid2c_msg_resp_init(CStmt *targ, BidInterface const *interface, BidM
                 cexpr_cast(cc_index_constant(
                                cc_access_str(str$("resp_msg"), str$("arg"), alloc),
                                0, alloc),
-                           emit_type(interface, &member.type, alloc),
+                           bid2c_type(interface, &member.type, alloc),
                            alloc),
                 alloc);
 
             cstmt_block_add(targ, cstmt_expr(set_expr));
             index++;
         }
+        break;
     }
-    break;
 
     default:
         break;
     }
 }
 
-static CDecl emit_method(BidInterface const *interface, BidMethod const *method, Alloc *alloc)
+static CDecl bid2c_method(BidInterface const *interface, BidMethod const *method, Alloc *alloc)
 {
-
     CStmt statement = cstmt_block(alloc);
 
     cstmt_block_add(&statement, bid2c_msg_create(interface, method, alloc));
@@ -402,7 +408,7 @@ static CDecl emit_method(BidInterface const *interface, BidMethod const *method,
     return func_decl;
 }
 
-static CDecl emit_callback(BidInterface const *interface, BidMethod const *method, Alloc *alloc)
+static CDecl bid2c_callback(BidInterface const *interface, BidMethod const *method, Alloc *alloc)
 {
     Str err_type = str_fmt(alloc, "{case:pascal}Error", interface->name);
     Str request_type = str_fmt(alloc, "{case:pascal}{case:pascal}Request", interface->name, method->name);
@@ -431,20 +437,21 @@ static CDecl emit_callback(BidInterface const *interface, BidMethod const *metho
                  ctype_ptr(ctype_name(str$("void"), alloc), alloc), // request_type const *
                  alloc);
 
-    CDecl decl = cdecl_type(str$(func_name), ctype_fn, alloc);
-    return decl;
+    return cdecl_type(str$(func_name), ctype_fn, alloc);
 }
 
 /* --- Types ---------------------------------------------------------------- */
-void bid2c_type(CUnit *unit, const BidInterface *interface, Alloc *alloc)
+
+void bid2c_typedef(CUnit *unit, const BidInterface *interface, Alloc *alloc)
 {
     vec_foreach(alias, &interface->aliases)
     {
         Str s = str_fmt(alloc, "{case:pascal}{case:pascal}", interface->name, alias.name);
-        CDecl type_def = cdecl_type(s, emit_type(interface, &alias.type, alloc), alloc);
+        CDecl type_def = cdecl_type(s, bid2c_type(interface, &alias.type, alloc), alloc);
         cunit_member(unit, cunit_decl(type_def));
     }
 }
+
 /* --- Messages ------------------------------------------------------------- */
 
 CType bid2c_method_message_type(BidInterface const *interface, Alloc *alloc)
@@ -474,6 +481,169 @@ CType bid2c_method_message_type(BidInterface const *interface, Alloc *alloc)
     return message_type_decl;
 }
 
+CStmt bid2c_dispatcher_case_if_success(BidInterface const *interface, BidMethod method, Alloc *alloc)
+{
+    Str response_constant_name = str_fmt(alloc, "{case:upper}_{case:upper}_RESPONSE", interface->name, method.name);
+    Str protocol_constant_name = str_fmt(alloc, "{case:upper}_PROTOCOL_ID", interface->name);
+    BidType response = method.response;
+    CStmt if_true_block = cstmt_block(alloc);
+
+    // resp_msg.prot = {case:upper}_PROTOCOL_ID;
+    CExpr set_prot_expr = cexpr_assign(cc_access_str(str$("resp_msg"), str$("prot"), alloc), cexpr_identifier(protocol_constant_name, alloc), alloc);
+    cstmt_block_add(&if_true_block, cstmt_expr(set_prot_expr));
+
+    // resp_msg.type = {case:upper}_{case:upper}_RESPONSE;
+    CExpr set_type_expr = cexpr_assign(cc_access_str(str$("resp_msg"), str$("type"), alloc), cexpr_identifier(response_constant_name, alloc), alloc);
+    cstmt_block_add(&if_true_block, cstmt_expr(set_type_expr));
+
+    switch (response.type)
+    {
+    case BID_TYPE_PRIMITIVE:
+    case BID_TYPE_ENUM:
+    {
+
+        CExpr left_resp = cc_index_constant(cc_access_str(str$("resp_msg"), str$("arg"), alloc), 0, alloc);
+        CExpr casted_right = cexpr_cast(cc_access_str(str$("resp"), str$("handle"), alloc), ctype_name(str$("BrId"), alloc), alloc);
+
+        CExpr set_expr = cexpr_assign(left_resp, casted_right, alloc);
+        cstmt_block_add(&if_true_block, cstmt_expr(set_expr));
+        break;
+    }
+
+    case BID_TYPE_STRUCT:
+    {
+        int index = 0;
+        vec_foreach(member, &response.struct_.members)
+        {
+            // resp_msg.{} = (type)resp.arg[{}];
+            CExpr res_msg_expr = cc_access_str(str$("resp"), member.name, alloc);
+            CExpr left = cc_index_constant(cc_access_str(str$("resp_msg"), str$("arg"), alloc), index, alloc);
+            CExpr res_msg_casted = cexpr_cast(res_msg_expr, ctype_name(str$("BrId"), alloc), alloc);
+            CExpr set_expr = cexpr_assign(left, res_msg_casted, alloc);
+
+            cstmt_block_add(&if_true_block, cstmt_expr(set_expr));
+            index++;
+        }
+        break;
+    }
+
+    default:
+        break;
+    }
+
+    return if_true_block;
+}
+
+CStmt bid2c_dispatcher_case_if_error(BidInterface const *interface, Alloc *alloc)
+{
+    Str error_constant_name = str_fmt(alloc, "{case:upper}_ERROR", interface->name);
+
+    Str protocol_constant_name = str_fmt(alloc, "{case:upper}_PROTOCOL_ID", interface->name);
+    CStmt if_false_block = cstmt_block(alloc);
+    // resp_msg.prot = {case:upper}_PROTOCOL_ID;
+    CExpr set_prot_expr = cexpr_assign(cc_access_str(str$("resp_msg"), str$("prot"), alloc), cexpr_identifier(protocol_constant_name, alloc), alloc);
+    cstmt_block_add(&if_false_block, cstmt_expr(set_prot_expr));
+
+    // resp_msg.type = {case:upper}_{case:upper}_ERROR;
+    CExpr set_type_expr = cexpr_assign(cc_access_str(str$("resp_msg"), str$("type"), alloc), cexpr_identifier(error_constant_name, alloc), alloc);
+    cstmt_block_add(&if_false_block, cstmt_expr(set_type_expr));
+
+    // resp_msg.arg[0] = error;
+    CExpr set_error_info = cexpr_assign((cc_index_constant(cc_access_str(str$("resp_msg"), str$("arg"), alloc), 0, alloc)), cexpr_identifier(str$("error"), alloc), alloc);
+    cstmt_block_add(&if_false_block, cstmt_expr(set_error_info));
+
+    return if_false_block;
+}
+
+void bid2c_dispatcher_case(BidInterface const *interface, CStmt *switch_block, BidMethod method, Alloc *alloc)
+{
+    Str success_constant_name = str_fmt(alloc, "{case:upper}_SUCCESS", interface->name);
+    Str request_constant_name = str_fmt(alloc, "{case:upper}_{case:upper}_REQUEST", interface->name, method.name);
+    Str request_type_name = str_fmt(alloc, "{case:pascal}{case:pascal}Request", interface->name, method.name);
+    Str response_type_name = str_fmt(alloc, "{case:pascal}{case:pascal}Response", interface->name, method.name);
+    Str error_type_name = str_fmt(alloc, "{case:pascal}Error", interface->name);
+    Str server_handle_name = str_fmt(alloc, "handle_{case:lower}", method.name);
+    BidType request = method.request;
+
+    // case {case:upper}_{case:upper}_REQUEST:
+    CStmt case_stmt = cstmt_case(cexpr_identifier(str$(request_constant_name), alloc));
+    CStmt case_block = cstmt_block(alloc);
+
+    // {} req = {}
+    cstmt_block_add(&case_block, cc_var_decl_str(request_type_name, str$("req"), cexpr_struct_initializer(alloc), alloc));
+
+    // req = ... req_msg->{}
+
+    switch (request.type)
+    {
+    case BID_TYPE_PRIMITIVE:
+    case BID_TYPE_ENUM:
+    {
+        // req = (req_type)req_msg->arg[0];
+        CExpr req_msg_expr = cc_index_constant(cc_ptr_access_str(str$("req_msg"), str$("arg"), alloc), 0, alloc);
+
+        CExpr req_msg_casted = cexpr_cast(req_msg_expr, ctype_name(request_type_name, alloc), alloc);
+        CExpr set_expr = cexpr_assign(cexpr_identifier(str$("req"), alloc), req_msg_casted, alloc);
+        cstmt_block_add(&case_block, cstmt_expr(set_expr));
+        break;
+    }
+
+    case BID_TYPE_STRUCT:
+    {
+        int index = 0;
+        vec_foreach(member, &request.struct_.members)
+        {
+            // req.{} = (type)req_msg->arg[{}];
+            CExpr left = cc_access_str(str$("req"), member.name, alloc);
+            CExpr req_msg_expr = cc_index_constant(cc_ptr_access_str(str$("req_msg"), str$("arg"), alloc), index, alloc);
+            CExpr req_msg_casted = cexpr_cast(req_msg_expr, bid2c_type(interface, &member.type, alloc), alloc);
+            CExpr set_expr = cexpr_assign(left, req_msg_casted, alloc);
+
+            cstmt_block_add(&case_block, cstmt_expr(set_expr));
+            index++;
+        }
+    }
+    break;
+
+    default:
+        break;
+    }
+
+    // {} resp = {}
+    cstmt_block_add(&case_block, cc_var_decl_str(response_type_name, str$("resp"), cexpr_struct_initializer(alloc), alloc));
+
+    // {} error = server->handle_{case:lower}(req_msg->from, &req, &resp, server->ctx)
+
+    CExpr handle_get = cc_ptr_access_str(str$("server"), str$(server_handle_name), alloc);
+    CExpr call = cexpr_call(alloc, handle_get);
+
+    cexpr_add_arg(&call, cc_ptr_access_str(str$("req_msg"), str$("from"), alloc));
+    cexpr_add_arg(&call, cexpr_ref(cexpr_identifier(str$("req"), alloc), alloc));
+    cexpr_add_arg(&call, cexpr_ref(cexpr_identifier(str$("resp"), alloc), alloc));
+    cexpr_add_arg(&call, cc_ptr_access_str(str$("server"), str$("ctx"), alloc));
+
+    cstmt_block_add(&case_block, cc_var_decl_str(error_type_name, str$("error"), call, alloc));
+
+    // if (error == {case:upper}_SUCCESS)
+
+    // error == {}_SUCCESS
+    CExpr check_expr = cexpr_eq(cexpr_identifier(str$("error"), alloc), cexpr_identifier(success_constant_name, alloc), alloc);
+
+    // if TRUE
+
+    CStmt if_true_block = bid2c_dispatcher_case_if_success(interface, method, alloc);
+    CStmt if_false_block = bid2c_dispatcher_case_if_error(interface, alloc);
+
+    CStmt if_statement = cstmt_if_else(check_expr, if_true_block, if_false_block, alloc);
+
+    cstmt_block_add(&case_block, if_statement);
+
+    // break
+    cstmt_block_add(&case_block, cstmt_break());
+    cstmt_block_add(switch_block, case_stmt);
+    cstmt_block_add(switch_block, case_block);
+}
+
 CDecl bid2c_dispatcher(BidInterface const *interface, Alloc *alloc)
 {
     Str server_handler_name = str_fmt(alloc, "{case:pascal}Server", interface->name);
@@ -499,156 +669,11 @@ CDecl bid2c_dispatcher(BidInterface const *interface, Alloc *alloc)
 
     // req_msg->type
     CExpr case_expr = cc_ptr_access_str(str$("req_msg"), str$("type"), alloc);
-    Str error_type_name = str_fmt(alloc, "{case:pascal}Error", interface->name);
-    Str success_constant_name = str_fmt(alloc, "{case:upper}_SUCCESS", interface->name);
-    Str error_constant_name = str_fmt(alloc, "{case:upper}_ERROR", interface->name);
-    Str protocol_constant_name = str_fmt(alloc, "{case:upper}_PROTOCOL_ID", interface->name);
     CStmt switch_block = cstmt_block(alloc);
 
     vec_foreach(method, &interface->methods)
     {
-        Str response_constant_name = str_fmt(alloc, "{case:upper}_{case:upper}_RESPONSE", interface->name, method.name);
-        Str request_constant_name = str_fmt(alloc, "{case:upper}_{case:upper}_REQUEST", interface->name, method.name);
-        Str request_type_name = str_fmt(alloc, "{case:pascal}{case:pascal}Request", interface->name, method.name);
-        Str response_type_name = str_fmt(alloc, "{case:pascal}{case:pascal}Response", interface->name, method.name);
-        Str server_handle_name = str_fmt(alloc, "handle_{case:lower}", method.name);
-        BidType request = method.request;
-        BidType response = method.response;
-
-        // case {case:upper}_{case:upper}_REQUEST:
-        CStmt case_stmt = cstmt_case(cexpr_identifier(str$(request_constant_name), alloc));
-        CStmt case_block = cstmt_block(alloc);
-
-        // {} req = {}
-        cstmt_block_add(&case_block, cc_var_decl_str(request_type_name, str$("req"), cexpr_struct_initializer(alloc), alloc));
-
-        // req = ... req_msg->{}
-
-        switch (request.type)
-        {
-        case BID_TYPE_PRIMITIVE:
-        case BID_TYPE_ENUM:
-        {
-            // req = (req_type)req_msg->arg[0];
-            CExpr req_msg_expr = cc_index_constant(cc_ptr_access_str(str$("req_msg"), str$("arg"), alloc), 0, alloc);
-
-            CExpr req_msg_casted = cexpr_cast(req_msg_expr, ctype_name(request_type_name, alloc), alloc);
-            CExpr set_expr = cexpr_assign(cexpr_identifier(str$("req"), alloc), req_msg_casted, alloc);
-            cstmt_block_add(&case_block, cstmt_expr(set_expr));
-            break;
-        }
-
-        case BID_TYPE_STRUCT:
-        {
-            int index = 0;
-            vec_foreach(member, &request.struct_.members)
-            {
-                // req.{} = (type)req_msg->arg[{}];
-                CExpr left = cc_access_str(str$("req"), member.name, alloc);
-                CExpr req_msg_expr = cc_index_constant(cc_ptr_access_str(str$("req_msg"), str$("arg"), alloc), index, alloc);
-                CExpr req_msg_casted = cexpr_cast(req_msg_expr, emit_type(interface, &member.type, alloc), alloc);
-                CExpr set_expr = cexpr_assign(left, req_msg_casted, alloc);
-
-                cstmt_block_add(&case_block, cstmt_expr(set_expr));
-                index++;
-            }
-        }
-        break;
-
-        default:
-            break;
-        }
-
-        // {} resp = {}
-        cstmt_block_add(&case_block, cc_var_decl_str(response_type_name, str$("resp"), cexpr_struct_initializer(alloc), alloc));
-
-        // {} error = server->handle_{case:lower}(req_msg->from, &req, &resp, server->ctx)
-
-        CExpr handle_get = cc_ptr_access_str(str$("server"), str$(server_handle_name), alloc);
-        CExpr call = cexpr_call(alloc, handle_get);
-
-        cexpr_add_arg(&call, cc_ptr_access_str(str$("req_msg"), str$("from"), alloc));
-        cexpr_add_arg(&call, cexpr_ref(cexpr_identifier(str$("req"), alloc), alloc));
-        cexpr_add_arg(&call, cexpr_ref(cexpr_identifier(str$("resp"), alloc), alloc));
-        cexpr_add_arg(&call, cc_ptr_access_str(str$("server"), str$("ctx"), alloc));
-
-        cstmt_block_add(&case_block, cc_var_decl_str(error_type_name, str$("error"), call, alloc));
-
-        // if (error == {case:upper}_SUCCESS)
-
-        // error == {}_SUCCESS
-        CExpr check_expr = cexpr_eq(cexpr_identifier(str$("error"), alloc), cexpr_identifier(success_constant_name, alloc), alloc);
-
-        // if TRUE
-
-        CStmt if_true_block = cstmt_block(alloc);
-        {
-            // resp_msg.prot = {case:upper}_PROTOCOL_ID;
-            CExpr set_prot_expr = cexpr_assign(cc_access_str(str$("resp_msg"), str$("prot"), alloc), cexpr_identifier(protocol_constant_name, alloc), alloc);
-            cstmt_block_add(&if_true_block, cstmt_expr(set_prot_expr));
-
-            // resp_msg.type = {case:upper}_{case:upper}_RESPONSE;
-            CExpr set_type_expr = cexpr_assign(cc_access_str(str$("resp_msg"), str$("type"), alloc), cexpr_identifier(response_constant_name, alloc), alloc);
-            cstmt_block_add(&if_true_block, cstmt_expr(set_type_expr));
-
-            switch (response.type)
-            {
-            case BID_TYPE_PRIMITIVE:
-            case BID_TYPE_ENUM:
-            {
-
-                CExpr left_resp = cc_index_constant(cc_access_str(str$("resp_msg"), str$("arg"), alloc), 0, alloc);
-                CExpr casted_right = cexpr_cast(cc_access_str(str$("resp"), str$("handle"), alloc), ctype_name(str$("BrId"), alloc), alloc);
-
-                CExpr set_expr = cexpr_assign(left_resp, casted_right, alloc);
-                cstmt_block_add(&if_true_block, cstmt_expr(set_expr));
-                break;
-            }
-
-            case BID_TYPE_STRUCT:
-            {
-                int index = 0;
-                vec_foreach(member, &response.struct_.members)
-                {
-                    // resp_msg.{} = (type)resp.arg[{}];
-                    CExpr res_msg_expr = cc_access_str(str$("resp"), member.name, alloc);
-                    CExpr left = cc_index_constant(cc_access_str(str$("resp_msg"), str$("arg"), alloc), index, alloc);
-                    CExpr res_msg_casted = cexpr_cast(res_msg_expr, ctype_name(str$("BrId"), alloc), alloc);
-                    CExpr set_expr = cexpr_assign(left, res_msg_casted, alloc);
-
-                    cstmt_block_add(&if_true_block, cstmt_expr(set_expr));
-                    index++;
-                }
-            }
-            break;
-
-            default:
-                break;
-            }
-        }
-        CStmt if_false_block = cstmt_block(alloc);
-        {
-            // resp_msg.prot = {case:upper}_PROTOCOL_ID;
-            CExpr set_prot_expr = cexpr_assign(cc_access_str(str$("resp_msg"), str$("prot"), alloc), cexpr_identifier(protocol_constant_name, alloc), alloc);
-            cstmt_block_add(&if_false_block, cstmt_expr(set_prot_expr));
-
-            // resp_msg.type = {case:upper}_{case:upper}_ERROR;
-            CExpr set_type_expr = cexpr_assign(cc_access_str(str$("resp_msg"), str$("type"), alloc), cexpr_identifier(error_constant_name, alloc), alloc);
-            cstmt_block_add(&if_false_block, cstmt_expr(set_type_expr));
-
-            // resp_msg.arg[0] = error;
-            CExpr set_error_info = cexpr_assign((cc_index_constant(cc_access_str(str$("resp_msg"), str$("arg"), alloc), 0, alloc)), cexpr_identifier(str$("error"), alloc), alloc);
-            cstmt_block_add(&if_false_block, cstmt_expr(set_error_info));
-        }
-
-        CStmt if_statement = cstmt_if_else(check_expr, if_true_block, if_false_block, alloc);
-
-        cstmt_block_add(&case_block, if_statement);
-
-        // break
-        cstmt_block_add(&case_block, cstmt_break());
-        cstmt_block_add(&switch_block, case_stmt);
-        cstmt_block_add(&switch_block, case_block);
+        bid2c_dispatcher_case(interface, &switch_block, method, alloc);
     }
 
     CStmt switch_statement = cstmt_switch(case_expr, switch_block, alloc);
@@ -686,6 +711,38 @@ CDecl bid2c_dispatcher(BidInterface const *interface, Alloc *alloc)
 
     return decl;
 }
+
+CDecl bid2c_server_structure_declaration(BidInterface const *interface, Alloc *alloc)
+{
+    /*
+        typedef struct
+        {
+            void *ctx;
+            {}{}Fn *handle_{};
+            {}ErrorFn *handle_error;
+        } {}Server;
+    */
+
+    Str error_fn_name = str_fmt(alloc, "{case:pascal}ErrorFn", interface->name);
+    Str server_handler_name = str_fmt(alloc, "{case:pascal}Server", interface->name);
+
+    CType server_handle = ctype_struct(str$(""), alloc);
+
+    ctype_member(&server_handle, str$("ctx"), ctype_ptr(ctype_name(str$("void"), alloc), alloc), alloc);
+
+    vec_foreach(method, &interface->methods)
+    {
+        Str func_type_name = str_fmt(alloc, "{case:pascal}{case:pascal}Fn", interface->name, method.name);
+        Str member_name = str_fmt(alloc, "handle_{}", method.name);
+        CType func_type = ctype_ptr(ctype_name(func_type_name, alloc), alloc);
+        ctype_member(&server_handle, member_name, func_type, alloc);
+    }
+
+    ctype_member(&server_handle, str$("handle_error"), ctype_ptr(ctype_name(error_fn_name, alloc), alloc), alloc);
+
+    return cdecl_type(server_handler_name, server_handle, alloc);
+}
+
 void bid2c_methods(CUnit *unit, BidInterface const *interface, Alloc *alloc)
 {
 
@@ -698,34 +755,35 @@ void bid2c_methods(CUnit *unit, BidInterface const *interface, Alloc *alloc)
     {
         if (method.request.type != BID_TYPE_NONE)
         {
-            Str s = str_fmt(alloc, "{case:pascal}{case:pascal}Request;", interface->name, method.name);
-            bid_unit_add_typedef(unit, interface, s, method.request, alloc);
+            Str s = str_fmt(alloc, "{case:pascal}{case:pascal}Request", interface->name, method.name);
+            bid2c_unit_add_typedef(unit, interface, s, method.request, alloc);
         }
 
         if (method.response.type != BID_TYPE_NONE)
         {
-            Str s = str_fmt(alloc, "{case:pascal}{case:pascal}Response;", interface->name, method.name);
-            bid_unit_add_typedef(unit, interface, s, method.response, alloc);
+            Str s = str_fmt(alloc, "{case:pascal}{case:pascal}Response", interface->name, method.name);
+            bid2c_unit_add_typedef(unit, interface, s, method.response, alloc);
         }
     }
 
     vec_foreach(event, &interface->events)
     {
-        Str s = str_fmt(alloc, "{case:pascal}{case:pascal}Event;", interface->name, event.name);
-        bid_unit_add_typedef(unit, interface, s, event.data, alloc);
+        Str s = str_fmt(alloc, "{case:pascal}{case:pascal}Event", interface->name, event.name);
+        bid2c_unit_add_typedef(unit, interface, s, event.data, alloc);
     }
 
     vec_foreach(method, &interface->methods)
     {
-        cunit_member(unit, cunit_decl(emit_method(interface, &method, alloc)));
+        cunit_member(unit, cunit_decl(bid2c_method(interface, &method, alloc)));
     }
 
     vec_foreach(method, &interface->methods)
     {
-        cunit_member(unit, cunit_decl(emit_callback(interface, &method, alloc)));
+        cunit_member(unit, cunit_decl(bid2c_callback(interface, &method, alloc)));
     }
 
     Str error_fn_name = str_fmt(alloc, "{case:pascal}ErrorFn", interface->name);
+
     {
         // typedef void {case:pascal}ErrorFn(BrId from, BrResult error, void* ctx);
 
@@ -737,40 +795,15 @@ void bid2c_methods(CUnit *unit, BidInterface const *interface, Alloc *alloc)
         cunit_member(unit, cunit_decl(typedef_decl));
     }
 
-    {
-        /*
-            typedef struct
-            {
-                void *ctx;
-                {}{}Fn *handle_{};
-                {}ErrorFn *handle_error;
-            } {}Server;
-        */
-        Str server_handler_name = str_fmt(alloc, "{case:pascal}Server", interface->name);
+    CDecl typedef_decl = bid2c_server_structure_declaration(interface, alloc);
+    cunit_member(unit, cunit_decl(typedef_decl));
 
-        CType server_handle = ctype_struct(str$(""), alloc);
-
-        ctype_member(&server_handle, str$("ctx"), ctype_ptr(ctype_name(str$("void"), alloc), alloc), alloc);
-
-        vec_foreach(method, &interface->methods)
-        {
-            Str func_type_name = str_fmt(alloc, "{case:pascal}{case:pascal}Fn", interface->name, method.name);
-            Str member_name = str_fmt(alloc, "handle_{}", method.name);
-            CType func_type = ctype_ptr(ctype_name(func_type_name, alloc), alloc);
-            ctype_member(&server_handle, member_name, func_type, alloc);
-        }
-
-        ctype_member(&server_handle, str$("handle_error"), ctype_ptr(ctype_name(error_fn_name, alloc), alloc), alloc);
-
-        CDecl typedef_decl = cdecl_type(server_handler_name, server_handle, alloc);
-        cunit_member(unit, cunit_decl(typedef_decl));
-    }
     CDecl dispatcher_decl = bid2c_dispatcher(interface, alloc);
     cunit_member(unit, cunit_decl(dispatcher_decl));
 }
+
 void bid2c(BidInterface const *interface, Emit *emit, Alloc *alloc)
 {
-
     CUnit unit;
     unit = cunit(alloc);
 
@@ -779,14 +812,14 @@ void bid2c(BidInterface const *interface, Emit *emit, Alloc *alloc)
     cunit_member(&unit, cunit_include(false, str$("bal/ev.h"), alloc));
     cunit_member(&unit, cunit_include(false, str$("stdint.h"), alloc));
 
-    // emit_fmt(emit, "#define {case:upper}_PROTOCOL_ID ({#0x})\n\n", interface->name, interface->id);
+    // bid2c_fmt(emit, "#define {case:upper}_PROTOCOL_ID ({#0x})\n\n", interface->name, interface->id);
     Str protocol_id = str_fmt(alloc, "{case:upper}_PROTOCOL_ID", interface->name);
     cunit_member(&unit, cunit_define(protocol_id, cexpr_cast(cexpr_constant(cval_unsigned(interface->id)), ctype_name(str$("uint32_t"), alloc), alloc), alloc));
 
     Str error_type = str_fmt(alloc, "{case:pascal}Error", interface->name);
-    cunit_member(&unit, cunit_decl(cdecl_type(error_type, emit_enum(interface, &interface->errors, alloc), alloc)));
+    cunit_member(&unit, cunit_decl(cdecl_type(error_type, bid2c_enum(interface, &interface->errors, alloc), alloc)));
 
-    bid2c_type(&unit, interface, alloc);
+    bid2c_typedef(&unit, interface, alloc);
 
     bid2c_methods(&unit, interface, alloc);
 
