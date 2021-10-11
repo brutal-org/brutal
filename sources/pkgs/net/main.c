@@ -1,15 +1,14 @@
 /* megalithicc network server */
 #include <brutal/io.h>
 #include <brutal/log.h>
+#include "interface.h"
 #include "pci.h"
 #include "rtl8139.h"
 
-int main(void)
+int br_entry_handover(Handover *handover)
 {
     log$("Hello from the net server!");
-    PciConfigType0 pci_conf = pci_get_network_card(NULL);
-    RTL8139Device *rtl8139_dev = rtl8139_init(&pci_conf);
-    log$("rtl8139 initialized \\\\o/");
+    interface_init(handover);
 
     BrIpcArgs ipc;
     ipc.flags = BR_IPC_RECV | BR_IPC_BLOCK;
@@ -25,13 +24,9 @@ int main(void)
             BrIrq irq = msg.arg[0];
 
             log$("IRQ: {}", irq);
-            if (irq == rtl8139_dev->int_line)
+            vec_foreach(v, &interfaces)
             {
-                br_ack(&(BrAckArgs){
-                    .handle = rtl8139_dev->irq_handle,
-                });
-
-                rtl8139_handle_irq();
+                v.driver->handle(v.ctx, irq);
             }
         }
         else

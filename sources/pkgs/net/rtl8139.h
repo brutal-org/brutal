@@ -61,9 +61,3 @@ typedef struct
     uint8_t tx_curr;
     uint16_t int_line;
 } RTL8139Device;
-
-
-RTL8139Device *rtl8139_init(PciConfigType0 *conf);
-void rtl8139_send_packet(uint8_t *data, size_t len);
-void rtl8139_handle_irq();
-void rtl8139_read_mac();
