@@ -9,5 +9,4 @@
 #include <pci/config.h>
 #include <handover/handover.h>
 
-PciConfigType0 pci_get_network_card(Handover *handover);
-uint32_t pci_get_base_io(PciConfigType0 *conf);
+void pci_get_network_cards(Handover *handover);
