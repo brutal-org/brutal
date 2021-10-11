@@ -1,8 +1,7 @@
 #include <brutal/io.h>
 #include <brutal/log.h>
-#include <syscalls/syscalls.h>
-#include <syscalls/io.h>
-#include <syscalls/helpers.h>
+#include <bal/io.h>
+#include <bal/helpers.h>
 #include "rtl8139.h"
 
 static const uint8_t tsd_reg[4] = {RTL8139_TSD0,

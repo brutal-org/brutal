@@ -1,7 +1,7 @@
 #pragma once
 
 #include <brutal/base.h>
-#include <syscalls/syscalls.h>
+#include <bal/syscalls.h>
 #include "pci.h"
 
 /* from: RTL8139D DataSheet p10-11 */
