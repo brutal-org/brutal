@@ -20,52 +20,52 @@ typedef Vec2(double) Vec2d;
 #define vec$(T, VEC) \
     vec_create((T), (VEC).x, (VEC).y)
 
-#define vec2_add(a, b) ( \
-    {                    \
-        auto __v = (a);  \
-        __v.x += (b).x;  \
-        __v.y += (b).y;  \
-        __v;             \
+#define vec2_add(a, b) (    \
+    {                       \
+        AutoType __v = (a); \
+        __v.x += (b).x;     \
+        __v.y += (b).y;     \
+        __v;                \
     })
 
-#define vec2_sub(a, b) ( \
-    {                    \
-        auto __v = (a);  \
-        __v.x -= (b).x;  \
-        __v.y -= (b).y;  \
-        __v;             \
+#define vec2_sub(a, b) (    \
+    {                       \
+        AutoType __v = (a); \
+        __v.x -= (b).x;     \
+        __v.y -= (b).y;     \
+        __v;                \
     })
 
-#define vec2_mul(a, b) ( \
-    {                    \
-        auto __v = (a);  \
-        __v.x *= (b).x;  \
-        __v.y *= (b).y;  \
-        __v;             \
+#define vec2_mul(a, b) (    \
+    {                       \
+        AutoType __v = (a); \
+        __v.x *= (b).x;     \
+        __v.y *= (b).y;     \
+        __v;                \
     })
 
-#define vec2_mul_v(a, v) ( \
-    {                      \
-        auto __v = (a);    \
-        __v.x *= v;        \
-        __v.y *= v;        \
-        __v;               \
+#define vec2_mul_v(a, v) (  \
+    {                       \
+        AutoType __v = (a); \
+        __v.x *= v;         \
+        __v.y *= v;         \
+        __v;                \
     })
 
-#define vec2_div(a, b) ( \
-    {                    \
-        auto __v = (a);  \
-        __v.x /= (b).x;  \
-        __v.y /= (b).y;  \
-        __v;             \
+#define vec2_div(a, b) (    \
+    {                       \
+        AutoType __v = (a); \
+        __v.x /= (b).x;     \
+        __v.y /= (b).y;     \
+        __v;                \
     })
 
-#define vec2_div_v(a, v) ( \
-    {                      \
-        auto __v = (a);    \
-        __v.x /= v;        \
-        __v.y /= v;        \
-        __v;               \
+#define vec2_div_v(a, v) (  \
+    {                       \
+        AutoType __v = (a); \
+        __v.x /= v;         \
+        __v.y /= v;         \
+        __v;                \
     })
 
 #define vec2_length_squared(a) \

@@ -790,7 +790,7 @@ void bid2c_methods(CUnit *unit, BidInterface const *interface, Alloc *alloc)
         CType t = ctype_func(ctype_name(str$("void"), alloc), str$(""), alloc);
         ctype_member(&t, str$("from"), ctype_name(str$("BrId"), alloc), alloc);
         ctype_member(&t, str$("error"), ctype_name(str$("BrResult"), alloc), alloc);
-        ctype_member(&t, str$("ctx"), ctype_ptr(ctype_name(str$("void"), alloc), alloc), alloc);
+        ctype_member(&t, str$("ctx"), ctype_ptr(ctype_void(str$("void"), alloc), alloc), alloc);
         CDecl typedef_decl = cdecl_type(error_fn_name, t, alloc);
         cunit_member(unit, cunit_decl(typedef_decl));
     }
@@ -810,7 +810,6 @@ void bid2c(BidInterface const *interface, Emit *emit, Alloc *alloc)
     cunit_member(&unit, cunit_pragma_once(alloc));
     cunit_member(&unit, cunit_include(false, str$("bal/types.h"), alloc));
     cunit_member(&unit, cunit_include(false, str$("bal/ev.h"), alloc));
-    cunit_member(&unit, cunit_include(false, str$("stdint.h"), alloc));
 
     // bid2c_fmt(emit, "#define {case:upper}_PROTOCOL_ID ({#0x})\n\n", interface->name, interface->id);
     Str protocol_id = str_fmt(alloc, "{case:upper}_PROTOCOL_ID", interface->name);

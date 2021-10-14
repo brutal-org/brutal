@@ -3,7 +3,7 @@
 #include <brutal/base/result.h>
 #include <brutal/text/str.h>
 
-enum error_kind
+typedef enum
 {
     ERR_KIND_SUCCESS,
 
@@ -19,11 +19,11 @@ enum error_kind
     ERR_KIND_EMPTY,
 
     ERR_KIND_UNDEFINED,
-};
+} ErrorKind;
 
 typedef struct
 {
-    enum error_kind kind;
+    ErrorKind kind;
     Str message;
 } Error;
 
@@ -48,6 +48,8 @@ typedef struct
 {
     char _dummy;
 } Success;
+
+#define ERROR(ERROR) ERR(MaybeError, ERROR)
 
 #define SUCCESS OK(MaybeError, (Success){})
 

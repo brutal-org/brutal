@@ -1,9 +1,0 @@
-interface repository
-{
-    errors
-    {
-        UNKNOWN_SERVICE,
-    };
-
-    method resolve StrFix128 -> TaskId;
-}

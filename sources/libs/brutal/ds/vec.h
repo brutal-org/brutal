@@ -95,16 +95,19 @@ void vec_swap_impl(VecImpl *impl, int idx1, int idx2);
 #define vec_compact(v) vec_compact_impl(impl$(v))
 
 #define vec_find(v, val, idx)                         \
-    STMT(                                             \
+    do                                                \
+    {                                                 \
         for ((idx) = 0; (idx) < (v)->length; (idx)++) \
         {                                             \
             if ((v)->data[(idx)] == (val))            \
                 break;                                \
         }                                             \
                                                       \
-        if ((idx) == (v)->length) {                   \
+        if ((idx) == (v)->length)                     \
+        {                                             \
             (idx) = -1;                               \
-        })
+        }                                             \
+    } while (0)
 
 #define vec_remove(v, val)           \
     do                               \

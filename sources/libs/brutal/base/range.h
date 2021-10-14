@@ -42,11 +42,11 @@
 #define range_from_start_and_end(T, START, END) \
     (T) { (START), (END - START) }
 
-#define range_merge(LHS, RHS) (                                 \
-    {                                                           \
-        auto __start = MIN(range_begin(LHS), range_begin(RHS)); \
-        auto __end = MAX(range_end(LHS), range_end(RHS));       \
-        range_from_start_and_end(typeof(LHS), __start, __end);  \
+#define range_merge(LHS, RHS) (                                     \
+    {                                                               \
+        AutoType __start = MIN(range_begin(LHS), range_begin(RHS)); \
+        AutoType __end = MAX(range_end(LHS), range_end(RHS));       \
+        range_from_start_and_end(typeof(LHS), __start, __end);      \
     })
 
 #define range_half_under(SELF, SPLIT) (         \

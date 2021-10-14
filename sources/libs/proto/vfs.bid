@@ -1,5 +1,4 @@
-
-interface vfs
+interface fs
 {
     id = 0x14f80c8f;
 
@@ -15,14 +14,14 @@ interface vfs
     type FsName: Str;
     type Off: long;
 
-    method open { path: BrMemObj, flags: int } -> { handle: FileHandle};
-    method close { handle: FileHandle } -> { handle: FileHandle};
+    method open { path: BrMemObj, flags: int } -> FileHandle;
+    method close { handle: FileHandle } -> FileHandle;
 
-    method read { handle: FileHandle, off: Off, data: BrMemObj } -> { readed: size_t};
-    method write { handle: FileHandle, off: Off, data: BrMemObj } -> { written: size_t};
+    method read { handle: FileHandle, off: Off, data: BrMemObj } -> { readed: size_t };
+    method write { handle: FileHandle, off: Off, data: BrMemObj } -> { written: size_t };
 
     method stat { handle: FileHandle } -> {
-        is_directory: bool,
+        is_dir: bool,
         size: size_t, 
         devid: FileSystemHandle,
     };

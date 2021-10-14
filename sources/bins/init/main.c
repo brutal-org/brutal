@@ -1,6 +1,6 @@
 #include <bal/exec.h>
 #include <bal/helpers.h>
-#include <bal/shared_mem.h>
+#include <bal/shm.h>
 #include <bal/syscalls.h>
 #include <brutal/alloc.h>
 #include <brutal/codec/tga.h>
@@ -8,8 +8,6 @@
 #include <brutal/log.h>
 #include <elf/exec.h>
 #include <handover/handover.h>
-#include <proto/fs_dev.h>
-#include <proto/vfs.h>
 
 static void display_bootimage(Handover const *handover)
 {
@@ -140,90 +138,6 @@ BrResult srv_run(Handover const *handover, Str name, BrExecArgs const *args, BrT
 
     return result;
 }
-static void init_vfs(Handover const *handover)
-{
-    // this is not 100% finalized, the majority of the code in this function is just for testing purpose
-
-    BrTaskInfos vfs_server = {};
-    srv_run(
-        handover,
-        str$("vfs"),
-        &(BrExecArgs){
-            .type = BR_START_ARGS,
-        },
-        &vfs_server);
-
-    BrTaskInfos bootfs_server = {};
-    srv_run(
-        handover,
-        str$("bootfs"),
-        &(BrExecArgs){
-            .type = BR_START_ARGS,
-        },
-        &bootfs_server);
-
-    // mount bootfs
-
-    Str path_mount = str$("/");
-    SharedMem m = UNWRAP(shared_mem_from_str(path_mount));
-
-    VfsMountRequest req =
-        {
-            .path = m.obj,
-            .fshandle = bootfs_server.tid,
-        };
-
-    VfsMountResponse resp = {};
-
-    vfs_mount(vfs_server.tid, &req, &resp);
-    shared_mem_free(&m);
-
-    // open file
-
-    Str path_str = str$("/hello/path");
-    log$("trying to create file: {}", path_str);
-    SharedMem path_mem = UNWRAP(shared_mem_from_str(path_str));
-
-    VfsOpenRequest open_req =
-        {
-            .path = path_mem.obj,
-            .flags = 0,
-        };
-
-    log$("path memobj: {}", path_mem.obj);
-    VfsOpenResponse open_resp =
-        {
-
-        };
-
-    log$("try to create file");
-    if (vfs_open(vfs_server.tid, &open_req, &open_resp) != VFS_SUCCESS)
-    {
-        return;
-    }
-
-    shared_mem_free(&path_mem);
-    log$("trying to write file");
-
-    // writing
-    Str hello_data = str$("hello world");
-    SharedMem write = UNWRAP(shared_mem_from_str(hello_data));
-
-    VfsWriteRequest write_req =
-        {
-            .handle = open_resp.handle,
-            .data = write.obj,
-            .off = 0,
-        };
-
-    VfsWriteResponse write_resp;
-
-    if (vfs_write(vfs_server.tid, &write_req, &write_resp) != VFS_SUCCESS)
-    {
-        return;
-    }
-    shared_mem_free(&write);
-}
 
 int br_entry_handover(Handover *handover)
 {
@@ -284,8 +198,6 @@ int br_entry_handover(Handover *handover)
         },
         &ps2_server);
 
-    init_vfs(handover);
-    /*
     BrTaskInfos echo_server = {};
     srv_run(
         handover,
@@ -294,7 +206,6 @@ int br_entry_handover(Handover *handover)
             .type = BR_START_ARGS,
         },
         &echo_server);
-        */
 
     while (true)
     {

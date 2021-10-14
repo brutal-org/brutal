@@ -42,7 +42,7 @@ void linear_buffer_clear_impl(LinearBufferImpl *impl);
 
 #define linear_buffer_push(SELF, VALUE) (                                         \
     {                                                                             \
-        auto tmp = (VALUE);                                                       \
+        AutoType tmp = (VALUE);                                                   \
         linear_buffer_push_impl(impl$(SELF), (uint8_t const *)&tmp, sizeof(tmp)); \
     })
 
@@ -51,10 +51,10 @@ void linear_buffer_clear_impl(LinearBufferImpl *impl);
 #define linear_buffer_clear(SELF) \
     linear_buffer_clear_impl(impl$(SELF))
 
-#define linear_buffer_foreach(VAR, SELF)                                     \
-    for (auto __it = (LinearBufferNode *)buffer_begin(&impl$(SELF)->buffer); \
-         __it < (LinearBufferNode *)buffer_end(&impl$(SELF)->buffer);        \
-         __it = (LinearBufferNode *)(((uint8_t *)__it) + __it->size))        \
-        for (auto VAR = (typeof((SELF)->_T))&__it->data;                     \
-             VAR;                                                            \
+#define linear_buffer_foreach(VAR, SELF)                                         \
+    for (AutoType __it = (LinearBufferNode *)buffer_begin(&impl$(SELF)->buffer); \
+         __it < (LinearBufferNode *)buffer_end(&impl$(SELF)->buffer);            \
+         __it = (LinearBufferNode *)(((uint8_t *)__it) + __it->size))            \
+        for (AutoType VAR = (typeof((SELF)->_T))&__it->data;                     \
+             VAR;                                                                \
              VAR = nullptr)

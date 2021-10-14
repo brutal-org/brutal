@@ -41,15 +41,15 @@ void list_remove_impl(ListImpl *head, ListImpl *impl);
 #define list_deinit(SELF) \
     list_deinit_impl(impl$(SELF))
 
-#define list_insert(SELF, ENTRY) (                                               \
-    {                                                                            \
-        auto __res = (typeof(SELF))list_insert_impl(impl$(SELF), sizeof(ENTRY)); \
-        (*__res->data) = ENTRY;                                                  \
-        __res;                                                                   \
+#define list_insert(SELF, ENTRY) (                                                   \
+    {                                                                                \
+        AutoType __res = (typeof(SELF))list_insert_impl(impl$(SELF), sizeof(ENTRY)); \
+        (*__res->data) = ENTRY;                                                      \
+        __res;                                                                       \
     })
 
-#define list_loop(VAR, SELF)                                   \
-    for (auto VAR = (SELF); VAR; VAR = (typeof(VAR))VAR->next) \
+#define list_loop(VAR, SELF)                                       \
+    for (AutoType VAR = (SELF); VAR; VAR = (typeof(VAR))VAR->next) \
         if (VAR->data != nullptr)
 
 #define list_remove(SELF, ENTRY) \

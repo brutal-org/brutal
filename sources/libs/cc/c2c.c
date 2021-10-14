@@ -586,7 +586,7 @@ void c2c_decl(Emit *emit, CDecl decl)
         // need to do (int) cast because gcc is not good :(
         assert_equal((int)decl.func_.type.type, (int)CTYPE_FUNC);
 
-        auto func_type = decl.func_.type;
+        CType func_type = decl.func_.type;
 
         // return:
         c2c_type(emit, *func_type.func_.ret);

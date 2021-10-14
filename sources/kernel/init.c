@@ -1,4 +1,3 @@
-
 #include <brutal/alloc.h>
 #include <brutal/log.h>
 #include "kernel/heap.h"

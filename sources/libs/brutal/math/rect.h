@@ -24,8 +24,8 @@ typedef Rect(float) Rectf;
 #define rect_collide(RECTA, RECTB) (              \
     {                                             \
         bool _result = false;                     \
-        auto _rect_a = (RECTA);                   \
-        auto _rect_b = (RECTB);                   \
+        AutoType _rect_a = (RECTA);               \
+        AutoType _rect_b = (RECTB);               \
         if (_rect_a.x + _rect_a.w >= _rect_b.x && \
             _rect_a.x <= _rect_b.x + _rect_b.w && \
             _rect_a.y + _rect_b.h >= _rect_b.y && \
@@ -39,8 +39,8 @@ typedef Rect(float) Rectf;
 #define rect_collide_point(RECT, VEC) (      \
     {                                        \
         bool _result = false;                \
-        auto _rect = (RECTA);                \
-        auto _point = (VEC);                 \
+        AutoType _rect = (RECTA);            \
+        AutoType _point = (VEC);             \
         if (_rect.x + _rect.w <= _point.x && \
             _rect.x >= _point.x &&           \
             _rect.y + _rect.h <= _point.y && \

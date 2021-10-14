@@ -41,18 +41,6 @@
         __expr.ok;                     \
     })
 
-#define TRY_V(T, EXPR, SUCCESS) (     \
-    {                                 \
-        typeof(EXPR) __expr = (EXPR); \
-                                      \
-        if (__expr != (SUCCESS))      \
-        {                             \
-            return ERR(T, __expr);    \
-        }                             \
-                                      \
-        __expr;                       \
-    })
-
 #define UNWRAP_OR_PANIC(EXPR, MESSAGE) ( \
     {                                    \
         typeof(EXPR) __expr = (EXPR);    \

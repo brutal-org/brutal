@@ -8,6 +8,7 @@
 #endif
 
 #ifdef __kernel__
+
 void acpi_init(Acpi *acpi, uintptr_t base, uintptr_t rsdp)
 {
     *acpi = (Acpi){};
@@ -16,7 +17,9 @@ void acpi_init(Acpi *acpi, uintptr_t base, uintptr_t rsdp)
     acpi->rsdp = (AcpiRsdp *)acpi_phys_to_virt(acpi, rsdp);
     acpi->rsdt = (AcpiRsdt *)acpi_phys_to_virt(acpi, acpi->rsdp->rsdt);
 }
+
 #else
+
 void acpi_init(Acpi *acpi, uintptr_t rsdp)
 {
     *acpi = (Acpi){};
