@@ -14,13 +14,13 @@ int atoi(char const *nptr)
 {
     int res = 0;
 
-    for(int i = 0; nptr[i] != 0; i++)
+    for (int i = 0; nptr[i] != 0; i++)
     {
-        if(isdigit(nptr[i]) == 0)
+        if (isdigit(nptr[i]) == 0)
         {
             return 0;
         }
-        res = res * 10 + nptr[i] - '0'; 
+        res = res * 10 + nptr[i] - '0';
     }
 
     return res;
@@ -30,13 +30,13 @@ long atol(char const *nptr)
 {
     long res = 0;
 
-    for(int i = 0; nptr[i] != 0; i++)
+    for (int i = 0; nptr[i] != 0; i++)
     {
-        if(isdigit(nptr[i]) == 0)
+        if (isdigit(nptr[i]) == 0)
         {
             return 0;
         }
-        res = res * 10 + nptr[i] - '0'; 
+        res = res * 10 + nptr[i] - '0';
     }
 
     return res;
@@ -46,13 +46,13 @@ long long atoll(char const *nptr)
 {
     long long res = 0;
 
-    for(int i = 0; nptr[i] != 0; i++)
+    for (int i = 0; nptr[i] != 0; i++)
     {
-        if(isdigit(nptr[i]) == 0)
+        if (isdigit(nptr[i]) == 0)
         {
             return 0;
         }
-        res = res * 10 + nptr[i] - '0'; 
+        res = res * 10 + nptr[i] - '0';
     }
 
     return res;
