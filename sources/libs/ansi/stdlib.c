@@ -246,11 +246,35 @@ long long llabs(long long j)
     return j;
 }
 
-// div_t div(int number, int denom);
+div_t div(int number, int denom)
+{
+    div_t res = {
+        .quot = number / denom,
+        .rem = number % denom,
+    };
 
-// ldiv_t ldiv(long number, long denom);
+    return res;
+}
 
-// lldiv_t lldiv(long long number, long long denom);
+ldiv_t ldiv(long number, long denom)
+{
+    ldiv_t res = {
+        .quot = number / denom,
+        .rem = number % denom,
+    };
+
+    return res;
+}
+
+lldiv_t lldiv(long long number, long long denom)
+{
+    lldiv_t res = {
+        .quot = number / denom,
+        .rem = number % denom,
+    };
+
+    return res;
+}
 
 /* --- 7.22.7 - Multibyte/wide character conversion functions --------------- */
 
