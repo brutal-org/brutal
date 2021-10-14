@@ -10,11 +10,53 @@
 
 // double atof(char const *nptr);
 
-// int atoi(char const *nptr);
+int atoi(char const *nptr)
+{
+    int res = 0;
 
-// long atol(char const *nptr);
+    for(int i = 0; nptr[i] != 0; i++)
+    {
+        if(isdigit(nptr[i]) == 0)
+        {
+            return 0;
+        }
+        res = res * 10 + nptr[i] - '0'; 
+    }
 
-// long long atoll(char const *nptr);
+    return res;
+}
+
+long atol(char const *nptr)
+{
+    long res = 0;
+
+    for(int i = 0; nptr[i] != 0; i++)
+    {
+        if(isdigit(nptr[i]) == 0)
+        {
+            return 0;
+        }
+        res = res * 10 + nptr[i] - '0'; 
+    }
+
+    return res;
+}
+
+long long atoll(char const *nptr)
+{
+    long long res = 0;
+
+    for(int i = 0; nptr[i] != 0; i++)
+    {
+        if(isdigit(nptr[i]) == 0)
+        {
+            return 0;
+        }
+        res = res * 10 + nptr[i] - '0'; 
+    }
+
+    return res;
+}
 
 // long int strtol(char const *restrict nptr,
 //                 char **restrict endptr,
