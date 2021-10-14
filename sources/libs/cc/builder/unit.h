@@ -14,4 +14,4 @@ CUnitEntry cunit_pragma_once(Alloc *alloc);
 
 CUnitEntry cunit_define(Str name, CExpr expression, Alloc *alloc);
 
-CUnitEntry cunit_include(bool qchar, Str path, Alloc *alloc);
+CUnitEntry cunit_include(bool system, Str path, Alloc *alloc);

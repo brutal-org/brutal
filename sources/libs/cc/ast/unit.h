@@ -5,7 +5,7 @@
 typedef struct
 {
     Str path;
-    bool is_q_char; // q char = "hello"
+    bool is_system;
 } CInclude;
 
 typedef struct

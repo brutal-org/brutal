@@ -43,13 +43,14 @@ static CType bid2c_primitive(BidInterface const *interface, BidPrimitive const *
 
 static CType bid2c_enum(BidInterface const *interface, BidEnum const *type, Alloc *alloc)
 {
-    CType enum_type = ctype_enum(str$(""), alloc);
+    CType enum_type = ctype_enum(alloc);
 
+    int value = 0;
     vec_foreach(member, &type->members)
     {
 
         Str s = str_fmt(alloc, "{case:upper}_{case:upper}", interface->name, member);
-        ctype_constant_no_value(&enum_type, s, alloc);
+        ctype_constant(&enum_type, s, cval_unsigned(value), alloc);
 
         alloc_free(alloc, s.buffer);
     }
@@ -58,7 +59,7 @@ static CType bid2c_enum(BidInterface const *interface, BidEnum const *type, Allo
 
 static CType bid2c_struct(BidInterface const *interface, BidStruct const *type, Alloc *alloc)
 {
-    CType cstruct = ctype_struct(str$(""), alloc);
+    CType cstruct = ctype_struct(alloc);
     vec_foreach(member, &type->members)
     {
         ctype_member(&cstruct,
@@ -222,12 +223,11 @@ static CStmt bid2c_msg_create(BidInterface const *interface, BidMethod const *me
 
 static CDecl bid2c_method_decl(BidInterface const *interface, BidMethod const *method, CStmt func_stmt, Alloc *alloc)
 {
-
     Str err_type = str_fmt(alloc, "{case:pascal}Error", interface->name);
     Str func_name = str_fmt(alloc, "{case:lower}_{case:lower}", interface->name, method->name);
 
     CType ret_type = ctype_name(err_type, alloc);
-    CType func_type = ctype_func(ret_type, func_name, alloc);
+    CType func_type = ctype_named(ctype_func(ret_type, alloc), func_name, alloc);
 
     ctype_member(&func_type, str$("task"), ctype_name(str$("BrId"), alloc), alloc);
 
@@ -415,7 +415,7 @@ static CDecl bid2c_callback(BidInterface const *interface, BidMethod const *meth
     Str response_type = str_fmt(alloc, "{case:pascal}{case:pascal}Response", interface->name, method->name);
     Str func_name = str_fmt(alloc, "{case:pascal}{case:pascal}Fn", interface->name, method->name);
 
-    CType ctype_fn = ctype_func(ctype_name(err_type, alloc), str$(""), alloc);
+    CType ctype_fn = ctype_func(ctype_name(err_type, alloc), alloc);
 
     ctype_member(&ctype_fn, str$("from"), ctype_name(str$("BrId"), alloc), alloc); // BrId from
 
@@ -434,7 +434,7 @@ static CDecl bid2c_callback(BidInterface const *interface, BidMethod const *meth
     }
 
     ctype_member(&ctype_fn, str$("ctx"),
-                 ctype_ptr(ctype_name(str$("void"), alloc), alloc), // request_type const *
+                 ctype_ptr(ctype_void(), alloc), // request_type const *
                  alloc);
 
     return cdecl_type(str$(func_name), ctype_fn, alloc);
@@ -457,12 +457,15 @@ void bid2c_typedef(CUnit *unit, const BidInterface *interface, Alloc *alloc)
 CType bid2c_method_message_type(BidInterface const *interface, Alloc *alloc)
 {
 
-    CType message_type_decl = ctype_enum(str$(""), alloc);
+    CType message_type_decl = ctype_enum(alloc);
 
-#define bid2c_const_msg_type(S)                 \
-    ctype_constant_no_value(&message_type_decl, \
-                            S,                  \
-                            alloc);
+    int index = 0;
+
+#define bid2c_const_msg_type(name)         \
+    ctype_constant(&message_type_decl,     \
+                   name,                   \
+                   cval_unsigned(index++), \
+                   alloc);
 
     bid2c_const_msg_type(str_fmt(alloc, "{case:upper}_INVALID", interface->name));
     bid2c_const_msg_type(str_fmt(alloc, "{case:upper}_ERROR", interface->name));
@@ -650,7 +653,7 @@ CDecl bid2c_dispatcher(BidInterface const *interface, Alloc *alloc)
     Str dispatcher_name = str_fmt(alloc, "{case:lower}_server_dispatch", interface->name);
 
     // static inline void {case:lower}_server_dispatch({case:pascal}Server* server, BrMsg const* req_msg)
-    CType func_type = ctype_func(ctype_name(str$("void"), alloc), str$(""), alloc);
+    CType func_type = ctype_func(ctype_void(), alloc);
     ctype_member(&func_type, str$("server"), ctype_ptr(ctype_name(server_handler_name, alloc), alloc), alloc);
     ctype_member(&func_type, str$("req_msg"), ctype_ptr(ctype_attr(ctype_name(str$("BrMsg"), alloc), CTYPE_CONST), alloc), alloc);
     CStmt func_statement = cstmt_block(alloc);
@@ -726,9 +729,9 @@ CDecl bid2c_server_structure_declaration(BidInterface const *interface, Alloc *a
     Str error_fn_name = str_fmt(alloc, "{case:pascal}ErrorFn", interface->name);
     Str server_handler_name = str_fmt(alloc, "{case:pascal}Server", interface->name);
 
-    CType server_handle = ctype_struct(str$(""), alloc);
+    CType server_handle = ctype_struct(alloc);
 
-    ctype_member(&server_handle, str$("ctx"), ctype_ptr(ctype_name(str$("void"), alloc), alloc), alloc);
+    ctype_member(&server_handle, str$("ctx"), ctype_ptr(ctype_void(), alloc), alloc);
 
     vec_foreach(method, &interface->methods)
     {
@@ -787,10 +790,10 @@ void bid2c_methods(CUnit *unit, BidInterface const *interface, Alloc *alloc)
     {
         // typedef void {case:pascal}ErrorFn(BrId from, BrResult error, void* ctx);
 
-        CType t = ctype_func(ctype_name(str$("void"), alloc), str$(""), alloc);
+        CType t = ctype_func(ctype_void(), alloc);
         ctype_member(&t, str$("from"), ctype_name(str$("BrId"), alloc), alloc);
         ctype_member(&t, str$("error"), ctype_name(str$("BrResult"), alloc), alloc);
-        ctype_member(&t, str$("ctx"), ctype_ptr(ctype_void(str$("void"), alloc), alloc), alloc);
+        ctype_member(&t, str$("ctx"), ctype_ptr(ctype_void(), alloc), alloc);
         CDecl typedef_decl = cdecl_type(error_fn_name, t, alloc);
         cunit_member(unit, cunit_decl(typedef_decl));
     }
@@ -804,14 +807,12 @@ void bid2c_methods(CUnit *unit, BidInterface const *interface, Alloc *alloc)
 
 void bid2c(BidInterface const *interface, Emit *emit, Alloc *alloc)
 {
-    CUnit unit;
-    unit = cunit(alloc);
+    CUnit unit = cunit(alloc);
 
     cunit_member(&unit, cunit_pragma_once(alloc));
-    cunit_member(&unit, cunit_include(false, str$("bal/types.h"), alloc));
-    cunit_member(&unit, cunit_include(false, str$("bal/ev.h"), alloc));
+    cunit_member(&unit, cunit_include(true, str$("bal/types.h"), alloc));
+    cunit_member(&unit, cunit_include(true, str$("bal/ev.h"), alloc));
 
-    // bid2c_fmt(emit, "#define {case:upper}_PROTOCOL_ID ({#0x})\n\n", interface->name, interface->id);
     Str protocol_id = str_fmt(alloc, "{case:upper}_PROTOCOL_ID", interface->name);
     cunit_member(&unit, cunit_define(protocol_id, cexpr_cast(cexpr_constant(cval_unsigned(interface->id)), ctype_name(str$("uint32_t"), alloc), alloc), alloc));
 

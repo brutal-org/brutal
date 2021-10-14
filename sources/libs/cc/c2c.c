@@ -617,13 +617,13 @@ static void c2c_include(Emit *emit, CInclude path)
 {
     emit_fmt(emit, "#include ");
 
-    if (path.is_q_char)
+    if (path.is_system)
     {
-        emit_fmt(emit, "\"{}\"\n", path.path);
+        emit_fmt(emit, "<{}>\n", path.path);
     }
     else
     {
-        emit_fmt(emit, "<{}>\n", path.path);
+        emit_fmt(emit, "\"{}\"\n", path.path);
     }
 }
 

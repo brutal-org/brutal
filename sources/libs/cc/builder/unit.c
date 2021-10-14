@@ -37,12 +37,12 @@ CUnitEntry cunit_pragma_once(Alloc *alloc)
     return cunit_pragma(str$("once"), alloc);
 }
 
-CUnitEntry cunit_include(bool qchar, Str path, Alloc *alloc)
+CUnitEntry cunit_include(bool system, Str path, Alloc *alloc)
 {
     return (CUnitEntry){
         .type = CUNIT_INCLUDE,
         ._include = (CInclude){
-            .is_q_char = qchar,
+            .is_system = system,
             .path = str_dup(path, alloc),
         },
     };
