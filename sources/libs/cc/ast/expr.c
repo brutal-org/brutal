@@ -34,7 +34,7 @@ static const char *cop_type_to_str[] = {
     [COP_GT] = ">",
     [COP_LT_EQ] = "<=",
     [COP_GT_EQ] = ">=",
-    [COP_INDEX] = "",
+    [COP_INDEX] = "[",
     [COP_DEREF] = "*",
     [COP_REF] = "&",
     [COP_ACCESS] = ".",
@@ -87,7 +87,7 @@ static int cop_precedence_table[] = {
     [COP_PTR_ACCESS] = 1,
 };
 
-int cop_precedence(COp cop)
+int cop_pre(COp cop)
 {
     return cop_precedence_table[cop];
 }
