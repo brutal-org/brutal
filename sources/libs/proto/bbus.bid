@@ -5,6 +5,6 @@ interface bbus
         UNKNOWN_SERVICE,
     };
 
-    method find_by_name Str -> Vec(TaskId);
-    method find_by_proto ProtoId -> Vec(TaskId);
+    method find_by_name Str -> Vec<TaskId>;
+    method find_by_proto ProtoId -> Vec<TaskId>;
 }

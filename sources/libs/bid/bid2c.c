@@ -27,9 +27,24 @@ static bool type_in_interface(BidInterface const *interface, Str name)
 
 static CType bid2c_primitive(BidInterface const *interface, BidPrimitive const *type, Alloc *alloc)
 {
-
     Str res;
-    if (type_in_interface(interface, type->name))
+
+    if (type->is_generic)
+    {
+        Str arguments = str_fmt(alloc, "");
+        for (int i = 0; i < type->generic_args.length; i++)
+        {
+            if (i != 0)
+            {
+                arguments = str_fmt(alloc, "{},", arguments);
+            }
+
+            arguments = str_fmt(alloc, "{} {}", arguments, type->generic_args.data[i]);
+        }
+
+        res = str_fmt(alloc, "{}({})", type->name, arguments);
+    }
+    else if (type_in_interface(interface, type->name))
     {
         res = str_fmt(alloc, "{case:pascal}{}", interface->name, type->name);
     }
@@ -810,6 +825,8 @@ void bid2c(BidInterface const *interface, Emit *emit, Alloc *alloc)
     CUnit unit = cunit(alloc);
 
     cunit_member(&unit, cunit_pragma_once(alloc));
+    cunit_member(&unit, cunit_include(true, str$("brutal/types.h"), alloc));
+    cunit_member(&unit, cunit_include(true, str$("brutal/ds/vec.h"), alloc));
     cunit_member(&unit, cunit_include(true, str$("bal/types.h"), alloc));
     cunit_member(&unit, cunit_include(true, str$("bal/ev.h"), alloc));
 

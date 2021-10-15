@@ -47,10 +47,27 @@ static Str parse_identifier(Scan *scan)
     return name;
 }
 
-static BidPrimitive parse_primitive(Scan *scan)
+static BidPrimitive parse_primitive(Scan *scan, Alloc *alloc)
 {
-    BidPrimitive type = {};
+    BidPrimitive type = {.is_generic = false};
     type.name = parse_identifier(scan);
+    skip_comment_and_space(scan);
+    if (scan_skip(scan, '<'))
+    {
+        vec_init(&type.generic_args, alloc);
+        while (!scan_skip(scan, '>') && !scan_ended(scan))
+        {
+            skip_comment_and_space(scan);
+            vec_push(&type.generic_args, parse_identifier(scan));
+            skip_comment_and_space(scan);
+            scan_skip(scan, ',');
+            skip_comment_and_space(scan);
+        }
+        skip_comment_and_space(scan);
+
+        scan_skip(scan, '>');
+        type.is_generic = true;
+    }
     return type;
 }
 
@@ -135,7 +152,7 @@ static BidType parse_type(Scan *scan, Alloc *alloc)
     {
         skip_comment_and_space(scan);
         type.type = BID_TYPE_PRIMITIVE;
-        type.primitive_ = parse_primitive(scan);
+        type.primitive_ = parse_primitive(scan, alloc);
     }
 
     return type;

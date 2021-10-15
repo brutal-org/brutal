@@ -7,6 +7,8 @@ typedef struct bid_type BidType;
 typedef struct
 {
     Str name;
+    bool is_generic;
+    Vec(Str) generic_args;
 } BidPrimitive;
 
 typedef struct

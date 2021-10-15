@@ -36,4 +36,4 @@ CType ctype_name(Str name, Alloc *alloc);
 
 CType ctype_attr(CType type, CTypeAttr attr);
 
-CType ctype_named(CType type, Str name, Alloc* alloc);
+CType ctype_named(CType type, Str name, Alloc *alloc);
