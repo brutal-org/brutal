@@ -7,20 +7,16 @@ LIBS_SRC = \
 	$(wildcard sources/host/sysv/$(CONFIG_ARCH)/*.s)   \
 	$(wildcard sources/host/sysv/$(CONFIG_ARCH)/*.c)   \
 	$(wildcard sources/libs/acpi/*.c)     \
-	$(wildcard sources/libs/ansi/*.c)     \
 	$(wildcard sources/libs/brutal/*.c)   \
 	$(wildcard sources/libs/brutal/*/*.c) \
-	$(wildcard sources/libs/bsd/*.c)      \
 	$(wildcard sources/libs/cc/*.c)       \
 	$(wildcard sources/libs/cc/*/*.c)       \
 	$(wildcard sources/libs/elf/*.c)      \
-	$(wildcard sources/libs/gnu/*.c)      \
 	$(wildcard sources/libs/pci/*.c)      \
 	$(wildcard sources/libs/handover/*.c) \
 	$(wildcard sources/libs/json/*.c)     \
-	$(wildcard sources/libs/math/*.c)     \
-	$(wildcard sources/libs/posix/*.c)    \
 	$(wildcard sources/libs/bal/*.c) \
+	$(wildcard sources/libs/stdc/*/*.c)     \
 	$(wildcard sources/libs/ubsan/*.c)
 
 LIBS_OBJ = \

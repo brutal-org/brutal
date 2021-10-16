@@ -28,11 +28,11 @@ CFLAGS_WARN ?= \
 	-Werror
 
 INC_LIBS= \
-	-Isources/libs/ansi \
-	-Isources/libs/posix \
-	-Isources/libs/bsd \
-	-Isources/libs/gnu \
-	-Isources/libs/math
+	-Isources/libs/stdc/ansi \
+	-Isources/libs/stdc/posix \
+	-Isources/libs/stdc/bsd \
+	-Isources/libs/stdc/gnu \
+	-Isources/libs/stdc/math
 
 INC_LIBBRUTAL= \
 	-Isources/libs/

@@ -1,4 +1,4 @@
-#include <ansi/ctype.h>
+#include <ctype.h>
 #include <json/json.h>
 
 static int is_closing_string(int c)

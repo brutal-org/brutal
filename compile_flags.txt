@@ -2,7 +2,7 @@
 -Isources/
 -Isources/bins
 -Isources/libs
--Isources/libs/ansi
--Isources/libs/posix
--Isources/libs/gnu
--Isources/libs/bsd
+-Isources/libs/stdc/ansi
+-Isources/libs/stdc/posix
+-Isources/libs/stdc/gnu
+-Isources/libs/stdc/bsd
