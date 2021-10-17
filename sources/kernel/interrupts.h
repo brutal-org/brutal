@@ -1,6 +1,5 @@
 #pragma once
 
-#include <brutal/types.h>
 #include "kernel/domain.h"
 #include "kernel/task.h"
 
