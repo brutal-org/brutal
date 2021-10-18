@@ -36,6 +36,8 @@ typedef struct
 
 #define nullstr str$("")
 
+#define is_nullstr(S) (S.len == 0)
+
 void str_rvs(Str str);
 
 Str str_dup(Str const str, Alloc *alloc);

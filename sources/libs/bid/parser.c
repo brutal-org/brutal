@@ -39,7 +39,7 @@ static Str parse_identifier(Scan *scan)
 {
     Str name = scan_skip_until(scan, is_identifier);
 
-    if (name.len == 0)
+    if (is_nullstr(name))
     {
         scan_throw(scan, str$("invalid identifier"), name);
     }

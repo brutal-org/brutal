@@ -270,7 +270,7 @@ Buffer case_to_lower_first(Str str, Alloc *alloc)
     Buffer buf;
     buffer_init(&buf, str.len, alloc);
 
-    if (str.len == 0)
+    if (is_nullstr(str))
     {
         return buf;
     }
@@ -300,7 +300,7 @@ Buffer case_to_upper_first(Str str, Alloc *alloc)
     Buffer buf;
     buffer_init(&buf, str.len, alloc);
 
-    if (str.len == 0)
+    if (is_nullstr(str))
     {
         return buf;
     }

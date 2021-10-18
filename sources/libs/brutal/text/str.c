@@ -13,7 +13,7 @@ void str_rvs(Str str)
 
 Str str_dup(Str const str, Alloc *alloc)
 {
-    if (str.len == 0)
+    if (is_nullstr(str))
     {
         return str_make_from_cstr("");
     }

@@ -79,7 +79,7 @@ size_t rune_length_utf8(Rune rune)
 
 Rune utf8_to_rune(Str str)
 {
-    if (str.len == 0 ||
+    if (is_nullstr(str) ||
         utf8_length(str.buffer[0]) > str.len)
     {
         return U'�';
