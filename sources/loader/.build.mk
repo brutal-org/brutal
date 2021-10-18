@@ -33,17 +33,16 @@ LOADER_LIBS_SRC = \
 	sources/libs/brutal/parse/scan.c                \
 	sources/libs/brutal/parse/lex.c                 \
 	sources/libs/brutal/io/write.c                  \
-	sources/libs/ansi/string.c			            \
+	sources/libs/stdc/ansi/string.c			        \
+	sources/libs/stdc/ansi/ctype.c			        \
 	$(wildcard sources/libs/json/*.c)		        \
 	$(wildcard sources/libs/brutal/alloc/*.c)	    \
 	$(wildcard sources/libs/brutal/ds/*.c) 		    \
 	$(wildcard sources/libs/brutal/hash/*.c)	    \
-	$(wildcard sources/host/efi/*.c)	\
+	$(wildcard sources/host/efi/*.c)	            \
 	$(wildcard sources/libs/brutal/log/*.c)         \
 	$(wildcard sources/libs/brutal/mem/*.c)         \
 	$(wildcard sources/libs/brutal/text/*.c)        \
-	$(wildcard sources/libs/ansi/ctype.c)           \
-	$(wildcard sources/libs/ansi/string.c)          \
 	$(wildcard sources/libs/handover/*.c)		    \
 	$(wildcard sources/libs/elf/elf.c) 				\
 	$(wildcard sources/libs/efi/*/*.c)              \
