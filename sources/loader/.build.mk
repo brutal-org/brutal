@@ -89,6 +89,4 @@ run-loader: $(LOADER) $(KERNEL) $(BUILDDIR_LOADER)/tools/OVMF.fd
 		-serial stdio \
 		-m 256 \
 		-bios $(BUILDDIR_LOADER)/tools/OVMF.fd \
-		-cpu host \
-		-enable-kvm \
 		-drive file=fat:rw:$(BUILDDIR_LOADER)/image,media=disk,format=raw

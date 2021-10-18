@@ -13,7 +13,7 @@ T := $(shell $(MAKE) $(MAKECMDGOALS) --no-print-directory \
 N := x
 C = $(words $N)$(eval N := x $N)
 
-ECHO = @echo -e "`printf "\e[1m[$C/$T]\e[m" `"
+ECHO = @echo -e "[$C/$T]"
 endif
 
 CFLAGS_STD ?= \

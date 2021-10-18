@@ -5,7 +5,9 @@ CFLAGS_WARN += \
 
 # --- Host compiler ---------------------------------------------------------- #
 
-HOST_CC=clang-12
+CLANG?=clang-12
+
+HOST_CC=$(CLANG)
 
 HOST_CFLAGS= \
 	-MD \
@@ -25,7 +27,7 @@ HOST_ARFLAGS=rcs
 
 # --- Cross-Compiler --------------------------------------------------------- #
 
-CROSS_CC=clang-12 -target $(CONFIG_ARCH)-none-elf
+CROSS_CC=$(CLANG) -target $(CONFIG_ARCH)-none-elf
 CROSS_CFLAGS= \
 	-MD \
 	$(CFLAGS_STD) \
