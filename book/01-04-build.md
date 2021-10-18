@@ -4,6 +4,8 @@ BRUTAL can be built by using either LLVM or GNU toolchains.
 
 In both cases you will need ``xorriso``, ``nasm`` and ``make``. On Arch Linux this can be done by doing ``pacman -S xorriso make nasm``.
 
+_NOTE: Run ``git submodule init && git submodule update`` to install the submodules before building_
+
 ## With LLVM
 
 Before trying to build BRUTAL with LLVM you need to install ``lld`` and ``clang-12``. On Arch Linux this can be done by doing ``pacman -S lld clang``.
