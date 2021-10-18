@@ -6,7 +6,6 @@
 #include <brutal/codec/tga.h>
 #include <brutal/gfx.h>
 #include <brutal/log.h>
-#include <elf/exec.h>
 #include <handover/handover.h>
 
 static void display_bootimage(Handover const *handover)
@@ -130,7 +129,7 @@ BrResult srv_run(Handover const *handover, Str name, BrExecArgs const *args, BrT
 
     assert_br_success(br_create(&elf_obj));
 
-    BrResult result = br_exec(elf_obj.handle, name, args, infos);
+    BrResult result = bal_exec(elf_obj.handle, name, args, infos);
 
     brh_close(elf_obj.handle);
 

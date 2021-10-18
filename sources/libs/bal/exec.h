@@ -37,4 +37,4 @@ typedef struct
     BrTask handle;
 } BrTaskInfos;
 
-BrResult br_exec(BrMemObj elf_obj, Str name, BrExecArgs const *args, BrTaskInfos *infos);
+BrResult bal_exec(BrMemObj elf_obj, Str name, BrExecArgs const *args, BrTaskInfos *infos);
