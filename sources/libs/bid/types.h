@@ -4,6 +4,12 @@
 
 typedef struct bid_type BidType;
 
+typedef struct  
+{
+    Str name;
+    Vec(Str) args;
+} BidTypeAttribute;
+
 typedef struct
 {
     Str name;
@@ -42,6 +48,8 @@ struct bid_type
         BidEnum enum_;
         BidStruct struct_;
     };
+
+    Vec(BidTypeAttribute) attribs;
 };
 
 struct bid_member

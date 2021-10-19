@@ -130,6 +130,63 @@ static BidStruct parse_struct(Scan *scan, Alloc *alloc)
     return type;
 }
 
+static BidTypeAttribute parse_type_attrib(Scan *scan, Alloc *alloc)
+{
+    BidTypeAttribute res = {};
+
+    skip_comment_and_space(scan);
+    Str name = parse_identifier(scan);
+    skip_comment_and_space(scan);
+
+    res.name = name;
+
+    if (!scan_skip(scan, '('))
+    {
+        return res;
+    }
+
+    vec_init(&res.args, alloc);
+
+    while (scan_curr(scan) != ')' && !scan_ended(scan))
+    {
+
+        skip_comment_and_space(scan);
+        Str arg = parse_identifier(scan);
+        skip_comment_and_space(scan);
+
+        vec_push(&res.args, arg);
+
+        if (!scan_skip(scan, ','))
+        {
+            break;
+        }
+    }
+
+    skip_comment_and_space(scan);
+    scan_skip(scan, ')');
+    skip_comment_and_space(scan);
+
+    return res;
+}
+
+static void parse_type_attribs(BidType *type, Scan *scan, Alloc *alloc)
+{
+    vec_init(&type->attribs, alloc);
+
+    while (scan_curr(scan) != ']' && scan_ended(scan) == false)
+    {
+        vec_push(&type->attribs, parse_type_attrib(scan, alloc));
+        if (!scan_skip(scan, ','))
+        {
+            break;
+        }
+    }
+
+    skip_comment_and_space(scan);
+    scan_skip(scan, ']');
+    skip_comment_and_space(scan);
+}
+
 static BidType parse_type(Scan *scan, Alloc *alloc)
 {
     BidType type = {};
@@ -153,6 +210,12 @@ static BidType parse_type(Scan *scan, Alloc *alloc)
         skip_comment_and_space(scan);
         type.type = BID_TYPE_PRIMITIVE;
         type.primitive_ = parse_primitive(scan, alloc);
+    }
+
+    skip_comment_and_space(scan);
+    if (scan_skip(scan, '['))
+    {
+        parse_type_attribs(&type, scan, alloc);
     }
 
     return type;
