@@ -55,8 +55,8 @@ dkms.conf
 
 bin/
 
-meta/toolchain/gnu/build
-meta/toolchain/gnu/local
-meta/toolchain/gnu/tarballs
+build/toolchain/gnu/build
+build/toolchain/gnu/local
+build/toolchain/gnu/tarballs
 
 book/brutal.pdf

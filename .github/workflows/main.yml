@@ -36,15 +36,15 @@ jobs:
           cache-name: cached-cross-compiler
         with:
           path: |
-            **/meta/toolchain/${{matrix.toolchain}}/local
+            **/build/toolchain/${{matrix.toolchain}}/local
           key: |
-            ${{ runner.os }}-${{matrix.toolchain}}-${{hashFiles(format('meta/toolchain/{0}/build.sh', matrix.toolchain)) }}
+            ${{ runner.os }}-${{matrix.toolchain}}-${{hashFiles(format('build/toolchain/{0}/build.sh', matrix.toolchain)) }}
           restore-keys: |
-            ${{ runner.os }}-${{matrix.toolchain}}-${{hashFiles(format('meta/toolchain/{0}/build.sh', matrix.toolchain)) }}
+            ${{ runner.os }}-${{matrix.toolchain}}-${{hashFiles(format('build/toolchain/{0}/build.sh', matrix.toolchain)) }}
 
       - name: Build Toolchain
         run: |
-          meta/toolchain/${{matrix.toolchain}}/build.sh x86_64
+          build/toolchain/${{matrix.toolchain}}/build.sh x86_64
 
   build-system:
     needs: build-toolchain
@@ -65,11 +65,11 @@ jobs:
           cache-name: cached-cross-compiler
         with:
           path: |
-            **/meta/toolchain/${{matrix.toolchain}}/local
+            **/build/toolchain/${{matrix.toolchain}}/local
           key: |
-            ${{ runner.os }}-${{matrix.toolchain}}-${{hashFiles(format('meta/toolchain/{0}/build.sh', matrix.toolchain)) }}
+            ${{ runner.os }}-${{matrix.toolchain}}-${{hashFiles(format('build/toolchain/{0}/build.sh', matrix.toolchain)) }}
           restore-keys: |
-            ${{ runner.os }}-${{matrix.toolchain}}-${{hashFiles(format('meta/toolchain/{0}/build.sh', matrix.toolchain)) }}
+            ${{ runner.os }}-${{matrix.toolchain}}-${{hashFiles(format('build/toolchain/{0}/build.sh', matrix.toolchain)) }}
 
       - name: Build System
         run: |

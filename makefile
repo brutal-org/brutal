@@ -54,9 +54,9 @@ BINDIR=bin/$(CONFIG_ARCH)-$(CONFIG_TOOLCHAIN)
 
 MKCWD=mkdir -p $(@D)
 
-include meta/config/default.mk
-include meta/toolchain/archs/$(CONFIG_ARCH).mk
-include meta/toolchain/$(CONFIG_TOOLCHAIN)/.build.mk
+include build/config/default.mk
+include build/toolchain/archs/$(CONFIG_ARCH).mk
+include build/toolchain/$(CONFIG_TOOLCHAIN)/.build.mk
 
 include sources/kernel/.build.mk
 include sources/bins/.cross.mk

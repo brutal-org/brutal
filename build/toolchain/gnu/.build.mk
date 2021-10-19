@@ -1,4 +1,4 @@
-export PATH := $(shell meta/toolchain/gnu/use.sh):$(PATH)
+export PATH := $(shell build/toolchain/gnu/use.sh):$(PATH)
 
 # --- Host compiler ---------------------------------------------------------- #
 
@@ -48,13 +48,13 @@ CROSS_KLDFLAGS= \
 	-Tsources/host/kernel/$(CONFIG_ARCH)/$(CONFIG_BOARD)/link.ld \
 	-z max-page-size=0x1000 \
 	$(ARCH_LDFLAGS) \
-	meta/toolchain/gnu/local/lib/gcc/$(CONFIG_ARCH)-elf/11.1.0/libgcc.a 
+	build/toolchain/gnu/local/lib/gcc/$(CONFIG_ARCH)-elf/11.1.0/libgcc.a 
 
 CROSS_ULDFLAGS= \
 	-Tsources/host/brutal/$(CONFIG_ARCH)/link.ld \
 	-z max-page-size=0x1000 \
 	$(ARCH_LDFLAGS) \
-	meta/toolchain/gnu/local/lib/gcc/$(CONFIG_ARCH)-elf/11.1.0/libgcc.a 
+	build/toolchain/gnu/local/lib/gcc/$(CONFIG_ARCH)-elf/11.1.0/libgcc.a 
 
 CROSS_AR=$(CONFIG_ARCH)-elf-ar
 CROSS_ARFLAGS=rcs
