@@ -1,7 +1,7 @@
 LOADER_CC = clang-12
 LOADER_LD = clang-12
 
-BUILDDIR_LOADER=build/loader
+BINDIR_LOADER=build/loader
 
 LOADER_CFLAGS= \
 	-MD \
@@ -51,24 +51,24 @@ LOADER_LIBS_SRC = \
 LOADER_SRCS = $(wildcard sources/loader/*.c)
 
 LOADER_OBJS = \
-	$(patsubst sources/%.c, $(BUILDDIR_LOADER)/%.c.o, $(LOADER_SRCS)) \
-	$(patsubst sources/%.c, $(BUILDDIR_LOADER)/%.c.o, $(LOADER_LIBS_SRC))
+	$(patsubst sources/%.c, $(BINDIR_LOADER)/%.c.o, $(LOADER_SRCS)) \
+	$(patsubst sources/%.c, $(BINDIR_LOADER)/%.c.o, $(LOADER_LIBS_SRC))
 
-LOADER=$(BUILDDIR_LOADER)/BOOTX64.EFI
+LOADER=$(BINDIR_LOADER)/BOOTX64.EFI
 
 $(LOADER): $(LOADER_OBJS)
 	$(MKCWD)
 	$(LOADER_LD) -o $@ $^ $(LOADER_LDFLAGS)
 
-$(BUILDDIR_LOADER)/%.c.o: sources/%.c
+$(BINDIR_LOADER)/%.c.o: sources/%.c
 	$(MKCWD)
 	$(LOADER_CC) -c -o $@ $< $(LOADER_CFLAGS)
 
-$(BUILDDIR_LOADER)/libs/%.c.o: sources/libs/%.c
+$(BINDIR_LOADER)/libs/%.c.o: sources/libs/%.c
 	$(MKCWD)
 	$(LOADER_CC) -c -o $@ $< $(LOADER_CFLAGS)
 
-$(BUILDDIR_LOADER)/tools/OVMF.fd:
+$(BINDIR_LOADER)/tools/OVMF.fd:
 	$(MKCWD)
 	wget https://efi.akeo.ie/OVMF/OVMF-X64.zip
 	unzip OVMF-X64.zip OVMF.fd
@@ -77,15 +77,15 @@ $(BUILDDIR_LOADER)/tools/OVMF.fd:
 
 loader: $(LOADER)
 
-run-loader: $(LOADER) $(KERNEL) $(BUILDDIR_LOADER)/tools/OVMF.fd
+run-loader: $(LOADER) $(KERNEL) $(BINDIR_LOADER)/tools/OVMF.fd
 
-	mkdir -p $(BUILDDIR_LOADER)/image/EFI/BOOT/
-	cp $(KERNEL) $(BUILDDIR_LOADER)/image/kernel.elf
-	cp sources/loader/config.json $(BUILDDIR_LOADER)/image/config.json
-	cp $(LOADER) $(BUILDDIR_LOADER)/image/EFI/BOOT/BOOTX64.EFI
+	mkdir -p $(BINDIR_LOADER)/image/EFI/BOOT/
+	cp $(KERNEL) $(BINDIR_LOADER)/image/kernel.elf
+	cp sources/loader/config.json $(BINDIR_LOADER)/image/config.json
+	cp $(LOADER) $(BINDIR_LOADER)/image/EFI/BOOT/BOOTX64.EFI
 
 	qemu-system-x86_64 \
 		-serial stdio \
 		-m 256 \
-		-bios $(BUILDDIR_LOADER)/tools/OVMF.fd \
-		-drive file=fat:rw:$(BUILDDIR_LOADER)/image,media=disk,format=raw
+		-bios $(BINDIR_LOADER)/tools/OVMF.fd \
+		-drive file=fat:rw:$(BINDIR_LOADER)/image,media=disk,format=raw

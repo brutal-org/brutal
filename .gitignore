@@ -53,7 +53,7 @@ dkms.conf
 
 .vscode/
 
-build/
+bin/
 
 meta/toolchain/gnu/build
 meta/toolchain/gnu/local

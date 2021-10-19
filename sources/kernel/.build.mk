@@ -1,6 +1,6 @@
-BUILDDIR_KERNEL = $(BUILDDIR)/kernel
+BINDIR_KERNEL = $(BINDIR)/kernel
 
-KERNEL=$(BUILDDIR_KERNEL)/kernel.elf
+KERNEL=$(BINDIR_KERNEL)/kernel.elf
 
 KERNEL_SRC += \
 	$(wildcard sources/kernel/*.c)                 \
@@ -28,16 +28,16 @@ KERNEL_SRC += \
 	$(wildcard sources/libs/ubsan/*.c)
 
 KERNEL_OBJ= \
-	$(patsubst sources/%, $(BUILDDIR_KERNEL)/%.o, $(KERNEL_SRC))
+	$(patsubst sources/%, $(BINDIR_KERNEL)/%.o, $(KERNEL_SRC))
 
 DEPENDENCIES += $(KERNEL_OBJ:.o=.d)
 
-$(BUILDDIR_KERNEL)/%.c.o: sources/%.c
+$(BINDIR_KERNEL)/%.c.o: sources/%.c
 	$(ECHO) "kernel CC" $<
 	@$(MKCWD)
 	@$(CROSS_CC) -c -o $@ $< $(CROSS_KCFLAGS)
 
-$(BUILDDIR_KERNEL)/%.s.o: sources/%.s
+$(BINDIR_KERNEL)/%.s.o: sources/%.s
 	$(ECHO) "kernel AS" $<
 	@$(MKCWD)
 	@$(CROSS_AS) -o $@ $< $(CROSS_ASFLAGS)

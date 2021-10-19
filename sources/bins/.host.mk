@@ -1,4 +1,4 @@
-BUILDDIR_HOST=$(BUILDDIR)/host
+BINDIR_HOST=$(BINDIR)/host
 
 LIBS_HOST_SRC = \
 	$(wildcard sources/host/linux/*.c)    \
@@ -16,16 +16,16 @@ LIBS_HOST_SRC = \
 	$(wildcard sources/libs/bid/*.c)
 
 LIBS_HOST_OBJ = \
-	$(patsubst sources/%, $(BUILDDIR_HOST)/%.o, $(LIBS_HOST_SRC))
+	$(patsubst sources/%, $(BINDIR_HOST)/%.o, $(LIBS_HOST_SRC))
 
-LIBS_HOST_BIN=$(BUILDDIR_HOST)/libbrutal.a
+LIBS_HOST_BIN=$(BINDIR_HOST)/libbrutal.a
 
-$(BUILDDIR_HOST)/%.c.o: sources/%.c
+$(BINDIR_HOST)/%.c.o: sources/%.c
 	$(ECHO) "host   CC" $<
 	@$(MKCWD)
 	@$(HOST_CC) -c -o $@ $< $(HOST_CFLAGS)
 
-$(BUILDDIR_HOST)/%.s.o: sources/%.s
+$(BINDIR_HOST)/%.s.o: sources/%.s
 	$(ECHO) "host   AS" $<
 	@$(MKCWD)
 	@$(CROSS_AS) -o $@ $< $(CROSS_ASFLAGS)
@@ -44,9 +44,9 @@ $(1)_HOST_SRC = \
 	$$(wildcard sources/bins/$($(1)_NAME)/*/*.c) \
 	$$(wildcard sources/bins/$($(1)_NAME)/*/*/*.c)
 
-$(1)_HOST_OBJ = $$(patsubst sources/%, $(BUILDDIR_HOST)/%.o, $$($(1)_HOST_SRC))
+$(1)_HOST_OBJ = $$(patsubst sources/%, $(BINDIR_HOST)/%.o, $$($(1)_HOST_SRC))
 
-$(1)_HOST_BIN  = $(BUILDDIR_HOST)/$($(1)_NAME)
+$(1)_HOST_BIN  = $(BINDIR_HOST)/$($(1)_NAME)
 
 DEPENDENCIES += $$($(1)_HOST_OBJ:.o=.d)
 
@@ -69,7 +69,7 @@ run-cc: $(CC_HOST_BIN)
 
 .PHONY: run-test
 run-test: $(TEST_HOST_BIN)
-	cd $(BUILDDIR_HOST); ./test
+	cd $(BINDIR_HOST); ./test
 
 .PHONY: run-demo
 run-demo: $(DEMO_HOST_BIN)

@@ -50,7 +50,8 @@ CROSS_CFLAGS_INC ?= \
 	-Isources/ \
 	-Ithirdparty
 
-BUILDDIR=build/$(CONFIG_ARCH)-$(CONFIG_TOOLCHAIN)
+BINDIR=bin/$(CONFIG_ARCH)-$(CONFIG_TOOLCHAIN)
+
 MKCWD=mkdir -p $(@D)
 
 include meta/config/default.mk
@@ -96,7 +97,7 @@ bochs: $(ISO)
 
 .PHONY: clean
 clean:
-	rm -rf $(BUILDDIR)
+	rm -rf $(BINDIR)
 
 .PHONY: clean
 clean-all:
