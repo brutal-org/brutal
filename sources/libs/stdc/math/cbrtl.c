@@ -40,9 +40,9 @@ long double cbrtl(long double x)
     int sign = u.i.se & 0x8000;
 
     /*
-	 * If x = +-Inf, then cbrt(x) = +-Inf.
-	 * If x = NaN, then cbrt(x) = NaN.
-	 */
+     * If x = +-Inf, then cbrt(x) = +-Inf.
+     * If x = NaN, then cbrt(x) = NaN.
+     */
     if (e == 0x7fff)
         return x + x;
     if (e == 0)
@@ -75,10 +75,10 @@ long double cbrtl(long double x)
     v.i.se = sign | (0x3fff + e / 3);
 
     /*
-	 * The following is the guts of s_cbrtf, with the handling of
-	 * special values removed and extra care for accuracy not taken,
-	 * but with most of the extra accuracy not discarded.
-	 */
+     * The following is the guts of s_cbrtf, with the handling of
+     * special values removed and extra care for accuracy not taken,
+     * but with most of the extra accuracy not discarded.
+     */
 
     /* ~5-bit estimate: */
     uft.f = x;
@@ -97,27 +97,27 @@ long double cbrtl(long double x)
 
 #    if LDBL_MANT_DIG == 64
     /*
-	 * dt is cbrtl(x) to ~47 bits (after x has been reduced to 1 <= x < 8).
-	 * Round it away from zero to 32 bits (32 so that t*t is exact, and
-	 * away from zero for technical reasons).
-	 */
+     * dt is cbrtl(x) to ~47 bits (after x has been reduced to 1 <= x < 8).
+     * Round it away from zero to 32 bits (32 so that t*t is exact, and
+     * away from zero for technical reasons).
+     */
     t = dt + (0x1.0p32L + 0x1.0p-31L) - 0x1.0p32;
 #    elif LDBL_MANT_DIG == 113
     /*
-	 * Round dt away from zero to 47 bits.  Since we don't trust the 47,
-	 * add 2 47-bit ulps instead of 1 to round up.  Rounding is slow and
-	 * might be avoidable in this case, since on most machines dt will
-	 * have been evaluated in 53-bit precision and the technical reasons
-	 * for rounding up might not apply to either case in cbrtl() since
-	 * dt is much more accurate than needed.
-	 */
+     * Round dt away from zero to 47 bits.  Since we don't trust the 47,
+     * add 2 47-bit ulps instead of 1 to round up.  Rounding is slow and
+     * might be avoidable in this case, since on most machines dt will
+     * have been evaluated in 53-bit precision and the technical reasons
+     * for rounding up might not apply to either case in cbrtl() since
+     * dt is much more accurate than needed.
+     */
     t = dt + 0x2.0p-46 + 0x1.0p60L - 0x1.0p60;
 #    endif
 
     /*
-	 * Final step Newton iteration to 64 or 113 bits with
-	 * error < 0.667 ulps
-	 */
+     * Final step Newton iteration to 64 or 113 bits with
+     * error < 0.667 ulps
+     */
     s = t * t;             /* t*t is exact */
     r = x / s;             /* error <= 0.5 ulps; |r| < |t| */
     w = t + t;             /* t+t is exact */

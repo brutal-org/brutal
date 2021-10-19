@@ -108,15 +108,15 @@ static inline long double add_and_denormalize(long double a, long double b, int 
     sum = dd_add(a, b);
 
     /*
-	 * If we are losing at least two bits of accuracy to denormalization,
-	 * then the first lost bit becomes a round bit, and we adjust the
-	 * lowest bit of sum.hi to make it a sticky bit summarizing all the
-	 * bits in sum.lo. With the sticky bit adjusted, the hardware will
-	 * break any ties in the correct direction.
-	 *
-	 * If we are losing only one bit to denormalization, however, we must
-	 * break the ties manually.
-	 */
+     * If we are losing at least two bits of accuracy to denormalization,
+     * then the first lost bit becomes a round bit, and we adjust the
+     * lowest bit of sum.hi to make it a sticky bit summarizing all the
+     * bits in sum.lo. With the sticky bit adjusted, the hardware will
+     * break any ties in the correct direction.
+     *
+     * If we are losing only one bit to denormalization, however, we must
+     * break the ties manually.
+     */
     if (sum.lo != 0)
     {
         u.f = sum.hi;
@@ -173,10 +173,10 @@ long double fmal(long double x, long double y, long double z)
     int spread;
 
     /*
-	 * Handle special cases. The order of operations and the particular
-	 * return values here are crucial in handling special cases involving
-	 * infinities, NaNs, overflows, and signed zeroes correctly.
-	 */
+     * Handle special cases. The order of operations and the particular
+     * return values here are crucial in handling special cases involving
+     * infinities, NaNs, overflows, and signed zeroes correctly.
+     */
     if (!isfinite(x) || !isfinite(y))
         return (x * y + z);
     if (!isfinite(z))
@@ -193,10 +193,10 @@ long double fmal(long double x, long double y, long double z)
     spread = ex + ey - ez;
 
     /*
-	 * If x * y and z are many orders of magnitude apart, the scaling
-	 * will overflow, so we handle these cases specially.  Rounding
-	 * modes other than FE_TONEAREST are painful.
-	 */
+     * If x * y and z are many orders of magnitude apart, the scaling
+     * will overflow, so we handle these cases specially.  Rounding
+     * modes other than FE_TONEAREST are painful.
+     */
     if (spread < -LDBL_MANT_DIG)
     {
 #    ifdef FE_INEXACT
@@ -241,13 +241,13 @@ long double fmal(long double x, long double y, long double z)
     fesetround(FE_TONEAREST);
 
     /*
-	 * Basic approach for round-to-nearest:
-	 *
-	 *     (xy.hi, xy.lo) = x * y           (exact)
-	 *     (r.hi, r.lo)   = xy.hi + z       (exact)
-	 *     adj = xy.lo + r.lo               (inexact; low bit is sticky)
-	 *     result = r.hi + adj              (correctly rounded)
-	 */
+     * Basic approach for round-to-nearest:
+     *
+     *     (xy.hi, xy.lo) = x * y           (exact)
+     *     (r.hi, r.lo)   = xy.hi + z       (exact)
+     *     adj = xy.lo + r.lo               (inexact; low bit is sticky)
+     *     result = r.hi + adj              (correctly rounded)
+     */
     xy = dd_mul(xs, ys);
     r = dd_add(xy.hi, zs);
 
@@ -256,9 +256,9 @@ long double fmal(long double x, long double y, long double z)
     if (r.hi == 0.0)
     {
         /*
-		 * When the addends cancel to 0, ensure that the result has
-		 * the correct sign.
-		 */
+         * When the addends cancel to 0, ensure that the result has
+         * the correct sign.
+         */
         fesetround(oround);
         volatile long double vzs = zs; /* XXX gcc CSE bug workaround */
         return xy.hi + vzs + scalbnl(xy.lo, spread);
@@ -267,11 +267,11 @@ long double fmal(long double x, long double y, long double z)
     if (oround != FE_TONEAREST)
     {
         /*
-		 * There is no need to worry about double rounding in directed
-		 * rounding modes.
-		 * But underflow may not be raised correctly, example in downward rounding:
-		 * fmal(0x1.0000000001p-16000L, 0x1.0000000001p-400L, -0x1p-16440L)
-		 */
+         * There is no need to worry about double rounding in directed
+         * rounding modes.
+         * But underflow may not be raised correctly, example in downward rounding:
+         * fmal(0x1.0000000001p-16000L, 0x1.0000000001p-400L, -0x1p-16440L)
+         */
         long double ret;
 #    if defined(FE_INEXACT) && defined(FE_UNDERFLOW)
         int e = fetestexcept(FE_INEXACT);

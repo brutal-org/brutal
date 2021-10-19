@@ -57,7 +57,7 @@ static double sinpi(double x)
 }
 
 #define N 12
-//static const double g = 6.024680040776729583740234375;
+// static const double g = 6.024680040776729583740234375;
 static const double gmhalf = 5.524680040776729583740234375;
 static const double Snum[N + 1] = {
     23531376880.410759688572007674451636754734846804940,

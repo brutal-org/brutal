@@ -132,9 +132,9 @@ long double __tanl(long double x, long double y, int odd)
     if (!odd)
         return w;
     /*
-	 * if allow error up to 2 ulp, simply return
-	 * -1.0 / (x+r) here
-	 */
+     * if allow error up to 2 ulp, simply return
+     * -1.0 / (x+r) here
+     */
     /* compute -1.0 / (x+r) accurately */
     z = w;
     z = z + 0x1p32 - 0x1p32;

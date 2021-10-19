@@ -4,7 +4,7 @@
 
 typedef struct bid_type BidType;
 
-typedef struct  
+typedef struct
 {
     Str name;
     Vec(Str) args;

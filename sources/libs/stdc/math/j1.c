@@ -67,13 +67,13 @@ static double common(uint32_t ix, double x, int y1, int sign)
     double z, s, c, ss, cc;
 
     /*
-	 * j1(x) = sqrt(2/(pi*x))*(p1(x)*cos(x-3pi/4)-q1(x)*sin(x-3pi/4))
-	 * y1(x) = sqrt(2/(pi*x))*(p1(x)*sin(x-3pi/4)+q1(x)*cos(x-3pi/4))
-	 *
-	 * sin(x-3pi/4) = -(sin(x) + cos(x))/sqrt(2)
-	 * cos(x-3pi/4) = (sin(x) - cos(x))/sqrt(2)
-	 * sin(x) +- cos(x) = -cos(2x)/(sin(x) -+ cos(x))
-	 */
+     * j1(x) = sqrt(2/(pi*x))*(p1(x)*cos(x-3pi/4)-q1(x)*sin(x-3pi/4))
+     * y1(x) = sqrt(2/(pi*x))*(p1(x)*sin(x-3pi/4)+q1(x)*cos(x-3pi/4))
+     *
+     * sin(x-3pi/4) = -(sin(x) + cos(x))/sqrt(2)
+     * cos(x-3pi/4) = (sin(x) - cos(x))/sqrt(2)
+     * sin(x) +- cos(x) = -cos(2x)/(sin(x) -+ cos(x))
+     */
     s = sin(x);
     if (y1)
         s = -s;

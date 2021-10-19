@@ -108,8 +108,8 @@ long double expm1l(long double x)
     qx = x + (0.5 * xx + xx * px / qx);
 
     /* exp(x) = exp(k ln 2) exp(remainder ln 2) = 2^k exp(remainder ln 2).
-	 We have qx = exp(remainder ln 2) - 1, so
-	 exp(x) - 1  =  2^k (qx + 1) - 1  =  2^k qx + 2^k - 1.  */
+     We have qx = exp(remainder ln 2) - 1, so
+     exp(x) - 1  =  2^k (qx + 1) - 1  =  2^k qx + 2^k - 1.  */
     px = scalbnl(1.0, k);
     x = px * qx + (px - 1.0);
     return x;

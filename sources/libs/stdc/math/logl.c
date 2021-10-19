@@ -123,13 +123,13 @@ long double logl(long double x)
 
     /* separate mantissa from exponent */
     /* Note, frexp is used so that denormal numbers
-	 * will be handled properly.
-	 */
+     * will be handled properly.
+     */
     x = frexpl(x, &e);
 
     /* logarithm using log(x) = z + z**3 P(z)/Q(z),
-	 * where z = 2(x-1)/(x+1)
-	 */
+     * where z = 2(x-1)/(x+1)
+     */
     if (e > 2 || e < -2)
     {
         if (x < SQRTH)
@@ -168,8 +168,8 @@ long double logl(long double x)
     y = y + e * C2;
     z = y - 0.5 * z;
     /* Note, the sum of above terms does not exceed x/4,
-	 * so it contributes at most about 1/4 lsb to the error.
-	 */
+     * so it contributes at most about 1/4 lsb to the error.
+     */
     z = z + x;
     z = z + e * C1; /* This sum has an error of 1/2 lsb. */
     return z;

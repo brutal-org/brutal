@@ -324,27 +324,27 @@ long double powl(long double x, long double y)
     i += 1;
 
     /* Find (x - A[i])/A[i]
-	 * in order to compute log(x/A[i]):
-	 *
-	 * log(x) = log( a x/a ) = log(a) + log(x/a)
-	 *
-	 * log(x/a) = log(1+v),  v = x/a - 1 = (x-a)/a
-	 */
+     * in order to compute log(x/A[i]):
+     *
+     * log(x) = log( a x/a ) = log(a) + log(x/a)
+     *
+     * log(x/a) = log(1+v),  v = x/a - 1 = (x-a)/a
+     */
     x -= A[i];
     x -= B[i / 2];
     x /= A[i];
 
     /* rational approximation for log(1+v):
-	 *
-	 * log(1+v)  =  v  -  v**2/2  +  v**3 P(v) / Q(v)
-	 */
+     *
+     * log(1+v)  =  v  -  v**2/2  +  v**3 P(v) / Q(v)
+     */
     z = x * x;
     w = x * (z * __polevll(x, P, 3) / __p1evll(x, Q, 3));
     w = w - 0.5 * z;
 
     /* Convert to base 2 logarithm:
-	 * multiply by log2(e) = 1 + LOG2EA
-	 */
+     * multiply by log2(e) = 1 + LOG2EA
+     */
     z = LOG2EA * w;
     z += w;
     z += LOG2EA * x;
@@ -359,14 +359,14 @@ long double powl(long double x, long double y)
     /* Multiply base 2 log by y, in extended precision. */
 
     /* separate y into large part ya
-	 * and small part yb less than 1/NXT
-	 */
+     * and small part yb less than 1/NXT
+     */
     ya = reducl(y);
     yb = y - ya;
 
     /* (w+z)(ya+yb)
-	 * = w*ya + w*yb + z*y
-	 */
+     * = w*ya + w*yb + z*y
+     */
     F = z * y + w * yb;
     Fa = reducl(F);
     Fb = F - Fa;
@@ -395,15 +395,15 @@ long double powl(long double x, long double y)
     }
 
     /* Now the product y * log2(x)  =  Hb + e/NXT.
-	 *
-	 * Compute base 2 exponential of Hb,
-	 * where -0.0625 <= Hb <= 0.
-	 */
+     *
+     * Compute base 2 exponential of Hb,
+     * where -0.0625 <= Hb <= 0.
+     */
     z = Hb * __polevll(Hb, R, 6); /*  z = 2**Hb - 1  */
 
     /* Express e/NXT as an integer plus a negative number of (1/NXT)ths.
-	 * Find lookup table entry for the fractional power of 2.
-	 */
+     * Find lookup table entry for the fractional power of 2.
+     */
     if (e < 0)
         i = 0;
     else
@@ -505,9 +505,9 @@ static long double powil(long double x, int nn)
     if (s < MINLOGL)
         return twom10000 * twom10000; /* underflow */
     /* Handle tiny denormal answer, but with less accuracy
-	 * since roundoff error in 1.0/x will be amplified.
-	 * The precise demarcation should be the gradual underflow threshold.
-	 */
+     * since roundoff error in 1.0/x will be amplified.
+     * The precise demarcation should be the gradual underflow threshold.
+     */
     if (s < -MAXLOGL + 2.0)
     {
         x = 1.0 / x;

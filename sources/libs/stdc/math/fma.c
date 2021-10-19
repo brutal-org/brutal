@@ -215,13 +215,13 @@ double fma(double x, double y, double z)
             if (r == c)
             {
                 /* min normal after rounding, underflow depends
-				   on arch behaviour which can be imitated by
-				   a double to float conversion */
+                   on arch behaviour which can be imitated by
+                   a double to float conversion */
                 float fltmin = 0x0.ffffff8p-63 * FLT_MIN * r;
                 return DBL_MIN / FLT_MIN * fltmin;
             }
             /* one bit is lost when scaled, add another top bit to
-			   only round once at conversion if it is inexact */
+               only round once at conversion if it is inexact */
             if (rhi << 53)
             {
                 i = rhi >> 1 | (rhi & 1) | 1ull << 62;
@@ -231,7 +231,7 @@ double fma(double x, double y, double z)
                 r = 2 * r - c; /* remove top bit */
 
                 /* raise underflow portably, such that it
-				   cannot be optimized away */
+                   cannot be optimized away */
                 {
                     double_t tiny = DBL_MIN / FLT_MIN * r;
                     r += (double)(tiny * tiny) * (r - r);

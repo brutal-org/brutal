@@ -108,8 +108,8 @@
 static const double
     erx = 8.45062911510467529297e-01, /* 0x3FEB0AC1, 0x60000000 */
     /*
- * Coefficients for approximation to  erf on [0,0.84375]
- */
+     * Coefficients for approximation to  erf on [0,0.84375]
+     */
     efx8 = 1.02703333676410069053e+00, /* 0x3FF06EBA, 0x8214DB69 */
     pp0 = 1.28379167095512558561e-01,  /* 0x3FC06EBA, 0x8214DB68 */
     pp1 = -3.25042107247001499370e-01, /* 0xBFD4CD7D, 0x691CB913 */
@@ -122,8 +122,8 @@ static const double
     qq4 = 1.32494738004321644526e-04,  /* 0x3F215DC9, 0x221C1A10 */
     qq5 = -3.96022827877536812320e-06, /* 0xBED09C43, 0x42A26120 */
     /*
- * Coefficients for approximation to  erf  in [0.84375,1.25]
- */
+     * Coefficients for approximation to  erf  in [0.84375,1.25]
+     */
     pa0 = -2.36211856075265944077e-03, /* 0xBF6359B8, 0xBEF77538 */
     pa1 = 4.14856118683748331666e-01,  /* 0x3FDA8D00, 0xAD92B34D */
     pa2 = -3.72207876035701323847e-01, /* 0xBFD7D240, 0xFBB8C3F1 */
@@ -138,8 +138,8 @@ static const double
     qa5 = 1.36370839120290507362e-02,  /* 0x3F8BEDC2, 0x6B51DD1C */
     qa6 = 1.19844998467991074170e-02,  /* 0x3F888B54, 0x5735151D */
     /*
- * Coefficients for approximation to  erfc in [1.25,1/0.35]
- */
+     * Coefficients for approximation to  erfc in [1.25,1/0.35]
+     */
     ra0 = -9.86494403484714822705e-03, /* 0xBF843412, 0x600D6435 */
     ra1 = -6.93858572707181764372e-01, /* 0xBFE63416, 0xE4BA7360 */
     ra2 = -1.05586262253232909814e+01, /* 0xC0251E04, 0x41B0E726 */
@@ -157,8 +157,8 @@ static const double
     sa7 = 6.57024977031928170135e+00,  /* 0x401A47EF, 0x8E484A93 */
     sa8 = -6.04244152148580987438e-02, /* 0xBFAEEFF2, 0xEE749A62 */
     /*
- * Coefficients for approximation to  erfc in [1/.35,28]
- */
+     * Coefficients for approximation to  erfc in [1/.35,28]
+     */
     rb0 = -9.86494292470009928597e-03, /* 0xBF843412, 0x39E86F4A */
     rb1 = -7.99283237680523006574e-01, /* 0xBFE993BA, 0x70C285DE */
     rb2 = -1.77579549177547519889e+01, /* 0xC031C209, 0x555F995A */

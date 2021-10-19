@@ -122,10 +122,10 @@ double pow(double x, double y)
         return x + y;
 
     /* determine if y is an odd int when x < 0
-	 * yisint = 0       ... y is not an integer
-	 * yisint = 1       ... y is an odd int
-	 * yisint = 2       ... y is an even int
-	 */
+     * yisint = 0       ... y is not an integer
+     * yisint = 1       ... y is an odd int
+     * yisint = 2       ... y is an even int
+     */
     yisint = 0;
     if (hx < 0)
     {
@@ -236,7 +236,7 @@ double pow(double x, double y)
         if (ix > 0x3ff00000)
             return hy > 0 ? s * huge * huge : s * tiny * tiny;
         /* now |1-x| is tiny <= 2**-20, suffice to compute
-		   log(x) by x-x^2/2+x^3/3-x^4/4 */
+           log(x) by x-x^2/2+x^3/3-x^4/4 */
         t = ax - 1.0; /* t has 20 trailing zeros */
         w = (t * t) * (0.5 - t * (0.3333333333333333333333 - t * 0.25));
         u = ivln2_h * t; /* ivln2_h has 21 sig. bits */
@@ -329,8 +329,8 @@ double pow(double x, double y)
             return s * tiny * tiny; /* underflow */
     }
     /*
-	 * compute 2**(p_h+p_l)
-	 */
+     * compute 2**(p_h+p_l)
+     */
     i = j & 0x7fffffff;
     k = (i >> 20) - 0x3ff;
     n = 0;

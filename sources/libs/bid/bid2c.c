@@ -313,7 +313,7 @@ static void bid2c_msg_handle(CStmt *targ, BidInterface const *interface, BidMeth
                 cc_access_str(str$("resp_msg"), str$("prot"), alloc), // resp_msg.prot
                 cexpr_identifier(protocol_id_str, alloc),
                 alloc),
-            cexpr_and( // &&
+            cexpr_and(
                 // resp_msg.type != response_id
                 cexpr_not_eq(
                     cexpr_resp_access_type,
@@ -676,9 +676,9 @@ CDecl bid2c_dispatcher(BidInterface const *interface, Alloc *alloc)
     // BrMsg resp_msg = {}
     cstmt_block_add(&func_statement, cc_var_decl_str(str$("BrMsg"), str$("resp_msg"), cexpr_struct_initializer(alloc), alloc));
 
-    /* 
+    /*
         switch(req_msg->type) {
-            case X: 
+            case X:
             {
             }
             ...

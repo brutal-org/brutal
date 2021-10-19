@@ -52,18 +52,18 @@ float cbrtf(float x)
     u.i |= hx;
 
     /*
-	 * First step Newton iteration (solving t*t-x/t == 0) to 16 bits.  In
-	 * double precision so that its terms can be arranged for efficiency
-	 * without causing overflow or underflow.
-	 */
+     * First step Newton iteration (solving t*t-x/t == 0) to 16 bits.  In
+     * double precision so that its terms can be arranged for efficiency
+     * without causing overflow or underflow.
+     */
     T = u.f;
     r = T * T * T;
     T = T * ((double_t)x + x + r) / (x + r + r);
 
     /*
-	 * Second step Newton iteration to 47 bits.  In double precision for
-	 * efficiency and accuracy.
-	 */
+     * Second step Newton iteration to 47 bits.  In double precision for
+     * efficiency and accuracy.
+     */
     r = T * T * T;
     T = T * ((double_t)x + x + r) / (x + r + r);
 

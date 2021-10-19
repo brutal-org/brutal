@@ -96,11 +96,11 @@ double log10(double x)
     val_lo = dk * log10_2lo + (lo + hi) * ivln10lo + lo * ivln10hi;
 
     /*
-	 * Extra precision in for adding y is not strictly needed
-	 * since there is no very large cancellation near x = sqrt(2) or
-	 * x = 1/sqrt(2), but we do it anyway since it costs little on CPUs
-	 * with some parallelism and it reduces the error for many args.
-	 */
+     * Extra precision in for adding y is not strictly needed
+     * since there is no very large cancellation near x = sqrt(2) or
+     * x = 1/sqrt(2), but we do it anyway since it costs little on CPUs
+     * with some parallelism and it reduces the error for many args.
+     */
     w = y + val_hi;
     val_lo += (y - w) + val_hi;
     val_hi = w;

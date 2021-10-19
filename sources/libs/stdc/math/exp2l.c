@@ -360,16 +360,16 @@ long double exp2l(long double x)
     }
 
     /*
-	 * Reduce x, computing z, i0, and k. The low bits of x + redux
-	 * contain the 16-bit integer part of the exponent (k) followed by
-	 * TBLBITS fractional bits (i0). We use bit tricks to extract these
-	 * as integers, then set z to the remainder.
-	 *
-	 * Example: Suppose x is 0xabc.123456p0 and TBLBITS is 8.
-	 * Then the low-order word of x + redux is 0x000abc12,
-	 * We split this into k = 0xabc and i0 = 0x12 (adjusted to
-	 * index into the table), then we compute z = 0x0.003456p0.
-	 */
+     * Reduce x, computing z, i0, and k. The low bits of x + redux
+     * contain the 16-bit integer part of the exponent (k) followed by
+     * TBLBITS fractional bits (i0). We use bit tricks to extract these
+     * as integers, then set z to the remainder.
+     *
+     * Example: Suppose x is 0xabc.123456p0 and TBLBITS is 8.
+     * Then the low-order word of x + redux is 0x000abc12,
+     * We split this into k = 0xabc and i0 = 0x12 (adjusted to
+     * index into the table), then we compute z = 0x0.003456p0.
+     */
     u.f = x + redux;
     i0 = u.i.m + TBLSIZE / 2;
     k.u = i0 / TBLSIZE * TBLSIZE;
@@ -733,16 +733,16 @@ exp2l(long double x)
     }
 
     /*
-	 * Reduce x, computing z, i0, and k. The low bits of x + redux
-	 * contain the 16-bit integer part of the exponent (k) followed by
-	 * TBLBITS fractional bits (i0). We use bit tricks to extract these
-	 * as integers, then set z to the remainder.
-	 *
-	 * Example: Suppose x is 0xabc.123456p0 and TBLBITS is 8.
-	 * Then the low-order word of x + redux is 0x000abc12,
-	 * We split this into k = 0xabc and i0 = 0x12 (adjusted to
-	 * index into the table), then we compute z = 0x0.003456p0.
-	 */
+     * Reduce x, computing z, i0, and k. The low bits of x + redux
+     * contain the 16-bit integer part of the exponent (k) followed by
+     * TBLBITS fractional bits (i0). We use bit tricks to extract these
+     * as integers, then set z to the remainder.
+     *
+     * Example: Suppose x is 0xabc.123456p0 and TBLBITS is 8.
+     * Then the low-order word of x + redux is 0x000abc12,
+     * We split this into k = 0xabc and i0 = 0x12 (adjusted to
+     * index into the table), then we compute z = 0x0.003456p0.
+     */
     u.f = x + redux;
     i0 = u.i2.lo + TBLSIZE / 2;
     k.u = i0 / TBLSIZE * TBLSIZE;

@@ -80,35 +80,35 @@ double log2(double x)
     R = t2 + t1;
 
     /*
-	 * f-hfsq must (for args near 1) be evaluated in extra precision
-	 * to avoid a large cancellation when x is near sqrt(2) or 1/sqrt(2).
-	 * This is fairly efficient since f-hfsq only depends on f, so can
-	 * be evaluated in parallel with R.  Not combining hfsq with R also
-	 * keeps R small (though not as small as a true `lo' term would be),
-	 * so that extra precision is not needed for terms involving R.
-	 *
-	 * Compiler bugs involving extra precision used to break Dekker's
-	 * theorem for spitting f-hfsq as hi+lo, unless double_t was used
-	 * or the multi-precision calculations were avoided when double_t
-	 * has extra precision.  These problems are now automatically
-	 * avoided as a side effect of the optimization of combining the
-	 * Dekker splitting step with the clear-low-bits step.
-	 *
-	 * y must (for args near sqrt(2) and 1/sqrt(2)) be added in extra
-	 * precision to avoid a very large cancellation when x is very near
-	 * these values.  Unlike the above cancellations, this problem is
-	 * specific to base 2.  It is strange that adding +-1 is so much
-	 * harder than adding +-ln2 or +-log10_2.
-	 *
-	 * This uses Dekker's theorem to normalize y+val_hi, so the
-	 * compiler bugs are back in some configurations, sigh.  And I
-	 * don't want to used double_t to avoid them, since that gives a
-	 * pessimization and the support for avoiding the pessimization
-	 * is not yet available.
-	 *
-	 * The multi-precision calculations for the multiplications are
-	 * routine.
-	 */
+     * f-hfsq must (for args near 1) be evaluated in extra precision
+     * to avoid a large cancellation when x is near sqrt(2) or 1/sqrt(2).
+     * This is fairly efficient since f-hfsq only depends on f, so can
+     * be evaluated in parallel with R.  Not combining hfsq with R also
+     * keeps R small (though not as small as a true `lo' term would be),
+     * so that extra precision is not needed for terms involving R.
+     *
+     * Compiler bugs involving extra precision used to break Dekker's
+     * theorem for spitting f-hfsq as hi+lo, unless double_t was used
+     * or the multi-precision calculations were avoided when double_t
+     * has extra precision.  These problems are now automatically
+     * avoided as a side effect of the optimization of combining the
+     * Dekker splitting step with the clear-low-bits step.
+     *
+     * y must (for args near sqrt(2) and 1/sqrt(2)) be added in extra
+     * precision to avoid a very large cancellation when x is very near
+     * these values.  Unlike the above cancellations, this problem is
+     * specific to base 2.  It is strange that adding +-1 is so much
+     * harder than adding +-ln2 or +-log10_2.
+     *
+     * This uses Dekker's theorem to normalize y+val_hi, so the
+     * compiler bugs are back in some configurations, sigh.  And I
+     * don't want to used double_t to avoid them, since that gives a
+     * pessimization and the support for avoiding the pessimization
+     * is not yet available.
+     *
+     * The multi-precision calculations for the multiplications are
+     * routine.
+     */
 
     /* hi+lo = f - hfsq + s*(hfsq+R) ~ log(1+f) */
     hi = f - hfsq;

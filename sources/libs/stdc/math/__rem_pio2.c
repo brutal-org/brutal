@@ -173,8 +173,8 @@ int __rem_pio2(double x, double *y)
         return n;
     }
     /*
-	 * all other (large) arguments
-	 */
+     * all other (large) arguments
+     */
     if (ix >= 0x7ff00000)
     { /* x is inf or NaN */
         y[0] = y[1] = x - x;

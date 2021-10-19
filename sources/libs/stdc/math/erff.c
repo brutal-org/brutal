@@ -18,8 +18,8 @@
 static const float
     erx = 8.4506291151e-01, /* 0x3f58560b */
     /*
- * Coefficients for approximation to  erf on [0,0.84375]
- */
+     * Coefficients for approximation to  erf on [0,0.84375]
+     */
     efx8 = 1.0270333290e+00, /* 0x3f8375d4 */
     pp0 = 1.2837916613e-01,  /* 0x3e0375d4 */
     pp1 = -3.2504209876e-01, /* 0xbea66beb */
@@ -32,8 +32,8 @@ static const float
     qq4 = 1.3249473704e-04,  /* 0x390aee49 */
     qq5 = -3.9602282413e-06, /* 0xb684e21a */
     /*
- * Coefficients for approximation to  erf  in [0.84375,1.25]
- */
+     * Coefficients for approximation to  erf  in [0.84375,1.25]
+     */
     pa0 = -2.3621185683e-03, /* 0xbb1acdc6 */
     pa1 = 4.1485610604e-01,  /* 0x3ed46805 */
     pa2 = -3.7220788002e-01, /* 0xbebe9208 */
@@ -48,8 +48,8 @@ static const float
     qa5 = 1.3637083583e-02,  /* 0x3c5f6e13 */
     qa6 = 1.1984500103e-02,  /* 0x3c445aa3 */
     /*
- * Coefficients for approximation to  erfc in [1.25,1/0.35]
- */
+     * Coefficients for approximation to  erfc in [1.25,1/0.35]
+     */
     ra0 = -9.8649440333e-03, /* 0xbc21a093 */
     ra1 = -6.9385856390e-01, /* 0xbf31a0b7 */
     ra2 = -1.0558626175e+01, /* 0xc128f022 */
@@ -67,8 +67,8 @@ static const float
     sa7 = 6.5702495575e+00,  /* 0x40d23f7c */
     sa8 = -6.0424413532e-02, /* 0xbd777f97 */
     /*
- * Coefficients for approximation to  erfc in [1/.35,28]
- */
+     * Coefficients for approximation to  erfc in [1/.35,28]
+     */
     rb0 = -9.8649431020e-03, /* 0xbc21a092 */
     rb1 = -7.9928326607e-01, /* 0xbf4c9dd4 */
     rb2 = -1.7757955551e+01, /* 0xc18e104b */

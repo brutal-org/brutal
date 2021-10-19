@@ -68,13 +68,13 @@ static double common(uint32_t ix, double x, int y0)
     double s, c, ss, cc, z;
 
     /*
-	 * j0(x) = sqrt(2/(pi*x))*(p0(x)*cos(x-pi/4)-q0(x)*sin(x-pi/4))
-	 * y0(x) = sqrt(2/(pi*x))*(p0(x)*sin(x-pi/4)+q0(x)*cos(x-pi/4))
-	 *
-	 * sin(x-pi/4) = (sin(x) - cos(x))/sqrt(2)
-	 * cos(x-pi/4) = (sin(x) + cos(x))/sqrt(2)
-	 * sin(x) +- cos(x) = -cos(2x)/(sin(x) -+ cos(x))
-	 */
+     * j0(x) = sqrt(2/(pi*x))*(p0(x)*cos(x-pi/4)-q0(x)*sin(x-pi/4))
+     * y0(x) = sqrt(2/(pi*x))*(p0(x)*sin(x-pi/4)+q0(x)*cos(x-pi/4))
+     *
+     * sin(x-pi/4) = (sin(x) - cos(x))/sqrt(2)
+     * cos(x-pi/4) = (sin(x) + cos(x))/sqrt(2)
+     * sin(x) +- cos(x) = -cos(2x)/(sin(x) -+ cos(x))
+     */
     s = sin(x);
     c = cos(x);
     if (y0)

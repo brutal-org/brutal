@@ -76,10 +76,10 @@ float powf(float x, float y)
         return x + y;
 
     /* determine if y is an odd int when x < 0
-	 * yisint = 0       ... y is not an integer
-	 * yisint = 1       ... y is an odd int
-	 * yisint = 2       ... y is an even int
-	 */
+     * yisint = 0       ... y is not an integer
+     * yisint = 1       ... y is an odd int
+     * yisint = 2       ... y is an even int
+     */
     yisint = 0;
     if (hx < 0)
     {
@@ -151,7 +151,7 @@ float powf(float x, float y)
         if (ix > 0x3f800007)
             return hy > 0 ? sn * huge * huge : sn * tiny * tiny;
         /* now |1-x| is tiny <= 2**-20, suffice to compute
-		   log(x) by x-x^2/2+x^3/3-x^4/4 */
+           log(x) by x-x^2/2+x^3/3-x^4/4 */
         t = ax - 1; /* t has 20 trailing zeros */
         w = (t * t) * (0.5f - t * (0.333333333333f - t * 0.25f));
         u = ivln2_h * t; /* ivln2_h has 16 sig. bits */
@@ -249,8 +249,8 @@ float powf(float x, float y)
             return sn * tiny * tiny; /* underflow */
     }
     /*
-	 * compute 2**(p_h+p_l)
-	 */
+     * compute 2**(p_h+p_l)
+     */
     i = j & 0x7fffffff;
     k = (i >> 23) - 0x7f;
     n = 0;

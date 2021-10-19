@@ -57,9 +57,9 @@ float fmaf(float x, float y, float z)
         fegetround() != FE_TONEAREST)       /* not round-to-nearest */
     {
         /*
-		underflow may not be raised correctly, example:
-		fmaf(0x1p-120f, 0x1p-120f, 0x1p-149f)
-		*/
+        underflow may not be raised correctly, example:
+        fmaf(0x1p-120f, 0x1p-120f, 0x1p-149f)
+        */
 #if defined(FE_INEXACT) && defined(FE_UNDERFLOW)
         if (e < 0x3ff - 126 && e >= 0x3ff - 149 && fetestexcept(FE_INEXACT))
         {
@@ -78,9 +78,9 @@ float fmaf(float x, float y, float z)
     }
 
     /*
-	 * If result is inexact, and exactly halfway between two float values,
-	 * we need to adjust the low-order bit in the direction of the error.
-	 */
+     * If result is inexact, and exactly halfway between two float values,
+     * we need to adjust the low-order bit in the direction of the error.
+     */
 #ifdef FE_TOWARDZERO
     fesetround(FE_TOWARDZERO);
 #endif

@@ -132,13 +132,13 @@ long double log10l(long double x)
         return INFINITY;
     /* separate mantissa from exponent */
     /* Note, frexp is used so that denormal numbers
-	 * will be handled properly.
-	 */
+     * will be handled properly.
+     */
     x = frexpl(x, &e);
 
     /* logarithm using log(x) = z + z**3 P(z)/Q(z),
-	 * where z = 2(x-1)/x+1)
-	 */
+     * where z = 2(x-1)/x+1)
+     */
     if (e > 2 || e < -2)
     {
         if (x < SQRTH)
@@ -175,13 +175,13 @@ long double log10l(long double x)
 
 done:
     /* Multiply log of fraction by log10(e)
-	 * and base 2 exponent by log10(2).
-	 *
-	 * ***CAUTION***
-	 *
-	 * This sequence of operations is critical and it may
-	 * be horribly defeated by some compiler optimizers.
-	 */
+     * and base 2 exponent by log10(2).
+     *
+     * ***CAUTION***
+     *
+     * This sequence of operations is critical and it may
+     * be horribly defeated by some compiler optimizers.
+     */
     z = y * (L10EB);
     z += x * (L10EB);
     z += e * (L102B);

@@ -113,8 +113,8 @@ static const long double
     erx = 0.845062911510467529296875L,
 
     /*
- * Coefficients for approximation to  erf on [0,0.84375]
- */
+     * Coefficients for approximation to  erf on [0,0.84375]
+     */
     /* 8 * (2/sqrt(pi) - 1) */
     efx8 = 1.0270333367641005911692712249723613735048E0L,
     pp[6] = {
@@ -131,8 +131,8 @@ static const long double
 },
 
     /*
- * Coefficients for approximation to  erf  in [0.84375,1.25]
- */
+     * Coefficients for approximation to  erf  in [0.84375,1.25]
+     */
     /* erf(x+1) = 0.845062911510467529296875 + pa(x)/qa(x)
    -0.15625 <= x <= +.25
    Peak relative error 8.5e-22  */
@@ -152,8 +152,8 @@ static const long double
 },
 
     /*
- * Coefficients for approximation to  erfc in [1.25,1/0.35]
- */
+     * Coefficients for approximation to  erfc in [1.25,1/0.35]
+     */
     /* erfc(1/x) = x exp (-1/x^2 - 0.5625 + ra(x^2)/sa(x^2))
    1/2.85711669921875 < 1/x < 1/1.25
    Peak relative error 3.1e-21  */
@@ -174,8 +174,8 @@ static const long double
 },
 
     /*
- * Coefficients for approximation to  erfc in [1/.35,107]
- */
+     * Coefficients for approximation to  erfc in [1/.35,107]
+     */
     /* erfc(1/x) = x exp (-1/x^2 - 0.5625 + rb(x^2)/sb(x^2))
    1/6.6666259765625 < 1/x < 1/2.85711669921875
    Peak relative error 4.2e-22  */

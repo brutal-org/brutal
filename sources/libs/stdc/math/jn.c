@@ -53,8 +53,8 @@ double jn(int n, double x)
         return x;
 
     /* J(-n,x) = (-1)^n * J(n, x), J(n, -x) = (-1)^n * J(n, x)
-	 * Thus, J(-n,x) = J(n,-x)
-	 */
+     * Thus, J(-n,x) = J(n,-x)
+     */
     /* nm1 = |n|-1 is used instead of |n| to handle n==INT_MIN */
     if (n == 0)
         return j0(x);
@@ -79,18 +79,18 @@ double jn(int n, double x)
         if (ix >= 0x52d00000)
         { /* x > 2**302 */
             /* (x >> n**2)
-			 *      Jn(x) = cos(x-(2n+1)*pi/4)*sqrt(2/x*pi)
-			 *      Yn(x) = sin(x-(2n+1)*pi/4)*sqrt(2/x*pi)
-			 *      Let s=sin(x), c=cos(x),
-			 *          xn=x-(2n+1)*pi/4, sqt2 = sqrt(2),then
-			 *
-			 *             n    sin(xn)*sqt2    cos(xn)*sqt2
-			 *          ----------------------------------
-			 *             0     s-c             c+s
-			 *             1    -s-c            -c+s
-			 *             2    -s+c            -c-s
-			 *             3     s+c             c-s
-			 */
+             *      Jn(x) = cos(x-(2n+1)*pi/4)*sqrt(2/x*pi)
+             *      Yn(x) = sin(x-(2n+1)*pi/4)*sqrt(2/x*pi)
+             *      Let s=sin(x), c=cos(x),
+             *          xn=x-(2n+1)*pi/4, sqt2 = sqrt(2),then
+             *
+             *             n    sin(xn)*sqt2    cos(xn)*sqt2
+             *          ----------------------------------
+             *             0     s-c             c+s
+             *             1    -s-c            -c+s
+             *             2    -s+c            -c-s
+             *             3     s+c             c-s
+             */
             switch (nm1 & 3)
             {
             case 0:
@@ -127,8 +127,8 @@ double jn(int n, double x)
         if (ix < 0x3e100000)
         { /* x < 2**-29 */
             /* x is tiny, return the first Taylor expansion of J(n,x)
-			 * J(n,x) = 1/n!*(x/2)^n  - ...
-			 */
+             * J(n,x) = 1/n!*(x/2)^n  - ...
+             */
             if (nm1 > 32) /* underflow */
                 b = 0.0;
             else
@@ -148,32 +148,32 @@ double jn(int n, double x)
         {
             /* use backward recurrence */
             /*                      x      x^2      x^2
-			 *  J(n,x)/J(n-1,x) =  ----   ------   ------   .....
-			 *                      2n  - 2(n+1) - 2(n+2)
-			 *
-			 *                      1      1        1
-			 *  (for large x)   =  ----  ------   ------   .....
-			 *                      2n   2(n+1)   2(n+2)
-			 *                      -- - ------ - ------ -
-			 *                       x     x         x
-			 *
-			 * Let w = 2n/x and h=2/x, then the above quotient
-			 * is equal to the continued fraction:
-			 *                  1
-			 *      = -----------------------
-			 *                     1
-			 *         w - -----------------
-			 *                        1
-			 *              w+h - ---------
-			 *                     w+2h - ...
-			 *
-			 * To determine how many terms needed, let
-			 * Q(0) = w, Q(1) = w(w+h) - 1,
-			 * Q(k) = (w+k*h)*Q(k-1) - Q(k-2),
-			 * When Q(k) > 1e4      good for single
-			 * When Q(k) > 1e9      good for double
-			 * When Q(k) > 1e17     good for quadruple
-			 */
+             *  J(n,x)/J(n-1,x) =  ----   ------   ------   .....
+             *                      2n  - 2(n+1) - 2(n+2)
+             *
+             *                      1      1        1
+             *  (for large x)   =  ----  ------   ------   .....
+             *                      2n   2(n+1)   2(n+2)
+             *                      -- - ------ - ------ -
+             *                       x     x         x
+             *
+             * Let w = 2n/x and h=2/x, then the above quotient
+             * is equal to the continued fraction:
+             *                  1
+             *      = -----------------------
+             *                     1
+             *         w - -----------------
+             *                        1
+             *              w+h - ---------
+             *                     w+2h - ...
+             *
+             * To determine how many terms needed, let
+             * Q(0) = w, Q(1) = w(w+h) - 1,
+             * Q(k) = (w+k*h)*Q(k-1) - Q(k-2),
+             * When Q(k) > 1e4      good for single
+             * When Q(k) > 1e9      good for double
+             * When Q(k) > 1e17     good for quadruple
+             */
             /* determine k */
             double t, q0, q1, w, h, z, tmp, nf;
             int k;
@@ -198,13 +198,13 @@ double jn(int n, double x)
             a = t;
             b = 1.0;
             /*  estimate log((2/x)^n*n!) = n*log(2/x)+n*ln(n)
-			 *  Hence, if n*(log(2n/x)) > ...
-			 *  single 8.8722839355e+01
-			 *  double 7.09782712893383973096e+02
-			 *  long double 1.1356523406294143949491931077970765006170e+04
-			 *  then recurrent value may overflow and the result is
-			 *  likely underflow to zero
-			 */
+             *  Hence, if n*(log(2n/x)) > ...
+             *  single 8.8722839355e+01
+             *  double 7.09782712893383973096e+02
+             *  long double 1.1356523406294143949491931077970765006170e+04
+             *  then recurrent value may overflow and the result is
+             *  likely underflow to zero
+             */
             tmp = nf * log(fabs(w));
             if (tmp < 7.09782712893383973096e+02)
             {
@@ -277,18 +277,18 @@ double yn(int n, double x)
     if (ix >= 0x52d00000)
     { /* x > 2**302 */
         /* (x >> n**2)
-		 *      Jn(x) = cos(x-(2n+1)*pi/4)*sqrt(2/x*pi)
-		 *      Yn(x) = sin(x-(2n+1)*pi/4)*sqrt(2/x*pi)
-		 *      Let s=sin(x), c=cos(x),
-		 *          xn=x-(2n+1)*pi/4, sqt2 = sqrt(2),then
-		 *
-		 *             n    sin(xn)*sqt2    cos(xn)*sqt2
-		 *          ----------------------------------
-		 *             0     s-c             c+s
-		 *             1    -s-c            -c+s
-		 *             2    -s+c            -c-s
-		 *             3     s+c             c-s
-		 */
+         *      Jn(x) = cos(x-(2n+1)*pi/4)*sqrt(2/x*pi)
+         *      Yn(x) = sin(x-(2n+1)*pi/4)*sqrt(2/x*pi)
+         *      Let s=sin(x), c=cos(x),
+         *          xn=x-(2n+1)*pi/4, sqt2 = sqrt(2),then
+         *
+         *             n    sin(xn)*sqt2    cos(xn)*sqt2
+         *          ----------------------------------
+         *             0     s-c             c+s
+         *             1    -s-c            -c+s
+         *             2    -s+c            -c-s
+         *             3     s+c             c-s
+         */
         switch (nm1 & 3)
         {
         case 0:

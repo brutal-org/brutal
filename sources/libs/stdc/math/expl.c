@@ -103,16 +103,16 @@ long double expl(long double x)
         return -0x1p-16445L / x;
 
     /* Express e**x = e**f 2**k
-	 *   = e**(f + k ln(2))
-	 */
+     *   = e**(f + k ln(2))
+     */
     px = floorl(LOG2E * x + 0.5);
     k = px;
     x -= px * LN2HI;
     x -= px * LN2LO;
 
     /* rational approximation of the fractional part:
-	 * e**x =  1 + 2x P(x**2)/(Q(x**2) - x P(x**2))
-	 */
+     * e**x =  1 + 2x P(x**2)/(Q(x**2) - x P(x**2))
+     */
     xx = x * x;
     px = x * __polevll(xx, P, 2);
     x = px / (__polevll(xx, Q, 3) - px);

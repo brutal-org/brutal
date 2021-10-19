@@ -124,11 +124,11 @@ long double log1pl(long double xm1)
     }
 
     /* Separate mantissa from exponent.
-	   Use frexp so that denormal numbers will be handled properly.  */
+       Use frexp so that denormal numbers will be handled properly.  */
     x = frexpl(x, &e);
 
     /* logarithm using log(x) = z + z^3 P(z)/Q(z),
-	   where z = 2(x-1)/x+1)  */
+       where z = 2(x-1)/x+1)  */
     if (e > 2 || e < -2)
     {
         if (x < SQRTH)

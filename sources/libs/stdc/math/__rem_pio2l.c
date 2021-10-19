@@ -107,8 +107,8 @@ int __rem_pio2l(long double x, long double *y)
         return n;
     }
     /*
-	 * all other (large) arguments
-	 */
+     * all other (large) arguments
+     */
     if (ex == 0x7fff)
     { /* x is inf or NaN */
         y[0] = y[1] = x - x;
@@ -132,7 +132,7 @@ int __rem_pio2l(long double x, long double *y)
         w += ty[2];
     r = ty[0] + w;
     /* TODO: for ld128 this does not follow the recommendation of the
-	comments of __rem_pio2_large which seem wrong if |ty[0]| > |ty[1]+ty[2]| */
+    comments of __rem_pio2_large which seem wrong if |ty[0]| > |ty[1]+ty[2]| */
     w -= r - ty[0];
     if (u.i.se >> 15)
     {

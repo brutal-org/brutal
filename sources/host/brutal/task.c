@@ -4,7 +4,7 @@
 
 TaskId host_task_self(void)
 {
-    //FIXME: return the real tid
+    // FIXME: return the real tid
     return (TaskId)BR_TASK_SELF;
 }
 
