@@ -59,4 +59,4 @@ meta/toolchain/gnu/build
 meta/toolchain/gnu/local
 meta/toolchain/gnu/tarballs
 
-docs/brutal.pdf
+book/brutal.pdf

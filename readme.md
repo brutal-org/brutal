@@ -3,7 +3,7 @@
 <br/>
 
 <p align="center">
-  <img width="256" src="meta/assets/logo.png">
+  <img width="256" src="book/shared/logo.png">
 </p>
 
 <br/>
@@ -68,7 +68,7 @@ See [credits.md](book/01-03-credits.md)
 ## License
 
 <a href="https://opensource.org/licenses/MIT">
-  <img align="right" height="96" alt="MIT License" src="meta/assets/mit-license.png" />
+  <img align="right" height="96" alt="MIT License" src="book/shared/mit-license.png" />
 </a>
 
 The brutal operating system and its core components are licensed under the **MIT License**.
