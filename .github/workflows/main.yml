@@ -119,17 +119,3 @@ jobs:
       - name: Run BID
         run: |
           make CONFIG_TOOLCHAIN=${{matrix.toolchain}} run-bid
-
-  format:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Install dependencies
-        run: .github/workflows/setup-ubuntu.sh
-
-      - uses: DoozyX/clang-format-lint-action@v0.12
-        with:
-          source: "."
-          exclude: "./thirdparty ./sources/libs/proto ./sources/utils/test.c"
-          clangFormatVersion: 12
