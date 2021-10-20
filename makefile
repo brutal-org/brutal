@@ -101,6 +101,6 @@ clean:
 
 .PHONY: clean
 clean-all:
-	rm -rf build/
+	rm -rf bin/ 
 
 -include $(DEPENDENCIES)
