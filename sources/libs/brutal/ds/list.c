@@ -6,6 +6,7 @@ static void list_deinit_head(ListImpl *entry)
     {
         alloc_release(entry->alloc, entry->data);
     }
+
     entry->data = nullptr;
 }
 
@@ -15,6 +16,7 @@ static void list_deinit_entry(ListImpl *entry)
     {
         alloc_release(entry->alloc, entry->data);
     }
+
     alloc_release(entry->alloc, entry);
 }
 
@@ -28,8 +30,6 @@ void list_init_impl(ListImpl *impl, Alloc *alloc)
 
 void list_deinit_impl(ListImpl *impl)
 {
-    size_t i = 0;
-
     ListImpl *entry = impl->next;
 
     while (entry != nullptr)
@@ -39,8 +39,6 @@ void list_deinit_impl(ListImpl *impl)
         list_deinit_entry(entry);
 
         entry = next;
-
-        i++;
     }
 }
 
@@ -65,7 +63,6 @@ ListImpl *list_insert_impl(ListImpl *impl, int data_size)
 
 void list_remove_impl(ListImpl *head, ListImpl *impl)
 {
-
     // impl -> [NEXT]
     if (impl == head)
     {

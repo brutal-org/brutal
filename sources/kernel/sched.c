@@ -188,7 +188,7 @@ Task *sched_peek(void)
 
 /* --- Dispatch ------------------------------------------------------------- */
 
-bool sched_dispatch_to_current(Task *task)
+static bool sched_dispatch_to_current(Task *task)
 {
     for (int i = 0; i < cpu_count(); i++)
     {
@@ -202,7 +202,7 @@ bool sched_dispatch_to_current(Task *task)
     return false;
 }
 
-bool sched_dispatch_to_idle(Task *task)
+static bool sched_dispatch_to_idle(Task *task)
 {
     for (int i = 0; i < cpu_count(); i++)
     {
@@ -314,78 +314,11 @@ static void sched_switch_other(void)
     }
 }
 
-void sched_dump(void)
-{
-    log_unlock("Tasks:");
-    vec_foreach(task, &tasks)
-    {
-        Cpu *cpu = sched_cpu(task);
-        log_unlock("{}({}) : CPU{}", str$(&task->name), task->id, cpu ? cpu->id : -1);
-    }
-
-    log_unlock("CPUs:");
-    for (int i = 0; i < cpu_count(); i++)
-    {
-        log_unlock("CPU{} : c:{}({}) n:{}({})",
-                   i,
-                   str$(&cpu(i)->current->name),
-                   cpu(i)->current->id,
-                   str$(&cpu(i)->next->name),
-                   cpu(i)->next->id);
-    }
-}
-
-void sched_ensure_no_duplicated(void)
-{
-    for (int i = 0; i < cpu_count(); i++)
-    {
-        for (int j = 0; j < cpu_count(); j++)
-        {
-            if (i == j)
-            {
-                continue;
-            }
-
-            if (cpu(i)->next == cpu(j)->next)
-            {
-                sched_dump();
-                panic$("sched_ensure_no_duplicated failled (CPU{} and CPU{})!", i, j);
-            }
-        }
-    }
-}
-
-void sched_ensure_no_cpu_jump(void)
-{
-    for (int i = 0; i < cpu_count(); i++)
-    {
-        for (int j = 0; j < cpu_count(); j++)
-        {
-            if (i == j)
-            {
-                continue;
-            }
-
-            if (cpu(i)->current == cpu(j)->next)
-            {
-                sched_dump();
-                panic$("sched_ensure_no_cpu_jump() failled {}:{#p}({}) jumped from CPU{} to CPU{} taking the place of {}:{#p}({})!",
-                       str$(&cpu(i)->current->name), (uintptr_t)cpu(i)->next, cpu(i)->current->id,
-                       i, j,
-                       str$(&cpu(j)->next->name), (uintptr_t)cpu(j)->next, cpu(j)->next->id);
-            }
-        }
-    }
-}
-
 void sched_yield(void)
 {
     lock_acquire(&lock);
 
     sched_next(sched_peek() ?: cpu_self()->idle, cpu_self());
-
-    sched_ensure_no_cpu_jump();
-    sched_ensure_no_duplicated();
 
     lock_release(&lock);
 
@@ -402,9 +335,6 @@ void sched_schedule(void)
 
     while (sched_dispatch(sched_peek()))
         ;
-
-    sched_ensure_no_cpu_jump();
-    sched_ensure_no_duplicated();
 
     lock_release(&lock);
 
