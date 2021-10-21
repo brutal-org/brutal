@@ -58,3 +58,5 @@ struct bid_member
     BidType type;
     bool kernel_handle;
 };
+
+bool bid_contain_attrib(BidType *type, Str attrib);

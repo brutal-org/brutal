@@ -105,11 +105,6 @@ static BidStruct parse_struct(Scan *scan, Alloc *alloc)
     {
         BidMember member = {};
 
-        if (scan_skip(scan, '@'))
-        {
-            member.kernel_handle = true;
-        }
-
         member.name = parse_identifier(scan);
 
         skip_comment_and_space(scan);

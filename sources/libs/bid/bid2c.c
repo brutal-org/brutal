@@ -106,6 +106,11 @@ static CType bid2c_type(BidInterface const *interface, BidType const *type, Allo
 
 static bool is_handle(BidType *type)
 {
+    if (bid_contain_attrib(type, str$("handle")))
+    {
+        return true;
+    }
+
     if (type->type != BID_TYPE_PRIMITIVE)
     {
         return false;
