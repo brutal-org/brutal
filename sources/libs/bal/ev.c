@@ -159,7 +159,7 @@ BrResult br_ev_resp(BrMsg const *req, BrMsg *resp)
 }
 
 static bool running = false;
-static int exit = 0;
+static int exit_code = 0;
 
 static bool wait_exit(MAYBE_UNUSED void *context)
 {
@@ -179,11 +179,11 @@ int br_ev_run(void)
         .deadline = BR_DEADLINE_INFINITY,
     });
 
-    return exit;
+    return exit_code;
 }
 
 void br_ev_exit(int value)
 {
     running = false;
-    exit = value;
+    exit_code = value;
 }

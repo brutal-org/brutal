@@ -17,7 +17,7 @@ enum test_result test_run(struct test test)
     task_fork(&runner);
     task_run(&runner);
 
-    if (task_child(&runner))
+    if (task_is_child(&runner))
     {
         test_alloc_begin_test();
         test.func();

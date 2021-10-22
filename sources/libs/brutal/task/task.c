@@ -23,7 +23,7 @@ void task_fork(struct task *task)
     };
 }
 
-bool task_child(struct task *task)
+bool task_is_child(struct task *task)
 {
     return task->handle == 0;
 }

@@ -59,7 +59,7 @@ void task_clone_func(struct task *task, task_clone_entry_t *entry);
 
 void task_exec(struct task *task);
 
-bool task_child(struct task *task);
+bool task_is_child(struct task *task);
 
 void task_run(struct task *task);
 
