@@ -35,7 +35,7 @@
 - [x] IPC
 - [x] IDL
 
-## Milestone 3 - ACPI, PCIe, VirtIO
+## Milestone 3 - ACPI, PCIe, BID, CC, Loader
 
 - [X] Fibers
 - [x] Event loop
@@ -44,6 +44,24 @@
   - [x] MCFG
 - [x] PCIe Server
   - [x] Device enumeration
+- [ ] BID (Interface definition language)
+  - [x] Parser
+  - [ ] Sema
+  - [ ] C code gen
+    - [ ] Client Code
+    - [x] Server Code
+    - [ ] Serialisation
+- [ ] CC (C Compiler)
+  - [ ] Lexer
+  - [ ] Parser
+  - [ ] Sema
+  - [x] AST
+  - [ ] Code gen (LLVM?)
+  - [x] Code gen C
+- [ ] Bootloader
+  - [x] Load the kernel
+  - [x] Load modules
+  - [ ] Pass handover information
 
 ## Milestone 4 - Filesystem and User Interfaces
 
