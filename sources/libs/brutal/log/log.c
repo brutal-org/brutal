@@ -18,11 +18,11 @@ static Str log_color(LogLevel level)
     case LOG_FIXME:
         return str$("");
 
-    case LOG_DEFAULT:
+    case LOG_DEBUG:
         return str$("");
 
     default:
-    case LOG_DEBUG:
+    case LOG_DEFAULT:
         return str$("");
     }
 }
@@ -40,12 +40,12 @@ static Str log_prefix(LogLevel level)
     case LOG_FIXME:
         return str$("fixme");
 
-    case LOG_DEFAULT:
-        return str$("info");
-
-    default:
     case LOG_DEBUG:
         return str$("debug");
+
+    default:
+    case LOG_DEFAULT:
+        return str$("info");
     }
 }
 
