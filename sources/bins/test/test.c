@@ -30,7 +30,7 @@ enum test_result test_run(struct test test)
 
         int result = UNWRAP(task_wait(&runner));
 
-        if (result == TASK_EXIT_SUCCESS)
+        if (result == TASK_EXIT_SUCCESS && !(test.flags & TEST_EXPECTED_TO_FAIL))
         {
             return TEST_PASS;
         }
