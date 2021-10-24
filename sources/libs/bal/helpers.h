@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bal/types.h>
+#include <bal/abi/types.h>
 
 BrResult brh_close(BrHandle handle);
 

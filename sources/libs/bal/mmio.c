@@ -1,6 +1,6 @@
+#include <bal/abi.h>
 #include <bal/helpers.h>
 #include <bal/mmio.h>
-#include <bal/syscalls.h>
 #include <brutal/log.h>
 
 void br_mmio_init(BrMmio *self, uintptr_t paddr, uintptr_t size)

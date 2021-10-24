@@ -1,5 +1,5 @@
+#include <bal/abi.h>
 #include <bal/helpers.h>
-#include <bal/syscalls.h>
 #include <host/mem.h>
 
 void host_mem_lock(void)

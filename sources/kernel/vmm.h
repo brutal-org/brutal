@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bal/types.h>
+#include <bal/abi.h>
 #include "kernel/pmm.h"
 
 typedef void *VmmSpace;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bal/types.h>
+#include <bal/abi/types.h>
 #include <brutal/mem.h>
 
 typedef struct

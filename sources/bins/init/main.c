@@ -1,12 +1,11 @@
+#include <bal/abi.h>
 #include <bal/exec.h>
 #include <bal/helpers.h>
 #include <bal/shm.h>
-#include <bal/syscalls.h>
 #include <brutal/alloc.h>
 #include <brutal/codec/tga.h>
 #include <brutal/gfx.h>
 #include <brutal/log.h>
-#include <handover/handover.h>
 
 static void display_bootimage(Handover const *handover)
 {

@@ -1,5 +1,5 @@
+#include <bal/abi.h>
 #include <bal/io.h>
-#include <bal/syscalls.h>
 #include <brutal/input.h>
 #include <brutal/log.h>
 #include "ps2.h"

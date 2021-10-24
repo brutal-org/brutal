@@ -3,8 +3,8 @@
 #include <brutal/log.h>
 
 #ifndef __kernel__
+#    include <bal/abi.h>
 #    include <bal/helpers.h>
-#    include <bal/syscalls.h>
 #endif
 
 #ifdef __kernel__

@@ -1,4 +1,4 @@
-#include <bal/syscalls.h>
+#include <bal/abi.h>
 #include <brutal/fibers.h>
 #include <brutal/log.h>
 typedef struct ipc_job

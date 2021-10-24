@@ -1,4 +1,4 @@
-#include <bal/syscalls.h>
+#include <bal/abi.h>
 #include <brutal/log.h>
 #include <host/log.h>
 #include "kernel/arch.h"

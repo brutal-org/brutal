@@ -1,4 +1,4 @@
-#include <bal/syscalls.h>
+#include <bal/abi.h>
 #include <brutal/alloc/global.h>
 #include <brutal/io/buffer.h>
 #include <brutal/sync.h>

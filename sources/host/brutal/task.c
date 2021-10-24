@@ -1,5 +1,5 @@
+#include <bal/abi.h>
 #include <bal/helpers.h>
-#include <bal/syscalls.h>
 #include <host/task.h>
 
 TaskId host_task_self(void)

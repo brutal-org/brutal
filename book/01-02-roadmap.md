@@ -83,7 +83,7 @@
 
 - [ ] Multiboot support
 - [ ] FAT32
-- [ ] RISCV support 
+- [ ] RISCV support
 - [ ] In house bootloader
 - [ ] Virtio
   - [ ] Device Configuration

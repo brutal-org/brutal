@@ -1,8 +1,7 @@
 
-#include <bal/syscalls.h>
+#include <bal/abi.h>
 #include <brutal/fibers.h>
 #include <brutal/log.h>
-#include <handover/handover.h>
 
 WEAK int br_entry_args(
     MAYBE_UNUSED long arg1,

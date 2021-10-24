@@ -1,8 +1,8 @@
+#include <bal/abi.h>
 #include <brutal/alloc.h>
 #include <brutal/log.h>
 #include <efi/lib.h>
 #include <efi/srvs.h>
-#include <handover/handover.h>
 #include "loader/protocol.h"
 
 static HandoverMmapType efi_mmap_type_to_handover[] = {

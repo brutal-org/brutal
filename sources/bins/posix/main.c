@@ -1,5 +1,5 @@
+#include <bal/abi.h>
 #include <bal/helpers.h>
-#include <bal/syscalls.h>
 #include <brutal/alloc.h>
 #include <brutal/io.h>
 #include <brutal/log.h>

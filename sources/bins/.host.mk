@@ -14,7 +14,7 @@ LIBS_HOST_SRC = \
 	$(wildcard sources/libs/ud/*/*.c)       \
 	$(wildcard sources/libs/json/*.c)     \
 	$(wildcard sources/libs/elf/*.c)      \
-	$(wildcard sources/libs/handover/*.c) \
+	$(wildcard sources/libs/bal/abi/handover.c) \
 	$(wildcard sources/libs/bid/*.c) \
 	$(wildcard sources/libs/bid/*/*.c)
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bal/types.h>
+#include <bal/abi.h>
 
 #ifdef __x86_64__
 #    include "kernel/x86_64/context.h"

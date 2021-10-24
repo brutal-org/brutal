@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bal/syscalls.h>
+#include <bal/abi.h>
 #include <brutal/base.h>
 #include <brutal/text.h>
 

@@ -2,6 +2,7 @@
 #include <brutal/io.h>
 #include <brutal/log.h>
 #include <ud/eval.h>
+#include <ud/gen.h>
 #include <ud/parse.h>
 
 int main(int argc, char const *argv[])

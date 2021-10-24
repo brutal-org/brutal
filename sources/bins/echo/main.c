@@ -1,5 +1,5 @@
+#include <bal/abi.h>
 #include <bal/ev.h>
-#include <bal/syscalls.h>
 #include <brutal/log.h>
 
 void br_event(BrMsg const *msg)

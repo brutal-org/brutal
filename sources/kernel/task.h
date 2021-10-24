@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bal/types.h>
+#include <bal/abi.h>
 #include <brutal/text.h>
 #include <brutal/time.h>
 #include <brutal/types.h>
