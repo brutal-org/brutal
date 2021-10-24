@@ -27,6 +27,7 @@ typedef enum
     CTYPE_FUNC,
     CTYPE_NAME,
 
+    CTYPE_COUNT,
 } CTypeType;
 
 typedef enum

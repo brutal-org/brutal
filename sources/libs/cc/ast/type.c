@@ -1,6 +1,6 @@
 #include <cc/ast/type.h>
 
-const char *ctype_type_to_str[] = {
+const char *ctype_type_to_str[CTYPE_COUNT] = {
     [CTYPE_INVALID] = "invalid",
 
     [CTYPE_ERROR] = "error",
@@ -17,11 +17,16 @@ const char *ctype_type_to_str[] = {
     [CTYPE_STRUCT] = "struct",
     [CTYPE_UNION] = "union",
     [CTYPE_ENUM] = "enum",
-    [CTYPE_FUNC] = "",
-    [CTYPE_NAME] = "",
 };
 
 Str ctype_to_str(CTypeType type)
 {
-    return str$(ctype_type_to_str[type]);
+    if (ctype_type_to_str[type])
+    {
+        return str$(ctype_type_to_str[type]);
+    }
+    else
+    {
+        return str$("");
+    }
 }

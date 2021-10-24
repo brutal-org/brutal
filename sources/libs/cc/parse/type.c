@@ -32,13 +32,10 @@ CType cparse_compound_type(Lex *lex, bool is_union, Alloc *alloc)
 
     while (!lex_ended(lex) && lex_skip_type(lex, CLEX_SEMICOLON))
     {
-        CType type = cparse_type_start(lex, alloc);
+        CType type = cparse_type(lex, alloc);
+        type = cparse_declarator(lex, type, alloc);
 
-        Str name = str_const$("");
-
-        type = cparse_type_end(lex, type, alloc);
-
-        ctype_member(&type, name, type, alloc);
+        ctype_member(&type, str$("TODO"), type, alloc);
 
         cparse_eat_whitespace(lex);
     }

@@ -9,49 +9,39 @@ direct-declarator:
     identifier
 */
 
-CType cparse_declarator_infix(Lex *lex, CType type, Alloc *alloc)
-{
-    if (lex_skip_type(lex, CLEX_LBRACE))
-    {
-        cparse_eat_whitespace(lex);
-
-        CType func = ctype_func(type, alloc);
-
-        while (lex_skip_type(lex, CLEX_COMMA))
-        {
-            CType arg_type = cparse_type(lex, alloc);
-            arg_type = cparse_declarator(lex, arg_type, alloc);
-
-            ctype_member(&func, nullstr, arg_type, alloc);
-
-            cparse_eat_whitespace(lex);
-        }
-
-        lex_expect(lex, CLEX_RBRACE);
-
-        return func;
-    }
-    else if (lex_skip_type(lex, CLEX_LBRACKET))
-    {
-        cparse_eat_whitespace(lex);
-        lex_expect(lex, CLEX_RBRACKET);
-        return ctype_array(type, 0, alloc);
-    }
-    else
-    {
-        panic_todo$("error type");
-    }
-}
-
 CType cparse_declarator_postfix(Lex *lex, CType type, Alloc *alloc)
 {
-    while (lex_curr_type(lex) == CLEX_LBRACE ||
-           lex_curr_type(lex) == CLEX_RBRACE)
+    while (true)
     {
-        type = cparse_declarator_infix(lex, type, alloc);
-    }
+        if (lex_skip_type(lex, CLEX_LBRACE))
+        {
+            cparse_eat_whitespace(lex);
 
-    return type;
+            type = ctype_func(type, alloc);
+
+            while (lex_skip_type(lex, CLEX_COMMA))
+            {
+                CType arg_type = cparse_type(lex, alloc);
+                arg_type = cparse_declarator(lex, arg_type, alloc);
+
+                ctype_member(&type, nullstr, arg_type, alloc);
+
+                cparse_eat_whitespace(lex);
+            }
+
+            lex_expect(lex, CLEX_RBRACE);
+        }
+        else if (lex_skip_type(lex, CLEX_LBRACKET))
+        {
+            cparse_eat_whitespace(lex);
+            lex_expect(lex, CLEX_RBRACKET);
+            type = ctype_array(type, 0, alloc);
+        }
+        else
+        {
+            return type;
+        }
+    }
 }
 
 CType cparse_declarator(Lex *lex, CType type, Alloc *alloc)
@@ -59,13 +49,22 @@ CType cparse_declarator(Lex *lex, CType type, Alloc *alloc)
     if (lex_skip_type(lex, CLEX_STAR))
     {
         type = ctype_ptr(type, alloc);
-        return cparse_declarator(lex, type, alloc);
+        cparse_eat_whitespace(lex);
+        type = cparse_declarator(lex, type, alloc);
+        cparse_eat_whitespace(lex);
+        type = cparse_declarator_postfix(lex, type, alloc);
+
+        return type;
     }
     else if (lex_skip_type(lex, CLEX_LPARENT))
     {
         type = ctype_parent(type, alloc);
-        CType inner = cparse_declarator(lex, type, alloc);
-        return;
+        cparse_eat_whitespace(lex);
+        CType inner = cparse_declarator(lex, ctype_tail(), alloc);
+        cparse_eat_whitespace(lex);
+
+        lex_expect(lex, CLEX_RPARENT);
+        return ctype_append(inner, cparse_declarator_postfix(lex, type, alloc), alloc);
     }
     else
     {
@@ -124,22 +123,11 @@ CDecl cparse_decl(Lex *lex, Alloc *alloc)
     {
         cparse_eat_whitespace(lex);
 
-        CType type = cparse_prefix_type(lex, alloc);
-
+        CType type = cparse_type(lex, alloc);
         cparse_eat_whitespace(lex);
+        type = cparse_declarator(lex, type, alloc);
 
-        Str name = nullstr;
-
-        if (lex_expect(lex, CLEX_ATOM))
-        {
-            name = lex_next(lex).str;
-        }
-
-        cparse_eat_whitespace(lex);
-
-        type = cparse_type_end(lex, type, alloc);
-
-        return cdecl_type(name, type, alloc);
+        return cdecl_type(str$("TODO"), type, alloc);
     }
     else
     {

@@ -2,6 +2,10 @@
 
 #include <cc/ast/type.h>
 
+CType ctype_error(void);
+
+CType ctype_tail(void);
+
 CType ctype_void(void);
 
 CType ctype_auto(void);
@@ -37,3 +41,5 @@ CType ctype_name(Str name, Alloc *alloc);
 CType ctype_attr(CType type, CTypeAttr attr);
 
 CType ctype_named(CType type, Str name, Alloc *alloc);
+
+CType ctype_append(CType type, CType new_tail, Alloc *alloc);

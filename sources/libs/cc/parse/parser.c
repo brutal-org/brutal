@@ -182,11 +182,9 @@ CUnit cparse_unit(Lex *lex, Alloc *alloc)
     while (!lex_ended(lex))
     {
         cunit_member(&unit, cunit_decl(cparse_decl(lex, alloc)));
-        log$("CURR: {} {}", lex_curr(lex).str, lex_curr(lex).type);
         cparse_eat_whitespace(lex);
-        log$("CURR: {} {}", lex_curr(lex).str, lex_curr(lex).type);
-
-        log$("ERROR? {}", (int)!lex_ok(lex));
+        lex_skip_type(lex, CLEX_SEMICOLON);
+        cparse_eat_whitespace(lex);
     }
 
     return unit;

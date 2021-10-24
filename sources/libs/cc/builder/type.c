@@ -1,5 +1,19 @@
 #include <cc/builder/type.h>
 
+CType ctype_error(void)
+{
+    return (CType){
+        .type = CTYPE_ERROR,
+    };
+}
+
+CType ctype_tail(void)
+{
+    return (CType){
+        .type = CTYPE_TAIL,
+    };
+}
+
 CType ctype_void(void)
 {
     return (CType){
@@ -175,4 +189,28 @@ CType ctype_named(CType type, Str name, Alloc *alloc)
 {
     type.name = str_dup(name, alloc);
     return type;
+}
+
+CType ctype_append(CType type, CType tail, Alloc *alloc)
+{
+    switch (type.type)
+    {
+    case CTYPE_TAIL:
+        return tail;
+
+    case CTYPE_PTR:
+        return ctype_ptr(ctype_append(*type.ptr_.subtype, tail, alloc), alloc);
+
+    case CTYPE_PARENT:
+        return ctype_parent(ctype_append(*type.parent_.subtype, tail, alloc), alloc);
+
+    case CTYPE_FUNC:
+        return ctype_func(ctype_append(*type.func_.ret, tail, alloc), alloc);
+
+    case CTYPE_ARRAY:
+        return ctype_array(ctype_append(*type.array_.subtype, tail, alloc), type.array_.size, alloc);
+
+    default:
+        panic$("ctype-no-tail");
+    }
 }
