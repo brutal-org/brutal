@@ -10,6 +10,8 @@ LIBS_HOST_SRC = \
 	$(wildcard sources/libs/brutal/*/*.c) \
 	$(wildcard sources/libs/cc/*.c)       \
 	$(wildcard sources/libs/cc/*/*.c)       \
+	$(wildcard sources/libs/udfore/*.c)       \
+	$(wildcard sources/libs/udfore/*/*.c)       \
 	$(wildcard sources/libs/json/*.c)     \
 	$(wildcard sources/libs/elf/*.c)      \
 	$(wildcard sources/libs/handover/*.c) \
@@ -74,3 +76,7 @@ run-test: $(TEST_HOST_BIN)
 .PHONY: run-demo
 run-demo: $(DEMO_HOST_BIN)
 	$(DEMO_HOST_BIN)
+
+.PHONY: run-ud
+run-ud: $(UD_HOST_BIN)
+	$(UD_HOST_BIN) sources/bins/ud/test.ud.exemple
