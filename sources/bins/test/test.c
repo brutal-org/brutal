@@ -11,7 +11,7 @@ void test_register(struct test test)
     tests_count++;
 }
 
-enum test_result test_run(struct test test)
+bool test_run(struct test test)
 {
     struct task runner;
     task_fork(&runner);
@@ -30,20 +30,13 @@ enum test_result test_run(struct test test)
 
         int result = UNWRAP(task_wait(&runner));
 
-        if (result == TASK_EXIT_SUCCESS && !(test.flags & TEST_EXPECTED_TO_FAIL))
+        if (test.flags & TEST_EXPECTED_TO_FAIL)
         {
-            return TEST_PASS;
+            return result != TASK_EXIT_SUCCESS;
         }
         else
         {
-            if (test.flags & TEST_EXPECTED_TO_FAIL)
-            {
-                return TEST_PASS;
-            }
-            else
-            {
-                return TAST_FAIL;
-            }
+            return result == TASK_EXIT_SUCCESS;
         }
     }
 }
@@ -71,9 +64,7 @@ int test_run_all(void)
     {
         struct test test = tests[i];
 
-        enum test_result result = test_run(test);
-
-        if (result == TEST_PASS)
+        if (test_run(test))
         {
             log$("[ PASS ] {}", test.name);
             pass_count++;
@@ -89,23 +80,7 @@ int test_run_all(void)
     log$("{} tests run, {} pass, {} fail", tests_count, pass_count, fail_count);
     log$("");
 
-    if (fail_count != 0)
-    {
-        return TASK_EXIT_FAILURE;
-    }
-    else
-    {
-        return TASK_EXIT_SUCCESS;
-    }
-}
-
-TEST(should_run)
-{
-}
-
-TEST_WITH_FLAGS(should_fail, TEST_EXPECTED_TO_FAIL)
-{
-    panic$("this test should fail");
+    return fail_count != 0 ? TASK_EXIT_FAILURE : TASK_EXIT_SUCCESS;
 }
 
 int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char const *argv[])

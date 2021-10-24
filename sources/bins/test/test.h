@@ -10,12 +10,6 @@ enum test_flags
     TEST_EXPECTED_TO_FAIL = 1 << 0,
 };
 
-enum test_result
-{
-    TEST_PASS,
-    TAST_FAIL,
-};
-
 struct test
 {
     enum test_flags flags;
