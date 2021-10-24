@@ -4,7 +4,7 @@ set -e
 # ----- Configs -------------------------------------------------------------- #
 
 if [ $# == 0 ]
-thens
+then
     echo "use build.sh <target>"
     echo "target may be: "
     echo "  - x86_64"
