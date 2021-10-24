@@ -1,4 +1,7 @@
 -std=gnu2x
+-Wall
+-Wextra
+-Werror
 -Isources/
 -Isources/bins
 -Isources/libs
