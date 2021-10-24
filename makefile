@@ -68,7 +68,7 @@ include sysroot/.build.mk
 include sources/libs/proto/.build.mk
 
 .PHONY: all
-all: $(ISO)
+all: $(ALL)
 
 ifeq ($(QEMU_BOOT_METHOD), kernel)
 

@@ -46,7 +46,7 @@ jobs:
         run: |
           build/toolchain/${{matrix.toolchain}}/build.sh x86_64
 
-  build-system:
+  build-all:
     needs: build-toolchain
     runs-on: ubuntu-latest
     strategy:
@@ -71,51 +71,18 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-${{matrix.toolchain}}-${{hashFiles(format('build/toolchain/{0}/build.sh', matrix.toolchain)) }}
 
-      - name: Build System
+      - name: Build All
         run: |
           make CONFIG_TOOLCHAIN=${{matrix.toolchain}} all
-
-  build-loader:
-    needs: build-toolchain
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Install dependencies
-        run: .github/workflows/setup-ubuntu.sh
-
-      - name: Build Loader
-        run: |
-          make loader
-
-  build-tests:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        toolchain: [gnu, llvm]
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Install dependencies
-        run: .github/workflows/setup-ubuntu.sh
 
       - name: Run Tests
         run: |
           make CONFIG_TOOLCHAIN=${{matrix.toolchain}} run-test
 
-  build-bid:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        toolchain: [gnu, llvm]
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Install dependencies
-        run: .github/workflows/setup-ubuntu.sh
-
       - name: Run BID
         run: |
           make CONFIG_TOOLCHAIN=${{matrix.toolchain}} run-bid
+
+      - name: Run UD
+        run: |
+          make CONFIG_TOOLCHAIN=${{matrix.toolchain}} run-ud

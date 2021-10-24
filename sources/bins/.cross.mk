@@ -53,6 +53,7 @@ $(1)_BIN  = $(BINDIR_CROSS)/$($(1)_NAME)
 DEPENDENCIES += $$($(1)_OBJ:.o=.d)
 
 SERVERS+=$$($(1)_BIN)
+ALL+=$$($(1)_BIN)
 
 $$($(1)_BIN): $$($(1)_OBJ) $(LIBS_BIN)
 	$$(ECHO) "brutal LD" $$@

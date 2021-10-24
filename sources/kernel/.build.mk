@@ -46,3 +46,5 @@ $(KERNEL): $(KERNEL_OBJ)
 	$(ECHO) "kernel LD" $@
 	@$(MKCWD)
 	@$(CROSS_LD) -o $@ $^ $(CROSS_KLDFLAGS)
+
+ALL+=$(KERNEL)

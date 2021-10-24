@@ -50,6 +50,7 @@ $(1)_HOST_SRC = \
 $(1)_HOST_OBJ = $$(patsubst sources/%, $(BINDIR_HOST)/%.o, $$($(1)_HOST_SRC))
 
 $(1)_HOST_BIN  = $(BINDIR_HOST)/$($(1)_NAME)
+ALL+=$$($(1)_HOST_BIN)
 
 DEPENDENCIES += $$($(1)_HOST_OBJ:.o=.d)
 
