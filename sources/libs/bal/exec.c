@@ -1,7 +1,7 @@
 #include <bal/abi.h>
 #include <bal/exec.h>
 #include <bal/helpers.h>
-#include <brutal/log.h>
+#include <brutal/debug.h>
 #include <elf/elf.h>
 
 static void bal_exec_load(BrSpace space, Elf64Header const *elf_header, BrMemObj elf_obj)

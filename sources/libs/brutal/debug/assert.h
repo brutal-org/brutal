@@ -1,7 +1,7 @@
 #pragma once
 
+#include <brutal/debug/locked.h>
 #include <brutal/io/print.h>
-#include <brutal/log/locked.h>
 
 #define assert_not_null(EXPR) (                      \
     {                                                \

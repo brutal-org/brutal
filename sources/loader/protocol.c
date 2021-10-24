@@ -1,6 +1,6 @@
 #include <bal/abi.h>
 #include <brutal/alloc.h>
-#include <brutal/log.h>
+#include <brutal/debug.h>
 #include <efi/lib.h>
 #include <efi/srvs.h>
 #include "loader/protocol.h"

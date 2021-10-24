@@ -1,5 +1,5 @@
 #include <brutal/alloc.h>
-#include <brutal/log.h>
+#include <brutal/debug.h>
 #include "kernel/space.h"
 
 /* --- Memory Mappings ------------------------------------------------------ */

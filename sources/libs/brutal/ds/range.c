@@ -1,5 +1,5 @@
+#include <brutal/debug/locked.h>
 #include <brutal/ds/range.h>
-#include <brutal/log/locked.h>
 
 void range_alloc_init(RangeAlloc *self, Alloc *alloc)
 {

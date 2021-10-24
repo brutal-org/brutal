@@ -1,6 +1,7 @@
-#include <brutal/log.h>
-#include <ud/builtin.h>
-#include <ud/ud.h>
+#include <brutal/debug.h>
+#include <ud/ast/builder.h>
+#include <ud/ast/query.h>
+#include <ud/eval/builtin.h>
 
 UdExpr ud_env_def(UdExpr env, UdExpr key, UdExpr value, Alloc *alloc)
 {

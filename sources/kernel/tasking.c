@@ -1,4 +1,4 @@
-#include <brutal/log.h>
+#include <brutal/debug.h>
 #include "kernel/arch.h"
 #include "kernel/sched.h"
 #include "kernel/task.h"

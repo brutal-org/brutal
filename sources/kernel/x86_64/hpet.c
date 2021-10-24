@@ -1,6 +1,6 @@
 #include <acpi/hpet.h>
 #include <acpi/rsdt.h>
-#include <brutal/log.h>
+#include <brutal/debug.h>
 #include <brutal/mem.h>
 #include "brutal/mem/volatile.h"
 #include "kernel/mmap.h"

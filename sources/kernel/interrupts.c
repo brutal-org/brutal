@@ -2,8 +2,8 @@
 #include <bal/abi.h>
 #include <brutal/alloc.h>
 #include <brutal/base.h>
+#include <brutal/debug.h>
 #include <brutal/ds.h>
-#include <brutal/log.h>
 #include "kernel/interrupts.h"
 #include "kernel/task.h"
 

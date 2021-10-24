@@ -1,6 +1,6 @@
 #include <brutal/alloc.h>
+#include <brutal/debug.h>
 #include <brutal/host.h>
-#include <brutal/log.h>
 #include <brutal/mem.h>
 #include <stdlib.h>
 

@@ -1,6 +1,6 @@
 #include <acpi/madt.h>
 #include <acpi/rsdt.h>
-#include <brutal/log.h>
+#include <brutal/debug.h>
 #include <brutal/mem.h>
 #include "kernel/mmap.h"
 #include "kernel/x86_64/apic.h"

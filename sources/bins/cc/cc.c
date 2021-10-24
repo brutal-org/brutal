@@ -1,6 +1,6 @@
 #include <brutal/alloc.h>
+#include <brutal/debug.h>
 #include <brutal/io.h>
-#include <brutal/log.h>
 #include <cc/parse.h>
 
 int main(int argc, char const *argv[])

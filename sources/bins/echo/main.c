@@ -1,6 +1,6 @@
 #include <bal/abi.h>
 #include <bal/ev.h>
-#include <brutal/log.h>
+#include <brutal/debug.h>
 
 void br_event(BrMsg const *msg)
 {

@@ -1,6 +1,6 @@
 #include <brutal/alloc.h>
+#include <brutal/debug.h>
 #include <brutal/io.h>
-#include <brutal/log.h>
 #include <efi/lib.h>
 #include <efi/srvs.h>
 #include <efi/tty.h>

@@ -1,5 +1,5 @@
 #include <brutal/alloc/heap.h>
-#include <brutal/log.h>
+#include <brutal/debug.h>
 #include <host/mem.h>
 
 #define ALLOC_HEAP_ALIGN (64)

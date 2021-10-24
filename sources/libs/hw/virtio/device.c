@@ -1,4 +1,4 @@
-#include <brutal/log.h>
+#include <brutal/debug.h>
 #include <virtio/device.h>
 
 void virtio_device_set_if_acknowledged(VirtioDevice *device, uint8_t status)

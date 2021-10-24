@@ -1,6 +1,6 @@
 #include <bal/abi.h>
+#include <brutal/debug.h>
 #include <brutal/fibers.h>
-#include <brutal/log.h>
 typedef struct ipc_job
 {
     uint32_t seq;

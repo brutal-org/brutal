@@ -1,7 +1,7 @@
 #pragma once
 
+#include <brutal/debug.h>
 #include <brutal/gfx/surface.h>
-#include <brutal/log.h>
 
 typedef enum
 {

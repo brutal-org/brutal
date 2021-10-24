@@ -1,6 +1,6 @@
 #include <brutal/alloc/base.h>
+#include <brutal/debug/assert.h>
 #include <brutal/ds/slot.h>
-#include <brutal/log/assert.h>
 
 void slot_capacity_impl(SlotImpl *impl, int new_capacity)
 {

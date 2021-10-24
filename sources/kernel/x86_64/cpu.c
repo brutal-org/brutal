@@ -1,4 +1,4 @@
-#include <brutal/log.h>
+#include <brutal/debug.h>
 #include "kernel/cpu.h"
 #include "kernel/heap.h"
 #include "kernel/kernel.h"

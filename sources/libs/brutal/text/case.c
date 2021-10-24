@@ -1,4 +1,4 @@
-#include <brutal/log/assert.h>
+#include <brutal/debug/assert.h>
 #include <brutal/parse/scan.h>
 #include <brutal/text/case.h>
 #include <ctype.h>

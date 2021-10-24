@@ -1,7 +1,7 @@
 
 #include <bal/abi.h>
+#include <brutal/debug.h>
 #include <brutal/fibers.h>
-#include <brutal/log.h>
 
 WEAK int br_entry_args(
     MAYBE_UNUSED long arg1,

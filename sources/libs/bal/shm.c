@@ -1,7 +1,7 @@
 #include <bal/helpers.h>
 #include <bal/shm.h>
 #include <brutal/base.h>
-#include <brutal/log.h>
+#include <brutal/debug.h>
 
 static BrResult balshm_map(BalShm *self)
 {

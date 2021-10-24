@@ -1,4 +1,4 @@
-#include <brutal/log.h>
+#include <brutal/debug.h>
 #include <brutal/task.h>
 #include "test/test.h"
 

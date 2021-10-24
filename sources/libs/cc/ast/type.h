@@ -1,8 +1,8 @@
 #pragma once
 
 #include <brutal/base.h>
+#include <brutal/debug.h>
 #include <brutal/ds.h>
-#include <brutal/log.h>
 #include <cc/ast/val.h>
 
 typedef enum

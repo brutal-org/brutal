@@ -40,7 +40,7 @@ LOADER_LIBS_SRC = \
 	$(wildcard sources/libs/brutal/ds/*.c) 		    \
 	$(wildcard sources/libs/brutal/hash/*.c)	    \
 	$(wildcard sources/host/efi/*.c)	            \
-	$(wildcard sources/libs/brutal/log/*.c)         \
+	$(wildcard sources/libs/brutal/debug/*.c)         \
 	$(wildcard sources/libs/brutal/mem/*.c)         \
 	$(wildcard sources/libs/brutal/text/*.c)        \
 	$(wildcard sources/libs/bal/abi/handover.c) \

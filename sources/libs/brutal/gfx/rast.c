@@ -1,6 +1,6 @@
+#include <brutal/debug/log.h>
 #include <brutal/ds/vec.h>
 #include <brutal/gfx/rast.h>
-#include <brutal/log/log.h>
 #include <brutal/math/min_max.h>
 #include <stdlib.h>
 

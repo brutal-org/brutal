@@ -1,6 +1,6 @@
 #include <brutal/alloc.h>
+#include <brutal/debug.h>
 #include <brutal/io.h>
-#include <brutal/log.h>
 #include <brutal/text.h>
 #include <json/json.h>
 #include "loader/config.h"

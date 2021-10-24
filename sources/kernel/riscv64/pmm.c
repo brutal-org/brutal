@@ -1,5 +1,5 @@
+#include <brutal/debug.h>
 #include <brutal/ds.h>
-#include <brutal/log.h>
 #include <brutal/mem.h>
 #include <brutal/sync.h>
 #include "kernel/arch.h"

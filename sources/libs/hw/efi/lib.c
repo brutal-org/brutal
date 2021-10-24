@@ -1,6 +1,6 @@
 #include <brutal/alloc.h>
+#include <brutal/debug.h>
 #include <brutal/io.h>
-#include <brutal/log.h>
 #include <efi/lib.h>
 
 static bool _init = false;

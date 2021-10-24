@@ -1,7 +1,7 @@
 #include <bal/abi.h>
 #include <bal/io.h>
+#include <brutal/debug.h>
 #include <brutal/input.h>
-#include <brutal/log.h>
 #include "ps2.h"
 
 static bool _kb_escaped = false;

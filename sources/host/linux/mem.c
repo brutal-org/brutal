@@ -1,4 +1,4 @@
-#include <brutal/log.h>
+#include <brutal/debug.h>
 #include <host/linux/err.h>
 #include <host/mem.h>
 #include <string.h>

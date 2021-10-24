@@ -1,8 +1,8 @@
 #include <bal/abi.h>
 #include <bal/helpers.h>
 #include <brutal/alloc.h>
+#include <brutal/debug.h>
 #include <brutal/io.h>
-#include <brutal/log.h>
 #include <brutal/time.h>
 
 int main(int argc, char const *argv[])

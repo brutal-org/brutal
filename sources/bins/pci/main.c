@@ -1,7 +1,7 @@
 #include <acpi/base.h>
 #include <bal/abi.h>
 #include <brutal/alloc.h>
-#include <brutal/log.h>
+#include <brutal/debug.h>
 #include <pci/pci.h>
 
 static Iter iter_pci(void *data, void *ctx)

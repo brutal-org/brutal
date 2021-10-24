@@ -1,5 +1,5 @@
 #include <bid/bid.h>
-#include <brutal/log.h>
+#include <brutal/debug.h>
 
 static bool parser_skip_comment(Scan *scan)
 {

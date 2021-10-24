@@ -1,4 +1,4 @@
-#include <brutal/log.h>
+#include <brutal/debug.h>
 #include <brutal/sync.h>
 #include "kernel/heap.h"
 #include "kernel/mmap.h"

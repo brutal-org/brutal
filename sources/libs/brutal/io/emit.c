@@ -1,6 +1,6 @@
 #include <brutal/base/attributes.h>
+#include <brutal/debug/assert.h>
 #include <brutal/io/emit.h>
-#include <brutal/log/assert.h>
 
 void emit_init(Emit *self, IoWriter *writer)
 {

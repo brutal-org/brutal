@@ -1,5 +1,5 @@
 #include <brutal/alloc.h>
-#include <brutal/log/assert.h>
+#include <brutal/debug/assert.h>
 #include <brutal/text/utf16.h>
 #include <efi/lib.h>
 #include <efi/protos.h>

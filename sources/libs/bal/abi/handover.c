@@ -1,5 +1,5 @@
 #include <bal/abi/handover.h>
-#include <brutal/log.h>
+#include <brutal/debug.h>
 
 HandoverModule const *handover_find_module(Handover const *handover, Str name)
 {

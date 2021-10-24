@@ -1,6 +1,6 @@
 #include <bal/abi.h>
 #include <bal/helpers.h>
-#include <brutal/log.h>
+#include <brutal/debug.h>
 
 BrResult brh_close(BrHandle handle)
 {

@@ -1,7 +1,7 @@
 #include <brutal/alloc.h>
 #include <brutal/alloc/global.h>
+#include <brutal/debug.h>
 #include <brutal/fibers.h>
-#include <brutal/log.h>
 #include <brutal/task.h>
 
 static Fiber *current = nullptr;

@@ -1,8 +1,8 @@
 #pragma once
 
+#include <brutal/debug/log.h>
+#include <brutal/debug/source_location.h>
 #include <brutal/io/print.h>
-#include <brutal/log/log.h>
-#include <brutal/log/source_location.h>
 
 /* --- Locked log functions ------------------------------------------------- */
 

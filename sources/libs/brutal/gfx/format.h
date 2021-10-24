@@ -1,8 +1,8 @@
 #pragma once
 
 #include <brutal/base/attributes.h>
+#include <brutal/debug/assert.h>
 #include <brutal/gfx/color.h>
-#include <brutal/log/assert.h>
 
 typedef enum
 {

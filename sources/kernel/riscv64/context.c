@@ -1,5 +1,5 @@
 #include <brutal/alloc.h>
-#include <brutal/log.h>
+#include <brutal/debug.h>
 #include "kernel/context.h"
 
 Context *context_create(void)

@@ -1,5 +1,5 @@
 #include <brutal/base/std.h>
-#include <brutal/log.h>
+#include <brutal/debug.h>
 #include <brutal/text.h>
 
 struct ubsan_source_location

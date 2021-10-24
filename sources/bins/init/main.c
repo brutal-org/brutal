@@ -4,8 +4,8 @@
 #include <bal/shm.h>
 #include <brutal/alloc.h>
 #include <brutal/codec/tga.h>
+#include <brutal/debug.h>
 #include <brutal/gfx.h>
-#include <brutal/log.h>
 
 static void display_bootimage(Handover const *handover)
 {
