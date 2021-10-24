@@ -61,7 +61,7 @@ See the [roadmap](book/01-02-roadmap.md) file for more information on how we pla
 
 ## Acknowledgements
 
-This project take inspirations and/or reuse code from the following projects.
+This project takes inspirations and/or reuse code from the following projects.
 
 See [credits.md](book/01-03-credits.md)
 
