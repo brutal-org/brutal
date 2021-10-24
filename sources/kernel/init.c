@@ -21,13 +21,13 @@ static bool elf_supported(Elf64Header const *header, size_t data_size)
         log$("not valid elf header");
     }
 
-    if (header->identifier.elf_class != ELF_CLASS_64)
+    if (header->ident.elf_class != ELF_CLASS_64)
     {
         log$("not 64bit ");
         return false;
     }
 
-    if (header->identifier.data_encoding != ELF_ENCODING_LITTLE_ENDIAN)
+    if (header->ident.data_encoding != ELF_ENCODING_LITTLE_ENDIAN)
     {
         log$("not little endian");
         return false;

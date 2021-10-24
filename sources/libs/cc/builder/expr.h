@@ -6,11 +6,11 @@ CExpr cexpr_empty(void);
 
 CExpr cexpr_constant(CVal val);
 
-CExpr cexpr_identifier(Str ident, Alloc *alloc);
+CExpr cexpr_self(void);
+
+CExpr cexpr_ident(Str ident, Alloc *alloc);
 
 CExpr cexpr_call(Alloc *alloc, CExpr name);
-
-void cexpr_add_arg(CExpr *self, CExpr arg);
 
 CExpr cexpr_infix(CExpr left, COp type, CExpr right, Alloc *alloc);
 
@@ -22,11 +22,7 @@ CExpr cexpr_cast(CExpr expr, CType type, Alloc *alloc);
 
 CExpr cexpr_ternary(CExpr cond, CExpr etrue, CExpr efalse, Alloc *alloc);
 
-CExpr cexpr_array_initializer(Alloc *alloc);
-
-CExpr cexpr_struct_initializer(Alloc *alloc);
-
-void cexpr_initializer_push_element(CExpr *target, CExpr designator, CExpr expr, Alloc *alloc);
+CExpr cexpr_initializer(Alloc *alloc);
 
 CExpr cexpr_preinc(CExpr a, Alloc *alloc);
 
@@ -107,3 +103,5 @@ CExpr cexpr_ref(CExpr a, Alloc *alloc);
 CExpr cexpr_access(CExpr a, CExpr b, Alloc *alloc);
 
 CExpr cexpr_ptr_access(CExpr a, CExpr b, Alloc *alloc);
+
+void cexpr_member(CExpr *target, CExpr expr);

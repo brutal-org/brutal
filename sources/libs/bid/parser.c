@@ -28,20 +28,20 @@ static void skip_comment_and_space(Scan *scan)
         ;
 }
 
-static int is_identifier(int chr)
+static int is_ident(int chr)
 {
     return chr == '_' || isalnum(chr);
 }
 
 static BidType parse_type(Scan *scan, Alloc *alloc);
 
-static Str parse_identifier(Scan *scan)
+static Str parse_ident(Scan *scan)
 {
-    Str name = scan_skip_until(scan, is_identifier);
+    Str name = scan_skip_until(scan, is_ident);
 
     if (is_nullstr(name))
     {
-        scan_throw(scan, str$("invalid identifier"), name);
+        scan_throw(scan, str$("invalid ident"), name);
     }
 
     return name;
@@ -50,7 +50,7 @@ static Str parse_identifier(Scan *scan)
 static BidPrimitive parse_primitive(Scan *scan, Alloc *alloc)
 {
     BidPrimitive type = {.is_generic = false};
-    type.name = parse_identifier(scan);
+    type.name = parse_ident(scan);
     skip_comment_and_space(scan);
     if (scan_skip(scan, '<'))
     {
@@ -58,7 +58,7 @@ static BidPrimitive parse_primitive(Scan *scan, Alloc *alloc)
         while (!scan_skip(scan, '>') && !scan_ended(scan))
         {
             skip_comment_and_space(scan);
-            vec_push(&type.generic_args, parse_identifier(scan));
+            vec_push(&type.generic_args, parse_ident(scan));
             skip_comment_and_space(scan);
             scan_skip(scan, ',');
             skip_comment_and_space(scan);
@@ -81,7 +81,7 @@ static BidEnum parse_enum(Scan *scan, Alloc *alloc)
 
     while (scan_curr(scan) != '}' && !scan_ended(scan))
     {
-        vec_push(&type.members, parse_identifier(scan));
+        vec_push(&type.members, parse_ident(scan));
 
         skip_comment_and_space(scan);
         scan_skip(scan, ',');
@@ -105,7 +105,7 @@ static BidStruct parse_struct(Scan *scan, Alloc *alloc)
     {
         BidMember member = {};
 
-        member.name = parse_identifier(scan);
+        member.name = parse_ident(scan);
 
         skip_comment_and_space(scan);
         scan_expect(scan, ':');
@@ -130,7 +130,7 @@ static BidTypeAttribute parse_type_attrib(Scan *scan, Alloc *alloc)
     BidTypeAttribute res = {};
 
     skip_comment_and_space(scan);
-    Str name = parse_identifier(scan);
+    Str name = parse_ident(scan);
     skip_comment_and_space(scan);
 
     res.name = name;
@@ -146,7 +146,7 @@ static BidTypeAttribute parse_type_attrib(Scan *scan, Alloc *alloc)
     {
 
         skip_comment_and_space(scan);
-        Str arg = parse_identifier(scan);
+        Str arg = parse_ident(scan);
         skip_comment_and_space(scan);
 
         vec_push(&res.args, arg);
@@ -200,7 +200,7 @@ static BidType parse_type(Scan *scan, Alloc *alloc)
         type.type = BID_TYPE_ENUM;
         type.enum_ = parse_enum(scan, alloc);
     }
-    else if (is_identifier(scan_curr(scan)))
+    else if (is_ident(scan_curr(scan)))
     {
         skip_comment_and_space(scan);
         type.type = BID_TYPE_PRIMITIVE;
@@ -220,7 +220,7 @@ static BidAlias parse_alias(Scan *scan, Alloc *alloc)
 {
     BidAlias alias = {};
 
-    alias.name = parse_identifier(scan);
+    alias.name = parse_ident(scan);
 
     skip_comment_and_space(scan);
     scan_skip(scan, ':');
@@ -235,7 +235,7 @@ static BidEvent parse_event(Scan *scan, Alloc *alloc)
 {
     BidEvent event = {};
 
-    event.name = parse_identifier(scan);
+    event.name = parse_ident(scan);
 
     skip_comment_and_space(scan);
 
@@ -248,7 +248,7 @@ static BidMethod parse_method(Scan *scan, Alloc *alloc)
 {
     BidMethod method = {};
 
-    method.name = parse_identifier(scan);
+    method.name = parse_ident(scan);
 
     skip_comment_and_space(scan);
 
@@ -279,7 +279,7 @@ BidInterface bid_parse(Scan *scan, Alloc *alloc)
 
     skip_comment_and_space(scan);
 
-    interface.name = parse_identifier(scan);
+    interface.name = parse_ident(scan);
 
     skip_comment_and_space(scan);
 
@@ -328,7 +328,7 @@ BidInterface bid_parse(Scan *scan, Alloc *alloc)
         }
         else
         {
-            scan_throw(scan, str$("expected errors/type/event/method"), parse_identifier(scan));
+            scan_throw(scan, str$("expected errors/type/event/method"), parse_ident(scan));
         }
 
         skip_comment_and_space(scan);

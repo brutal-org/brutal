@@ -8,9 +8,10 @@ typedef enum
 {
     CEXPR_INVALID,
     CEXPR_EMPTY,
-
+    
+    CEXPR_SELF,
     CEXPR_CONSTANT,
-    CEXPR_IDENTIFIER,
+    CEXPR_IDENT,
 
     CEXPR_PREFIX,
     CEXPR_INFIX,
@@ -19,8 +20,7 @@ typedef enum
     CEXPR_CALL,
     CEXPR_CAST,
     CEXPR_TERNARY,
-    CEXPR_ARRAY_INITIALIZER,  // { [0] = 1, [1] = 2, }
-    CEXPR_STRUCT_INITIALIZER, // { .a = 1, .b = 2, }
+    CEXPR_INITIALIZER,
 } CExprType;
 
 typedef enum
@@ -92,7 +92,7 @@ struct cexpr
     union
     {
         CVal constant_;
-        Str identifier_;
+        Str ident_;
 
         struct
         {
@@ -128,8 +128,8 @@ struct cexpr
 
         struct
         {
-            Vec(CInitializer) initializer;
-        } array_initializer_, struct_initializer_;
+            Vec(CExpr) initializer;
+        } initializer_;
     };
 };
 

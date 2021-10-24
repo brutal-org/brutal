@@ -191,14 +191,13 @@ static int get_pre(CExpr *expr)
     case CEXPR_INFIX:
         return cop_pre(expr->infix_.op);
 
-    case CEXPR_IDENTIFIER:
+    case CEXPR_IDENT:
     case CEXPR_CONSTANT:
         return 0;
 
     case CEXPR_CALL:
     case CEXPR_CAST:
-    case CEXPR_ARRAY_INITIALIZER:
-    case CEXPR_STRUCT_INITIALIZER:
+    case CEXPR_INITIALIZER:
         return 1;
 
     case CEXPR_TERNARY:
@@ -224,8 +223,11 @@ static void c2c_expr_pre(Emit *emit, CExpr expr, int parent_pre)
         c2c_value(emit, expr.constant_);
         break;
 
-    case CEXPR_IDENTIFIER:
-        emit_fmt(emit, "{}", expr.identifier_);
+    case CEXPR_IDENT:
+        emit_fmt(emit, "{}", expr.ident_);
+        break;
+
+    case CEXPR_SELF:
         break;
 
     case CEXPR_PREFIX:
@@ -290,44 +292,18 @@ static void c2c_expr_pre(Emit *emit, CExpr expr, int parent_pre)
         c2c_expr_pre(emit, *expr.ternary_.expr_false, pre);
         break;
 
-    case CEXPR_STRUCT_INITIALIZER:
+    case CEXPR_INITIALIZER:
         emit_fmt(emit, "{{\n");
         emit_ident(emit);
 
-        vec_foreach(v, &expr.struct_initializer_.initializer)
+        vec_foreach(v, &expr.initializer_.initializer)
         {
-            if (v.designator->type != CEXPR_EMPTY && v.designator->type != CEXPR_INVALID)
-            {
-                emit_fmt(emit, ".");
-                c2c_expr_pre(emit, *v.designator, cop_pre(COP_ASSIGN));
-                emit_fmt(emit, " = ");
-            }
-            c2c_expr_pre(emit, *v.initializer, cop_pre(COP_ASSIGN));
+            c2c_expr_pre(emit, v, C2C_MAX_PRECEDENCE);
             emit_fmt(emit, ",\n");
         }
 
         emit_deident(emit);
         emit_fmt(emit, "}}");
-        break;
-
-    case CEXPR_ARRAY_INITIALIZER:
-        emit_fmt(emit, "{{\n");
-        emit_ident(emit);
-
-        vec_foreach(v, &expr.array_initializer_.initializer)
-        {
-            if (v.designator->type != CEXPR_EMPTY)
-            {
-                emit_fmt(emit, "[");
-                c2c_expr_pre(emit, *v.designator, cop_pre(C2C_MAX_PRECEDENCE));
-                emit_fmt(emit, "] = ");
-            }
-            c2c_expr_pre(emit, *v.initializer, cop_pre(COP_ASSIGN));
-            emit_fmt(emit, ",\n");
-        }
-
-        emit_deident(emit);
-        emit_fmt(emit, "\n}}");
         break;
 
     default:

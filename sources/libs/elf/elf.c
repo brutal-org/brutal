@@ -2,8 +2,8 @@
 
 bool elf_validate(Elf64Header const *header)
 {
-    return header->identifier.magics[0] == '\177' &&
-           header->identifier.magics[1] == 'E' &&
-           header->identifier.magics[2] == 'L' &&
-           header->identifier.magics[3] == 'F';
+    return header->ident.magics[0] == '\177' &&
+           header->ident.magics[1] == 'E' &&
+           header->ident.magics[2] == 'L' &&
+           header->ident.magics[3] == 'F';
 }

@@ -15,11 +15,18 @@ CExpr cexpr_constant(CVal val)
     };
 }
 
-CExpr cexpr_identifier(Str ident, Alloc *alloc)
+CExpr cexpr_self(void)
 {
     return (CExpr){
-        .type = CEXPR_IDENTIFIER,
-        .identifier_ = str_dup(ident, alloc)};
+        .type = CEXPR_SELF,
+    };
+}
+
+CExpr cexpr_ident(Str ident, Alloc *alloc)
+{
+    return (CExpr){
+        .type = CEXPR_IDENT,
+        .ident_ = str_dup(ident, alloc)};
 }
 
 CExpr cexpr_call(Alloc *alloc, CExpr name)
@@ -31,16 +38,6 @@ CExpr cexpr_call(Alloc *alloc, CExpr name)
     vec_init(&call.call_.args, alloc);
 
     return call;
-}
-
-void cexpr_add_arg(CExpr *self, CExpr arg)
-{
-    if (self->type != CEXPR_CALL)
-    {
-        panic$("cexpr add arg should only be called with a call expression");
-    }
-
-    vec_push(&self->call_.args, arg);
 }
 
 CExpr cexpr_infix(CExpr left, COp type, CExpr right, Alloc *alloc)
@@ -102,39 +99,15 @@ CExpr cexpr_ternary(CExpr cond, CExpr etrue, CExpr efalse, Alloc *alloc)
     };
 }
 
-CExpr cexpr_array_initializer(Alloc *alloc)
+CExpr cexpr_initializer(Alloc *alloc)
 {
     CExpr result = {
-        .type = CEXPR_ARRAY_INITIALIZER,
+        .type = CEXPR_INITIALIZER,
     };
 
-    vec_init(&result.array_initializer_.initializer, alloc);
+    vec_init(&result.initializer_.initializer, alloc);
 
     return result;
-}
-
-CExpr cexpr_struct_initializer(Alloc *alloc)
-{
-    CExpr result = {
-        .type = CEXPR_STRUCT_INITIALIZER,
-    };
-
-    vec_init(&result.struct_initializer_.initializer, alloc);
-
-    return result;
-}
-
-void cexpr_initializer_push_element(CExpr *target, CExpr designator, CExpr expr, Alloc *alloc)
-{
-    if (target->type == CEXPR_STRUCT_INITIALIZER || target->type == CEXPR_ARRAY_INITIALIZER)
-    {
-        CInitializer initializer = {.designator = alloc_move(alloc, designator), .initializer = alloc_move(alloc, expr)};
-        vec_push(&target->struct_initializer_.initializer, initializer);
-    }
-    else
-    {
-        panic$("cepxr_initializer_push_element must be used with array initializer or struct initializer");
-    }
 }
 
 // ++a
@@ -375,4 +348,20 @@ CExpr cexpr_access(CExpr a, CExpr b, Alloc *alloc)
 CExpr cexpr_ptr_access(CExpr a, CExpr b, Alloc *alloc)
 {
     return cexpr_infix(a, COP_PTR_ACCESS, b, alloc);
+}
+
+void cexpr_member(CExpr *self, CExpr expr)
+{
+    if (self->type == CEXPR_CALL)
+    {
+        vec_push(&self->call_.args, expr);
+    }
+    else if (self->type == CEXPR_INITIALIZER)
+    {
+        vec_push(&self->initializer_.initializer, expr);
+    }
+    else
+    {
+        panic$("cepxr_initializer_push_element must be used with array initializer or struct initializer");
+    }
 }

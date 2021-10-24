@@ -52,13 +52,13 @@ typedef struct PACKED
     uint8_t os;
     uint8_t abi_version;
     uint8_t _padding[7];
-} Elf64Identifier;
+} Elf64Ident;
 
-static_assert(sizeof(Elf64Identifier) == 16, "");
+static_assert(sizeof(Elf64Ident) == 16, "");
 
 typedef struct PACKED
 {
-    Elf64Identifier identifier;
+    Elf64Ident ident;
 
     uint16_t object_type;
     uint16_t machine_type;

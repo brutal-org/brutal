@@ -28,7 +28,7 @@ CExpr cc_index_constant(CExpr v, int idx, Alloc *alloc);
                float          \
              : cval_float)(VAL)
 
-void cc_push_initializer_member(CExpr *targ, Str designator, Str value, Alloc *alloc);
+void cc_push_initializer_member(CExpr *targ, Str designator, CExpr value, Alloc *alloc);
 
 #define cexpr_str_op(type, strA, strB, ALLOC) \
-    cexpr_##type(cexpr_identifier(strA, ALLOC), cexpr_identifier(strB, ALLOC), ALLOC)
+    cexpr_##type(cexpr_ident(strA, ALLOC), cexpr_ident(strB, ALLOC), ALLOC)
