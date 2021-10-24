@@ -8,7 +8,7 @@ KERNEL_SRC += \
 	$(wildcard sources/kernel/$(CONFIG_ARCH)/*.s)  \
 	$(wildcard sources/libs/stdc/ansi/ctype.c)     \
 	$(wildcard sources/libs/stdc/ansi/string.c)    \
-	$(wildcard sources/libs/acpi/*.c)              \
+	$(wildcard sources/libs/hw/acpi/*.c)           \
 	$(wildcard sources/libs/brutal/alloc/*.c)      \
 	$(wildcard sources/libs/brutal/ds/*.c)         \
 	$(wildcard sources/libs/brutal/hash/*.c)       \

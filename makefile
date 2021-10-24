@@ -39,6 +39,7 @@ INC_LIBBRUTAL= \
 
 HOST_CFLAGS_INC ?= \
 	$(INC_LIBBRUTAL) \
+	-Isources/libs/hw \
 	-Isources/bins \
 	-Isources/ \
 	-Ithirdparty
@@ -46,6 +47,7 @@ HOST_CFLAGS_INC ?= \
 CROSS_CFLAGS_INC ?= \
 	$(INC_LIBS) \
 	$(INC_LIBBRUTAL) \
+	-Isources/libs/hw \
 	-Isources/bins \
 	-Isources/ \
 	-Ithirdparty
@@ -77,8 +79,8 @@ run: $(ISO)
 		-no-reboot \
 		-no-shutdown \
 		-kernel $(KERNEL)
-		-hda $(ISO) 
-		
+		-hda $(ISO)
+
 else ifeq ($(QEMU_BOOT_METHOD), iso)
 
 run: $(ISO)
@@ -101,6 +103,6 @@ clean:
 
 .PHONY: clean
 clean-all:
-	rm -rf bin/ 
+	rm -rf bin/
 
 -include $(DEPENDENCIES)

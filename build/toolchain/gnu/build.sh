@@ -4,7 +4,7 @@ set -e
 # ----- Configs -------------------------------------------------------------- #
 
 if [ $# == 0 ]
-then 
+thens
     echo "use build.sh <target>"
     echo "target may be: "
     echo "  - x86_64"
@@ -98,10 +98,10 @@ pushd "$DIR/build/$TARGET"
             --target=$TARGET \
             --prefix=$PREFIX \
             --with-sysroot \
-            --disable-werror || exit 1
+            --disable-werror
 
-        make -j $MAKEJOBS || exit 1
-        make install || exit 1
+        make -j $MAKEJOBS
+        make install
     popd
 
     pushd gcc
@@ -111,10 +111,10 @@ pushd "$DIR/build/$TARGET"
             --disable-nls \
             --with-newlib \
             --with-sysroot \
-            --enable-languages=c|| exit 1
+            --enable-languages=c
 
-        make -j $MAKEJOBS all-gcc all-target-libgcc || exit 1
-        make install-gcc install-target-libgcc || exit 1
+        make -j $MAKEJOBS all-gcc all-target-libgcc
+        make install-gcc install-target-libgcc
     popd
 popd
 

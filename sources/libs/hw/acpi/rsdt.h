@@ -1,6 +1,6 @@
 #pragma once
 
-#include <acpi/acpi.h>
+#include <acpi/base.h>
 #include <acpi/stdh.h>
 
 typedef struct PACKED acpi_rsdt

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <acpi/acpi.h>
+#include <acpi/base.h>
 #include <bal/mmio.h>
 #include <brutal/ds.h>
 #include <pci/addr.h>

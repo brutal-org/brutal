@@ -2,20 +2,20 @@ BINDIR_CROSS = $(BINDIR)/cross
 
 LIBS_SRC = \
 	$(wildcard sources/host/brutal/*.c)   \
-	$(wildcard sources/host/brutal/$(CONFIG_ARCH)/*.s) \
 	$(wildcard sources/host/brutal/$(CONFIG_ARCH)/*.c) \
-	$(wildcard sources/host/sysv/$(CONFIG_ARCH)/*.s)   \
+	$(wildcard sources/host/brutal/$(CONFIG_ARCH)/*.s) \
 	$(wildcard sources/host/sysv/$(CONFIG_ARCH)/*.c)   \
-	$(wildcard sources/libs/acpi/*.c)     \
+	$(wildcard sources/host/sysv/$(CONFIG_ARCH)/*.s)   \
+	$(wildcard sources/libs/bal/*.c) \
 	$(wildcard sources/libs/brutal/*.c)   \
 	$(wildcard sources/libs/brutal/*/*.c) \
 	$(wildcard sources/libs/cc/*.c)       \
 	$(wildcard sources/libs/cc/*/*.c)       \
 	$(wildcard sources/libs/elf/*.c)      \
-	$(wildcard sources/libs/pci/*.c)      \
 	$(wildcard sources/libs/handover/*.c) \
+	$(wildcard sources/libs/hw/acpi/*.c)     \
+	$(wildcard sources/libs/hw/pci/*.c)      \
 	$(wildcard sources/libs/json/*.c)     \
-	$(wildcard sources/libs/bal/*.c) \
 	$(wildcard sources/libs/stdc/*/*.c)     \
 	$(wildcard sources/libs/ubsan/*.c)
 

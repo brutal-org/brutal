@@ -1,7 +1,7 @@
 LOADER_CC = clang-12
 LOADER_LD = clang-12
 
-BINDIR_LOADER=build/loader
+BINDIR_LOADER=bin/loader
 
 LOADER_CFLAGS= \
 	-MD \
@@ -45,8 +45,8 @@ LOADER_LIBS_SRC = \
 	$(wildcard sources/libs/brutal/text/*.c)        \
 	$(wildcard sources/libs/handover/*.c)		    \
 	$(wildcard sources/libs/elf/elf.c) 				\
-	$(wildcard sources/libs/efi/*/*.c)              \
-	$(wildcard sources/libs/efi/*.c)
+	$(wildcard sources/libs/hw/efi/*/*.c)              \
+	$(wildcard sources/libs/hw/efi/*.c)
 
 LOADER_SRCS = $(wildcard sources/loader/*.c)
 

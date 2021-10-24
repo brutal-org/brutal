@@ -1,4 +1,4 @@
-#include <acpi/acpi.h>
+#include <acpi/base.h>
 #include <acpi/rsdt.h>
 #include <bal/syscalls.h>
 #include <brutal/log.h>

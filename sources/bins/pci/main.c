@@ -1,4 +1,4 @@
-#include <acpi/acpi.h>
+#include <acpi/base.h>
 #include <brutal/alloc.h>
 #include <brutal/log.h>
 #include <handover/handover.h>
