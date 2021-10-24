@@ -1,4 +1,4 @@
-#include <udfore/udfore.h>
+#include <ud/ud.h>
 
 void ud_dump(UdExpr const *expr, IoWriter *writer)
 {

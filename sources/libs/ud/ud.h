@@ -2,7 +2,7 @@
 
 #include <brutal/alloc.h>
 #include <brutal/io.h>
-#include <udfore/sexpr.h>
+#include <ud/sexpr.h>
 
 UdExpr ud_parse(Scan *scan, Alloc *alloc);
 
