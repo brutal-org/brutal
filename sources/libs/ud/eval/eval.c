@@ -1,4 +1,7 @@
-#include <ud/ud.h>
+#include <ud/ast/builder.h>
+#include <ud/ast/query.h>
+#include <ud/eval/env.h>
+#include <ud/eval/eval.h>
 
 UdExpr ud_eval_args(UdExpr expr, UdExpr *env, Alloc *alloc)
 {

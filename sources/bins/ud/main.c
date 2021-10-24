@@ -1,7 +1,8 @@
 #include <brutal/alloc.h>
 #include <brutal/io.h>
 #include <brutal/log.h>
-#include <ud/ud.h>
+#include <ud/eval.h>
+#include <ud/parse.h>
 
 int main(int argc, char const *argv[])
 {
@@ -34,18 +35,18 @@ int main(int argc, char const *argv[])
     }
 
     print(io_std_out(), "[AST] ");
-    ud_dump(&expr, io_std_out());
+    ud_gen_dump(&expr, io_std_out());
 
     UdExpr env = ud_env_default(alloc_global());
 
     print(io_std_out(), "\n[ENV] ");
-    ud_dump(&env, io_std_out());
+    ud_gen_dump(&env, io_std_out());
     print(io_std_out(), "\n");
 
     UdExpr result = ud_eval(expr, &env, alloc_global());
 
     print(io_std_out(), "\n[RES] ");
-    ud_dump(&result, io_std_out());
+    ud_gen_dump(&result, io_std_out());
 
     return 0;
 }

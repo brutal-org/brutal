@@ -1,6 +1,7 @@
-#include <ud/ud.h>
+#include <ud/ast/query.h>
+#include <ud/gen.h>
 
-void ud_dump(UdExpr const *expr, IoWriter *writer)
+void ud_gen_dump(UdExpr const *expr, IoWriter *writer)
 {
     print(writer, "{}[", ud_type_to_string(expr->type));
 
@@ -34,18 +35,18 @@ void ud_dump(UdExpr const *expr, IoWriter *writer)
 
     case UD_PAIR:
         print(writer, "lhs=");
-        ud_dump(expr->pair_.lhs, writer);
+        ud_gen_dump(expr->pair_.lhs, writer);
         print(writer, ", rhs=");
-        ud_dump(expr->pair_.rhs, writer);
+        ud_gen_dump(expr->pair_.rhs, writer);
         break;
 
     case UD_LAMBDA:
         print(writer, "params=");
-        ud_dump(expr->lambda_.parms, writer);
+        ud_gen_dump(expr->lambda_.parms, writer);
         print(writer, ", env=");
-        ud_dump(expr->lambda_.env, writer);
+        ud_gen_dump(expr->lambda_.env, writer);
         print(writer, ", body=");
-        ud_dump(expr->lambda_.body, writer);
+        ud_gen_dump(expr->lambda_.body, writer);
 
     default:
         break;

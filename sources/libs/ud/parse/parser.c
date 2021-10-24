@@ -1,6 +1,6 @@
-#include <brutal/alloc.h>
 #include <brutal/log.h>
-#include <ud/ud.h>
+#include <ud/ast/builder.h>
+#include <ud/ast/query.h>
 
 static UdExpr parse_expression(Scan *scan, Alloc *alloc);
 
