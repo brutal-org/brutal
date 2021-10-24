@@ -9,6 +9,9 @@ typedef enum
 {
     CTYPE_INVALID,
 
+    CTYPE_TAIL,
+    CTYPE_ERROR,
+
     CTYPE_VOID,
     CTYPE_AUTO,
     CTYPE_BOOL,
@@ -23,6 +26,7 @@ typedef enum
     CTYPE_ENUM,
     CTYPE_FUNC,
     CTYPE_NAME,
+
 } CTypeType;
 
 typedef enum

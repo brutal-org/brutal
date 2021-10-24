@@ -1,3 +1,4 @@
+#include <brutal/debug.h>
 #include <cc/parse/lexer.h>
 
 struct
@@ -51,6 +52,7 @@ struct
     {CLEX_RPARENT, ")"},
     {CLEX_LBRACKET, "["},
     {CLEX_RBRACKET, "]"},
+    {CLEX_COMMA, ","},
     {CLEX_LBRACE, "{"},
     {CLEX_RBRACE, "}"},
     {CLEX_LCHEVRON, "<"},
@@ -82,6 +84,7 @@ static LexemeType clex_impl(Scan *scan)
     {
         if (scan_skip_word(scan, str$(keywords[i].literal)))
         {
+            log$("trying '{}'", str$(keywords[i].literal));
             return keywords[i].type;
         }
     }

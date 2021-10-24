@@ -1,6 +1,6 @@
 #include <cc/ast/expr.h>
 
-static const char *cop_type_to_str[] = {
+static const char *cop_type_to_str[COP_COUNT] = {
     [COP_INC] = "++",
     [COP_DEC] = "--",
     [COP_ASSIGN] = "=",
@@ -46,7 +46,7 @@ Str cop_to_str(COp type)
     return str$(cop_type_to_str[type]);
 }
 
-static int cop_precedence_table[] = {
+static int cop_precedence_table[COP_COUNT] = {
     [COP_INC] = 1,
     [COP_DEC] = 1,
     [COP_ASSIGN] = 14,
@@ -90,4 +90,30 @@ static int cop_precedence_table[] = {
 int cop_pre(COp cop)
 {
     return cop_precedence_table[cop];
+}
+
+int cexpr_pre(CExpr *expr)
+{
+    switch (expr->type)
+    {
+    case CEXPR_PREFIX:
+    case CEXPR_POSTFIX:
+    case CEXPR_INFIX:
+        return cop_pre(expr->infix_.op);
+
+    case CEXPR_IDENT:
+    case CEXPR_CONSTANT:
+        return 0;
+
+    case CEXPR_CALL:
+    case CEXPR_CAST:
+    case CEXPR_INITIALIZER:
+        return 1;
+
+    case CEXPR_TERNARY:
+        return 13;
+
+    default:
+        return 0;
+    }
 }

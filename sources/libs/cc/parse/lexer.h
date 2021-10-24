@@ -54,6 +54,7 @@
     LEXEME(RBRACKET)            \
     LEXEME(LBRACE)              \
     LEXEME(RBRACE)              \
+    LEXEME(COMMA)               \
     LEXEME(LCHEVRON)            \
     LEXEME(RCHEVRON)            \
     LEXEME(POUND)               \

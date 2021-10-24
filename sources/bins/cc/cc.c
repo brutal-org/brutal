@@ -1,6 +1,7 @@
 #include <brutal/alloc.h>
 #include <brutal/debug.h>
 #include <brutal/io.h>
+#include <cc/c2c.h>
 #include <cc/parse.h>
 
 int main(int argc, char const *argv[])
@@ -29,14 +30,21 @@ int main(int argc, char const *argv[])
     Scan scan;
     scan_init(&scan, buffer_str(&source_buffer));
 
+    log$("lex");
     Lex lex = clex(&scan, base$(&heap));
+    log$("lex ok");
 
     if (scan_dump_error(&scan, io_std_err()))
     {
         return -1;
     }
 
-    lex_dump(&lex, clex_to_str);
+    CUnit unit = cparse_unit(&lex, base$(&heap));
+
+    Emit emit;
+    emit_init(&emit, io_std_out());
+
+    c2c_unit(&emit, unit);
 
     heap_alloc_deinit(&heap);
 

@@ -24,7 +24,7 @@ void lex_deinit(Lex *self)
     vec_deinit(&self->lexemes);
 }
 
-bool lex_end(Lex *self)
+bool lex_ended(Lex *self)
 {
     return !lex_ok(self) || self->head >= self->lexemes.length;
 }

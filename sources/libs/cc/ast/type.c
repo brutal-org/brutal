@@ -2,6 +2,10 @@
 
 const char *ctype_type_to_str[] = {
     [CTYPE_INVALID] = "invalid",
+
+    [CTYPE_ERROR] = "error",
+    [CTYPE_TAIL] = "tail",
+
     [CTYPE_VOID] = "void",
     [CTYPE_AUTO] = "auto",
     [CTYPE_BOOL] = "bool",

@@ -66,11 +66,11 @@ $(foreach bin, $(HOST_BINS), $(eval $(call HOST_TEMPLATE,$(bin))))
 
 .PHONY: run-bid
 run-bid: $(BID_HOST_BIN)
-	$(BID_HOST_BIN) sources/libs/proto/exemple.bid sources/libs/proto/exemple.h
+	$(BID_HOST_BIN) sources/libs/proto/example.bid sources/libs/proto/example.h
 
 .PHONY: run-cc
 run-cc: $(CC_HOST_BIN)
-	$(CC_HOST_BIN) sources/bins/test.c
+	$(CC_HOST_BIN) sources/bins/cc/test.c.example
 
 .PHONY: run-test
 run-test: $(TEST_HOST_BIN)
@@ -82,4 +82,4 @@ run-demo: $(DEMO_HOST_BIN)
 
 .PHONY: run-ud
 run-ud: $(UD_HOST_BIN)
-	$(UD_HOST_BIN) sources/bins/ud/test.ud.exemple
+	$(UD_HOST_BIN) sources/bins/ud/test.ud.example

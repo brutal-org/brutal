@@ -8,7 +8,7 @@ typedef enum
 {
     CEXPR_INVALID,
     CEXPR_EMPTY,
-    
+
     CEXPR_SELF,
     CEXPR_CONSTANT,
     CEXPR_IDENT,
@@ -70,6 +70,8 @@ typedef enum
     COP_REF,        // &
     COP_ACCESS,     // .
     COP_PTR_ACCESS, // ->
+
+    COP_COUNT,
 } COp;
 
 typedef struct
@@ -136,3 +138,5 @@ struct cexpr
 Str cop_to_str(COp type);
 
 int cop_pre(COp cop);
+
+int cexpr_pre(CExpr *expr);

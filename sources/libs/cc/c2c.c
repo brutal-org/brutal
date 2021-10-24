@@ -182,35 +182,9 @@ static void c2c_op_fix(Emit *emit, COp op)
     emit_fmt(emit, "{}", cop_to_str(op));
 }
 
-static int get_pre(CExpr *expr)
-{
-    switch (expr->type)
-    {
-    case CEXPR_PREFIX:
-    case CEXPR_POSTFIX:
-    case CEXPR_INFIX:
-        return cop_pre(expr->infix_.op);
-
-    case CEXPR_IDENT:
-    case CEXPR_CONSTANT:
-        return 0;
-
-    case CEXPR_CALL:
-    case CEXPR_CAST:
-    case CEXPR_INITIALIZER:
-        return 1;
-
-    case CEXPR_TERNARY:
-        return 13;
-
-    default:
-        return 0;
-    }
-}
-
 static void c2c_expr_pre(Emit *emit, CExpr expr, int parent_pre)
 {
-    int pre = get_pre(&expr);
+    int pre = cexpr_pre(&expr);
 
     if (pre > parent_pre)
     {
