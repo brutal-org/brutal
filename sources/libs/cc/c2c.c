@@ -168,8 +168,8 @@ static void c2c_type_end(Emit *emit, CType type)
     }
     else if (type.type == CTYPE_ARRAY)
     {
-        c2c_type_end(emit, *type.ptr_.subtype);
         emit_fmt(emit, "[{}]", type.array_.size);
+        c2c_type_end(emit, *type.ptr_.subtype);
     }
 }
 
