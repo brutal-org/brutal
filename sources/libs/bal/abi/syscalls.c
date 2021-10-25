@@ -1,10 +1,43 @@
 #include <bal/abi/syscalls.h>
-#include <host/asm.h>
 
-BrResult br_syscall(BrSyscall syscall, BrArg arg1, BrArg arg2, BrArg arg3, BrArg arg4, BrArg arg5)
+#if defined(__x86_64__)
+BrResult br_syscall(
+    BrSyscall syscall,
+    BrArg arg1,
+    BrArg arg2,
+    BrArg arg3,
+    BrArg arg4,
+    BrArg arg5)
 {
-    return (BrResult)asm_syscall(syscall, arg1, arg2, arg3, arg4, arg5);
+    uint64_t res;
+
+    register uint64_t r8 asm("r8") = arg4;
+    register uint64_t r9 asm("r9") = arg5;
+
+    asm volatile("syscall"
+                 : "=a"(res)
+                 : "a"(syscall), "b"(arg1), "d"(arg2), "S"(arg3), "r"(r8), "r"(r9)
+                 : "memory", "r11", "rcx");
+
+    return res;
 }
+
+#elif defined(__riscv)
+
+BrResult br_syscall(
+    [[maybe_unused]] BrSyscall syscall,
+    [[maybe_unused]] BrArg arg1,
+    [[maybe_unused]] BrArg arg2,
+    [[maybe_unused]] BrArg arg3,
+    [[maybe_unused]] BrArg arg4,
+    [[maybe_unused]] BrArg arg5)
+{
+    return 0;
+}
+
+#else
+#    error "Unsupported architecture!"
+#endif
 
 BrResult br_log(BrLogArgs *args)
 {

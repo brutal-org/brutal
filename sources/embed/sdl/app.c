@@ -1,6 +1,6 @@
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <brutal/base.h>
-#include <host/app.h>
+#include <embed/app.h>
 
 void host_app_init(MAYBE_UNUSED HostApp *self)
 {

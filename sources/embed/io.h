@@ -1,5 +1,6 @@
 #pragma once
 
+#include <brutal/base/defs.h>
 #include <brutal/base/error.h>
 #include <brutal/base/result.h>
 #include <brutal/io/read.h>
@@ -7,16 +8,16 @@
 #include <brutal/io/write.h>
 #include <brutal/text/str.h>
 
-#if defined(__efi__)
-#    include <host/efi/io.h>
-#elif defined(__linux__)
-#    include <host/linux/io.h>
-#elif defined(__brutal__)
-#    include <host/brutal/io.h>
-#elif defined(__kernel__)
-#    include <host/kernel/io.h>
+#if defined(SYSTEM_EFI)
+#    include <embed/efi/io.h>
+#elif defined(SYSTEM_POSIX)
+#    include <embed/posix/io.h>
+#elif defined(SYSTEM_BRUTAL)
+#    include <embed/brutal/io.h>
+#elif defined(SYSTEM_KERNEL)
+#    include <embed/kernel/io.h>
 #else
-#    error "Unsupported platform!"
+#    error "Unsupported embedder!"
 #endif
 
 typedef Result(Error, HostIoFile) HostIoOpenFileResult;

@@ -1,6 +1,6 @@
 #include <brutal/base.h>
+#include <embed/log.h>
 #include <errno.h>
-#include <host/log.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

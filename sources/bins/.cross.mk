@@ -1,11 +1,11 @@
-BINDIR_CROSS = $(BINDIR)/cross
-
 LIBS_SRC = \
-	$(wildcard sources/host/brutal/*.c)   \
-	$(wildcard sources/host/brutal/$(CONFIG_ARCH)/*.c) \
-	$(wildcard sources/host/brutal/$(CONFIG_ARCH)/*.s) \
-	$(wildcard sources/host/sysv/$(CONFIG_ARCH)/*.c)   \
-	$(wildcard sources/host/sysv/$(CONFIG_ARCH)/*.s)   \
+	$(wildcard sources/embed/brutal/*.c)   \
+	$(wildcard sources/embed/brutal/$(CONFIG_ARCH)/*.c) \
+	$(wildcard sources/embed/brutal/$(CONFIG_ARCH)/*.s) \
+	$(wildcard sources/embed/sysv/$(CONFIG_ARCH)/*.c)   \
+	$(wildcard sources/embed/sysv/$(CONFIG_ARCH)/*.s)   \
+	$(wildcard sources/embed/$(CONFIG_ARCH)/*.c) \
+	$(wildcard sources/embed/$(CONFIG_ARCH)/*.s) \
 	$(wildcard sources/libs/bal/*.c) \
 	$(wildcard sources/libs/bal/*/*.c) \
 	$(wildcard sources/libs/brutal/*.c)   \

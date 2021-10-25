@@ -1,6 +1,6 @@
 #include <brutal/base/attributes.h>
 #include <brutal/io/file.h>
-#include <host/io.h>
+#include <embed/io.h>
 
 MaybeError io_file_open(IoFile *self, Str path)
 {

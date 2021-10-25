@@ -4,12 +4,12 @@
 #include <brutal/gfx.h>
 #include <brutal/math.h>
 
-#if defined(__linux__)
-#    include <host/linux/ui.h>
-#elif defined(__brutal__)
-#    include <host/brutal/ui.h>
+#if defined(SYSTEM_SDL)
+#    include <embed/sdl/ui.h>
+#elif defined(SYSTEM_BRUTAL)
+#    include <embed/brutal/ui.h>
 #else
-#    error "Unsupported platform!"
+#    error "Unsupported embedder!"
 #endif
 
 typedef struct host_ui_surface HostUiSurface;

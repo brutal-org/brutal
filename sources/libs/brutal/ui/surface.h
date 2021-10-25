@@ -1,7 +1,7 @@
 #pragma once
 
 #include <brutal/app.h>
-#include <host/ui.h>
+#include <embed/ui.h>
 
 typedef struct
 {

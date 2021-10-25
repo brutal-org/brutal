@@ -35,8 +35,6 @@ HandoverMmap get_mmap()
 
     HandoverMmapEntry *start_from = h_mmap->entries;
 
-    uint64_t pages_count = 0;
-
     int last_type = -1;
     uint64_t last_end = 0xFFFFFFFFFFFF;
 
@@ -55,8 +53,6 @@ HandoverMmap get_mmap()
         {
             type = efi_mmap_type_to_handover[desc->type];
         }
-
-        pages_count += length;
 
         if (last_type == type && last_end == desc->physical_start)
         {
@@ -123,7 +119,7 @@ HandoverFramebuffer get_framebuffer(EFIBootServices *bs)
 
     EFIGraphicsOutputModeInfo *info;
 
-    uint64_t size_of_info, num_modes, native_mode;
+    uint64_t size_of_info;
 
     EFIStatus status = gop->query_mode(gop, gop->mode == nullptr ? 0 : gop->mode->mode, &size_of_info, &info);
 
@@ -135,12 +131,6 @@ HandoverFramebuffer get_framebuffer(EFIBootServices *bs)
     if (status != EFI_SUCCESS)
     {
         panic$("Couldn't get framebuffer native mode");
-    }
-
-    else
-    {
-        native_mode = gop->mode->mode;
-        num_modes = gop->mode->max_mode;
     }
 
     uint64_t addr = gop->mode->framebuffer_base;

@@ -2,7 +2,7 @@
 #include <brutal/mem.h>
 #include <efi/lib.h>
 #include <efi/srvs/bs.h>
-#include <host/mem.h>
+#include <embed/mem.h>
 #include "loader/memory.h"
 
 static Pages *pages;

@@ -3,7 +3,7 @@
 #include <brutal/text/utf16.h>
 #include <efi/lib.h>
 #include <efi/protos.h>
-#include <host/io.h>
+#include <embed/io.h>
 
 static EFILoadedImage *image_loader = nullptr;
 static EFISimpleFileSystemProtocol *rootfs = nullptr;

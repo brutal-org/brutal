@@ -1,7 +1,7 @@
 #include <brutal/base/attributes.h>
 #include <brutal/base/cast.h>
 #include <brutal/io/std.h>
-#include <host/io.h>
+#include <embed/io.h>
 
 static IoReadResult std_io_read(IoStdChannel *channel, uint8_t *data, MAYBE_UNUSED size_t offset, size_t size)
 {

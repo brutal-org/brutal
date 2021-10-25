@@ -1,6 +1,6 @@
 #include <brutal/alloc/heap.h>
 #include <brutal/debug.h>
-#include <host/mem.h>
+#include <embed/mem.h>
 
 #define ALLOC_HEAP_ALIGN (64)
 #define ALLOC_HEAP_MAGIC (0xc001c0de)

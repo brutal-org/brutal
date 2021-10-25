@@ -6,19 +6,21 @@ KERNEL_SRC += \
 	$(wildcard sources/kernel/*.c)                 \
 	$(wildcard sources/kernel/$(CONFIG_ARCH)/*.c)  \
 	$(wildcard sources/kernel/$(CONFIG_ARCH)/*.s)  \
+	$(wildcard sources/embed/$(CONFIG_ARCH)/*.c)   \
+	$(wildcard sources/embed/$(CONFIG_ARCH)/*.s)   \
+	$(wildcard sources/embed/kernel/*.c)           \
 	$(wildcard sources/libs/stdc/ansi/ctype.c)     \
 	$(wildcard sources/libs/stdc/ansi/string.c)    \
 	$(wildcard sources/libs/hw/acpi/*.c)           \
 	$(wildcard sources/libs/brutal/alloc/*.c)      \
 	$(wildcard sources/libs/brutal/ds/*.c)         \
 	$(wildcard sources/libs/brutal/hash/*.c)       \
-	$(wildcard sources/host/kernel/*.c)            \
 	$(wildcard sources/libs/brutal/io/buffer.c)    \
 	$(wildcard sources/libs/brutal/io/fmt.c)       \
 	$(wildcard sources/libs/brutal/io/print.c)     \
 	$(wildcard sources/libs/brutal/parse/*.c)      \
 	$(wildcard sources/libs/brutal/io/write.c)     \
-	$(wildcard sources/libs/brutal/debug/*.c)        \
+	$(wildcard sources/libs/brutal/debug/*.c)      \
 	$(wildcard sources/libs/brutal/mem/*.c)        \
 	$(wildcard sources/libs/brutal/sync/*.c)       \
 	$(wildcard sources/libs/brutal/text/*.c)       \
@@ -26,6 +28,9 @@ KERNEL_SRC += \
 	$(wildcard sources/libs/elf/elf.c)             \
 	$(wildcard sources/libs/bal/abi/handover.c)    \
 	$(wildcard sources/libs/ubsan/*.c)
+
+list-kernel-src:
+	@echo $(KERNEL_SRC)
 
 KERNEL_OBJ= \
 	$(patsubst sources/%, $(BINDIR_KERNEL)/%.o, $(KERNEL_SRC))

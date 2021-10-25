@@ -1,5 +1,5 @@
 #include <brutal/base.h>
-#include <host/time.h>
+#include <embed/time.h>
 #include <time.h>
 
 Tick host_time_current_tick(void)

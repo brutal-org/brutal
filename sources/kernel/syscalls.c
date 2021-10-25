@@ -1,6 +1,6 @@
 #include <bal/abi.h>
 #include <brutal/debug.h>
-#include <host/log.h>
+#include <embed/log.h>
 #include "kernel/arch.h"
 #include "kernel/domain.h"
 #include "kernel/global.h"

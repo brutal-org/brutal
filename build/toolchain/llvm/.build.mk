@@ -22,7 +22,7 @@ HOST_CFLAGS= \
 HOST_LD=ld.lld
 HOST_LDFLAGS=`pkg-config sdl2 --libs`
 
-HOST_AR=ar
+HOST_AR=llvm-ar
 HOST_ARFLAGS=rcs
 
 # --- Cross-Compiler --------------------------------------------------------- #
@@ -48,12 +48,12 @@ CROSS_UCFLAGS= \
 
 CROSS_LD=ld.lld
 CROSS_KLDFLAGS= \
-	-Tsources/host/kernel/$(CONFIG_ARCH)/link.ld \
+	-Tsources/embed/kernel/$(CONFIG_ARCH)/link.ld \
 	-z max-page-size=0x1000 \
 	$(ARCH_LDFLAGS)
 
 CROSS_ULDFLAGS= \
-	-Tsources/host/brutal/$(CONFIG_ARCH)/link.ld \
+	-Tsources/embed/brutal/$(CONFIG_ARCH)/link.ld \
 	-z max-page-size=0x1000 \
 	$(ARCH_LDFLAGS)
 

@@ -1,6 +1,6 @@
 #include <bal/abi.h>
 #include <bal/helpers.h>
-#include <host/mem.h>
+#include <embed/mem.h>
 
 void host_mem_lock(void)
 {

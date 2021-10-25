@@ -1,7 +1,8 @@
 #include <brutal/alloc.h>
 #include <brutal/debug.h>
-#include <brutal/host.h>
 #include <brutal/mem.h>
+#include <embed/log.h>
+#include <embed/task.h>
 #include <stdlib.h>
 
 /* --- 7.22 - General utilities --------------------------------------------- */

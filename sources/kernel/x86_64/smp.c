@@ -1,6 +1,6 @@
 #include <brutal/debug.h>
 #include <brutal/mem.h>
-#include <host/mem.h>
+#include <embed/mem.h>
 #include "kernel/arch.h"
 #include "kernel/heap.h"
 #include "kernel/kernel.h"

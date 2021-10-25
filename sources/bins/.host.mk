@@ -1,11 +1,12 @@
-BINDIR_HOST=$(BINDIR)/host
-
 LIBS_HOST_SRC = \
-	$(wildcard sources/host/linux/*.c)    \
-	$(wildcard sources/host/linux/$(CONFIG_ARCH)/*.s) \
-	$(wildcard sources/host/linux/$(CONFIG_ARCH)/*.c) \
-	$(wildcard sources/host/sysv/$(CONFIG_ARCH)/*.s) \
-	$(wildcard sources/host/sysv/$(CONFIG_ARCH)/*.c) \
+	$(wildcard sources/embed/posix/*.c)    \
+	$(wildcard sources/embed/posix/$(CONFIG_HOST_ARCH)/*.s) \
+	$(wildcard sources/embed/posix/$(CONFIG_HOST_ARCH)/*.c) \
+	$(wildcard sources/embed/sysv/$(CONFIG_HOST_ARCH)/*.s) \
+	$(wildcard sources/embed/sysv/$(CONFIG_HOST_ARCH)/*.c) \
+	$(wildcard sources/embed/sdl/*.c) \
+	$(wildcard sources/embed/$(CONFIG_HOST_ARCH)/*.s) \
+	$(wildcard sources/embed/$(CONFIG_HOST_ARCH)/*.c) \
 	$(wildcard sources/libs/brutal/*.c)   \
 	$(wildcard sources/libs/brutal/*/*.c) \
 	$(wildcard sources/libs/cc/*.c)       \
@@ -57,7 +58,7 @@ DEPENDENCIES += $$($(1)_HOST_OBJ:.o=.d)
 $$($(1)_HOST_BIN): $$($(1)_HOST_OBJ) $(LIBS_HOST_BIN)
 	$$(ECHO) "host   LD" $$@
 	@$$(MKCWD)
-	$(HOST_CC) -o $$@ $$^ $(HOST_LDFLAGS) $(HOST_CFLAGS)
+	@$(HOST_CC) -o $$@ $$^ $(HOST_LDFLAGS) $(HOST_CFLAGS)
 
 endef
 

@@ -1,7 +1,7 @@
 #include <brutal/alloc/global.h>
 #include <brutal/text/utf16.h>
 #include <efi/lib.h>
-#include <host/log.h>
+#include <embed/log.h>
 
 static IoWriter writer;
 

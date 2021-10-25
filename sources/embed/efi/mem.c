@@ -1,7 +1,7 @@
 #include <brutal/debug.h>
 #include <efi/lib.h>
 #include <efi/srvs/bs.h>
-#include <host/mem.h>
+#include <embed/mem.h>
 
 Error host_mem_acquire(size_t size, void **out_result, MAYBE_UNUSED enum host_mem_flag flags)
 {

@@ -1,5 +1,5 @@
-LOADER_CC = clang-12
-LOADER_LD = clang-12
+LOADER_CC = $(CLANG)
+LOADER_LD = $(CLANG)
 
 BINDIR_LOADER=bin/loader
 
@@ -39,13 +39,15 @@ LOADER_LIBS_SRC = \
 	$(wildcard sources/libs/brutal/alloc/*.c)	    \
 	$(wildcard sources/libs/brutal/ds/*.c) 		    \
 	$(wildcard sources/libs/brutal/hash/*.c)	    \
-	$(wildcard sources/host/efi/*.c)	            \
-	$(wildcard sources/libs/brutal/debug/*.c)         \
+	$(wildcard sources/embed/efi/*.c)	            \
+	$(wildcard sources/embed/$(CONFIG_ARCH)/*.c)    \
+	$(wildcard sources/embed/$(CONFIG_ARCH)/*.s)    \
+	$(wildcard sources/libs/brutal/debug/*.c)       \
 	$(wildcard sources/libs/brutal/mem/*.c)         \
 	$(wildcard sources/libs/brutal/text/*.c)        \
-	$(wildcard sources/libs/bal/abi/handover.c) \
+	$(wildcard sources/libs/bal/abi/handover.c)     \
 	$(wildcard sources/libs/elf/elf.c) 				\
-	$(wildcard sources/libs/hw/efi/*/*.c)              \
+	$(wildcard sources/libs/hw/efi/*/*.c)           \
 	$(wildcard sources/libs/hw/efi/*.c)
 
 LOADER_SRCS = $(wildcard sources/loader/*.c)
@@ -59,16 +61,19 @@ LOADER=$(BINDIR_LOADER)/BOOTX64.EFI
 ALL+=$(BINDIR_LOADER)/BOOTX64.EFI
 
 $(LOADER): $(LOADER_OBJS)
-	$(MKCWD)
-	$(LOADER_LD) -o $@ $^ $(LOADER_LDFLAGS)
+	@$(MKCWD)
+	$(ECHO) "loader LD" $<
+	@$(LOADER_LD) -o $@ $^ $(LOADER_LDFLAGS)
 
 $(BINDIR_LOADER)/%.c.o: sources/%.c
-	$(MKCWD)
-	$(LOADER_CC) -c -o $@ $< $(LOADER_CFLAGS)
+	@$(MKCWD)
+	$(ECHO) "loader CC" $<
+	@$(LOADER_CC) -c -o $@ $< $(LOADER_CFLAGS)
 
 $(BINDIR_LOADER)/libs/%.c.o: sources/libs/%.c
-	$(MKCWD)
-	$(LOADER_CC) -c -o $@ $< $(LOADER_CFLAGS)
+	@$(MKCWD)
+	$(ECHO) "loader CC" $<
+	@$(LOADER_CC) -c -o $@ $< $(LOADER_CFLAGS)
 
 $(BINDIR_LOADER)/tools/OVMF.fd:
 	$(MKCWD)

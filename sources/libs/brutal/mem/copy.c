@@ -1,9 +1,19 @@
 #include <brutal/mem/funcs.h>
-#include <host/asm.h>
+#include <embed/arch.h>
 
-void *mem_cpy(void *s1, void const *s2, size_t n)
+void *mem_cpy(void *to, void const *from, size_t n)
 {
-    asm_mem_copy(s1, s2, n);
+#ifdef ARCH_HAS_MEMCPY
+    return arch_mem_copy(to, from, n);
+#else
+    uint8_t *dest = (uint8_t *)to;
+    uint8_t const *src = (uint8_t const *)from;
 
-    return s1;
+    for (size_t i = 0; i < n; i++)
+    {
+        dest[i] = src[i];
+    }
+
+    return to;
+#endif
 }

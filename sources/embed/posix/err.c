@@ -1,6 +1,6 @@
 #include <brutal/debug.h>
+#include <embed/posix/err.h>
 #include <errno.h>
-#include <host/linux/err.h>
 #include <string.h>
 
 Error error_from_errno(void)

@@ -1,5 +1,5 @@
 #include <brutal/debug.h>
-#include <host/log.h>
+#include <embed/log.h>
 
 #ifdef __kernel__
 #    include "kernel/cpu.h"

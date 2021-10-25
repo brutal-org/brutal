@@ -1,6 +1,6 @@
 #include <brutal/debug.h>
-#include <host/linux/err.h>
-#include <host/mem.h>
+#include <embed/mem.h>
+#include <embed/posix/err.h>
 #include <string.h>
 #include <sys/mman.h>
 

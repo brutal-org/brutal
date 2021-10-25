@@ -1,5 +1,5 @@
 #include <brutal/alloc/heap.h>
-#include <host/mem.h>
+#include <embed/mem.h>
 
 static Alloc *heap(void)
 {

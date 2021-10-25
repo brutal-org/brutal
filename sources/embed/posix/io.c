@@ -1,9 +1,9 @@
 #include <brutal/alloc.h>
 #include <brutal/debug/assert.h>
 #include <brutal/text/utf8.h>
+#include <embed/io.h>
+#include <embed/posix/err.h>
 #include <fcntl.h>
-#include <host/io.h>
-#include <host/linux/err.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
