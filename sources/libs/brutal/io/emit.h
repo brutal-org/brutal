@@ -5,6 +5,7 @@
 typedef struct
 {
     int indent;
+    int indent_size;
     IoWriter *writer;
     bool line_begin;
 } Emit;
@@ -12,6 +13,8 @@ typedef struct
 void emit_init(Emit *self, IoWriter *writer);
 
 void emit_deinit(Emit *self);
+
+void emit_ident_size(Emit *self, int size);
 
 void emit_ident(Emit *self);
 

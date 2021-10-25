@@ -58,13 +58,14 @@ CType cparse_declarator(Lex *lex, CType type, Alloc *alloc)
     }
     else if (lex_skip_type(lex, CLEX_LPARENT))
     {
-        type = ctype_parent(type, alloc);
         cparse_eat_whitespace(lex);
         CType inner = cparse_declarator(lex, ctype_tail(), alloc);
         cparse_eat_whitespace(lex);
 
         lex_expect(lex, CLEX_RPARENT);
-        return ctype_append(inner, cparse_declarator_postfix(lex, type, alloc), alloc);
+
+        type = ctype_parent(cparse_declarator_postfix(lex, type, alloc), alloc);
+        return ctype_append(inner, type, alloc);
     }
     else
     {

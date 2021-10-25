@@ -2,6 +2,7 @@
 #include <brutal/debug.h>
 #include <brutal/io.h>
 #include <cc/c2c.h>
+#include <cc/gen/dump.h>
 #include <cc/parse.h>
 
 int main(int argc, char const *argv[])
@@ -30,9 +31,7 @@ int main(int argc, char const *argv[])
     Scan scan;
     scan_init(&scan, buffer_str(&source_buffer));
 
-    log$("lex");
     Lex lex = clex(&scan, base$(&heap));
-    log$("lex ok");
 
     if (scan_dump_error(&scan, io_std_err()))
     {
@@ -44,7 +43,29 @@ int main(int argc, char const *argv[])
     Emit emit;
     emit_init(&emit, io_std_out());
 
+    emit_fmt(&emit, "\n");
+
+    emit_fmt(&emit, "--- BEGIN OG CODE ---\n");
+    emit_fmt(&emit, "{}\n", buffer_str(&source_buffer));
+    emit_fmt(&emit, "--- END OG CODE ---\n");
+
+    emit_fmt(&emit, "\n");
+    emit_fmt(&emit, "\n");
+
+    emit_ident_size(&emit, 2);
+    emit_fmt(&emit, "--- BEGIN AST ---\n");
+    cdump_unit(&emit, unit);
+    emit_fmt(&emit, "--- END AST ---\n");
+
+    emit_fmt(&emit, "\n");
+    emit_fmt(&emit, "\n");
+
+    emit_ident_size(&emit, 4);
+
+    emit_fmt(&emit, "--- BEGIN CODE ---\n");
     c2c_unit(&emit, unit);
+    emit_fmt(&emit, "--- END CODE ---\n");
+    emit_fmt(&emit, "\n");
 
     heap_alloc_deinit(&heap);
 
