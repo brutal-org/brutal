@@ -1,8 +1,7 @@
 #include <brutal/alloc.h>
 #include <brutal/debug.h>
 #include <brutal/io.h>
-#include <cc/c2c.h>
-#include <cc/gen/dump.h>
+#include <cc/gen.h>
 #include <cc/parse.h>
 
 int main(int argc, char const *argv[])
@@ -63,7 +62,7 @@ int main(int argc, char const *argv[])
     emit_ident_size(&emit, 4);
 
     emit_fmt(&emit, "--- BEGIN CODE ---\n");
-    c2c_unit(&emit, unit);
+    cgen_c_unit(&emit, unit);
     emit_fmt(&emit, "--- END CODE ---\n");
     emit_fmt(&emit, "\n");
 

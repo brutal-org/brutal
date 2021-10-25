@@ -1,4 +1,3 @@
-#include <cc/parse/lexer.h>
 #include <cc/parse/parser.h>
 
 CType cparse_compound_type(Lex *lex, bool is_union, Alloc *alloc)

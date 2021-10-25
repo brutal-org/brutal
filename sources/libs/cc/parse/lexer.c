@@ -80,24 +80,7 @@ struct
 
 static LexemeType clex_impl(Scan *scan)
 {
-    for (size_t i = 0; i < ARRAY_LENGTH(keywords); i++)
-    {
-        if (scan_skip_word(scan, str$(keywords[i].literal)))
-        {
-            return keywords[i].type;
-        }
-    }
-
-    if (isalpha(scan_curr(scan)) || scan_curr(scan) == '_')
-    {
-        while (isalnum(scan_curr(scan)) || scan_curr(scan) == '_')
-        {
-            scan_next(scan);
-        }
-
-        return CLEX_ATOM;
-    }
-    else if (isspace(scan_curr(scan)))
+    if (isspace(scan_curr(scan)))
     {
         while (isspace(scan_curr(scan)))
         {
@@ -123,6 +106,24 @@ static LexemeType clex_impl(Scan *scan)
         }
 
         return CLEX_COMMENT;
+    }
+
+    for (size_t i = 0; i < ARRAY_LENGTH(keywords); i++)
+    {
+        if (scan_skip_word(scan, str$(keywords[i].literal)))
+        {
+            return keywords[i].type;
+        }
+    }
+
+    if (isalpha(scan_curr(scan)) || scan_curr(scan) == '_')
+    {
+        while (isalnum(scan_curr(scan)) || scan_curr(scan) == '_')
+        {
+            scan_next(scan);
+        }
+
+        return CLEX_ATOM;
     }
 
     return LEXEME_INVALID;

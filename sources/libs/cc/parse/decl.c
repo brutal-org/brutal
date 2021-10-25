@@ -1,14 +1,5 @@
 #include <cc/parse/parser.h>
 
-/* 
-direct-declarator:
-    pointer direct-declarator
-    (direct-declarator)
-    direct-declarator [ type-qualifier-listopt assignment-expressionopt ]
-    direct-declarator ( parameter-type-list )
-    identifier
-*/
-
 CType cparse_declarator_postfix(Lex *lex, CType type, Alloc *alloc)
 {
     while (true)

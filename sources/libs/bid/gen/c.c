@@ -1,7 +1,7 @@
 #include <bid/bid.h>
 #include <cc/builder.h>
 #include <cc/builder/helper.h>
-#include <cc/c2c.h>
+#include <cc/gen.h>
 
 static CType bid2c_type(BidInterface const *interface, BidType const *type, Alloc *alloc);
 
@@ -843,5 +843,5 @@ void bid2c(BidInterface const *interface, Emit *emit, Alloc *alloc)
 
     bid2c_methods(&unit, interface, alloc);
 
-    c2c_unit(emit, unit);
+    cgen_c_unit(emit, unit);
 }
