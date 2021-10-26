@@ -3,7 +3,6 @@
 #include <brutal/io.h>
 #include <cc/gen.h>
 #include <cc/parse.h>
-#include <codegen/codegen.h>
 
 int main(int argc, char const *argv[])
 {
