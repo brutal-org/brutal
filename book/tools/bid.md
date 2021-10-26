@@ -1,16 +1,13 @@
+# Interface Definition language (BID)
 
-# Brutal Interface Definition language
-
-BID is a language used for generating C Inter Process Communication code. It is used for communicating with services.
-**This documentation is a simple look at BID, the spec/documentation may change, and may be outdated, or incomplete <!>.**
+Brutal Interface Definition language or simply BID is a language used for generating C Inter Process Communication code. It is used for communicating with services.
 
 ## Definitions
 
 - an `identifier` is every alphabetical character and numeric character (`[a-zA-Z0-9]`).
-
 - a `type` (not the keyword) is a struct, an identifier or an enum (see (#types-in-bid)).
 
-## Types in bid
+## Type
 
 In bid you have 3 class of types: primitives, structures, and enums.
 
@@ -54,7 +51,7 @@ enum {
 };
 ```
 
-## Bid Interface
+## Interface
 
 First each method/structure are placed in an interface, and each interface has a name:
 

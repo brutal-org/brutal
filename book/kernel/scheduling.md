@@ -1,6 +1,6 @@
-## Scheduling
+# Scheduling
 
-### The context
+## The Context
 
 For an os, scheduling is very important, its need to be optimized, fast, and responsive. We needed a scheduler that support multiple CPU. We also needed a scheduler that did the least task switch possible. For exemple, in a system with 4 cpu and 4 task we may have:
 
@@ -54,7 +54,7 @@ Here is the solution:
 
 this is way better, but here each process waits 1 tick and stays for 4 tick in the cpu. Each process here are on the same level.
 
-### The implementation
+## The Implementation
 
 So in brutal we have (this may change over time) a scheduler state for each task:
 
@@ -81,11 +81,11 @@ That's why we have 2 part of the scheduler:
 - when the number of running processes is lower than the number of cpu
 - when the number of running processes is higher than the number of cpu
 
-### When the number of running processes is lower than the number of cpu
+## When The Number Of Running Processes Is Lower Than The Number Of Cpu
 
 If the number of processes is lower than the number of cpu we don't need to switch context. But if we have 1 process that started running and it does not execute code we need to assign him a cpu. That's why we have 'idle cpu'. Lazy cpu are cpu that don't do anything for the moment. For exemple if we have 3 process and 5 core, we have 2 idle cpu. So if a cpu is idle and there is a process waiting to run, we give the process to the idle cpu. For cpu that are already running a process we just put the same process as the next process.
 
-### When the number of running processes is higher than the number of cpu
+## When The Number Of Running Processes Is Higher Than The Number Of Cpu
 
 If the number of processes is higher than the number of cpu we need to switch X process. Were X is equal to:
 
@@ -99,10 +99,10 @@ we can't switch higher than the cpu_count (we can't switch for 6 process using 5
 
 For each `schedule_count` we get the process that has run the longest and replace it with the process that waited the longest. But we can still have the case where we have a idle cpu. For exemple if a process is deleted or sleeping so when we get the most waiting process, we check if there is no idle cpu. If there is one, put the most waiting process in the idle cpu. If there is not replace the most running process with the most waiting process.
 
-### Cpu cache is important
+## CPU Cache Is Important
 
 The problem of interrupt is that they are really heavy, they invalidate the cache, they can take a lot of cpu cycles... So we need to send them only when they are needed. That mean that if a cpu don't need to switch to another process we don't send him an interrupt (if a process next task is equal to the process current task)
 
-### Task switch
+## Task Switch
 
 So for each cpu that need a switch the cpu 0 send him a IPI (inter process interrupt) number 100. The process set the current process to the next process, and do a context switch.

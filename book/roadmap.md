@@ -1,6 +1,58 @@
 # Roadmap
 
-## Milestone 1 - To userspace and beyond
+The following roadmap is always subject to change.
+
+## Current Milestone
+
+### Milestone 3 - ACPI, PCIe, BID, CC, Loader
+
+- [X] Fibers
+- [x] Event loop
+- [X] IRQ routing to userspace
+- [x] ACPI Server
+  - [x] MCFG
+- [x] PCIe Server
+  - [x] Device enumeration
+- [ ] BID (Interface definition language)
+  - [x] Parser
+  - [ ] Sema
+  - [ ] C code gen
+    - [ ] Client Code
+    - [x] Server Code
+    - [ ] Serialization
+- [ ] CC (C Compiler)
+  - [ ] Lexer
+  - [ ] Parser
+  - [ ] Sema
+  - [x] AST
+  - [ ] Code gen (LLVM?)
+  - [x] Code gen C
+- [ ] Bootloader
+  - [x] Load the kernel
+  - [x] Load modules
+  - [ ] Pass handover information
+
+## Upcoming Milestones
+
+### Milestone 4 - Filesystem and User Interfaces
+
+- [ ] VFS
+- [ ] ext2
+- [ ] Compositor
+- [ ] Shell
+
+### Milestone 5 - DOOM!
+
+- [ ] DOOM :rage2:
+
+### Milestone 6 - Networking
+
+- [ ] Implement TCP/IP
+- [ ] Send a message on IRC
+
+## Past Milestones
+
+### Milestone 1 - To userspace and beyond
 
 - [x] Baby steps (x86_64)
 - [x] GDT/IDT
@@ -17,7 +69,7 @@
 - [x] Syscalls
 - [x] SIMD (avx, sse, fpu, xsave)
 
-## Milestone 2 - Userspace, IPC, and Syscalls
+### Milestone 2 - Userspace, IPC, and Syscalls
 
 - [x] Syscalls
   - [x] log
@@ -35,51 +87,7 @@
 - [x] IPC
 - [x] IDL
 
-## Milestone 3 - ACPI, PCIe, BID, CC, Loader
-
-- [X] Fibers
-- [x] Event loop
-- [X] IRQ routing to userspace
-- [x] ACPI Server
-  - [x] MCFG
-- [x] PCIe Server
-  - [x] Device enumeration
-- [ ] BID (Interface definition language)
-  - [x] Parser
-  - [ ] Sema
-  - [ ] C code gen
-    - [ ] Client Code
-    - [x] Server Code
-    - [ ] Serialisation
-- [ ] CC (C Compiler)
-  - [ ] Lexer
-  - [ ] Parser
-  - [ ] Sema
-  - [x] AST
-  - [ ] Code gen (LLVM?)
-  - [x] Code gen C
-- [ ] Bootloader
-  - [x] Load the kernel
-  - [x] Load modules
-  - [ ] Pass handover information
-
-## Milestone 4 - Filesystem and User Interfaces
-
-- [ ] VFS
-- [ ] ext2
-- [ ] Compositor
-- [ ] Shell
-
-## Milestone 5 - DOOM!
-
-- [ ] DOOM :rage2:
-
-## Milestone 6 - Networking
-
-- [ ] Implement TCP/IP
-- [ ] Send a message on IRC
-
-## Good to have
+## Backlog
 
 - [ ] Multiboot support
 - [ ] FAT32

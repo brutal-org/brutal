@@ -1,0 +1,6 @@
+[book]
+authors = ["VAN BOSSUYT Nicolas"]
+language = "en"
+multilingual = false
+src = "."
+title = "The BRUTAL Handbook"

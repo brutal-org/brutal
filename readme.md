@@ -57,13 +57,13 @@ You can find instructions about building BRUTAL [here](book/01-04-build.md).
 
 Right now the main goal of brutal is to run doom.
 
-See the [roadmap](book/01-02-roadmap.md) file for more information on how we plan to get there and where you can contribute.
+See the [roadmap](book/roadmap.md) file for more information on how we plan to get there and where you can contribute.
 
 ## Acknowledgements
 
 This project takes inspirations and/or reuse code from the following projects.
 
-See [credits.md](book/01-03-credits.md)
+See [credits.md](book/credits.md)
 
 ## License
 

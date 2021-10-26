@@ -1,8 +1,33 @@
-## Syscalls
+# Syscalls
 
-The kernel syscalls are defined in the file `librairies/syscalls/syscalls.h`.
+- [Syscalls](#syscalls)
+  - [Debug](#debug)
+    - [br_log](#br_log)
+  - [Memory Management](#memory-management)
+    - [br_map](#br_map)
+    - [br_unmap](#br_unmap)
+  - [Object Management](#object-management)
+    - [br_create](#br_create)
+    - [br_create with task](#br_create-with-task)
+    - [br_create with mem_obj](#br_create-with-mem_obj)
+    - [br_create with space](#br_create-with-space)
+    - [br_create with irq](#br_create-with-irq)
+    - [br_close](#br_close)
+    - [br_stat](#br_stat)
+  - [Task Management](#task-management)
+    - [br_start](#br_start)
+    - [br_exit](#br_exit)
+    - [br_drop](#br_drop)
+  - [IPC](#ipc)
+    - [br_ipc](#br_ipc)
+    - [br_bind](#br_bind)
+    - [br_unbind](#br_unbind)
+    - [br_ack](#br_ack)
+  - [Input/Output](#inputoutput)
+    - [br_in](#br_in)
+    - [br_out](#br_out)
 
-> Note: these syscalls may change during the development of the kernel.
+## Debug
 
 ### br_log
 
@@ -15,6 +40,8 @@ The kernel syscalls are defined in the file `librairies/syscalls/syscalls.h`.
   - `BR_BAD_ADDRESS`: The address of the message was not located in user memory.
 
 This syscall display a message in the kernel logs. It's useful when trying to debug something.
+
+## Memory Management
 
 ### br_map
 
@@ -62,9 +89,11 @@ If `size` is equal to 0, the kernel will use the memory object size instead.
 
 This syscall unmaps a memory range from an address space.
 
+## Object Management
+
 ### br_create
 
-- Arguments:  
+- Arguments:
   - `BrObjectType type`: The object type.
   - (out) `BrId id`: The resulting object id.
   - (out) `BrHandle handle`: The resulting object handle.
@@ -76,7 +105,7 @@ This syscall unmaps a memory range from an address space.
 
 This syscall is used for making different kernel object (task, memory_space, memory object, irq mapping...).
 
-#### br_create with task
+### br_create with task
 
 - Arguments:
   - `StrFix128 name`: Task name.
@@ -88,7 +117,7 @@ This syscall is used for making different kernel object (task, memory_space, mem
 - Result:
   - `BR_BAD_HANDLE`: `space` is not a valid handle.
 
-#### br_create with mem_obj
+### br_create with mem_obj
 
 - Arguments:
   - (out/in) `uintptr_t addr`: Memory object physical addr.
@@ -102,7 +131,7 @@ This syscall is used for making different kernel object (task, memory_space, mem
 
 Create a memory object. If `addr` is equal to 0, let the kernel choose the physical address.
 
-#### br_create with space
+### br_create with space
 
 - Arguments:
   - `BrSpaceFlags flags`
@@ -110,7 +139,7 @@ Create a memory object. If `addr` is equal to 0, let the kernel choose the physi
 - Result:
   - `BR_SUCCESS`
 
-#### br_create with irq
+### br_create with irq
 
 - Arguments:
   - `BrIrqId irq`: Irq to map.
@@ -118,6 +147,31 @@ Create a memory object. If `addr` is equal to 0, let the kernel choose the physi
 - Result:
   - `BR_SUCCESS`
   - `BR_BAD_CAPABILITY`: The current process has not the `BR_CAP_IRQ` capability.
+
+### br_close
+
+- Arguments:
+  - `BrHandle handle`: handle to close.
+
+- Result:
+  - `BR_SUCCESS`
+  - `BR_BAD_HANDLE`: The handle was invalid.
+
+Closes an handle.
+
+### br_stat
+
+- Arguments:
+  - `BrHandle handle`: Object handle.
+  - (out) `BrHandleInfo info`: Object result info.
+
+- Result:
+  - `BR_SUCCESS`
+  - `BR_BAD_HANDLE`: `handle` is not a valid handle or the object is a not supported object.
+
+Used for getting information about an object.
+
+## Task Management
 
 ### br_start
 
@@ -146,6 +200,20 @@ The syscall begins the execution of a task.
 
 This syscall stops the execution of a task.
 
+### br_drop
+
+- Arguments:
+  - `BrTask task_handle`: Target task.
+  - `BrCap cap`: The capability to remove.
+
+- Result:
+  - `BR_SUCCESS`
+  - `BR_BAD_HANDLE`: The task handle was invalid.
+
+This syscall drop one or more task capabilities.
+
+## IPC
+
 ### br_ipc
 
 - Arguments: 
@@ -165,29 +233,6 @@ This syscall stops the execution of a task.
   - `BR_CHANNEL_EMPTY`: (only when receiving) The message channel was empty.
 
 This syscall is used for any IPC action. `deadline` is in tick (or currently in `ms`). If `deadline` is equal to 0 then the process will wait until a message is received.
-
-### br_drop
-
-- Arguments:
-  - `BrTask task_handle`: Target task.
-  - `BrCap cap`: The capability to remove.
-
-- Result:
-  - `BR_SUCCESS`
-  - `BR_BAD_HANDLE`: The task handle was invalid.
-
-This syscall drop one or more task capabilities.
-
-### br_close
-
-- Arguments:
-  - `BrHandle handle`: handle to close.
-
-- Result:
-  - `BR_SUCCESS`
-  - `BR_BAD_HANDLE`: The handle was invalid.
-
-This syscall closes a handle.
 
 ### br_bind
 
@@ -230,17 +275,8 @@ Unbind an irq for this current task.
 Ack an irq for this current task.
 Used for getting an interrupt again, after receiving one.
 
-### br_stat
 
-- Arguments:
-  - `BrHandle handle`: Object handle.
-  - (out) `BrHandleInfo info`: Object result info.
-
-- Result:
-  - `BR_SUCCESS`
-  - `BR_BAD_HANDLE`: `handle` is not a valid handle or the object is a not supported object.
-
-Used for getting information about an object.
+## Input/Output
 
 ### br_in
 

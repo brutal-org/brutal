@@ -1,4 +1,6 @@
-# Acknowledgements
+# Credits
+
+The BRUTAL Operating System takes inspirations and/or reuse code from the following projects.
 
 ## **limine-bootloader/limine**
 
