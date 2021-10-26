@@ -5,9 +5,9 @@ CFLAGS_WARN += \
 
 # --- Host compiler ---------------------------------------------------------- #
 
-CLANG?=clang-12
+LLVM_VERSION=-12
 
-HOST_CC=$(CLANG)
+HOST_CC=clang$(LLVM_VERSION)
 
 HOST_CFLAGS= \
 	-MD \
@@ -22,12 +22,12 @@ HOST_CFLAGS= \
 HOST_LD=ld.lld
 HOST_LDFLAGS=`pkg-config sdl2 --libs`
 
-HOST_AR=llvm-ar
+HOST_AR=llvm-ar$(LLVM_VERSION)
 HOST_ARFLAGS=rcs
 
 # --- Cross-Compiler --------------------------------------------------------- #
 
-CROSS_CC=$(CLANG) -target $(CONFIG_ARCH)-none-elf
+CROSS_CC=clang$(LLVM_VERSION) -target $(CONFIG_ARCH)-none-elf
 CROSS_CFLAGS= \
 	-MD \
 	$(CFLAGS_STD) \
@@ -57,5 +57,5 @@ CROSS_ULDFLAGS= \
 	-z max-page-size=0x1000 \
 	$(ARCH_LDFLAGS)
 
-CROSS_AR=ar
+CROSS_AR=llvm-ar$(LLVM_VERSION)
 CROSS_ARFLAGS=rcs

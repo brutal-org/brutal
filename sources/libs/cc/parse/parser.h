@@ -5,13 +5,7 @@
 
 CDecl cparse_decl(Lex *lex, Alloc *alloc);
 
-typedef struct
-{
-    Str name;
-    CType type;
-} CDeclarator;
-
-CDeclarator cparse_declarator(Lex *lex, CType type, Alloc *alloc);
+CType cparse_declarator(Lex *lex, CType type, Alloc *alloc);
 
 CExpr cparse_expr(Lex *lex, Alloc *alloc);
 
