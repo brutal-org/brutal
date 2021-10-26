@@ -204,11 +204,12 @@ union ldshape
 #undef CMPLXF
 #undef CMPLXL
 
-#define __CMPLX(x, y, t)    \
-    ((union {               \
-         _Complex t __z;    \
-         t __xy[2];         \
-     }){.__xy = {(x), (y)}} \
+#define __CMPLX(x, y, t)     \
+    ((union                  \
+      {                      \
+          _Complex t __z;    \
+          t __xy[2];         \
+      }){.__xy = {(x), (y)}} \
          .__z)
 
 #define CMPLX(x, y) __CMPLX(x, y, double)
