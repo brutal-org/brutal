@@ -25,7 +25,7 @@ HOST_CFLAGS= \
 	$(shell $(LLVM_CONFIG) --cflags)
 
 HOST_LD=ld.lld
-HOST_LDFLAGS=`pkg-config sdl2 --libs` $(shell $(LLVM_CONFIG) --ldflags)
+HOST_LDFLAGS=`pkg-config sdl2 --libs` $(shell $(LLVM_CONFIG) --ldflags)  $(shell $(LLVM_CONFIG) --libs)
 
 HOST_AR=llvm-ar$(LLVM_VERSION)
 ifeq (, $(shell which $(HOST_AR) 2> /dev/null))

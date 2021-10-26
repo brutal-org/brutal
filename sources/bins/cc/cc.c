@@ -3,6 +3,7 @@
 #include <brutal/io.h>
 #include <cc/gen.h>
 #include <cc/parse.h>
+#include <codegen/codegen.h>
 
 int main(int argc, char const *argv[])
 {
@@ -38,6 +39,13 @@ int main(int argc, char const *argv[])
     }
 
     CUnit unit = cparse_unit(&lex, base$(&heap));
+
+    Buffer object_buffer;
+    buffer_init(&object_buffer, 512, base$(&heap));
+
+    IoWriter object_buffer_writer = buffer_writer(&source_buffer);
+
+    codegen_from_unit(unit, &object_buffer_writer);
 
     Emit emit;
     emit_init(&emit, io_std_out());
