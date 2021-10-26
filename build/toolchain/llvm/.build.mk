@@ -6,6 +6,7 @@ CFLAGS_WARN += \
 # --- Host compiler ---------------------------------------------------------- #
 
 LLVM_VERSION ?=-12
+LLVM_CONFIG?=llvm-config$(LLVM_VERSION)
 
 HOST_CC=clang$(LLVM_VERSION)
 ifeq (, $(shell which $(HOST_CC) 2> /dev/null))
@@ -20,10 +21,11 @@ HOST_CFLAGS= \
 	$(HOST_CFLAGS_INC) \
 	-fsanitize=address \
 	-fsanitize=undefined \
-	`pkg-config sdl2 --cflags`
+	`pkg-config sdl2 --cflags` \
+	$(shell $(LLVM_CONFIG) --cflags)
 
 HOST_LD=ld.lld
-HOST_LDFLAGS=`pkg-config sdl2 --libs`
+HOST_LDFLAGS=`pkg-config sdl2 --libs` $(shell $(LLVM_CONFIG) --ldflags)
 
 HOST_AR=llvm-ar$(LLVM_VERSION)
 ifeq (, $(shell which $(HOST_AR) 2> /dev/null))
