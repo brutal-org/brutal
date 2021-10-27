@@ -67,3 +67,7 @@ bool scan_expect(Scan *self, char c);
 bool scan_expect_word(Scan *self, Str word);
 
 bool scan_dump_error(Scan *self, IoWriter *writer);
+
+/* --- Helpers -------------------------------------------------------------- */
+
+long scan_str_to_number(Str string);

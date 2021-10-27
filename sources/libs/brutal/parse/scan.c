@@ -275,3 +275,14 @@ bool scan_dump_error(Scan *self, IoWriter *writer)
 
     return true;
 }
+
+
+long scan_str_to_number(Str string)
+{
+    Scan scanner = {0};
+    scan_init(&scanner, string);
+
+    long val = scan_next_decimal(&scanner);
+
+    return val;
+}
