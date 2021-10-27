@@ -25,8 +25,21 @@ CType cparse_declarator_postfix(Lex *lex, CType type, Alloc *alloc)
         else if (lex_skip_type(lex, CLEX_LBRACKET))
         {
             cparse_eat_whitespace(lex);
+
+            // TODO: support negative 
+            if(lex_curr_type(lex) == CLEX_INTEGER)
+            {
+                long size = lex_curr(lex).integer_value;
+                type = ctype_array(type, size, alloc);
+                lex_next(lex);
+                cparse_eat_whitespace(lex);
+            }
+            else 
+            {
+                type = ctype_array(type, 0, alloc);
+            }
+            
             lex_expect(lex, CLEX_RBRACKET);
-            type = ctype_array(type, 0, alloc);
         }
         else
         {
