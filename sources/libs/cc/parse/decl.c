@@ -29,7 +29,7 @@ CType cparse_declarator_postfix(Lex *lex, CType type, Alloc *alloc)
             // TODO: support negative 
             if(lex_curr_type(lex) == CLEX_INTEGER)
             {
-                long size = lex_curr(lex).integer_value;
+                long size = 0  /* lex_curr(lex).integer_value TODO: implement an str_to_int function*/;
                 type = ctype_array(type, size, alloc);
                 lex_next(lex);
                 cparse_eat_whitespace(lex);

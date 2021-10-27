@@ -10,8 +10,7 @@ Lex lex(Scan *scan, LexFn *fn, Alloc *alloc)
     {
         scan_begin(scan);
 
-        Lexeme l = fn(scan);
-        l.str = scan_end(scan);
+        Lexeme l = { fn(scan), scan_end(scan)};
 
         vec_push(&self.lexemes, l);
     }
@@ -36,7 +35,6 @@ Lexeme lex_peek(Lex *self, int offset)
         return (Lexeme){
             LEXEME_EOF,
             str$(""),
-            0
         };
     }
 
