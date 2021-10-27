@@ -1,4 +1,39 @@
 #include <cc/parse/parser.h>
+/* 
+this function may be over-complicated but here is what it does: 
+
+    it tries to add an array at the last possible place in the ast: 
+
+    if we have 
+    int a[5][10]; 
+
+    we should have an ast converted from: 
+    array 10: 
+        array 5: 
+            int 
+
+    to this: 
+
+    array 5: 
+        array 10: 
+            int 
+    
+    so when we add an array we try to put it before the last non array entry in the ast. 
+
+    this function also take in account parenthesis.
+*/
+
+static void cparse_add_array_postfix(CType* current, int size, Alloc* alloc)
+{
+    if(current->type != CTYPE_ARRAY)
+    {
+        *current = ctype_array(*current, size, alloc);
+    }
+    else 
+    {
+        cparse_add_array_postfix(current->array_.subtype, size, alloc);
+    }
+}
 
 CType cparse_declarator_postfix(Lex *lex, CType type, Alloc *alloc)
 {
@@ -30,7 +65,7 @@ CType cparse_declarator_postfix(Lex *lex, CType type, Alloc *alloc)
             if(lex_curr_type(lex) == CLEX_INTEGER)
             {
                 long size = scan_str_to_number(lex_curr(lex).str);
-                type = ctype_array(type, size, alloc);
+                cparse_add_array_postfix(&type, size, alloc);
                 lex_next(lex);
                 cparse_eat_whitespace(lex);
             }
