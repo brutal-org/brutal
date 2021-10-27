@@ -3,6 +3,7 @@
 #include <brutal/io.h>
 #include <cc/gen.h>
 #include <cc/parse.h>
+#include <stdio.h>
 
 int main(int argc, char const *argv[])
 {
@@ -39,12 +40,14 @@ int main(int argc, char const *argv[])
 
     CUnit unit = cparse_unit(&lex, base$(&heap));
 
+    Module* mod = UNWRAP(cgen_llvm_unit(unit));
+    printf("%lli\n",(long long)mod);
+
     IoFile object_file;
     io_file_create(&object_file, str$(argv[2]));
 
     IoWriter object_file_writer = io_file_writer(&object_file);
-
-    codegen_from_unit(unit, &object_file_writer);
+    cgen_llvm_compile(mod, &object_file_writer);
 
     Emit emit;
     emit_init(&emit, io_std_out());
@@ -62,6 +65,13 @@ int main(int argc, char const *argv[])
     emit_fmt(&emit, "--- BEGIN AST ---\n");
     cdump_unit(&emit, unit);
     emit_fmt(&emit, "--- END AST ---\n");
+
+    emit_fmt(&emit, "\n");
+    emit_fmt(&emit, "\n");
+
+    emit_fmt(&emit, "--- BEGIN LLVM IR ---\n");
+    cgen_llvm_dump(mod);
+    emit_fmt(&emit, "--- END LLVM IR ---\n");
 
     emit_fmt(&emit, "\n");
     emit_fmt(&emit, "\n");

@@ -6,7 +6,7 @@
 
 static int codegen_initialized = 0;
 
-void codegen_init()
+void cgen_llvm_init()
 {
     if (codegen_initialized)
         return;
@@ -19,7 +19,7 @@ void codegen_init()
     codegen_initialized = 1;
 }
 
-MaybeError codegen_emit_object_file(LLVMModuleRef module, IoWriter *object_writer)
+MaybeError cgen_llvm_compile(Module *module, IoWriter *object_writer)
 {
     MaybeError result = SUCCESS;
     char *triple = LLVMGetDefaultTargetTriple();
@@ -61,14 +61,19 @@ cleanup:
     return result;
 }
 
-MaybeError codegen_from_unit(CUnit unit, IoWriter *object_writer)
+void cgen_llvm_dump(Module *mod)
 {
-    codegen_init();
-    MaybeError result = SUCCESS;
+    LLVMDumpModule(mod);
+}
+
+CGenResult cgen_llvm_unit(CUnit unit)
+{
+    cgen_llvm_init();
     // create context, module and builder
     LLVMContextRef context = LLVMContextCreate();
     LLVMModuleRef module = LLVMModuleCreateWithNameInContext("file_module", context);
     LLVMBuilderRef builder = LLVMCreateBuilderInContext(context);
+    CGenResult result = OK(CGenResult, module);
 
     vec_foreach(entry, &unit.units)
     {
@@ -91,18 +96,19 @@ MaybeError codegen_from_unit(CUnit unit, IoWriter *object_writer)
     if (LLVMVerifyModule(module, LLVMReturnStatusAction, &errorMsg))
     {
         fprintf(stderr, "%s\n", errorMsg);
-        result = ERR(MaybeError, ERR_UNDEFINED);
+        result = ERR(CGenResult, ERR_UNDEFINED);
         goto cleanup;
     }
-
-    // LLVMDumpModule(module);
-    codegen_emit_object_file(module, object_writer);
 
 cleanup:
     // clean memory
     LLVMDisposeMessage(errorMsg);
     LLVMDisposeBuilder(builder);
-    LLVMDisposeModule(module);
+    if (!result.succ)
+    {
+        LLVMDisposeModule(module);
+        return result;
+    }
     LLVMContextDispose(context);
     return result;
 }
