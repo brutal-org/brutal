@@ -1,5 +1,6 @@
 #include <cc/gen/llvm_gen.h>
 #include <stdio.h>
+#include <llvm-c/Analysis.h>
 #include <llvm-c/Core.h>
 #include <llvm-c/TargetMachine.h>
 
@@ -14,8 +15,7 @@ void codegen_emit_object_file(LLVMModuleRef module, IoWriter * /*object_writer*/
     {
         // TODO: Handle error
         fprintf(stderr, "%s\n", errorMsg);
-        LLVMDisposeMessage(errorMsg);
-        return;
+        goto cleanup;
     }
     char *cpu_name = LLVMGetHostCPUName();
     char *cpu_features = LLVMGetHostCPUFeatures();
@@ -25,10 +25,11 @@ void codegen_emit_object_file(LLVMModuleRef module, IoWriter * /*object_writer*/
 
     LLVMMemoryBufferRef buffer;
     LLVMTargetMachineEmitToMemoryBuffer(machine, module, LLVMObjectFile, &errorMsg, &buffer);
-
-    // clean memory
     LLVMDisposeMessage(cpu_features);
     LLVMDisposeMessage(cpu_name);
+
+cleanup:
+    // clean memory
     LLVMDisposeMessage(triple);
     LLVMDisposeMessage(errorMsg);
 }
@@ -46,10 +47,18 @@ void codegen_from_unit(CUnit unit, IoWriter *object_writer)
         {
         }
     }
+    char *errorMsg = NULL;
+    if (LLVMVerifyModule(module, LLVMReturnStatusAction, &errorMsg))
+    {
+        fprintf(stderr, "%s\n", errorMsg);
+        goto cleanup;
+    }
 
     codegen_emit_object_file(module, object_writer);
 
+cleanup:
     // clean memory
+    LLVMDisposeMessage(errorMsg);
     LLVMDisposeBuilder(builder);
     LLVMDisposeModule(module);
     LLVMContextDispose(context);
