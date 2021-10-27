@@ -5,7 +5,7 @@ CFLAGS_WARN += \
 
 # --- Host compiler ---------------------------------------------------------- #
 
-LLVM_VERSION=-12
+LLVM_VERSION ?=-12
 
 HOST_CC=clang$(LLVM_VERSION)
 
