@@ -6,6 +6,7 @@
     LEXEME(WHITESPACE)          \
     LEXEME(COMMENT)             \
     LEXEME(ATOM)                \
+    LEXEME(INTEGER)             \
     LEXEME(AUTO)                \
     LEXEME(BREAK)               \
     LEXEME(CASE)                \

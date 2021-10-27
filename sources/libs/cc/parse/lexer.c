@@ -78,7 +78,7 @@ struct
     {CLEX_SEMICOLON, ";"},
 };
 
-static LexemeType clex_impl(Scan *scan)
+static Lexeme clex_impl(Scan *scan)
 {
     if (isspace(scan_curr(scan)))
     {
@@ -87,7 +87,7 @@ static LexemeType clex_impl(Scan *scan)
             scan_next(scan);
         }
 
-        return CLEX_WHITESPACE;
+        return lexeme$(CLEX_WHITESPACE);
     }
     else if (scan_skip_word(scan, str$("/*")))
     {
@@ -96,7 +96,7 @@ static LexemeType clex_impl(Scan *scan)
             scan_next(scan);
         }
 
-        return CLEX_COMMENT;
+        return lexeme$(CLEX_COMMENT);
     }
     else if (scan_skip_word(scan, str$("//")))
     {
@@ -105,14 +105,14 @@ static LexemeType clex_impl(Scan *scan)
             scan_next(scan);
         }
 
-        return CLEX_COMMENT;
+        return lexeme$(CLEX_COMMENT);
     }
 
     for (size_t i = 0; i < ARRAY_LENGTH(keywords); i++)
     {
         if (scan_skip_word(scan, str$(keywords[i].literal)))
         {
-            return keywords[i].type;
+            return lexeme$(keywords[i].type);
         }
     }
 
@@ -123,10 +123,17 @@ static LexemeType clex_impl(Scan *scan)
             scan_next(scan);
         }
 
-        return CLEX_ATOM;
+        return lexeme$(CLEX_ATOM);
     }
 
-    return LEXEME_INVALID;
+    if(isdigit(scan_curr(scan)))
+    {
+        long value = scan_next_decimal(scan);
+
+        return lexeme_num$(CLEX_INTEGER, value);
+    }
+
+    return lexeme$(LEXEME_INVALID);
 }
 
 Lex clex(Scan *scan, Alloc *alloc)

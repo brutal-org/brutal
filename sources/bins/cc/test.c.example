@@ -1,1 +1,1 @@
-typedef _Bool *(*(*[][]))[][];
+typedef _Bool *(*(*[10][]))[][];

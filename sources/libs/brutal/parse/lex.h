@@ -19,7 +19,7 @@ typedef struct
     LexError error;
 } Lex;
 
-typedef LexemeType LexFn(Scan *scan);
+typedef Lexeme LexFn(Scan *scan);
 
 typedef Str LexToStrFn(LexemeType type);
 
