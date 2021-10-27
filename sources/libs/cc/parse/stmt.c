@@ -23,16 +23,12 @@ CStmt cparse_stmt(Lex *lex, Alloc *alloc)
     }
     else if (lex_skip_type(lex, CLEX_IF))
     {
-        cparse_eat_whitespace(lex);
-        lex_expect(lex, CLEX_LPARENT);
-        cparse_eat_whitespace(lex);
+        cparse_separator(lex, CLEX_LPARENT);
 
         CExpr expr = cparse_expr(lex, alloc);
 
-        cparse_eat_whitespace(lex);
-        lex_expect(lex, CLEX_RPARENT);
-        cparse_eat_whitespace(lex);
-
+        cparse_separator(lex, CLEX_RPARENT);
+        
         CStmt stmt_true = cparse_stmt(lex, alloc);
 
         cparse_eat_whitespace(lex);
@@ -50,27 +46,19 @@ CStmt cparse_stmt(Lex *lex, Alloc *alloc)
     }
     else if (lex_skip_type(lex, CLEX_FOR))
     {
-        cparse_eat_whitespace(lex);
-        lex_expect(lex, CLEX_LPARENT);
-        cparse_eat_whitespace(lex);
+        cparse_separator(lex, CLEX_LPARENT);
 
         CStmt init_stmt = cparse_stmt(lex, alloc);
 
-        cparse_eat_whitespace(lex);
-        lex_expect(lex, CLEX_SEMICOLON);
-        cparse_eat_whitespace(lex);
+        cparse_separator(lex, CLEX_SEMICOLON);
 
         CExpr cond_expr = cparse_expr(lex, alloc);
 
-        cparse_eat_whitespace(lex);
-        lex_expect(lex, CLEX_SEMICOLON);
-        cparse_eat_whitespace(lex);
+        cparse_separator(lex, CLEX_SEMICOLON);
 
         CExpr iter_expr = cparse_expr(lex, alloc);
 
-        cparse_eat_whitespace(lex);
-        lex_expect(lex, CLEX_RPARENT);
-        cparse_eat_whitespace(lex);
+        cparse_separator(lex, CLEX_RPARENT);
 
         CStmt stmt = cparse_stmt(lex, alloc);
 
@@ -78,15 +66,11 @@ CStmt cparse_stmt(Lex *lex, Alloc *alloc)
     }
     else if (lex_skip_type(lex, CLEX_WHILE))
     {
-        cparse_eat_whitespace(lex);
-        lex_expect(lex, CLEX_LPARENT);
-        cparse_eat_whitespace(lex);
+        cparse_separator(lex, CLEX_LPARENT);
 
         CExpr expr = cparse_expr(lex, alloc);
 
-        cparse_eat_whitespace(lex);
-        lex_expect(lex, CLEX_RPARENT);
-        cparse_eat_whitespace(lex);
+        cparse_separator(lex, CLEX_RPARENT);
 
         CStmt stmt = cparse_stmt(lex, alloc);
 
@@ -98,31 +82,22 @@ CStmt cparse_stmt(Lex *lex, Alloc *alloc)
 
         CStmt stmt = cparse_stmt(lex, alloc);
 
-        cparse_eat_whitespace(lex);
-        lex_expect(lex, CLEX_WHILE);
-        cparse_eat_whitespace(lex);
-        lex_expect(lex, CLEX_LPARENT);
-        cparse_eat_whitespace(lex);
+        cparse_separator(lex, CLEX_WHILE);
+        cparse_separator(lex, CLEX_LPARENT);
 
         CExpr expr = cparse_expr(lex, alloc);
 
-        cparse_eat_whitespace(lex);
-        lex_expect(lex, CLEX_RPARENT);
-        cparse_eat_whitespace(lex);
+        cparse_separator(lex, CLEX_RPARENT);
 
         return cstmt_do(expr, stmt, alloc);
     }
     else if (lex_skip_type(lex, CLEX_SWITCH))
     {
-        cparse_eat_whitespace(lex);
-        lex_expect(lex, CLEX_LPARENT);
-        cparse_eat_whitespace(lex);
+        cparse_separator(lex, CLEX_LPARENT);
 
         CExpr expr = cparse_expr(lex, alloc);
 
-        cparse_eat_whitespace(lex);
-        lex_expect(lex, CLEX_RPARENT);
-        cparse_eat_whitespace(lex);
+        cparse_separator(lex, CLEX_RPARENT);
 
         CStmt stmt = cparse_stmt(lex, alloc);
 
