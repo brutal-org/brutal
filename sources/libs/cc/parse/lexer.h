@@ -76,7 +76,9 @@
     LEXEME(EXCLAMATION)         \
     LEXEME(DOT)                 \
     LEXEME(ARROW)               \
-    LEXEME(SEMICOLON)
+    LEXEME(SEMICOLON)           \
+    LEXEME(STRING)              \
+    LEXEME(CHARACTER)
 
 // clang-format off
 
