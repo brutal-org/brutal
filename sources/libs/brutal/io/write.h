@@ -15,7 +15,7 @@ typedef struct
     size_t offset;
 } IoWriter;
 
-static inline IoResult io_write(IoWriter *self, uint8_t *data, size_t size)
+static inline IoResult io_write(IoWriter *self, const uint8_t *data, size_t size)
 {
     size_t written = TRY(IoResult, self->write(self->context, data, self->offset, size));
     self->offset += written;

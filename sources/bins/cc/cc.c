@@ -39,12 +39,12 @@ int main(int argc, char const *argv[])
 
     CUnit unit = cparse_unit(&lex, base$(&heap));
 
-    Buffer object_buffer;
-    buffer_init(&object_buffer, 512, base$(&heap));
+    IoFile object_file;
+    io_file_create(&object_file, str$(argv[2]));
 
-    IoWriter object_buffer_writer = buffer_writer(&source_buffer);
+    IoWriter object_file_writer = io_file_writer(&object_file);
 
-    codegen_from_unit(unit, &object_buffer_writer);
+    codegen_from_unit(unit, &object_file_writer);
 
     Emit emit;
     emit_init(&emit, io_std_out());
