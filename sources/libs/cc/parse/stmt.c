@@ -4,7 +4,7 @@ CStmt cparse_stmt(Lex *lex, Alloc *alloc)
 {
     if (lex_skip_type(lex, CLEX_LBRACE))
     {
-        cparse_eat_whitespace(lex);
+        cparse_whitespace(lex);
 
         CStmt block = cstmt_block(alloc);
 
@@ -12,11 +12,7 @@ CStmt cparse_stmt(Lex *lex, Alloc *alloc)
         {
             CStmt stmt = cparse_stmt(lex, alloc);
             cstmt_block_add(&block, stmt);
-
-            cparse_eat_whitespace(lex);
-            lex_skip_type(lex, CLEX_SEMICOLON);
-
-            cparse_eat_whitespace(lex);
+            cparse_separator(lex, CLEX_SEMICOLON);
         }
 
         return block;
@@ -28,17 +24,17 @@ CStmt cparse_stmt(Lex *lex, Alloc *alloc)
         CExpr expr = cparse_expr(lex, alloc);
 
         cparse_separator(lex, CLEX_RPARENT);
-        
+
         CStmt stmt_true = cparse_stmt(lex, alloc);
 
-        cparse_eat_whitespace(lex);
+        cparse_whitespace(lex);
 
         if (!lex_skip_type(lex, CLEX_ELSE))
         {
             return cstmt_if(expr, stmt_true, alloc);
         }
 
-        cparse_eat_whitespace(lex);
+        cparse_whitespace(lex);
 
         CStmt stmt_false = cparse_stmt(lex, alloc);
 
@@ -78,11 +74,12 @@ CStmt cparse_stmt(Lex *lex, Alloc *alloc)
     }
     else if (lex_skip_type(lex, CLEX_DO))
     {
-        cparse_eat_whitespace(lex);
+        cparse_whitespace(lex);
 
         CStmt stmt = cparse_stmt(lex, alloc);
 
         cparse_separator(lex, CLEX_WHILE);
+
         cparse_separator(lex, CLEX_LPARENT);
 
         CExpr expr = cparse_expr(lex, alloc);
@@ -105,7 +102,7 @@ CStmt cparse_stmt(Lex *lex, Alloc *alloc)
     }
     else if (lex_skip_type(lex, CLEX_RETURN))
     {
-        cparse_eat_whitespace(lex);
+        cparse_whitespace(lex);
 
         CExpr expr = cparse_expr(lex, alloc);
 
@@ -113,7 +110,7 @@ CStmt cparse_stmt(Lex *lex, Alloc *alloc)
     }
     else if (lex_skip_type(lex, CLEX_GOTO))
     {
-        cparse_eat_whitespace(lex);
+        cparse_whitespace(lex);
 
         if (lex_curr_type(lex) == CLEX_ATOM)
         {
@@ -129,7 +126,7 @@ CStmt cparse_stmt(Lex *lex, Alloc *alloc)
     }
     else if (lex_skip_type(lex, CLEX_CASE))
     {
-        cparse_eat_whitespace(lex);
+        cparse_whitespace(lex);
 
         CExpr expr = cparse_expr(lex, alloc);
 

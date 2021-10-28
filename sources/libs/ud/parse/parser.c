@@ -1,6 +1,7 @@
 #include <brutal/debug.h>
 #include <ud/ast/builder.h>
 #include <ud/ast/query.h>
+#include <ud/parse/parser.h>
 
 static UdExpr parse_expression(Scan *scan, Alloc *alloc);
 
@@ -238,7 +239,7 @@ static UdExpr parse_expression(Scan *scan, Alloc *alloc)
     }
     else if (is_num(scan_curr(scan)))
     {
-        return ud_num(scan_next_decimal(scan));
+        return ud_num(scan_next_number(scan));
     }
     else if (skip_keyword(scan, "#\\"))
     {

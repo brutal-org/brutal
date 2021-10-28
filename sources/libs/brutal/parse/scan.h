@@ -38,10 +38,6 @@ char scan_next(Scan *self);
 
 void scan_next_n(Scan *self, int n);
 
-long scan_next_digit(Scan *self);
-
-long scan_next_decimal(Scan *self);
-
 bool scan_skip(Scan *self, char c);
 
 bool scan_skip_word(Scan *self, Str word);
@@ -67,7 +63,3 @@ bool scan_expect(Scan *self, char c);
 bool scan_expect_word(Scan *self, Str word);
 
 bool scan_dump_error(Scan *self, IoWriter *writer);
-
-/* --- Helpers -------------------------------------------------------------- */
-
-long scan_str_to_number(Str string);

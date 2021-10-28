@@ -2,6 +2,7 @@
 
 #include <bid/ast.h>
 #include <brutal/io.h>
+#include <brutal/parse.h>
 
 BidInterface bid_parse(Scan *scan, Alloc *alloc);
 

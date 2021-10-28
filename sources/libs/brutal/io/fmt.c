@@ -2,6 +2,7 @@
 #include <brutal/base/attributes.h>
 #include <brutal/base/keywords.h>
 #include <brutal/io/fmt.h>
+#include <brutal/parse/nums.h>
 #include <brutal/text/case.h>
 #include <brutal/text/utf8.h>
 #include <brutal/text/vals.h>
@@ -172,7 +173,7 @@ static void fmt_parse_min_width(Fmt *fmt, Scan *scan)
         fmt->fill_with_zero = false;
     }
 
-    fmt->min_width = scan_next_decimal(scan);
+    fmt->min_width = scan_next_number(scan);
 }
 
 Fmt fmt_parse(Scan *scan)

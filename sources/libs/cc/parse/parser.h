@@ -19,6 +19,6 @@ CVal cparse_val(Lex *lex, Alloc *alloc);
 
 /* --- Miscs ---------------------------------------------------------------- */
 
-void cparse_eat_whitespace(Lex *lex);
+void cparse_whitespace(Lex *lex);
 
-bool cparse_separator(Lex* lex, LexemeType type);
+bool cparse_separator(Lex *lex, LexemeType type);

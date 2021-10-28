@@ -1,4 +1,3 @@
-#include <ctype.h>
 #include <json/json.h>
 
 static int is_closing_string(int c)
@@ -84,7 +83,7 @@ JsonValue json_parse(Scan *scan, Alloc *alloc)
     }
     else if (isdigit(scan_curr(scan)) || scan_curr(scan) == '-') // number
     {
-        return json_number(scan_next_decimal(scan));
+        return json_number(scan_next_number(scan));
     }
     else if (scan_skip_word(scan, str$("true"))) // boolean (true)
     {

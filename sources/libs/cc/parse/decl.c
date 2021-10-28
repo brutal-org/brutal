@@ -23,13 +23,13 @@ this function may be over-complicated but here is what it does:
     this function also take in account parenthesis.
 */
 
-static void cparse_add_array_postfix(CType* current, int size, Alloc* alloc)
+static void cparse_add_array_postfix(CType *current, int size, Alloc *alloc)
 {
-    if(current->type != CTYPE_ARRAY)
+    if (current->type != CTYPE_ARRAY)
     {
         *current = ctype_array(*current, size, alloc);
     }
-    else 
+    else
     {
         cparse_add_array_postfix(current->array_.subtype, size, alloc);
     }
@@ -41,7 +41,7 @@ CType cparse_declarator_postfix(Lex *lex, CType type, Alloc *alloc)
     {
         if (lex_skip_type(lex, CLEX_LBRACE))
         {
-            cparse_eat_whitespace(lex);
+            cparse_whitespace(lex);
 
             type = ctype_func(type, alloc);
 
@@ -52,28 +52,28 @@ CType cparse_declarator_postfix(Lex *lex, CType type, Alloc *alloc)
 
                 ctype_member(&type, nullstr, arg_type, alloc);
 
-                cparse_eat_whitespace(lex);
+                cparse_whitespace(lex);
             }
 
             lex_expect(lex, CLEX_RBRACE);
         }
         else if (lex_skip_type(lex, CLEX_LBRACKET))
         {
-            cparse_eat_whitespace(lex);
+            cparse_whitespace(lex);
 
-            // TODO: support negative 
-            if(lex_curr_type(lex) == CLEX_INTEGER)
+            // TODO: support negative
+            if (lex_curr_type(lex) == CLEX_INTEGER)
             {
-                long size = scan_str_to_number(lex_curr(lex).str);
+                long size = str_to_number(lex_curr(lex).str);
                 cparse_add_array_postfix(&type, size, alloc);
                 lex_next(lex);
-                cparse_eat_whitespace(lex);
+                cparse_whitespace(lex);
             }
-            else 
+            else
             {
                 type = ctype_array(type, 0, alloc);
             }
-            
+
             lex_expect(lex, CLEX_RBRACKET);
         }
         else
@@ -88,18 +88,18 @@ CType cparse_declarator(Lex *lex, CType type, Alloc *alloc)
     if (lex_skip_type(lex, CLEX_STAR))
     {
         type = ctype_ptr(type, alloc);
-        cparse_eat_whitespace(lex);
+        cparse_whitespace(lex);
         type = cparse_declarator(lex, type, alloc);
-        cparse_eat_whitespace(lex);
+        cparse_whitespace(lex);
         type = cparse_declarator_postfix(lex, type, alloc);
 
         return type;
     }
     else if (lex_skip_type(lex, CLEX_LPARENT))
     {
-        cparse_eat_whitespace(lex);
+        cparse_whitespace(lex);
         CType inner = cparse_declarator(lex, ctype_tail(), alloc);
-        cparse_eat_whitespace(lex);
+        cparse_whitespace(lex);
 
         lex_expect(lex, CLEX_RPARENT);
 
@@ -151,7 +151,7 @@ CDeclAttr cparse_decl_attr(Lex *lex)
             break;
         }
 
-        cparse_eat_whitespace(lex);
+        cparse_whitespace(lex);
     }
 
     return attr;
@@ -161,10 +161,10 @@ CDecl cparse_decl(Lex *lex, Alloc *alloc)
 {
     if (lex_skip_type(lex, CLEX_TYPEDEF))
     {
-        cparse_eat_whitespace(lex);
+        cparse_whitespace(lex);
 
         CType type = cparse_type(lex, alloc);
-        cparse_eat_whitespace(lex);
+        cparse_whitespace(lex);
         type = cparse_declarator(lex, type, alloc);
 
         return cdecl_type(str$("TODO"), type, alloc);

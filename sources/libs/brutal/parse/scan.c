@@ -94,59 +94,6 @@ void scan_next_n(Scan *self, int n)
     }
 }
 
-long scan_next_digit(Scan *self)
-{
-    char c = tolower(scan_next(self));
-
-    if (isalpha(c))
-    {
-        return c - 'a' + 10;
-    }
-    else
-    {
-        return c - '0';
-    }
-}
-
-long scan_next_decimal(Scan *self)
-{
-    long result = 0;
-    bool is_negative = false;
-    char sign = scan_peek(self, 0);
-
-    if (sign == '-')
-    {
-        is_negative = true;
-        scan_next(self);
-    }
-
-    while (!scan_ended(self))
-    {
-        char v = scan_peek(self, 0);
-        if (v >= '0' && v <= '9')
-        {
-            result *= 10;
-            result += v - '0';
-        }
-        else
-        {
-            if (is_negative)
-            {
-                result *= -1;
-            }
-            return result;
-        }
-        scan_next(self);
-    }
-
-    if (is_negative)
-    {
-        result *= -1;
-    }
-
-    return result;
-}
-
 bool scan_skip(Scan *self, char c)
 {
     if (scan_curr(self) == c)
@@ -274,15 +221,4 @@ bool scan_dump_error(Scan *self, IoWriter *writer)
     print(writer, "^ here\n");
 
     return true;
-}
-
-
-long scan_str_to_number(Str string)
-{
-    Scan scanner = {0};
-    scan_init(&scanner, string);
-
-    long val = scan_next_decimal(&scanner);
-
-    return val;
 }

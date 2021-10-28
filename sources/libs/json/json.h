@@ -3,6 +3,7 @@
 #include <brutal/alloc.h>
 #include <brutal/ds.h>
 #include <brutal/io.h>
+#include <brutal/parse.h>
 
 enum json_type
 {

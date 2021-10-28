@@ -13,13 +13,13 @@ CType cparse_compound_type(Lex *lex, bool is_union, Alloc *alloc)
         compound = ctype_struct(alloc);
     }
 
-    cparse_eat_whitespace(lex);
+    cparse_whitespace(lex);
 
     if (lex_curr(lex).type == CLEX_ATOM)
     {
         Str name = lex_next(lex).str;
         ctype_named(compound, name, alloc);
-        cparse_eat_whitespace(lex);
+        cparse_whitespace(lex);
     }
 
     if (!lex_skip_type(lex, CLEX_LBRACE))
@@ -27,7 +27,7 @@ CType cparse_compound_type(Lex *lex, bool is_union, Alloc *alloc)
         return compound;
     }
 
-    cparse_eat_whitespace(lex);
+    cparse_whitespace(lex);
 
     while (!lex_ended(lex) && lex_skip_type(lex, CLEX_SEMICOLON))
     {
@@ -36,10 +36,10 @@ CType cparse_compound_type(Lex *lex, bool is_union, Alloc *alloc)
 
         ctype_member(&type, str$("TODO"), type, alloc);
 
-        cparse_eat_whitespace(lex);
+        cparse_whitespace(lex);
     }
 
-    cparse_eat_whitespace(lex);
+    cparse_whitespace(lex);
 
     lex_expect(lex, CLEX_RBRACE);
 
@@ -60,13 +60,13 @@ CType cparse_type(Lex *lex, Alloc *alloc)
     {
         CType enum_type = ctype_enum(alloc);
 
-        cparse_eat_whitespace(lex);
+        cparse_whitespace(lex);
 
         if (lex_curr(lex).type == CLEX_ATOM)
         {
             Str name = lex_next(lex).str;
             ctype_named(enum_type, name, alloc);
-            cparse_eat_whitespace(lex);
+            cparse_whitespace(lex);
         }
 
         if (!lex_skip_type(lex, CLEX_LBRACE))
@@ -74,14 +74,14 @@ CType cparse_type(Lex *lex, Alloc *alloc)
             return enum_type;
         }
 
-        cparse_eat_whitespace(lex);
+        cparse_whitespace(lex);
 
         while (!lex_ended(lex) && lex_skip_type(lex, CLEX_SEMICOLON))
         {
-            cparse_eat_whitespace(lex);
+            cparse_whitespace(lex);
         }
 
-        cparse_eat_whitespace(lex);
+        cparse_whitespace(lex);
 
         lex_expect(lex, CLEX_RBRACE);
 
