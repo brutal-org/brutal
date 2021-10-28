@@ -19,7 +19,7 @@ void cgen_llvm_init()
     codegen_initialized = 1;
 }
 
-MaybeError cgen_llvm_compile(Module *module, IoWriter *object_writer)
+MaybeError cgen_llvm_compile(CGenContext *ctx, IoWriter *object_writer)
 {
     MaybeError result = SUCCESS;
     char *triple = LLVMGetDefaultTargetTriple();
@@ -30,50 +30,65 @@ MaybeError cgen_llvm_compile(Module *module, IoWriter *object_writer)
     {
         // TODO: Handle error
         fprintf(stderr, "%s\n", errorMsg);
-        result = ERR(MaybeError, ERR_UNDEFINED);
-        goto cleanup;
+        result = ERROR(ERR_UNDEFINED);
     }
-    char *cpu_name = LLVMGetHostCPUName();
-    char *cpu_features = LLVMGetHostCPUFeatures();
-    LLVMTargetMachineRef machine = LLVMCreateTargetMachine(target, triple,
-                                                           "", "",
-                                                           LLVMCodeGenLevelNone, LLVMRelocDefault, LLVMCodeModelDefault);
-
-    LLVMDisposeMessage(cpu_features);
-    LLVMDisposeMessage(cpu_name);
-
-    LLVMMemoryBufferRef buffer;
-    if (LLVMTargetMachineEmitToMemoryBuffer(machine, module, LLVMObjectFile, &errorMsg, &buffer))
+    else
     {
-        // TODO: Handle error
-        fprintf(stderr, "%s\n", errorMsg);
-        result = ERR(MaybeError, ERR_UNDEFINED);
-        goto cleanup;
-    }
-    LLVMDisposeTargetMachine(machine);
+        char *cpu_name = LLVMGetHostCPUName();
+        char *cpu_features = LLVMGetHostCPUFeatures();
+        LLVMTargetMachineRef machine = LLVMCreateTargetMachine(target, triple,
+                                                               cpu_name, cpu_features,
+                                                               LLVMCodeGenLevelNone, LLVMRelocDefault, LLVMCodeModelDefault);
 
-    io_write(object_writer, (const uint8_t *)LLVMGetBufferStart(buffer), LLVMGetBufferSize(buffer));
-    LLVMDisposeMemoryBuffer(buffer);
-cleanup:
+        LLVMDisposeMessage(cpu_features);
+        LLVMDisposeMessage(cpu_name);
+
+        LLVMMemoryBufferRef buffer;
+        if (LLVMTargetMachineEmitToMemoryBuffer(machine, ctx->mod, LLVMObjectFile, &errorMsg, &buffer))
+        {
+            // TODO: Handle error
+            fprintf(stderr, "%s\n", errorMsg);
+            result = ERR(MaybeError, ERR_UNDEFINED);
+        }
+        else
+        {
+            io_write(object_writer, (const uint8_t *)LLVMGetBufferStart(buffer), LLVMGetBufferSize(buffer));
+        }
+        LLVMDisposeTargetMachine(machine);
+        LLVMDisposeMemoryBuffer(buffer);
+    }
     // clean memory
     LLVMDisposeMessage(triple);
     LLVMDisposeMessage(errorMsg);
     return result;
 }
 
-void cgen_llvm_dump(Module *mod)
+void cgen_llvm_dump(CGenContext *ctx)
 {
-    LLVMDumpModule(mod);
+    LLVMDumpModule(ctx->mod);
 }
 
-CGenResult cgen_llvm_unit(CUnit unit)
+CGenContext cgen_llvm_init_context(const char *name)
+{
+    CGenContext result;
+    result.ctx = LLVMContextCreate();
+    result.mod = LLVMModuleCreateWithNameInContext(name, result.ctx);
+    return result;
+}
+
+void cgen_llvm_deinit_context(CGenContext *ctx)
+{
+    LLVMDisposeModule(ctx->mod);
+    LLVMContextDispose(ctx->ctx);
+}
+
+MaybeError cgen_llvm_unit(CGenContext *ctx, CUnit unit)
 {
     cgen_llvm_init();
-    // create context, module and builder
-    LLVMContextRef context = LLVMContextCreate();
-    LLVMModuleRef module = LLVMModuleCreateWithNameInContext("file_module", context);
-    LLVMBuilderRef builder = LLVMCreateBuilderInContext(context);
-    CGenResult result = OK(CGenResult, module);
+
+    MaybeError result = SUCCESS;
+
+    LLVMBuilderRef builder = LLVMCreateBuilderInContext(ctx->ctx);
 
     vec_foreach(entry, &unit.units)
     {
@@ -83,32 +98,25 @@ CGenResult cgen_llvm_unit(CUnit unit)
     }
 
     // Dummy function
-    LLVMTypeRef param_types[] = {LLVMInt32TypeInContext(context), LLVMInt32TypeInContext(context)};
-    LLVMTypeRef ret_type = LLVMFunctionType(LLVMInt32TypeInContext(context), param_types, 2, 0);
-    LLVMValueRef sum = LLVMAddFunction(module, "sum", ret_type);
+    LLVMTypeRef param_types[] = {LLVMInt32TypeInContext(ctx->ctx), LLVMInt32TypeInContext(ctx->ctx)};
+    LLVMTypeRef ret_type = LLVMFunctionType(LLVMInt32TypeInContext(ctx->ctx), param_types, 2, 0);
+    LLVMValueRef sum = LLVMAddFunction(ctx->mod, "sum", ret_type);
 
-    LLVMBasicBlockRef entry = LLVMAppendBasicBlockInContext(context, sum, "entry");
+    LLVMBasicBlockRef entry = LLVMAppendBasicBlockInContext(ctx->ctx, sum, "entry");
     LLVMPositionBuilderAtEnd(builder, entry);
     LLVMValueRef tmp = LLVMBuildAdd(builder, LLVMGetParam(sum, 0), LLVMGetParam(sum, 1), "tmp");
     LLVMBuildRet(builder, tmp);
 
     char *errorMsg = NULL;
-    if (LLVMVerifyModule(module, LLVMReturnStatusAction, &errorMsg))
+    if (LLVMVerifyModule(ctx->mod, LLVMReturnStatusAction, &errorMsg))
     {
         fprintf(stderr, "%s\n", errorMsg);
-        result = ERR(CGenResult, ERR_UNDEFINED);
-        goto cleanup;
+        result = ERROR(ERR_UNDEFINED);
     }
 
-cleanup:
     // clean memory
     LLVMDisposeMessage(errorMsg);
     LLVMDisposeBuilder(builder);
-    if (!result.succ)
-    {
-        LLVMDisposeModule(module);
-        return result;
-    }
-    LLVMContextDispose(context);
+
     return result;
 }

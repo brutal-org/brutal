@@ -2,9 +2,19 @@
 #include <cc/ast/unit.h>
 
 typedef void Module;
-typedef Result(Error, Module*) CGenResult;
+typedef void Context;
+
+typedef struct
+{
+    Module *mod;
+    Context *ctx;
+} CGenContext;
 
 void cgen_llvm_init();
-CGenResult cgen_llvm_unit(CUnit cunit);
-void cgen_llvm_dump(Module* module);
-MaybeError cgen_llvm_compile(Module* module, IoWriter *object_writer);
+
+CGenContext cgen_llvm_init_context(const char* name);
+void cgen_llvm_deinit_context(CGenContext *ctx);
+
+MaybeError cgen_llvm_unit(CGenContext *ctx, CUnit cunit);
+void cgen_llvm_dump(CGenContext *ctx);
+MaybeError cgen_llvm_compile(CGenContext *ctx, IoWriter *object_writer);

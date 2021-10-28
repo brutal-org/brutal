@@ -40,14 +40,14 @@ int main(int argc, char const *argv[])
 
     CUnit unit = cparse_unit(&lex, base$(&heap));
 
-    Module* mod = UNWRAP(cgen_llvm_unit(unit));
-    printf("%lli\n",(long long)mod);
+    CGenContext cgen_ctx = cgen_llvm_init_context("file_module");
+    cgen_llvm_unit(&cgen_ctx, unit);
 
     IoFile object_file;
     io_file_create(&object_file, str$(argv[2]));
 
     IoWriter object_file_writer = io_file_writer(&object_file);
-    cgen_llvm_compile(mod, &object_file_writer);
+    cgen_llvm_compile(&cgen_ctx, &object_file_writer);
 
     Emit emit;
     emit_init(&emit, io_std_out());
@@ -70,8 +70,9 @@ int main(int argc, char const *argv[])
     emit_fmt(&emit, "\n");
 
     emit_fmt(&emit, "--- BEGIN LLVM IR ---\n");
-    cgen_llvm_dump(mod);
+    cgen_llvm_dump(&cgen_ctx);
     emit_fmt(&emit, "--- END LLVM IR ---\n");
+    cgen_llvm_deinit_context(&cgen_ctx);
 
     emit_fmt(&emit, "\n");
     emit_fmt(&emit, "\n");
