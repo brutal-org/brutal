@@ -1,5 +1,12 @@
-LOADER_CC=clang$(LLVM_VERSION) 
+LOADER_CC=clang$(LLVM_VERSION)
+ifeq (, $(shell which $(LOADER_CC) 2> /dev/null))
+	LOADER_CC=clang
+endif
+
 LOADER_LD=clang$(LLVM_VERSION)
+ifeq (, $(shell which $(LOADER_LD) 2> /dev/null))
+	LOADER_LD=clang
+endif
 
 BINDIR_LOADER=bin/loader
 
@@ -31,6 +38,7 @@ LOADER_LIBS_SRC = \
 	sources/libs/brutal/io/std.c                    \
 	sources/libs/brutal/io/print.c                  \
 	sources/libs/brutal/parse/scan.c                \
+	sources/libs/brutal/parse/nums.c                \
 	sources/libs/brutal/parse/lex.c                 \
 	sources/libs/brutal/io/write.c                  \
 	sources/libs/stdc/ansi/string.c			        \

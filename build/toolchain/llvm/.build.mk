@@ -8,6 +8,9 @@ CFLAGS_WARN += \
 LLVM_VERSION ?=-12
 
 HOST_CC=clang$(LLVM_VERSION)
+ifeq (, $(shell which $(HOST_CC) 2> /dev/null))
+	HOST_CC=clang
+endif
 
 HOST_CFLAGS= \
 	-MD \
@@ -23,11 +26,19 @@ HOST_LD=ld.lld
 HOST_LDFLAGS=`pkg-config sdl2 --libs`
 
 HOST_AR=llvm-ar$(LLVM_VERSION)
+ifeq (, $(shell which $(HOST_AR) 2> /dev/null))
+	HOST_AR=llvm-ar
+endif
+
 HOST_ARFLAGS=rcs
 
 # --- Cross-Compiler --------------------------------------------------------- #
 
 CROSS_CC=clang$(LLVM_VERSION) -target $(CONFIG_ARCH)-none-elf
+ifeq (, $(shell which clang$(LLVM_VERSION) 2> /dev/null))
+	CROSS_CC=clang -target $(CONFIG_ARCH)-none-elf
+endif
+
 CROSS_CFLAGS= \
 	-MD \
 	$(CFLAGS_STD) \
@@ -57,5 +68,9 @@ CROSS_ULDFLAGS= \
 	-z max-page-size=0x1000 \
 	$(ARCH_LDFLAGS)
 
-CROSS_AR=llvm-ar$(LLVM_VERSION)
+CROSS_AR?=llvm-ar$(LLVM_VERSION)
+ifeq (, $(shell which $(CROSS_AR) 2> /dev/null))
+	CROSS_AR=llvm-ar
+endif
+
 CROSS_ARFLAGS=rcs
