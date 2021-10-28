@@ -29,17 +29,17 @@ static CType bid2c_primitive(BidInterface const *interface, BidPrimitive const *
 {
     Str res;
 
-    if (type->is_generic)
+    if (type->args.length > 0)
     {
         Str arguments = str_fmt(alloc, "");
-        for (int i = 0; i < type->generic_args.length; i++)
+        for (int i = 0; i < type->args.length; i++)
         {
             if (i != 0)
             {
                 arguments = str_fmt(alloc, "{},", arguments);
             }
 
-            arguments = str_fmt(alloc, "{} {}", arguments, type->generic_args.data[i]);
+            arguments = str_fmt(alloc, "{} {}", arguments, type->args.data[i]);
         }
 
         res = str_fmt(alloc, "{}({})", type->name, arguments);
@@ -106,11 +106,6 @@ static CType bid2c_type(BidInterface const *interface, BidType const *type, Allo
 
 static bool is_handle(BidType *type)
 {
-    if (bid_contain_attrib(type, str$("handle")))
-    {
-        return true;
-    }
-
     if (type->type != BID_TYPE_PRIMITIVE)
     {
         return false;

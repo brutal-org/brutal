@@ -28,6 +28,33 @@ static void skip_comment_and_space(Scan *scan)
         ;
 }
 
+static bool skip_keyword(Scan *scan, char const *kw)
+{
+    skip_comment_and_space(scan);
+    bool result = scan_skip_word(scan, str$(kw));
+    skip_comment_and_space(scan);
+
+    return result;
+}
+
+static bool skip_separator(Scan *scan, char sep)
+{
+    skip_comment_and_space(scan);
+    bool result = scan_skip(scan, sep);
+    skip_comment_and_space(scan);
+
+    return result;
+}
+
+static bool expect_separator(Scan *scan, char sep)
+{
+    skip_comment_and_space(scan);
+    bool result = scan_expect(scan, sep);
+    skip_comment_and_space(scan);
+
+    return result;
+}
+
 static int is_ident(int chr)
 {
     return chr == '_' || isalnum(chr);
@@ -49,46 +76,38 @@ static Str parse_ident(Scan *scan)
 
 static BidPrimitive parse_primitive(Scan *scan, Alloc *alloc)
 {
-    BidPrimitive type = {.is_generic = false};
+    BidPrimitive type = {};
     type.name = parse_ident(scan);
-    skip_comment_and_space(scan);
-    if (scan_skip(scan, '<'))
-    {
-        vec_init(&type.generic_args, alloc);
-        while (!scan_skip(scan, '>') && !scan_ended(scan))
-        {
-            skip_comment_and_space(scan);
-            vec_push(&type.generic_args, parse_ident(scan));
-            skip_comment_and_space(scan);
-            scan_skip(scan, ',');
-            skip_comment_and_space(scan);
-        }
-        skip_comment_and_space(scan);
 
-        scan_skip(scan, '>');
-        type.is_generic = true;
+    if (!skip_separator(scan, '('))
+    {
+        return type;
     }
+
+    vec_init(&type.args, alloc);
+
+    while (!skip_separator(scan, ')') && !scan_ended(scan))
+    {
+        vec_push(&type.args, parse_ident(scan));
+        skip_separator(scan, ',');
+    }
+
     return type;
 }
 
 static BidEnum parse_enum(Scan *scan, Alloc *alloc)
 {
     BidEnum type = {};
+
     vec_init(&type.members, alloc);
 
-    scan_skip(scan, '{');
-    skip_comment_and_space(scan);
+    skip_separator(scan, '{');
 
-    while (scan_curr(scan) != '}' && !scan_ended(scan))
+    while (!skip_separator(scan, '}') && !scan_ended(scan))
     {
         vec_push(&type.members, parse_ident(scan));
-
-        skip_comment_and_space(scan);
-        scan_skip(scan, ',');
-        skip_comment_and_space(scan);
+        skip_separator(scan, ',');
     }
-
-    scan_skip(scan, '}');
 
     return type;
 }
@@ -98,88 +117,24 @@ static BidStruct parse_struct(Scan *scan, Alloc *alloc)
     BidStruct type = {};
     vec_init(&type.members, alloc);
 
-    scan_skip(scan, '{');
-    skip_comment_and_space(scan);
+    skip_separator(scan, '{');
 
-    while (scan_curr(scan) != '}' && !scan_ended(scan))
+    while (!skip_separator(scan, '}') && !scan_ended(scan))
     {
         BidMember member = {};
 
         member.name = parse_ident(scan);
 
-        skip_comment_and_space(scan);
-        scan_expect(scan, ':');
-        skip_comment_and_space(scan);
+        expect_separator(scan, ':');
 
         member.type = parse_type(scan, alloc);
 
         vec_push(&type.members, member);
 
-        skip_comment_and_space(scan);
-        scan_skip(scan, ',');
-        skip_comment_and_space(scan);
+        skip_separator(scan, ',');
     }
-
-    scan_skip(scan, '}');
 
     return type;
-}
-
-static BidTypeAttribute parse_type_attrib(Scan *scan, Alloc *alloc)
-{
-    BidTypeAttribute res = {};
-
-    skip_comment_and_space(scan);
-    Str name = parse_ident(scan);
-    skip_comment_and_space(scan);
-
-    res.name = name;
-
-    if (!scan_skip(scan, '('))
-    {
-        return res;
-    }
-
-    vec_init(&res.args, alloc);
-
-    while (scan_curr(scan) != ')' && !scan_ended(scan))
-    {
-
-        skip_comment_and_space(scan);
-        Str arg = parse_ident(scan);
-        skip_comment_and_space(scan);
-
-        vec_push(&res.args, arg);
-
-        if (!scan_skip(scan, ','))
-        {
-            break;
-        }
-    }
-
-    skip_comment_and_space(scan);
-    scan_skip(scan, ')');
-    skip_comment_and_space(scan);
-
-    return res;
-}
-
-static void parse_type_attribs(BidType *type, Scan *scan, Alloc *alloc)
-{
-    vec_init(&type->attribs, alloc);
-
-    while (scan_curr(scan) != ']' && scan_ended(scan) == false)
-    {
-        vec_push(&type->attribs, parse_type_attrib(scan, alloc));
-        if (!scan_skip(scan, ','))
-        {
-            break;
-        }
-    }
-
-    skip_comment_and_space(scan);
-    scan_skip(scan, ']');
-    skip_comment_and_space(scan);
 }
 
 static BidType parse_type(Scan *scan, Alloc *alloc)
@@ -188,15 +143,13 @@ static BidType parse_type(Scan *scan, Alloc *alloc)
 
     type.type = BID_TYPE_NONE;
 
-    if (scan_skip_word(scan, str$("struct")) || scan_curr(scan) == '{')
+    if (skip_keyword(scan, "struct") || skip_separator(scan, '{'))
     {
-        skip_comment_and_space(scan);
         type.type = BID_TYPE_STRUCT;
         type.struct_ = parse_struct(scan, alloc);
     }
-    else if (scan_skip_word(scan, str$("enum")))
+    else if (skip_keyword(scan, "enum"))
     {
-        skip_comment_and_space(scan);
         type.type = BID_TYPE_ENUM;
         type.enum_ = parse_enum(scan, alloc);
     }
@@ -208,10 +161,6 @@ static BidType parse_type(Scan *scan, Alloc *alloc)
     }
 
     skip_comment_and_space(scan);
-    if (scan_skip(scan, '['))
-    {
-        parse_type_attribs(&type, scan, alloc);
-    }
 
     return type;
 }
@@ -222,9 +171,7 @@ static BidAlias parse_alias(Scan *scan, Alloc *alloc)
 
     alias.name = parse_ident(scan);
 
-    skip_comment_and_space(scan);
-    scan_skip(scan, ':');
-    skip_comment_and_space(scan);
+    expect_separator(scan, ':');
 
     alias.type = parse_type(scan, alloc);
 
@@ -254,11 +201,7 @@ static BidMethod parse_method(Scan *scan, Alloc *alloc)
 
     method.request = parse_type(scan, alloc);
 
-    skip_comment_and_space(scan);
-
-    scan_skip_word(scan, str$("->"));
-
-    skip_comment_and_space(scan);
+    skip_keyword(scan, "->");
 
     method.response = parse_type(scan, alloc);
 
@@ -273,47 +216,34 @@ BidInterface bid_parse(Scan *scan, Alloc *alloc)
     vec_init(&interface.events, alloc);
     vec_init(&interface.methods, alloc);
 
-    skip_comment_and_space(scan);
-
-    scan_expect_word(scan, str$("interface"));
-
-    skip_comment_and_space(scan);
+    skip_keyword(scan, "interface");
 
     interface.name = parse_ident(scan);
 
-    skip_comment_and_space(scan);
-
-    scan_expect(scan, '{');
-
-    skip_comment_and_space(scan);
+    expect_separator(scan, '{');
 
     while (scan_curr(scan) != '}' && !scan_ended(scan))
     {
-        if (scan_skip_word(scan, str$("errors")))
+        if (skip_keyword(scan, "errors"))
         {
-            skip_comment_and_space(scan);
             interface.errors = parse_enum(scan, alloc);
         }
-        else if (scan_skip_word(scan, str$("type")))
+        else if (skip_keyword(scan, "type"))
         {
-            skip_comment_and_space(scan);
             vec_push(&interface.aliases, parse_alias(scan, alloc));
         }
-        else if (scan_skip_word(scan, str$("event")))
+        else if (skip_keyword(scan, "event"))
         {
-            skip_comment_and_space(scan);
             vec_push(&interface.events, parse_event(scan, alloc));
         }
-        else if (scan_skip_word(scan, str$("method")))
+        else if (skip_keyword(scan, "method"))
         {
-            skip_comment_and_space(scan);
             vec_push(&interface.methods, parse_method(scan, alloc));
         }
-        else if (scan_skip_word(scan, str$("id")))
+        else if (skip_keyword(scan, "id"))
         {
-            skip_comment_and_space(scan);
-            scan_expect(scan, '=');
-            skip_comment_and_space(scan);
+            expect_separator(scan, '=');
+
             scan_expect_word(scan, str$("0x"));
 
             uint32_t id = 0;
@@ -331,14 +261,10 @@ BidInterface bid_parse(Scan *scan, Alloc *alloc)
             scan_throw(scan, str$("expected errors/type/event/method"), parse_ident(scan));
         }
 
-        skip_comment_and_space(scan);
-
-        scan_expect(scan, ';');
-
-        skip_comment_and_space(scan);
+        expect_separator(scan, ';');
     }
 
-    scan_expect(scan, '}');
+    expect_separator(scan, '}');
 
     vec_push(&interface.errors.members, str$("UNEXPECTED_MESSAGE"));
     vec_push(&interface.errors.members, str$("BAD_COMMUNICATION"));

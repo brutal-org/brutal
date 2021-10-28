@@ -22,11 +22,11 @@ interface fs
 
     method stat { handle: FileHandle } -> {
         is_dir: bool,
-        size: size_t, 
+        size: size_t,
         devid: FileSystemHandle,
     };
 
     method mount { path: BrMemObj, fshandle: BrId } -> { devid: FileHandle };
-    
+
     method umount { path: BrMemObj } -> { devid: FileHandle };
 }

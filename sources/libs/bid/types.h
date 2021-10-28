@@ -8,13 +8,6 @@ typedef struct
 {
     Str name;
     Vec(Str) args;
-} BidTypeAttribute;
-
-typedef struct
-{
-    Str name;
-    bool is_generic;
-    Vec(Str) generic_args;
 } BidPrimitive;
 
 typedef struct
@@ -48,8 +41,6 @@ struct bid_type
         BidEnum enum_;
         BidStruct struct_;
     };
-
-    Vec(BidTypeAttribute) attribs;
 };
 
 struct bid_member
@@ -58,5 +49,3 @@ struct bid_member
     BidType type;
     bool kernel_handle;
 };
-
-bool bid_contain_attrib(BidType *type, Str attrib);

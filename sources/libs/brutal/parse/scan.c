@@ -209,9 +209,9 @@ bool scan_dump_error(Scan *self, IoWriter *writer)
 
     Str line = str_sub(src, line_start, line_end);
 
-    print(writer, "    |\n");
+    print(writer, "    :\n");
     print(writer, "{3d} | {}\n", line_number, line);
-    print(writer, "    | ");
+    print(writer, "    : ");
 
     for (int i = 0; i < err.position - line_start; i++)
     {

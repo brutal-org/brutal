@@ -1,4 +1,4 @@
-interface Compositor
+interface Wm
 {
     errors
     {
