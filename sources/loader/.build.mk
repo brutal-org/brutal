@@ -1,3 +1,5 @@
+ifeq ($(CONFIG_TOOLCHAIN), llvm)
+
 LOADER_CC=clang$(LLVM_VERSION)
 ifeq (, $(shell which $(LOADER_CC) 2> /dev/null))
 	LOADER_CC=clang
@@ -104,3 +106,5 @@ run-loader: $(LOADER) $(KERNEL) $(BINDIR_LOADER)/tools/OVMF.fd
 		-m 256 \
 		-bios $(BINDIR_LOADER)/tools/OVMF.fd \
 		-drive file=fat:rw:$(BINDIR_LOADER)/image,media=disk,format=raw
+
+endif
