@@ -71,17 +71,17 @@ ALL+=$(BINDIR_LOADER)/BOOTX64.EFI
 $(LOADER): $(LOADER_OBJS)
 	@$(MKCWD)
 	$(ECHO) "loader LD" $<
-	@$(LOADER_LD) -o $@ $^ $(LOADER_LDFLAGS)
+	$(V)$(LOADER_LD) -o $@ $^ $(LOADER_LDFLAGS)
 
 $(BINDIR_LOADER)/%.c.o: sources/%.c
 	@$(MKCWD)
 	$(ECHO) "loader CC" $<
-	@$(LOADER_CC) -c -o $@ $< $(LOADER_CFLAGS)
+	$(V)$(LOADER_CC) -c -o $@ $< $(LOADER_CFLAGS)
 
 $(BINDIR_LOADER)/libs/%.c.o: sources/libs/%.c
 	@$(MKCWD)
 	$(ECHO) "loader CC" $<
-	@$(LOADER_CC) -c -o $@ $< $(LOADER_CFLAGS)
+	$(V)$(LOADER_CC) -c -o $@ $< $(LOADER_CFLAGS)
 
 $(BINDIR_LOADER)/tools/OVMF.fd:
 	$(MKCWD)

@@ -40,16 +40,16 @@ DEPENDENCIES += $(KERNEL_OBJ:.o=.d)
 $(BINDIR_KERNEL)/%.c.o: sources/%.c
 	$(ECHO) "kernel CC" $<
 	@$(MKCWD)
-	@$(CROSS_CC) -c -o $@ $< $(CROSS_KCFLAGS)
+	$(V)$(CROSS_CC) -c -o $@ $< $(CROSS_KCFLAGS)
 
 $(BINDIR_KERNEL)/%.s.o: sources/%.s
 	$(ECHO) "kernel AS" $<
 	@$(MKCWD)
-	@$(CROSS_AS) -o $@ $< $(CROSS_ASFLAGS)
+	$(V)$(CROSS_AS) -o $@ $< $(CROSS_ASFLAGS)
 
 $(KERNEL): $(KERNEL_OBJ)
 	$(ECHO) "kernel LD" $@
 	@$(MKCWD)
-	@$(CROSS_LD) -o $@ $^ $(CROSS_KLDFLAGS)
+	$(V)$(CROSS_LD) -o $@ $^ $(CROSS_KLDFLAGS)
 
 ALL+=$(KERNEL)

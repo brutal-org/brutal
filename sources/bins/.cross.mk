@@ -30,17 +30,17 @@ DEPENDENCIES += $(LIBS_OBJ:.o=.d)
 $(BINDIR_CROSS)/%.c.o: sources/%.c
 	$(ECHO) "brutal CC" $<
 	@$(MKCWD)
-	@$(CROSS_CC) -c -o $@ $< $(CROSS_UCFLAGS)
+	$(V)$(CROSS_CC) -c -o $@ $< $(CROSS_UCFLAGS)
 
 $(BINDIR_CROSS)/%.s.o: sources/%.s
 	$(ECHO) "brutal AS" $<
 	@$(MKCWD)
-	@$(CROSS_AS) -o $@ $< $(CROSS_ASFLAGS)
+	$(V)$(CROSS_AS) -o $@ $< $(CROSS_ASFLAGS)
 
 $(LIBS_BIN): $(LIBS_OBJ)
 	$(ECHO) "brutal AR" $@
 	@$(MKCWD)
-	@$(CROSS_AR) $(CROSS_ARFLAGS) $@ $^
+	$(V)$(CROSS_AR) $(CROSS_ARFLAGS) $@ $^
 
 define BIN_TEMPLATE
 
@@ -58,7 +58,7 @@ ALL+=$$($(1)_BIN)
 $$($(1)_BIN): $$($(1)_OBJ) $(LIBS_BIN)
 	$$(ECHO) "brutal LD" $$@
 	@$$(MKCWD)
-	@$(CROSS_LD) -o $$@ $$^ $(CROSS_ULDFLAGS)
+	$(V)$(CROSS_LD) -o $$@ $$^ $(CROSS_ULDFLAGS)
 
 endef
 

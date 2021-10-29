@@ -8,12 +8,18 @@ export LC_ALL=C
 ifndef ECHO
 T := $(shell $(MAKE) $(MAKECMDGOALS) --no-print-directory \
       -nrRf $(firstword $(MAKEFILE_LIST)) \
-      ECHO="%COUNT_ME%" | grep -c "%COUNT_ME%")
+      ECHO="__COUNT_ME__" | grep -c "__COUNT_ME__")
 
 N := x
 C = $(words $N)$(eval N := x $N)
 
 ECHO = @echo -e "[$C/$T]"
+endif
+
+ifeq ($(VERBOSE), yes)
+	V:=
+else
+	V:=@
 endif
 
 CFLAGS_STD ?= \

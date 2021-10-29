@@ -1,8 +1,11 @@
 #!/bin/bash
+
+set -e
+
 sudo apt update
 
 # LLVM/CLANG
-bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
+sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
 sudo apt install -y clang-12 llvm-12 lld 
 
 # GCC/binutils

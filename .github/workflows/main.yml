@@ -73,16 +73,16 @@ jobs:
 
       - name: Build All
         run: |
-          make CONFIG_TOOLCHAIN=${{matrix.toolchain}} all
+          make VERBOSE=yes CONFIG_TOOLCHAIN=${{matrix.toolchain}} all
 
       - name: Run Tests
         run: |
-          make CONFIG_TOOLCHAIN=${{matrix.toolchain}} run-test
+          make VERBOSE=yes CONFIG_TOOLCHAIN=${{matrix.toolchain}} run-test
 
       - name: Run BID
         run: |
-          make CONFIG_TOOLCHAIN=${{matrix.toolchain}} run-bid
+          make VERBOSE=yes CONFIG_TOOLCHAIN=${{matrix.toolchain}} run-bid
 
       - name: Run UD
         run: |
-          make CONFIG_TOOLCHAIN=${{matrix.toolchain}} run-ud
+          make VERBOSE=yes CONFIG_TOOLCHAIN=${{matrix.toolchain}} run-ud
