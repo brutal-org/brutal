@@ -107,9 +107,9 @@ static LexemeType clex_impl(Scan *scan)
 
         return (CLEX_COMMENT);
     }
-    else if(scan_skip_word(scan, str$("\"")))
+    else if (scan_skip_word(scan, str$("\"")))
     {
-        
+
         while (!scan_skip(scan, '"') && !scan_ended(scan))
         {
             scan_next(scan);
@@ -117,16 +117,15 @@ static LexemeType clex_impl(Scan *scan)
 
         return (CLEX_STRING);
     }
-    else if(scan_skip_word(scan, str$("'")))
+    else if (scan_skip_word(scan, str$("'")))
     {
-        if(scan_curr(scan) != '\'') // case for just ''  
+        if (scan_curr(scan) != '\'') // case for just ''
         {
             scan_next(scan);
         }
 
         scan_skip(scan, '\'');
         return CLEX_CHARACTER;
-
     }
 
     for (size_t i = 0; i < ARRAY_LENGTH(keywords); i++)
@@ -147,9 +146,9 @@ static LexemeType clex_impl(Scan *scan)
         return (CLEX_ATOM);
     }
 
-    if(isdigit(scan_curr(scan)))
+    if (isdigit(scan_curr(scan)))
     {
-        while(isdigit(scan_curr(scan)) && !scan_ended(scan))
+        while (isdigit(scan_curr(scan)) && !scan_ended(scan))
         {
             scan_next(scan);
         }

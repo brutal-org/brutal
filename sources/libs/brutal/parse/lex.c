@@ -10,7 +10,7 @@ Lex lex(Scan *scan, LexFn *fn, Alloc *alloc)
     {
         scan_begin(scan);
 
-        Lexeme l = { fn(scan), scan_end(scan)};
+        Lexeme l = {fn(scan), scan_end(scan)};
 
         vec_push(&self.lexemes, l);
     }
