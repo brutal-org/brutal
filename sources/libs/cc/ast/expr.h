@@ -21,6 +21,8 @@ typedef enum
     CEXPR_CAST,
     CEXPR_TERNARY,
     CEXPR_INITIALIZER,
+
+    CEXPR_COUNT
 } CExprType;
 
 typedef enum
@@ -136,6 +138,8 @@ struct cexpr
 };
 
 Str cop_to_str(COp type);
+
+Str cexpr_type_to_str(CExprType type);
 
 int cop_pre(COp cop);
 

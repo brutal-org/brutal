@@ -27,6 +27,7 @@ typedef enum
     CSTMT_LABEL,
     CSTMT_CASE,
     CSTMT_DEFAULT,
+    CSTMT_COUNT
 } CStmtType;
 
 typedef struct cstmt CStmt;
@@ -95,3 +96,5 @@ struct cstmt
         } case_;
     };
 };
+
+Str cstmt_type_to_str(CStmtType type);

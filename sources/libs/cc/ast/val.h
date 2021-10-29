@@ -13,6 +13,7 @@ typedef enum
     CVAL_UNSIGNED,
     CVAL_FLOAT,
     CVAL_STRING,
+    CVAL_COUNT,
 } CValType;
 
 typedef struct
@@ -27,3 +28,5 @@ typedef struct
         Str string_;
     };
 } CVal;
+
+Str cval_type_to_str(CValType type);

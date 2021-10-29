@@ -46,6 +46,25 @@ Str cop_to_str(COp type)
     return str$(cop_type_to_str[type]);
 }
 
+static const char *cexpr_type_to_str_raw[COP_COUNT] = {
+    [CEXPR_EMPTY] = "empty",
+    [CEXPR_SELF] = "self",
+    [CEXPR_CONSTANT] = "constant",
+    [CEXPR_IDENT] = "identifier",
+    [CEXPR_PREFIX] = "prefix",
+    [CEXPR_INFIX] = "infix",
+    [CEXPR_POSTFIX] = "postfix",
+    [CEXPR_CALL] = "call",
+    [CEXPR_CAST] = "cast",
+    [CEXPR_TERNARY] = "ternary",
+    [CEXPR_INITIALIZER] = "initializer",
+};
+
+Str cexpr_type_to_str(CExprType type)
+{
+    return str$(cexpr_type_to_str_raw[type]);
+}
+
 static int cop_precedence_table[COP_COUNT] = {
     [COP_INC] = 1,
     [COP_DEC] = 1,
