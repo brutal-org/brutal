@@ -122,9 +122,11 @@ void cdump_expr(Emit *emit, CExpr expr)
 
     case CEXPR_CONSTANT:
         cdump_value(emit, expr.constant_);
+        break;
 
     case CEXPR_IDENT:
         emit_fmt(emit, "identifier: {}\n", expr.ident_);
+        break;
 
     case CEXPR_POSTFIX:
         emit_fmt(emit, "op: {}\n", cop_to_str(expr.postfix_.op));

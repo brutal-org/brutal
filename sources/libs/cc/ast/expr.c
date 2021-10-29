@@ -46,7 +46,7 @@ Str cop_to_str(COp type)
     return str$(cop_type_to_str[type]);
 }
 
-static const char *cexpr_type_to_str_raw[COP_COUNT] = {
+static const char *cexpr_type_to_str_raw[CEXPR_COUNT] = {
     [CEXPR_EMPTY] = "empty",
     [CEXPR_SELF] = "self",
     [CEXPR_CONSTANT] = "constant",
