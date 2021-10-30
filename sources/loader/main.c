@@ -119,7 +119,7 @@ void loader_boot(LoaderEntry *entry, Buffer *config_buf)
 
     entry_point(&handover, 0xC001B001);
 
-    assert_unreachable();
+    panic$("entry_point should no return!");
 }
 
 void loader_menu(void)
@@ -159,5 +159,5 @@ EFIStatus efi_main(EFIHandle handle, EFISystemTable *st)
 
     loader_menu();
 
-    assert_unreachable();
+    panic$("loader_menu should no return!");
 }

@@ -100,7 +100,6 @@ HostIoOpenFileResult host_io_file_open(Str path)
 
     if (status != EFI_SUCCESS)
     {
-        assert_unreachable();
         return ERR(HostIoOpenFileResult, ERR_UNDEFINED);
     }
     else
@@ -112,7 +111,7 @@ HostIoOpenFileResult host_io_file_open(Str path)
 HostIoOpenFileResult host_io_file_create(Str path)
 {
     UNUSED(path);
-    assert_unreachable();
+    panic$("host_io_file_create() not implemented");
 }
 
 MaybeError host_io_file_close(HostIoFile handle)
@@ -142,7 +141,7 @@ IoResult host_io_write_file(HostIoFile handle, uint8_t const *data, size_t size)
     UNUSED(handle);
     UNUSED(data);
     UNUSED(size);
-    assert_unreachable();
+    panic$("host_io_write_file() not implemented");
 }
 
 IoResult host_io_read_std(IoStdChannel channel, uint8_t *data, size_t size)
@@ -150,7 +149,7 @@ IoResult host_io_read_std(IoStdChannel channel, uint8_t *data, size_t size)
     UNUSED(channel);
     UNUSED(data);
     UNUSED(size);
-    assert_unreachable();
+    panic$("host_io_read_std() not implemented");
 }
 
 IoResult host_io_write_std(IoStdChannel channel, uint8_t const *data, size_t size)

@@ -1,3 +1,5 @@
+#include <brutal/base/attributes.h>
+#include <brutal/debug/locked.h>
 #include <brutal/io/fmt.h>
 #include <brutal/io/print.h>
 #include <brutal/parse/scan.h>
@@ -12,9 +14,17 @@ PrintValue print_val_unsigned(FmtUInt val)
     return (PrintValue){nullstr, PRINT_UNSIGNED, {._unsigned = val}};
 }
 
-PrintValue print_val_float(double val)
+PrintValue print_val_float(MAYBE_UNUSED double val)
 {
+#if !defined(__kernel__) && !defined(__loader__)
     return (PrintValue){nullstr, PRINT_FLOAT, {._float = val}};
+#else
+    return (PrintValue){
+        nullstr,
+        PRINT_STRING,
+        {._string = str$("<float>")},
+    };
+#endif
 }
 
 PrintValue print_val_cstring(char const *val)
@@ -61,10 +71,10 @@ IoResult print_dispatch(IoWriter *writer, Fmt fmt, PrintValue value)
         {
             return fmt_unsigned(fmt, writer, value._unsigned);
         }
-
+#if !defined(__kernel__) && !defined(__loader__)
     case PRINT_FLOAT:
         return fmt_float(fmt, writer, value._float);
-
+#endif
     case PRINT_STRING:
         return fmt_string(fmt, writer, value._string);
 
@@ -73,6 +83,8 @@ IoResult print_dispatch(IoWriter *writer, Fmt fmt, PrintValue value)
 
     case PRINT_CHAR:
         return fmt_char(fmt, writer, value._char);
+    default:
+        panic$("No formater for value of type {}", value.type)
     }
 
     return OK(IoResult, 0);

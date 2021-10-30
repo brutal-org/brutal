@@ -1,3 +1,4 @@
+#include <brutal/debug.h>
 #include <cc/gen/dump.h>
 
 void cdump_value(Emit *emit, CVal value)
@@ -9,17 +10,21 @@ void cdump_value(Emit *emit, CVal value)
     case CVAL_SIGNED:
         emit_fmt(emit, "{}", value.signed_);
         break;
+
     case CVAL_UNSIGNED:
         emit_fmt(emit, "{}", value.unsigned_);
         break;
+
     case CVAL_FLOAT:
         emit_fmt(emit, "{}", value.float_);
         break;
+
     case CVAL_STRING:
         emit_fmt(emit, "\"{}\"", value.string_);
         break;
+
     default:
-        assert_unreachable();
+        panic$("unknown value type {}", value.type);
     }
 
     emit_fmt(emit, "\n");
@@ -110,7 +115,7 @@ void cdump_type(Emit *emit, CType type)
         break;
 
     default:
-        assert_unreachable();
+        panic$("unknown ctype type {}", type.type);
     }
 
     emit_deident(emit);
@@ -118,7 +123,7 @@ void cdump_type(Emit *emit, CType type)
 
 void cdump_expr(Emit *emit, CExpr expr)
 {
-    emit_fmt(emit, "expr:{} \n", cexpr_type_to_str(expr.type));
+    emit_fmt(emit, "expr:{} ", cexpr_type_to_str(expr.type));
     emit_ident(emit);
 
     switch (expr.type)
@@ -171,8 +176,15 @@ void cdump_expr(Emit *emit, CExpr expr)
         break;
 
     case CEXPR_TERNARY:
+        emit_fmt(emit, "\n");
+
+        emit_fmt(emit, "cond: ");
         cdump_expr(emit, *expr.ternary_.expr_cond);
+
+        emit_fmt(emit, "true: ");
         cdump_expr(emit, *expr.ternary_.expr_true);
+
+        emit_fmt(emit, "false: ");
         cdump_expr(emit, *expr.ternary_.expr_false);
         break;
 
@@ -184,7 +196,7 @@ void cdump_expr(Emit *emit, CExpr expr)
         break;
 
     default:
-        assert_unreachable();
+        panic$("unknown cexpr type {}", expr.type);
     }
 
     emit_deident(emit);
@@ -192,9 +204,10 @@ void cdump_expr(Emit *emit, CExpr expr)
 
 void cdump_stmt(Emit *emit, CStmt stmt)
 {
-    todo$("dump stmt");
     UNUSED(emit);
     UNUSED(stmt);
+
+    panic$("cdump stmt not implemented");
 }
 
 void cdump_decl(Emit *emit, CDecl decl)

@@ -21,9 +21,9 @@ bool test_run(struct test test)
     {
         test_alloc_begin_test();
         test.func();
-        task_exit(&runner, TASK_EXIT_SUCCESS);
         test_alloc_end_test();
-        assert_unreachable();
+        task_exit(&runner, TASK_EXIT_SUCCESS);
+        panic$("tak_exit returned")
     }
     else
     {

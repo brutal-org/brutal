@@ -102,11 +102,6 @@ TEST_WITH_FLAGS(assert_lower_than_should_fail, TEST_EXPECTED_TO_FAIL)
     assert_lower_than(96, 72);
 }
 
-TEST_WITH_FLAGS(assert_unreachable_should_fail, TEST_EXPECTED_TO_FAIL)
-{
-    assert_unreachable();
-}
-
 TEST(assert_equal_str_pass)
 {
     assert_str_equal(str$("foo"), str$("foo"));

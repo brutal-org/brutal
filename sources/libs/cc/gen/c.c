@@ -1,3 +1,4 @@
+#include <brutal/debug.h>
 #include <cc/gen/c.h>
 
 /* --- CVal ----------------------------------------------------------------- */
@@ -23,7 +24,7 @@ void cgen_c_value(Emit *emit, CVal value)
         break;
 
     default:
-        emit_fmt(emit, "");
+        panic$("Unknown CVal type {}", value.type);
         break;
     }
 }
@@ -292,8 +293,7 @@ static void cgen_c_expr_pre(Emit *emit, CExpr expr, int parent_pre)
         break;
 
     default:
-        panic$("invalid !");
-        break;
+        panic$("Unknow cexpr type {}", expr.type);
     }
 
     if (pre > parent_pre)
@@ -520,11 +520,11 @@ void cgen_c_decl(Emit *emit, CDecl decl)
     else if (decl.type == CDECL_VAR)
     {
         cgen_c_type_start(emit, decl.var_.type);
-
         emit_fmt(emit, " {} ", decl.name);
-
         cgen_c_type_end(emit, decl.var_.type);
-        if (decl.var_.expr.type != CEXPR_INVALID && decl.var_.expr.type != CEXPR_EMPTY)
+
+        if (decl.var_.expr.type != CEXPR_INVALID &&
+            decl.var_.expr.type != CEXPR_EMPTY)
         {
             emit_fmt(emit, "=");
             cgen_c_expr(emit, decl.var_.expr);
@@ -532,30 +532,14 @@ void cgen_c_decl(Emit *emit, CDecl decl)
     }
     else if (decl.type == CDECL_FUNC)
     {
-        // need to do (int) cast because gcc is not good :(
-        assert_equal((int)decl.func_.type.type, (int)CTYPE_FUNC);
-
         CType func_type = decl.func_.type;
 
-        // return:
-        cgen_c_type(emit, *func_type.func_.ret);
+        // Declarator
+        cgen_c_type_start(emit, func_type);
+        emit_fmt(emit, " {}", decl.name);
+        cgen_c_type_end(emit, func_type);
 
-        // name
-        emit_fmt(emit, " {}(", decl.name);
-
-        // args
-        int first = 0;
-        vec_foreach(v, &func_type.func_.params)
-        {
-            if (first != 0)
-            {
-                emit_fmt(emit, ", ");
-            }
-            first++;
-            cgen_c_member(emit, v);
-        }
-
-        emit_fmt(emit, ")\n");
+        // Body
         cgen_c_stmt(emit, decl.func_.body);
     }
 }

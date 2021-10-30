@@ -1,7 +1,5 @@
 #pragma once
 
-#include <brutal/base.h>
-#include <brutal/debug.h>
 #include <brutal/ds.h>
 #include <cc/ast/val.h>
 
@@ -36,6 +34,8 @@ typedef enum
     CTYPE_RESTRICT = (1 << 1),
     CTYPE_VOLATILE = (1 << 2),
 } CTypeAttr;
+
+#define CTYPE_ARRAY_UNBOUNDED (-1)
 
 typedef struct ctype CType;
 typedef struct ctype_member CTypeMember;

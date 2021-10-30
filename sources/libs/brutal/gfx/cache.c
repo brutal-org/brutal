@@ -36,23 +36,23 @@ void gfx_cache_end(GfxCache *self, MAYBE_UNUSED GfxSurface surface)
         switch (command->type)
         {
         case GFX_COMMAND_RECT:
-            todo$("Implement RECT command.");
+            panic$("Implement RECT command.");
             break;
 
         case GFX_COMMAND_LINE:
-            todo$("Implement LINE command.");
+            panic$("Implement LINE command.");
             break;
 
         case GFX_COMMAND_TEXT:
-            todo$("Implement TEXT command.");
+            panic$("Implement TEXT command.");
             break;
 
         case GFX_COMMAND_POLY:
-            todo$("Implement POLY command.");
+            panic$("Implement POLY command.");
             break;
 
         default:
-            assert_unreachable();
+            panic$("Unknown command {}", command->type);
             break;
         }
     }

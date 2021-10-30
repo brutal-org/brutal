@@ -136,5 +136,3 @@
                    #LHS, #RHS, __lhs, __rhs);                    \
         }                                                        \
     })
-
-#define assert_unreachable() ({ panic$("We reach the unreachable"); })

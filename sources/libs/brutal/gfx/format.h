@@ -83,7 +83,7 @@ static inline void gfx_pixel_store(GfxColor color, void *dst, GfxPixelFormat for
     break;
 
     default:
-        assert_unreachable();
+        panic$("Unknown pixel format {}", format);
     }
 }
 
@@ -116,7 +116,7 @@ static inline GfxColor gfx_pixel_load(const void *src, GfxPixelFormat format)
     }
 
     default:
-        assert_unreachable();
+        panic$("Unknown pixel format {}", format);
     }
 }
 
@@ -137,6 +137,6 @@ static inline size_t gfx_pixel_size(GfxPixelFormat format)
         return sizeof(GfxPixelBGRA8888);
 
     default:
-        assert_unreachable();
+        panic$("Unknown pixel format {}", format);
     }
 }

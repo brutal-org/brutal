@@ -67,7 +67,7 @@ void arch_entry_main(Handover *handover)
     init_start(handover);
 
     sched_stop(task_self(), 0);
-    assert_unreachable();
+    panic$("sched_stop(self) returned!");
 }
 
 void arch_entry_other(void)
@@ -87,5 +87,5 @@ void arch_entry_other(void)
     cpu_enable_interrupts();
 
     sched_stop(task_self(), 0);
-    assert_unreachable();
+    panic$("sched_stop(self) returned!");
 }

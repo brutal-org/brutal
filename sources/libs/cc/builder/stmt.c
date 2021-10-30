@@ -1,3 +1,4 @@
+#include <brutal/debug.h>
 #include <cc/builder/stmt.h>
 
 CStmt cstmt_empty(void)
@@ -38,7 +39,7 @@ void cstmt_block_add(CStmt *self, CStmt stmt)
 {
     if (self->type != CSTMT_BLOCK)
     {
-        panic$("cstmt_block_add should only be called with block");
+        panic$("Invalid use of cstmt_block_add().");
     }
 
     vec_push(&self->block_.stmts, stmt);

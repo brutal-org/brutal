@@ -1,6 +1,6 @@
 #include <bid/bid.h>
+#include <brutal/debug.h>
 #include <cc/builder.h>
-#include <cc/builder/helper.h>
 #include <cc/gen.h>
 
 static CType bid2c_type(BidInterface const *interface, BidType const *type, Alloc *alloc);
@@ -100,7 +100,7 @@ static CType bid2c_type(BidInterface const *interface, BidType const *type, Allo
         return bid2c_struct(interface, &type->struct_, alloc);
 
     default:
-        panic$("invalid type");
+        panic$("Unknow type {}", type->type);
     }
 }
 

@@ -53,6 +53,6 @@ static inline GfxColor gfx_paint_sample(GfxPaint paint, float x, float y)
         return paint.fill;
 
     default:
-        panic_todo$("Implement other paint types.");
+        panic$("Other paint types not implemented.");
     }
 }

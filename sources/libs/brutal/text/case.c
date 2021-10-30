@@ -387,6 +387,6 @@ Buffer case_change(Case c, Str str, Alloc *alloc)
         return case_to_sponge(str, alloc);
 
     default:
-        assert_unreachable();
+        panic$("unknown text casing {}", c);
     }
 }

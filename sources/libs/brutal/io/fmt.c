@@ -284,6 +284,8 @@ IoResult fmt_unsigned(Fmt self, IoWriter *writer, FmtUInt value)
     return io_write(writer, buffer, i);
 }
 
+#if !defined(__kernel__) && !defined(__loader__)
+
 IoResult fmt_float(Fmt self, IoWriter *writer, double value)
 {
     if (isnan(value))
@@ -325,6 +327,8 @@ IoResult fmt_float(Fmt self, IoWriter *writer, double value)
 
     return OK(IoResult, written);
 }
+
+#endif
 
 IoResult fmt_char(Fmt self, IoWriter *writer, unsigned int character)
 {

@@ -12,15 +12,6 @@ static Str log_color(LogLevel level)
     case LOG_PANIC:
         return str$("");
 
-    case LOG_TODO:
-        return str$("");
-
-    case LOG_FIXME:
-        return str$("");
-
-    case LOG_DEBUG:
-        return str$("");
-
     default:
     case LOG_DEFAULT:
         return str$("");
@@ -34,18 +25,9 @@ static Str log_prefix(LogLevel level)
     case LOG_PANIC:
         return str$("panic");
 
-    case LOG_TODO:
-        return str$("todo");
-
-    case LOG_FIXME:
-        return str$("fixme");
-
-    case LOG_DEBUG:
-        return str$("debug");
-
     default:
     case LOG_DEFAULT:
-        return str$("info");
+        return str$("");
     }
 }
 

@@ -1,3 +1,4 @@
+#include <brutal/debug.h>
 #include <cc/builder/type.h>
 
 CType ctype_error(void)

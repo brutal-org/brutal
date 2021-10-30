@@ -1,3 +1,4 @@
+#include <brutal/debug.h>
 #include <cc/builder/expr.h>
 
 CExpr cexpr_empty(void)
@@ -362,6 +363,6 @@ void cexpr_member(CExpr *self, CExpr expr)
     }
     else
     {
-        panic$("cepxr_initializer_push_element must be used with array initializer or struct initializer");
+        panic$("Invalid use of cexpr_member");
     }
 }
