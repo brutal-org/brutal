@@ -24,3 +24,9 @@ bool cparse_skip_separator(Lex *lex, LexemeType type)
     cparse_whitespace(lex);
     return result;
 }
+
+bool cparse_is_separator(Lex *lex, LexemeType type)
+{
+    cparse_whitespace(lex);
+    return lex_curr_type(lex) == type;
+}

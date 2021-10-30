@@ -24,3 +24,5 @@ void cparse_whitespace(Lex *lex);
 bool cparse_expect_separator(Lex *lex, LexemeType type);
 
 bool cparse_skip_separator(Lex *lex, LexemeType type);
+
+bool cparse_is_separator(Lex *lex, LexemeType type);

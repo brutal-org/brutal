@@ -214,6 +214,9 @@ static void cgen_c_expr_pre(Emit *emit, CExpr expr, int parent_pre)
 
     switch (expr.type)
     {
+    case CEXPR_EMPTY:
+        break;
+
     case CEXPR_CONSTANT:
         cgen_c_value(emit, expr.constant_);
         break;
@@ -302,7 +305,7 @@ static void cgen_c_expr_pre(Emit *emit, CExpr expr, int parent_pre)
         break;
 
     default:
-        panic$("Unknow cexpr type {}", expr.type);
+        panic$("Unknown cexpr type {}", expr.type);
     }
 
     if (pre > parent_pre)
@@ -334,6 +337,8 @@ void cgen_c_stmt(Emit *emit, CStmt stmt)
 {
     switch (stmt.type)
     {
+    case CSTMT_EMPTY:
+        break;
 
     case CSTMT_DECL:
         cgen_c_decl(emit, *stmt.decl_.decl);
@@ -365,7 +370,7 @@ void cgen_c_stmt(Emit *emit, CStmt stmt)
         emit_fmt(emit, "if (");
 
         cgen_c_expr(emit, stmt.if_.expr);
-        emit_fmt(emit, ") \n");
+        emit_fmt(emit, ")\n");
 
         if (stmt.if_.stmt_true->type != CSTMT_BLOCK)
         {
@@ -380,7 +385,7 @@ void cgen_c_stmt(Emit *emit, CStmt stmt)
 
         if (stmt.if_.stmt_false->type != CSTMT_EMPTY)
         {
-            emit_fmt(emit, "else\n");
+            emit_fmt(emit, "\nelse\n");
             if (stmt.if_.stmt_true->type != CSTMT_BLOCK)
             {
                 emit_ident(emit);
@@ -547,6 +552,8 @@ void cgen_c_decl(Emit *emit, CDecl decl)
         cgen_c_type_start(emit, func_type);
         emit_fmt(emit, " {}", decl.name);
         cgen_c_type_end(emit, func_type);
+
+        emit_fmt(emit, "\n", decl.name);
 
         // Body
         cgen_c_stmt(emit, decl.func_.body);

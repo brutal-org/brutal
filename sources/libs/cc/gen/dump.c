@@ -108,6 +108,15 @@ void cdump_type(Emit *emit, CType type)
 
     case CTYPE_FUNC:
         emit_fmt(emit, "func\n");
+        emit_fmt(emit, "ret:");
+        cdump_type(emit, *type.func_.ret);
+
+        vec_foreach(param, &type.func_.params)
+        {
+            emit_fmt(emit, "{}:", param.name);
+            cdump_type(emit, param.type);
+        }
+
         break;
 
     case CTYPE_NAME:
@@ -204,10 +213,80 @@ void cdump_expr(Emit *emit, CExpr expr)
 
 void cdump_stmt(Emit *emit, CStmt stmt)
 {
-    UNUSED(emit);
-    UNUSED(stmt);
+    emit_fmt(emit, "stmt:{}", cstmt_type_to_str(stmt.type));
+    emit_ident(emit);
 
-    panic$("cdump stmt not implemented");
+    switch (stmt.type)
+    {
+    case CSTMT_INVALID:
+    case CSTMT_EMPTY:
+        emit_fmt(emit, "\n");
+        break;
+
+    case CSTMT_DECL:
+        cdump_decl(emit, *stmt.decl_.decl);
+        emit_fmt(emit, "\n");
+        break;
+
+    case CSTMT_EXPR:
+        cdump_expr(emit, stmt.expr_.expr);
+        emit_fmt(emit, "\n");
+        break;
+
+    case CSTMT_BLOCK:
+        emit_fmt(emit, "\n");
+        vec_foreach(inner, &stmt.block_.stmts)
+        {
+            cdump_stmt(emit, inner);
+        }
+        break;
+
+    case CSTMT_IF:
+        cdump_expr(emit, stmt.if_.expr);
+        emit_fmt(emit, "\ntrue:");
+        cdump_stmt(emit, *stmt.if_.stmt_true);
+        emit_fmt(emit, "\nfalse:");
+        cdump_stmt(emit, *stmt.if_.stmt_false);
+        emit_fmt(emit, "\n");
+        break;
+
+    case CSTMT_FOR:
+        emit_fmt(emit, "\ninit:");
+        cdump_stmt(emit, *stmt.for_.init_stmt);
+        emit_fmt(emit, "\ncond:");
+        cdump_expr(emit, stmt.for_.cond_expr);
+        emit_fmt(emit, "\ninc:");
+        cdump_expr(emit, stmt.for_.iter_expr);
+        emit_fmt(emit, "\nbody:");
+        cdump_stmt(emit, *stmt.for_.stmt);
+        emit_fmt(emit, "\n");
+        break;
+
+    case CSTMT_WHILE:
+        cdump_expr(emit, stmt.while_.expr);
+        emit_fmt(emit, "\nbody:");
+        cdump_stmt(emit, *stmt.while_.stmt);
+        emit_fmt(emit, "\n");
+        break;
+
+    case CSTMT_DO:
+        cdump_stmt(emit, *stmt.do_.stmt);
+        emit_fmt(emit, "\nwhile:");
+        cdump_expr(emit, stmt.do_.expr);
+        emit_fmt(emit, "\n");
+        break;
+
+    case CSTMT_SWITCH:
+        cdump_expr(emit, stmt.switch_.expr);
+        emit_fmt(emit, "\n");
+        cdump_stmt(emit, *stmt.switch_.stmt);
+        break;
+    default:
+        panic$("unknown cstmt type {}", stmt.type);
+        break;
+    }
+
+    emit_deident(emit);
 }
 
 void cdump_decl(Emit *emit, CDecl decl)

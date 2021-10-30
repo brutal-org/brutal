@@ -7,13 +7,16 @@ CType cparse_declarator_postfix(Lex *lex, CType type, Alloc *alloc)
     {
         CType func = ctype_func(ctype_tail(), alloc);
 
-        while (cparse_skip_separator(lex, CLEX_COMMA))
+        if (!cparse_skip_separator(lex, CLEX_RPARENT))
         {
-            CDeclarator decl = cparse_declarator(lex, alloc);
-            ctype_member(&func, decl.name, decl.type, alloc);
-        }
+            do
+            {
+                CDeclarator decl = cparse_declarator(lex, alloc);
+                ctype_member(&func, decl.name, decl.type, alloc);
+            } while (cparse_skip_separator(lex, CLEX_COMMA));
 
-        cparse_expect_separator(lex, CLEX_RPARENT);
+            cparse_expect_separator(lex, CLEX_RPARENT);
+        }
 
         CType ret = cparse_declarator_postfix(lex, type, alloc);
         ctype_append(&func, ret);
@@ -157,7 +160,7 @@ CDecl cparse_decl(Lex *lex, Alloc *alloc)
 
         if (decl.type.type == CTYPE_FUNC)
         {
-            if (cparse_skip_separator(lex, CLEX_LBRACE))
+            if (cparse_is_separator(lex, CLEX_LBRACE))
             {
                 CStmt body = cparse_stmt(lex, alloc);
                 return cdecl_attrib(cdecl_func(decl.name, decl.type, body, alloc), attr);
