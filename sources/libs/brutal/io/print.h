@@ -14,10 +14,10 @@ typedef enum
 {
     PRINT_SIGNED,
     PRINT_UNSIGNED,
+    PRINT_FLOAT,
     PRINT_STRING,
     PRINT_POINTER,
     PRINT_CHAR,
-    PRINT_TRANS,
 } PrintType;
 
 typedef struct print_value PrintValue;
@@ -28,12 +28,6 @@ typedef struct
     PrintValue *values;
 } PrintArgs;
 
-typedef struct
-{
-    Str fmt;
-    PrintArgs args;
-} PrintTrans;
-
 struct print_value
 {
     Str name;
@@ -43,16 +37,18 @@ struct print_value
     {
         FmtInt _signed;
         FmtUInt _unsigned;
+        double _float;
         Str _string;
         void *_pointer;
         char _char;
-        PrintTrans _trans;
     };
 };
 
 PrintValue print_val_signed(FmtInt);
 
 PrintValue print_val_unsigned(FmtUInt);
+
+PrintValue print_val_float(double);
 
 PrintValue print_val_string(Str);
 
@@ -61,8 +57,6 @@ PrintValue print_val_cstring(char const *);
 PrintValue print_val_char(char);
 
 PrintValue print_val_pointer(void *);
-
-PrintValue print_val_trans(PrintTrans);
 
 // clang-format off
 
@@ -73,6 +67,8 @@ PrintValue print_val_trans(PrintTrans);
         signed int: print_val_signed,           \
         signed long: print_val_signed,          \
 	    signed long long: print_val_signed,     \
+        float: print_val_float,                 \
+        double: print_val_float,                \
                                                 \
         unsigned char: print_val_unsigned,      \
         unsigned short: print_val_unsigned,     \
@@ -83,12 +79,11 @@ PrintValue print_val_trans(PrintTrans);
         char const*: print_val_cstring,         \
         char: print_val_char,                   \
         Str: print_val_string,                  \
-        PrintTrans: print_val_trans,            \
         void*: print_val_pointer                \
     )(VALUE),
 
 #define named$(NAME, VALUE) ({                  \
-       PrintValue pv = PRINT_MATCH(VALUE);            \
+       PrintValue pv = PRINT_MATCH(VALUE);      \
        pv.name = str$(NAME);                    \
        pv;                                      \
     })
@@ -105,21 +100,12 @@ PrintValue print_val_trans(PrintTrans);
     IFNE(__VA_ARGS__)   \
     (PRINT_ARGS_N, PRINT_ARGS_)(__VA_ARGS__)
 
-IoWriteResult print_impl(IoWriter *writer, Str format, PrintArgs args);
+IoResult print_impl(IoWriter *writer, Str format, PrintArgs args);
 
 #define print(writer, fmt, ...) \
     print_impl(writer, str$(fmt), PRINT_ARGS(__VA_ARGS__))
 
-#define print_trans(_fmt, ...)              \
-    (PrintTrans)                            \
-    {                                       \
-        str$(_fmt), PRINT_ARGS(__VA_ARGS__) \
-    }
+Str str_fmt_impl(Alloc *alloc, Str format, PrintArgs args);
 
-#define empty_trans() \
-    print_trans("")
-
-Str fmt_str_impl(Alloc *alloc, PrintTrans trans);
-
-#define str_fmt(alloc, _fmt, ...) \
-    fmt_str_impl(alloc, print_trans((_fmt), __VA_ARGS__))
+#define str_fmt(alloc, fmt, ...) \
+    str_fmt_impl(alloc, str$(fmt), PRINT_ARGS(__VA_ARGS__))

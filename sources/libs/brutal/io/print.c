@@ -12,6 +12,11 @@ PrintValue print_val_unsigned(FmtUInt val)
     return (PrintValue){nullstr, PRINT_UNSIGNED, {._unsigned = val}};
 }
 
+PrintValue print_val_float(double val)
+{
+    return (PrintValue){nullstr, PRINT_FLOAT, {._float = val}};
+}
+
 PrintValue print_val_cstring(char const *val)
 {
     return (PrintValue){nullstr, PRINT_STRING, {._string = str$(val)}};
@@ -32,18 +37,10 @@ PrintValue print_val_pointer(void *ptr)
     return (PrintValue){nullstr, PRINT_POINTER, {._pointer = ptr}};
 }
 
-PrintValue print_val_trans(PrintTrans trans)
-{
-    return (PrintValue){nullstr, PRINT_TRANS, {._trans = trans}};
-}
-
-IoWriteResult print_dispatch(IoWriter *writer, Fmt fmt, PrintValue value)
+IoResult print_dispatch(IoWriter *writer, Fmt fmt, PrintValue value)
 {
     switch (value.type)
     {
-
-    case PRINT_TRANS:
-        return print_impl(writer, value._trans.fmt, value._trans.args);
 
     case PRINT_SIGNED:
         if (fmt.type == FMT_CHAR)
@@ -65,6 +62,9 @@ IoWriteResult print_dispatch(IoWriter *writer, Fmt fmt, PrintValue value)
             return fmt_unsigned(fmt, writer, value._unsigned);
         }
 
+    case PRINT_FLOAT:
+        return fmt_float(fmt, writer, value._float);
+
     case PRINT_STRING:
         return fmt_string(fmt, writer, value._string);
 
@@ -75,10 +75,10 @@ IoWriteResult print_dispatch(IoWriter *writer, Fmt fmt, PrintValue value)
         return fmt_char(fmt, writer, value._char);
     }
 
-    return OK(IoWriteResult, 0);
+    return OK(IoResult, 0);
 }
 
-IoWriteResult print_impl(IoWriter *writer, Str format, PrintArgs args)
+IoResult print_impl(IoWriter *writer, Str format, PrintArgs args)
 {
     size_t current = 0;
     size_t written = 0;
@@ -91,12 +91,12 @@ IoWriteResult print_impl(IoWriter *writer, Str format, PrintArgs args)
         if (scan_skip_word(&scan, str$("{{")))
         {
             skip_fmt = false;
-            written += TRY(IoWriteResult, io_put(writer, '{'));
+            written += TRY(IoResult, io_put(writer, '{'));
         }
         else if (scan_skip_word(&scan, str$("}}")))
         {
             skip_fmt = false;
-            written += TRY(IoWriteResult, io_put(writer, '}'));
+            written += TRY(IoResult, io_put(writer, '}'));
         }
         else if (scan_curr(&scan) == '{' && !skip_fmt)
         {
@@ -104,11 +104,11 @@ IoWriteResult print_impl(IoWriter *writer, Str format, PrintArgs args)
 
             if (current < args.count)
             {
-                written += TRY(IoWriteResult, print_dispatch(writer, fmt, args.values[current]));
+                written += TRY(IoResult, print_dispatch(writer, fmt, args.values[current]));
             }
             else
             {
-                written += TRY(IoWriteResult, io_print(writer, str$("{}")));
+                written += TRY(IoResult, io_print(writer, str$("{}")));
             }
 
             current++;
@@ -121,23 +121,18 @@ IoWriteResult print_impl(IoWriter *writer, Str format, PrintArgs args)
         else
         {
             skip_fmt = false;
-            written += TRY(IoWriteResult, io_put(writer, scan_next(&scan)));
+            written += TRY(IoResult, io_put(writer, scan_next(&scan)));
         }
     }
 
-    return OK(IoWriteResult, written);
+    return OK(IoResult, written);
 }
 
-Str fmt_str_impl(Alloc *alloc, PrintTrans trans)
+Str str_fmt_impl(Alloc *alloc, Str fmt, PrintArgs args)
 {
     Buffer buf;
-
-    buffer_init(&buf, 1, alloc);
-
-    Str temp = buffer_fmt(&buf, "{}", trans); // need to use a variable here because we need an rvalue
-    Str res = str_dup(temp, alloc);
-
-    buffer_deinit(&buf);
-
-    return res;
+    buffer_init(&buf, fmt.len, alloc);
+    IoWriter writer = buffer_writer(&buf);
+    print_impl(&writer, fmt, args);
+    return buffer_str(&buf);
 }

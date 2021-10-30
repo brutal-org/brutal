@@ -14,6 +14,10 @@ void cgen_c_value(Emit *emit, CVal value)
         emit_fmt(emit, "{}", value.unsigned_);
         break;
 
+    case CVAL_FLOAT:
+        emit_fmt(emit, "{}", value.float_);
+        break;
+
     case CVAL_STRING:
         emit_fmt(emit, "\"{}\"", value.string_);
         break;
@@ -168,7 +172,14 @@ static void cgen_c_type_end(Emit *emit, CType type)
     }
     else if (type.type == CTYPE_ARRAY)
     {
-        emit_fmt(emit, "[{}]", type.array_.size);
+        if (type.array_.size == CTYPE_ARRAY_UNBOUNDED)
+        {
+            emit_fmt(emit, "[]", type.array_.size);
+        }
+        else
+        {
+            emit_fmt(emit, "[{}]", type.array_.size);
+        }
         cgen_c_type_end(emit, *type.ptr_.subtype);
     }
 }

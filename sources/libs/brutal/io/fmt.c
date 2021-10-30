@@ -6,6 +6,7 @@
 #include <brutal/text/case.h>
 #include <brutal/text/utf8.h>
 #include <brutal/text/vals.h>
+#include <math.h>
 
 static int fmt_base(Fmt self)
 {
@@ -222,22 +223,22 @@ size_t fmt_write_length(Fmt self, unsigned long value)
     return length;
 }
 
-IoWriteResult fmt_signed(Fmt self, IoWriter *writer, FmtInt value)
+IoResult fmt_signed(Fmt self, IoWriter *writer, FmtInt value)
 {
     size_t written = 0;
 
     if (value < 0)
     {
-        written += TRY(IoWriteResult, io_put(writer, '-'));
+        written += TRY(IoResult, io_put(writer, '-'));
         value *= -1;
     }
 
-    written += TRY(IoWriteResult, fmt_unsigned(self, writer, value));
+    written += TRY(IoResult, fmt_unsigned(self, writer, value));
 
-    return OK(IoWriteResult, written);
+    return OK(IoResult, written);
 }
 
-IoWriteResult fmt_unsigned(Fmt self, IoWriter *writer, FmtUInt value)
+IoResult fmt_unsigned(Fmt self, IoWriter *writer, FmtUInt value)
 {
     uint8_t buffer[sizeof(FmtUInt) * 8] = {};
     size_t i = 0;
@@ -283,7 +284,49 @@ IoWriteResult fmt_unsigned(Fmt self, IoWriter *writer, FmtUInt value)
     return io_write(writer, buffer, i);
 }
 
-IoWriteResult fmt_char(Fmt self, IoWriter *writer, unsigned int character)
+IoResult fmt_float(Fmt self, IoWriter *writer, double value)
+{
+    if (isnan(value))
+    {
+        return io_print(writer, str$("nan"));
+    }
+
+    int written = 0;
+
+    if (value < 0)
+    {
+        written += TRY(IoResult, io_put(writer, '-'));
+        value *= -1;
+    }
+
+    if (isinf(value))
+    {
+        written += TRY(IoResult, io_print(writer, str$("inf")));
+        return OK(IoResult, written);
+    }
+
+    written += TRY(IoResult, fmt_unsigned(self, writer, (FmtUInt)value));
+
+    if (self.precison == 0)
+    {
+        return OK(IoResult, written);
+    }
+
+    written += TRY(IoResult, io_put(writer, '.'));
+
+    value -= (FmtUInt)value;
+
+    for (int i = 0; i < self.precison; i++)
+    {
+        value *= fmt_base(self);
+        written += TRY(IoResult, io_put(writer, fmt_digit(self, (FmtUInt)value)));
+        value -= (FmtUInt)value;
+    }
+
+    return OK(IoResult, written);
+}
+
+IoResult fmt_char(Fmt self, IoWriter *writer, unsigned int character)
 {
     size_t written = 0;
 
@@ -320,12 +363,12 @@ IoWriteResult fmt_char(Fmt self, IoWriter *writer, unsigned int character)
 
     StrFix8 utf8 = rune_to_utf8((Rune)character);
 
-    written += TRY(IoWriteResult, io_print(writer, str$(&utf8)));
+    written += TRY(IoResult, io_print(writer, str$(&utf8)));
 
-    return OK(IoWriteResult, written);
+    return OK(IoResult, written);
 }
 
-IoWriteResult fmt_string(Fmt self, IoWriter *writer, Str value)
+IoResult fmt_string(Fmt self, IoWriter *writer, Str value)
 {
     if (self.casing == CASE_DEFAULT)
     {
@@ -334,7 +377,7 @@ IoWriteResult fmt_string(Fmt self, IoWriter *writer, Str value)
     else
     {
         Buffer buffer = case_change(self.casing, value, alloc_global());
-        IoWriteResult result = io_print(writer, buffer_str(&buffer));
+        IoResult result = io_print(writer, buffer_str(&buffer));
         buffer_deinit(&buffer);
         return result;
     }

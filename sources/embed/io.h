@@ -28,10 +28,10 @@ HostIoOpenFileResult host_io_file_create(Str path);
 
 MaybeError host_io_file_close(HostIoFile handle);
 
-IoReadResult host_io_read_file(HostIoFile handle, uint8_t *data, size_t size);
+IoResult host_io_read_file(HostIoFile handle, uint8_t *data, size_t size);
 
-IoWriteResult host_io_write_file(HostIoFile handle, uint8_t const *data, size_t size);
+IoResult host_io_write_file(HostIoFile handle, uint8_t const *data, size_t size);
 
-IoReadResult host_io_read_std(IoStdChannel channel, uint8_t *data, size_t size);
+IoResult host_io_read_std(IoStdChannel channel, uint8_t *data, size_t size);
 
-IoWriteResult host_io_write_std(IoStdChannel channel, uint8_t const *data, size_t size);
+IoResult host_io_write_std(IoStdChannel channel, uint8_t const *data, size_t size);

@@ -19,7 +19,7 @@ void host_log_unlock(void)
     lock_release(&lock);
 }
 
-static IoWriteResult host_log_write(MAYBE_UNUSED void *context, uint8_t const *data, MAYBE_UNUSED size_t offset, size_t size)
+static IoResult host_log_write(MAYBE_UNUSED void *context, uint8_t const *data, MAYBE_UNUSED size_t offset, size_t size)
 {
     for (size_t i = 0; i < size; i++)
     {
@@ -36,7 +36,7 @@ static IoWriteResult host_log_write(MAYBE_UNUSED void *context, uint8_t const *d
         }
     }
 
-    return OK(IoWriteResult, size);
+    return OK(IoResult, size);
 }
 
 IoWriter *host_log_writer(void)

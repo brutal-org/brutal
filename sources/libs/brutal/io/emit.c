@@ -31,7 +31,7 @@ void emit_deident(Emit *self)
     self->indent--;
 }
 
-static IoWriteResult emit_write_impl(Emit *self, uint8_t const *data, MAYBE_UNUSED size_t offset, size_t size)
+static IoResult emit_write_impl(Emit *self, uint8_t const *data, MAYBE_UNUSED size_t offset, size_t size)
 {
     size_t written = 0;
 
@@ -41,7 +41,7 @@ static IoWriteResult emit_write_impl(Emit *self, uint8_t const *data, MAYBE_UNUS
         {
             for (int j = 0; j < self->indent_size * self->indent; j++)
             {
-                written += TRY(IoWriteResult, io_put(self->writer, ' '));
+                written += TRY(IoResult, io_put(self->writer, ' '));
             }
 
             self->line_begin = false;
@@ -52,10 +52,10 @@ static IoWriteResult emit_write_impl(Emit *self, uint8_t const *data, MAYBE_UNUS
             self->line_begin = true;
         }
 
-        written += TRY(IoWriteResult, io_put(self->writer, data[i]));
+        written += TRY(IoResult, io_put(self->writer, data[i]));
     }
 
-    return OK(IoWriteResult, written);
+    return OK(IoResult, written);
 }
 
 IoWriter emit_writer(Emit *self)

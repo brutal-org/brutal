@@ -19,14 +19,14 @@ void host_log_unlock(void)
     // FIXME: no-op
 }
 
-static IoWriteResult host_log_write(MAYBE_UNUSED void *context, uint8_t const *data, MAYBE_UNUSED size_t offset, size_t size)
+static IoResult host_log_write(MAYBE_UNUSED void *context, uint8_t const *data, MAYBE_UNUSED size_t offset, size_t size)
 {
     if (write(2, data, size) == -1)
     {
-        return ERR(IoWriteResult, make_error(ERR_KIND_UNDEFINED, strerror(errno)));
+        return ERR(IoResult, make_error(ERR_KIND_UNDEFINED, strerror(errno)));
     }
 
-    return OK(IoWriteResult, size);
+    return OK(IoResult, size);
 }
 
 IoWriter *host_log_writer(void)

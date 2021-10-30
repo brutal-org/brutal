@@ -3,12 +3,12 @@
 #include <brutal/io/std.h>
 #include <embed/io.h>
 
-static IoReadResult std_io_read(IoStdChannel *channel, uint8_t *data, MAYBE_UNUSED size_t offset, size_t size)
+static IoResult std_io_read(IoStdChannel *channel, uint8_t *data, MAYBE_UNUSED size_t offset, size_t size)
 {
     return host_io_read_std(*channel, data, size);
 }
 
-static IoWriteResult std_io_write(IoStdChannel *channel, uint8_t const *data, MAYBE_UNUSED size_t offset, size_t size)
+static IoResult std_io_write(IoStdChannel *channel, uint8_t const *data, MAYBE_UNUSED size_t offset, size_t size)
 {
     return host_io_write_std(*channel, data, size);
 }

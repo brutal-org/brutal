@@ -35,6 +35,6 @@ typedef struct PACKED
     le_int8_t image_descriptor;
 } TgaHeader;
 
-IoWriteResult tga_encode(IoWriter *writer, GfxSurface surface);
+IoResult tga_encode(IoWriter *writer, GfxSurface surface);
 
 GfxSurface tga_decode_in_memory(void *addr, size_t size);

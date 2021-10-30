@@ -56,7 +56,7 @@ Str buffer_str(Buffer *self)
     return str_n$(self->used, (char *)self->data);
 }
 
-static IoReadResult buffer_read_impl(Buffer *self, char *data, size_t offset, size_t size)
+static IoResult buffer_read_impl(Buffer *self, char *data, size_t offset, size_t size)
 {
     size_t read = MIN(size, self->used - offset);
 
@@ -65,7 +65,7 @@ static IoReadResult buffer_read_impl(Buffer *self, char *data, size_t offset, si
         data[i] = self->data[offset + i];
     }
 
-    return OK(IoReadResult, read);
+    return OK(IoResult, read);
 }
 
 IoReader buffer_reader(Buffer *self)
@@ -76,14 +76,14 @@ IoReader buffer_reader(Buffer *self)
     };
 }
 
-static IoWriteResult buffer_write_impl(Buffer *self, char const *data, MAYBE_UNUSED size_t offset, size_t size)
+static IoResult buffer_write_impl(Buffer *self, char const *data, MAYBE_UNUSED size_t offset, size_t size)
 {
     for (size_t i = 0; i < size; i++)
     {
         buffer_push(self, data[i]);
     }
 
-    return OK(IoWriteResult, size);
+    return OK(IoResult, size);
 }
 
 IoWriter buffer_writer(Buffer *self)

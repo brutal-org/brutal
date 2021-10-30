@@ -55,33 +55,33 @@ MaybeError host_io_file_close(HostIoFile handle)
     return SUCCESS;
 }
 
-IoReadResult host_io_read_file(HostIoFile handle, uint8_t *data, size_t size)
+IoResult host_io_read_file(HostIoFile handle, uint8_t *data, size_t size)
 {
     ssize_t result = read(handle, data, size);
 
     if (result == -1)
     {
         Error error = error_from_errno();
-        return ERR(IoReadResult, error);
+        return ERR(IoResult, error);
     }
 
-    return OK(IoReadResult, result);
+    return OK(IoResult, result);
 }
 
-IoWriteResult host_io_write_file(HostIoFile handle, uint8_t const *data, size_t size)
+IoResult host_io_write_file(HostIoFile handle, uint8_t const *data, size_t size)
 {
     ssize_t result = write(handle, data, size);
 
     if (result == -1)
     {
         Error error = error_from_errno();
-        return ERR(IoWriteResult, error);
+        return ERR(IoResult, error);
     }
 
-    return OK(IoWriteResult, result);
+    return OK(IoResult, result);
 }
 
-IoReadResult host_io_read_std(IoStdChannel channel, uint8_t *data, size_t size)
+IoResult host_io_read_std(IoStdChannel channel, uint8_t *data, size_t size)
 {
     assert_equal((int)channel, IO_STD_IN);
 
@@ -90,21 +90,21 @@ IoReadResult host_io_read_std(IoStdChannel channel, uint8_t *data, size_t size)
     if (result == -1)
     {
         Error error = error_from_errno();
-        return ERR(IoReadResult, error);
+        return ERR(IoResult, error);
     }
 
-    return OK(IoReadResult, result);
+    return OK(IoResult, result);
 }
 
-IoWriteResult host_io_write_std(IoStdChannel channel, uint8_t const *data, size_t size)
+IoResult host_io_write_std(IoStdChannel channel, uint8_t const *data, size_t size)
 {
     ssize_t result = write((int)channel, data, size);
 
     if (result == -1)
     {
         Error error = error_from_errno();
-        return ERR(IoWriteResult, error);
+        return ERR(IoResult, error);
     }
 
-    return OK(IoWriteResult, result);
+    return OK(IoResult, result);
 }

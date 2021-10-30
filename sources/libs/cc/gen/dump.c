@@ -2,28 +2,28 @@
 
 void cdump_value(Emit *emit, CVal value)
 {
-    emit_fmt(emit, "value:{}\n", cval_type_to_str(value.type));
-    emit_ident(emit);
+    emit_fmt(emit, "value:{} ", cval_type_to_str(value.type));
+
     switch (value.type)
     {
     case CVAL_SIGNED:
-        emit_fmt(emit, "data: {}\n", value.signed_);
+        emit_fmt(emit, "{}", value.signed_);
         break;
     case CVAL_UNSIGNED:
-        emit_fmt(emit, "data: {}\n", value.unsigned_);
+        emit_fmt(emit, "{}", value.unsigned_);
         break;
     case CVAL_FLOAT:
-        emit_fmt(emit, "data: (float non supported in fmt)\n");
+        emit_fmt(emit, "{}", value.float_);
         break;
     case CVAL_STRING:
-        emit_fmt(emit, "data \"{}\"\n", value.string_);
+        emit_fmt(emit, "\"{}\"", value.string_);
         break;
     default:
         assert_unreachable();
     }
-    emit_deident(emit);
-}
 
+    emit_fmt(emit, "\n");
+}
 void cdump_type(Emit *emit, CType type)
 {
     emit_fmt(emit, "type:");
@@ -66,7 +66,14 @@ void cdump_type(Emit *emit, CType type)
         break;
 
     case CTYPE_ARRAY:
-        emit_fmt(emit, "array[{}]\n", type.array_.size);
+        if (type.array_.size == CTYPE_ARRAY_UNBOUNDED)
+        {
+            emit_fmt(emit, "array[]\n");
+        }
+        else
+        {
+            emit_fmt(emit, "array[{}]\n", type.array_.size);
+        }
         cdump_type(emit, *type.array_.subtype);
         break;
 

@@ -121,7 +121,7 @@ MaybeError host_io_file_close(HostIoFile handle)
     return SUCCESS;
 }
 
-IoReadResult host_io_read_file(HostIoFile handle, uint8_t *data, size_t size)
+IoResult host_io_read_file(HostIoFile handle, uint8_t *data, size_t size)
 {
     EFIFileProtocol *file = handle;
     uint64_t read_write_size = size;
@@ -129,15 +129,15 @@ IoReadResult host_io_read_file(HostIoFile handle, uint8_t *data, size_t size)
 
     if (status != EFI_SUCCESS)
     {
-        return ERR(IoReadResult, ERR_UNDEFINED);
+        return ERR(IoResult, ERR_UNDEFINED);
     }
     else
     {
-        return OK(IoReadResult, read_write_size);
+        return OK(IoResult, read_write_size);
     }
 }
 
-IoWriteResult host_io_write_file(HostIoFile handle, uint8_t const *data, size_t size)
+IoResult host_io_write_file(HostIoFile handle, uint8_t const *data, size_t size)
 {
     UNUSED(handle);
     UNUSED(data);
@@ -145,7 +145,7 @@ IoWriteResult host_io_write_file(HostIoFile handle, uint8_t const *data, size_t 
     assert_unreachable();
 }
 
-IoReadResult host_io_read_std(IoStdChannel channel, uint8_t *data, size_t size)
+IoResult host_io_read_std(IoStdChannel channel, uint8_t *data, size_t size)
 {
     UNUSED(channel);
     UNUSED(data);
@@ -153,7 +153,7 @@ IoReadResult host_io_read_std(IoStdChannel channel, uint8_t *data, size_t size)
     assert_unreachable();
 }
 
-IoWriteResult host_io_write_std(IoStdChannel channel, uint8_t const *data, size_t size)
+IoResult host_io_write_std(IoStdChannel channel, uint8_t const *data, size_t size)
 {
     assert_not_equal((int)channel, IO_STD_IN);
 
@@ -163,5 +163,5 @@ IoWriteResult host_io_write_std(IoStdChannel channel, uint8_t const *data, size_
 
     alloc_free(alloc_global(), cstr);
 
-    return OK(IoWriteResult, size);
+    return OK(IoResult, size);
 }

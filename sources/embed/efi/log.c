@@ -5,7 +5,7 @@
 
 static IoWriter writer;
 
-static IoWriteResult host_log_write(MAYBE_UNUSED void *context, uint8_t const *data, MAYBE_UNUSED size_t offset, size_t size)
+static IoResult host_log_write(MAYBE_UNUSED void *context, uint8_t const *data, MAYBE_UNUSED size_t offset, size_t size)
 {
 
     uint16_t *cstr = str_to_cstr_utf16_dos(str_n$(size, (char *)data), alloc_global());
@@ -14,7 +14,7 @@ static IoWriteResult host_log_write(MAYBE_UNUSED void *context, uint8_t const *d
 
     alloc_free(alloc_global(), cstr);
 
-    return OK(IoWriteResult, size);
+    return OK(IoResult, size);
 }
 
 IoWriter *host_log_writer(void)

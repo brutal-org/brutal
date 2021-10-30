@@ -14,7 +14,7 @@ MaybeError io_file_create(IoFile *self, Str path)
     return SUCCESS;
 }
 
-static IoReadResult io_file_read_impl(IoFile *self, uint8_t *data, MAYBE_UNUSED size_t offset, size_t size)
+static IoResult io_file_read_impl(IoFile *self, uint8_t *data, MAYBE_UNUSED size_t offset, size_t size)
 {
 
     return host_io_read_file(self->handle, data, size);
@@ -28,7 +28,7 @@ IoReader io_file_reader(IoFile *self)
     };
 }
 
-static IoWriteResult io_file_write_impl(IoFile *self, uint8_t const *data, MAYBE_UNUSED size_t offset, size_t size)
+static IoResult io_file_write_impl(IoFile *self, uint8_t const *data, MAYBE_UNUSED size_t offset, size_t size)
 {
     return host_io_write_file(self->handle, data, size);
 }
