@@ -1,85 +1,48 @@
+#include <brutal/debug.h>
 #include <cc/parse/parser.h>
-/* 
-this function may be over-complicated but here is what it does: 
-
-    it tries to add an array at the last possible place in the ast: 
-
-    if we have 
-    int a[5][10]; 
-
-    we should have an ast converted from: 
-    array 10: 
-        array 5: 
-            int 
-
-    to this: 
-
-    array 5: 
-        array 10: 
-            int 
-    
-    so when we add an array we try to put it before the last non array entry in the ast. 
-
-    this function also take in account parenthesis.
-*/
-
-static void cparse_add_array_postfix(CType *current, int size, Alloc *alloc)
-{
-    if (current->type != CTYPE_ARRAY)
-    {
-        *current = ctype_array(*current, size, alloc);
-    }
-    else
-    {
-        cparse_add_array_postfix(current->array_.subtype, size, alloc);
-    }
-}
 
 CType cparse_declarator_postfix(Lex *lex, CType type, Alloc *alloc)
 {
-    while (true)
+    if (lex_skip_type(lex, CLEX_LPARENT))
     {
-        if (lex_skip_type(lex, CLEX_LBRACE))
+        cparse_whitespace(lex);
+
+        CType func = ctype_func(ctype_tail(), alloc);
+
+        while (lex_skip_type(lex, CLEX_COMMA))
         {
+            CType arg_type = cparse_type(lex, alloc);
+            arg_type = cparse_declarator(lex, arg_type, alloc);
+            ctype_member(&func, nullstr, arg_type, alloc);
+
             cparse_whitespace(lex);
-
-            type = ctype_func(type, alloc);
-
-            while (lex_skip_type(lex, CLEX_COMMA))
-            {
-                CType arg_type = cparse_type(lex, alloc);
-                arg_type = cparse_declarator(lex, arg_type, alloc);
-
-                ctype_member(&type, nullstr, arg_type, alloc);
-
-                cparse_whitespace(lex);
-            }
-
-            lex_expect(lex, CLEX_RBRACE);
         }
-        else if (lex_skip_type(lex, CLEX_LBRACKET))
+
+        lex_expect(lex, CLEX_RPARENT);
+
+        CType ret = cparse_declarator_postfix(lex, type, alloc);
+        return ctype_append(func, ret, alloc);
+    }
+    else if (lex_skip_type(lex, CLEX_LBRACKET))
+    {
+        cparse_whitespace(lex);
+
+        long size = CTYPE_ARRAY_UNBOUNDED;
+
+        if (lex_curr_type(lex) == CLEX_INTEGER)
         {
-            cparse_whitespace(lex);
-
-            // TODO: support negative
-            if (lex_curr_type(lex) == CLEX_INTEGER)
-            {
-                long size = str_to_number(lex_curr(lex).str);
-                cparse_add_array_postfix(&type, size, alloc);
-                lex_next(lex);
-                cparse_whitespace(lex);
-            }
-            else
-            {
-                type = ctype_array(type, 0, alloc);
-            }
-
-            lex_expect(lex, CLEX_RBRACKET);
+            size = str_to_number(lex_next(lex).str);
         }
-        else
-        {
-            return type;
-        }
+
+        cparse_separator(lex, CLEX_RBRACKET);
+
+        CType inner = cparse_declarator_postfix(lex, type, alloc);
+
+        return ctype_array(inner, size, alloc);
+    }
+    else
+    {
+        return type;
     }
 }
 
@@ -173,6 +136,6 @@ CDecl cparse_decl(Lex *lex, Alloc *alloc)
     {
         CDeclAttr attr = cparse_decl_attr(lex);
         UNUSED(attr);
-        panic_todo$("parse cfunc and cvar");
+        panic$("parse cfunc and cvar not implemented");
     }
 }
