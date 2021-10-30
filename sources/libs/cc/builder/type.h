@@ -28,8 +28,6 @@ CType ctype_struct(Alloc *alloc);
 
 CType ctype_union(Alloc *alloc);
 
-void ctype_member(CType *self, Str name, CType type, Alloc *alloc);
-
 CType ctype_enum(Alloc *alloc);
 
 void ctype_constant(CType *self, Str name, CVal val, Alloc *alloc);
@@ -42,4 +40,6 @@ CType ctype_attr(CType type, CTypeAttr attr);
 
 CType ctype_named(CType type, Str name, Alloc *alloc);
 
-CType ctype_append(CType type, CType new_tail, Alloc *alloc);
+void ctype_member(CType *self, Str name, CType type, Alloc *alloc);
+
+void ctype_append(CType *type, CType new_tail);

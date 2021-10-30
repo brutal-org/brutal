@@ -10,7 +10,7 @@ CUnit cparse_unit(Lex *lex, Alloc *alloc)
     {
         cunit_member(&unit, cunit_decl(cparse_decl(lex, alloc)));
 
-        cparse_separator(lex, CLEX_SEMICOLON);
+        cparse_expect_separator(lex, CLEX_SEMICOLON);
     }
 
     return unit;

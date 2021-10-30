@@ -15,7 +15,7 @@ CType cparse_compound_type(Lex *lex, bool is_union, Alloc *alloc)
 
     cparse_whitespace(lex);
 
-    if (lex_curr(lex).type == CLEX_ATOM)
+    if (lex_curr(lex).type == CLEX_IDENT)
     {
         Str name = lex_next(lex).str;
         ctype_named(compound, name, alloc);
@@ -31,11 +31,8 @@ CType cparse_compound_type(Lex *lex, bool is_union, Alloc *alloc)
 
     while (!lex_ended(lex) && lex_skip_type(lex, CLEX_SEMICOLON))
     {
-        CType type = cparse_type(lex, alloc);
-        type = cparse_declarator(lex, type, alloc);
-
-        ctype_member(&type, str$("TODO"), type, alloc);
-
+        CDeclarator declarator = cparse_declarator(lex, alloc);
+        ctype_member(&compound, declarator.name, declarator.type, alloc);
         cparse_whitespace(lex);
     }
 
@@ -62,7 +59,7 @@ CType cparse_type(Lex *lex, Alloc *alloc)
 
         cparse_whitespace(lex);
 
-        if (lex_curr(lex).type == CLEX_ATOM)
+        if (lex_curr(lex).type == CLEX_IDENT)
         {
             Str name = lex_next(lex).str;
             ctype_named(enum_type, name, alloc);

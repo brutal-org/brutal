@@ -5,7 +5,7 @@
 #define FOREACH_LEXEMES(LEXEME) \
     LEXEME(WHITESPACE)          \
     LEXEME(COMMENT)             \
-    LEXEME(ATOM)                \
+    LEXEME(IDENT)               \
     LEXEME(INTEGER)             \
     LEXEME(AUTO)                \
     LEXEME(BREAK)               \

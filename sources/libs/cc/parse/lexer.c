@@ -143,7 +143,7 @@ static LexemeType clex_impl(Scan *scan)
             scan_next(scan);
         }
 
-        return (CLEX_ATOM);
+        return (CLEX_IDENT);
     }
 
     if (isdigit(scan_curr(scan)))

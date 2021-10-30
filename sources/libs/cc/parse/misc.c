@@ -9,10 +9,18 @@ void cparse_whitespace(Lex *lex)
     }
 }
 
-bool cparse_separator(Lex *lex, LexemeType type)
+bool cparse_expect_separator(Lex *lex, LexemeType type)
 {
     cparse_whitespace(lex);
     bool result = lex_expect(lex, type);
+    cparse_whitespace(lex);
+    return result;
+}
+
+bool cparse_skip_separator(Lex *lex, LexemeType type)
+{
+    cparse_whitespace(lex);
+    bool result = lex_skip_type(lex, type);
     cparse_whitespace(lex);
     return result;
 }

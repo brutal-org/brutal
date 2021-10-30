@@ -5,9 +5,9 @@
 
 CDecl cparse_decl(Lex *lex, Alloc *alloc);
 
-CType cparse_declarator(Lex *lex, CType type, Alloc *alloc);
+CDeclarator cparse_declarator(Lex *lex, Alloc *alloc);
 
-CExpr cparse_expr(Lex *lex, Alloc *alloc);
+CExpr cparse_expr(Lex *lex, int pre, Alloc *alloc);
 
 CStmt cparse_stmt(Lex *lex, Alloc *alloc);
 
@@ -21,4 +21,6 @@ CVal cparse_val(Lex *lex, Alloc *alloc);
 
 void cparse_whitespace(Lex *lex);
 
-bool cparse_separator(Lex *lex, LexemeType type);
+bool cparse_expect_separator(Lex *lex, LexemeType type);
+
+bool cparse_skip_separator(Lex *lex, LexemeType type);

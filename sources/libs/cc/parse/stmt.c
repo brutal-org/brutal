@@ -12,18 +12,18 @@ CStmt cparse_stmt(Lex *lex, Alloc *alloc)
         {
             CStmt stmt = cparse_stmt(lex, alloc);
             cstmt_block_add(&block, stmt);
-            cparse_separator(lex, CLEX_SEMICOLON);
+            cparse_expect_separator(lex, CLEX_SEMICOLON);
         }
 
         return block;
     }
     else if (lex_skip_type(lex, CLEX_IF))
     {
-        cparse_separator(lex, CLEX_LPARENT);
+        cparse_expect_separator(lex, CLEX_LPARENT);
 
-        CExpr expr = cparse_expr(lex, alloc);
+        CExpr expr = cparse_expr(lex, CEXPR_MAX_PRECEDENCE, alloc);
 
-        cparse_separator(lex, CLEX_RPARENT);
+        cparse_expect_separator(lex, CLEX_RPARENT);
 
         CStmt stmt_true = cparse_stmt(lex, alloc);
 
@@ -42,19 +42,19 @@ CStmt cparse_stmt(Lex *lex, Alloc *alloc)
     }
     else if (lex_skip_type(lex, CLEX_FOR))
     {
-        cparse_separator(lex, CLEX_LPARENT);
+        cparse_expect_separator(lex, CLEX_LPARENT);
 
         CStmt init_stmt = cparse_stmt(lex, alloc);
 
-        cparse_separator(lex, CLEX_SEMICOLON);
+        cparse_expect_separator(lex, CLEX_SEMICOLON);
 
-        CExpr cond_expr = cparse_expr(lex, alloc);
+        CExpr cond_expr = cparse_expr(lex, CEXPR_MAX_PRECEDENCE, alloc);
 
-        cparse_separator(lex, CLEX_SEMICOLON);
+        cparse_expect_separator(lex, CLEX_SEMICOLON);
 
-        CExpr iter_expr = cparse_expr(lex, alloc);
+        CExpr iter_expr = cparse_expr(lex, CEXPR_MAX_PRECEDENCE, alloc);
 
-        cparse_separator(lex, CLEX_RPARENT);
+        cparse_expect_separator(lex, CLEX_RPARENT);
 
         CStmt stmt = cparse_stmt(lex, alloc);
 
@@ -62,11 +62,11 @@ CStmt cparse_stmt(Lex *lex, Alloc *alloc)
     }
     else if (lex_skip_type(lex, CLEX_WHILE))
     {
-        cparse_separator(lex, CLEX_LPARENT);
+        cparse_expect_separator(lex, CLEX_LPARENT);
 
-        CExpr expr = cparse_expr(lex, alloc);
+        CExpr expr = cparse_expr(lex, CEXPR_MAX_PRECEDENCE, alloc);
 
-        cparse_separator(lex, CLEX_RPARENT);
+        cparse_expect_separator(lex, CLEX_RPARENT);
 
         CStmt stmt = cparse_stmt(lex, alloc);
 
@@ -78,23 +78,23 @@ CStmt cparse_stmt(Lex *lex, Alloc *alloc)
 
         CStmt stmt = cparse_stmt(lex, alloc);
 
-        cparse_separator(lex, CLEX_WHILE);
+        cparse_expect_separator(lex, CLEX_WHILE);
 
-        cparse_separator(lex, CLEX_LPARENT);
+        cparse_expect_separator(lex, CLEX_LPARENT);
 
-        CExpr expr = cparse_expr(lex, alloc);
+        CExpr expr = cparse_expr(lex, CEXPR_MAX_PRECEDENCE, alloc);
 
-        cparse_separator(lex, CLEX_RPARENT);
+        cparse_expect_separator(lex, CLEX_RPARENT);
 
         return cstmt_do(expr, stmt, alloc);
     }
     else if (lex_skip_type(lex, CLEX_SWITCH))
     {
-        cparse_separator(lex, CLEX_LPARENT);
+        cparse_expect_separator(lex, CLEX_LPARENT);
 
-        CExpr expr = cparse_expr(lex, alloc);
+        CExpr expr = cparse_expr(lex, CEXPR_MAX_PRECEDENCE, alloc);
 
-        cparse_separator(lex, CLEX_RPARENT);
+        cparse_expect_separator(lex, CLEX_RPARENT);
 
         CStmt stmt = cparse_stmt(lex, alloc);
 
@@ -104,7 +104,7 @@ CStmt cparse_stmt(Lex *lex, Alloc *alloc)
     {
         cparse_whitespace(lex);
 
-        CExpr expr = cparse_expr(lex, alloc);
+        CExpr expr = cparse_expr(lex, CEXPR_MAX_PRECEDENCE, alloc);
 
         return cstmt_return(expr);
     }
@@ -112,7 +112,7 @@ CStmt cparse_stmt(Lex *lex, Alloc *alloc)
     {
         cparse_whitespace(lex);
 
-        if (lex_curr_type(lex) == CLEX_ATOM)
+        if (lex_curr_type(lex) == CLEX_IDENT)
         {
             Str label = lex_curr(lex).str;
             lex_next(lex);
@@ -120,7 +120,7 @@ CStmt cparse_stmt(Lex *lex, Alloc *alloc)
         }
         else
         {
-            lex_expect(lex, CLEX_ATOM);
+            lex_expect(lex, CLEX_IDENT);
             return cstmt_empty();
         }
     }
@@ -128,7 +128,7 @@ CStmt cparse_stmt(Lex *lex, Alloc *alloc)
     {
         cparse_whitespace(lex);
 
-        CExpr expr = cparse_expr(lex, alloc);
+        CExpr expr = cparse_expr(lex, CEXPR_MAX_PRECEDENCE, alloc);
 
         return cstmt_case(expr);
     }

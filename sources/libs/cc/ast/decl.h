@@ -25,9 +25,13 @@ typedef enum
     CDECL_NO_RETURN = (1 << 6),
 } CDeclAttr;
 
-typedef struct cdecl CDecl;
+typedef struct
+{
+    Str name;
+    CType type;
+} CDeclarator;
 
-struct cdecl
+typedef struct cdecl
 {
     CDeclType type;
     CDeclAttr attr;
@@ -52,4 +56,4 @@ struct cdecl
             CStmt body;
         } func_;
     };
-};
+} CDecl;

@@ -1,9 +1,21 @@
 #include <cc/parse/parser.h>
 
-CExpr cparse_expr(Lex *lex, Alloc *alloc)
+/*
+CExpr cparse_expr_prefix(Lex *lex, Alloc *alloc)
+{
+}
+
+CExpr cparse_expr_infix(Lex *lex, CExpr lhs, Alloc *alloc)
+{
+}
+
+*/
+
+CExpr cparse_expr(Lex *lex, int pre, Alloc *alloc)
 {
     UNUSED(lex);
+    UNUSED(pre);
     UNUSED(alloc);
 
-    panic_todo$("parse cexpr");
+    return cexpr_empty();
 }

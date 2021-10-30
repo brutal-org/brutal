@@ -3,27 +3,24 @@
 
 CType cparse_declarator_postfix(Lex *lex, CType type, Alloc *alloc)
 {
-    if (lex_skip_type(lex, CLEX_LPARENT))
+    if (cparse_skip_separator(lex, CLEX_LPARENT))
     {
-        cparse_whitespace(lex);
-
         CType func = ctype_func(ctype_tail(), alloc);
 
-        while (lex_skip_type(lex, CLEX_COMMA))
+        while (cparse_skip_separator(lex, CLEX_COMMA))
         {
-            CType arg_type = cparse_type(lex, alloc);
-            arg_type = cparse_declarator(lex, arg_type, alloc);
-            ctype_member(&func, nullstr, arg_type, alloc);
-
-            cparse_whitespace(lex);
+            CDeclarator decl = cparse_declarator(lex, alloc);
+            ctype_member(&func, decl.name, decl.type, alloc);
         }
 
-        lex_expect(lex, CLEX_RPARENT);
+        cparse_expect_separator(lex, CLEX_RPARENT);
 
         CType ret = cparse_declarator_postfix(lex, type, alloc);
-        return ctype_append(func, ret, alloc);
+        ctype_append(&func, ret);
+
+        return func;
     }
-    else if (lex_skip_type(lex, CLEX_LBRACKET))
+    else if (cparse_skip_separator(lex, CLEX_LBRACKET))
     {
         cparse_whitespace(lex);
 
@@ -34,7 +31,7 @@ CType cparse_declarator_postfix(Lex *lex, CType type, Alloc *alloc)
             size = str_to_number(lex_next(lex).str);
         }
 
-        cparse_separator(lex, CLEX_RBRACKET);
+        cparse_expect_separator(lex, CLEX_RBRACKET);
 
         CType inner = cparse_declarator_postfix(lex, type, alloc);
 
@@ -46,33 +43,56 @@ CType cparse_declarator_postfix(Lex *lex, CType type, Alloc *alloc)
     }
 }
 
-CType cparse_declarator(Lex *lex, CType type, Alloc *alloc)
+CDeclarator cparse_declarator_prefix(Lex *lex, CType type, Alloc *alloc)
 {
-    if (lex_skip_type(lex, CLEX_STAR))
+    if (cparse_skip_separator(lex, CLEX_STAR))
     {
         type = ctype_ptr(type, alloc);
-        cparse_whitespace(lex);
-        type = cparse_declarator(lex, type, alloc);
-        cparse_whitespace(lex);
-        type = cparse_declarator_postfix(lex, type, alloc);
 
-        return type;
+        CDeclarator inner = cparse_declarator_prefix(lex, type, alloc);
+        cparse_whitespace(lex);
+        inner.type = cparse_declarator_postfix(lex, inner.type, alloc);
+
+        return inner;
     }
-    else if (lex_skip_type(lex, CLEX_LPARENT))
+    else if (cparse_skip_separator(lex, CLEX_LPARENT))
     {
-        cparse_whitespace(lex);
-        CType inner = cparse_declarator(lex, ctype_tail(), alloc);
-        cparse_whitespace(lex);
+        CDeclarator inner = cparse_declarator_prefix(lex, ctype_tail(), alloc);
 
-        lex_expect(lex, CLEX_RPARENT);
+        if (!cparse_expect_separator(lex, CLEX_RPARENT))
+        {
+            ctype_append(&inner.type, ctype_error());
+            return inner;
+        }
 
-        type = ctype_parent(cparse_declarator_postfix(lex, type, alloc), alloc);
-        return ctype_append(inner, type, alloc);
+        CType postfix = cparse_declarator_postfix(lex, type, alloc);
+        ctype_append(&inner.type, ctype_parent(postfix, alloc));
+
+        return inner;
+    }
+    else if (lex_curr_type(lex) == CLEX_IDENT)
+    {
+        return (CDeclarator){
+            .type = type,
+            .name = lex_next(lex).str,
+        };
     }
     else
     {
-        return type;
+        return (CDeclarator){
+            .type = type,
+            .name = str$(""),
+        };
     }
+}
+
+CDeclarator cparse_declarator(Lex *lex, Alloc *alloc)
+{
+    CType type = cparse_type(lex, alloc);
+    cparse_whitespace(lex);
+    CDeclarator decl = cparse_declarator_prefix(lex, type, alloc);
+    decl.type = cparse_declarator_postfix(lex, decl.type, alloc);
+    return decl;
 }
 
 CDeclAttr cparse_decl_attr(Lex *lex)
@@ -125,17 +145,41 @@ CDecl cparse_decl(Lex *lex, Alloc *alloc)
     if (lex_skip_type(lex, CLEX_TYPEDEF))
     {
         cparse_whitespace(lex);
+        CDeclarator declarator = cparse_declarator(lex, alloc);
 
-        CType type = cparse_type(lex, alloc);
-        cparse_whitespace(lex);
-        type = cparse_declarator(lex, type, alloc);
-
-        return cdecl_type(str$("TODO"), type, alloc);
+        return cdecl_type(declarator.name, declarator.type, alloc);
     }
     else
     {
         CDeclAttr attr = cparse_decl_attr(lex);
-        UNUSED(attr);
-        panic$("parse cfunc and cvar not implemented");
+        cparse_whitespace(lex);
+        CDeclarator decl = cparse_declarator(lex, alloc);
+
+        if (decl.type.type == CTYPE_FUNC)
+        {
+            if (cparse_skip_separator(lex, CLEX_LBRACE))
+            {
+                CStmt body = cparse_stmt(lex, alloc);
+                return cdecl_attrib(cdecl_func(decl.name, decl.type, body, alloc), attr);
+            }
+            else
+            {
+                cparse_expect_separator(lex, CLEX_SEMICOLON);
+                return cdecl_attrib(cdecl_func(decl.name, decl.type, cstmt_empty(), alloc), attr);
+            }
+        }
+        else
+        {
+            if (cparse_skip_separator(lex, CLEX_EQUAL))
+            {
+                CExpr init = cparse_expr(lex, CEXPR_MAX_PRECEDENCE, alloc);
+                return cdecl_var(decl.name, decl.type, init, alloc);
+            }
+            else
+            {
+                cparse_expect_separator(lex, CLEX_SEMICOLON);
+                return cdecl_attrib(cdecl_var(decl.name, decl.type, cexpr_empty(), alloc), attr);
+            }
+        }
     }
 }

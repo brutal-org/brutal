@@ -4,6 +4,8 @@
 #include <cc/ast/type.h>
 #include <cc/ast/val.h>
 
+#define CEXPR_MAX_PRECEDENCE (16)
+
 typedef enum
 {
     CEXPR_INVALID,

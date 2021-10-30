@@ -78,8 +78,6 @@ void cgen_c_type(Emit *emit, CType type)
 
 static void cgen_c_type_start(Emit *emit, CType type)
 {
-    emit_fmt(emit, "{}", ctype_to_str(type.type));
-
     if (type.type == CTYPE_NAME)
     {
         emit_fmt(emit, type.name);
@@ -103,6 +101,15 @@ static void cgen_c_type_start(Emit *emit, CType type)
     else if ((type.type == CTYPE_STRUCT || type.type == CTYPE_UNION) &&
              type.struct_.members.length != 0)
     {
+        if (type.type == CTYPE_STRUCT)
+        {
+            emit_fmt(emit, "struct");
+        }
+        else
+        {
+            emit_fmt(emit, "union");
+        }
+
         emit_fmt(emit, "{} ", type.name);
 
         cgen_c_type_attr(emit, type.attr);
@@ -120,7 +127,7 @@ static void cgen_c_type_start(Emit *emit, CType type)
     }
     else if (type.type == CTYPE_ENUM)
     {
-        emit_fmt(emit, "{} ", type.name);
+        emit_fmt(emit, "enum {} ", type.name);
         emit_fmt(emit, "\n{{\n");
         emit_ident(emit);
 
@@ -139,6 +146,10 @@ static void cgen_c_type_start(Emit *emit, CType type)
     {
         cgen_c_type_attr(emit, type.attr);
         cgen_c_type_start(emit, *type.array_.subtype);
+    }
+    else
+    {
+        emit_fmt(emit, ctype_to_str(type.type));
     }
 }
 
@@ -186,8 +197,6 @@ static void cgen_c_type_end(Emit *emit, CType type)
 }
 
 /* --- CExpr ---------------------------------------------------------------- */
-
-#define cgen_c_MAX_PRECEDENCE (16)
 
 static void cgen_c_op_fix(Emit *emit, COp op)
 {
@@ -258,7 +267,7 @@ static void cgen_c_expr_pre(Emit *emit, CExpr expr, int parent_pre)
                 emit_fmt(emit, ", ");
             }
 
-            cgen_c_expr_pre(emit, v, cgen_c_MAX_PRECEDENCE);
+            cgen_c_expr_pre(emit, v, CEXPR_MAX_PRECEDENCE);
         }
         emit_fmt(emit, ")");
         break;
@@ -284,7 +293,7 @@ static void cgen_c_expr_pre(Emit *emit, CExpr expr, int parent_pre)
 
         vec_foreach(v, &expr.initializer_.initializer)
         {
-            cgen_c_expr_pre(emit, v, cgen_c_MAX_PRECEDENCE);
+            cgen_c_expr_pre(emit, v, CEXPR_MAX_PRECEDENCE);
             emit_fmt(emit, ",\n");
         }
 
@@ -304,7 +313,7 @@ static void cgen_c_expr_pre(Emit *emit, CExpr expr, int parent_pre)
 
 void cgen_c_expr(Emit *emit, CExpr expr)
 {
-    cgen_c_expr_pre(emit, expr, cgen_c_MAX_PRECEDENCE);
+    cgen_c_expr_pre(emit, expr, CEXPR_MAX_PRECEDENCE);
 }
 /* --- CStmt ---------------------------------------------------------------- */
 

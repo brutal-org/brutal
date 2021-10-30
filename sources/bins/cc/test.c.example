@@ -1,1 +1,5 @@
-typedef _Bool *(*(*[1][2]))[3][4];
+typedef _Bool *(*(*T[1][2]))[3][4];
+
+void main()
+{
+}

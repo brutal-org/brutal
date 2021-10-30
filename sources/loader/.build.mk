@@ -21,6 +21,7 @@ LOADER_CFLAGS= \
 	-ffreestanding \
 	-D__x86_64__ \
 	-D__efi__ \
+	-D__loader__ \
 	-target x86_64-unknown-windows \
 	-fno-stack-protector \
 	-fshort-wchar \

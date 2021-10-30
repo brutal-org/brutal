@@ -192,26 +192,31 @@ CType ctype_named(CType type, Str name, Alloc *alloc)
     return type;
 }
 
-CType ctype_append(CType type, CType tail, Alloc *alloc)
+void ctype_append(CType *type, CType tail)
 {
-    switch (type.type)
+    switch (type->type)
     {
     case CTYPE_TAIL:
-        return tail;
+        *type = tail;
+        break;
 
     case CTYPE_PTR:
-        return ctype_ptr(ctype_append(*type.ptr_.subtype, tail, alloc), alloc);
+        ctype_append(type->ptr_.subtype, tail);
+        break;
 
     case CTYPE_PARENT:
-        return ctype_parent(ctype_append(*type.parent_.subtype, tail, alloc), alloc);
+        ctype_append(type->parent_.subtype, tail);
+        break;
 
     case CTYPE_FUNC:
-        return ctype_func(ctype_append(*type.func_.ret, tail, alloc), alloc);
+        ctype_append(type->func_.ret, tail);
+        break;
 
     case CTYPE_ARRAY:
-        return ctype_array(ctype_append(*type.array_.subtype, tail, alloc), type.array_.size, alloc);
+        ctype_append(type->array_.subtype, tail);
+        break;
 
     default:
-        panic$("ctype-no-tail");
+        panic$("ctype_append on type {}", ctype_to_str(type->type));
     }
 }
