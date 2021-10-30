@@ -42,7 +42,7 @@
 ## Features
 
 - Rich and modern C library
-  - Custome allocators
+  - Custom allocators
   - Generic data structures
   - Fibers
 - Capability based micro-kernel
