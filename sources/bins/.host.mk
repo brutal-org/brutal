@@ -11,6 +11,7 @@ LIBS_HOST_SRC = \
 	$(wildcard sources/libs/brutal/*/*.c) \
 	$(wildcard sources/libs/cc/*.c)       \
 	$(wildcard sources/libs/cc/*/*.c)       \
+	$(wildcard sources/libs/cc/*/*/*.c)       \
 	$(wildcard sources/libs/ud/*.c)       \
 	$(wildcard sources/libs/ud/*/*.c)       \
 	$(wildcard sources/libs/json/*.c)     \
