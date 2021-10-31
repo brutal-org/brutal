@@ -1,5 +1,4 @@
-#include <cc/gen/c/type.h>
-#include <cc/gen/c/val.h>
+#include <cc/gen/c/c.h>
 
 static void cgen_c_member(Emit *emit, CTypeMember type)
 {

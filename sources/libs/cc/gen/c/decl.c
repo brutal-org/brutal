@@ -1,7 +1,4 @@
-#include <cc/gen/c/decl.h>
-#include <cc/gen/c/type.h>
-#include <cc/gen/c/expr.h>
-#include <cc/gen/c/stmt.h>
+#include <cc/gen/c/c.h>
 
 static void cgen_c_decl_attr(Emit *emit, CDeclAttr attr)
 {

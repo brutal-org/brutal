@@ -1,6 +1,4 @@
-#include <cc/gen/c/unit.h>
-#include <cc/gen/c/expr.h>
-#include <cc/gen/c/decl.h>
+#include <cc/gen/c/c.h>
 
 static void cgen_c_include(Emit *emit, CInclude path)
 {

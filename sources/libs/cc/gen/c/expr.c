@@ -1,6 +1,4 @@
-#include <cc/gen/c/expr.h>
-#include <cc/gen/c/val.h>
-#include <cc/gen/c/type.h>
+#include <cc/gen/c/c.h>
 #include <brutal/debug.h>
 
 static void cgen_c_op_fix(Emit *emit, COp op)

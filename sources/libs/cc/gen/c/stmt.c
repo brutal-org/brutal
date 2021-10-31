@@ -1,8 +1,4 @@
-#include <cc/gen/c/stmt.h>
-#include <cc/gen/c/decl.h>
-#include <cc/gen/c/expr.h>
-
-/* --- CStmt ---------------------------------------------------------------- */
+#include <cc/gen/c/c.h>
 
 static bool cgen_c_should_stmt_endline(CStmtType type)
 {
