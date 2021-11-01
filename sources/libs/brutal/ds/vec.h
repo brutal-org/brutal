@@ -82,6 +82,8 @@ void vec_swap_impl(VecImpl *impl, int idx1, int idx2);
 
 #define vec_clear(v) ((v)->length = 0)
 
+#define vec_at(v, idx) ((v)->data[idx])
+
 #define vec_first(v) (v)->data[0]
 
 #define vec_last(v) (v)->data[(v)->length - 1]
