@@ -55,10 +55,10 @@ bool map_get_impl(MapImpl *impl, Str key, void *data);
 // clang-format off
 
 #define map_foreach(KEY, DATA, MAP)                          \
-    vec_foreach(__bucket, &((MAP)->buckets))                 \
-        vec_foreach(__kv, &(__b))                            \
+    vec_foreach(__bucket, &(impl$(MAP)->buckets))                 \
+        vec_foreach(__kv, &(__bucket))                            \
             for (bool __map_once = true; __map_once;)        \
             for (Str KEY = str$(&__kv->key); __map_once;) \
-            for (typeof(*(MAP)->_T) DATA = *(typeof(impl$(MAP)->_T))__kv->data; __map_once; __map_once = false)
+            for (typeof(*(MAP)->_T) DATA = *(typeof((MAP)->_T))__kv->data; __map_once; __map_once = false)
 
 // clang-format on
