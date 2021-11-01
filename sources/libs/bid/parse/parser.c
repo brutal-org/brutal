@@ -1,4 +1,4 @@
-#include <bid/bid.h>
+#include <bid/parse.h>
 #include <brutal/debug.h>
 
 static bool parser_skip_comment(Scan *scan)
@@ -208,9 +208,9 @@ static BidMethod parse_method(Scan *scan, Alloc *alloc)
     return method;
 }
 
-BidInterface bid_parse(Scan *scan, Alloc *alloc)
+BidIface bid_parse(Scan *scan, Alloc *alloc)
 {
-    BidInterface interface = {};
+    BidIface interface = {};
 
     vec_init(&interface.aliases, alloc);
     vec_init(&interface.events, alloc);

@@ -67,7 +67,7 @@ $(foreach bin, $(HOST_BINS), $(eval $(call HOST_TEMPLATE,$(bin))))
 
 .PHONY: run-bid
 run-bid: $(BID_HOST_BIN)
-	$(BID_HOST_BIN) sources/libs/proto/example.bid sources/libs/proto/example.h
+	$(BID_HOST_BIN) sources/libs/proto/example.bid --output-json
 
 .PHONY: run-cc
 run-cc: $(CC_HOST_BIN)

@@ -1,42 +1,39 @@
 #include <brutal/alloc.h>
 #include <brutal/debug.h>
-#include <brutal/io.h>
-#include <brutal/text.h>
-#include <json/json.h>
+#include <json/parser.h>
 #include "loader/config.h"
 
-LoaderEntry config_get_entry(Str name, Str path, Buffer *buffer)
+LoaderEntry config_entry_parse(Json json)
 {
-    IoFile file;
-    IoReader reader;
-    LoaderEntry ret;
+    LoaderEntry entry;
 
-    io_file_open(&file, path);
+    entry.name = json_get(&json, str$("name")).string;
+    entry.kernel = json_get(&json, str$("kernel")).string;
 
-    reader = io_file_reader(&file);
+    return entry;
+}
 
-    *buffer = io_readall((&reader), alloc_global());
+LoaderEntry config_get_entry(Str name, Str path)
+{
+    Json config_json = json_parse_file(path, alloc_global());
 
-    Str base = str$((char *)buffer->data);
-
-    Scan scanner = {};
-
-    scan_init(&scanner, base);
-
-    JsonValue json = json_parse(&scanner, alloc_global());
-
-    JsonValue res = JSON_MEMBER_GET(json, JSON_ARRAY, str$("entries"));
-
-    int i = 0;
-    JsonValue entry_name = JSON_MEMBER_GET(res.array.data[i], JSON_STRING, str$("name"));
-
-    while (str_eq(entry_name.string, name) != true)
+    Json entries_json;
+    if (!json_try_get(&config_json, str$("entries"), &entries_json))
     {
-        entry_name = JSON_MEMBER_GET(res.array.data[i], JSON_STRING, str$("name"));
-        i++;
+        panic$("No entries found!");
     }
 
-    ret.kernel = JSON_MEMBER_GET(res.array.data[i], JSON_STRING, str$("kernel")).string;
+    for (int i = 0; i < json_len(&entries_json); i++)
+    {
+        LoaderEntry entry = config_entry_parse(json_at(&entries_json, i));
 
-    return ret;
+        if (str_eq(entry.name, name))
+        {
+            return entry;
+        }
+
+        return entry;
+    }
+
+    panic$("Entry '{}' not found!", name);
 }

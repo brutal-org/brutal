@@ -46,7 +46,8 @@ LOADER_LIBS_SRC = \
 	sources/libs/brutal/io/write.c                  \
 	sources/libs/stdc/ansi/string.c			        \
 	sources/libs/stdc/ansi/ctype.c			        \
-	$(wildcard sources/libs/json/*.c)		        \
+	$(wildcard sources/libs/json/parser.c)		    \
+	$(wildcard sources/libs/json/objects.c)		    \
 	$(wildcard sources/libs/brutal/alloc/*.c)	    \
 	$(wildcard sources/libs/brutal/ds/*.c) 		    \
 	$(wildcard sources/libs/brutal/hash/*.c)	    \
@@ -73,7 +74,7 @@ ALL+=$(BINDIR_LOADER)/BOOTX64.EFI
 
 $(LOADER): $(LOADER_OBJS)
 	@$(MKCWD)
-	$(ECHO) "loader LD" $<
+	$(ECHO) "loader LD" $@
 	$(V)$(LOADER_LD) -o $@ $^ $(LOADER_LDFLAGS)
 
 $(BINDIR_LOADER)/%.c.o: sources/%.c

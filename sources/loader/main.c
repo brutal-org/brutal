@@ -103,13 +103,11 @@ EntryPointFn loader_load_kernel(Str path)
     return (EntryPointFn)entry;
 }
 
-void loader_boot(LoaderEntry *entry, Buffer *config_buf)
+void loader_boot(LoaderEntry *entry)
 {
     log$("Loading kernel...");
 
     EntryPointFn entry_point = loader_load_kernel(entry->kernel);
-
-    buffer_deinit(config_buf);
 
     log$("Kernel loaded, jumping in to it...");
 
@@ -125,17 +123,14 @@ void loader_boot(LoaderEntry *entry, Buffer *config_buf)
 void loader_menu(void)
 {
     EFIInputKey key = efi_tty_get_key();
-
-    Buffer buffer;
-
-    LoaderEntry entry = config_get_entry(str$("Brutal"), str$("/config.json"), &buffer);
+    LoaderEntry entry = config_get_entry(str$("Brutal"), str$("/config.json"));
 
     while (key.scan_code != SCAN_ESC)
     {
         if (key.unicode_char == CHAR_CARRIAGE_RETURN)
         {
             efi_tty_clear();
-            loader_boot(&entry, &buffer);
+            loader_boot(&entry);
         }
 
         key = efi_tty_get_key();
@@ -154,9 +149,7 @@ EFIStatus efi_main(EFIHandle handle, EFISystemTable *st)
     efi_tty_clear();
 
     memory_init();
-
     loader_splash();
-
     loader_menu();
 
     panic$("loader_menu should no return!");

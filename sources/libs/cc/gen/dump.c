@@ -29,6 +29,7 @@ void cdump_value(Emit *emit, CVal value)
 
     emit_fmt(emit, "\n");
 }
+
 void cdump_type(Emit *emit, CType type)
 {
     emit_fmt(emit, "type:");

@@ -4,6 +4,7 @@
 #include <brutal/io.h>
 #include "test/test.h"
 
+/*
 TEST(gfx_draw_rectangle)
 {
     GfxCanvas canvas;
@@ -27,3 +28,4 @@ TEST(gfx_draw_rectangle)
 
     gfx_canvas_deinit(&canvas);
 }
+*/

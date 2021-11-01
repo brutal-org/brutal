@@ -10,8 +10,9 @@ typedef struct
 
 typedef struct
 {
+    Str name;
     Str kernel;
     Vec(LoaderModule) modules;
 } LoaderEntry;
 
-LoaderEntry config_get_entry(Str name, Str path, Buffer *buffer);
+LoaderEntry config_get_entry(Str name, Str path);

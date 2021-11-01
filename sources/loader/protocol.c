@@ -22,9 +22,8 @@ static HandoverMmapType efi_mmap_type_to_handover[] = {
     [EFI_ACPI_MEMORY_NVS] = HANDOVER_MMAP_RESERVED,
 };
 
-HandoverMmap get_mmap()
+HandoverMmap get_mmap(void)
 {
-
     size_t entry_count = 0;
     size_t descriptor_size = 0;
     EFIMemoryDescriptor *mmap = get_efi_memory_map(&entry_count, &descriptor_size);

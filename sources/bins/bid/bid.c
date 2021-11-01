@@ -1,13 +1,53 @@
-#include <bid/bid.h>
+#include <bid/gen.h>
+#include <bid/parse.h>
 #include <brutal/alloc.h>
 #include <brutal/debug.h>
 #include <brutal/io.h>
+#include <cc/gen.h>
+#include <json/emit.h>
+
+void bid_emit_json(BidIface const iface, IoWriter *writer)
+{
+    HeapAlloc heap;
+    heap_alloc_init(&heap, NODE_DEFAULT);
+
+    Json json = bidgen_json_iface(iface, alloc_global());
+    heap_alloc_deinit(&heap);
+
+    Emit emit;
+    emit_init(&emit, writer);
+    json_emit(json, &emit);
+    emit_deinit(&emit);
+
+    heap_alloc_deinit(&heap);
+}
+
+void bid_emit_c(BidIface const iface, IoWriter *writer)
+{
+    HeapAlloc heap;
+    heap_alloc_init(&heap, NODE_DEFAULT);
+
+    CUnit unit = bidgen_c(&iface, alloc_global());
+    heap_alloc_deinit(&heap);
+
+    Emit emit;
+    emit_init(&emit, writer);
+    cgen_c_unit(&emit, unit);
+    emit_deinit(&emit);
+
+    heap_alloc_deinit(&heap);
+}
 
 int main(int argc, char const *argv[])
 {
-    if (argc < 3)
+    if (argc != 3)
     {
-        log$("bid usage [bid input] [c output]");
+        log$("usage: bid input option");
+        log$("");
+        log$("options:");
+        log$("  --output-json   set the output to json");
+        log$("  --output-c      set the output to c");
+
         return 0;
     }
 
@@ -29,23 +69,25 @@ int main(int argc, char const *argv[])
     Scan scan;
     scan_init(&scan, buffer_str(&source_buffer));
 
-    BidInterface interface = bid_parse(&scan, base$(&heap));
+    BidIface iface = bid_parse(&scan, base$(&heap));
 
     if (scan_dump_error(&scan, io_std_err()))
     {
         return -1;
     }
 
-    IoFile output_file;
-    io_file_create(&output_file, str$(argv[2]));
-
-    IoWriter output_file_writer = io_file_writer(&output_file);
-    Emit emit;
-    emit_init(&emit, &output_file_writer);
-
-    bid2c(&interface, &emit, alloc_global());
-
-    heap_alloc_deinit(&heap);
+    if (str_eq(str$("--output-json"), str$(argv[2])))
+    {
+        bid_emit_json(iface, io_std_out());
+    }
+    else if (str_eq(str$("--output-c"), str$(argv[2])))
+    {
+        bid_emit_c(iface, io_std_out());
+    }
+    else
+    {
+        panic$("Unknow option {}", argv[2]);
+    }
 
     return 0;
 }

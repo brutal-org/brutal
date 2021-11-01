@@ -47,5 +47,4 @@ struct bid_member
 {
     Str name;
     BidType type;
-    bool kernel_handle;
 };
