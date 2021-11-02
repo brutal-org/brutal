@@ -64,23 +64,3 @@ $$($(1)_HOST_BIN): $$($(1)_HOST_OBJ) $(LIBS_HOST_BIN)
 endef
 
 $(foreach bin, $(HOST_BINS), $(eval $(call HOST_TEMPLATE,$(bin))))
-
-.PHONY: run-bid
-run-bid: $(BID_HOST_BIN)
-	$(BID_HOST_BIN) sources/libs/proto/example.bid --output-json
-
-.PHONY: run-cc
-run-cc: $(CC_HOST_BIN)
-	$(CC_HOST_BIN) sources/bins/cc/test.c.example
-
-.PHONY: run-test
-run-test: $(TEST_HOST_BIN)
-	cd $(BINDIR_HOST); ./test
-
-.PHONY: run-demo
-run-demo: $(DEMO_HOST_BIN)
-	$(DEMO_HOST_BIN)
-
-.PHONY: run-ud
-run-ud: $(UD_HOST_BIN)
-	$(UD_HOST_BIN) sources/bins/ud/test.ud.example

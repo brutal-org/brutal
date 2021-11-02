@@ -1,0 +1,11 @@
+interface BBus
+{
+    errors
+    {
+        UNKNOWN_SERVICE,
+    };
+
+    method find {Str name, Vec(ProtoId) protos} -> Vec(TaskId);
+
+    method bind {Str name, Vec(ProtoId) protos} -> Void;
+}

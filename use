@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -e
+
+if [ -z "$1" ]; then
+  echo "Usage: $0 [tool] [args...]"
+  exit 1
+fi
+
+if [[ -z "${CONFIG_TOOLCHAIN}" ]]; then
+  CONFIG_TOOLCHAIN="llvm"
+fi
+
+BINS=./bin/$(uname -m)-$CONFIG_TOOLCHAIN/host
+make -s $BINS/$1
+$BINS/$@

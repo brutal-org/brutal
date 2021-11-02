@@ -1,5 +1,0 @@
-#!/bin/bash
-set -e
-TOOL=./bin/$(uname -m)-llvm/host/$1
-make -s $TOOL
-$TOOL

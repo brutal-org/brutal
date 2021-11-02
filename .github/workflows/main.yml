@@ -77,12 +77,4 @@ jobs:
 
       - name: Run Tests
         run: |
-          make VERBOSE=yes CONFIG_TOOLCHAIN=${{matrix.toolchain}} run-test
-
-      - name: Run BID
-        run: |
-          make VERBOSE=yes CONFIG_TOOLCHAIN=${{matrix.toolchain}} run-bid
-
-      - name: Run UD
-        run: |
-          make VERBOSE=yes CONFIG_TOOLCHAIN=${{matrix.toolchain}} run-ud
+          VERBOSE=yes CONFIG_TOOLCHAIN=${{matrix.toolchain}} ./use test

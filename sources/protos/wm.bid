@@ -1,10 +1,5 @@
 interface Wm
 {
-    errors
-    {
-        UNKNOWN_SERVICE,
-    };
-
     type SurfaceHandle: uint64_t;
 
     method surface_create {
