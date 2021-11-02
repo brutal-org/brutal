@@ -1,0 +1,69 @@
+#pragma once
+
+#include <brutal/alloc/base.h>
+#include <brutal/io/read.h>
+#include <brutal/io/write.h>
+#include <embed/io.h>
+
+typedef struct
+{
+    uint8_t *data;
+    size_t used;
+    size_t capacity;
+    Alloc *alloc;
+} Buf;
+
+#define FixBuf(T, S) \
+    struct           \
+    {                \
+        size_t len;  \
+        T data[S];   \
+    }
+
+#define InlineBuf(T) \
+    struct           \
+    {                \
+        size_t len;  \
+        T buf[];     \
+    }
+
+void buf_init(Buf *self, size_t capacity, Alloc *alloc);
+
+void buf_deinit(Buf *self);
+
+void buf_ensure(Buf *self, size_t capacity);
+
+void buf_clear(Buf *self);
+
+void buf_push_impl(Buf *self, uint8_t const *data, size_t size);
+
+Str buf_str(Buf *self);
+
+#define buf_putc(SELF, CHR) \
+    buf_push(SELF, (char)(CHR))
+
+#define buf_push(SELF, DATA) (                                             \
+    {                                                                      \
+        typeof(DATA) __data = (DATA);                                      \
+        buf_push_impl((SELF), (uint8_t const *)&(__data), sizeof(__data)); \
+    })
+
+#define buf_write(SELF, DATA, SIZE) \
+    buf_push_impl((SELF), (uint8_t const *)(DATA), (SIZE))
+
+#define buf_begin(SELF) ((SELF)->data)
+
+#define buf_end(SELF) ((SELF)->data + (SELF)->used)
+
+#define buf_used(SELF) ((SELF)->used)
+
+IoReader buf_reader(Buf *self);
+
+IoWriter buf_writer(Buf *self);
+
+#define buf_fmt(BUF, FMT, ...) (                                   \
+    {                                                              \
+        IoWriter __writer = buf_writer(BUF);                       \
+        print_impl(&__writer, str$(FMT), PRINT_ARGS(__VA_ARGS__)); \
+        buf_str(BUF);                                              \
+    })

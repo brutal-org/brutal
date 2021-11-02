@@ -6,7 +6,7 @@
 typedef struct PACKED
 {
     char signature[4];
-    uint32_t length;
+    uint32_t len;
     uint8_t revision;
     uint8_t checksum;
     char oem_id[6];

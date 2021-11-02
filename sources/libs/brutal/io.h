@@ -2,7 +2,7 @@
 
 #include <brutal/base.h>
 /* --- */
-#include <brutal/io/buffer.h>
+#include <brutal/io/buf.h>
 #include <brutal/io/copy.h>
 #include <brutal/io/emit.h>
 #include <brutal/io/fmt.h>

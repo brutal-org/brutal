@@ -80,7 +80,7 @@ static void fill_handover_mmap(Handover *target, struct stivale2_struct_tag_memm
     {
         HandoverMmapEntry *entry = &target->mmap.entries[i];
 
-        entry->length = memory_map->memmap[i].length;
+        entry->len = memory_map->memmap[i].length;
         entry->base = memory_map->memmap[i].base;
         entry->type = stivale_mmap_type_to_handover_type(memory_map->memmap[i].type);
     }
@@ -118,7 +118,7 @@ void fill_handover_cmdline(Handover *target, struct stivale2_struct_tag_cmdline 
 {
     target->cmd_lines.present = true;
 
-    mem_cpy(target->cmd_lines.cmd_line.buffer, (void *)cmdline->cmdline, cstr_len((char *)cmdline->cmdline));
+    mem_cpy(target->cmd_lines.cmd_line.buf, (void *)cmdline->cmdline, cstr_len((char *)cmdline->cmdline));
     target->cmd_lines.cmd_line.len = cstr_len((char *)cmdline->cmdline);
 }
 

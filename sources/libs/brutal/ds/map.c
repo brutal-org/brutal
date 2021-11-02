@@ -3,7 +3,7 @@
 
 static uint32_t map_hash(Str key)
 {
-    return fnv_32(key.buffer, key.len, FNV1_32_INIT);
+    return fnv_32(key.buf, key.len, FNV1_32_INIT);
 }
 
 static MapNode *map_node_create(Alloc *alloc, Str key, const void *data, int data_size)
@@ -15,7 +15,7 @@ static MapNode *map_node_create(Alloc *alloc, Str key, const void *data, int dat
 
     node->data = (uint8_t *)node + sizeof(MapNode) + ALIGN_UP(key.len, 16);
 
-    mem_cpy(&node->key.buffer, key.buffer, key.len);
+    mem_cpy(&node->key.buf, key.buf, key.len);
     node->key.len = key.len;
 
     mem_cpy(node->data, data, data_size);

@@ -33,7 +33,7 @@ struct json
     };
 };
 
-bool json_is(Json const *json, JsonType type);
+bool json_is(Json const json, JsonType type);
 
 Json json_object(Alloc *alloc);
 
@@ -41,17 +41,17 @@ Json json_object_with_type(Str type, Alloc *alloc);
 
 void json_put(Json *json, Str key, Json value);
 
-Json json_get(Json *json, Str key);
+Json json_get(Json const json, Str key);
 
-bool json_try_get(Json *json, Str key, Json *result);
+bool json_try_get(Json const json, Str key, Json *result);
 
 Json json_array(Alloc *alloc);
 
 void json_append(Json *json, Json value);
 
-Json json_at(Json const *json, int index);
+Json json_at(Json json, int index);
 
-int json_len(Json const *json);
+int json_len(Json json);
 
 Json json_null(void);
 
@@ -63,4 +63,4 @@ Json json_error(void);
 
 Json json_number(long number);
 
-Json json_string(Str str, Alloc *alloc);
+Json json_str(Str str, Alloc *alloc);

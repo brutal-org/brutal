@@ -1,5 +1,6 @@
 #pragma once
 
+#include <brutal/io/buf.h>
 #include <brutal/math/min_max.h>
 #include <brutal/math/rect.h>
 #include <brutal/math/vec2.h>
@@ -19,8 +20,8 @@ typedef Edge(float) Edgef;
 typedef Slice(Edgei) Edgesi;
 typedef Slice(Edgef) Edgesf;
 
-typedef InlineSlice(Edgei) InlineEdgesi;
-typedef InlineSlice(Edgef) InlineEdgesf;
+typedef InlineBuf(Edgei) InlineEdgesi;
+typedef InlineBuf(Edgef) InlineEdgesf;
 
 #define edge_min_y(EDGE) math_min((EDGE).sy, (EDGE).ey)
 #define edge_max_y(EDGE) math_max((EDGE).sy, (EDGE).ey)
@@ -31,7 +32,7 @@ typedef InlineSlice(Edgef) InlineEdgesf;
                                                        \
         for (size_t i = 0; i < (EDGES).len; i++)       \
         {                                              \
-            typeof(*edges.buffer) e = edges.buffer[i]; \
+            typeof(*edges.buf) e = edges.buf[i];       \
                                                        \
             minx = MIN(minx, e.sx);                    \
             miny = MIN(miny, e.sy);                    \

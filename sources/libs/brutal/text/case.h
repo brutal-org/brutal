@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/io/buffer.h>
+#include <brutal/io/buf.h>
 
 typedef enum
 {
@@ -25,42 +25,42 @@ typedef enum
     CASE_SPONGE,
 } Case;
 
-Buffer case_to_default(Str str, Alloc *alloc);
+Buf case_to_default(Str str, Alloc *alloc);
 
-Buffer case_to_camel(Str str, Alloc *alloc);
+Buf case_to_camel(Str str, Alloc *alloc);
 
-Buffer case_to_capital(Str str, Alloc *alloc);
+Buf case_to_capital(Str str, Alloc *alloc);
 
-Buffer case_to_constant(Str str, Alloc *alloc);
+Buf case_to_constant(Str str, Alloc *alloc);
 
-Buffer case_to_dot(Str str, Alloc *alloc);
+Buf case_to_dot(Str str, Alloc *alloc);
 
-Buffer case_to_header(Str str, Alloc *alloc);
+Buf case_to_header(Str str, Alloc *alloc);
 
-Buffer case_to_no(Str str, Alloc *alloc);
+Buf case_to_no(Str str, Alloc *alloc);
 
-Buffer case_to_param(Str str, Alloc *alloc);
+Buf case_to_param(Str str, Alloc *alloc);
 
-Buffer case_to_pascal(Str str, Alloc *alloc);
+Buf case_to_pascal(Str str, Alloc *alloc);
 
-Buffer case_to_path(Str str, Alloc *alloc);
+Buf case_to_path(Str str, Alloc *alloc);
 
-Buffer case_to_sentence(Str str, Alloc *alloc);
+Buf case_to_sentence(Str str, Alloc *alloc);
 
-Buffer case_to_snake(Str str, Alloc *alloc);
+Buf case_to_snake(Str str, Alloc *alloc);
 
-Buffer case_to_title(Str str, Alloc *alloc);
+Buf case_to_title(Str str, Alloc *alloc);
 
-Buffer case_to_swap(Str str, Alloc *alloc);
+Buf case_to_swap(Str str, Alloc *alloc);
 
-Buffer case_to_lower(Str str, Alloc *alloc);
+Buf case_to_lower(Str str, Alloc *alloc);
 
-Buffer case_to_lower_first(Str str, Alloc *alloc);
+Buf case_to_lower_first(Str str, Alloc *alloc);
 
-Buffer case_to_upper(Str str, Alloc *alloc);
+Buf case_to_upper(Str str, Alloc *alloc);
 
-Buffer case_to_upper_first(Str str, Alloc *alloc);
+Buf case_to_upper_first(Str str, Alloc *alloc);
 
-Buffer case_to_sponge(Str str, Alloc *alloc);
+Buf case_to_sponge(Str str, Alloc *alloc);
 
-Buffer case_change(Case c, Str str, Alloc *alloc);
+Buf case_change(Case c, Str str, Alloc *alloc);

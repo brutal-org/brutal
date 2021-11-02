@@ -4,9 +4,9 @@
 
 static void test_case(Case c, char const *input, char const *expected)
 {
-    Buffer transformed = case_change(c, str$(input), test_alloc());
-    assert_str_equal(buffer_str(&transformed), str$(expected));
-    buffer_deinit(&transformed);
+    Buf transformed = case_change(c, str$(input), test_alloc());
+    assert_str_equal(buf_str(&transformed), str$(expected));
+    buf_deinit(&transformed);
 }
 
 TEST(change_case)

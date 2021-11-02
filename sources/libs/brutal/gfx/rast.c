@@ -48,7 +48,7 @@ void gfx_rast_fill(
 
             for (size_t i = 0; i < edges.len; i++)
             {
-                Edgef edge = edges.buffer[i];
+                Edgef edge = edges.buf[i];
 
                 if (edge_min_y(edge) <= yy && edge_max_y(edge) > yy)
                 {
@@ -57,11 +57,11 @@ void gfx_rast_fill(
                 }
             }
 
-            qsort(active.data, active.length, sizeof(float), float_cmp);
+            qsort(active.data, active.len, sizeof(float), float_cmp);
 
             bool odd_even = true;
 
-            for (int i = 0; i + 1 < active.length; i++)
+            for (int i = 0; i + 1 < active.len; i++)
             {
                 float start = MAX(active.data[i], rect_left(bound));
                 float end = MIN(active.data[i + 1], rect_right(bound));

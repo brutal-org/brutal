@@ -13,10 +13,10 @@ static Lock pmm_lock = {};
 
 static uintptr_t memory_map_get_highest_address(HandoverMmap const *memory_map)
 {
-    size_t length = memory_map->entries[memory_map->size - 1].length;
+    size_t len = memory_map->entries[memory_map->size - 1].len;
     size_t start = memory_map->entries[memory_map->size - 1].base;
 
-    return ALIGN_UP(length + start, MEM_PAGE_SIZE);
+    return ALIGN_UP(len + start, MEM_PAGE_SIZE);
 }
 
 static void pmm_bitmap_initialize(HandoverMmap const *memory_map)
@@ -36,7 +36,7 @@ static void pmm_bitmap_initialize(HandoverMmap const *memory_map)
             continue;
         }
 
-        if (entry->length > bitmap_target_size)
+        if (entry->len > bitmap_target_size)
         {
             log$("Allocated memory bitmap at {x}-{x}", entry->base, entry->base + bitmap_target_size - 1);
 
@@ -57,7 +57,7 @@ static void pmm_load_memory_map(HandoverMmap const *memory_map)
     for (size_t i = 0; i < memory_map->size; i++)
     {
         size_t base = ALIGN_UP(memory_map->entries[i].base, MEM_PAGE_SIZE);
-        size_t size = ALIGN_DOWN(memory_map->entries[i].length, MEM_PAGE_SIZE);
+        size_t size = ALIGN_DOWN(memory_map->entries[i].len, MEM_PAGE_SIZE);
 
         log$("    type: {x} {x}-{x}", memory_map->entries[i].type, base, base + size - 1);
 

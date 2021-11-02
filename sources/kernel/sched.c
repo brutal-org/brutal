@@ -354,7 +354,7 @@ void sched_finalize(void)
 {
     LOCK_RETAINER(&lock);
 
-    for (int i = 0; i < tasks.length; i++)
+    for (int i = 0; i < tasks.len; i++)
     {
         Task *task = tasks.data[i];
 

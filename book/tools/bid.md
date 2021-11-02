@@ -41,7 +41,7 @@ A structure in bid is created using `{` and `}`:
 
 ### The enum type
 
-An enum is created when using the  `enum` keyword:
+An enum is created when using the `enum` keyword:
 
 ```bid
 enum {
@@ -56,7 +56,7 @@ enum {
 First each method/structure are placed in an interface, and each interface has a name:
 
 ```bid
-interface identifier 
+interface identifier
 {
 
 }
@@ -162,10 +162,11 @@ method surface_create {width: int, height: int} -> SurfaceHandle;
 If you have this BID code:
 
 ```bid
-method surface_create { width: int, height: int } -> { handle: SurfaceHandle, buffer: MObj};
+method surface_create { width: int, height: int } -> { handle: SurfaceHandle, buf: MObj};
 ```
 
 BID will generates this:
+
 ```c
 typedef struct
 {
@@ -176,7 +177,7 @@ typedef struct
 typedef struct
 {
     CompositorSurfaceHandle handle;
-    MObj buffer;
+    MObj buf;
 } CompositorSurfaceCreateResponse;
 
 typedef enum

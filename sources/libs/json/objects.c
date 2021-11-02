@@ -1,9 +1,9 @@
 #include <brutal/debug.h>
 #include <json/objects.h>
 
-bool json_is(Json const *json, JsonType type)
+bool json_is(Json const json, JsonType type)
 {
-    return json->type == type;
+    return json.type == type;
 }
 
 Json json_object(Alloc *alloc)
@@ -17,28 +17,28 @@ Json json_object(Alloc *alloc)
 Json json_object_with_type(Str type, Alloc *alloc)
 {
     Json object = json_object(alloc);
-    json_put(&object, str$("$type"), json_string(type, alloc));
+    json_put(&object, str$("$type"), json_str(type, alloc));
     return object;
 }
 
 void json_put(Json *json, Str key, Json value)
 {
-    assert_truth(json_is(json, JSON_OBJECT));
+    assert_truth(json_is(*json, JSON_OBJECT));
     map_put(&json->object, key, value);
 }
 
-Json json_get(Json *json, Str key)
+Json json_get(Json json, Str key)
 {
     assert_truth(json_is(json, JSON_OBJECT));
 
     Json data;
-    return map_get(&json->object, key, &data) ? data : json_null();
+    return map_get(&json.object, key, &data) ? data : json_null();
 }
 
-bool json_try_get(Json *json, Str key, Json *result)
+bool json_try_get(Json json, Str key, Json *result)
 {
     assert_truth(json_is(json, JSON_OBJECT));
-    return map_get(&json->object, key, result);
+    return map_get(&json.object, key, result);
 }
 
 Json json_array(Alloc *alloc)
@@ -52,21 +52,21 @@ Json json_array(Alloc *alloc)
 
 void json_append(Json *json, Json value)
 {
-    assert_truth(json_is(json, JSON_ARRAY));
+    assert_truth(json_is(*json, JSON_ARRAY));
     vec_push(&json->array, value);
 }
 
-Json json_at(Json const *json, int index)
+Json json_at(Json const json, int index)
 {
     assert_truth(json_is(json, JSON_ARRAY));
 
-    return vec_at(&json->array, index);
+    return vec_at(&json.array, index);
 }
 
-int json_len(Json const *json)
+int json_len(Json const json)
 {
     assert_truth(json_is(json, JSON_ARRAY));
-    return json->array.length;
+    return json.array.len;
 }
 
 Json json_null(void)
@@ -105,7 +105,7 @@ Json json_number(long number)
     };
 }
 
-Json json_string(Str str, Alloc *alloc)
+Json json_str(Str str, Alloc *alloc)
 {
     return (Json){
         .type = JSON_STRING,

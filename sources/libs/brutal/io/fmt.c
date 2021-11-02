@@ -1,3 +1,5 @@
+#define _BRUTAL_SOURCE
+
 #include <brutal/alloc/global.h>
 #include <brutal/base/attributes.h>
 #include <brutal/base/keywords.h>
@@ -213,16 +215,6 @@ Fmt fmt_parse(Scan *scan)
     return fmt;
 }
 
-size_t fmt_write_length(Fmt self, unsigned long value)
-{
-    size_t length = 0;
-    for (; value != 0; length++)
-    {
-        value /= fmt_base(self);
-    }
-    return length;
-}
-
 IoResult fmt_signed(Fmt self, IoWriter *writer, FmtInt value)
 {
     size_t written = 0;
@@ -238,20 +230,30 @@ IoResult fmt_signed(Fmt self, IoWriter *writer, FmtInt value)
     return OK(IoResult, written);
 }
 
+static void reverse(uint8_t *str, size_t len)
+{
+    for (uint8_t *p1 = str, *p2 = str + len - 1; p2 > p1; ++p1, --p2)
+    {
+        *p1 ^= *p2;
+        *p2 ^= *p1;
+        *p1 ^= *p2;
+    }
+}
+
 IoResult fmt_unsigned(Fmt self, IoWriter *writer, FmtUInt value)
 {
-    uint8_t buffer[sizeof(FmtUInt) * 8] = {};
+    uint8_t buf[sizeof(FmtUInt) * 8] = {};
     size_t i = 0;
 
     if (value == 0)
     {
-        buffer[0] = '0';
+        buf[0] = '0';
         i++;
     }
 
     while (value != 0)
     {
-        buffer[i] = fmt_digit(self, value % fmt_base(self));
+        buf[i] = fmt_digit(self, value % fmt_base(self));
         value /= fmt_base(self);
         i++;
     }
@@ -262,11 +264,11 @@ IoResult fmt_unsigned(Fmt self, IoWriter *writer, FmtUInt value)
         {
             if (self.fill_with_zero)
             {
-                buffer[i] = '0';
+                buf[i] = '0';
             }
             else
             {
-                buffer[i] = ' ';
+                buf[i] = ' ';
             }
 
             i++;
@@ -275,13 +277,13 @@ IoResult fmt_unsigned(Fmt self, IoWriter *writer, FmtUInt value)
 
     if (self.prefix)
     {
-        buffer[i++] = fmt_prefix(self);
-        buffer[i++] = '0';
+        buf[i++] = fmt_prefix(self);
+        buf[i++] = '0';
     }
 
-    str_rvs(str_n$(i, (char *)buffer));
+    reverse(buf, i);
 
-    return io_write(writer, buffer, i);
+    return io_write(writer, buf, i);
 }
 
 #if !defined(__kernel__) && !defined(__loader__)
@@ -380,9 +382,9 @@ IoResult fmt_string(Fmt self, IoWriter *writer, Str value)
     }
     else
     {
-        Buffer buffer = case_change(self.casing, value, alloc_global());
-        IoResult result = io_print(writer, buffer_str(&buffer));
-        buffer_deinit(&buffer);
+        Buf buf = case_change(self.casing, value, alloc_global());
+        IoResult result = io_print(writer, buf_str(&buf));
+        buf_deinit(&buf);
         return result;
     }
 }

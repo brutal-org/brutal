@@ -58,7 +58,7 @@ enum com_line_status_bit
     COM_LINE_PARITY_ERROR = 1 << 2,
     COM_LINE_FRAMING_ERROR = 1 << 3,
     COM_LINE_BREAK_INDICATOR = 1 << 4,
-    COM_LINE_TRANSMITTER_BUFFER_EMPTY = 1 << 5,
+    COM_LINE_TRANSMITTER_BUF_EMPTY = 1 << 5,
     COM_LINE_TRANSMITTER_EMPTY = 1 << 6,
     COM_LINE_IMPENDING_ERROR = 1 << 7,
 };
@@ -79,6 +79,6 @@ void com_putc(enum com_port port, char c);
 
 char com_getc(enum com_port port);
 
-size_t com_write(enum com_port port, void const *buffer, size_t size);
+size_t com_write(enum com_port port, void const *buf, size_t size);
 
 void com_initialize(enum com_port port);

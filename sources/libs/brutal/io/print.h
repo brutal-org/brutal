@@ -5,7 +5,6 @@
 #include <brutal/base/map.h>
 #include <brutal/base/std.h>
 #include <brutal/base/vaopt.h>
-#include <brutal/io/buffer.h>
 #include <brutal/io/fmt.h>
 #include <brutal/io/write.h>
 #include <brutal/text/str.h>

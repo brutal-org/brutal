@@ -81,7 +81,7 @@ Json json_parse(Scan *scan, Alloc *alloc)
 
     if (scan_curr(scan) == '"') // string
     {
-        return json_string(parse_str(scan), alloc);
+        return json_str(parse_str(scan), alloc);
     }
     else if (isdigit(scan_curr(scan)) || scan_curr(scan) == '-') // number
     {
@@ -131,10 +131,10 @@ Json json_parse_file(Str path, Alloc *alloc)
     io_file_open(&file, path);
 
     IoReader reader = io_file_reader(&file);
-    Buffer buffer = io_readall((&reader), alloc_global());
+    Buf buf = io_readall((&reader), alloc_global());
 
     Scan scan = {};
-    scan_init(&scan, buffer_str(&buffer));
+    scan_init(&scan, buf_str(&buf));
     Json json = json_parse(&scan, alloc);
 
     io_file_close(&file);

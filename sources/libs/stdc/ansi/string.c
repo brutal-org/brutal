@@ -149,8 +149,8 @@ int strncmp(char const *s1, char const *s2, size_t n)
 
 char *strchr(char const *s, int c)
 {
-    size_t length = strlen(s);
-    for (size_t i = 0; i < length; i++)
+    size_t len = strlen(s);
+    for (size_t i = 0; i < len; i++)
     {
         if (s[i] == c)
         {
@@ -167,13 +167,13 @@ char *strchr(char const *s, int c)
 
 char *strrchr(char const *s, int c)
 {
-    size_t length = strlen(s);
-    size_t pos = length;
+    size_t len = strlen(s);
+    size_t pos = len;
 
     while (s[pos] != c && pos-- != 0)
         ;
 
-    if (pos == length)
+    if (pos == len)
     {
         return nullptr;
     }

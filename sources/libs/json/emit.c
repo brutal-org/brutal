@@ -7,12 +7,12 @@ void json_emit_string(Str str, Emit *emit)
 
     for (size_t i = 0; i < str.len; i++)
     {
-        if (str.buffer[i] == '"')
+        if (str.buf[i] == '"')
         {
             emit_fmt(emit, "\\");
         }
 
-        emit_fmt(emit, "{c}", str.buffer[i]);
+        emit_fmt(emit, "{c}", str.buf[i]);
     }
 
     emit_fmt(emit, "\"");

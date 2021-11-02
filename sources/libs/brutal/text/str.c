@@ -1,25 +1,15 @@
 #include <brutal/base/keywords.h>
 #include <brutal/text/str.h>
 
-void str_rvs(Str str)
-{
-    for (int i = 0, j = str.len - 1; i < j; i++, j--)
-    {
-        char c = str.buffer[i];
-        str.buffer[i] = str.buffer[j];
-        str.buffer[j] = c;
-    }
-}
-
 Str str_dup(Str const str, Alloc *alloc)
 {
     if (is_nullstr(str))
     {
         return str_make_from_cstr("");
     }
-    char *buffer = (char *)alloc_malloc(alloc, str.len);
-    mem_cpy(buffer, str.buffer, str.len);
-    return str_n$(str.len, buffer);
+    char *buf = (char *)alloc_malloc(alloc, str.len);
+    mem_cpy(buf, str.buf, str.len);
+    return str_n$(str.len, buf);
 }
 
 bool str_eq(Str const lhs, Str const rhs)
@@ -31,7 +21,7 @@ bool str_eq(Str const lhs, Str const rhs)
 
     for (size_t i = 0; i < lhs.len; i++)
     {
-        if (lhs.buffer[i] != rhs.buffer[i])
+        if (lhs.buf[i] != rhs.buf[i])
         {
             return false;
         }
@@ -50,7 +40,7 @@ int str_count(Str const haystack, Str const needle)
     int count = 0;
     for (size_t i = 0; i < haystack.len - needle.len; i++)
     {
-        Str slice = str_n$(needle.len, haystack.buffer + i);
+        Str slice = str_n$(needle.len, haystack.buf + i);
 
         if (str_eq(slice, needle))
         {
@@ -67,7 +57,7 @@ int str_count_chr(Str const str, char chr)
 
     for (size_t i = 0; i < str.len; i++)
     {
-        if (str.buffer[i] == chr)
+        if (str.buf[i] == chr)
         {
             result++;
         }
@@ -86,7 +76,7 @@ int str_last(Str const lStr, Str const rStr)
     int pos = -1;
     for (size_t i = 0; i < lStr.len - rStr.len; i++)
     {
-        Str substr = str_n$(rStr.len, lStr.buffer + i);
+        Str substr = str_n$(rStr.len, lStr.buf + i);
 
         if (str_eq(substr, rStr))
         {
@@ -103,7 +93,7 @@ int str_last_chr(Str const str, char chr)
 
     for (size_t i = 0; i < str.len; i++)
     {
-        if (str.buffer[i] == chr)
+        if (str.buf[i] == chr)
         {
             result = i;
         }
@@ -121,7 +111,7 @@ int str_first(Str const lStr, Str const rStr)
 
     for (size_t i = 0; i < lStr.len - rStr.len; i++)
     {
-        Str substr = str_n$(rStr.len, lStr.buffer + i);
+        Str substr = str_n$(rStr.len, lStr.buf + i);
 
         if (str_eq(substr, rStr))
         {
@@ -136,7 +126,7 @@ int str_first_chr(Str const str, char chr)
 {
     for (size_t i = 0; i < str.len; i++)
     {
-        if (str.buffer[i] == chr)
+        if (str.buf[i] == chr)
         {
             return i;
         }

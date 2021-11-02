@@ -42,9 +42,9 @@ HandoverMmap get_mmap(void)
     {
         EFIMemoryDescriptor *desc = (EFIMemoryDescriptor *)((uint64_t)mmap + descriptor_size * i);
 
-        uint64_t length = desc->num_pages << 12;
+        uint64_t len = desc->num_pages << 12;
         uint64_t phys_base = desc->physical_start;
-        uint64_t phys_end = desc->physical_start + length;
+        uint64_t phys_end = desc->physical_start + len;
 
         int type = HANDOVER_MMAP_RESERVED;
 
@@ -55,13 +55,13 @@ HandoverMmap get_mmap(void)
 
         if (last_type == type && last_end == desc->physical_start)
         {
-            start_from[-1].length += length;
+            start_from[-1].len += len;
         }
 
         else
         {
             start_from->type = type;
-            start_from->length = length;
+            start_from->len = len;
             start_from->base = phys_base;
             last_type = type;
 

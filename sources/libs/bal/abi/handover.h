@@ -27,7 +27,7 @@ typedef struct
     HandoverMmapType type;
 
     uintptr_t base;
-    size_t length;
+    size_t len;
 } HandoverMmapEntry;
 
 typedef struct

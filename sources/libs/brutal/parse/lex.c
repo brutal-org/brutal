@@ -25,12 +25,12 @@ void lex_deinit(Lex *self)
 
 bool lex_ended(Lex *self)
 {
-    return !lex_ok(self) || self->head >= self->lexemes.length;
+    return !lex_ok(self) || self->head >= self->lexemes.len;
 }
 
 Lexeme lex_peek(Lex *self, int offset)
 {
-    if (self->head + offset >= self->lexemes.length)
+    if (self->head + offset >= self->lexemes.len)
     {
         return (Lexeme){
             LEXEME_EOF,

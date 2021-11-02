@@ -19,13 +19,13 @@ enum tga_image_origin
 
 typedef struct PACKED
 {
-    le_int8_t id_length;
+    le_int8_t id_len;
     le_int8_t colour_map_type;
 
 #define TGA_DATATYPE_UNCOMPRESSED_RGB (2)
     le_int8_t data_type_code;
     le_int16_t colour_map_origin;
-    le_int16_t colour_map_length;
+    le_int16_t colour_map_len;
     le_int8_t colour_map_depth;
     le_int16_t x_origin;
     le_int16_t y_origin;

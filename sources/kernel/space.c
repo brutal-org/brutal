@@ -37,7 +37,7 @@ static void memory_mapping_destroy(Space *space, MemoryMapping *mapping)
 
 void space_destroy(Space *self)
 {
-    for (int i = 0; i < self->mappings.length; i++)
+    for (int i = 0; i < self->mappings.len; i++)
     {
         memory_mapping_destroy(self, self->mappings.data[i]);
     }

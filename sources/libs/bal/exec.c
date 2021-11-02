@@ -116,7 +116,7 @@ static uintptr_t bal_exec_stack(BrSpace space, BrExecArgs const *exec_args, BrTa
         for (int i = 0; i < cmain.argc; i++)
         {
             head -= ALIGN_UP(cmain.argv[i].len + 1, 16);
-            mem_cpy(head, cmain.argv[i].buffer, cmain.argv[i].len);
+            mem_cpy(head, cmain.argv[i].buf, cmain.argv[i].len);
             head[cmain.argv[i].len] = 0;
 
             argv[i] = 0xC0000000 - ((uintptr_t)base - (uintptr_t)head);

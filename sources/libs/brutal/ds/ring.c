@@ -54,7 +54,7 @@ void ring_clear_impl(RingImpl *impl)
     impl->used = 0;
 }
 
-int ring_length_impl(RingImpl *impl)
+int ring_len_impl(RingImpl *impl)
 {
     return impl->used;
 }

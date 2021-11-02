@@ -18,7 +18,7 @@ bool com_can_read(enum com_port port)
 
 bool com_can_write(enum com_port port)
 {
-    return (com_read_reg(port, COM_LINE_STATUS) & COM_LINE_TRANSMITTER_BUFFER_EMPTY);
+    return (com_read_reg(port, COM_LINE_STATUS) & COM_LINE_TRANSMITTER_BUF_EMPTY);
 }
 
 void com_wait_write(enum com_port port)
@@ -43,11 +43,11 @@ char com_getc(enum com_port port)
     return com_read_reg(port, COM_DATA);
 }
 
-size_t com_write(enum com_port port, void const *buffer, size_t size)
+size_t com_write(enum com_port port, void const *buf, size_t size)
 {
     for (size_t i = 0; i < size; i++)
     {
-        com_putc(port, ((char const *)buffer)[i]);
+        com_putc(port, ((char const *)buf)[i]);
     }
 
     return size;

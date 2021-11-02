@@ -22,5 +22,5 @@ typedef struct PACKED
 
 static inline int acpi_mcfg_record_count(AcpiMcfg *mcfg)
 {
-    return (mcfg->stdh.length - sizeof(AcpiMcfg)) / sizeof(AcpiMcfgRecord);
+    return (mcfg->stdh.len - sizeof(AcpiMcfg)) / sizeof(AcpiMcfgRecord);
 }

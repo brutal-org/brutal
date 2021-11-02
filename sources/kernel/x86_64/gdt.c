@@ -46,7 +46,7 @@ struct gdt_entry gdt_entry_simple(uint8_t flags, uint8_t granularity)
 struct gdt_tss_entry gdt_entry_tss(uintptr_t tss)
 {
     return (struct gdt_tss_entry){
-        .length = sizeof(struct tss),
+        .len = sizeof(struct tss),
         .base_low16 = tss & 0xffff,
         .base_mid8 = (tss >> 16) & 0xff,
         .flags1 = 0b10001001,

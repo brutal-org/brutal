@@ -12,7 +12,7 @@ Iter acpi_madt_iterate(Acpi *acpi, IterFn *fn, void *ctx)
 
     AcpiMadtRecord *record = madt->records;
 
-    while ((uintptr_t)record < (uintptr_t)madt + madt->sdth.length)
+    while ((uintptr_t)record < (uintptr_t)madt + madt->sdth.len)
     {
         if (fn(record, ctx) == ITER_STOP)
         {

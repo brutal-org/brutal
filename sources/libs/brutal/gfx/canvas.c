@@ -5,29 +5,29 @@ void gfx_canvas_init(GfxCanvas *self, Alloc *alloc, int width, int height, GfxPi
 {
     *self = (GfxCanvas){};
 
-    gfx_buffer_init(&self->buffer, alloc, width, height, format);
+    gfx_buf_init(&self->buf, alloc, width, height, format);
     gfx_cache_init(&self->cache, alloc);
 }
 
 void gfx_canvas_deinit(GfxCanvas *self)
 {
     gfx_cache_deinit(&self->cache);
-    gfx_buffer_deinit(&self->buffer);
+    gfx_buf_deinit(&self->buf);
 }
 
 void gfx_canvas_begin(GfxCanvas *self)
 {
-    gfx_cache_begin(&self->cache, gfx_buffer_surface(&self->buffer));
+    gfx_cache_begin(&self->cache, gfx_buf_surface(&self->buf));
 }
 
 void gfx_canvas_end(GfxCanvas *self)
 {
-    gfx_cache_end(&self->cache, gfx_buffer_surface(&self->buffer));
+    gfx_cache_end(&self->cache, gfx_buf_surface(&self->buf));
 }
 
 GfxSurface gfx_canvas_surface(GfxCanvas *self)
 {
-    return gfx_buffer_surface(&self->buffer);
+    return gfx_buf_surface(&self->buf);
 }
 
 void gfx_canvas_fill(GfxCanvas *self, GfxPaint paint)

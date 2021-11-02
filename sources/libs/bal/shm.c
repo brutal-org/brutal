@@ -94,7 +94,7 @@ MaybeError DEPRECATED(balshm_init_str)(BalShm *self, Str str)
 
     InlineStr *target = self->buf;
 
-    mem_cpy(target->buffer, str.buffer, str.len);
+    mem_cpy(target->buf, str.buf, str.len);
     target->len = str.len;
 
     return SUCCESS;

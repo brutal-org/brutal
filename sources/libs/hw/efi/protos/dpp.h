@@ -18,5 +18,5 @@ typedef struct
 {
     uint8_t type;
     uint8_t sub_type;
-    uint8_t length[2];
+    uint8_t len[2];
 } EFIDevicePath;

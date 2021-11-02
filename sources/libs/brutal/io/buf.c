@@ -1,26 +1,26 @@
 #include <brutal/base/attributes.h>
 #include <brutal/base/macros.h>
-#include <brutal/io/buffer.h>
+#include <brutal/io/buf.h>
 
-void buffer_init(Buffer *self, size_t capacity, Alloc *alloc)
+void buf_init(Buf *self, size_t capacity, Alloc *alloc)
 {
-    *self = (Buffer){
+    *self = (Buf){
         .data = nullptr,
         .used = 0,
         .capacity = 0,
         .alloc = alloc,
     };
 
-    buffer_ensure(self, capacity);
+    buf_ensure(self, capacity);
 }
 
-void buffer_deinit(Buffer *self)
+void buf_deinit(Buf *self)
 {
     alloc_free(self->alloc, self->data);
-    *self = (Buffer){};
+    *self = (Buf){};
 }
 
-void buffer_ensure(Buffer *self, size_t capacity)
+void buf_ensure(Buf *self, size_t capacity)
 {
     if (self->capacity >= capacity)
     {
@@ -38,25 +38,25 @@ void buffer_ensure(Buffer *self, size_t capacity)
     self->capacity = capacity;
 }
 
-void buffer_clear(Buffer *self)
+void buf_clear(Buf *self)
 {
     self->used = 0;
 }
 
-void buffer_push_impl(Buffer *self, uint8_t const *data, size_t size)
+void buf_push_impl(Buf *self, uint8_t const *data, size_t size)
 {
-    buffer_ensure(self, self->used + size);
+    buf_ensure(self, self->used + size);
 
     mem_cpy(self->data + self->used, data, size);
     self->used += size;
 }
 
-Str buffer_str(Buffer *self)
+Str buf_str(Buf *self)
 {
     return str_n$(self->used, (char *)self->data);
 }
 
-static IoResult buffer_read_impl(Buffer *self, char *data, size_t offset, size_t size)
+static IoResult buf_read_impl(Buf *self, char *data, size_t offset, size_t size)
 {
     size_t read = MIN(size, self->used - offset);
 
@@ -68,28 +68,28 @@ static IoResult buffer_read_impl(Buffer *self, char *data, size_t offset, size_t
     return OK(IoResult, read);
 }
 
-IoReader buffer_reader(Buffer *self)
+IoReader buf_reader(Buf *self)
 {
     return (IoReader){
-        .read = (IoRead *)buffer_read_impl,
+        .read = (IoRead *)buf_read_impl,
         .context = self,
     };
 }
 
-static IoResult buffer_write_impl(Buffer *self, char const *data, MAYBE_UNUSED size_t offset, size_t size)
+static IoResult buf_write_impl(Buf *self, char const *data, MAYBE_UNUSED size_t offset, size_t size)
 {
     for (size_t i = 0; i < size; i++)
     {
-        buffer_push(self, data[i]);
+        buf_push(self, data[i]);
     }
 
     return OK(IoResult, size);
 }
 
-IoWriter buffer_writer(Buffer *self)
+IoWriter buf_writer(Buf *self)
 {
     return (IoWriter){
-        .write = (IoWrite *)buffer_write_impl,
+        .write = (IoWrite *)buf_write_impl,
         .context = self,
     };
 }

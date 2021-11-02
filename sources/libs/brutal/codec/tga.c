@@ -19,7 +19,7 @@ IoResult tga_encode(IoWriter *writer, GfxSurface surface)
     size_t written = 0;
 
     written = TRY(IoResult, io_write(writer, (uint8_t *)&header, sizeof(TgaHeader)));
-    written += TRY(IoResult, io_write(writer, (uint8_t *)surface.buffer, surface.size));
+    written += TRY(IoResult, io_write(writer, (uint8_t *)surface.buf, surface.size));
 
     return OK(IoResult, written);
 }
@@ -29,14 +29,14 @@ GfxSurface tga_decode_in_memory(void *addr, size_t size)
     assert_greater_than(size, sizeof(TgaHeader));
 
     TgaHeader *header = (TgaHeader *)addr;
-    void *buffer = header + 1;
+    void *buf = header + 1;
 
     return (GfxSurface){
         .width = load_le(header->width),
         .height = load_le(header->height),
         .pitch = load_le(header->width) * (load_le(header->bits_per_pixel) / 8),
         .format = GFX_PIXEL_FORMAT_RGBA8888,
-        .buffer = buffer,
+        .buf = buf,
         .size = size - sizeof(TgaHeader),
     };
 }

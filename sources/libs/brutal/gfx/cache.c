@@ -2,7 +2,7 @@
 
 void gfx_cache_init(GfxCache *self, Alloc *alloc)
 {
-    linear_buffer_init(&self->commands, alloc);
+    linear_buf_init(&self->commands, alloc);
 
     grid_init(&self->front_hashgrid, 16, 16, alloc);
     grid_init(&self->back_hashgrid, 16, 16, alloc);
@@ -13,7 +13,7 @@ void gfx_cache_deinit(GfxCache *self)
     grid_deinit(&self->back_hashgrid);
     grid_deinit(&self->front_hashgrid);
 
-    linear_buffer_deinit(&self->commands);
+    linear_buf_deinit(&self->commands);
 }
 
 void gfx_cache_begin(GfxCache *self, GfxSurface surface)
@@ -31,7 +31,7 @@ void gfx_cache_begin(GfxCache *self, GfxSurface surface)
 
 void gfx_cache_end(GfxCache *self, MAYBE_UNUSED GfxSurface surface)
 {
-    linear_buffer_foreach(command, &self->commands)
+    linear_buf_foreach(command, &self->commands)
     {
         switch (command->type)
         {
@@ -57,7 +57,7 @@ void gfx_cache_end(GfxCache *self, MAYBE_UNUSED GfxSurface surface)
         }
     }
 
-    linear_buffer_clear(&self->commands);
+    linear_buf_clear(&self->commands);
 }
 
 void gfx_cache_invalidate(GfxCache *self)
@@ -79,7 +79,7 @@ void gfx_cache_rect(GfxCache *self, Rectf rect, GfxStroke stroke, GfxPaint fill,
         .rect = rect,
     };
 
-    linear_buffer_push(&self->commands, command);
+    linear_buf_push(&self->commands, command);
 }
 
 // void gfx_cache_line(GfxCache *self, Edgef line, GfxStroke stroke, Trans2 transform)

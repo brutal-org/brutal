@@ -68,14 +68,14 @@ typedef Vec2(double) Vec2d;
         __v;                \
     })
 
-#define vec2_length_squared(a) \
+#define vec2_len_squared(a) \
     ((a).x * (a).x + (a).y * (a).y)
 
-#define vec2_length(a) \
-    sqrt(vec2_length_squared(a))
+#define vec2_len(a) \
+    sqrt(vec2_len_squared(a))
 
 #define vec2_distance(a, b) \
-    vec2_length(vec2_sub(b, a))
+    vec2_len(vec2_sub(b, a))
 
 #define vec2_angle(a) \
     deg2rad(atan2f((a).y, (a).x))

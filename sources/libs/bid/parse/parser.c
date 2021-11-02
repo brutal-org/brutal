@@ -210,15 +210,15 @@ static BidMethod parse_method(Scan *scan, Alloc *alloc)
 
 BidIface bid_parse(Scan *scan, Alloc *alloc)
 {
-    BidIface interface = {};
+    BidIface iface = {};
 
-    vec_init(&interface.aliases, alloc);
-    vec_init(&interface.events, alloc);
-    vec_init(&interface.methods, alloc);
+    vec_init(&iface.aliases, alloc);
+    vec_init(&iface.events, alloc);
+    vec_init(&iface.methods, alloc);
 
     skip_keyword(scan, "interface");
 
-    interface.name = parse_ident(scan);
+    iface.name = parse_ident(scan);
 
     expect_separator(scan, '{');
 
@@ -226,19 +226,19 @@ BidIface bid_parse(Scan *scan, Alloc *alloc)
     {
         if (skip_keyword(scan, "errors"))
         {
-            interface.errors = parse_enum(scan, alloc);
+            iface.errors = parse_enum(scan, alloc);
         }
         else if (skip_keyword(scan, "type"))
         {
-            vec_push(&interface.aliases, parse_alias(scan, alloc));
+            vec_push(&iface.aliases, parse_alias(scan, alloc));
         }
         else if (skip_keyword(scan, "event"))
         {
-            vec_push(&interface.events, parse_event(scan, alloc));
+            vec_push(&iface.events, parse_event(scan, alloc));
         }
         else if (skip_keyword(scan, "method"))
         {
-            vec_push(&interface.methods, parse_method(scan, alloc));
+            vec_push(&iface.methods, parse_method(scan, alloc));
         }
         else if (skip_keyword(scan, "id"))
         {
@@ -254,7 +254,7 @@ BidIface bid_parse(Scan *scan, Alloc *alloc)
                 id += scan_next_digit(scan);
             }
 
-            interface.id = id;
+            iface.id = id;
         }
         else
         {
@@ -266,9 +266,9 @@ BidIface bid_parse(Scan *scan, Alloc *alloc)
 
     expect_separator(scan, '}');
 
-    vec_push(&interface.errors.members, str$("UNEXPECTED_MESSAGE"));
-    vec_push(&interface.errors.members, str$("BAD_COMMUNICATION"));
-    vec_push(&interface.errors.members, str$("SUCCESS"));
+    vec_push(&iface.errors.members, str$("UNEXPECTED_MESSAGE"));
+    vec_push(&iface.errors.members, str$("BAD_COMMUNICATION"));
+    vec_push(&iface.errors.members, str$("SUCCESS"));
 
-    return interface;
+    return iface;
 }

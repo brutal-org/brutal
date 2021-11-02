@@ -1,60 +1,60 @@
 #pragma once
 
 #include <brutal/alloc/base.h>
-#include <brutal/io/buffer.h>
+#include <brutal/io/buf.h>
 
 typedef struct
 {
     size_t size;
     uint8_t data[];
-} LinearBufferNode;
+} LinearBufNode;
 
 typedef struct
 {
-    Buffer buffer;
+    Buf buf;
     size_t current;
-} LinearBufferImpl;
+} LinearBufImpl;
 
-#define LinearBuffer(T)                                                            \
+#define LinearBuf(T)                                                               \
     union                                                                          \
     {                                                                              \
-        LinearBufferImpl _impl;                                                    \
+        LinearBufImpl _impl;                                                       \
                                                                                    \
         /* Don't access this, it's a meta variable for storing the element type */ \
         T *_T;                                                                     \
     }
 
-void linear_buffer_init_impl(LinearBufferImpl *impl, Alloc *alloc);
+void linear_buf_init_impl(LinearBufImpl *impl, Alloc *alloc);
 
-void linear_buffer_deinit_impl(LinearBufferImpl *impl);
+void linear_buf_deinit_impl(LinearBufImpl *impl);
 
-void linear_buffer_push_impl(LinearBufferImpl *impl, uint8_t const *data, size_t size);
+void linear_buf_push_impl(LinearBufImpl *impl, uint8_t const *data, size_t size);
 
-void linear_buffer_attach_impl(LinearBufferImpl *impl, uint8_t const *data, size_t size);
+void linear_buf_attach_impl(LinearBufImpl *impl, uint8_t const *data, size_t size);
 
-void linear_buffer_clear_impl(LinearBufferImpl *impl);
+void linear_buf_clear_impl(LinearBufImpl *impl);
 
-#define linear_buffer_init(SELF, ALLOC) \
-    linear_buffer_init_impl(impl$(SELF), (ALLOC))
+#define linear_buf_init(SELF, ALLOC) \
+    linear_buf_init_impl(impl$(SELF), (ALLOC))
 
-#define linear_buffer_deinit(SELF) \
-    linear_buffer_deinit_impl(impl$(SELF))
+#define linear_buf_deinit(SELF) \
+    linear_buf_deinit_impl(impl$(SELF))
 
-#define linear_buffer_push(SELF, VALUE) (                                         \
-    {                                                                             \
-        AutoType tmp = (VALUE);                                                   \
-        linear_buffer_push_impl(impl$(SELF), (uint8_t const *)&tmp, sizeof(tmp)); \
+#define linear_buf_push(SELF, VALUE) (                                         \
+    {                                                                          \
+        AutoType tmp = (VALUE);                                                \
+        linear_buf_push_impl(impl$(SELF), (uint8_t const *)&tmp, sizeof(tmp)); \
     })
 
-#define linear_buffer_attach(SELF, VALUE) ({})
+#define linear_buf_attach(SELF, VALUE) ({})
 
-#define linear_buffer_clear(SELF) \
-    linear_buffer_clear_impl(impl$(SELF))
+#define linear_buf_clear(SELF) \
+    linear_buf_clear_impl(impl$(SELF))
 
-#define linear_buffer_foreach(VAR, SELF)                                         \
-    for (AutoType __it = (LinearBufferNode *)buffer_begin(&impl$(SELF)->buffer); \
-         __it < (LinearBufferNode *)buffer_end(&impl$(SELF)->buffer);            \
-         __it = (LinearBufferNode *)(((uint8_t *)__it) + __it->size))            \
-        for (AutoType VAR = (typeof((SELF)->_T))&__it->data;                     \
-             VAR;                                                                \
+#define linear_buf_foreach(VAR, SELF)                                   \
+    for (AutoType __it = (LinearBufNode *)buf_begin(&impl$(SELF)->buf); \
+         __it < (LinearBufNode *)buf_end(&impl$(SELF)->buf);            \
+         __it = (LinearBufNode *)(((uint8_t *)__it) + __it->size))      \
+        for (AutoType VAR = (typeof((SELF)->_T))&__it->data;            \
+             VAR;                                                       \
              VAR = nullptr)

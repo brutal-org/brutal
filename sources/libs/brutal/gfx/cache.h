@@ -59,13 +59,13 @@ typedef struct
     InlineEdgesf edges;
 } GfxPolyCommand;
 
-typedef LinearBuffer(GfxCommand) GfxCommandBuffer;
+typedef LinearBuf(GfxCommand) GfxCommandBuf;
 
 typedef Grid(Fnv32) HashGrid;
 
 typedef struct
 {
-    GfxCommandBuffer commands;
+    GfxCommandBuf commands;
 
     HashGrid front_hashgrid;
     HashGrid back_hashgrid;

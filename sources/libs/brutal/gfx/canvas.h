@@ -5,7 +5,7 @@
 
 typedef struct
 {
-    GfxBuffer buffer;
+    GfxBuf buf;
     GfxCache cache;
 
     GfxStroke stroke;

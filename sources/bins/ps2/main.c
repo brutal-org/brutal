@@ -34,18 +34,18 @@ void ps2_handle_irq(void)
 {
     uint8_t status = br_in8(PS2_STATUS);
 
-    while (status & PS2_BUFFER_FULL)
+    while (status & PS2_BUF_FULL)
     {
-        uint8_t which_buffer = status & PS2_WHICH_BUFFER;
+        uint8_t which_buf = status & PS2_WHICH_BUF;
 
-        if (which_buffer == PS2_KEYBOARD_BUFFER)
+        if (which_buf == PS2_KEYBOARD_BUF)
         {
-            uint8_t scancode = br_in8(PS2_BUFFER);
+            uint8_t scancode = br_in8(PS2_BUF);
             ps2kb_handle_code(scancode);
         }
-        else if (which_buffer == PS2_MOUSE_BUFFER)
+        else if (which_buf == PS2_MOUSE_BUF)
         {
-            uint8_t packet = br_in8(PS2_BUFFER);
+            uint8_t packet = br_in8(PS2_BUF);
             log$("MOUSE: {#02x}", packet);
         }
 

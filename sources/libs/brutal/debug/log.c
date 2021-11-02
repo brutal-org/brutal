@@ -5,32 +5,6 @@
 #    include "kernel/cpu.h"
 #endif
 
-static Str log_color(LogLevel level)
-{
-    switch (level)
-    {
-    case LOG_PANIC:
-        return str$("");
-
-    default:
-    case LOG_DEFAULT:
-        return str$("");
-    }
-}
-
-static Str log_prefix(LogLevel level)
-{
-    switch (level)
-    {
-    case LOG_PANIC:
-        return str$("panic");
-
-    default:
-    case LOG_DEFAULT:
-        return str$("");
-    }
-}
-
 void log_unlock_impl(LogLevel level, SourceLocation location, Str fmt, PrintArgs args)
 {
 #ifdef __kernel__
@@ -42,7 +16,11 @@ void log_unlock_impl(LogLevel level, SourceLocation location, Str fmt, PrintArgs
     }
 #endif
 
-    print(host_log_writer(), "{}{}: ", log_color(level), log_prefix(level));
+    if (level == LOG_PANIC)
+    {
+        print(host_log_writer(), "panic: ");
+    }
+
     print(host_log_writer(), "{}:{3d}: ", location.filename, location.line);
     print_impl(host_log_writer(), fmt, args);
     print(host_log_writer(), "\n");

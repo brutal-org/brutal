@@ -20,7 +20,7 @@
 #define ALIGN_UP(ADDR, ALIGN) (((ADDR) + (ALIGN)-1) & ~((ALIGN)-1))
 
 // Return the number of element in an array
-#define ARRAY_LENGTH(ARR) (sizeof(ARR) / sizeof(ARR[0]))
+#define ARRAY_LEN(ARR) (sizeof(ARR) / sizeof(ARR[0]))
 
 // Return the filename of the current translation unite
 #define __FILENAME__ (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)

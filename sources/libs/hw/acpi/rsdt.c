@@ -8,7 +8,7 @@ Iter acpi_rsdt_iterate(
 {
     AcpiRsdt *rsdt = acpi->rsdt;
 
-    size_t child_count = (rsdt->stdh.length - sizeof(rsdt->stdh)) / 4;
+    size_t child_count = (rsdt->stdh.len - sizeof(rsdt->stdh)) / 4;
 
     for (size_t i = 0; i < child_count; i++)
     {

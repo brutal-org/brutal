@@ -6,7 +6,7 @@
 void scan_init(Scan *self, Str str)
 {
     *self = (Scan){
-        .buffer = str.buffer,
+        .buf = str.buf,
         .size = str.len,
         .head = 0,
     };
@@ -34,7 +34,7 @@ char scan_peek(Scan *self, int offset)
         return '\0';
     }
 
-    return self->buffer[self->head + offset];
+    return self->buf[self->head + offset];
 }
 
 char scan_next(Scan *self)
@@ -70,15 +70,15 @@ void scan_scan_skip_space(Scan *self)
 Str scan_skip_until(Scan *self, int (*callback)(int))
 {
     int start = self->head;
-    int length = 0;
+    int len = 0;
 
     while (callback(scan_curr(self)) && !scan_ended(self))
     {
-        length++;
+        len++;
         scan_next(self);
     }
 
-    return str_n$(length, (char *)self->buffer + start);
+    return str_n$(len, (char *)self->buf + start);
 }
 
 char scan_curr(Scan *self)
@@ -112,7 +112,7 @@ bool scan_skip_word(Scan *self, Str word)
 {
     for (size_t i = 0; i < word.len; i++)
     {
-        if (scan_peek(self, i) != word.buffer[i])
+        if (scan_peek(self, i) != word.buf[i])
         {
             return false;
         }
@@ -144,7 +144,7 @@ Str scan_end(Scan *self)
 {
     return str_n$(
         self->head - self->token,
-        (char *)self->buffer + self->token);
+        (char *)self->buf + self->token);
 }
 
 /* --- Error Handeling ------------------------------------------------------ */
@@ -199,7 +199,7 @@ bool scan_dump_error(Scan *self, IoWriter *writer)
     }
 
     ScanError err = self->error;
-    Str src = str_n$(self->size, (char *)self->buffer);
+    Str src = str_n$(self->size, (char *)self->buf);
 
     print(writer, "error: {}: {}\n", err.message, str$(&err.token));
 

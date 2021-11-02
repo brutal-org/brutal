@@ -13,7 +13,7 @@ void range_alloc_deinit(RangeAlloc *self)
 
 void range_alloc_used(RangeAlloc *self, USizeRange range)
 {
-    for (int i = 0; i < self->length; i++)
+    for (int i = 0; i < self->len; i++)
     {
         USizeRange curr = self->data[i];
 
@@ -47,7 +47,7 @@ void range_alloc_used(RangeAlloc *self, USizeRange range)
 
 USizeRange range_alloc_alloc(RangeAlloc *self, size_t size)
 {
-    for (int i = 0; i < self->length; i++)
+    for (int i = 0; i < self->len; i++)
     {
         if (self->data[i].size == size)
         {
@@ -74,7 +74,7 @@ USizeRange range_alloc_alloc(RangeAlloc *self, size_t size)
 
 static void range_alloc_compress(RangeAlloc *self, int start)
 {
-    while (start + 1 < self->length &&
+    while (start + 1 < self->len &&
            range_contiguous(self->data[start], self->data[start + 1]))
     {
         self->data[start] = range_merge(self->data[start], self->data[start + 1]);
@@ -91,7 +91,7 @@ static void range_alloc_compress(RangeAlloc *self, int start)
 
 void range_alloc_unused(RangeAlloc *self, USizeRange range)
 {
-    for (int i = 0; i < self->length; i++)
+    for (int i = 0; i < self->len; i++)
     {
         if (range_contiguous(self->data[i], range))
         {
@@ -100,7 +100,7 @@ void range_alloc_unused(RangeAlloc *self, USizeRange range)
             return;
         }
 
-        if (i + 1 < self->length &&
+        if (i + 1 < self->len &&
             (self->data[i].base < range.base) &&
             (range.base < self->data[i + 1].base))
         {

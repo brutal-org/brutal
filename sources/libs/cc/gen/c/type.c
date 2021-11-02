@@ -65,7 +65,7 @@ void cgen_c_type_start(Emit *emit, CType type)
         cgen_c_type(emit, *type.func_.ret); // return
     }
     else if ((type.type == CTYPE_STRUCT || type.type == CTYPE_UNION) &&
-             type.struct_.members.length != 0)
+             type.struct_.members.len != 0)
     {
         if (type.type == CTYPE_STRUCT)
         {

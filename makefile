@@ -35,10 +35,10 @@ CFLAGS_WARN ?= \
 
 INC_LIBS= \
 	-Isources/libs/stdc/ansi \
-	-Isources/libs/stdc/posix \
+	-Isources/libs/stdc/math \
 	-Isources/libs/stdc/bsd \
 	-Isources/libs/stdc/gnu \
-	-Isources/libs/stdc/math
+	-Isources/libs/stdc/posix
 
 INC_LIBBRUTAL= \
 	-Isources/libs/

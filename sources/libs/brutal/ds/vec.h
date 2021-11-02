@@ -9,22 +9,22 @@
 typedef struct
 {
     char *data;
-    int length;
+    int len;
 
     Alloc *alloc;
     int data_size;
     int capacity;
 } VecImpl;
 
-#define Vec(T)          \
-    union               \
-    {                   \
-        struct          \
-        {               \
-            T *data;    \
-            int length; \
-        };              \
-        VecImpl _impl;  \
+#define Vec(T)         \
+    union              \
+    {                  \
+        struct         \
+        {              \
+            T *data;   \
+            int len;   \
+        };             \
+        VecImpl _impl; \
     }
 
 void vec_init_impl(VecImpl *impl, int data_size, Alloc *alloc);
@@ -52,15 +52,15 @@ void vec_swap_impl(VecImpl *impl, int idx1, int idx2);
 #define vec_deinit(v) vec_deinit_impl(impl$(v))
 
 #define vec_push(v, val) \
-    (vec_expand_impl(impl$(v)) ? ((v)->data[(v)->length++] = (val), true) : false)
+    (vec_expand_impl(impl$(v)) ? ((v)->data[(v)->len++] = (val), true) : false)
 
-#define vec_pop(v) (v)->data[--(v)->length]
+#define vec_pop(v) (v)->data[--(v)->len]
 
 #define vec_splice(v, start, count) \
-    (vec_splice_impl(impl$(v), start, count), (v)->length -= (count))
+    (vec_splice_impl(impl$(v), start, count), (v)->len -= (count))
 
 #define vec_swapsplice(v, start, count) \
-    (vec_swapsplice_impl(impl$(v), start, count), (v)->length -= (count))
+    (vec_swapsplice_impl(impl$(v), start, count), (v)->len -= (count))
 
 #define vec_insert(v, idx, val) (                       \
     {                                                   \
@@ -68,47 +68,47 @@ void vec_swap_impl(VecImpl *impl, int idx1, int idx2);
         if (__result)                                   \
         {                                               \
             (v)->data[idx] = (val);                     \
-            (v)->length++;                              \
+            (v)->len++;                                 \
         }                                               \
         __result;                                       \
     })
 
-#define vec_sort(v, fn) qsort((v)->data, (v)->length, sizeof(*(v)->data), fn)
+#define vec_sort(v, fn) qsort((v)->data, (v)->len, sizeof(*(v)->data), fn)
 
 #define vec_swap(v, idx1, idx2) vec_swap_impl(impl$(v), idx1, idx2)
 
 #define vec_truncate(v, len) \
-    ((v)->length = (len) < (v)->length ? (len) : (v)->length)
+    ((v)->len = (len) < (v)->len ? (len) : (v)->len)
 
-#define vec_clear(v) ((v)->length = 0)
+#define vec_clear(v) ((v)->len = 0)
 
 #define vec_at(v, idx) ((v)->data[idx])
 
 #define vec_first(v) (v)->data[0]
 
-#define vec_last(v) (v)->data[(v)->length - 1]
+#define vec_last(v) (v)->data[(v)->len - 1]
 
 #define vec_begin(v) ((v)->data)
 
-#define vec_end(v) ((v)->data + (v)->length)
+#define vec_end(v) ((v)->data + (v)->len)
 
 #define vec_reserve(v, n) vec_reserve_impl(impl$(v), n)
 
 #define vec_compact(v) vec_compact_impl(impl$(v))
 
-#define vec_find(v, val, idx)                         \
-    do                                                \
-    {                                                 \
-        for ((idx) = 0; (idx) < (v)->length; (idx)++) \
-        {                                             \
-            if ((v)->data[(idx)] == (val))            \
-                break;                                \
-        }                                             \
-                                                      \
-        if ((idx) == (v)->length)                     \
-        {                                             \
-            (idx) = -1;                               \
-        }                                             \
+#define vec_find(v, val, idx)                      \
+    do                                             \
+    {                                              \
+        for ((idx) = 0; (idx) < (v)->len; (idx)++) \
+        {                                          \
+            if ((v)->data[(idx)] == (val))         \
+                break;                             \
+        }                                          \
+                                                   \
+        if ((idx) == (v)->len)                     \
+        {                                          \
+            (idx) = -1;                            \
+        }                                          \
     } while (0)
 
 #define vec_remove(v, val)           \
@@ -123,18 +123,18 @@ void vec_swap_impl(VecImpl *impl, int idx1, int idx2);
         }                            \
     } while (0)
 
-#define vec_reverse(v)                                   \
-    do                                                   \
-    {                                                    \
-        int __i = (v)->length / 2;                       \
-        while (__i--)                                    \
-        {                                                \
-            vec_swap((v), __i, (v)->length - (__i + 1)); \
-        }                                                \
+#define vec_reverse(v)                                \
+    do                                                \
+    {                                                 \
+        int __i = (v)->len / 2;                       \
+        while (__i--)                                 \
+        {                                             \
+            vec_swap((v), __i, (v)->len - (__i + 1)); \
+        }                                             \
     } while (0)
 
 #define vec_foreach(VAR, SELF)                                          \
-    if ((SELF)->length)                                                 \
+    if ((SELF)->len)                                                    \
         for (typeof((SELF)->data + 0) __once, __it = vec_begin(SELF); ( \
                  {                                                      \
                      __once = nullptr;                                  \

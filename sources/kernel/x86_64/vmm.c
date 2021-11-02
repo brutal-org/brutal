@@ -87,7 +87,7 @@ static void vmm_load_memory_map(VmmSpace target, HandoverMmap const *memory_map)
              i + 1,
              memory_map->size,
              entry.base,
-             entry.base + entry.length);
+             entry.base + entry.len);
 
         if (entry.type == HANDOVER_MMAP_KERNEL_MODULE)
         {
@@ -95,10 +95,10 @@ static void vmm_load_memory_map(VmmSpace target, HandoverMmap const *memory_map)
             vmm_map(target,
                     (VmmRange){
                         .base = mmap_phys_to_kernel(ALIGN_DOWN(entry.base, MEM_PAGE_SIZE)),
-                        .size = ALIGN_UP(entry.length, MEM_PAGE_SIZE)},
+                        .size = ALIGN_UP(entry.len, MEM_PAGE_SIZE)},
                     (PmmRange){
                         .base = ALIGN_DOWN(entry.base, MEM_PAGE_SIZE),
-                        .size = ALIGN_UP(entry.length, MEM_PAGE_SIZE)},
+                        .size = ALIGN_UP(entry.len, MEM_PAGE_SIZE)},
                     BR_MEM_WRITABLE);
         }
 
@@ -108,10 +108,10 @@ static void vmm_load_memory_map(VmmSpace target, HandoverMmap const *memory_map)
             vmm_map(target,
                     (VmmRange){
                         .base = mmap_phys_to_io(ALIGN_DOWN(entry.base, MEM_PAGE_SIZE)),
-                        .size = ALIGN_UP(entry.length, MEM_PAGE_SIZE)},
+                        .size = ALIGN_UP(entry.len, MEM_PAGE_SIZE)},
                     (PmmRange){
                         .base = ALIGN_DOWN(entry.base, MEM_PAGE_SIZE),
-                        .size = ALIGN_UP(entry.length, MEM_PAGE_SIZE)},
+                        .size = ALIGN_UP(entry.len, MEM_PAGE_SIZE)},
                     BR_MEM_WRITABLE);
         }
     }

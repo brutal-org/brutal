@@ -75,16 +75,16 @@ EntryPointFn loader_load_kernel(Str path)
 {
     IoFile file;
     IoReader reader;
-    Buffer buffer;
+    Buf buf;
 
     log$("Loading elf file...");
     io_file_open(&file, path);
     reader = io_file_reader(&file);
-    buffer = io_readall((&reader), alloc_global());
+    buf = io_readall((&reader), alloc_global());
 
-    Elf64Header *header = (Elf64Header *)buffer.data;
+    Elf64Header *header = (Elf64Header *)buf.data;
 
-    if (buffer.used < sizeof(Elf64Header) ||
+    if (buf.used < sizeof(Elf64Header) ||
         !elf_validate(header))
     {
         panic$("Invalid elf file!");
@@ -92,11 +92,11 @@ EntryPointFn loader_load_kernel(Str path)
 
     log$("Elf file loaded in memory, mapping it...");
 
-    loader_load(header, buffer.data);
+    loader_load(header, buf.data);
 
     uintptr_t entry = header->entry;
 
-    buffer_deinit(&buffer);
+    buf_deinit(&buf);
 
     log$("Entry is {#x}", entry);
 

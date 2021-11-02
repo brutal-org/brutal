@@ -7,5 +7,5 @@ IoResult io_put(IoWriter *writer, uint8_t c)
 
 IoResult io_print(IoWriter *writer, Str str)
 {
-    return io_write(writer, (uint8_t *)str.buffer, str.len);
+    return io_write(writer, (uint8_t *)str.buf, str.len);
 }

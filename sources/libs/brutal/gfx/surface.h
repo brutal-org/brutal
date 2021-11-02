@@ -11,7 +11,7 @@ typedef struct
     int height;
     int pitch;
     GfxPixelFormat format;
-    void *buffer;
+    void *buf;
     size_t size;
 } GfxSurface;
 
@@ -19,13 +19,13 @@ typedef struct
 {
     GfxSurface surface;
     Alloc *alloc;
-} GfxBuffer;
+} GfxBuf;
 
-void gfx_buffer_init(GfxBuffer *self, Alloc *alloc, int width, int height, GfxPixelFormat format);
+void gfx_buf_init(GfxBuf *self, Alloc *alloc, int width, int height, GfxPixelFormat format);
 
-void gfx_buffer_deinit(GfxBuffer *self);
+void gfx_buf_deinit(GfxBuf *self);
 
-GfxSurface gfx_buffer_surface(GfxBuffer *self);
+GfxSurface gfx_buf_surface(GfxBuf *self);
 
 static inline GfxColor gfx_surface_load(GfxSurface self, int x, int y)
 {
@@ -34,7 +34,7 @@ static inline GfxColor gfx_surface_load(GfxSurface self, int x, int y)
         return GFX_COLOR_MAGENTA;
     }
 
-    uint8_t *pixel = ((uint8_t *)self.buffer) + self.pitch * y + x * gfx_pixel_size(self.format);
+    uint8_t *pixel = ((uint8_t *)self.buf) + self.pitch * y + x * gfx_pixel_size(self.format);
     return gfx_pixel_load(pixel, self.format);
 }
 
@@ -45,8 +45,8 @@ static inline void gfx_surface_store(GfxSurface self, int x, int y, GfxColor col
         return;
     }
 
-    uint8_t *buffer = (uint8_t *)self.buffer;
-    uint8_t *pixel = buffer + self.pitch * y + x * gfx_pixel_size(self.format);
+    uint8_t *buf = (uint8_t *)self.buf;
+    uint8_t *pixel = buf + self.pitch * y + x * gfx_pixel_size(self.format);
     gfx_pixel_store(color, pixel, self.format);
 }
 

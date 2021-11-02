@@ -43,6 +43,6 @@ GfxSurface host_ui_surface_surface(HostUiSurface *self)
         .height = sdl_surface->h,
         .pitch = sdl_surface->pitch,
         .format = GFX_PIXEL_FORMAT_BGRA8888,
-        .buffer = sdl_surface->pixels,
+        .buf = sdl_surface->pixels,
     };
 }

@@ -15,7 +15,7 @@ TEST(ds_range_alloc_used_start)
     log$("After test");
     range_alloc_dump(&alloc);
 
-    assert_equal(alloc.length, 1);
+    assert_equal(alloc.len, 1);
     assert_truth(range_eq(alloc.data[0], higher_half));
 
     range_alloc_deinit(&alloc);
@@ -35,7 +35,7 @@ TEST(ds_range_alloc_used_center)
     log$("After test");
     range_alloc_dump(&alloc);
 
-    assert_equal(alloc.length, 2);
+    assert_equal(alloc.len, 2);
     assert_truth(range_eq(alloc.data[0], lower_half));
     assert_truth(range_eq(alloc.data[1], higher_half));
 
@@ -55,7 +55,7 @@ TEST(ds_range_alloc_used_end)
     log$("After test");
     range_alloc_dump(&alloc);
 
-    assert_equal(alloc.length, 1);
+    assert_equal(alloc.len, 1);
     assert_truth(range_eq(alloc.data[0], lower_half));
 
     range_alloc_deinit(&alloc);
@@ -74,7 +74,7 @@ TEST(ds_range_alloc_unused_begin)
     log$("After test");
     range_alloc_dump(&alloc);
 
-    assert_equal(alloc.length, 1);
+    assert_equal(alloc.len, 1);
     assert_truth(range_eq(alloc.data[0], final_range));
 
     range_alloc_deinit(&alloc);
@@ -94,7 +94,7 @@ TEST(ds_range_alloc_unused_middle)
     log$("After test");
     range_alloc_dump(&alloc);
 
-    assert_equal(alloc.length, 1);
+    assert_equal(alloc.len, 1);
     assert_truth(range_eq(alloc.data[0], final_range));
 
     range_alloc_deinit(&alloc);
@@ -114,7 +114,7 @@ TEST(ds_range_alloc_unused_end)
     log$("After test");
     range_alloc_dump(&alloc);
 
-    assert_equal(alloc.length, 1);
+    assert_equal(alloc.len, 1);
     assert_truth(range_eq(alloc.data[0], final_range));
 
     range_alloc_deinit(&alloc);

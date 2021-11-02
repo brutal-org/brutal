@@ -54,7 +54,7 @@ struct PACKED gdt_entry
 
 struct PACKED gdt_tss_entry
 {
-    uint16_t length;
+    uint16_t len;
     uint16_t base_low16;
     uint8_t base_mid8;
     uint8_t flags1;

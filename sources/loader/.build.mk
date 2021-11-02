@@ -35,7 +35,7 @@ LOADER_LDFLAGS= \
 	-fuse-ld=lld-link
 
 LOADER_LIBS_SRC = \
-	sources/libs/brutal/io/buffer.c                 \
+	sources/libs/brutal/io/buf.c                    \
 	sources/libs/brutal/io/fmt.c                    \
 	sources/libs/brutal/io/file.c                   \
 	sources/libs/brutal/io/std.c                    \

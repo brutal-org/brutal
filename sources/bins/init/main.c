@@ -39,7 +39,7 @@ static void display_bootimage(Handover const *handover)
         .height = fb->height,
         .pitch = fb->pitch,
         .format = GFX_PIXEL_FORMAT_BGRA8888,
-        .buffer = (void *)fb_map.vaddr,
+        .buf = (void *)fb_map.vaddr,
         .size = fb_size,
     };
 

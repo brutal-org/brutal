@@ -25,11 +25,11 @@ static void cgen_c_define(Emit *emit, CDefine define)
 {
     emit_fmt(emit, "#define ");
     emit_fmt(emit, define.name);
-    if (define.args.length != 0)
+    if (define.args.len != 0)
     {
         emit_fmt(emit, "(");
 
-        for (int i = 0; i < define.args.length; i++)
+        for (int i = 0; i < define.args.len; i++)
         {
             if (i != 0)
             {

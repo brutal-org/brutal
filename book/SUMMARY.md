@@ -3,6 +3,8 @@
 - [Introduction](./introduction.md)
 - [Building](./building.md)
 - [Roadmap](./roadmap.md)
+- [Style]()
+  - [Naming](./style/naming.md)
 - [Kernel]()
   - [Syscalls](./kernel/syscalls.md)
   - [Scheduling](./kernel/scheduling.md)

@@ -28,9 +28,9 @@ void vec_deinit_impl(VecImpl *impl)
     *impl = (VecImpl){};
 }
 
-bool vec_realloc_impl(VecImpl *impl, int new_length)
+bool vec_realloc_impl(VecImpl *impl, int new_len)
 {
-    void *ptr = alloc_acquire(impl->alloc, new_length * impl->data_size);
+    void *ptr = alloc_acquire(impl->alloc, new_len * impl->data_size);
 
     if (ptr == nullptr)
     {
@@ -39,19 +39,19 @@ bool vec_realloc_impl(VecImpl *impl, int new_length)
 
     if (impl->data != nullptr)
     {
-        mem_cpy(ptr, impl->data, MIN((impl->length), new_length) * impl->data_size);
+        mem_cpy(ptr, impl->data, MIN((impl->len), new_len) * impl->data_size);
         alloc_release(impl->alloc, impl->data);
     }
 
     impl->data = (char *)ptr;
-    impl->capacity = new_length;
+    impl->capacity = new_len;
 
     return true;
 }
 
 bool vec_expand_impl(VecImpl *impl)
 {
-    if (impl->length + 1 > impl->capacity)
+    if (impl->len + 1 > impl->capacity)
     {
         int n = (impl->capacity == 0) ? 1 : impl->capacity << 1;
         return vec_realloc_impl(impl, n);
@@ -92,7 +92,7 @@ bool vec_reserve_po2_impl(VecImpl *impl, int n)
 
 bool vec_compact_impl(VecImpl *impl)
 {
-    if (impl->length == 0)
+    if (impl->len == 0)
     {
         alloc_release(impl->alloc, impl->data);
         impl->data = nullptr;
@@ -102,7 +102,7 @@ bool vec_compact_impl(VecImpl *impl)
     }
     else
     {
-        int n = impl->length;
+        int n = impl->len;
         return vec_realloc_impl(impl, n);
     }
 }
@@ -118,7 +118,7 @@ bool vec_insert_impl(VecImpl *impl, int idx)
 
     mem_move(impl->data + (idx + 1) * impl->data_size,
              impl->data + idx * impl->data_size,
-             (impl->length - idx) * impl->data_size);
+             (impl->len - idx) * impl->data_size);
 
     return 0;
 }
@@ -126,13 +126,13 @@ bool vec_insert_impl(VecImpl *impl, int idx)
 void vec_splice_impl(VecImpl *impl, int start, int count)
 {
     mem_move(impl->data + start * impl->data_size, impl->data + (start + count) * impl->data_size,
-             (impl->length - start - count) * impl->data_size);
+             (impl->len - start - count) * impl->data_size);
 }
 
 void vec_swapsplice_impl(VecImpl *impl, int start, int count)
 {
     mem_move(impl->data + start * impl->data_size,
-             impl->data + (impl->length - count) * impl->data_size,
+             impl->data + (impl->len - count) * impl->data_size,
              count * impl->data_size);
 }
 

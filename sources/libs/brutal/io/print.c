@@ -142,9 +142,9 @@ IoResult print_impl(IoWriter *writer, Str format, PrintArgs args)
 
 Str str_fmt_impl(Alloc *alloc, Str fmt, PrintArgs args)
 {
-    Buffer buf;
-    buffer_init(&buf, fmt.len, alloc);
-    IoWriter writer = buffer_writer(&buf);
+    Buf buf;
+    buf_init(&buf, fmt.len, alloc);
+    IoWriter writer = buf_writer(&buf);
     print_impl(&writer, fmt, args);
-    return buffer_str(&buf);
+    return buf_str(&buf);
 }

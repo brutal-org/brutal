@@ -3,17 +3,17 @@
 #include <brutal/text/case.h>
 #include <ctype.h>
 
-Buffer case_to_default(Str str, Alloc *alloc)
+Buf case_to_default(Str str, Alloc *alloc)
 {
-    Buffer buf;
-    buffer_init(&buf, str.len, alloc);
-    buffer_write(&buf, str.buffer, str.len);
+    Buf buf;
+    buf_init(&buf, str.len, alloc);
+    buf_write(&buf, str.buf, str.len);
     return buf;
 }
 
-Buffer case_to_camel(Str str, Alloc *alloc)
+Buf case_to_camel(Str str, Alloc *alloc)
 {
-    Buffer buf = case_to_pascal(str, alloc);
+    Buf buf = case_to_pascal(str, alloc);
 
     if (buf.used == 0)
     {
@@ -25,9 +25,9 @@ Buffer case_to_camel(Str str, Alloc *alloc)
     return buf;
 }
 
-Buffer case_to_capital(Str str, Alloc *alloc)
+Buf case_to_capital(Str str, Alloc *alloc)
 {
-    Buffer buf = case_to_no(str, alloc);
+    Buf buf = case_to_no(str, alloc);
 
     for (size_t i = 0; i < buf.used; i++)
     {
@@ -40,9 +40,9 @@ Buffer case_to_capital(Str str, Alloc *alloc)
     return buf;
 }
 
-Buffer case_to_constant(Str str, Alloc *alloc)
+Buf case_to_constant(Str str, Alloc *alloc)
 {
-    Buffer buf = case_to_no(str, alloc);
+    Buf buf = case_to_no(str, alloc);
 
     for (size_t i = 0; i < buf.used; i++)
     {
@@ -59,9 +59,9 @@ Buffer case_to_constant(Str str, Alloc *alloc)
     return buf;
 }
 
-Buffer case_to_dot(Str str, Alloc *alloc)
+Buf case_to_dot(Str str, Alloc *alloc)
 {
-    Buffer buf = case_to_no(str, alloc);
+    Buf buf = case_to_no(str, alloc);
 
     for (size_t i = 0; i < buf.used; i++)
     {
@@ -74,9 +74,9 @@ Buffer case_to_dot(Str str, Alloc *alloc)
     return buf;
 }
 
-Buffer case_to_header(Str str, Alloc *alloc)
+Buf case_to_header(Str str, Alloc *alloc)
 {
-    Buffer buf = case_to_no(str, alloc);
+    Buf buf = case_to_no(str, alloc);
 
     for (size_t i = 0; i < buf.used; i++)
     {
@@ -98,10 +98,10 @@ static int is_sep(int c)
     return isblank(c) || c == '.' || c == '_' || c == '/' || c == '-';
 }
 
-Buffer case_to_no(Str str, Alloc *alloc)
+Buf case_to_no(Str str, Alloc *alloc)
 {
-    Buffer buf;
-    buffer_init(&buf, str.len, alloc);
+    Buf buf;
+    buf_init(&buf, str.len, alloc);
 
     Scan scan;
     scan_init(&scan, str);
@@ -118,17 +118,17 @@ Buffer case_to_no(Str str, Alloc *alloc)
 
             if (!scan_ended(&scan))
             {
-                buffer_putc(&buf, ' ');
+                buf_putc(&buf, ' ');
             }
         }
         else
         {
             if (islower(scan_peek(&scan, -1)) && isupper(scan_curr(&scan)))
             {
-                buffer_putc(&buf, ' ');
+                buf_putc(&buf, ' ');
             }
 
-            buffer_putc(&buf, tolower(scan_curr(&scan)));
+            buf_putc(&buf, tolower(scan_curr(&scan)));
 
             scan_next(&scan);
         }
@@ -137,9 +137,9 @@ Buffer case_to_no(Str str, Alloc *alloc)
     return buf;
 }
 
-Buffer case_to_param(Str str, Alloc *alloc)
+Buf case_to_param(Str str, Alloc *alloc)
 {
-    Buffer buf = case_to_no(str, alloc);
+    Buf buf = case_to_no(str, alloc);
 
     for (size_t i = 0; i < buf.used; i++)
     {
@@ -152,37 +152,37 @@ Buffer case_to_param(Str str, Alloc *alloc)
     return buf;
 }
 
-Buffer case_to_pascal(Str str, Alloc *alloc)
+Buf case_to_pascal(Str str, Alloc *alloc)
 {
-    Buffer nocase = case_to_no(str, alloc);
+    Buf nocase = case_to_no(str, alloc);
 
     if (nocase.used == 0)
     {
         return nocase;
     }
 
-    Buffer buf;
-    buffer_init(&buf, nocase.used, alloc);
+    Buf buf;
+    buf_init(&buf, nocase.used, alloc);
 
     for (size_t i = 0; i < nocase.used; i++)
     {
         if (i == 0 || nocase.data[i - 1] == ' ')
         {
-            buffer_putc(&buf, toupper(nocase.data[i]));
+            buf_putc(&buf, toupper(nocase.data[i]));
         }
         else if (nocase.data[i] != ' ')
         {
-            buffer_putc(&buf, nocase.data[i]);
+            buf_putc(&buf, nocase.data[i]);
         }
     }
 
-    buffer_deinit(&nocase);
+    buf_deinit(&nocase);
     return buf;
 }
 
-Buffer case_to_path(Str str, Alloc *alloc)
+Buf case_to_path(Str str, Alloc *alloc)
 {
-    Buffer buf = case_to_no(str, alloc);
+    Buf buf = case_to_no(str, alloc);
 
     for (size_t i = 0; i < buf.used; i++)
     {
@@ -195,9 +195,9 @@ Buffer case_to_path(Str str, Alloc *alloc)
     return buf;
 }
 
-Buffer case_to_sentence(Str str, Alloc *alloc)
+Buf case_to_sentence(Str str, Alloc *alloc)
 {
-    Buffer buf = case_to_no(str, alloc);
+    Buf buf = case_to_no(str, alloc);
 
     if (buf.used == 0)
     {
@@ -209,9 +209,9 @@ Buffer case_to_sentence(Str str, Alloc *alloc)
     return buf;
 }
 
-Buffer case_to_snake(Str str, Alloc *alloc)
+Buf case_to_snake(Str str, Alloc *alloc)
 {
-    Buffer buf = case_to_no(str, alloc);
+    Buf buf = case_to_no(str, alloc);
 
     for (size_t i = 0; i < buf.used; i++)
     {
@@ -224,108 +224,108 @@ Buffer case_to_snake(Str str, Alloc *alloc)
     return buf;
 }
 
-Buffer case_to_title(Str str, Alloc *alloc)
+Buf case_to_title(Str str, Alloc *alloc)
 {
     return case_to_capital(str, alloc);
 }
 
-Buffer case_to_swap(Str str, Alloc *alloc)
+Buf case_to_swap(Str str, Alloc *alloc)
 {
-    Buffer buf;
-    buffer_init(&buf, str.len, alloc);
+    Buf buf;
+    buf_init(&buf, str.len, alloc);
 
     for (size_t i = 0; i < str.len; i++)
     {
-        char c = str.buffer[i];
+        char c = str.buf[i];
 
         if (isupper(c))
         {
-            buffer_putc(&buf, tolower(c));
+            buf_putc(&buf, tolower(c));
         }
         else
         {
-            buffer_putc(&buf, toupper(c));
+            buf_putc(&buf, toupper(c));
         }
     }
 
     return buf;
 }
 
-Buffer case_to_lower(Str str, Alloc *alloc)
+Buf case_to_lower(Str str, Alloc *alloc)
 {
-    Buffer buf;
-    buffer_init(&buf, str.len, alloc);
+    Buf buf;
+    buf_init(&buf, str.len, alloc);
 
     for (size_t i = 0; i < str.len; i++)
     {
-        char c = str.buffer[i];
-        buffer_putc(&buf, tolower(c));
+        char c = str.buf[i];
+        buf_putc(&buf, tolower(c));
     }
 
     return buf;
 }
 
-Buffer case_to_lower_first(Str str, Alloc *alloc)
+Buf case_to_lower_first(Str str, Alloc *alloc)
 {
-    Buffer buf;
-    buffer_init(&buf, str.len, alloc);
+    Buf buf;
+    buf_init(&buf, str.len, alloc);
 
     if (is_nullstr(str))
     {
         return buf;
     }
 
-    buffer_write(&buf, str.buffer, str.len);
+    buf_write(&buf, str.buf, str.len);
     buf.data[0] = tolower(buf.data[0]);
 
     return buf;
 }
 
-Buffer case_to_upper(Str str, Alloc *alloc)
+Buf case_to_upper(Str str, Alloc *alloc)
 {
-    Buffer buf;
-    buffer_init(&buf, str.len, alloc);
+    Buf buf;
+    buf_init(&buf, str.len, alloc);
 
     for (size_t i = 0; i < str.len; i++)
     {
-        char c = str.buffer[i];
-        buffer_putc(&buf, toupper(c));
+        char c = str.buf[i];
+        buf_putc(&buf, toupper(c));
     }
 
     return buf;
 }
 
-Buffer case_to_upper_first(Str str, Alloc *alloc)
+Buf case_to_upper_first(Str str, Alloc *alloc)
 {
-    Buffer buf;
-    buffer_init(&buf, str.len, alloc);
+    Buf buf;
+    buf_init(&buf, str.len, alloc);
 
     if (is_nullstr(str))
     {
         return buf;
     }
 
-    buffer_write(&buf, str.buffer, str.len);
+    buf_write(&buf, str.buf, str.len);
     buf.data[0] = toupper(buf.data[0]);
 
     return buf;
 }
 
-Buffer case_to_sponge(Str str, Alloc *alloc)
+Buf case_to_sponge(Str str, Alloc *alloc)
 {
-    Buffer buf;
-    buffer_init(&buf, str.len, alloc);
+    Buf buf;
+    buf_init(&buf, str.len, alloc);
 
     for (size_t i = 0; i < str.len; i++)
     {
-        char c = str.buffer[i];
-        buffer_putc(&buf, i % 2 ? tolower(c) : toupper(c));
+        char c = str.buf[i];
+        buf_putc(&buf, i % 2 ? tolower(c) : toupper(c));
     }
 
     return buf;
 }
 
-Buffer case_change(Case c, Str str, Alloc *alloc)
+Buf case_change(Case c, Str str, Alloc *alloc)
 {
     switch (c)
     {

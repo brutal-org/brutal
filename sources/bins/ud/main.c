@@ -18,15 +18,15 @@ int main(int argc, char const *argv[])
 
     IoReader source_file_reader = io_file_reader(&source_file);
 
-    Buffer source_buffer;
-    buffer_init(&source_buffer, 512, alloc_global());
+    Buf source_buf;
+    buf_init(&source_buf, 512, alloc_global());
 
-    IoWriter source_buffer_writer = buffer_writer(&source_buffer);
+    IoWriter source_buf_writer = buf_writer(&source_buf);
 
-    io_copy(&source_file_reader, &source_buffer_writer);
+    io_copy(&source_file_reader, &source_buf_writer);
 
     Scan scan;
-    scan_init(&scan, buffer_str(&source_buffer));
+    scan_init(&scan, buf_str(&source_buf));
 
     UdExpr expr = ud_parse(&scan, alloc_global());
 

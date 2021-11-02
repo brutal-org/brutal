@@ -19,7 +19,7 @@ typedef enum
 
 typedef struct
 {
-    uint64_t length;
+    uint64_t len;
     union
     {
         uint64_t data_block;

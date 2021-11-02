@@ -1,8 +1,8 @@
 #include <bid/ast/query.h>
 
-bool type_in_interface(BidIface const *interface, Str name)
+bool bid_type_in_interface(BidIface const *iface, Str name)
 {
-    vec_foreach(type, &interface->aliases)
+    vec_foreach(type, &iface->aliases)
     {
         if (str_eq(type.name, name))
         {

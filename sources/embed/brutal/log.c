@@ -1,12 +1,12 @@
 #include <bal/abi.h>
 #include <brutal/alloc/global.h>
-#include <brutal/io/buffer.h>
+#include <brutal/io/buf.h>
 #include <brutal/sync.h>
 #include <embed/log.h>
 
 static bool initialized = false;
 static Lock lock = {};
-static Buffer buffer = {};
+static Buf buf = {};
 static IoWriter log = {};
 
 void host_log_lock(void)
@@ -23,16 +23,16 @@ static IoResult host_log_write(MAYBE_UNUSED void *context, uint8_t const *data, 
 {
     for (size_t i = 0; i < size; i++)
     {
-        buffer_push(&buffer, data[i]);
+        buf_push(&buf, data[i]);
 
         if (data[i] == '\n')
         {
             br_log(&(BrLogArgs){
-                .message = (char const *)buffer_begin(&buffer),
-                .size = buffer_used(&buffer),
+                .message = (char const *)buf_begin(&buf),
+                .size = buf_used(&buf),
             });
 
-            buffer_clear(&buffer);
+            buf_clear(&buf);
         }
     }
 
@@ -44,7 +44,7 @@ IoWriter *host_log_writer(void)
     if (!initialized)
     {
         log.write = host_log_write;
-        buffer_init(&buffer, 128, alloc_global());
+        buf_init(&buf, 128, alloc_global());
         initialized = true;
     }
 
