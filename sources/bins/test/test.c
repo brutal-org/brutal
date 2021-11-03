@@ -3,15 +3,15 @@
 #include "test/test.h"
 
 static size_t tests_count = 0;
-static struct test tests[1024] = {};
+static Test tests[1024] = {};
 
-void test_register(struct test test)
+void test_register(Test test)
 {
     tests[tests_count] = test;
     tests_count++;
 }
 
-bool test_run(struct test test)
+bool test_run(Test test)
 {
     struct task runner;
     task_fork(&runner);
@@ -29,15 +29,27 @@ bool test_run(struct test test)
     {
 
         int result = UNWRAP(task_wait(&runner));
+        bool pass;
 
         if (test.flags & TEST_EXPECTED_TO_FAIL)
         {
-            return result != TASK_EXIT_SUCCESS;
+            pass = result != TASK_EXIT_SUCCESS;
         }
         else
         {
-            return result == TASK_EXIT_SUCCESS;
+            pass = result == TASK_EXIT_SUCCESS;
         }
+
+        if (pass)
+        {
+            log$("[ PASS ] {}", test.name);
+        }
+        else
+        {
+            log$("[ FAIL ] {}", test.name);
+        }
+
+        return pass;
     }
 }
 
@@ -47,7 +59,7 @@ void test_run_by_name(Str name)
     {
         if (str_eq(tests[i].name, name))
         {
-            tests[i].func();
+            test_run(tests[i]);
         }
     }
 }
@@ -62,16 +74,14 @@ int test_run_all(void)
 
     for (size_t i = 0; i < tests_count; i++)
     {
-        struct test test = tests[i];
+        Test test = tests[i];
 
         if (test_run(test))
         {
-            log$("[ PASS ] {}", test.name);
             pass_count++;
         }
         else
         {
-            log$("[ FAIL ] {}", test.name);
             fail_count++;
         }
     }
@@ -85,11 +95,6 @@ int test_run_all(void)
 
 int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char const *argv[])
 {
-    for (int i = 0; i < argc; i++)
-    {
-        log$("argc[{}]='{}'", i, str$(argv[i]));
-    }
-
     if (argc == 3 && str_eq(str$(argv[1]), str$("-t")))
     {
         test_run_by_name(str$(argv[2]));

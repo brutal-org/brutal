@@ -10,12 +10,12 @@ enum test_flags
     TEST_EXPECTED_TO_FAIL = 1 << 0,
 };
 
-struct test
+typedef struct
 {
     enum test_flags flags;
     Str name;
     TestFunc *func;
-};
+} Test;
 
 void test_alloc_begin_test(void);
 
@@ -23,7 +23,7 @@ void test_alloc_end_test(void);
 
 Alloc *test_alloc(void);
 
-void test_register(struct test test);
+void test_register(Test test);
 
 #define TEST_FUNCTION_NAME(name) test_##name
 
@@ -31,7 +31,7 @@ void test_register(struct test test);
     void TEST_FUNCTION_NAME(name)(void);                                        \
     [[gnu::constructor]] static inline void test_register_##name##_detail(void) \
     {                                                                           \
-        test_register((struct test){                                            \
+        test_register((Test){                                                   \
             flags,                                                              \
             str$(#name),                                                        \
             TEST_FUNCTION_NAME(name),                                           \
