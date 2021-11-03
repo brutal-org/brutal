@@ -7,8 +7,7 @@
 #include <brutal/base/defs.h>
 #include <brutal/base/endian.h>
 #include <brutal/base/error.h>
-#include <brutal/base/ints.h>
-#include <brutal/base/iteration.h>
+#include <brutal/base/iter.h>
 #include <brutal/base/keywords.h>
 #include <brutal/base/macros.h>
 #include <brutal/base/range.h>

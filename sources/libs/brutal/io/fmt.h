@@ -1,19 +1,13 @@
 #pragma once
 
 #include <brutal/base/defs.h>
-#include <brutal/base/ints.h>
 #include <brutal/io/write.h>
 #include <brutal/parse/scan.h>
 #include <brutal/text/case.h>
 #include <brutal/text/str.h>
 
-#if __SIZEOF_INT128__ == 16 && COMPILER_GCC && defined(__x86_64__)
-typedef Int128 FmtInt;
-typedef UInt128 FmtUInt;
-#else
 typedef int64_t FmtInt;
 typedef uint64_t FmtUInt;
-#endif
 
 typedef enum
 {

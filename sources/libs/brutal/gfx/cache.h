@@ -8,7 +8,7 @@
 #include <brutal/hash/fnv.h>
 #include <brutal/math/edge.h>
 
-#define GFX_CACHE_CELL_SIZE (128)
+#define GFX_CACHE_CELL_SIZE (64)
 
 typedef enum
 {
@@ -28,12 +28,12 @@ typedef struct
     Rectf clip;
     GfxStroke stroke;
     GfxPaint fill;
-    Trans2 transform;
 } GfxCommand;
 
 typedef struct
 {
     GfxCommand base;
+
     Rectf rect;
 } GfxRectCommand;
 
@@ -61,14 +61,14 @@ typedef struct
 
 typedef LinearBuf(GfxCommand) GfxCommandBuf;
 
-typedef Grid(Fnv32) HashGrid;
+typedef Grid(Fnv32) GfxHashGrid;
 
 typedef struct
 {
     GfxCommandBuf commands;
 
-    HashGrid front_hashgrid;
-    HashGrid back_hashgrid;
+    GfxHashGrid front_hashgrid;
+    GfxHashGrid back_hashgrid;
 } GfxCache;
 
 void gfx_cache_init(GfxCache *self, Alloc *alloc);

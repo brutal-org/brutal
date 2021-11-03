@@ -3,7 +3,6 @@
 #include <brutal/alloc/base.h>
 #include <brutal/io/read.h>
 #include <brutal/io/write.h>
-#include <embed/io.h>
 
 typedef struct
 {
@@ -12,20 +11,6 @@ typedef struct
     size_t capacity;
     Alloc *alloc;
 } Buf;
-
-#define FixBuf(T, S) \
-    struct           \
-    {                \
-        size_t len;  \
-        T data[S];   \
-    }
-
-#define InlineBuf(T) \
-    struct           \
-    {                \
-        size_t len;  \
-        T buf[];     \
-    }
 
 void buf_init(Buf *self, size_t capacity, Alloc *alloc);
 
@@ -60,10 +45,3 @@ Str buf_str(Buf *self);
 IoReader buf_reader(Buf *self);
 
 IoWriter buf_writer(Buf *self);
-
-#define buf_fmt(BUF, FMT, ...) (                                   \
-    {                                                              \
-        IoWriter __writer = buf_writer(BUF);                       \
-        print_impl(&__writer, str$(FMT), PRINT_ARGS(__VA_ARGS__)); \
-        buf_str(BUF);                                              \
-    })

@@ -11,6 +11,7 @@ typedef struct
     int height;
     int pitch;
     GfxPixelFormat format;
+
     void *buf;
     size_t size;
 } GfxSurface;

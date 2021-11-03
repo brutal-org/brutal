@@ -66,7 +66,7 @@ void gfx_cache_invalidate(GfxCache *self)
     grid_fill(&self->back_hashgrid, 0x0);
 }
 
-void gfx_cache_rect(GfxCache *self, Rectf rect, GfxStroke stroke, GfxPaint fill, Trans2 transform)
+void gfx_cache_rect(GfxCache *self, Rectf rect, GfxStroke stroke, GfxPaint fill, MAYBE_UNUSED Trans2 trans)
 {
     GfxRectCommand command = (GfxRectCommand){
         .base = (GfxCommand){
@@ -74,7 +74,6 @@ void gfx_cache_rect(GfxCache *self, Rectf rect, GfxStroke stroke, GfxPaint fill,
             .bound = rect,
             .stroke = stroke,
             .fill = fill,
-            .transform = transform,
         },
         .rect = rect,
     };
