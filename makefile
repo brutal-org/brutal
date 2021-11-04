@@ -109,7 +109,7 @@ clean:
 	rm -rf $(BINDIR)
 
 .PHONY: clean
-clean-all:
+nuke:
 	rm -rf bin/
 
 -include $(DEPENDENCIES)
