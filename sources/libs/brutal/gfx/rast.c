@@ -30,6 +30,7 @@ void gfx_rast_fill(
     Edgesf edges,
     Recti clip,
     GfxPaint paint,
+    GfxRastRule rule,
     Alloc *alloc)
 {
     Rectf bound = edges_bound(edges);
@@ -66,7 +67,7 @@ void gfx_rast_fill(
                 float start = MAX(active.data[i], rect_left(bound));
                 float end = MIN(active.data[i + 1], rect_right(bound));
 
-                if (odd_even)
+                if (odd_even || rule == GFX_RAST_NONZERO)
                 {
                     for (float x = start; x < end; x += 1.0f / RAST_AA)
                     {

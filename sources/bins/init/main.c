@@ -85,6 +85,7 @@ static void display_bootimage(Handover const *handover)
         },
         (Recti){0, 0, 1024, 1024},
         (GfxPaint){.type = GFX_PAINT_FILL, .fill = GFX_COLOR_BLUE},
+        GFX_RAST_EVENODD,
         alloc_global());
 
     gfx_surface_copy(
