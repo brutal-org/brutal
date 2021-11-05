@@ -28,7 +28,7 @@ typedef struct
     Str name;
     uint32_t id;
 
-    BidEnum errors;
+    BidType errors;
     Vec(BidAlias) aliases;
     Vec(BidEvent) events;
     Vec(BidMethod) methods;

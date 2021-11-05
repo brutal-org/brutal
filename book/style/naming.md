@@ -2,7 +2,7 @@
 
 ## BID
 
-- snake_case for all methodes
+- snake_case for all methods
 - CONST_CASE for all constants
 - PascalCase for all types
 

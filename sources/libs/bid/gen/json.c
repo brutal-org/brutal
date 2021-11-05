@@ -57,6 +57,9 @@ Json bidgen_json_type(BidType const type, Alloc *alloc)
 {
     switch (type.type)
     {
+    case BID_TYPE_NONE:
+        return json_object_with_type(str$("BidNone"), alloc);
+
     case BID_TYPE_PRIMITIVE:
         return bidgen_json_primitive(type.primitive_, alloc);
 
@@ -91,13 +94,13 @@ Json bidgen_json_event(BidEvent const event, Alloc *alloc)
     return json;
 }
 
-Json bidgen_json_methode(BidMethod const methode, Alloc *alloc)
+Json bidgen_json_method(BidMethod const method, Alloc *alloc)
 {
     Json json = json_object_with_type(str$("BidMethod"), alloc);
 
-    json_put(&json, str$("name"), json_str(methode.name, alloc));
-    json_put(&json, str$("request"), bidgen_json_type(methode.request, alloc));
-    json_put(&json, str$("response"), bidgen_json_type(methode.response, alloc));
+    json_put(&json, str$("name"), json_str(method.name, alloc));
+    json_put(&json, str$("request"), bidgen_json_type(method.request, alloc));
+    json_put(&json, str$("response"), bidgen_json_type(method.response, alloc));
 
     return json;
 }
@@ -106,7 +109,7 @@ Json bidgen_json_iface(BidIface const iface, Alloc *alloc)
 {
     Json aliases_json = json_array(alloc);
     Json events_json = json_array(alloc);
-    Json methodes_json = json_array(alloc);
+    Json methods_json = json_array(alloc);
 
     vec_foreach(alias, &iface.aliases)
     {
@@ -118,19 +121,19 @@ Json bidgen_json_iface(BidIface const iface, Alloc *alloc)
         json_append(&events_json, bidgen_json_event(event, alloc));
     }
 
-    vec_foreach(methode, &iface.methods)
+    vec_foreach(method, &iface.methods)
     {
-        json_append(&methodes_json, bidgen_json_methode(methode, alloc));
+        json_append(&methods_json, bidgen_json_method(method, alloc));
     }
 
     Json iface_json = json_object_with_type(str$("BidIface"), alloc);
 
     json_put(&iface_json, str$("id"), json_number(iface.id));
     json_put(&iface_json, str$("name"), json_str(iface.name, alloc));
-    json_put(&iface_json, str$("errors"), bidgen_json_enum(iface.errors, alloc));
+    json_put(&iface_json, str$("errors"), bidgen_json_type(iface.errors, alloc));
     json_put(&iface_json, str$("aliases"), aliases_json);
     json_put(&iface_json, str$("events"), events_json);
-    json_put(&iface_json, str$("methods"), methodes_json);
+    json_put(&iface_json, str$("methods"), methods_json);
 
     return iface_json;
 }

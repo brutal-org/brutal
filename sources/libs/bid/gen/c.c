@@ -802,7 +802,7 @@ CUnit bidgen_c(BidIface const *iface, Alloc *alloc)
     cunit_member(&unit, cunit_define(protocol_id, cexpr_cast(cexpr_constant(cval_unsigned(iface->id)), ctype_name(str$("uint32_t"), alloc), alloc), alloc));
 
     Str error_type = str_fmt(alloc, "{case:pascal}Error", iface->name);
-    cunit_member(&unit, cunit_decl(cdecl_type(error_type, bidgen_c_enum(iface, &iface->errors, alloc), alloc)));
+    cunit_member(&unit, cunit_decl(cdecl_type(error_type, bidgen_c_type(iface, &iface->errors, alloc), alloc)));
 
     bidgen_c_typedef(&unit, iface, alloc);
 

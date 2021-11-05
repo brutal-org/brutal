@@ -21,6 +21,7 @@ void json_emit_string(Str str, Emit *emit)
 void json_emit(Json const json, Emit *emit)
 {
     bool first = true;
+    bool any = false;
 
     switch (json.type)
     {
@@ -38,41 +39,56 @@ void json_emit(Json const json, Emit *emit)
 
     case JSON_ARRAY:
         emit_fmt(emit, "[");
-
+        emit_ident(emit);
         vec_foreach(el, &json.array)
         {
             if (!first)
             {
-                emit_fmt(emit, ", ");
+                emit_fmt(emit, ",");
             }
+            emit_fmt(emit, "\n");
 
             json_emit(el, emit);
 
             first = false;
+            any = true;
         }
 
+        if (any)
+        {
+            emit_fmt(emit, "\n");
+        }
+
+        emit_deident(emit);
         emit_fmt(emit, "]");
         break;
 
     case JSON_OBJECT:
         emit_fmt(emit, "{{");
-
-        bool first = true;
+        emit_ident(emit);
 
         map_foreach(k, v, &json.object)
         {
             if (!first)
             {
-                emit_fmt(emit, ", ");
+                emit_fmt(emit, ",");
             }
+            emit_fmt(emit, "\n");
 
             json_emit_string(k, emit);
             emit_fmt(emit, ": ");
             json_emit(v, emit);
 
             first = false;
+            any = true;
         }
 
+        if (any)
+        {
+            emit_fmt(emit, "\n");
+        }
+
+        emit_deident(emit);
         emit_fmt(emit, "}}");
         break;
 

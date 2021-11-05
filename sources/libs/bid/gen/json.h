@@ -15,6 +15,6 @@ Json bidgen_json_alias(BidAlias const alias, Alloc *alloc);
 
 Json bidgen_json_event(BidEvent const event, Alloc *alloc);
 
-Json bidgen_json_methode(BidMethod const methode, Alloc *alloc);
+Json bidgen_json_method(BidMethod const method, Alloc *alloc);
 
 Json bidgen_json_iface(BidIface const iface, Alloc *alloc);

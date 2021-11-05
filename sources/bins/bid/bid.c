@@ -1,5 +1,6 @@
 #include <bid/gen.h>
 #include <bid/parse.h>
+#include <bid/pass.h>
 #include <brutal/alloc.h>
 #include <brutal/debug.h>
 #include <brutal/io.h>
@@ -78,6 +79,7 @@ int main(int argc, char const *argv[])
 
     if (str_eq(str$("--output-json"), str$(argv[2])))
     {
+        iface = bid_pass_prefix(iface, base$(&heap));
         bid_emit_json(iface, io_std_out());
     }
     else if (str_eq(str$("--output-c"), str$(argv[2])))
