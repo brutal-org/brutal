@@ -47,8 +47,26 @@ The following roadmap is always subject to change.
 
 ### Milestone 6 - Networking
 
-- [ ] Implement TCP/IP
-- [ ] Send a message on IRC
+- [ ] Hardware
+  - [ ] rtl8139
+  - [ ] e1000?
+  - [ ] virtio-net?
+- [ ] Protocols
+  - [ ] Ethernet
+  - [ ] Arp
+  - [ ] IPv4
+  - [ ] UDP
+  - [ ] TCP
+  - [ ] HTTP
+  - [ ] ICMP
+  - [ ] IRC
+  - [ ] TELNET
+- [ ] Tools
+  - [ ] ping
+  - [ ] irc
+  - [ ] telnet
+  - [ ] fetch
+- [ ] webserver ?
 
 ## Past Milestones
 
