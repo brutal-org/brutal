@@ -4,24 +4,29 @@
 #include <brutal/input.h>
 #include "ps2.h"
 
-static bool _kb_escaped = false;
+typedef struct
+{
+    BalIo io;
+
+    bool kb_escaped;
+} Ps2;
 
 void ps2kb_handle_key(KbKey key, KbMotion motion)
 {
     log$("{} {}", kbkey_to_str(key), motion ? "UP" : "DOWN");
 }
 
-void ps2kb_handle_code(uint8_t scancode)
+void ps2kb_handle_code(Ps2 *ps2, uint8_t scancode)
 {
-    if (_kb_escaped)
+    if (ps2->kb_escaped)
     {
-        _kb_escaped = false;
+        ps2->kb_escaped = false;
         KbKey key = (KbKey)((scancode & 0x7f) + 0x80);
         ps2kb_handle_key(key, scancode & 0x80 ? KBMOTION_UP : KBMOTION_DOWN);
     }
     else if (scancode == PS2_KEYBOARD_ESCAPE)
     {
-        _kb_escaped = true;
+        ps2->kb_escaped = true;
     }
     else
     {
@@ -30,26 +35,26 @@ void ps2kb_handle_code(uint8_t scancode)
     }
 }
 
-void ps2_handle_irq(void)
+void ps2_handle_irq(Ps2 *ps2)
 {
-    uint8_t status = br_in8(PS2_STATUS);
+    uint8_t status = bal_io_in8(ps2->io, PS2_REG_STATUS);
 
-    while (status & PS2_BUF_FULL)
+    while (status & PS2_STATUS_FULL)
     {
-        uint8_t which_buf = status & PS2_WHICH_BUF;
+        uint8_t is_mouse_buf = status & PS2_STATUS_MOUSE;
 
-        if (which_buf == PS2_KEYBOARD_BUF)
+        if (is_mouse_buf)
         {
-            uint8_t scancode = br_in8(PS2_BUF);
-            ps2kb_handle_code(scancode);
-        }
-        else if (which_buf == PS2_MOUSE_BUF)
-        {
-            uint8_t packet = br_in8(PS2_BUF);
+            uint8_t packet = bal_io_in8(ps2->io, PS2_REG_BUF);
             log$("MOUSE: {#02x}", packet);
         }
+        else
+        {
+            uint8_t scancode = bal_io_in8(ps2->io, PS2_REG_BUF);
+            ps2kb_handle_code(ps2, scancode);
+        }
 
-        status = br_in8(PS2_STATUS);
+        status = bal_io_in8(ps2->io, PS2_REG_STATUS);
     }
 }
 
@@ -60,6 +65,11 @@ int br_entry_args(
     MAYBE_UNUSED long arg4,
     MAYBE_UNUSED long arg5)
 {
+    Ps2 ps2 = {
+        .io = bal_io_port(0x64, 0x8),
+        .kb_escaped = false,
+    };
+
     BrCreateArgs keyboard_irq = {
         .type = BR_OBJECT_IRQ,
         .irq = {
@@ -103,7 +113,7 @@ int br_entry_args(
         if (msg.from == BR_TASK_IRQ)
         {
             BrIrq irq = msg.arg[0];
-            ps2_handle_irq();
+            ps2_handle_irq(&ps2);
 
             if (irq == 1)
             {
