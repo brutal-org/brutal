@@ -1,4 +1,4 @@
-name: Build and Test
+name: Build and Test (Ubuntu)
 
 on:
   push:
@@ -11,6 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: true
 
       - name: Install dependencies
         run: .github/workflows/setup-ubuntu.sh

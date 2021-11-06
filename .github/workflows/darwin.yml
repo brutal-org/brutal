@@ -1,0 +1,27 @@
+name: Build and Test (Darwin)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-all:
+    runs-on: macos-11
+  
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Install dependencies
+        run: .github/workflows/setup-darwin.sh
+
+      - name: Build All
+        run: |
+          make VERBOSE=yes all
+
+      - name: Run Tests
+        run: |
+          VERBOSE=yes ./brutal test
