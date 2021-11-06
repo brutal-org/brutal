@@ -77,4 +77,4 @@ jobs:
 
       - name: Run Tests
         run: |
-          VERBOSE=yes CONFIG_TOOLCHAIN=${{matrix.toolchain}} ./use test
+          VERBOSE=yes CONFIG_TOOLCHAIN=${{matrix.toolchain}} ./brutal test
