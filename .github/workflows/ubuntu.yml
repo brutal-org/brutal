@@ -28,6 +28,8 @@ jobs:
         toolchain: [gnu, llvm]
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: true
 
       - name: Install dependencies
         run: .github/workflows/setup-ubuntu.sh
@@ -57,6 +59,8 @@ jobs:
         toolchain: [gnu, llvm]
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: true
 
       - name: Install dependencies
         run: .github/workflows/setup-ubuntu.sh
