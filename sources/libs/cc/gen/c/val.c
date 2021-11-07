@@ -1,5 +1,5 @@
-#include <cc/gen/c/c.h> 
 #include <brutal/debug.h>
+#include <cc/gen/c/c.h>
 
 void cgen_c_value(Emit *emit, CVal value)
 {

@@ -56,6 +56,3 @@ BidIface bid_pass_prefix(BidIface iface, Alloc *alloc)
 
     return prefixed;
 }
-
-
-

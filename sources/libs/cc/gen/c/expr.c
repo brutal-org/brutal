@@ -1,5 +1,5 @@
-#include <cc/gen/c/c.h>
 #include <brutal/debug.h>
+#include <cc/gen/c/c.h>
 
 static void cgen_c_op_fix(Emit *emit, COp op)
 {
@@ -121,4 +121,3 @@ void cgen_c_expr(Emit *emit, CExpr expr)
 {
     cgen_c_expr_pre(emit, expr, CEXPR_MAX_PRECEDENCE);
 }
-
