@@ -1,3 +1,3 @@
 #!/bin/bash
 
-brew install nasm xorriso wget llvm
+brew install nasm xorriso wget llvm sdl2

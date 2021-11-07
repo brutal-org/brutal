@@ -9,7 +9,7 @@ on:
 jobs:
   build-all:
     runs-on: macos-11
-  
+
     steps:
       - uses: actions/checkout@v2
         with:
@@ -20,8 +20,8 @@ jobs:
 
       - name: Build All
         run: |
-          make VERBOSE=yes all
+          .github/workflows/env-darwin.sh make VERBOSE=yes all
 
       - name: Run Tests
         run: |
-          VERBOSE=yes ./brutal test
+          VERBOSE=yes .github/workflows/env-darwin.sh ./brutal test

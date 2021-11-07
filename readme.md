@@ -18,9 +18,6 @@
 <br/>
 
 <p align="center">
-    <a href="https://github.com/brutal-org/brutal/actions/workflows/main.yml">
-      <img src="https://github.com/brutal-org/brutal/actions/workflows/main.yml/badge.svg">
-    </a>
     <a href="https://github.com/brutal-org/brutal/issues">
       <img src="https://img.shields.io/github/issues/brutal-org/brutal">
     </a>
@@ -38,6 +35,11 @@
 <br/>
 <br/>
 <br/>
+
+## CI
+
+- [![Build and Test (Ubuntu)](https://github.com/brutal-org/brutal/actions/workflows/ubuntu.yml/badge.svg)](https://github.com/brutal-org/brutal/actions/workflows/ubuntu.yml)
+- [![Build and Test (Darwin)](https://github.com/brutal-org/brutal/actions/workflows/darwin.yml/badge.svg)](https://github.com/brutal-org/brutal/actions/workflows/darwin.yml)
 
 ## Features
 
