@@ -1,10 +1,10 @@
 #include <brutal/alloc.h>
 #include "kernel/object.h"
 
+static _Atomic BrHandle id = 1;
 static bool initialized = false;
 static VecObject global = {};
 static Lock lock = {};
-static _Atomic BrHandle id = 1;
 
 void object_init(Object *self, BrObjectType type, ObjectDtor *dtor)
 {
@@ -23,6 +23,7 @@ void object_init(Object *self, BrObjectType type, ObjectDtor *dtor)
     }
 
     vec_push(&global, self);
+
     lock_release(&lock);
 }
 

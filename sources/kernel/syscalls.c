@@ -154,7 +154,7 @@ BrResult sys_create_mem_obj(BrId *id, BrMemObj *handle, BrCreateMemObjArgs *args
     }
     else
     {
-        PmmResult pmm_result = pmm_alloc(args->size);
+        PmmResult pmm_result = pmm_alloc(args->size, !(args->flags & BR_MEM_OBJ_LOWER));
 
         if (!pmm_result.succ)
         {

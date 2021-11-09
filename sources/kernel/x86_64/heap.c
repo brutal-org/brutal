@@ -1,3 +1,4 @@
+#include <brutal/debug.h>
 #include <brutal/sync.h>
 #include "kernel/heap.h"
 #include "kernel/mmap.h"
@@ -11,9 +12,10 @@ HeapResult heap_alloc(size_t size)
 
     LOCK_RETAINER(&heap_lock)
 
-    PmmRange pmm_range = TRY(HeapResult, pmm_alloc(size));
+    PmmRange pmm_range = TRY(HeapResult, pmm_alloc(size, true));
     pmm_range.base = mmap_phys_to_io(pmm_range.base);
     HeapRange heap_range = range$(HeapRange, pmm_range);
+
     return OK(HeapResult, heap_range);
 }
 
@@ -24,6 +26,7 @@ HeapResult heap_free(HeapRange range)
     PmmRange pmm_range = range$(PmmRange, range);
     pmm_range.base = mmap_io_to_phys(pmm_range.base);
     TRY(HeapResult, pmm_unused(pmm_range));
+
     return OK(HeapResult, range);
 }
 

@@ -22,6 +22,30 @@ typedef enum
     HANDOVER_MMAP_FRAMEBUFFER,
 } HandoverMmapType;
 
+static inline Str ho_mmtype_to_str(HandoverMmapType type)
+{
+    switch (type)
+    {
+    case HANDOVER_MMAP_FREE:
+        return str$("FREE");
+
+    case HANDOVER_MMAP_KERNEL_MODULE:
+        return str$("KERNEL");
+
+    case HANDOVER_MMAP_RESERVED:
+        return str$("RESERVED");
+
+    case HANDOVER_MMAP_RECLAIMABLE:
+        return str$("RECLAIMABLE");
+
+    case HANDOVER_MMAP_FRAMEBUFFER:
+        return str$("FRAMEBUFFER");
+
+    default:
+        return str$("UNKNOWN");
+    }
+}
+
 typedef struct
 {
     HandoverMmapType type;

@@ -1,3 +1,4 @@
+#include <brutal/debug.h>
 #include <brutal/ds/bitmap.h>
 #include <brutal/mem.h>
 
@@ -29,16 +30,28 @@ void bitmap_fill(Bitmap *bitmap, bool value)
     }
 }
 
-USizeRange bitmap_find_range(Bitmap const *bitmap, size_t start, size_t size, bool value)
+USizeRange bitmap_find_free(Bitmap const *bitmap, size_t start, size_t size, bool upper)
 {
+    if (start == (size_t)-1)
+    {
+        start = bitmap_len(bitmap);
+    }
+
+    if (bitmap->size == 0)
+    {
+        return (USizeRange){};
+    }
+
     size_t range_start = 0;
     size_t range_size = 0;
 
-    for (size_t i = start; i < bitmap->size * 8; i++)
+    for (size_t i = start;
+         upper ? i > 0 : i < bitmap_len(bitmap);
+         i += upper ? -1 : +1)
     {
-        if (bitmap_get(bitmap, i) == value)
+        if (bitmap_get(bitmap, i) == 0)
         {
-            if (range_size == 0)
+            if (range_size == 0 || upper)
             {
                 range_start = i;
             }
@@ -51,7 +64,7 @@ USizeRange bitmap_find_range(Bitmap const *bitmap, size_t start, size_t size, bo
             range_start = 0;
         }
 
-        if (size <= range_size)
+        if (size == range_size)
         {
             return (USizeRange){range_start, range_size};
         }

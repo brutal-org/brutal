@@ -8,6 +8,8 @@
 #    define ARCH_HAS_MEMCPY 1
 #endif
 
+size_t arch_backtrace(uintptr_t *buf, size_t cap);
+
 void arch_pause(void);
 
 void *arch_mem_set(void *d, uint8_t s, size_t c);

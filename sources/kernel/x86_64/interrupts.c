@@ -71,26 +71,6 @@ static void dump_register(Regs const *regs)
     log_unlock("R15: {#016p}", regs->r15);
 }
 
-struct stackframe
-{
-    struct stackframe *rbp;
-    uint64_t rip;
-};
-
-static void backtrace(uintptr_t rbp, uint64_t rip)
-{
-    struct stackframe *stackframe = (struct stackframe *)rbp;
-
-    log_unlock("Backtrace:");
-    log_unlock("{016x}", rip);
-
-    while (stackframe)
-    {
-        log_unlock("{016x}", stackframe->rip);
-        stackframe = stackframe->rbp;
-    }
-}
-
 static void interrupt_error_handler(Regs *regs, uintptr_t rsp)
 {
     lock_acquire(&error_lock);
@@ -112,9 +92,6 @@ static void interrupt_error_handler(Regs *regs, uintptr_t rsp)
     }
 
     dump_register(regs);
-    log_unlock("");
-    backtrace(regs->rbp, regs->rip);
-    log_unlock("");
     log_unlock("------------------------------------------------------------");
     log_unlock("");
 

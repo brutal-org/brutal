@@ -62,7 +62,7 @@ static bool check_minor_magic(HeapMinor *min, void *ptr)
     }
     else
     {
-        panic$("Bad free({p})", ptr);
+        panic$("Bad free({p}) magic is {08x}", ptr, min->magic);
     }
 
     return false;

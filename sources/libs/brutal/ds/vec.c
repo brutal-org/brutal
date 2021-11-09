@@ -39,7 +39,7 @@ bool vec_realloc_impl(VecImpl *impl, int new_len)
 
     if (impl->data != nullptr)
     {
-        mem_cpy(ptr, impl->data, MIN((impl->len), new_len) * impl->data_size);
+        mem_cpy(ptr, impl->data, MIN(impl->len, new_len) * impl->data_size);
         alloc_release(impl->alloc, impl->data);
     }
 
@@ -53,7 +53,7 @@ bool vec_expand_impl(VecImpl *impl)
 {
     if (impl->len + 1 > impl->capacity)
     {
-        int n = (impl->capacity == 0) ? 1 : impl->capacity << 1;
+        int n = (impl->capacity == 0) ? 1 : impl->capacity * 2;
         return vec_realloc_impl(impl, n);
     }
     else

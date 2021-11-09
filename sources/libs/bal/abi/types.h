@@ -168,6 +168,7 @@ typedef enum
     BR_MEM_OBJ_NONE = 0,
 
     BR_MEM_OBJ_PMM = 1 << 0,
+    BR_MEM_OBJ_LOWER = 1 << 1,
 } BrMemObjFlags;
 
 #define BR_MEM_NONE ((BrMemFlags)0)

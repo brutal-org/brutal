@@ -7,7 +7,10 @@
 #include "kernel/pmm.h"
 
 static Bitmap pmm_bitmap = {};
-static size_t best_bet = 0;
+
+static size_t best_bet_upper = 0;
+static size_t best_bet_lower = (size_t)-1;
+
 static size_t used_memory = 0;
 static Lock pmm_lock = {};
 
@@ -29,18 +32,18 @@ static void pmm_bitmap_initialize(HandoverMmap const *memory_map)
 
     for (size_t i = 0; i < memory_map->size; i++)
     {
-        HandoverMmapEntry const *entry = &memory_map->entries[i];
+        HandoverMmapEntry entry = memory_map->entries[i];
 
-        if (entry->type != HANDOVER_MMAP_FREE)
+        if (entry.type != HANDOVER_MMAP_FREE)
         {
             continue;
         }
 
-        if (entry->len > bitmap_target_size)
+        if (entry.len > bitmap_target_size)
         {
-            log$("Allocated memory bitmap at {x}-{x}", entry->base, entry->base + bitmap_target_size - 1);
+            log$("Allocated memory bitmap at {x}-{x}", entry.base, entry.base + bitmap_target_size - 1);
 
-            bitmap_init(&pmm_bitmap, (void *)mmap_phys_to_io(entry->base), bitmap_target_size);
+            bitmap_init(&pmm_bitmap, (void *)mmap_phys_to_io(entry.base), bitmap_target_size);
             break;
         }
     }
@@ -56,12 +59,14 @@ static void pmm_load_memory_map(HandoverMmap const *memory_map)
 
     for (size_t i = 0; i < memory_map->size; i++)
     {
-        size_t base = ALIGN_UP(memory_map->entries[i].base, MEM_PAGE_SIZE);
-        size_t size = ALIGN_DOWN(memory_map->entries[i].len, MEM_PAGE_SIZE);
+        HandoverMmapEntry entry = memory_map->entries[i];
 
-        log$("    type: {x} {x}-{x}", memory_map->entries[i].type, base, base + size - 1);
+        size_t base = ALIGN_UP(entry.base, MEM_PAGE_SIZE);
+        size_t size = ALIGN_DOWN(entry.len, MEM_PAGE_SIZE);
 
-        if (memory_map->entries[i].type != HANDOVER_MMAP_FREE)
+        log$("    {x}-{x} {}", base, base + size - 1, ho_mmtype_to_str(entry.type));
+
+        if (entry.type != HANDOVER_MMAP_FREE)
         {
             continue;
         }
@@ -71,7 +76,7 @@ static void pmm_load_memory_map(HandoverMmap const *memory_map)
         available_memory += size;
     }
 
-    log$("Available Memory: {}kib", available_memory / 1024);
+    log$("Available Memory: {}kib", available_memory / KiB(1));
 }
 
 void pmm_initialize(Handover const *handover)
@@ -85,7 +90,7 @@ void pmm_initialize(Handover const *handover)
     pmm_used((PmmRange){mmap_io_to_phys((uintptr_t)pmm_bitmap.data), pmm_bitmap.size});
 }
 
-PmmResult pmm_alloc(size_t size)
+PmmResult pmm_alloc(size_t size, bool upper)
 {
     LOCK_RETAINER(&pmm_lock);
 
@@ -94,12 +99,20 @@ PmmResult pmm_alloc(size_t size)
     used_memory += size;
 
     size_t page_size = size / MEM_PAGE_SIZE;
-    USizeRange page_range = bitmap_find_range(&pmm_bitmap, best_bet, page_size, PMM_UNUSED);
+    USizeRange page_range = bitmap_find_free(&pmm_bitmap, upper ? best_bet_upper : best_bet_lower, page_size, upper);
 
     if (range_empty(page_range))
     {
-        best_bet = 0;
-        page_range = bitmap_find_range(&pmm_bitmap, 0, page_size, PMM_UNUSED);
+        if (upper)
+        {
+            best_bet_upper = -1;
+        }
+        else
+        {
+            best_bet_lower = 0;
+        }
+
+        page_range = bitmap_find_free(&pmm_bitmap, upper ? -1 : 0, page_size, upper);
     }
 
     if (!range_any(page_range))
@@ -108,7 +121,14 @@ PmmResult pmm_alloc(size_t size)
         return ERR(PmmResult, BR_OUT_OF_MEMORY);
     }
 
-    best_bet = range_end(page_range);
+    if (upper)
+    {
+        best_bet_upper = range_begin(page_range);
+    }
+    else
+    {
+        best_bet_lower = range_end(page_range);
+    }
 
     bitmap_set_range(&pmm_bitmap, page_range, PMM_USED);
 
@@ -155,7 +175,15 @@ PmmResult pmm_unused(PmmRange range)
 
     bitmap_set_range(&pmm_bitmap, page_range, PMM_UNUSED);
 
-    best_bet = (page_range.base);
+    if (best_bet_upper < range_end(page_range))
+    {
+        best_bet_upper = range_end(page_range);
+    }
+
+    if (best_bet_lower > range_begin(page_range))
+    {
+        best_bet_lower = range_begin(page_range);
+    }
 
     return OK(PmmResult, range);
 }

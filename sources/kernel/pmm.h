@@ -11,7 +11,7 @@ typedef Result(BrResult, PmmRange) PmmResult;
 
 void pmm_initialize(Handover const *handover);
 
-PmmResult pmm_alloc(size_t size);
+PmmResult pmm_alloc(size_t size, bool upper);
 
 PmmResult pmm_used(PmmRange range);
 

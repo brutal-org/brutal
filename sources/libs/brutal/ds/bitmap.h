@@ -39,6 +39,11 @@ void bitmap_init(Bitmap *self, void *data, size_t size);
 
 void bitmap_set_range(Bitmap *bitmap, USizeRange range, bool value);
 
+static inline size_t bitmap_len(const Bitmap *bitmap)
+{
+    return bitmap->size * 8;
+}
+
 void bitmap_fill(Bitmap *bitmap, bool value);
 
-USizeRange bitmap_find_range(Bitmap const *bitmap, size_t start, size_t size, bool value);
+USizeRange bitmap_find_free(Bitmap const *bitmap, size_t start, size_t size, bool upper);

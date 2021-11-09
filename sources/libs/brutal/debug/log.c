@@ -1,4 +1,5 @@
 #include <brutal/debug.h>
+#include <embed/arch.h>
 #include <embed/log.h>
 
 #ifdef __kernel__
@@ -36,6 +37,16 @@ void log_impl(LogLevel level, SourceLocation location, Str fmt, PrintArgs args)
 noreturn void panic_impl(LogLevel level, SourceLocation location, Str fmt, PrintArgs args)
 {
     log_unlock_impl(level, location, fmt, args);
+
+    print(host_log_writer(), "Backtrace:\n");
+
+    uintptr_t buf[128];
+    size_t len = arch_backtrace(buf, 128);
+
+    for (size_t i = 0; i < len; i++)
+    {
+        print(host_log_writer(), "\t{#p}\n", buf[i]);
+    }
 
     host_log_panic();
 }
