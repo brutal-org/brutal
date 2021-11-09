@@ -84,6 +84,7 @@ int main(int argc, char const *argv[])
     }
     else if (str_eq(str$("--output-c"), str$(argv[2])))
     {
+        iface = bid_pass_prefix(iface, base$(&heap));
         bid_emit_c(iface, io_std_out());
     }
     else

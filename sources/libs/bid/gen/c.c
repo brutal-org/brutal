@@ -3,16 +3,16 @@
 #include <cc/builder.h>
 #include <cc/gen.h>
 
-static CType bidgen_c_type(BidIface const *iface, BidType const *type, Alloc *alloc);
+static CType bidgen_c_type(BidType const *type, Alloc *alloc);
 
-void bidgen_c_unit_add_typedef(CUnit *unit, BidIface const *iface, Str s, BidType type, Alloc *alloc)
+void bidgen_c_unit_add_typedef(CUnit *unit, Str s, BidType type, Alloc *alloc)
 {
-    CType t = bidgen_c_type(iface, &type, alloc);
+    CType t = bidgen_c_type(&type, alloc);
     CDecl type_def = cdecl_type(s, t, alloc);
     cunit_member(unit, cunit_decl(type_def));
 }
 
-static CType bidgen_c_primitive(BidIface const *iface, BidPrimitive const *type, Alloc *alloc)
+static CType bidgen_c_primitive(BidPrimitive const *type, Alloc *alloc)
 {
     Str res;
 
@@ -31,57 +31,52 @@ static CType bidgen_c_primitive(BidIface const *iface, BidPrimitive const *type,
 
         res = str_fmt(alloc, "{}({})", type->name, arguments);
     }
-    else if (bid_type_in_interface(iface, type->name))
-    {
-        res = str_fmt(alloc, "{case:pascal}{}", iface->name, type->name);
-    }
     else
     {
-        res = str_fmt(alloc, "{}", type->name);
+        res = type->name;
     }
 
     return ctype_name(res, alloc);
 }
 
-static CType bidgen_c_enum(BidIface const *iface, BidEnum const *type, Alloc *alloc)
+static CType bidgen_c_enum(BidEnum const *type, Alloc *alloc)
 {
     CType enum_type = ctype_enum(alloc);
 
     int value = 0;
     vec_foreach(member, &type->members)
     {
-        Str s = str_fmt(alloc, "{case:upper}_{case:upper}", iface->name, member);
-        ctype_constant(&enum_type, s, cval_unsigned(value), alloc);
+        ctype_constant(&enum_type, member, cval_unsigned(value), alloc);
     }
     return enum_type;
 }
 
-static CType bidgen_c_struct(BidIface const *iface, BidStruct const *type, Alloc *alloc)
+static CType bidgen_c_struct(BidStruct const *type, Alloc *alloc)
 {
     CType cstruct = ctype_struct(alloc);
     vec_foreach(member, &type->members)
     {
         ctype_member(&cstruct,
                      member.name,
-                     bidgen_c_type(iface, &member.type, alloc),
+                     bidgen_c_type(&member.type, alloc),
                      alloc);
     }
 
     return cstruct;
 }
 
-static CType bidgen_c_type(BidIface const *iface, BidType const *type, Alloc *alloc)
+static CType bidgen_c_type(BidType const *type, Alloc *alloc)
 {
     switch (type->type)
     {
     case BID_TYPE_PRIMITIVE:
-        return bidgen_c_primitive(iface, &type->primitive_, alloc);
+        return bidgen_c_primitive(&type->primitive_, alloc);
 
     case BID_TYPE_ENUM:
-        return bidgen_c_enum(iface, &type->enum_, alloc);
+        return bidgen_c_enum(&type->enum_, alloc);
 
     case BID_TYPE_STRUCT:
-        return bidgen_c_struct(iface, &type->struct_, alloc);
+        return bidgen_c_struct(&type->struct_, alloc);
 
     default:
         panic$("Unknow type {}", type->type);
@@ -187,7 +182,7 @@ static CStmt bidgen_c_msg_create(BidIface const *iface, BidMethod const *method,
     Str protocol_id = str_fmt(alloc, "{case:upper}_PROTOCOL_ID", iface->name);
     cc_push_initializer_member(&msg_init, str$("prot"), cexpr_ident(protocol_id, alloc), alloc);
 
-    Str request = str_fmt(alloc, "{case:upper}_{case:upper}_REQUEST", iface->name, method->name);
+    Str request = str_fmt(alloc, "{case:upper}_REQUEST", method->name);
     cc_push_initializer_member(&msg_init, str$("type"), cexpr_ident(request, alloc), alloc);
 
     if (method->request.type != BID_TYPE_NONE)
@@ -207,28 +202,25 @@ static CStmt bidgen_c_msg_create(BidIface const *iface, BidMethod const *method,
 static CDecl bidgen_c_method_decl(BidIface const *iface, BidMethod const *method, CStmt func_stmt, Alloc *alloc)
 {
     Str err_type = str_fmt(alloc, "{case:pascal}Error", iface->name);
-    Str func_name = str_fmt(alloc, "{case:lower}_{case:lower}", iface->name, method->name);
 
     CType ret_type = ctype_name(err_type, alloc);
-    CType func_type = ctype_named(ctype_func(ret_type, alloc), func_name, alloc);
+    CType func_type = ctype_named(ctype_func(ret_type, alloc), method->name, alloc);
 
     ctype_member(&func_type, str$("task"), ctype_name(str$("BrId"), alloc), alloc);
 
     if (method->request.type != BID_TYPE_NONE)
     {
-        Str request_type = str_fmt(alloc, "{case:pascal}{case:pascal}Request", iface->name, method->name);
-        CType req_type = ctype_ptr(ctype_attr(ctype_name(request_type, alloc), CTYPE_CONST), alloc);
+        CType req_type = ctype_ptr(ctype_attr(ctype_name(method->request.primitive_.name, alloc), CTYPE_CONST), alloc);
         ctype_member(&func_type, str$("req"), req_type, alloc);
     }
 
     if (method->response.type != BID_TYPE_NONE)
     {
-        Str response_type = str_fmt(alloc, "{case:pascal}{case:pascal}Response", iface->name, method->name);
-        CType res_type = ctype_ptr(ctype_name(response_type, alloc), alloc);
+        CType res_type = ctype_ptr(ctype_name(method->request.primitive_.name, alloc), alloc);
         ctype_member(&func_type, str$("resp"), res_type, alloc);
     }
 
-    CDecl func = cdecl_func(func_name, func_type, func_stmt, alloc);
+    CDecl func = cdecl_func(method->name, func_type, func_stmt, alloc);
 
     return cdecl_attrib(func, CDECL_INLINE | CDECL_STATIC);
 }
@@ -236,9 +228,11 @@ static CDecl bidgen_c_method_decl(BidIface const *iface, BidMethod const *method
 static CExpr bidgen_c_br_ev_eq_call(Alloc *alloc)
 {
     CExpr call = cc_func_call(str$("br_ev_req"), alloc);
+
     cexpr_member(&call, cexpr_ident(str$("task"), alloc));
     cexpr_member(&call, cexpr_ref(cexpr_ident(str$("req_msg"), alloc), alloc));
     cexpr_member(&call, cexpr_ref(cexpr_ident(str$("resp_msg"), alloc), alloc));
+
     return call;
 }
 
@@ -269,7 +263,7 @@ static void bidgen_c_msg_handle(CStmt *targ, BidIface const *iface, BidMethod co
     */
 
     Str protocol_id_str = str_fmt(alloc, "{case:upper}_PROTOCOL_ID", iface->name);
-    Str response_id_str = str_fmt(alloc, "{case:upper}_{case:upper}_RESPONSE", iface->name, method->name);
+    Str response_id_str = str_fmt(alloc, "{case:upper}_RESPONSE", method->name);
     Str error_id_str = str_fmt(alloc, "{case:upper}_ERROR", iface->name);
     Str unexpected_str = str_fmt(alloc, "{case:upper}_UNEXPECTED_MESSAGE", iface->name);
 
@@ -323,12 +317,12 @@ static void bidgen_c_msg_handle(CStmt *targ, BidIface const *iface, BidMethod co
     cstmt_block_add(targ, stmt);
 }
 
-static void bidgen_c_msg_resp_init(CStmt *targ, BidIface const *iface, BidMethod const *method, Alloc *alloc)
+static void bidgen_c_msg_resp_init(CStmt *targ, BidMethod const *method, Alloc *alloc)
 {
 
     BidType response = method->response;
 
-    Str request_type = str_fmt(alloc, "{case:pascal}{case:pascal}Request", iface->name, method->name);
+    Str request_type = str_fmt(alloc, "{case:pascal}Request", method->name);
     switch (response.type)
     {
     case BID_TYPE_PRIMITIVE:
@@ -352,7 +346,7 @@ static void bidgen_c_msg_resp_init(CStmt *targ, BidIface const *iface, BidMethod
                 cexpr_cast(cc_index_constant(
                                cc_access_str(str$("resp_msg"), str$("arg"), alloc),
                                0, alloc),
-                           bidgen_c_type(iface, &member.type, alloc),
+                           bidgen_c_type(&member.type, alloc),
                            alloc),
                 alloc);
 
@@ -380,7 +374,7 @@ static CDecl bidgen_c_method(BidIface const *iface, BidMethod const *method, All
 
     bidgen_c_msg_handle(&statement, iface, method, alloc);
 
-    bidgen_c_msg_resp_init(&statement, iface, method, alloc);
+    bidgen_c_msg_resp_init(&statement, method, alloc);
 
     Str success_str = str_fmt(alloc, "{case:upper}_SUCCESS",
                               iface->name);
@@ -394,9 +388,9 @@ static CDecl bidgen_c_method(BidIface const *iface, BidMethod const *method, All
 static CDecl bidgen_c_callback(BidIface const *iface, BidMethod const *method, Alloc *alloc)
 {
     Str err_type = str_fmt(alloc, "{case:pascal}Error", iface->name);
-    Str request_type = str_fmt(alloc, "{case:pascal}{case:pascal}Request", iface->name, method->name);
-    Str response_type = str_fmt(alloc, "{case:pascal}{case:pascal}Response", iface->name, method->name);
-    Str func_name = str_fmt(alloc, "{case:pascal}{case:pascal}Fn", iface->name, method->name);
+    Str request_type = str_fmt(alloc, "{case:pascal}Request", method->name);
+    Str response_type = str_fmt(alloc, "{case:pascal}Response", method->name);
+    Str func_name = str_fmt(alloc, "{case:pascal}Fn", method->name);
 
     CType ctype_fn = ctype_func(ctype_name(err_type, alloc), alloc);
 
@@ -429,8 +423,7 @@ void bidgen_c_typedef(CUnit *unit, const BidIface *iface, Alloc *alloc)
 {
     vec_foreach(alias, &iface->aliases)
     {
-        Str s = str_fmt(alloc, "{case:pascal}{case:pascal}", iface->name, alias.name);
-        CDecl type_def = cdecl_type(s, bidgen_c_type(iface, &alias.type, alloc), alloc);
+        CDecl type_def = cdecl_type(alias.name, bidgen_c_type(&alias.type, alloc), alloc);
         cunit_member(unit, cunit_decl(type_def));
     }
 }
@@ -455,13 +448,13 @@ CType bidgen_c_method_message_type(BidIface const *iface, Alloc *alloc)
 
     vec_foreach(method, &iface->methods)
     {
-        bidgen_c_const_msg_type(str_fmt(alloc, "{case:upper}_{case:upper}_RESPONSE", iface->name, method.name));
-        bidgen_c_const_msg_type(str_fmt(alloc, "{case:upper}_{case:upper}_REQUEST", iface->name, method.name));
+        bidgen_c_const_msg_type(str_fmt(alloc, "{case:upper}_RESPONSE", method.name));
+        bidgen_c_const_msg_type(str_fmt(alloc, "{case:upper}_REQUEST", method.name));
     }
 
     vec_foreach(event, &iface->events)
     {
-        bidgen_c_const_msg_type(str_fmt(alloc, "{case:upper}_{case:upper}_EVENT", iface->name, event.name));
+        bidgen_c_const_msg_type(str_fmt(alloc, "{case:upper}_EVENT", event.name));
     }
 
     return message_type_decl;
@@ -469,7 +462,7 @@ CType bidgen_c_method_message_type(BidIface const *iface, Alloc *alloc)
 
 CStmt bidgen_c_dispatcher_case_if_success(BidIface const *iface, BidMethod method, Alloc *alloc)
 {
-    Str response_constant_name = str_fmt(alloc, "{case:upper}_{case:upper}_RESPONSE", iface->name, method.name);
+    Str response_constant_name = str_fmt(alloc, "{case:upper}_RESPONSE", method.name);
     Str protocol_constant_name = str_fmt(alloc, "{case:upper}_PROTOCOL_ID", iface->name);
     BidType response = method.response;
     CStmt if_true_block = cstmt_block(alloc);
@@ -544,9 +537,9 @@ CStmt bidgen_c_dispatcher_case_if_error(BidIface const *iface, Alloc *alloc)
 void bidgen_c_dispatcher_case(BidIface const *iface, CStmt *switch_block, BidMethod method, Alloc *alloc)
 {
     Str success_constant_name = str_fmt(alloc, "{case:upper}_SUCCESS", iface->name);
-    Str request_constant_name = str_fmt(alloc, "{case:upper}_{case:upper}_REQUEST", iface->name, method.name);
-    Str request_type_name = str_fmt(alloc, "{case:pascal}{case:pascal}Request", iface->name, method.name);
-    Str response_type_name = str_fmt(alloc, "{case:pascal}{case:pascal}Response", iface->name, method.name);
+    Str request_constant_name = str_fmt(alloc, "{case:upper}_REQUEST", method.name);
+    Str request_type_name = str_fmt(alloc, "{case:pascal}Request", method.name);
+    Str response_type_name = str_fmt(alloc, "{case:pascal}Response", method.name);
     Str error_type_name = str_fmt(alloc, "{case:pascal}Error", iface->name);
     Str server_handle_name = str_fmt(alloc, "handle_{case:lower}", method.name);
     BidType request = method.request;
@@ -582,7 +575,7 @@ void bidgen_c_dispatcher_case(BidIface const *iface, CStmt *switch_block, BidMet
             // req.{} = (type)req_msg->arg[{}];
             CExpr left = cc_access_str(str$("req"), member.name, alloc);
             CExpr req_msg_expr = cc_index_constant(cc_ptr_access_str(str$("req_msg"), str$("arg"), alloc), index, alloc);
-            CExpr req_msg_casted = cexpr_cast(req_msg_expr, bidgen_c_type(iface, &member.type, alloc), alloc);
+            CExpr req_msg_casted = cexpr_cast(req_msg_expr, bidgen_c_type(&member.type, alloc), alloc);
             CExpr set_expr = cexpr_assign(left, req_msg_casted, alloc);
 
             cstmt_block_add(&case_block, cstmt_expr(set_expr));
@@ -718,7 +711,7 @@ CDecl bidgen_c_server_structure_declaration(BidIface const *iface, Alloc *alloc)
 
     vec_foreach(method, &iface->methods)
     {
-        Str func_type_name = str_fmt(alloc, "{case:pascal}{case:pascal}Fn", iface->name, method.name);
+        Str func_type_name = str_fmt(alloc, "{case:pascal}Fn", method.name);
         Str member_name = str_fmt(alloc, "handle_{}", method.name);
         CType func_type = ctype_ptr(ctype_name(func_type_name, alloc), alloc);
         ctype_member(&server_handle, member_name, func_type, alloc);
@@ -737,25 +730,10 @@ void bidgen_c_methods(CUnit *unit, BidIface const *iface, Alloc *alloc)
     CDecl m_type_def = cdecl_type(m_type_str, bidgen_c_method_message_type(iface, alloc), alloc);
     cunit_member(unit, cunit_decl(m_type_def));
 
-    vec_foreach(method, &iface->methods)
-    {
-        if (method.request.type != BID_TYPE_NONE)
-        {
-            Str s = str_fmt(alloc, "{case:pascal}{case:pascal}Request", iface->name, method.name);
-            bidgen_c_unit_add_typedef(unit, iface, s, method.request, alloc);
-        }
-
-        if (method.response.type != BID_TYPE_NONE)
-        {
-            Str s = str_fmt(alloc, "{case:pascal}{case:pascal}Response", iface->name, method.name);
-            bidgen_c_unit_add_typedef(unit, iface, s, method.response, alloc);
-        }
-    }
-
     vec_foreach(event, &iface->events)
     {
         Str s = str_fmt(alloc, "{case:pascal}{case:pascal}Event", iface->name, event.name);
-        bidgen_c_unit_add_typedef(unit, iface, s, event.data, alloc);
+        bidgen_c_unit_add_typedef(unit, s, event.data, alloc);
     }
 
     vec_foreach(method, &iface->methods)
@@ -800,9 +778,6 @@ CUnit bidgen_c(BidIface const *iface, Alloc *alloc)
 
     Str protocol_id = str_fmt(alloc, "{case:upper}_PROTOCOL_ID", iface->name);
     cunit_member(&unit, cunit_define(protocol_id, cexpr_cast(cexpr_constant(cval_unsigned(iface->id)), ctype_name(str$("uint32_t"), alloc), alloc), alloc));
-
-    Str error_type = str_fmt(alloc, "{case:pascal}Error", iface->name);
-    cunit_member(&unit, cunit_decl(cdecl_type(error_type, bidgen_c_type(iface, &iface->errors, alloc), alloc)));
 
     bidgen_c_typedef(&unit, iface, alloc);
 
