@@ -53,7 +53,7 @@
 
 ## Build Instructions
 
-You can find instructions about building BRUTAL [here](book/build.md).
+You can find instructions about building BRUTAL [here](book/building.md).
 
 ## Roadmap
 
