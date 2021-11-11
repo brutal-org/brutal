@@ -1,4 +1,4 @@
-#include <bal/pack/unpack.h>
+#include <bal/ipc/unpack.h>
 
 void bal_unpack_init(BalUnpack *self, void *buf, size_t len)
 {

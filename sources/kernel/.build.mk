@@ -26,7 +26,7 @@ KERNEL_SRC += \
 	$(wildcard sources/libs/brutal/text/*.c)       \
 	$(wildcard sources/libs/brutal/time/convert.c) \
 	$(wildcard sources/libs/elf/elf.c)             \
-	$(wildcard sources/libs/bal/abi/handover.c)    \
+	$(wildcard sources/libs/bal/boot/handover.c)    \
 	$(wildcard sources/libs/ubsan/*.c)
 
 list-kernel-src:

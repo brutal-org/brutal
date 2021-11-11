@@ -1,8 +1,7 @@
 #pragma once
 
 #include <bal/abi/types.h>
-#include <bal/io.h>
-#include <brutal/mem.h>
+#include <bal/hw/io.h>
 
 typedef struct
 {

@@ -4,7 +4,7 @@
 #include "kernel/heap.h"
 #include "kernel/memory.h"
 
-BrGlobalInfo *global(void);
+BrGlobals *global(void);
 
 HeapRange global_region(void);
 

@@ -1,5 +1,4 @@
-#include <bal/abi.h>
-#include <bal/helpers.h>
+#include <bal/task.h>
 #include <brutal/alloc.h>
 #include <brutal/debug.h>
 #include <brutal/io.h>
@@ -10,7 +9,7 @@ int main(int argc, char const *argv[])
 
     log$("Hello from the posix server!");
 
-    DateTime dt = timestamp_to_datetime(brh_global_info()->time);
+    DateTime dt = timestamp_to_datetime(bal_globals()->time);
     log$("Time is {}/{}/{}", dt.day, dt.month, dt.year);
 
     log$("ARGC={}", argc);

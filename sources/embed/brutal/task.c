@@ -1,5 +1,4 @@
 #include <bal/abi.h>
-#include <bal/helpers.h>
 #include <embed/task.h>
 
 TaskId host_task_self(void)

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bal/mmio.h>
+#include <bal/hw.h>
 #include <pci/addr.h>
 #include <pci/config.h>
 

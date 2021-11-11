@@ -248,13 +248,13 @@ typedef struct
 {
     Tick tick;
     TimeStamp time;
-} BrGlobalInfo;
+} BrGlobals;
 
 typedef struct
 {
     BrTask task;
     StrFix128 name;
-} BrLocalInfo;
+} BrLocals;
 
 typedef enum
 {
@@ -283,7 +283,7 @@ typedef struct
 typedef struct
 {
     StrFix128 name;
-    BrCap capabilities;
+    BrCap caps;
     bool stopped;
     bool started;
     bool blocked;
@@ -308,6 +308,7 @@ typedef struct
 typedef struct
 {
     BrObjectType type;
+
     union
     {
         BrInfoMemObj memobj;

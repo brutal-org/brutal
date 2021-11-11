@@ -1,7 +1,5 @@
 #include <bal/abi.h>
-#include <bal/exec.h>
-#include <bal/helpers.h>
-#include <bal/shm.h>
+#include <bal/task.h>
 #include <brutal/alloc.h>
 #include <brutal/codec/tga.h>
 #include <brutal/debug.h>
@@ -96,8 +94,8 @@ static void display_bootimage(Handover const *handover)
 
     // Cleanup
 
-    brh_close(img_obj.handle);
-    brh_close(fb_obj.handle);
+    bal_close(img_obj.handle);
+    bal_close(fb_obj.handle);
 
     assert_br_success(br_unmap(&(BrUnmapArgs){
         .space = BR_SPACE_SELF,
@@ -131,7 +129,7 @@ BrResult srv_run(Handover const *handover, Str name, BrExecArgs const *args, BrT
 
     BrResult result = bal_exec(elf_obj.handle, name, args, infos);
 
-    brh_close(elf_obj.handle);
+    bal_close(elf_obj.handle);
 
     log$("Service '{}' created!", name);
 

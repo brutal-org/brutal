@@ -1,5 +1,4 @@
-#include <bal/helpers.h>
-#include <bal/shm.h>
+#include <bal/hw/shm.h>
 #include <brutal/base.h>
 #include <brutal/debug.h>
 
@@ -78,7 +77,7 @@ MaybeError balshm_deinit(BalShm *self)
 {
     balshm_unmap(self);
 
-    BrResult result = brh_close(self->obj);
+    BrResult result = bal_close(self->obj);
 
     if (result != BR_SUCCESS)
     {

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <bal/abi/handover.h>
 #include <bal/abi/types.h>
+#include <bal/boot/handover.h>
 
 #define BR_MAX_ARGC (256)
 

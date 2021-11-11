@@ -14,7 +14,6 @@ LIBS_SRC = \
 	$(wildcard sources/libs/cc/*/*.c)       \
 	$(wildcard sources/libs/cc/*/*/*.c)  \
 	$(wildcard sources/libs/elf/*.c)      \
-	$(wildcard sources/libs/bal/abi/handover.c) \
 	$(wildcard sources/libs/hw/acpi/*.c)     \
 	$(wildcard sources/libs/hw/pci/*.c)      \
 	$(wildcard sources/libs/json/*.c)     \

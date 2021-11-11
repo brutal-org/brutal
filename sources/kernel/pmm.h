@@ -1,6 +1,7 @@
 #pragma once
 
 #include <bal/abi.h>
+#include <bal/boot.h>
 
 #define PMM_USED (true)
 #define PMM_UNUSED (false)

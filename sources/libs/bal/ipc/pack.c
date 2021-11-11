@@ -1,5 +1,4 @@
-#include <bal/helpers.h>
-#include <bal/pack/pack.h>
+#include <bal/ipc/pack.h>
 #include <brutal/mem.h>
 
 void bal_pack_init(BalPack *self)
@@ -9,8 +8,8 @@ void bal_pack_init(BalPack *self)
 
 void bal_pack_deinit(BalPack *self)
 {
-    brh_unmap(BR_SPACE_SELF, self->buf, self->len);
-    brh_close(self->obj);
+    bal_unmap(BR_SPACE_SELF, self->buf, self->len);
+    bal_close(self->obj);
 }
 
 void bal_pack_ensure(BalPack *self, size_t cap)
@@ -40,8 +39,8 @@ void bal_pack_ensure(BalPack *self, size_t cap)
     if (self->buf != nullptr)
     {
         mem_cpy((void *)memmap.vaddr, self->buf, self->curr);
-        brh_unmap(BR_SPACE_SELF, self->buf, self->len);
-        brh_close(self->obj);
+        bal_unmap(BR_SPACE_SELF, self->buf, self->len);
+        bal_close(self->obj);
     }
 
     self->obj = memobj.handle;

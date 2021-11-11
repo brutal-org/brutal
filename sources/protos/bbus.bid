@@ -5,7 +5,7 @@ interface BBus
         UNKNOWN_SERVICE,
     };
 
-    method find {Str name, Vec(ProtoId) protos} -> Vec(TaskId);
+    method find {name : Str, protos : Vec(ProtoId)} -> Vec(TaskId);
 
-    method bind {Str name, Vec(ProtoId) protos} -> Void;
+    method bind {name : Str, protos : Vec(ProtoId)} -> Void;
 }

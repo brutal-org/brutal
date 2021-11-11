@@ -1,6 +1,5 @@
 #include <bal/abi.h>
-#include <bal/exec.h>
-#include <bal/helpers.h>
+#include <bal/task/exec.h>
 #include <brutal/debug.h>
 #include <elf/elf.h>
 
@@ -74,7 +73,7 @@ static void bal_exec_load(BrSpace space, Elf64Header const *elf_header, BrMemObj
                 .size = size,
             }));
 
-            assert_br_success(brh_close(prog_obj.handle));
+            assert_br_success(bal_close(prog_obj.handle));
         }
 
         prog_header = (Elf64ProgramHeader *)((uint8_t *)prog_header + elf_header->program_header_table_entry_size);
@@ -174,7 +173,7 @@ static uintptr_t bal_exec_stack(BrSpace space, BrExecArgs const *exec_args, BrTa
 
     assert_br_success(br_unmap(&local_stack_unmap));
 
-    assert_br_success(brh_close(stack_obj.handle));
+    assert_br_success(bal_close(stack_obj.handle));
 
     return sp;
 }
@@ -225,7 +224,7 @@ BrResult bal_exec(BrMemObj elf_obj, Str name, BrExecArgs const *args, BrTaskInfo
 
     assert_br_success(br_start(&elf_start));
 
-    assert_br_success(brh_close(elf_space.handle));
+    assert_br_success(bal_close(elf_space.handle));
 
     BrUnmapArgs elf_unmap = {
         .space = BR_SPACE_SELF,

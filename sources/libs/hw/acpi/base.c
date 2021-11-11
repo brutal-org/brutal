@@ -2,11 +2,6 @@
 #include <acpi/rsdt.h>
 #include <brutal/debug.h>
 
-#ifndef __kernel__
-#    include <bal/abi.h>
-#    include <bal/helpers.h>
-#endif
-
 #ifdef __kernel__
 
 void acpi_init(Acpi *acpi, uintptr_t base, uintptr_t rsdp)
@@ -19,6 +14,7 @@ void acpi_init(Acpi *acpi, uintptr_t base, uintptr_t rsdp)
 }
 
 #else
+#    include <bal/abi.h>
 
 void acpi_init(Acpi *acpi, uintptr_t rsdp)
 {

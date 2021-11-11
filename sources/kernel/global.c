@@ -5,7 +5,7 @@
 
 Lock lock;
 HeapRange heap;
-BrGlobalInfo *info = nullptr;
+BrGlobals *info = nullptr;
 
 static void global_ensure(void)
 {
@@ -14,13 +14,13 @@ static void global_ensure(void)
     if (info == nullptr)
     {
         heap = UNWRAP(heap_alloc(ALIGN_UP(sizeof(info), MEM_PAGE_SIZE)));
-        info = (BrGlobalInfo *)range_begin(heap);
+        info = (BrGlobals *)range_begin(heap);
 
-        *info = (BrGlobalInfo){};
+        *info = (BrGlobals){};
     }
 }
 
-BrGlobalInfo *global(void)
+BrGlobals *global(void)
 {
     global_ensure();
     return info;

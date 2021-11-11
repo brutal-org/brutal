@@ -1,6 +1,5 @@
 #include <bal/abi.h>
-#include <bal/helpers.h>
-#include <bal/mmio.h>
+#include <bal/hw/mmio.h>
 #include <brutal/debug.h>
 
 void br_mmio_init(BrMmio *self, uintptr_t paddr, uintptr_t size)
@@ -63,7 +62,7 @@ void br_mmio_deinit(BrMmio *self)
 
     assert_truth(br_unmap(&mem_unmap) == BR_SUCCESS);
 
-    brh_close(self->handle);
+    bal_close(self->handle);
 }
 
 BalIo br_mmio_range(BrMmio *self)

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <bal/abi.h>
+#include <bal/boot.h>
 #include <brutal/io.h>
 #include "kernel/tasking.h"
 

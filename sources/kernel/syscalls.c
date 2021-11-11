@@ -455,7 +455,7 @@ BrResult sys_stat_task(BrInfoTask *args, Task *task)
     args->blocked = task->is_blocked;
     args->started = task->is_started;
     args->stopped = task->is_stopped;
-    args->capabilities = task->caps;
+    args->caps = task->caps;
     args->name = task->name;
     args->id = task->id;
 

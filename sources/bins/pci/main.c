@@ -1,5 +1,6 @@
 #include <acpi/base.h>
 #include <bal/abi.h>
+#include <bal/boot.h>
 #include <brutal/alloc.h>
 #include <brutal/debug.h>
 #include <pci/pci.h>

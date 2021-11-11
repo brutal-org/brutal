@@ -1,5 +1,5 @@
 #include <bal/abi.h>
-#include <bal/io.h>
+#include <bal/hw/io.h>
 #include <brutal/mem.h>
 
 BalIo bal_io_mem(uintptr_t base, size_t size)
