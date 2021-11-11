@@ -22,14 +22,3 @@ MaybeError balshm_init_mobj(BalShm *self, BrMemObj obj);
 MaybeError balshm_init_size(BalShm *self, size_t size);
 
 MaybeError balshm_deinit(BalShm *self);
-
-MaybeError DEPRECATED(balshm_init_str)(BalShm *self, Str str);
-
-Str DEPRECATED(balshm_as_str)(BalShm const *self);
-
-static inline void balshm_cleanup_impl(BalShm *self)
-{
-    balshm_deinit(self);
-}
-
-#define BALSHM_CLEANUP CLEANUP(balshm_cleanup_impl)

@@ -87,21 +87,3 @@ MaybeError balshm_deinit(BalShm *self)
 
     return SUCCESS;
 }
-
-MaybeError DEPRECATED(balshm_init_str)(BalShm *self, Str str)
-{
-    TRY(MaybeError, balshm_init_size(self, str.len + +sizeof(InlineStr)));
-
-    InlineStr *target = self->buf;
-
-    mem_cpy(target->buf, str.buf, str.len);
-    target->len = str.len;
-
-    return SUCCESS;
-}
-
-Str DEPRECATED(balshm_as_str)(BalShm const *self)
-{
-    InlineStr *r = self->buf;
-    return str$(r);
-}

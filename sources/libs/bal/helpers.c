@@ -9,6 +9,15 @@ BrResult brh_close(BrHandle handle)
     });
 }
 
+BrResult brh_unmap(BrSpace space, void *base, size_t len)
+{
+    return br_unmap(&(BrUnmapArgs){
+        space,
+        (uintptr_t)base,
+        len,
+    });
+}
+
 static BrGlobalInfo *global_infos = nullptr;
 
 BrGlobalInfo *brh_global_info(void)
