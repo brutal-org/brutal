@@ -3,9 +3,9 @@
 #include <embed/log.h>
 #include "kernel/arch.h"
 #include "kernel/domain.h"
+#include "kernel/event.h"
 #include "kernel/global.h"
 #include "kernel/init.h"
-#include "kernel/interrupts.h"
 #include "kernel/memory.h"
 #include "kernel/sched.h"
 #include "kernel/syscalls.h"
@@ -185,23 +185,6 @@ BrResult sys_create_space(BrId *id, BrSpace *handle, BrCreateSpaceArgs *args)
     return BR_SUCCESS;
 }
 
-BrResult sys_create_irq(BrId *id, BrIrq *handle, BrCreateIrqArgs *args)
-{
-    if (!(task_self()->caps & BR_CAP_IRQ))
-    {
-        return BR_BAD_CAPABILITY;
-    }
-
-    Irq *irq = irq_create(args->irq);
-
-    *id = irq->id;
-    *handle = domain_add(task_self()->domain, base$(irq));
-
-    irq_deref(irq);
-
-    return BR_SUCCESS;
-}
-
 BrResult sys_create(BrCreateArgs *args)
 {
     if (!(task_self()->caps & BR_CAP_TASK))
@@ -219,9 +202,6 @@ BrResult sys_create(BrCreateArgs *args)
 
     case BR_OBJECT_MEMORY:
         return sys_create_mem_obj(&args->id, &args->handle, &args->mem_obj);
-
-    case BR_OBJECT_IRQ:
-        return sys_create_irq(&args->id, &args->handle, &args->irq);
 
     default:
         return BR_BAD_ARGUMENTS;
@@ -361,75 +341,22 @@ BrResult sys_close(BrCloseArgs *args)
 
 BrResult sys_bind(BrBindArgs *args)
 {
-    if (!(task_self()->caps & BR_CAP_IRQ))
+    if (args->event.type == BR_EVENT_IRQ && !(task_self()->caps & BR_CAP_IRQ))
     {
         return BR_BAD_CAPABILITY;
     }
 
-    Irq *irq = (Irq *)domain_lookup(task_self()->domain, args->handle, BR_OBJECT_IRQ);
-
-    if (!irq)
-    {
-        return BR_BAD_HANDLE;
-    }
-
-    BrResult result = irq_bind(task_self(), args->flags, irq);
-
-    irq_deref(irq);
-
-    return result;
+    return event_bind(task_self(), args->event, args->flags);
 }
 
 BrResult sys_unbind(BrUnbindArgs *args)
 {
-    if (!(task_self()->caps & BR_CAP_IRQ))
-    {
-        return BR_BAD_CAPABILITY;
-    }
-
-    Irq *irq = (Irq *)domain_lookup(task_self()->domain, args->handle, BR_OBJECT_IRQ);
-
-    if (!irq)
-    {
-        return BR_BAD_HANDLE;
-    }
-
-    BrResult result = irq_unbind(args->flags, irq);
-
-    irq_deref(irq);
-
-    return result;
+    return event_unbind(task_self(), args->event);
 }
 
 BrResult sys_ack(BrAckArgs *args)
 {
-    if (!(task_self()->caps & BR_CAP_IRQ))
-    {
-        return BR_BAD_CAPABILITY;
-    }
-
-    Task *task = nullptr;
-
-    task_ref(task_self());
-    task = task_self();
-
-    if (!task)
-    {
-        return BR_BAD_HANDLE;
-    }
-
-    Irq *irq = (Irq *)domain_lookup(task->domain, args->handle, BR_OBJECT_IRQ);
-
-    if (!irq)
-    {
-        return BR_BAD_HANDLE;
-    }
-
-    BrResult result = irq_ack(irq);
-
-    irq_deref(irq);
-
-    return result;
+    return event_ack(task_self(), args->event);
 }
 
 BrResult sys_stat_memobj(BrInfoMemObj *args, MemObj *obj)
@@ -458,13 +385,6 @@ BrResult sys_stat_task(BrInfoTask *args, Task *task)
     args->caps = task->caps;
     args->name = task->name;
     args->id = task->id;
-
-    return BR_SUCCESS;
-}
-
-BrResult sys_stat_irq(BrInfoIrq *args, Irq *irq)
-{
-    args->id = irq->irq;
 
     return BR_SUCCESS;
 }
@@ -503,11 +423,8 @@ BrResult sys_stat(BrStatArgs *args)
     case BR_OBJECT_TASK:
         return sys_stat_task(&args->info.taskobj, (Task *)object);
 
-    case BR_OBJECT_IRQ:
-        return sys_stat_irq(&args->info.irqobj, (Irq *)object);
-
     default:
-        return BR_BAD_HANDLE;
+        panic$("Unknow object type {}", object->type);
     }
 }
 

@@ -1,7 +1,7 @@
 #include <brutal/debug.h>
 #include "kernel/arch.h"
+#include "kernel/event.h"
 #include "kernel/init.h"
-#include "kernel/interrupts.h"
 #include "kernel/kernel.h"
 #include "kernel/mmap.h"
 #include "kernel/pmm.h"
@@ -55,6 +55,7 @@ void arch_entry_main(Handover *handover)
     cpu_initialize();
     syscall_initialize();
     sched_initialize();
+    event_initialize();
     tasking_initialize();
 
     other_ready++;

@@ -49,6 +49,9 @@ static inline const char *br_syscall_to_string(BrSyscall syscall)
     RESULT(SUCCESS)             \
     RESULT(INTERRUPTED)         \
     RESULT(TIMEOUT)             \
+    RESULT(ALREADY_BINDED)      \
+    RESULT(ALREADY_ACK)         \
+    RESULT(NOT_BINDED)          \
     RESULT(BAD_ADDRESS)         \
     RESULT(BAD_ARGUMENTS)       \
     RESULT(BAD_CAPABILITY)      \
@@ -134,7 +137,6 @@ typedef enum
     BR_OBJECT_DOMAIN,
     BR_OBJECT_SPACE,
     BR_OBJECT_TASK,
-    BR_OBJECT_IRQ,
 } BrObjectType;
 
 typedef uint64_t BrArg;
@@ -206,6 +208,24 @@ typedef uint64_t BrTimeout;
 
 typedef uint32_t BrMsgFlags;
 
+typedef BrHandle BrIrq;
+
+typedef enum
+{
+    BR_EVENT_INVALID,
+
+    BR_EVENT_IRQ,
+} BrEventType;
+
+typedef struct
+{
+    BrEventType type;
+    union
+    {
+        BrIrq irq;
+    };
+} BrEvent;
+
 typedef struct
 {
     BrId from;
@@ -213,8 +233,18 @@ typedef struct
     uint32_t seq;
     uint32_t prot;
     uint32_t type;
-    BrArg arg[BR_MSG_ARG_COUNT];
+
+    union
+    {
+        BrArg args[BR_MSG_ARG_COUNT];
+        BrEvent event;
+    };
 } BrMsg;
+
+static inline bool br_event_eq(BrEvent a, BrEvent b)
+{
+    return a.type == b.type && a.irq == b.irq;
+}
 
 _Static_assert(sizeof(BrMsg) == 64, "");
 
@@ -224,15 +254,6 @@ _Static_assert(sizeof(BrMsg) == 64, "");
 #define BR_IPC_RECV ((BrIpcFlags)(1 << 2))
 
 typedef uint32_t BrIpcFlags;
-
-typedef uint32_t BrIrqId;
-
-typedef BrHandle BrIrq;
-
-#define BR_IRQ_NONE (0)
-#define BR_IRQ_BIND_ONCE (1 << 0) // will be disabled after the irq reception
-
-typedef uint64_t BrIrqFlags;
 
 #define BR_CAP_NONE (0)
 #define BR_CAP_IRQ (1 << 0)
@@ -277,11 +298,6 @@ typedef struct
 
 typedef struct
 {
-    BrIrqId id;
-} BrInfoIrq;
-
-typedef struct
-{
     StrFix128 name;
     BrCap caps;
     bool stopped;
@@ -315,6 +331,5 @@ typedef struct
         BrInfoDomain domainobj;
         BrInfoSpace spaceobj;
         BrInfoTask taskobj;
-        BrInfoIrq irqobj;
     };
 } BrHandleInfo;

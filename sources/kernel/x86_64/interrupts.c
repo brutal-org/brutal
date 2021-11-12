@@ -4,8 +4,8 @@
 #include <brutal/types.h>
 #include "kernel/context.h"
 #include "kernel/cpu.h"
+#include "kernel/event.h"
 #include "kernel/global.h"
-#include "kernel/interrupts.h"
 #include "kernel/sched.h"
 #include "kernel/x86_64/apic.h"
 #include "kernel/x86_64/asm.h"
@@ -110,7 +110,7 @@ uint64_t interrupt_handler(uint64_t rsp)
 
     if (regs->int_no >= 32 && regs->int_no <= 48)
     {
-        irq_dispatch(regs->int_no - 32);
+        event_trigger((BrEvent){.type = BR_EVENT_IRQ, .irq = regs->int_no - 32});
     }
 
     if (regs->int_no < 32)

@@ -13,7 +13,7 @@ BrResult envelope_send(Envelope *self, BrMsg const *msg, Domain *domain)
     {
         if (msg->flags & BR_MSG_HND(i))
         {
-            self->objs[i] = domain_lookup(domain, msg->arg[i], BR_OBJECT_ANY);
+            self->objs[i] = domain_lookup(domain, msg->args[i], BR_OBJECT_ANY);
 
             if (!self->objs[i])
             {
@@ -42,7 +42,7 @@ BrResult envelope_recv(Envelope *self, BrMsg *msg, Domain *domain)
     {
         if (self->objs[i])
         {
-            self->msg.arg[i] = domain_add(domain, self->objs[i]);
+            self->msg.args[i] = domain_add(domain, self->objs[i]);
         }
     }
 

@@ -32,6 +32,7 @@
 ### br_log
 
 - Arguments:
+
   - `char const* message`: Message to be displayed.
   - `size_t size`: Size of the message.
 
@@ -46,6 +47,7 @@ This syscall display a message in the kernel logs. It's useful when trying to de
 ### br_map
 
 - Arguments:
+
   - `BrSpace space`: Target memory space.
   - `BrMemObj mem_obj`: Memory object source.
   - `size_t offset`: Offset from `mem_obj` base.
@@ -60,7 +62,7 @@ This syscall display a message in the kernel logs. It's useful when trying to de
 - Result:
   - `BR_SUCCESS`: The mapping was successfully created.
   - `BR_BAD_HANDLE`: `mem_obj` or space was not a valid handle.
-  - `BR_BAD_ARGUMENT`: The `offset` and  `size` where not valid.
+  - `BR_BAD_ARGUMENT`: The `offset` and `size` where not valid.
   - `BR_OUT_OF_MEMORY`: The syscall wasn't able to allocate memory.
 
 This syscall is used for mapping a `BrMemObj` in `space`. The memory will look like:
@@ -78,6 +80,7 @@ If `size` is equal to 0, the kernel will use the memory object size instead.
 ### br_unmap
 
 - Arguments:
+
   - `BrSpace space`: Address space where the memory will be unmapped.
   - `uintptr_t vaddr`: Start of the range that will be unmapped.
   - `size_t size`: Size of the range that will be unmapped.
@@ -94,6 +97,7 @@ This syscall unmaps a memory range from an address space.
 ### br_create
 
 - Arguments:
+
   - `BrObjectType type`: The object type.
   - (out) `BrId id`: The resulting object id.
   - (out) `BrHandle handle`: The resulting object handle.
@@ -108,6 +112,7 @@ This syscall is used for making different kernel object (task, memory_space, mem
 ### br_create with task
 
 - Arguments:
+
   - `StrFix128 name`: Task name.
   - `BrSpace space`: Task memory space.
   - `BrCap caps`: Task capabilities.
@@ -120,6 +125,7 @@ This syscall is used for making different kernel object (task, memory_space, mem
 ### br_create with mem_obj
 
 - Arguments:
+
   - (out/in) `uintptr_t addr`: Memory object physical addr.
   - `size_t size`: Memory object size.
   - `BrMemObjFlags flags`: Flags.
@@ -134,23 +140,16 @@ Create a memory object. If `addr` is equal to 0, let the kernel choose the physi
 ### br_create with space
 
 - Arguments:
+
   - `BrSpaceFlags flags`
 
 - Result:
   - `BR_SUCCESS`
 
-### br_create with irq
-
-- Arguments:
-  - `BrIrqId irq`: Irq to map.
-
-- Result:
-  - `BR_SUCCESS`
-  - `BR_BAD_CAPABILITY`: The current process has not the `BR_CAP_IRQ` capability.
-
 ### br_close
 
 - Arguments:
+
   - `BrHandle handle`: handle to close.
 
 - Result:
@@ -162,6 +161,7 @@ Closes an handle.
 ### br_stat
 
 - Arguments:
+
   - `BrHandle handle`: Object handle.
   - (out) `BrHandleInfo info`: Object result info.
 
@@ -176,6 +176,7 @@ Used for getting information about an object.
 ### br_start
 
 - Arguments:
+
   - `BrTask task`: Task to start.
   - `uintptr_t ip`: The instruction pointer of the task.
   - `uintptr_t sp`: The stack pointer of the task.
@@ -191,6 +192,7 @@ The syscall begins the execution of a task.
 ### br_exit
 
 - Arguments:
+
   - `BrTask task`: Task to exit.
   - `uintptr_t exit_value`: The exit value of the task.
 
@@ -203,6 +205,7 @@ This syscall stops the execution of a task.
 ### br_drop
 
 - Arguments:
+
   - `BrTask task_handle`: Target task.
   - `BrCap cap`: The capability to remove.
 
@@ -216,7 +219,8 @@ This syscall drop one or more task capabilities.
 
 ### br_ipc
 
-- Arguments: 
+- Arguments:
+
   - (out/in)`BrId to`: Targe.t
   - (out/in)`BrMsg msg`: Msg to pass.
   - (out/in)`BrDeadline deadline`: Deadline.
@@ -237,6 +241,7 @@ This syscall is used for any IPC action. `deadline` is in tick (or currently in 
 ### br_bind
 
 - Arguments:
+
   - `BrIrq handle`: Irq handle.
   - `BrIrqFlags flags`:
     - `BR_IRQ_BIND_ONCE`: The irq is unbind once the interrupt is reached.
@@ -251,6 +256,7 @@ Bind an irq for this current task.
 ### br_unbind
 
 - Arguments:
+
   - `BrIrq handle`
   - `BrIrqFlags flags`
 
@@ -264,6 +270,7 @@ Unbind an irq for this current task.
 ### br_ack
 
 - Arguments:
+
   - `BrIrq handle`
   - `BrIrqFlags flags`
 
@@ -275,12 +282,12 @@ Unbind an irq for this current task.
 Ack an irq for this current task.
 Used for getting an interrupt again, after receiving one.
 
-
 ## Input/Output
 
 ### br_in
 
 - Arguments:
+
   - `uint16_t port`: Target port to do an io_in.
   - (out) `uint32_t data`: io_in result.
   - `int size`: io_in size (8bit, 16bit...).
@@ -294,6 +301,7 @@ This syscall is used to do `inb`/`inl`/`inw` for x86.
 ### br_out
 
 - Arguments:
+
   - `uint16_t port`: Target port to do an io_out.
   - `uint32_t data`: io_out result.
   - `int size`: io_out size (8bit, 16bit...).

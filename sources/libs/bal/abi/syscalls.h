@@ -62,11 +62,6 @@ typedef struct
 
 typedef struct
 {
-    BrIrqId irq;
-} BrCreateIrqArgs;
-
-typedef struct
-{
     BrObjectType type;
     BrId id;
     BrHandle handle;
@@ -76,7 +71,6 @@ typedef struct
         BrCreateTaskArgs task;
         BrCreateMemObjArgs mem_obj;
         BrCreateSpaceArgs space;
-        BrCreateIrqArgs irq;
     };
 } BrCreateArgs;
 
@@ -126,26 +120,30 @@ typedef struct
 
 SYSCALL(close) (BrCloseArgs* args);
 
+
+#define BR_BIND_NONE (0)
+#define BR_BIND_ONE_SHOT (1 << 0) // Bind the event to the current task only once.
+
+typedef uint64_t BrBindFlags;
+
 typedef struct
 {
-    BrIrq handle;
-    BrIrqFlags flags;
+    BrEvent event;
+    BrBindFlags flags;
 } BrBindArgs;
 
 SYSCALL(bind) (BrBindArgs* args);
 
 typedef struct
 {
-    BrIrq handle;
-    BrIrqFlags flags;
+    BrEvent event;
 } BrUnbindArgs;
 
 SYSCALL(unbind) (BrUnbindArgs* args);
 
 typedef struct
 {
-    BrIrq handle;
-    BrIrqFlags flags;
+    BrEvent event;
 } BrAckArgs;
 
 SYSCALL(ack) (BrAckArgs* args);

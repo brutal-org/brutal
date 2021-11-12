@@ -7,7 +7,6 @@
 typedef struct
 {
     BalIo io;
-
     bool kb_escaped;
 } Ps2;
 
@@ -66,41 +65,14 @@ int br_entry_args(
     MAYBE_UNUSED long arg5)
 {
     Ps2 ps2 = {
-        .io = bal_io_port(0x64, 0x8),
-        .kb_escaped = false,
+        .io = bal_io_port(0x60, 0x8),
     };
 
-    BrCreateArgs keyboard_irq = {
-        .type = BR_OBJECT_IRQ,
-        .irq = {
-            .irq = 1,
-        },
-    };
+    BrEvent keyboard_irq = {.type = BR_EVENT_IRQ, .irq = 1};
+    BrEvent mouse_irq = {.type = BR_EVENT_IRQ, .irq = 16};
 
-    assert_br_success(br_create(&keyboard_irq));
-
-    BrBindArgs keyboard_bind = {
-        .handle = keyboard_irq.handle,
-        .flags = BR_IRQ_NONE,
-    };
-
-    assert_br_success(br_bind(&keyboard_bind));
-
-    BrCreateArgs mouse_irq = {
-        .type = BR_OBJECT_IRQ,
-        .irq = {
-            .irq = 12,
-        },
-    };
-
-    assert_br_success(br_create(&mouse_irq));
-
-    BrBindArgs mouse_bind = {
-        .handle = mouse_irq.handle,
-        .flags = BR_IRQ_NONE,
-    };
-
-    assert_br_success(br_bind(&mouse_bind));
+    assert_br_success(br_bind(&(BrBindArgs){.event = keyboard_irq, .flags = BR_BIND_NONE}));
+    assert_br_success(br_bind(&(BrBindArgs){.event = mouse_irq, .flags = BR_BIND_NONE}));
 
     BrIpcArgs ipc;
     ipc.flags = BR_IPC_RECV | BR_IPC_BLOCK;
@@ -110,23 +82,11 @@ int br_entry_args(
     {
         BrMsg msg = ipc.msg;
 
-        if (msg.from == BR_TASK_IRQ)
+        if (msg.from == BR_TASK_IRQ && msg.event.type == BR_EVENT_IRQ)
         {
-            BrIrq irq = msg.arg[0];
             ps2_handle_irq(&ps2);
 
-            if (irq == 1)
-            {
-                br_ack(&(BrAckArgs){
-                    .handle = keyboard_irq.handle,
-                });
-            }
-            else if (irq == 12)
-            {
-                br_ack(&(BrAckArgs){
-                    .handle = mouse_irq.handle,
-                });
-            }
+            br_ack(&(BrAckArgs){.event = msg.event});
         }
         else
         {

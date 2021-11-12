@@ -1,7 +1,7 @@
 #include <brutal/alloc.h>
 #include <brutal/debug.h>
 #include "kernel/cpu.h"
-#include "kernel/interrupts.h"
+#include "kernel/event.h"
 #include "kernel/kernel.h"
 #include "kernel/sched.h"
 #include "kernel/task.h"
@@ -15,7 +15,7 @@ void task_destroy(Task *task)
 {
     log$("Destroying task {}({})", str$(&task->name), task->id);
 
-    irq_unbind_all(task);
+    event_unbind_all(task);
     context_destroy(task->context);
     space_deref(task->space);
     domain_deref(task->domain);
