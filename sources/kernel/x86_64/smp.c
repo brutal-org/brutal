@@ -18,9 +18,11 @@ atomic_bool cpu_ready = false;
 extern uint32_t trampoline_start;
 extern uint32_t trampoline_end;
 
+#define TRAMPOLINE_VIRTUAL_START (0x1000)
+
 static size_t smp_trampoline_size(void)
 {
-    uint64_t trampoline_len = (uintptr_t)&trampoline_end - (uintptr_t)&trampoline_start + MEM_PAGE_SIZE;
+    uint64_t trampoline_len = (uintptr_t)&trampoline_end - (uintptr_t)&trampoline_start;
     return ALIGN_UP(trampoline_len, MEM_PAGE_SIZE);
 }
 
@@ -29,18 +31,20 @@ static void smp_trampoline_map(void)
     log$("Initializing cpu trampoline");
     log$("trampoline is {x} bytes in size", smp_trampoline_size());
 
-    uint64_t trampoline_len = (uintptr_t)&trampoline_end - (uintptr_t)&trampoline_start + MEM_PAGE_SIZE;
+    uint64_t trampoline_len = smp_trampoline_size();
 
     vmm_map(vmm_kernel_space(),
             (VmmRange){
                 .base = (0x0),
-                .size = smp_trampoline_size()},
+                .size = trampoline_len + TRAMPOLINE_VIRTUAL_START, /* map under the trampoline for cpu cpu magic value (see smp_initialize_cpu_contex) */
+            },
             (PmmRange){
                 .base = (0x0),
-                .size = smp_trampoline_size()},
+                .size = trampoline_len + TRAMPOLINE_VIRTUAL_START,
+            },
             BR_MEM_WRITABLE);
 
-    mem_cpy((void *)0x1000, (void *)&trampoline_start, trampoline_len - 0x1000);
+    mem_cpy((void *)TRAMPOLINE_VIRTUAL_START, (void *)&trampoline_start, trampoline_len);
 }
 
 static void smp_trampoline_unmap(void)
@@ -50,7 +54,7 @@ static void smp_trampoline_unmap(void)
     vmm_unmap(vmm_kernel_space(),
               (VmmRange){
                   .base = (0x0),
-                  .size = smp_trampoline_size(),
+                  .size = smp_trampoline_size() + TRAMPOLINE_VIRTUAL_START,
               });
 }
 
@@ -60,7 +64,7 @@ void smp_entry_other(void)
     arch_entry_other();
 }
 
-static void smp_trampoline_setup(void)
+static void smp_initialize_cpu_context(void)
 {
     // Load future cpu page table
     volatile_write64(SMP_INIT_PAGE_TABLE, asm_read_cr3());
@@ -76,11 +80,13 @@ static void smp_trampoline_setup(void)
     volatile_write64(SMP_INIT_ENTRY, (uintptr_t)smp_entry_other);
 }
 
-static void smp_initialize_cpu(uint32_t lapic_id)
+static void smp_start_cpu(uint32_t lapic_id)
 {
     lapic_send_init(lapic_id);
+
     hpet_sleep(10);
-    lapic_send_sipi(lapic_id, 4096);
+
+    lapic_send_sipi(lapic_id, TRAMPOLINE_VIRTUAL_START);
 }
 
 void smp_boot_other(void)
@@ -100,8 +106,8 @@ void smp_boot_other(void)
 
         cpu_ready = false;
 
-        smp_trampoline_setup();
-        smp_initialize_cpu(cpu_impl(cpu)->lapic);
+        smp_initialize_cpu_context();
+        smp_start_cpu(cpu_impl(cpu)->lapic);
 
         WAIT_FOR(cpu_ready);
     }
