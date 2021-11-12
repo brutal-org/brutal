@@ -80,21 +80,6 @@ BidIface bid_pass_prefix(BidIface iface, Alloc *alloc)
         bid_alias(&prefixed, name, prefix_type(alias.type, iface, alloc));
     }
 
-    vec_foreach(event, &iface.events)
-    {
-        Str name = str_fmt(alloc, "{case:snake}_{case:snake}", iface.name, event.name);
-        BidType prefixed_data = event.data;
-
-        if (prefixed_data.type != BID_TYPE_PRIMITIVE)
-        {
-            Str name = str_fmt(alloc, "{case:pascal}{case:pascal}Data", iface.name, event.name);
-            bid_alias(&prefixed, name, prefixed_data);
-            prefixed_data = bid_primitive(name, alloc);
-        }
-
-        bid_event(&prefixed, name, prefix_type(prefixed_data, iface, alloc));
-    }
-
     vec_foreach(methods, &iface.methods)
     {
         Str name = str_fmt(alloc, "{case:snake}_{case:snake}", iface.name, methods.name);

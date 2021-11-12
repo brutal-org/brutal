@@ -164,17 +164,6 @@ static void parse_alias(Scan *scan, BidIface *iface, Alloc *alloc)
     bid_alias(iface, name, type);
 }
 
-static void parse_event(Scan *scan, BidIface *iface, Alloc *alloc)
-{
-    Str name = parse_ident(scan);
-
-    skip_comment_and_space(scan);
-
-    BidType data = parse_type(scan, alloc);
-
-    bid_event(iface, name, data);
-}
-
 static void parse_method(Scan *scan, BidIface *iface, Alloc *alloc)
 {
     Str name = parse_ident(scan);
@@ -210,10 +199,6 @@ BidIface bid_parse(Scan *scan, Alloc *alloc)
         {
             parse_alias(scan, &iface, alloc);
         }
-        else if (skip_keyword(scan, "event"))
-        {
-            parse_event(scan, &iface, alloc);
-        }
         else if (skip_keyword(scan, "method"))
         {
             parse_method(scan, &iface, alloc);
@@ -236,7 +221,7 @@ BidIface bid_parse(Scan *scan, Alloc *alloc)
         }
         else
         {
-            scan_throw(scan, str$("expected errors/type/event/method"), parse_ident(scan));
+            scan_throw(scan, str$("expected errors/type/method"), parse_ident(scan));
         }
 
         expect_separator(scan, ';');

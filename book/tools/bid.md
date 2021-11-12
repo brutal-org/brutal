@@ -67,7 +67,6 @@ For the moment there is only 1 interface supported per file.
 An interface may contain:
 
 - `errors`
-- `event` (not supported)
 - `type`
 - `method`
 - `id = x`
@@ -78,7 +77,6 @@ Each time you add an interface member, they must be separated by a semicolon:
 interface identifier
 {
     errors {};
-    event {};
     id = 10;
 }
 ```

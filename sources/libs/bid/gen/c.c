@@ -452,11 +452,6 @@ CType bidgen_c_method_message_type(BidIface const *iface, Alloc *alloc)
         bidgen_c_const_msg_type(str_fmt(alloc, "{case:upper}_REQUEST", method.name));
     }
 
-    vec_foreach(event, &iface->events)
-    {
-        bidgen_c_const_msg_type(str_fmt(alloc, "{case:upper}_EVENT", event.name));
-    }
-
     return message_type_decl;
 }
 
@@ -729,12 +724,6 @@ void bidgen_c_methods(CUnit *unit, BidIface const *iface, Alloc *alloc)
 
     CDecl m_type_def = cdecl_type(m_type_str, bidgen_c_method_message_type(iface, alloc), alloc);
     cunit_member(unit, cunit_decl(m_type_def));
-
-    vec_foreach(event, &iface->events)
-    {
-        Str s = str_fmt(alloc, "{case:pascal}{case:pascal}Event", iface->name, event.name);
-        bidgen_c_unit_add_typedef(unit, s, event.data, alloc);
-    }
 
     vec_foreach(method, &iface->methods)
     {

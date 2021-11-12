@@ -84,16 +84,6 @@ Json bidgen_json_alias(BidAlias const alias, Alloc *alloc)
     return json;
 }
 
-Json bidgen_json_event(BidEvent const event, Alloc *alloc)
-{
-    Json json = json_object_with_type(str$("BidEvent"), alloc);
-
-    json_put(&json, str$("name"), json_str(event.name, alloc));
-    json_put(&json, str$("data"), bidgen_json_type(event.data, alloc));
-
-    return json;
-}
-
 Json bidgen_json_method(BidMethod const method, Alloc *alloc)
 {
     Json json = json_object_with_type(str$("BidMethod"), alloc);
@@ -108,17 +98,11 @@ Json bidgen_json_method(BidMethod const method, Alloc *alloc)
 Json bidgen_json_iface(BidIface const iface, Alloc *alloc)
 {
     Json aliases_json = json_array(alloc);
-    Json events_json = json_array(alloc);
     Json methods_json = json_array(alloc);
 
     vec_foreach(alias, &iface.aliases)
     {
         json_append(&aliases_json, bidgen_json_alias(alias, alloc));
-    }
-
-    vec_foreach(event, &iface.events)
-    {
-        json_append(&events_json, bidgen_json_event(event, alloc));
     }
 
     vec_foreach(method, &iface.methods)
@@ -132,7 +116,6 @@ Json bidgen_json_iface(BidIface const iface, Alloc *alloc)
     json_put(&iface_json, str$("name"), json_str(iface.name, alloc));
     json_put(&iface_json, str$("errors"), bidgen_json_type(iface.errors, alloc));
     json_put(&iface_json, str$("aliases"), aliases_json);
-    json_put(&iface_json, str$("events"), events_json);
     json_put(&iface_json, str$("methods"), methods_json);
 
     return iface_json;

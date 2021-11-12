@@ -10,8 +10,6 @@ void bid_iface_name(BidIface *iface, Str name);
 
 void bid_alias(BidIface *iface, Str name, BidType type);
 
-void bid_event(BidIface *iface, Str name, BidType data);
-
 void bid_method(BidIface *iface, Str name, BidType request, BidType response);
 
 BidType bid_none(void);

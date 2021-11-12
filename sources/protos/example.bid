@@ -9,19 +9,6 @@ interface Example
 
     type Time : uint64_t;
 
-    event notification
-    {
-        kind : enum
-        {
-            FOO,
-            BAR
-        },
-        nested : struct
-        {
-            data : int
-        }
-    };
-
     type PingPong : {
         time : Time
     };

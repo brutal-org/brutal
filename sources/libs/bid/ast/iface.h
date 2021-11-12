@@ -12,12 +12,6 @@ typedef struct
 typedef struct
 {
     Str name;
-    BidType data;
-} BidEvent;
-
-typedef struct
-{
-    Str name;
 
     BidType request;
     BidType response;
@@ -30,6 +24,5 @@ typedef struct
 
     BidType errors;
     Vec(BidAlias) aliases;
-    Vec(BidEvent) events;
     Vec(BidMethod) methods;
 } BidIface;

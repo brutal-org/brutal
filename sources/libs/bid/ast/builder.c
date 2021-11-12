@@ -7,7 +7,6 @@ BidIface bid_iface(Alloc *alloc)
     iface.errors = bid_enum(alloc);
 
     vec_init(&iface.aliases, alloc);
-    vec_init(&iface.events, alloc);
     vec_init(&iface.methods, alloc);
 
     bid_enum_constant(&iface.errors, str$("UNEXPECTED_MESSAGE"));
@@ -31,12 +30,6 @@ void bid_alias(BidIface *iface, Str name, BidType type)
 {
     BidAlias alias = {name, type};
     vec_push(&iface->aliases, alias);
-}
-
-void bid_event(BidIface *iface, Str name, BidType data)
-{
-    BidEvent event = {name, data};
-    vec_push(&iface->events, event);
 }
 
 void bid_method(BidIface *iface, Str name, BidType request, BidType response)
