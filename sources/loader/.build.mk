@@ -34,7 +34,7 @@ LOADER_LDFLAGS= \
 	-Wl,-subsystem:efi_application \
 	-fuse-ld=lld-link
 
-LOADER_LIBS_SRC = \
+LOADER_SRC = \
 	sources/libs/brutal/io/buf.c                    \
 	sources/libs/brutal/io/fmt.c                    \
 	sources/libs/brutal/io/file.c                   \
@@ -46,6 +46,7 @@ LOADER_LIBS_SRC = \
 	sources/libs/brutal/io/write.c                  \
 	sources/libs/stdc/ansi/string.c			        \
 	sources/libs/stdc/ansi/ctype.c			        \
+	$(wildcard sources/loader/*.c) 					\
 	$(wildcard sources/libs/json/parser.c)		    \
 	$(wildcard sources/libs/json/objects.c)		    \
 	$(wildcard sources/libs/brutal/alloc/*.c)	    \
@@ -53,20 +54,16 @@ LOADER_LIBS_SRC = \
 	$(wildcard sources/libs/brutal/hash/*.c)	    \
 	$(wildcard sources/embed/efi/*.c)	            \
 	$(wildcard sources/embed/$(CONFIG_ARCH)/*.c)    \
-	$(wildcard sources/embed/$(CONFIG_ARCH)/*.s)    \
 	$(wildcard sources/libs/brutal/debug/*.c)       \
 	$(wildcard sources/libs/brutal/mem/*.c)         \
 	$(wildcard sources/libs/brutal/text/*.c)        \
-	$(wildcard sources/libs/bal/boot/handover.c)     \
+	$(wildcard sources/libs/bal/boot/handover.c)    \
 	$(wildcard sources/libs/elf/elf.c) 				\
 	$(wildcard sources/libs/hw/efi/*/*.c)           \
 	$(wildcard sources/libs/hw/efi/*.c)
 
-LOADER_SRCS = $(wildcard sources/loader/*.c)
-
 LOADER_OBJS = \
-	$(patsubst sources/%.c, $(BINDIR_LOADER)/%.c.o, $(LOADER_SRCS)) \
-	$(patsubst sources/%.c, $(BINDIR_LOADER)/%.c.o, $(LOADER_LIBS_SRC))
+	$(patsubst sources/%, $(BINDIR_LOADER)/%.o, $(LOADER_SRC)) \
 
 LOADER=$(BINDIR_LOADER)/BOOTX64.EFI
 

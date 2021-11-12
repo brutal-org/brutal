@@ -2,8 +2,6 @@ LIBS_HOST_SRC = \
 	$(wildcard sources/embed/posix/*.c)    \
 	$(wildcard sources/embed/posix/$(CONFIG_HOST_ARCH)/*.s) \
 	$(wildcard sources/embed/posix/$(CONFIG_HOST_ARCH)/*.c) \
-	$(wildcard sources/embed/sysv/$(CONFIG_HOST_ARCH)/*.s) \
-	$(wildcard sources/embed/sysv/$(CONFIG_HOST_ARCH)/*.c) \
 	$(wildcard sources/embed/sdl/*.c) \
 	$(wildcard sources/embed/$(CONFIG_HOST_ARCH)/*.s) \
 	$(wildcard sources/embed/$(CONFIG_HOST_ARCH)/*.c) \

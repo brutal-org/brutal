@@ -2,7 +2,7 @@ interface fs
 {
     id = 0x14f80c8f;
 
-    errors 
+    errors
     {
         INVALID_PATH,
         INVALID_DEV,
