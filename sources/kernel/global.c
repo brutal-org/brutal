@@ -13,7 +13,7 @@ static void global_ensure(void)
 
     if (info == nullptr)
     {
-        heap = UNWRAP(heap_alloc(ALIGN_UP(sizeof(info), MEM_PAGE_SIZE)));
+        heap = UNWRAP(heap_alloc(ALIGN_UP(sizeof(*info), MEM_PAGE_SIZE)));
         info = (BrGlobals *)range_begin(heap);
 
         *info = (BrGlobals){};
