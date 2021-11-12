@@ -121,7 +121,7 @@ void cdump_type(Emit *emit, CType type)
         break;
 
     case CTYPE_NAME:
-        emit_fmt(emit, "name\n");
+        emit_fmt(emit, "name {}\n", type.name);
         break;
 
     default:
@@ -140,14 +140,16 @@ void cdump_expr(Emit *emit, CExpr expr)
     {
     case CEXPR_EMPTY:
     case CEXPR_SELF:
+        emit_fmt(emit, "\n");
         break;
 
     case CEXPR_CONSTANT:
         cdump_value(emit, expr.constant_);
+        emit_fmt(emit, "\n");
         break;
 
     case CEXPR_IDENT:
-        emit_fmt(emit, "identifier: {}\n", expr.ident_);
+        emit_fmt(emit, "{}\n", expr.ident_);
         break;
 
     case CEXPR_POSTFIX:
@@ -167,6 +169,7 @@ void cdump_expr(Emit *emit, CExpr expr)
         break;
 
     case CEXPR_CALL:
+        emit_fmt(emit, "\n");
         cdump_expr(emit, *expr.call_.expr);
         emit_fmt(emit, "arg:\n");
 
@@ -191,18 +194,20 @@ void cdump_expr(Emit *emit, CExpr expr)
         emit_fmt(emit, "cond: ");
         cdump_expr(emit, *expr.ternary_.expr_cond);
 
-        emit_fmt(emit, "true: ");
+        emit_fmt(emit, "\ntrue:");
         cdump_expr(emit, *expr.ternary_.expr_true);
 
-        emit_fmt(emit, "false: ");
+        emit_fmt(emit, "\nfalse: ");
         cdump_expr(emit, *expr.ternary_.expr_false);
         break;
 
     case CEXPR_INITIALIZER:
+        emit_fmt(emit, "\n");
         vec_foreach(v, &expr.initializer_.initializer)
         {
             cdump_expr(emit, v);
         }
+
         break;
 
     default:
@@ -292,7 +297,7 @@ void cdump_stmt(Emit *emit, CStmt stmt)
 
 void cdump_decl(Emit *emit, CDecl decl)
 {
-    emit_fmt(emit, "decl:");
+    emit_fmt(emit, " decl:");
     emit_ident(emit);
     if (decl.type == CDECL_TYPE)
     {
@@ -324,9 +329,44 @@ void cdump_unit(Emit *emit, CUnit unit)
 
     vec_foreach(entry, &unit.units)
     {
-        if (entry.type == CUNIT_DECLARATION)
+        switch (entry.type)
         {
+        case CUNIT_INCLUDE:
+            emit_fmt(emit, " include: \n");
+            emit_ident(emit);
+            emit_fmt(emit, " path: {}\n", entry._include.path);
+            emit_fmt(emit, " system: {}\n", (int)entry._include.is_system);
+            emit_deident(emit);
+            break;
+
+        case CUNIT_PRAGMA:
+            emit_fmt(emit, " pragma: {}\n", entry._pragma.text);
+            break;
+
+        case CUNIT_DECLARATION:
             cdump_decl(emit, entry._decl);
+            break;
+
+        case CUNIT_DEFINE:
+            emit_fmt(emit, " define {}: \n", entry._define.name);
+            emit_ident(emit);
+            if (entry._define.args.len != 0)
+            {
+
+                emit_fmt(emit, " arg: \n");
+
+                vec_foreach(arg_name, &entry._define.args)
+                {
+                    emit_fmt(emit, " - {}\n", arg_name);
+                }
+            }
+            cdump_expr(emit, entry._define.expression);
+            emit_deident(emit);
+            break;
+
+        default:
+            panic$("unknown cunit entry type {}", entry.type);
+            break;
         }
     }
 
