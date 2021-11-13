@@ -61,4 +61,7 @@ $$($(1)_HOST_BIN): $$($(1)_HOST_OBJ) $(LIBS_HOST_BIN)
 
 endef
 
+list-host:
+	@echo $(HOST_BINS)
+
 $(foreach bin, $(HOST_BINS), $(eval $(call HOST_TEMPLATE,$(bin))))

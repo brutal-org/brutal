@@ -75,21 +75,16 @@ static Str parse_ident(Scan *scan)
     return name;
 }
 
-static BidType parse_primitive(Scan *scan, Alloc *alloc)
+static BidType parse_primitive(Scan *scan)
 {
-    BidType type = bid_primitive(parse_ident(scan), alloc);
+    Str ident = parse_ident(scan);
 
-    if (!skip_separator(scan, '('))
+    if (str_eq(ident, str$("Nil")))
     {
-        return type;
+        return bid_nil();
     }
 
-    while (!skip_separator(scan, ')') && !scan_ended(scan))
-    {
-        bid_primitive_arg(&type, parse_ident(scan));
-    }
-
-    return type;
+    return bid_primitive(ident);
 }
 
 static void parse_enum_constant(Scan *scan, BidType *enum_)
@@ -98,7 +93,7 @@ static void parse_enum_constant(Scan *scan, BidType *enum_)
 
     while (!skip_separator(scan, '}') && !scan_ended(scan))
     {
-        bid_enum_constant(enum_, parse_ident(scan));
+        bid_enum_member(enum_, parse_ident(scan));
         skip_separator(scan, ',');
     }
 }
@@ -132,25 +127,43 @@ static BidType parse_struct(Scan *scan, Alloc *alloc)
     return type;
 }
 
+static BidType parse_vec(BidType subtype, Scan *scan, Alloc *alloc)
+{
+    skip_comment_and_space(scan);
+
+    if (!skip_separator(scan, '['))
+    {
+        return subtype;
+    }
+
+    expect_separator(scan, ']');
+
+    return bid_vec(subtype, alloc);
+}
+
 static BidType parse_type(Scan *scan, Alloc *alloc)
 {
-    if (skip_keyword(scan, "struct") || skip_separator(scan, '{'))
+    BidType type = bid_nil();
+
+    if (skip_keyword(scan, "struct") ||
+        skip_separator(scan, '{'))
     {
-        return parse_struct(scan, alloc);
+        type = parse_struct(scan, alloc);
     }
     else if (skip_keyword(scan, "enum"))
     {
-        return parse_enum(scan, alloc);
+        type = parse_enum(scan, alloc);
     }
     else if (is_ident(scan_curr(scan)))
     {
-        return parse_primitive(scan, alloc);
+        type = parse_primitive(scan);
     }
     else
     {
         scan_throw(scan, str$("Un expected token"), str$(""));
-        return bid_none();
     }
+
+    return parse_vec(type, scan, alloc);
 }
 
 static void parse_alias(Scan *scan, BidIface *iface, Alloc *alloc)
@@ -164,70 +177,89 @@ static void parse_alias(Scan *scan, BidIface *iface, Alloc *alloc)
     bid_alias(iface, name, type);
 }
 
-static void parse_method(Scan *scan, BidIface *iface, Alloc *alloc)
+static void parse_method_body(Scan *scan, Str name, BidIface *iface, Alloc *alloc)
 {
-    Str name = parse_ident(scan);
+    BidType request = bid_nil();
+    BidType response = bid_nil();
 
-    skip_comment_and_space(scan);
+    if (skip_keyword(scan, "->"))
+    {
+        response = parse_type(scan, alloc);
+    }
+    else
+    {
+        request = parse_type(scan, alloc);
 
-    BidType request = parse_type(scan, alloc);
-
-    skip_keyword(scan, "->");
-
-    BidType response = parse_type(scan, alloc);
+        if (skip_keyword(scan, "->"))
+        {
+            response = parse_type(scan, alloc);
+        }
+    }
 
     bid_method(iface, name, request, response);
 }
 
+static void parse_method(Scan *scan, BidIface *iface, Alloc *alloc)
+{
+    Str name = parse_ident(scan);
+    return parse_method_body(scan, name, iface, alloc);
+}
+
 BidIface bid_parse(Scan *scan, Alloc *alloc)
 {
-    BidIface iface = bid_iface(alloc);
-
     skip_keyword(scan, "interface");
 
-    bid_iface_name(&iface, parse_ident(scan));
+    Str name = parse_ident(scan);
 
-    expect_separator(scan, '{');
+    BidIface iface = bid_iface(name, alloc);
 
-    while (scan_curr(scan) != '}' && !scan_ended(scan))
+    if (skip_separator(scan, '{'))
     {
-        if (skip_keyword(scan, "errors"))
+        while (scan_curr(scan) != '}' && !scan_ended(scan))
         {
-            parse_enum_constant(scan, &iface.errors);
-        }
-        else if (skip_keyword(scan, "type"))
-        {
-            parse_alias(scan, &iface, alloc);
-        }
-        else if (skip_keyword(scan, "method"))
-        {
-            parse_method(scan, &iface, alloc);
-        }
-        else if (skip_keyword(scan, "id"))
-        {
-            expect_separator(scan, '=');
-
-            scan_expect_word(scan, str$("0x"));
-
-            uint32_t id = 0;
-
-            while (isxdigit(scan_curr(scan)))
+            if (skip_keyword(scan, "errors"))
             {
-                id *= 0x10;
-                id += scan_next_digit(scan);
+                parse_enum_constant(scan, &iface.errors);
+            }
+            else if (skip_keyword(scan, "type"))
+            {
+                parse_alias(scan, &iface, alloc);
+            }
+            else if (skip_keyword(scan, "method"))
+            {
+                parse_method(scan, &iface, alloc);
+            }
+            else if (skip_keyword(scan, "id"))
+            {
+                expect_separator(scan, '=');
+
+                scan_expect_word(scan, str$("0x"));
+
+                uint32_t id = 0;
+
+                while (isxdigit(scan_curr(scan)))
+                {
+                    id *= 0x10;
+                    id += scan_next_digit(scan);
+                }
+
+                iface.id = id;
+            }
+            else
+            {
+                scan_throw(scan, str$("expected errors/type/method"), parse_ident(scan));
             }
 
-            iface.id = id;
-        }
-        else
-        {
-            scan_throw(scan, str$("expected errors/type/method"), parse_ident(scan));
+            expect_separator(scan, ';');
         }
 
-        expect_separator(scan, ';');
+        expect_separator(scan, '}');
     }
-
-    expect_separator(scan, '}');
+    else
+    {
+        Buf name = case_to_snake(iface.name, alloc);
+        parse_method_body(scan, buf_str(&name), &iface, alloc);
+    }
 
     return iface;
 }

@@ -62,4 +62,7 @@ endef
 
 -include sources/bins/*/.build.mk
 
+list-cross:
+	@echo $(CROSS_BINS)
+
 $(foreach bin, $(CROSS_BINS), $(eval $(call BIN_TEMPLATE,$(bin))))

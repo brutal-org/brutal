@@ -1,17 +1,27 @@
 #include <bid/ast/builder.h>
 
-BidIface bid_iface(Alloc *alloc)
+BidIface bid_iface(Str name, Alloc *alloc)
 {
-    BidIface iface;
+    BidIface iface = bid_iface_barebone(name, alloc);
 
     iface.errors = bid_enum(alloc);
 
+    bid_enum_member(&iface.errors, str$("SUCCESS"));
+    bid_enum_member(&iface.errors, str$("UNEXPECTED_MESSAGE"));
+    bid_enum_member(&iface.errors, str$("BAD_COMMUNICATION"));
+
+    return iface;
+}
+
+BidIface bid_iface_barebone(Str name, Alloc *alloc)
+{
+    BidIface iface;
+
+    iface.errors = bid_nil();
+    iface.name = str_dup(name, alloc);
+
     vec_init(&iface.aliases, alloc);
     vec_init(&iface.methods, alloc);
-
-    bid_enum_constant(&iface.errors, str$("UNEXPECTED_MESSAGE"));
-    bid_enum_constant(&iface.errors, str$("BAD_COMMUNICATION"));
-    bid_enum_constant(&iface.errors, str$("SUCCESS"));
 
     return iface;
 }
@@ -21,45 +31,57 @@ void bid_iface_id(BidIface *iface, uint32_t id)
     iface->id = id;
 }
 
-void bid_iface_name(BidIface *iface, Str name)
-{
-    iface->name = name;
-}
-
 void bid_alias(BidIface *iface, Str name, BidType type)
 {
-    BidAlias alias = {name, type};
+    BidAlias alias = {name, nullstr, type};
+    vec_push(&iface->aliases, alias);
+}
+
+void bid_alias_mangled(BidIface *iface, Str name, Str mangled, BidType type)
+{
+    BidAlias alias = {name, mangled, type};
     vec_push(&iface->aliases, alias);
 }
 
 void bid_method(BidIface *iface, Str name, BidType request, BidType response)
 {
-    BidMethod method = {name, request, response};
+    BidMethod method = {name, nullstr, request, response};
     vec_push(&iface->methods, method);
 }
 
-BidType bid_none(void)
+void bid_method_mangled(BidIface *iface, Str name, Str mangled, BidType request, BidType response)
+{
+    BidMethod method = {name, mangled, request, response};
+    vec_push(&iface->methods, method);
+}
+
+BidType bid_nil(void)
 {
     return (BidType){
-        .type = BID_TYPE_NONE,
+        .type = BID_TYPE_NIL,
     };
 }
 
-BidType bid_primitive(Str str, Alloc *alloc)
+BidType bid_primitive(Str str)
 {
-    BidPrimitive primitive_;
-    primitive_.name = str;
-    vec_init(&primitive_.args, alloc);
-
     return (BidType){
         .type = BID_TYPE_PRIMITIVE,
-        .primitive_ = primitive_,
+        .primitive_ = {
+            .name = str,
+            .mangled = nullstr,
+        },
     };
 }
 
-void bid_primitive_arg(BidType *type, Str name)
+BidType bid_primitive_mangled(Str str, Str mangled)
 {
-    vec_push(&type->enum_.members, name);
+    return (BidType){
+        .type = BID_TYPE_PRIMITIVE,
+        .primitive_ = {
+            .name = str,
+            .mangled = mangled,
+        },
+    };
 }
 
 BidType bid_enum(Alloc *alloc)
@@ -73,14 +95,30 @@ BidType bid_enum(Alloc *alloc)
     };
 }
 
-void bid_enum_constant(BidType *enum_, Str name)
+void bid_enum_member(BidType *enum_, Str name)
 {
-    vec_push(&enum_->enum_.members, name);
+    BidEnumMember member;
+
+    member.name = name;
+    member.mangled = nullstr;
+
+    vec_push(&enum_->enum_.members, member);
+}
+
+void bid_enum_constant_mangled(BidType *enum_, Str name, Str mangled)
+{
+    BidEnumMember member;
+
+    member.name = name;
+    member.mangled = mangled;
+
+    vec_push(&enum_->enum_.members, member);
 }
 
 BidType bid_struct(Alloc *alloc)
 {
     BidStruct struct_;
+
     vec_init(&struct_.members, alloc);
 
     return (BidType){
@@ -91,9 +129,20 @@ BidType bid_struct(Alloc *alloc)
 
 void bid_struct_member(BidType *struct_, Str name, BidType type)
 {
-    BidMember member;
+    BidStructMember member;
+
     member.name = name;
     member.type = type;
 
     vec_push(&struct_->struct_.members, member);
+}
+
+BidType bid_vec(BidType subtype, Alloc *alloc)
+{
+    return (BidType){
+        .type = BID_TYPE_VEC,
+        .vec_ = {
+            .subtype = alloc_move(alloc, subtype),
+        },
+    };
 }

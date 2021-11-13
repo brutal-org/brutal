@@ -2,26 +2,80 @@
 
 #include <bid/ast.h>
 
-BidIface bid_iface(Alloc *alloc);
+/* --- Interface ---------------------------------------- */
 
-void bid_iface_id(BidIface *iface, uint32_t id);
+BidIface bid_iface(
+    Str name,
+    Alloc *alloc);
 
-void bid_iface_name(BidIface *iface, Str name);
+BidIface bid_iface_barebone(
+    Str name,
+    Alloc *alloc);
 
-void bid_alias(BidIface *iface, Str name, BidType type);
+void bid_iface_id(
+    BidIface *iface,
+    uint32_t id);
 
-void bid_method(BidIface *iface, Str name, BidType request, BidType response);
+void bid_alias(
+    BidIface *iface,
+    Str name,
+    BidType type);
 
-BidType bid_none(void);
+void bid_alias_mangled(
+    BidIface *iface,
+    Str name,
+    Str mangled,
+    BidType type);
 
-BidType bid_primitive(Str str, Alloc *alloc);
+void bid_alias_mangled(
+    BidIface *iface,
+    Str name,
+    Str mangled,
+    BidType type);
 
-void bid_primitive_arg(BidType *struct_, Str name);
+void bid_method(
+    BidIface *iface,
+    Str name,
+    BidType request,
+    BidType response);
 
-BidType bid_enum(Alloc *alloc);
+void bid_method_mangled(
+    BidIface *iface,
+    Str name,
+    Str mangled,
+    BidType request,
+    BidType response);
 
-void bid_enum_constant(BidType *struct_, Str name);
+/* --- Types -------------------------------------------- */
 
-BidType bid_struct(Alloc *alloc);
+BidType bid_nil(
+    void);
 
-void bid_struct_member(BidType *struct_, Str name, BidType type);
+BidType bid_primitive(
+    Str str);
+
+BidType bid_primitive_mangled(
+    Str str,
+    Str mangled);
+
+BidType bid_enum(
+    Alloc *alloc);
+
+void bid_enum_member(
+    BidType *enum_,
+    Str name);
+
+void bid_enum_constant_mangled(
+    BidType *enum_,
+    Str name,
+    Str mangled);
+
+BidType bid_struct(
+    Alloc *alloc);
+
+void bid_struct_member(
+    BidType *struct_,
+    Str name,
+    BidType type);
+
+BidType bid_vec(BidType subtype, Alloc *alloc);

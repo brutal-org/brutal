@@ -23,12 +23,28 @@ void bid_emit_json(BidIface const iface, IoWriter *writer)
     heap_alloc_deinit(&heap);
 }
 
-void bid_emit_c(BidIface const iface, IoWriter *writer)
+void bid_emit_source(BidIface const iface, IoWriter *writer)
 {
     HeapAlloc heap;
     heap_alloc_init(&heap, NODE_DEFAULT);
 
-    CUnit unit = bidgen_c(&iface, alloc_global());
+    CUnit unit = bidgen_c_source(iface, alloc_global());
+    heap_alloc_deinit(&heap);
+
+    Emit emit;
+    emit_init(&emit, writer);
+    cgen_c_unit(&emit, unit);
+    emit_deinit(&emit);
+
+    heap_alloc_deinit(&heap);
+}
+
+void bid_emit_header(BidIface const iface, IoWriter *writer)
+{
+    HeapAlloc heap;
+    heap_alloc_init(&heap, NODE_DEFAULT);
+
+    CUnit unit = bidgen_c_header(iface, alloc_global());
     heap_alloc_deinit(&heap);
 
     Emit emit;
@@ -43,11 +59,12 @@ int main(int argc, char const *argv[])
 {
     if (argc != 3)
     {
-        log$("usage: bid input option");
+        log$("Usage: {} [file] [options...]", argv[0]);
         log$("");
-        log$("options:");
-        log$("  --output-json   set the output to json");
-        log$("  --output-c      set the output to c");
+        log$("Options:");
+        log$("  --json   generate a json object");
+        log$("  --header generate a C header file");
+        log$("  --source generate a C source file");
 
         return 0;
     }
@@ -77,15 +94,20 @@ int main(int argc, char const *argv[])
         return -1;
     }
 
-    if (str_eq(str$("--output-json"), str$(argv[2])))
+    if (str_eq(str$("--json"), str$(argv[2])))
     {
         iface = bid_pass_prefix(iface, base$(&heap));
         bid_emit_json(iface, io_std_out());
     }
-    else if (str_eq(str$("--output-c"), str$(argv[2])))
+    else if (str_eq(str$("--source"), str$(argv[2])))
     {
         iface = bid_pass_prefix(iface, base$(&heap));
-        bid_emit_c(iface, io_std_out());
+        bid_emit_source(iface, io_std_out());
+    }
+    else if (str_eq(str$("--header"), str$(argv[2])))
+    {
+        iface = bid_pass_prefix(iface, base$(&heap));
+        bid_emit_header(iface, io_std_out());
     }
     else
     {

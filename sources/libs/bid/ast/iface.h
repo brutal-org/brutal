@@ -6,12 +6,15 @@
 typedef struct
 {
     Str name;
+    Str mangled;
+
     BidType type;
 } BidAlias;
 
 typedef struct
 {
     Str name;
+    Str mangled;
 
     BidType request;
     BidType response;
@@ -20,6 +23,7 @@ typedef struct
 typedef struct
 {
     Str name;
+
     uint32_t id;
 
     BidType errors;

@@ -7,28 +7,36 @@ typedef struct bid_type BidType;
 typedef struct
 {
     Str name;
-    Vec(Str) args;
+    Str mangled;
 } BidPrimitive;
 
 typedef struct
 {
-    Vec(Str) members;
-} BidEnum;
+    BidType *subtype;
+} BidVec;
 
-typedef struct bid_member BidMember;
+typedef struct bid_enum_member BidEnumMember;
 
 typedef struct
 {
-    Vec(BidMember) members;
+    Vec(BidEnumMember) members;
+} BidEnum;
+
+typedef struct bid_struct_member BidStructMember;
+
+typedef struct
+{
+    Vec(BidStructMember) members;
 } BidStruct;
 
 typedef enum
 {
-    BID_TYPE_NONE,
+    BID_TYPE_NIL,
 
     BID_TYPE_PRIMITIVE,
     BID_TYPE_ENUM,
     BID_TYPE_STRUCT,
+    BID_TYPE_VEC,
 } BidTypeType;
 
 struct bid_type
@@ -40,10 +48,17 @@ struct bid_type
         BidPrimitive primitive_;
         BidEnum enum_;
         BidStruct struct_;
+        BidVec vec_;
     };
 };
 
-struct bid_member
+struct bid_enum_member
+{
+    Str name;
+    Str mangled;
+};
+
+struct bid_struct_member
 {
     Str name;
     BidType type;
