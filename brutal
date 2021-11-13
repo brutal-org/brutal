@@ -2,15 +2,97 @@
 
 set -e
 
-if [ -z "$1" ]; then
-  echo "Usage: $0 [tool] [args...]"
-  exit 1
-fi
+TOOLS="$(make list-host | tr '[:upper:]' '[:lower:]') "
+JOBS=""
+SILENT="-s"
+
+export VERBOSE="no"
 
 if [[ -z "${CONFIG_TOOLCHAIN}" ]]; then
   CONFIG_TOOLCHAIN="llvm"
 fi
 
-BINS=./bin/$(uname -m)-$CONFIG_TOOLCHAIN/host
-make -s $BINS/$1
-$BINS/$@
+usage()
+{
+  echo "Usage: $0 [options...] [tool] [args...]"
+  echo ""
+  echo "Options:"
+  echo "    -a, --all      Make all before"
+  echo "    -c, --clean    Do a clean build"
+  echo "    -n, --nuke     Nuke the build dir"
+  echo "    -f, --fast     Do it fast"
+  echo "        --fix      Run some common fixes"
+  echo "    -h, --help     Show usage"
+  echo "    -r, --run      Start the virtual machine"
+  echo "    -v, --verbose  Enable detailed logging"
+  echo ""
+  echo "Tools:"
+  echo "    $TOOLS"
+  echo ""
+  exit 1
+}
+
+if [ -z "$1" ]; then
+  usage
+  exit 1
+fi
+
+while [[ $1 == -* ]]; do
+  case $1 in
+    "-a" | "--all")
+      make $JOBS $SILENT all
+      ;;
+
+    "-c" | "--clean")
+      make $SILENT clean
+      ;;
+
+    "-n" | "--nuke")
+      make $SILENT nuke
+      ;;
+
+    "-f" | "--fast")
+      JOBS="-j"
+      ;;
+
+    "--fix")
+      echo "Cleaning up buildir..."
+      make $SILENT nuke
+      echo "Making we have all submodules..."
+      git submodule update --init --recursive
+      echo "Done!"
+      ;;
+
+    "-h" | "--help")
+      usage
+      ;;
+
+    "-r" | "--run")
+      make $JOBS $SILENT run
+      ;;
+
+    "-v" | "--verbose")
+      export VERBOSE=yes
+      SILENT=""
+      ;;
+
+    *)
+      echo "Unknown option '$1'!"
+      echo ""
+      usage
+      ;;
+  esac
+  shift
+done
+
+if [ $# -gt 0 ]; then
+  if [[ $TOOLS != *"$1 "* ]]; then
+    echo "Unknown tool '$1'!"
+    echo ""
+    usage
+  fi
+
+  BINS=./bin/$(uname -m)-$CONFIG_TOOLCHAIN/host
+  make $JOBS $SILENT $BINS/$1
+  $BINS/$@
+fi
