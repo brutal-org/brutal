@@ -64,3 +64,5 @@ Buf case_to_upper_first(Str str, Alloc *alloc);
 Buf case_to_sponge(Str str, Alloc *alloc);
 
 Buf case_change(Case c, Str str, Alloc *alloc);
+
+Str case_change_str(Case c, Str str, Alloc *alloc);

@@ -390,3 +390,9 @@ Buf case_change(Case c, Str str, Alloc *alloc)
         panic$("unknown text casing {}", c);
     }
 }
+
+Str case_change_str(Case c, Str str, Alloc *alloc)
+{
+    Buf buf = case_change(c, str, alloc);
+    return buf_str(&buf);
+}
