@@ -1,0 +1,2 @@
+interface Locate { name : Str, protos : Proto[] } -> Service[];
+

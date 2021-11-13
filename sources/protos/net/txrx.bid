@@ -1,0 +1,5 @@
+interface TxRx
+{
+    method tx Buf -> Nil;
+    method rx -> Buf;
+}
