@@ -26,8 +26,22 @@ void cdump_value(Emit *emit, CVal value)
     default:
         panic$("unknown value type {}", value.type);
     }
+}
 
-    emit_fmt(emit, "\n");
+void cdump_member(Emit *emit, CTypeMembers const *members)
+{
+    emit_fmt(emit, "members:\n");
+    emit_ident(emit);
+
+    vec_foreach(member, members)
+    {
+        emit_fmt(emit, "member:{}\n", member.name);
+        emit_ident(emit);
+        cdump_type(emit, member.type);
+        emit_deident(emit);
+    }
+
+    emit_deident(emit);
 }
 
 void cdump_type(Emit *emit, CType type)
@@ -97,10 +111,12 @@ void cdump_type(Emit *emit, CType type)
 
     case CTYPE_STRUCT:
         emit_fmt(emit, "struct\n");
+        cdump_member(emit, &type.struct_.members);
         break;
 
     case CTYPE_UNION:
         emit_fmt(emit, "union\n");
+        cdump_member(emit, &type.union_.members);
         break;
 
     case CTYPE_ENUM:
@@ -109,19 +125,18 @@ void cdump_type(Emit *emit, CType type)
 
     case CTYPE_FUNC:
         emit_fmt(emit, "func\n");
-        emit_fmt(emit, "ret:");
-        cdump_type(emit, *type.func_.ret);
+        emit_fmt(emit, "return:\n");
 
-        vec_foreach(param, &type.func_.params)
-        {
-            emit_fmt(emit, "{}:", param.name);
-            cdump_type(emit, param.type);
-        }
+        emit_ident(emit);
+        cdump_type(emit, *type.func_.ret);
+        emit_deident(emit);
+
+        cdump_member(emit, &type.func_.params);
 
         break;
 
     case CTYPE_NAME:
-        emit_fmt(emit, "name {}\n", type.name);
+        emit_fmt(emit, "name\n{}\n", type.name);
         break;
 
     default:
@@ -135,12 +150,12 @@ void cdump_expr(Emit *emit, CExpr expr)
 {
     emit_fmt(emit, "expr:{} ", cexpr_type_to_str(expr.type));
     emit_ident(emit);
+    emit_fmt(emit, "\n");
 
     switch (expr.type)
     {
     case CEXPR_EMPTY:
     case CEXPR_SELF:
-        emit_fmt(emit, "\n");
         break;
 
     case CEXPR_CONSTANT:
@@ -169,7 +184,6 @@ void cdump_expr(Emit *emit, CExpr expr)
         break;
 
     case CEXPR_CALL:
-        emit_fmt(emit, "\n");
         cdump_expr(emit, *expr.call_.expr);
         emit_fmt(emit, "arg:\n");
 
@@ -189,8 +203,6 @@ void cdump_expr(Emit *emit, CExpr expr)
         break;
 
     case CEXPR_TERNARY:
-        emit_fmt(emit, "\n");
-
         emit_fmt(emit, "cond: ");
         cdump_expr(emit, *expr.ternary_.expr_cond);
 
@@ -202,7 +214,6 @@ void cdump_expr(Emit *emit, CExpr expr)
         break;
 
     case CEXPR_INITIALIZER:
-        emit_fmt(emit, "\n");
         vec_foreach(v, &expr.initializer_.initializer)
         {
             cdump_expr(emit, v);
@@ -222,25 +233,25 @@ void cdump_stmt(Emit *emit, CStmt stmt)
     emit_fmt(emit, "stmt:{}", cstmt_type_to_str(stmt.type));
     emit_ident(emit);
 
+    emit_fmt(emit, "\n");
     switch (stmt.type)
     {
     case CSTMT_INVALID:
     case CSTMT_EMPTY:
-        emit_fmt(emit, "\n");
+    case CSTMT_CONTINUE:
+    case CSTMT_DEFAULT:
+    case CSTMT_BREAK:
         break;
 
     case CSTMT_DECL:
         cdump_decl(emit, *stmt.decl_.decl);
-        emit_fmt(emit, "\n");
         break;
 
     case CSTMT_EXPR:
         cdump_expr(emit, stmt.expr_.expr);
-        emit_fmt(emit, "\n");
         break;
 
     case CSTMT_BLOCK:
-        emit_fmt(emit, "\n");
         vec_foreach(inner, &stmt.block_.stmts)
         {
             cdump_stmt(emit, inner);
@@ -249,11 +260,10 @@ void cdump_stmt(Emit *emit, CStmt stmt)
 
     case CSTMT_IF:
         cdump_expr(emit, stmt.if_.expr);
-        emit_fmt(emit, "\ntrue:");
+        emit_fmt(emit, "true:");
         cdump_stmt(emit, *stmt.if_.stmt_true);
-        emit_fmt(emit, "\nfalse:");
+        emit_fmt(emit, "false:");
         cdump_stmt(emit, *stmt.if_.stmt_false);
-        emit_fmt(emit, "\n");
         break;
 
     case CSTMT_FOR:
@@ -287,6 +297,23 @@ void cdump_stmt(Emit *emit, CStmt stmt)
         emit_fmt(emit, "\n");
         cdump_stmt(emit, *stmt.switch_.stmt);
         break;
+
+    case CSTMT_RETURN:
+        cdump_expr(emit, stmt.return_.expr);
+        break;
+
+    case CSTMT_GOTO:
+        emit_fmt(emit, " {}\n", stmt.goto_.label);
+        break;
+
+    case CSTMT_LABEL:
+        emit_fmt(emit, " {}\n", stmt.label_.label);
+        break;
+
+    case CSTMT_CASE:
+        cdump_expr(emit, stmt.case_.expr);
+        break;
+
     default:
         panic$("unknown cstmt type {}", stmt.type);
         break;
@@ -324,7 +351,7 @@ void cdump_decl(Emit *emit, CDecl decl)
 
 void cdump_unit(Emit *emit, CUnit unit)
 {
-    emit_fmt(emit, "cunit\n");
+    emit_fmt(emit, " cunit:\n");
     emit_ident(emit);
 
     vec_foreach(entry, &unit.units)

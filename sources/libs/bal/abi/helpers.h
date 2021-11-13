@@ -5,4 +5,3 @@
 BrResult bal_close(BrHandle handle);
 
 BrResult bal_unmap(BrSpace space, void *base, size_t len);
-

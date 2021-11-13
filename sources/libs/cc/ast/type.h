@@ -40,6 +40,7 @@ typedef enum
 typedef struct ctype CType;
 typedef struct ctype_member CTypeMember;
 typedef struct ctype_constant CTypeConstant;
+typedef Vec(CTypeMember) CTypeMembers;
 
 struct ctype
 {
@@ -67,7 +68,7 @@ struct ctype
 
         struct
         {
-            Vec(CTypeMember) members;
+            CTypeMembers members;
         } struct_, union_;
 
         struct
@@ -78,7 +79,7 @@ struct ctype
         struct
         {
             CType *ret;
-            Vec(CTypeMember) params;
+            CTypeMembers params;
         } func_;
     };
 };
