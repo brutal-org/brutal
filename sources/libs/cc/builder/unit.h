@@ -4,14 +4,12 @@
 
 CUnit cunit(Alloc *alloc);
 
-void cunit_member(CUnit *unit, CUnitEntry entry);
+void cunit_decl(CUnit *self, CDecl decl);
 
-CUnitEntry cunit_decl(CDecl decl);
+void cunit_pragma(CUnit *self, Str text, Alloc *alloc);
 
-CUnitEntry cunit_pragma(Str text, Alloc *alloc);
+void cunit_pragma_once(CUnit *self, Alloc *alloc);
 
-CUnitEntry cunit_pragma_once(Alloc *alloc);
+void cunit_define(CUnit *self, Str name, CExpr expression, Alloc *alloc);
 
-CUnitEntry cunit_define(Str name, CExpr expression, Alloc *alloc);
-
-CUnitEntry cunit_include(bool system, Str path, Alloc *alloc);
+void cunit_include(CUnit *self, bool system, Str path, Alloc *alloc);

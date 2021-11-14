@@ -22,9 +22,8 @@ typedef struct
 
 typedef struct
 {
-    Str name;
-
     uint32_t id;
+    Str name;
 
     BidType errors;
     Vec(BidAlias) aliases;

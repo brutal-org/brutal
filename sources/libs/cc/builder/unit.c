@@ -12,43 +12,49 @@ void cunit_member(CUnit *unit, CUnitEntry entry)
     vec_push(&unit->units, entry);
 }
 
-CUnitEntry cunit_decl(CDecl decl)
+void cunit_decl(CUnit *self, CDecl decl)
 {
-    return (CUnitEntry){
-        .type = CUNIT_DECLARATION,
-        ._decl = decl,
-    };
+    cunit_member(
+        self,
+        (CUnitEntry){
+            .type = CUNIT_DECLARATION,
+            ._decl = decl,
+        });
 }
 
-CUnitEntry cunit_pragma(Str value, Alloc *alloc)
+void cunit_pragma(CUnit *self, Str value, Alloc *alloc)
 {
     CPragma pragma = {
         .text = str_dup(value, alloc),
     };
 
-    return (CUnitEntry){
-        .type = CUNIT_PRAGMA,
-        ._pragma = pragma,
-    };
+    cunit_member(
+        self,
+        (CUnitEntry){
+            .type = CUNIT_PRAGMA,
+            ._pragma = pragma,
+        });
 }
 
-CUnitEntry cunit_pragma_once(Alloc *alloc)
+void cunit_pragma_once(CUnit *self, Alloc *alloc)
 {
-    return cunit_pragma(str$("once"), alloc);
+    cunit_pragma(self, str$("once"), alloc);
 }
 
-CUnitEntry cunit_include(bool system, Str path, Alloc *alloc)
+void cunit_include(CUnit *self, bool system, Str path, Alloc *alloc)
 {
-    return (CUnitEntry){
-        .type = CUNIT_INCLUDE,
-        ._include = (CInclude){
-            .is_system = system,
-            .path = str_dup(path, alloc),
-        },
-    };
+    cunit_member(
+        self,
+        (CUnitEntry){
+            .type = CUNIT_INCLUDE,
+            ._include = (CInclude){
+                .is_system = system,
+                .path = str_dup(path, alloc),
+            },
+        });
 }
 
-CUnitEntry cunit_define(Str name, CExpr expression, Alloc *alloc)
+void cunit_define(CUnit *self, Str name, CExpr expression, Alloc *alloc)
 {
     CUnitEntry def = {
         .type = CUNIT_DEFINE,
@@ -60,5 +66,5 @@ CUnitEntry cunit_define(Str name, CExpr expression, Alloc *alloc)
 
     vec_init(&def._define.args, alloc);
 
-    return def;
+    cunit_member(self, def);
 }
