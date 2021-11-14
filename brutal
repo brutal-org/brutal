@@ -5,6 +5,7 @@ set -e
 TOOLS="$(make list-host | tr '[:upper:]' '[:lower:]') "
 JOBS=""
 SILENT="-s"
+DEBUG=""
 
 export VERBOSE="no"
 
@@ -19,6 +20,7 @@ usage()
   echo "Options:"
   echo "    -a, --all      Make all before"
   echo "    -c, --clean    Do a clean build"
+  echo "    -d, --debug    Run the tool inside a debuger"
   echo "    -n, --nuke     Nuke the build dir"
   echo "    -f, --fast     Do it fast"
   echo "        --fix      Run some common fixes"
@@ -45,6 +47,10 @@ while [[ $1 == -* ]]; do
 
     "-c" | "--clean")
       make $SILENT clean
+      ;;
+
+    "-d" | "--debug")
+      DEBUG="lldb --"
       ;;
 
     "-n" | "--nuke")
@@ -94,5 +100,5 @@ if [ $# -gt 0 ]; then
 
   BINS=./bin/$(uname -m)-$CONFIG_TOOLCHAIN/host
   make $JOBS $SILENT $BINS/$1
-  $BINS/$@
+  $DEBUG $BINS/$@
 fi
