@@ -77,16 +77,17 @@ void bal_unpack_str(BalUnpack *self, Str *str, Alloc *alloc)
     *str = str_n$(len, buf);
 }
 
-void bal_unpack_vec_impl(BalUnpack *self, VecImpl *v, BalUnpackFn *el, size_t el_size, Alloc *alloc)
+void bal_unpack_slice_impl(BalUnpack *self, VoidSlice *slice, BalUnpackFn *el, size_t el_size, Alloc *alloc)
 {
-    vec_init_impl(v, el_size, alloc);
     uint64_t len;
     bal_unpack_u64(self, &len);
-    vec_reserve_impl(v, len);
-    v->len = len;
+    void *buf = alloc_calloc(alloc, el_size, len);
 
     for (uint64_t i = 0; i < len; i++)
     {
-        el(self, v->data + v->data_size * i, alloc);
+        el(self, buf + el_size * i, alloc);
     }
+
+    slice->len = len;
+    slice->buf = buf;
 }

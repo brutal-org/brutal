@@ -61,6 +61,11 @@ void bal_pack_enum(BalPack *self, const int *v)
     bal_pack(self, v, sizeof(*v));
 }
 
+void bal_pack_size(BalPack *self, size_t const *s)
+{
+    bal_pack(self, s, sizeof(*s));
+}
+
 void bal_pack_s8(BalPack *self, const int8_t *v)
 {
     bal_pack(self, v, sizeof(*v));
@@ -113,16 +118,16 @@ void bal_pack_f64(BalPack *self, const double *v)
 
 void bal_pack_str(BalPack *self, const Str *v)
 {
-    bal_pack_u64(self, &v->len);
+    bal_pack_size(self, &v->len);
     bal_pack(self, v->buf, v->len);
 }
 
-void bal_pack_vec_impl(BalPack *self, VecImpl *v, BalPackFn *el)
+void bal_pack_slice_impl(BalPack *self, SliceImpl const *v, BalPackFn *el)
 {
-    bal_pack_enum(self, &v->len);
+    bal_pack_size(self, &v->len);
 
-    for (int i = 0; i < v->len; i++)
+    for (size_t i = 0; i < v->len; i++)
     {
-        el(self, v->data + v->data_size * i);
+        el(self, v->buf + v->size * i);
     }
 }
