@@ -1,4 +1,5 @@
 #include <bid/ast/builder.h>
+#include <brutal/hash.h>
 
 BidIface bid_iface(Str name, Alloc *alloc)
 {
@@ -19,16 +20,12 @@ BidIface bid_iface_barebone(Str name, Alloc *alloc)
 
     iface.errors = bid_nil();
     iface.name = str_dup(name, alloc);
+    iface.id = fnv_32(name.buf, name.len, FNV1_32_INIT);
 
     vec_init(&iface.aliases, alloc);
     vec_init(&iface.methods, alloc);
 
     return iface;
-}
-
-void bid_iface_id(BidIface *iface, uint32_t id)
-{
-    iface->id = id;
 }
 
 void bid_alias(BidIface *iface, Str name, BidType type)

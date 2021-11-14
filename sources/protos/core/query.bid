@@ -1,1 +1,1 @@
-interface Query -> Proto[];
+interface method query -> Proto[];

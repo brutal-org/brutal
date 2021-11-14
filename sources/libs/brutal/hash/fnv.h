@@ -22,6 +22,6 @@ typedef uint64_t Fnv64;
 #define FNV1_64_INIT ((Fnv64)0xcbf29ce484222325ULL)
 #define FNV_64_PRIME ((Fnv64)0x100000001b3ULL)
 
-Fnv64 fnv_64(void *buf, size_t len, Fnv64 hashval);
+Fnv64 fnv_64(void const *buf, size_t len, Fnv64 hashval);
 
-Fnv64 fnv_64a(void *buf, size_t len, Fnv64 hashval);
+Fnv64 fnv_64a(void const *buf, size_t len, Fnv64 hashval);

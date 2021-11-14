@@ -12,10 +12,6 @@ BidIface bid_iface_barebone(
     Str name,
     Alloc *alloc);
 
-void bid_iface_id(
-    BidIface *iface,
-    uint32_t id);
-
 void bid_alias(
     BidIface *iface,
     Str name,

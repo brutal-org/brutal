@@ -1,1 +1,1 @@
-interface Ping -> Nil;
+interface method ping -> Nil;

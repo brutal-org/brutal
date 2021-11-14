@@ -109,7 +109,7 @@ static BidType parse_struct(Scan *scan, Alloc *alloc)
 {
     BidType type = bid_struct(alloc);
 
-    skip_separator(scan, '{');
+    expect_separator(scan, '{');
 
     while (!skip_separator(scan, '}') && !scan_ended(scan))
     {
@@ -145,8 +145,7 @@ static BidType parse_type(Scan *scan, Alloc *alloc)
 {
     BidType type = bid_nil();
 
-    if (skip_keyword(scan, "struct") ||
-        skip_separator(scan, '{'))
+    if (skip_keyword(scan, "struct") || scan_curr(scan) == '{')
     {
         type = parse_struct(scan, alloc);
     }
@@ -209,12 +208,17 @@ BidIface bid_parse(Scan *scan, Alloc *alloc)
 {
     skip_keyword(scan, "interface");
 
+    bool is_methode = skip_keyword(scan, "method");
+
     Str name = parse_ident(scan);
 
-    BidIface iface = bid_iface(name, alloc);
+    Str name_pascal = case_change_str(CASE_PASCAL, name, alloc);
+    BidIface iface = bid_iface(name_pascal, alloc);
 
-    if (skip_separator(scan, '{'))
+    if (!is_methode)
     {
+        expect_separator(scan, '{');
+
         while (scan_curr(scan) != '}' && !scan_ended(scan))
         {
             if (skip_keyword(scan, "errors"))
@@ -229,22 +233,6 @@ BidIface bid_parse(Scan *scan, Alloc *alloc)
             {
                 parse_method(scan, &iface, alloc);
             }
-            else if (skip_keyword(scan, "id"))
-            {
-                expect_separator(scan, '=');
-
-                scan_expect_word(scan, str$("0x"));
-
-                uint32_t id = 0;
-
-                while (isxdigit(scan_curr(scan)))
-                {
-                    id *= 0x10;
-                    id += scan_next_digit(scan);
-                }
-
-                iface.id = id;
-            }
             else
             {
                 scan_throw(scan, str$("expected errors/type/method"), parse_ident(scan));
@@ -257,8 +245,7 @@ BidIface bid_parse(Scan *scan, Alloc *alloc)
     }
     else
     {
-        Buf name = case_to_snake(iface.name, alloc);
-        parse_method_body(scan, buf_str(&name), &iface, alloc);
+        parse_method_body(scan, name, &iface, alloc);
     }
 
     return iface;

@@ -1,2 +1,1 @@
-interface Locate { name : Str, protos : Proto[] } -> Service[];
-
+interface method locate { name : Str, protos : Proto[] } -> Srv[];

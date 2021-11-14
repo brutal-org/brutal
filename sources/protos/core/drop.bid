@@ -1,1 +1,1 @@
-interface Drop -> Nil;
+interface method drop -> Nil;

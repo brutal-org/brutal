@@ -69,7 +69,6 @@ An interface may contain:
 - `errors`
 - `type`
 - `method`
-- `id = x`
 
 Each time you add an interface member, they must be separated by a semicolon:
 
@@ -77,7 +76,6 @@ Each time you add an interface member, they must be separated by a semicolon:
 interface identifier
 {
     errors {};
-    id = 10;
 }
 ```
 
@@ -209,19 +207,3 @@ static inline void compositor_server_dispatch(CompositorServer *server, BrMsg co
     ...
 }
 ```
-
-### Protocol ID
-
-Each interface should contain an unique int identifier:
-
-```bid
-id = integral_value
-```
-
-so for exemple:
-
-```bid
-id = 0x12345
-```
-
-Will use the `0x12345` value as an protocol id for the current interface.

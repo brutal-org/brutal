@@ -28,7 +28,7 @@ Fnv32 fnv_32a(void const *buf, size_t len, Fnv32 hval)
     return hval;
 }
 
-Fnv64 fnv_64(void *buf, size_t len, Fnv64 hval)
+Fnv64 fnv_64(void const *buf, size_t len, Fnv64 hval)
 {
     uint8_t *bp = (uint8_t *)buf;
     uint8_t *be = bp + len;
@@ -43,7 +43,7 @@ Fnv64 fnv_64(void *buf, size_t len, Fnv64 hval)
     return hval;
 }
 
-Fnv64 fnv_64a(void *buf, size_t len, Fnv64 hval)
+Fnv64 fnv_64a(void const *buf, size_t len, Fnv64 hval)
 {
     uint8_t *bp = (uint8_t *)buf;
     uint8_t *be = bp + len;
