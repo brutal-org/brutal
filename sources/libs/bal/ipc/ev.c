@@ -2,15 +2,21 @@
 #include <bal/ipc/ev.h>
 #include <brutal/debug.h>
 
-WEAK void br_event(MAYBE_UNUSED IpcEv *self, MAYBE_UNUSED BrMsg const *msg)
+typedef struct
 {
+    IpcEv *self;
+    BrMsg *msg;
+    void *ctx;
+
+    IpcFn *fn;
+} BrEvCtx;
+
+void br_ev_handle(BrEvCtx *ctx)
+{
+    BrMsg msg = *ctx->msg;
+    ctx->fn(ctx->self, &msg, ctx->ctx);
 }
 
-void br_ev_handle(IpcEv *self)
-{
-    BrMsg m = self->ev_arg.msg;
-    br_event(self, &m);
-}
 static void req_dispatch(IpcEv *self)
 {
     while (true)
@@ -40,8 +46,34 @@ static void req_dispatch(IpcEv *self)
 
             if (!message_handeled)
             {
-                self->ev_arg = ipc;
-                fiber_start((FiberFn *)br_ev_handle, self);
+                vec_foreach(proto, &self->protos)
+                {
+                    if (proto.id == ipc.msg.prot)
+                    {
+                        fiber_start(
+                            (FiberFn *)br_ev_handle,
+                            &(BrEvCtx){
+                                self,
+                                &ipc.msg,
+                                proto.ctx,
+                                self->sink,
+                            });
+
+                        message_handeled = true;
+                    }
+                }
+            }
+
+            if (!message_handeled && self->sink)
+            {
+                fiber_start(
+                    (FiberFn *)br_ev_handle,
+                    &(BrEvCtx){
+                        self,
+                        &ipc.msg,
+                        nullptr,
+                        self->sink,
+                    });
             }
         }
 
@@ -98,10 +130,22 @@ static bool req_wait(ReqWaitCtx *ctx)
     return true;
 }
 
-void br_ev_init(IpcEv *self)
+void br_ev_init(IpcEv *self, Alloc *alloc)
 {
     self->dispatcher = fiber_start((FiberFn *)req_dispatch, self);
     self->dispatcher->state = FIBER_IDLE;
+    vec_init(&self->protos, alloc);
+}
+
+void br_ev_deinit(IpcEv *self)
+{
+    vec_deinit(&self->protos);
+}
+
+void br_ev_impl(IpcEv *self, uint32_t id, IpcFn *fn, void *ctx)
+{
+    IpcProto proto = {id, fn, ctx};
+    vec_push(&self->protos, proto);
 }
 
 BrResult br_ev_req(IpcEv *self, BrId to, BrMsg *req, BrMsg *resp)
