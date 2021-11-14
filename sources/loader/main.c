@@ -52,7 +52,7 @@ void loader_load(Elf64Header const *elf_header, void *base)
         if (prog_header->type == ELF_PROGRAM_HEADER_LOAD)
         {
             void *file_segment = (void *)((uint64_t)base + prog_header->file_offset);
-            /* don't care about extra zero as loader_phys_alloc_page memset the page to zero by default */
+
             void *mem_phys_segment = (void *)loader_phys_alloc_page(ALIGN_UP(prog_header->memory_size, PAGE_SIZE) / PAGE_SIZE);
 
             mem_cpy(mem_phys_segment, file_segment, prog_header->file_size);

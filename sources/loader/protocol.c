@@ -7,19 +7,20 @@
 
 static HandoverMmapType efi_mmap_type_to_handover[] = {
     [EFI_RESERVED_MEMORY_TYPE] = HANDOVER_MMAP_RESERVED,
-    [EFI_RUNTIME_SERVICES_CODE] = HANDOVER_MMAP_RESERVED,
-    [EFI_RUNTIME_SERVICES_DATA] = HANDOVER_MMAP_RESERVED,
-    [EFI_MEMORY_MAPPED_IO] = HANDOVER_MMAP_RESERVED,
-    [EFI_MEMORY_MAPPED_IO_PORT_SPACE] = HANDOVER_MMAP_RESERVED,
-    [EFI_PAL_CODE] = HANDOVER_MMAP_RESERVED,
-    [EFI_UNUSABLE_MEMORY] = HANDOVER_MMAP_RESERVED,
-    [EFI_ACPI_RECLAIM_MEMORY] = HANDOVER_MMAP_RECLAIMABLE,
     [EFI_LOADER_CODE] = HANDOVER_MMAP_RECLAIMABLE,
     [EFI_LOADER_DATA] = HANDOVER_MMAP_RECLAIMABLE,
     [EFI_BOOT_SERVICES_CODE] = HANDOVER_MMAP_RECLAIMABLE,
     [EFI_BOOT_SERVICES_DATA] = HANDOVER_MMAP_RECLAIMABLE,
+    [EFI_RUNTIME_SERVICES_CODE] = HANDOVER_MMAP_RESERVED,
+    [EFI_RUNTIME_SERVICES_DATA] = HANDOVER_MMAP_RESERVED,
     [EFI_CONVENTIONAL_MEMORY] = HANDOVER_MMAP_FREE,
+    [EFI_UNUSABLE_MEMORY] = HANDOVER_MMAP_RESERVED,
+    [EFI_ACPI_RECLAIM_MEMORY] = HANDOVER_MMAP_RECLAIMABLE,
     [EFI_ACPI_MEMORY_NVS] = HANDOVER_MMAP_RESERVED,
+    [EFI_MEMORY_MAPPED_IO] = HANDOVER_MMAP_RESERVED,
+    [EFI_MEMORY_MAPPED_IO_PORT_SPACE] = HANDOVER_MMAP_RESERVED,
+    [EFI_PAL_CODE] = HANDOVER_MMAP_RESERVED,
+    [EFI_PERSISTENT_MEMORY] = HANDOVER_MMAP_RESERVED,
 };
 
 HandoverMmap get_mmap(void)
@@ -32,47 +33,39 @@ HandoverMmap get_mmap(void)
 
     mem_set(h_mmap, 0, sizeof(HandoverMmap) + (entry_count) * sizeof(HandoverMmapEntry));
 
-    HandoverMmapEntry *start_from = h_mmap->entries;
+    HandoverMmapEntry *current = h_mmap->entries;
+    HandoverMmapEntry *previous_entry = nullptr;
+    uint64_t final_entry_count = 0;
 
-    int last_type = -1;
-    uint64_t last_end = 0xFFFFFFFFFFFF;
-
-    uint64_t entries = 0;
     for (uint64_t i = 0; i < entry_count; i++)
     {
         EFIMemoryDescriptor *desc = (EFIMemoryDescriptor *)((uint64_t)mmap + descriptor_size * i);
 
         uint64_t len = desc->num_pages << 12;
         uint64_t phys_base = desc->physical_start;
-        uint64_t phys_end = desc->physical_start + len;
 
-        int type = HANDOVER_MMAP_RESERVED;
+        HandoverMmapType type = efi_mmap_type_to_handover[desc->type];
 
-        if (desc->type < EFI_MAX_MEMORY_TYPE)
+        if (previous_entry != nullptr &&
+            previous_entry->type == type &&
+            (previous_entry->base + previous_entry->len) == desc->physical_start)
         {
-            type = efi_mmap_type_to_handover[desc->type];
+            previous_entry->len += len;
         }
-
-        if (last_type == type && last_end == desc->physical_start)
-        {
-            start_from[-1].len += len;
-        }
-
         else
         {
-            start_from->type = type;
-            start_from->len = len;
-            start_from->base = phys_base;
-            last_type = type;
+            current->type = type;
+            current->len = len;
+            current->base = phys_base;
 
-            start_from++;
-            entries++;
+            previous_entry = current;
+
+            current++;
+            final_entry_count++;
         }
-
-        last_end = phys_end;
     }
 
-    h_mmap->size = entries;
+    h_mmap->size = final_entry_count;
 
     return *h_mmap;
 }
@@ -111,14 +104,13 @@ uintptr_t get_rsdp()
 
 HandoverFramebuffer get_framebuffer(EFIBootServices *bs)
 {
-    EFIGUID gop_guid = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
     EFIGraphicsOutputProtocol *gop;
+    EFIGraphicsOutputModeInfo *info;
+    uint64_t size_of_info;
+
+    EFIGUID gop_guid = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
 
     bs->locate_protocol(&gop_guid, nullptr, (void **)&gop);
-
-    EFIGraphicsOutputModeInfo *info;
-
-    uint64_t size_of_info;
 
     EFIStatus status = gop->query_mode(gop, gop->mode == nullptr ? 0 : gop->mode->mode, &size_of_info, &info);
 
@@ -132,12 +124,16 @@ HandoverFramebuffer get_framebuffer(EFIBootServices *bs)
         panic$("Couldn't get framebuffer native mode");
     }
 
-    uint64_t addr = gop->mode->framebuffer_base;
-    uint32_t width = gop->mode->info->horizontal_resolution;
-    uint32_t height = gop->mode->info->vertical_resolution;
-    uint32_t pitch = gop->mode->info->pixels_per_scan_line * gop->mode->info->pixel_format;
+    EFIGraphicsOutputModeInfo *gop_info = gop->mode->info;
 
-    return (HandoverFramebuffer){true, addr, width, height, pitch, gop->mode->info->pixel_format};
+    return (HandoverFramebuffer){
+        .present = true,
+        .addr = gop->mode->framebuffer_base,
+        .width = gop_info->horizontal_resolution,
+        .height = gop_info->vertical_resolution,
+        .pitch = gop_info->pixels_per_scan_line * gop_info->pixel_format,
+        .bpp = gop_info->pixel_format,
+    };
 }
 
 Handover get_handover(void)
