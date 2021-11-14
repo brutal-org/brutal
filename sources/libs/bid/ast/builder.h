@@ -57,7 +57,7 @@ BidType bid_primitive_mangled(
 BidType bid_enum(
     Alloc *alloc);
 
-void bid_enum_member(
+void bid_enum_constant(
     BidType *enum_,
     Str name);
 

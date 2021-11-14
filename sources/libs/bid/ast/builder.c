@@ -7,9 +7,9 @@ BidIface bid_iface(Str name, Alloc *alloc)
 
     iface.errors = bid_enum(alloc);
 
-    bid_enum_member(&iface.errors, str$("SUCCESS"));
-    bid_enum_member(&iface.errors, str$("UNEXPECTED_MESSAGE"));
-    bid_enum_member(&iface.errors, str$("BAD_COMMUNICATION"));
+    bid_enum_constant(&iface.errors, str$("SUCCESS"));
+    bid_enum_constant(&iface.errors, str$("UNEXPECTED_MESSAGE"));
+    bid_enum_constant(&iface.errors, str$("BAD_COMMUNICATION"));
 
     return iface;
 }
@@ -30,8 +30,7 @@ BidIface bid_iface_barebone(Str name, Alloc *alloc)
 
 void bid_alias(BidIface *iface, Str name, BidType type)
 {
-    BidAlias alias = {name, nullstr, type};
-    vec_push(&iface->aliases, alias);
+    bid_alias_mangled(iface, name, nullstr, type);
 }
 
 void bid_alias_mangled(BidIface *iface, Str name, Str mangled, BidType type)
@@ -42,8 +41,7 @@ void bid_alias_mangled(BidIface *iface, Str name, Str mangled, BidType type)
 
 void bid_method(BidIface *iface, Str name, BidType request, BidType response)
 {
-    BidMethod method = {name, nullstr, request, response};
-    vec_push(&iface->methods, method);
+    bid_method_mangled(iface, name, nullstr, request, response);
 }
 
 void bid_method_mangled(BidIface *iface, Str name, Str mangled, BidType request, BidType response)
@@ -61,13 +59,7 @@ BidType bid_nil(void)
 
 BidType bid_primitive(Str str)
 {
-    return (BidType){
-        .type = BID_TYPE_PRIMITIVE,
-        .primitive_ = {
-            .name = str,
-            .mangled = nullstr,
-        },
-    };
+    return bid_primitive_mangled(str, nullstr);
 }
 
 BidType bid_primitive_mangled(Str str, Str mangled)
@@ -92,14 +84,9 @@ BidType bid_enum(Alloc *alloc)
     };
 }
 
-void bid_enum_member(BidType *enum_, Str name)
+void bid_enum_constant(BidType *enum_, Str name)
 {
-    BidEnumMember member;
-
-    member.name = name;
-    member.mangled = nullstr;
-
-    vec_push(&enum_->enum_.members, member);
+    bid_enum_constant_mangled(enum_, name, nullstr);
 }
 
 void bid_enum_constant_mangled(BidType *enum_, Str name, Str mangled)

@@ -93,7 +93,7 @@ static void parse_enum_constant(Scan *scan, BidType *enum_)
 
     while (!skip_separator(scan, '}') && !scan_ended(scan))
     {
-        bid_enum_member(enum_, parse_ident(scan));
+        bid_enum_constant(enum_, parse_ident(scan));
         skip_separator(scan, ',');
     }
 }
