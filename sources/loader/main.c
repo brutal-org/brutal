@@ -53,10 +53,10 @@ void loader_load(Elf64Header const *elf_header, void *base)
         {
             void *file_segment = (void *)((uint64_t)base + prog_header->file_offset);
 
-            void *mem_phys_segment = (void *)loader_phys_alloc_page(ALIGN_UP(prog_header->memory_size, PAGE_SIZE) / PAGE_SIZE);
+            void *mem_phys_segment = (void *)kernel_module_phys_alloc_page(ALIGN_UP(prog_header->memory_size, PAGE_SIZE) / PAGE_SIZE, prog_header->virtual_address - 0xffffffff80000000);
 
             mem_cpy(mem_phys_segment, file_segment, prog_header->file_size);
-
+            mem_set(mem_phys_segment + prog_header->file_size, 0, prog_header->memory_size - prog_header->file_size);
             memory_map_range((VmmRange){
                                  .base = prog_header->virtual_address,
                                  .size = ALIGN_UP(prog_header->memory_size, PAGE_SIZE),
@@ -65,6 +65,10 @@ void loader_load(Elf64Header const *elf_header, void *base)
                                  .base = (uintptr_t)mem_phys_segment,
                                  .size = ALIGN_UP(prog_header->memory_size, PAGE_SIZE),
                              });
+        }
+        else 
+        {
+            log$("unkown header: {}", prog_header->type);
         }
 
         prog_header = (Elf64ProgramHeader *)((void *)prog_header + elf_header->program_header_table_entry_size);
@@ -82,6 +86,7 @@ EntryPointFn loader_load_kernel(Str path)
     reader = io_file_reader(&file);
     buf = io_readall((&reader), alloc_global());
 
+    log$("Loaded elf file...");
     Elf64Header *header = (Elf64Header *)buf.data;
 
     if (buf.used < sizeof(Elf64Header) ||

@@ -8,6 +8,8 @@ typedef uintptr_t Pages;
 typedef Range(uint64_t) VmmRange;
 typedef Range(uint64_t) PmmRange;
 
+#define UEFI_MEM_BRUTAL_KERNEL_MODULE (0x80000ff0)
+
 #define PAGE_SIZE (0x1000)
 
 #define PAGE_ADDR (~(((uint64_t)0b11111111111)))
@@ -32,6 +34,8 @@ void memory_flush_tlb(void);
 void memory_map_range(VmmRange vmm_range, PmmRange pmm_range);
 
 uint64_t loader_phys_alloc_page(size_t count);
+
+uint64_t kernel_module_phys_alloc_page(size_t count, uint64_t addr);
 
 static inline uintptr_t memory_phys_to_io(uintptr_t phys_addr)
 {

@@ -7,6 +7,24 @@
 
 static Pages *pages;
 
+uint64_t kernel_module_phys_alloc_page(size_t count, uint64_t addr)
+{
+    uint64_t res = addr;
+
+    // type, memory type, pages, memory
+    EFIStatus status = efi_st()->boot_services->allocate_pages(ALLOCATE_ADDRESS, UEFI_MEM_BRUTAL_KERNEL_MODULE, count, &res);
+
+    if (status != EFI_SUCCESS)
+    {
+        log$("Failed to allocate {} pages of memory: {}", count, status);
+        return 0;
+    }
+
+    mem_set((void *)res, 0, PAGE_SIZE * count);
+
+    return res;
+}
+
 uint64_t loader_phys_alloc_page(size_t count)
 {
     uint64_t res = 0;

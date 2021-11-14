@@ -4,6 +4,7 @@
 #include <efi/lib.h>
 #include <efi/srvs.h>
 #include "loader/protocol.h"
+#include "loader/memory.h"
 
 static HandoverMmapType efi_mmap_type_to_handover[] = {
     [EFI_RESERVED_MEMORY_TYPE] = HANDOVER_MMAP_RESERVED,
@@ -44,7 +45,16 @@ HandoverMmap get_mmap(void)
         uint64_t len = desc->num_pages << 12;
         uint64_t phys_base = desc->physical_start;
 
-        HandoverMmapType type = efi_mmap_type_to_handover[desc->type];
+        HandoverMmapType type;
+
+        if (desc->type == UEFI_MEM_BRUTAL_KERNEL_MODULE)
+        {
+            type = HANDOVER_MMAP_KERNEL_MODULE;
+        }
+        else
+        {
+            type = efi_mmap_type_to_handover[desc->type];
+        }
 
         if (previous_entry != nullptr &&
             previous_entry->type == type &&

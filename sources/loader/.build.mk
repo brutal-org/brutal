@@ -101,8 +101,8 @@ run-loader: $(LOADER) $(KERNEL) $(BINDIR_LOADER)/tools/OVMF.fd
 	cp $(LOADER) $(BINDIR_LOADER)/image/EFI/BOOT/BOOTX64.EFI
 
 	qemu-system-x86_64 \
-		-serial stdio \
-		-m 256 \
+		-serial stdio -enable-kvm\
+		-m 256 -no-reboot -no-shutdown\
 		-bios $(BINDIR_LOADER)/tools/OVMF.fd \
 		-drive file=fat:rw:$(BINDIR_LOADER)/image,media=disk,format=raw
 
