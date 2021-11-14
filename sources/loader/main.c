@@ -53,7 +53,7 @@ void loader_load(Elf64Header const *elf_header, void *base)
         {
             void *file_segment = (void *)((uint64_t)base + prog_header->file_offset);
 
-            void *mem_phys_segment = (void *)kernel_module_phys_alloc_page(ALIGN_UP(prog_header->memory_size, PAGE_SIZE) / PAGE_SIZE, prog_header->virtual_address - 0xffffffff80000000);
+            void *mem_phys_segment = (void *)kernel_module_phys_alloc_page_addr(ALIGN_UP(prog_header->memory_size, PAGE_SIZE) / PAGE_SIZE, prog_header->virtual_address - 0xffffffff80000000);
 
             mem_cpy(mem_phys_segment, file_segment, prog_header->file_size);
             mem_set(mem_phys_segment + prog_header->file_size, 0, prog_header->memory_size - prog_header->file_size);
@@ -107,6 +107,22 @@ EntryPointFn loader_load_kernel(Str path)
 
     return (EntryPointFn)entry;
 }
+#define MMAP_KERNEL_BASE (0xffffffff80000000)
+Handover* allocate_handover(void)
+{
+    uintptr_t handover_copy_phys = kernel_module_phys_alloc_page((sizeof(Handover)/ PAGE_SIZE)+1);
+
+    memory_map_range((VmmRange){
+        .base = handover_copy_phys + MMAP_KERNEL_BASE,
+        .size = ALIGN_UP(sizeof(Handover), PAGE_SIZE),
+    }, 
+    (PmmRange){
+        .base = handover_copy_phys,
+        .size = ALIGN_UP(sizeof(Handover), PAGE_SIZE),
+    });
+    memory_flush_tlb();
+    return (Handover*)(handover_copy_phys + MMAP_KERNEL_BASE);
+}
 
 void loader_boot(LoaderEntry *entry)
 {
@@ -115,12 +131,12 @@ void loader_boot(LoaderEntry *entry)
     EntryPointFn entry_point = loader_load_kernel(entry->kernel);
 
     log$("Kernel loaded, jumping in to it...");
-
-    Handover handover = get_handover();
+    Handover* handover = allocate_handover();
+    *handover = get_handover();
 
     efi_deinit();
 
-    entry_point(&handover, 0xC001B001);
+    entry_point(handover, 0xC001B001);
 
     panic$("entry_point should no return!");
 }
