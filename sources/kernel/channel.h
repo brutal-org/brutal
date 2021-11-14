@@ -1,12 +1,12 @@
 #pragma once
 
 #include <brutal/ds.h>
-#include "kernel/envelope.h"
+#include "kernel/parcel.h"
 
 typedef struct
 {
     Lock lock;
-    Ring(Envelope) msgs;
+    Ring(Parcel) msgs;
 } Channel;
 
 Channel *channel_create(void);

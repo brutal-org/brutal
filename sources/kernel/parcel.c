@@ -1,6 +1,6 @@
-#include "kernel/envelope.h"
+#include "kernel/parcel.h"
 
-BrResult envelope_send(Envelope *self, BrMsg const *msg, Domain *domain)
+BrResult parcel_pack(Parcel *self, BrMsg const *msg, Domain *domain)
 {
     self->msg = *msg;
 
@@ -17,7 +17,7 @@ BrResult envelope_send(Envelope *self, BrMsg const *msg, Domain *domain)
 
             if (!self->objs[i])
             {
-                envelope_deinit(self);
+                parcel_deinit(self);
 
                 return BR_BAD_HANDLE;
             }
@@ -27,13 +27,13 @@ BrResult envelope_send(Envelope *self, BrMsg const *msg, Domain *domain)
     return BR_SUCCESS;
 }
 
-BrResult envelope_recv(Envelope *self, BrMsg *msg, Domain *domain)
+BrResult parcel_unpack(Parcel *self, BrMsg *msg, Domain *domain)
 {
     *msg = self->msg;
 
     if (domain == nullptr)
     {
-        envelope_deinit(self);
+        parcel_deinit(self);
 
         return BR_SUCCESS;
     }
@@ -46,12 +46,12 @@ BrResult envelope_recv(Envelope *self, BrMsg *msg, Domain *domain)
         }
     }
 
-    envelope_deinit(self);
+    parcel_deinit(self);
 
     return BR_SUCCESS;
 }
 
-void envelope_deinit(Envelope *self)
+void parcel_deinit(Parcel *self)
 {
     for (size_t i = 0; i < BR_MSG_ARG_COUNT; i++)
     {

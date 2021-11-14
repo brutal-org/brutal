@@ -233,7 +233,7 @@ This syscall drop one or more task capabilities.
   - `BR_SUCCESS`
   - `BR_BAD_ID`: (only when sending) `to` was not a valid Id.
   - `BR_CHANNEL_FULL`: (only when sending) The target process has received too many messages.
-  - `BR_BAD_HANDLE`: (only when sending) An handle in `msg` envelope was not valid.
+  - `BR_BAD_HANDLE`: (only when sending) An handle in `msg` parcel was not valid.
   - `BR_CHANNEL_EMPTY`: (only when receiving) The message channel was empty.
 
 This syscall is used for any IPC action. `deadline` is in tick (or currently in `ms`). If `deadline` is equal to 0 then the process will wait until a message is received.

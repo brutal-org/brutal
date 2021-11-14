@@ -19,15 +19,15 @@ void channel_destroy(Channel *self)
 
 static BrResult channel_send_unlock(Channel *self, Domain *domain, BrMsg const *msg)
 {
-    Envelope env = {};
-    BrResult res = envelope_send(&env, msg, domain);
+    Parcel parcel = {};
+    BrResult res = parcel_pack(&parcel, msg, domain);
 
     if (res != BR_SUCCESS)
     {
         return res;
     }
 
-    if (!ring_push(&self->msgs, &env))
+    if (!ring_push(&self->msgs, &parcel))
     {
         return BR_CHANNEL_FULL;
     }
@@ -37,14 +37,14 @@ static BrResult channel_send_unlock(Channel *self, Domain *domain, BrMsg const *
 
 static BrResult channel_recv_unlock(Channel *self, Domain *domain, BrMsg *msg)
 {
-    Envelope env = {};
+    Parcel parcel = {};
 
-    if (!ring_pop(&self->msgs, &env))
+    if (!ring_pop(&self->msgs, &parcel))
     {
         return BR_CHANNEL_EMPTY;
     }
 
-    envelope_recv(&env, msg, domain);
+    parcel_unpack(&parcel, msg, domain);
 
     return BR_SUCCESS;
 }
