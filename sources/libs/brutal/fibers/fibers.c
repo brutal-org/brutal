@@ -43,17 +43,17 @@ static void fiber_free(Fiber *self)
 
 static void fiber_main(void)
 {
-    current->fn();
-    fiber_ret();
+    fiber_ret(current->fn(current->args));
 }
 
-Fiber *fiber_start(FiberFn fn)
+Fiber *fiber_start(FiberFn fn, void *args)
 {
     Fiber *self = fiber_alloc();
 
     static int id = 0;
     self->id = id++;
     self->fn = fn;
+    self->args = args;
 
     if (fn != nullptr)
     {
@@ -79,31 +79,46 @@ FiberBlockResult fiber_block(FiberBlocker blocker)
     return current->blocker.result;
 }
 
-void fiber_ret(void)
+void fiber_ret(void *ret)
 {
+    current->ret = ret;
     current->state = FIBER_CANCELING;
     fiber_yield();
 }
 
-static bool wait_fiber(Fiber *fiber)
+typedef struct
 {
-    if (fiber->state != FIBER_CANCELING)
+    Fiber *fiber;
+    void *ret;
+} FiberAwaitCtx;
+
+static bool wait_fiber(FiberAwaitCtx *ctx)
+{
+    if (ctx->fiber->state != FIBER_CANCELING)
     {
         return false;
     }
 
-    fiber->state = FIBER_CANCELED;
+    ctx->fiber->state = FIBER_CANCELED;
+    ctx->fiber->ret = ctx->fiber->ret;
 
     return true;
 }
 
-void fiber_await(Fiber *fiber)
+void *fiber_await(Fiber *fiber)
 {
+    FiberAwaitCtx ctx = {
+        fiber,
+        nullptr,
+    };
+
     fiber_block((FiberBlocker){
         .function = (FiberBlockerFn *)wait_fiber,
-        .context = fiber,
+        .context = &ctx,
         .deadline = -1,
     });
+
+    return ctx.ret;
 }
 
 static bool fiber_try_unblock(Fiber *self)

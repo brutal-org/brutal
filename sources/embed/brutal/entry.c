@@ -40,7 +40,7 @@ WEAK int br_entry_handover(
 
 void _entry(BrStartType type, long arg1, long arg2, long arg3, long arg4, long arg5)
 {
-    fiber_start(nullptr);
+    fiber_start(nullptr, nullptr);
 
     int exit_value = -1;
 

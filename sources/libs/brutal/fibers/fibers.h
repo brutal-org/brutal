@@ -7,7 +7,7 @@
 
 #define FIBER_CURRENT_RUNNING_PROC (nullptr)
 
-typedef void FiberFn(void);
+typedef void *FiberFn(void *arg);
 
 typedef struct PACKED
 {
@@ -57,6 +57,8 @@ struct fiber
     FiberBlocker blocker;
 
     FiberFn *fn;
+    void *args;
+    void *ret;
 
     void *stack;
     FibersContext ctx;
@@ -67,13 +69,13 @@ struct fiber
 
 void fiber_yield(void);
 
-Fiber *fiber_start(FiberFn call);
+Fiber *fiber_start(FiberFn fn, void *args);
 
 FiberBlockResult fiber_block(FiberBlocker blocker);
 
-void fiber_ret(void);
+void fiber_ret(void *ret);
 
-void fiber_await(Fiber *fiber);
+void *fiber_await(Fiber *fiber);
 
 Fiber *fiber_self(void);
 

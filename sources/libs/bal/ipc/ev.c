@@ -56,7 +56,7 @@ static void req_dispatch(void)
             if (!message_handeled)
             {
                 ev_arg = ipc;
-                fiber_start((FiberFn *)br_ev_handle);
+                fiber_start((FiberFn *)br_ev_handle, nullptr);
             }
         }
 
@@ -68,7 +68,7 @@ static void ensure_dispatcher(void)
 {
     if (dispatcher == nullptr)
     {
-        dispatcher = fiber_start(req_dispatch);
+        dispatcher = fiber_start((FiberFn *)req_dispatch, nullptr);
         dispatcher->state = FIBER_IDLE;
     }
 }
