@@ -1,32 +1,17 @@
 #include <bal/abi.h>
 #include <bal/ipc/ev.h>
 #include <brutal/debug.h>
-#include <brutal/fibers.h>
 
-typedef struct ipc_job
-{
-    uint32_t seq;
-    bool ok;
-    BrMsg *resp;
-
-    struct ipc_job *next;
-    struct ipc_job *prev;
-} IpcJob;
-
-static Fiber *dispatcher = nullptr;
-static IpcJob *jobs = nullptr;
-static BrIpcArgs ev_arg;
-
-WEAK void br_event(MAYBE_UNUSED BrMsg const *msg)
+WEAK void br_event(MAYBE_UNUSED IpcEv *self, MAYBE_UNUSED BrMsg const *msg)
 {
 }
 
-void br_ev_handle()
+void br_ev_handle(IpcEv *self)
 {
-    BrMsg m = ev_arg.msg;
-    br_event(&m);
+    BrMsg m = self->ev_arg.msg;
+    br_event(self, &m);
 }
-static void req_dispatch(void)
+static void req_dispatch(IpcEv *self)
 {
     while (true)
     {
@@ -41,7 +26,7 @@ static void req_dispatch(void)
         {
             bool message_handeled = false;
 
-            for (IpcJob *j = jobs; j; j = j->next)
+            for (IpcJob *j = self->jobs; j; j = j->next)
             {
                 if (j->seq == ipc.msg.seq)
                 {
@@ -55,8 +40,8 @@ static void req_dispatch(void)
 
             if (!message_handeled)
             {
-                ev_arg = ipc;
-                fiber_start((FiberFn *)br_ev_handle, nullptr);
+                self->ev_arg = ipc;
+                fiber_start((FiberFn *)br_ev_handle, self);
             }
         }
 
@@ -64,38 +49,29 @@ static void req_dispatch(void)
     }
 }
 
-static void ensure_dispatcher(void)
+static void queue_job(IpcEv *self, IpcJob *job)
 {
-    if (dispatcher == nullptr)
+    if (self->jobs)
     {
-        dispatcher = fiber_start((FiberFn *)req_dispatch, nullptr);
-        dispatcher->state = FIBER_IDLE;
-    }
-}
+        job->next = self->jobs->next;
+        job->prev = self->jobs;
 
-static void queue_job(IpcJob *job)
-{
-    if (jobs)
-    {
-        job->next = jobs->next;
-        job->prev = jobs;
-
-        jobs->next->prev = job;
-        jobs->next = job;
+        self->jobs->next->prev = job;
+        self->jobs->next = job;
     }
     else
     {
-        jobs = job;
-        jobs->next = jobs;
-        jobs->prev = jobs;
+        self->jobs = job;
+        self->jobs->next = self->jobs;
+        self->jobs->prev = self->jobs;
     }
 }
 
-static void dequeue_job(IpcJob *job)
+static void dequeue_job(IpcEv *self, IpcJob *job)
 {
     if (job == job->next)
     {
-        jobs = nullptr;
+        self->jobs = nullptr;
     }
     else
     {
@@ -104,23 +80,32 @@ static void dequeue_job(IpcJob *job)
     }
 }
 
-static bool req_wait(IpcJob *job)
+typedef struct
 {
-    ensure_dispatcher();
-    if (!job->ok)
+    IpcEv *ev;
+    IpcJob *job;
+} ReqWaitCtx;
+
+static bool req_wait(ReqWaitCtx *ctx)
+{
+    if (!ctx->job->ok)
     {
         return false;
     }
 
-    dequeue_job(job);
+    dequeue_job(ctx->ev, ctx->job);
 
     return true;
 }
 
-BrResult br_ev_req(BrId to, BrMsg *req, BrMsg *resp)
+void br_ev_init(IpcEv *self)
 {
-    ensure_dispatcher();
+    self->dispatcher = fiber_start((FiberFn *)req_dispatch, self);
+    self->dispatcher->state = FIBER_IDLE;
+}
 
+BrResult br_ev_req(IpcEv *self, BrId to, BrMsg *req, BrMsg *resp)
+{
     static uint32_t seq = 0;
     req->seq = seq++;
 
@@ -135,21 +120,19 @@ BrResult br_ev_req(BrId to, BrMsg *req, BrMsg *resp)
     job.seq = req->seq;
     job.resp = resp;
 
-    queue_job(&job);
+    queue_job(self, &job);
 
     fiber_block((FiberBlocker){
         .function = (FiberBlockerFn *)req_wait,
-        .context = (void *)&job,
+        .context = (void *)&(ReqWaitCtx){self, &job},
         .deadline = -1,
     });
 
     return BR_SUCCESS;
 }
 
-BrResult br_ev_resp(BrMsg const *req, BrMsg *resp)
+BrResult br_ev_resp(MAYBE_UNUSED IpcEv *self, BrMsg const *req, BrMsg *resp)
 {
-    ensure_dispatcher();
-
     resp->seq = req->seq;
 
     return br_ipc(&(BrIpcArgs){
@@ -160,32 +143,26 @@ BrResult br_ev_resp(BrMsg const *req, BrMsg *resp)
     });
 }
 
-static bool running = false;
-static int exit_code = 0;
-
-static bool wait_exit(MAYBE_UNUSED void *context)
+static bool wait_exit(MAYBE_UNUSED IpcEv *self)
 {
-    return !running;
+    return !self->running;
 }
 
-int br_ev_run(void)
+int br_ev_run(IpcEv *self)
 {
-    dispatcher = nullptr;
-    ensure_dispatcher();
-
-    running = true;
+    self->running = true;
 
     fiber_block((FiberBlocker){
         .context = nullptr,
-        .function = wait_exit,
+        .function = (FiberBlockerFn *)wait_exit,
         .deadline = BR_DEADLINE_INFINITY,
     });
 
-    return exit_code;
+    return self->exit_code;
 }
 
-void br_ev_exit(int value)
+void br_ev_exit(IpcEv *self, int value)
 {
-    running = false;
-    exit_code = value;
+    self->exit_code = value;
+    self->running = false;
 }
