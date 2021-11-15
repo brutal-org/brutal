@@ -15,23 +15,23 @@
 					"name" : "init"
 				},
 				{
-					"path" : "/server/posix",
+					"path" : "/servers/posix",
 					"name" : "posix"
 				},
 				{
-					"path" : "/server/echo",
+					"path" : "/servers/echo",
 					"name" : "echo"
 				}, 
 				{
-					"path" : "/server/acpi",
+					"path" : "/servers/acpi",
 					"name" : "acpi"
 				},
 				{
-					"path" : "/server/pci",
+					"path" : "/servers/pci",
 					"name" : "pci"
 				},
 				{
-					"path" : "/server/ps2",
+					"path" : "/servers/ps2",
 					"name" : "ps2"
 				},
 				{
