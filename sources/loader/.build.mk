@@ -93,16 +93,18 @@ $(BINDIR_LOADER)/tools/OVMF.fd:
 
 loader: $(LOADER)
 
-run-loader: $(LOADER) $(KERNEL) $(BINDIR_LOADER)/tools/OVMF.fd
-
+run-loader: $(LOADER) $(SERVERS) $(KERNEL) $(BINDIR_LOADER)/tools/OVMF.fd
+	$(MKCWD)
 	mkdir -p $(BINDIR_LOADER)/image/EFI/BOOT/
+	mkdir -p $(BINDIR_LOADER)/image/servers
 	cp $(KERNEL) $(BINDIR_LOADER)/image/kernel.elf
+	cp $(SERVERS) $(BINDIR_LOADER)/image/servers
 	cp sources/loader/config.json $(BINDIR_LOADER)/image/config.json
 	cp $(LOADER) $(BINDIR_LOADER)/image/EFI/BOOT/BOOTX64.EFI
 
 	qemu-system-x86_64 \
 		-serial stdio -enable-kvm\
-		-m 256 -no-reboot -no-shutdown\
+		-smp 4 -m 256 -no-reboot -no-shutdown\
 		-bios $(BINDIR_LOADER)/tools/OVMF.fd \
 		-drive file=fat:rw:$(BINDIR_LOADER)/image,media=disk,format=raw
 

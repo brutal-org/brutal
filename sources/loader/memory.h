@@ -26,6 +26,7 @@ typedef Range(uint64_t) PmmRange;
 #define PML1_GET_INDEX(ADDR) PMLX_GET_INDEX(ADDR, 0)
 
 #define MMAP_IO_BASE (0xffff800000000000)
+#define MMAP_KERNEL_BASE (0xffffffff80000000)
 
 void memory_init(void);
 
@@ -38,7 +39,6 @@ uint64_t loader_phys_alloc_page(size_t count);
 uint64_t kernel_module_phys_alloc_page_addr(size_t count, uint64_t addr);
 
 uint64_t kernel_module_phys_alloc_page(size_t count);
-
 
 static inline uintptr_t memory_phys_to_io(uintptr_t phys_addr)
 {

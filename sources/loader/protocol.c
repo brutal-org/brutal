@@ -1,10 +1,11 @@
 #include <bal/abi.h>
 #include <brutal/alloc.h>
 #include <brutal/debug.h>
+#include <brutal/io.h>
 #include <efi/lib.h>
 #include <efi/srvs.h>
-#include "loader/protocol.h"
 #include "loader/memory.h"
+#include "loader/protocol.h"
 
 static HandoverMmapType efi_mmap_type_to_handover[] = {
     [EFI_RESERVED_MEMORY_TYPE] = HANDOVER_MMAP_RESERVED,
@@ -145,11 +146,56 @@ HandoverFramebuffer get_framebuffer(EFIBootServices *bs)
         .bpp = gop_info->pixel_format,
     };
 }
-
-Handover get_handover(void)
+static void load_module_data(HandoverModule *target, Str path)
 {
+    IoFile file;
+    IoReader reader;
+    Buf buf;
+
+    io_file_open(&file, path);
+    reader = io_file_reader(&file);
+
+    // TODO: make a kernel_module alloc instead of allocating 2 time (even if the first time is always freed)
+    buf = io_readall((&reader), alloc_global());
+
+    uintptr_t buf_page_size = ALIGN_UP(buf.used, PAGE_SIZE) / PAGE_SIZE;
+    uintptr_t module_addr = kernel_module_phys_alloc_page(buf_page_size);
+
+    memcpy((void *)module_addr, buf.data, buf.used);
+
+    target->size = ALIGN_UP(buf.used, PAGE_SIZE);
+    target->addr = module_addr;
+
+    buf_deinit(&buf);
+
+    log$("Loading module data '{}' (size: {})...", path, target->size);
+}
+static HandoverModules get_handover_modules(const LoaderEntry *entry)
+{
+    HandoverModules res = {};
+    int id = 0;
+    vec_foreach(module, &entry->modules)
+    {
+        HandoverModule *target = &res.module[id];
+
+        memcpy(target->module_name.buf, module.name.buf, module.name.len);
+        target->module_name.len = module.name.len;
+
+        load_module_data(target, module.path);
+
+        id++;
+    }
+
+    res.size = id;
+
+    return res;
+}
+Handover get_handover(const LoaderEntry *entry)
+{
+
     EFIBootServices *bs = efi_st()->boot_services;
     HandoverFramebuffer fb = get_framebuffer(bs);
+    HandoverModules modules = get_handover_modules(entry);
     uintptr_t rsdp = get_rsdp();
     HandoverMmap mmap = get_mmap();
 
@@ -157,5 +203,6 @@ Handover get_handover(void)
         .framebuffer = fb,
         .rsdp = rsdp,
         .mmap = mmap,
+        .modules = modules,
     };
 }

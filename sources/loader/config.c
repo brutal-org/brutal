@@ -10,6 +10,25 @@ LoaderEntry config_entry_parse(Json json)
     entry.name = json_get(json, str$("name")).string;
     entry.kernel = json_get(json, str$("kernel")).string;
 
+    Json modules;
+    if (json_try_get(json, str$("modules"), &modules))
+    {
+        vec_init(&entry.modules, alloc_global());
+
+        for (int i = 0; i < json_len(modules); i++)
+        {
+            Json module = json_at(modules, i);
+            LoaderModule current_module = {};
+
+            current_module.name = json_get(module, str$("name")).string;
+            current_module.path = json_get(module, str$("path")).string;
+
+            vec_push(&entry.modules, current_module);
+
+            log$("detected module: {} path: {}", current_module.name, current_module.path);
+        }
+    }
+
     return entry;
 }
 

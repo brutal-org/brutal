@@ -2,7 +2,13 @@
 	"entries" :	[
 		{
 			"name": "Brutal",
-			"kernel" : "/kernel.elf"
+			"kernel" : "/kernel.elf",
+			"modules" : [
+				{
+					"path" : "/servers/init",
+					"name" : "init"
+				}
+			]
 		}
 	]
 }

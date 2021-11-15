@@ -6,6 +6,7 @@
 typedef struct
 {
     Str path;
+    Str name;
 } LoaderModule;
 
 typedef struct
