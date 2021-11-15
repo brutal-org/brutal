@@ -152,13 +152,15 @@ HandoverFramebuffer get_framebuffer(EFIBootServices *bs, const LoaderFramebuffer
 
     EFIGraphicsOutputModeInfo *gop_info = gop->mode->info;
 
+    assert_truth(gop_info->pixel_format == PIXEL_BGR_8_BIT);
+
     return (HandoverFramebuffer){
         .present = true,
         .addr = gop->mode->framebuffer_base,
         .width = gop_info->horizontal_resolution,
         .height = gop_info->vertical_resolution,
-        .pitch = gop_info->pixels_per_scan_line * gop_info->pixel_format,
-        .bpp = gop_info->pixel_format,
+        .pitch = gop_info->pixels_per_scan_line * sizeof(uint32_t),
+        .bpp = 32,
     };
 }
 static void load_module_data(HandoverModule *target, Str path)
