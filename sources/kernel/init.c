@@ -97,6 +97,12 @@ void init_start(Handover const *handover)
     Str name = str$("init");
 
     HandoverModule const *elf_module = handover_find_module(handover, name);
+
+    if(elf_module == nullptr)
+    {
+        panic$("can't find 'init' handover module !");
+    }
+
     Elf64Header *elf_header = (Elf64Header *)mmap_phys_to_io(elf_module->addr);
     MemObj *elf_obj = mem_obj_pmm((HeapRange){elf_module->addr, elf_module->size}, MEM_OBJ_NONE);
 
