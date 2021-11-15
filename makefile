@@ -72,6 +72,7 @@ include sources/kernel/.build.mk
 include sources/bins/.cross.mk
 include sources/bins/.host.mk
 include sources/loader/.build.mk
+include sources/protos/.build.mk
 include sysroot/.build.mk
 
 .PHONY: all

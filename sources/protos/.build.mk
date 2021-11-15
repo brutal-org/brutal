@@ -2,15 +2,19 @@ PROTOS:=\
 	$(wildcard sources/protos/*.bid) \
 	$(wildcard sources/protos/*/*.bid)
 
-PROTOS_HEADERS:=$(patsubst sources/%.bid, $(BINDIR_CROSS)/%.h, $(PROTOS))
-PROTOS_SOURCES:=$(patsubst sources/%.bid, $(BINDIR_CROSS)/%.c, $(PROTOS))
+PROTOS_HEADERS:=$(patsubst %.bid, %.h, $(PROTOS))
+PROTOS_SOURCES:=$(patsubst %.bid, %.c, $(PROTOS))
 
 PROTOS_GENERATED:=$(PROTOS_HEADERS) $(PROTOS_SOURCES)
 
-$(BINDIR_CROSS)/%.h: sources/%.bid | $(BID_BIN)
-	$(BID_BIN) $< --header > $@
+%.h: %.bid $(BID_HOST_BIN)
+	@$(MKCWD)
+	@$(ECHO) "brutal BID" $@
+	@$(BID_HOST_BIN) $< --header > $@
 
-$(BINDIR_CROSS)/%.c: sources/%.bid | $(BID_BIN)
-	$(BID_BIN) $< --source > $@
+%.c: %.bid $(BID_HOST_BIN)
+	@$(MKCWD)
+	@$(ECHO) "brutal BID" $@
+	@$(BID_HOST_BIN) $< --source > $@
 
 all-protos: $(PROTOS_GENERATED)

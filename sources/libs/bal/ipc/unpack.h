@@ -42,4 +42,4 @@ void bal_unpack_str(BalUnpack *self, Str *str, Alloc *alloc);
 
 void bal_unpack_slice_impl(BalUnpack *self, VoidSlice *slice, BalUnpackFn *el, size_t el_size, Alloc *alloc);
 
-#define bal_unpack_slice(SELF, SLICE, EL, ALLOC) bal_unpack_slice_impl(SELF, (VoidSlice *)slice, el, sizeof(*slice->buf), alloc)
+#define bal_unpack_slice(SELF, SLICE, EL, ALLOC) bal_unpack_slice_impl(SELF, (VoidSlice *)(SLICE), EL, sizeof(*(SLICE)->buf), ALLOC)
