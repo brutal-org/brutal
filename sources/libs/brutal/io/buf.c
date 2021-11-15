@@ -78,11 +78,7 @@ IoReader buf_reader(Buf *self)
 
 static IoResult buf_write_impl(Buf *self, char const *data, MAYBE_UNUSED size_t offset, size_t size)
 {
-    for (size_t i = 0; i < size; i++)
-    {
-        buf_push(self, data[i]);
-    }
-
+    buf_push_impl(self, (uint8_t const *)data, size);
     return OK(IoResult, size);
 }
 
