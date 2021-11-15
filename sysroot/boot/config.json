@@ -1,0 +1,42 @@
+{
+	"entries": [
+		{
+			"name": "Brutal",
+			"kernel": "/boot/kernel.elf",
+			"framebuffer": {
+				"width": 465464,
+				"height": 1080
+			},
+			"modules": [
+				{
+					"name": "init",
+					"path": "/servers/init"
+				},
+				{
+					"name": "posix",
+					"path": "/servers/posix"
+				},
+				{
+					"name": "echo",
+					"path": "/servers/echo"
+				},
+				{
+					"name": "acpi",
+					"path": "/servers/acpi"
+				},
+				{
+					"name": "pci",
+					"path": "/servers/pci"
+				},
+				{
+					"name": "ps2",
+					"path": "/servers/ps2"
+				},
+				{
+					"name": "bootimg",
+					"path": "/boot/logo.tga"
+				}
+			]
+		}
+	]
+}

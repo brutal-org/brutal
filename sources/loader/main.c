@@ -13,34 +13,9 @@ typedef void (*EntryPointFn)(Handover *handover, uint64_t t) __attribute__((sysv
 
 void __chkstk() { return; }
 
-static char const *logo[] = {
-    "/yyyyo:yyyys  `:osys/.",
-    "  -hMMd .yMMN oNMMNmMMMh.",
-    "   -hd   .yNyMMy.  `+MMm`",
-    "/sssss:ssssyNMM`     dMM-",
-    "  :dMMd -hMMNoMMh:` .sMMd",
-    "   :dd   -hN /mMMMMMMNs`                 Press Enter to boot",
-    ".+++++y+++++y+++ydhdd+`                  Press ESC to shutdown",
-    ":MMMMMMMMMMMMMMMd: dMMNs`",
-    ":MMh     `MMMMd:   dMMMMd",
-    ":MMh      MMMy/////mMMMMM-",
-    ":MMh      MMNyMMMMMMMMMMm`",
-    ":MMNmmmmmmMMN sNMMMMMMMh.",
-    ".yyyyyyyyyyys  `/oyys+.",
-};
-
 void loader_splash(void)
 {
-    efi_tty_set_attribute(EFI_BLUE);
-
     print(io_std_out(), "Brutal boot\n");
-
-    efi_tty_set_attribute(EFI_WHITE);
-
-    for (size_t i = 0; i < sizeof(logo) / sizeof(*logo); i++)
-    {
-        print(io_std_out(), "{}\n", logo[i]);
-    }
 }
 
 void loader_load(Elf64Header const *elf_header, void *base)
@@ -77,14 +52,12 @@ void loader_load(Elf64Header const *elf_header, void *base)
 
 EntryPointFn loader_load_kernel(Str path)
 {
-    IoFile file;
-    IoReader reader;
-    Buf buf;
-
     log$("Loading elf file...");
+
+    IoFile file;
     io_file_open(&file, path);
-    reader = io_file_reader(&file);
-    buf = io_readall((&reader), alloc_global());
+    IoReader reader = io_file_reader(&file);
+    Buf buf = io_readall((&reader), alloc_global());
 
     log$("Loaded elf file...");
     Elf64Header *header = (Elf64Header *)buf.data;
@@ -107,7 +80,7 @@ EntryPointFn loader_load_kernel(Str path)
 
     return (EntryPointFn)entry;
 }
-#define MMAP_KERNEL_BASE (0xffffffff80000000)
+
 Handover *allocate_handover(void)
 {
     uintptr_t handover_copy_phys = kernel_module_phys_alloc_page((sizeof(Handover) / PAGE_SIZE) + 1);
@@ -120,6 +93,7 @@ Handover *allocate_handover(void)
                          .base = handover_copy_phys,
                          .size = ALIGN_UP(sizeof(Handover), PAGE_SIZE),
                      });
+
     memory_flush_tlb();
     return (Handover *)(handover_copy_phys + MMAP_KERNEL_BASE);
 }
@@ -141,25 +115,6 @@ void loader_boot(LoaderEntry *entry)
     panic$("entry_point should no return!");
 }
 
-void loader_menu(void)
-{
-    EFIInputKey key = efi_tty_get_key();
-    LoaderEntry entry = config_get_entry(str$("Brutal"), str$("/config.json"));
-
-    while (key.scan_code != SCAN_ESC)
-    {
-        if (key.unicode_char == CHAR_CARRIAGE_RETURN)
-        {
-            efi_tty_clear();
-            loader_boot(&entry);
-        }
-
-        key = efi_tty_get_key();
-    }
-
-    efi_st()->runtime_services->reset_system(EFI_RESET_SHUTDOWN, 0, 0, nullptr);
-}
-
 EFIStatus efi_main(EFIHandle handle, EFISystemTable *st)
 {
     efi_init(handle, st);
@@ -167,11 +122,12 @@ EFIStatus efi_main(EFIHandle handle, EFISystemTable *st)
     st->boot_services->set_watchdog_timer(0, 0, 0, nullptr);
 
     efi_tty_reset();
-    efi_tty_clear();
 
     memory_init();
     loader_splash();
-    loader_menu();
+
+    LoaderEntry entry = config_get_entry(str$("Brutal"), str$("/boot/config.json"));
+    loader_boot(&entry);
 
     panic$("loader_menu should no return!");
 }

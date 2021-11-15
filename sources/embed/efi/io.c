@@ -42,8 +42,6 @@ static EFISimpleFileSystemProtocol *efi_rootfs(void)
         return rootfs;
     }
 
-    log$("Opening rootfs...");
-
     EFIGUID guid = EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID;
 
     EFIStatus status = efi_st()->boot_services->open_protocol(
@@ -53,8 +51,6 @@ static EFISimpleFileSystemProtocol *efi_rootfs(void)
         efi_handle(),
         nullptr,
         EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL);
-
-    log$("Opening rootfs...ok");
 
     assert_truth(status == EFI_SUCCESS);
 
@@ -68,11 +64,7 @@ EFIFileProtocol *efi_rootdir(void)
         return rootdir;
     }
 
-    log$("Opening rootdir...");
-
     EFIStatus status = efi_rootfs()->open_volume(efi_rootfs(), &rootdir);
-
-    log$("Opening rootdir...ok");
 
     assert_truth(status == EFI_SUCCESS);
 

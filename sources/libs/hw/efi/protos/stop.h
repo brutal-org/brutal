@@ -69,6 +69,6 @@ typedef struct _EFI_SIMPLE_TEXT_OUTPUT
     EFI_TEXTO_CLEAR_SCREEN clear_screen;
     EFI_TEXTO_SET_CURSOR_POSITION set_cursor_position;
     EFI_TEXTO_ENABLE_CURSOR enable_cursor;
-    SimpleTextOutputMode *mode;
 
+    SimpleTextOutputMode *mode;
 } EFISimpleTextOutput;

@@ -146,11 +146,11 @@ static int get_gop_mode(EFIGraphicsOutputProtocol *gop, size_t req_width, size_t
             log$(" - {} = {}x{}", i, info->horizontal_resolution, info->vertical_resolution);
         }
     }
-    
+
     return 0;
 }
 
-HandoverFramebuffer get_framebuffer(EFIBootServices *bs, const LoaderFramebuffer *fb)
+static HandoverFramebuffer get_framebuffer(EFIBootServices *bs, LoaderFramebuffer const *fb)
 {
     EFIGraphicsOutputProtocol *gop;
     EFIStatus status;
@@ -179,6 +179,7 @@ HandoverFramebuffer get_framebuffer(EFIBootServices *bs, const LoaderFramebuffer
         .bpp = 32,
     };
 }
+
 static void load_module_data(HandoverModule *target, Str path)
 {
     IoFile file;
@@ -203,7 +204,8 @@ static void load_module_data(HandoverModule *target, Str path)
 
     log$("Loading module data '{}' (size: {})...", path, target->size);
 }
-static HandoverModules get_handover_modules(const LoaderEntry *entry)
+
+static HandoverModules get_handover_modules(LoaderEntry const *entry)
 {
     HandoverModules res = {};
     int id = 0;
@@ -223,11 +225,10 @@ static HandoverModules get_handover_modules(const LoaderEntry *entry)
 
     return res;
 }
-Handover get_handover(const LoaderEntry *entry)
-{
 
-    EFIBootServices *bs = efi_st()->boot_services;
-    HandoverFramebuffer fb = get_framebuffer(bs, &entry->framebuffer);
+Handover get_handover(LoaderEntry const *entry)
+{
+    HandoverFramebuffer fb = get_framebuffer(efi_st()->boot_services, &entry->framebuffer);
     HandoverModules modules = get_handover_modules(entry);
     uintptr_t rsdp = get_rsdp();
     HandoverMmap mmap = get_mmap();

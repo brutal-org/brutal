@@ -7,10 +7,10 @@ ARCH_KCFLAGS = \
 	-mno-sse \
 	-mno-sse2 \
 	-mno-red-zone \
-	-mcmodel=kernel 
+	-mcmodel=kernel
 
 ARCH_CFLAGS = \
-	-fsanitize=undefined 
+	-fsanitize=undefined
 
 CROSS_AS=nasm
 CROSS_ASFLAGS=-f elf64
@@ -19,6 +19,6 @@ QEMU_ARGS= \
 		-M q35 \
 		-smp 4 \
 		-m 256M \
-		-rtc base=localtime 
+		-rtc base=localtime
 
 QEMU_BOOT_METHOD=iso

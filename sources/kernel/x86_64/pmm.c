@@ -53,23 +53,19 @@ static void pmm_bitmap_initialize(HandoverMmap const *memory_map)
 
 static void pmm_load_memory_map(HandoverMmap const *memory_map)
 {
-    log$("Memory map:");
-
     size_t available_memory = 0;
 
     for (size_t i = 0; i < memory_map->size; i++)
     {
         HandoverMmapEntry entry = memory_map->entries[i];
 
-        size_t base = ALIGN_UP(entry.base, MEM_PAGE_SIZE);
-        size_t size = ALIGN_DOWN(entry.len, MEM_PAGE_SIZE);
-
-        log$("    {x}-{x} {}", base, base + size - 1, ho_mmtype_to_str(entry.type));
-
         if (entry.type != HANDOVER_MMAP_FREE)
         {
             continue;
         }
+
+        size_t base = ALIGN_UP(entry.base, MEM_PAGE_SIZE);
+        size_t size = ALIGN_DOWN(entry.len, MEM_PAGE_SIZE);
 
         pmm_unused((PmmRange){base, size});
 

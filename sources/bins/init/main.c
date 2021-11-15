@@ -71,21 +71,6 @@ static void display_bootimage(Handover const *handover)
 
     gfx_surface_clear(fb_surface, GFX_COLOR_BLACK);
 
-    gfx_rast_fill(
-        fb_surface,
-        (Edgesf){
-            4,
-            (Edgef[]){
-                {0, 0, 32, 0},
-                {32, 0, 32, 32},
-                {32, 32, 0, 0},
-            },
-        },
-        (Recti){0, 0, 1024, 1024},
-        (GfxPaint){.type = GFX_PAINT_FILL, .fill = GFX_COLOR_BLUE},
-        GFX_RAST_EVENODD,
-        alloc_global());
-
     gfx_surface_copy(
         fb_surface,
         img_surface,
@@ -138,10 +123,6 @@ BrResult srv_run(Handover const *handover, Str name, BrExecArgs const *args, BrT
 
 int br_entry_handover(Handover *handover)
 {
-    log$("Handover at {#p}", (void *)handover);
-
-    handover_dump(handover);
-
     if (handover->framebuffer.present)
     {
         display_bootimage(handover);

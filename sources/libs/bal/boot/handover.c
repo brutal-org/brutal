@@ -40,7 +40,7 @@ void handover_dump(Handover const *handover)
     {
         HandoverMmapEntry entry = handover->mmap.entries[i];
 
-        log$("\t{#p}-{#p} {}", entry.base, entry.base + entry.len - 1, entry.type);
+        log$("\t{#p}-{#p} {}", entry.base, entry.base + entry.len - 1, ho_mmtype_to_str(entry.type));
     }
 
     log$("Framebuffer:");

@@ -41,6 +41,9 @@ void arch_entry_main(Handover *handover)
 
     kernel_splash();
 
+    log$("Handover at {#p}", (void *)handover);
+    handover_dump(handover);
+
     gdt_initialize();
     idt_initialize();
     simd_initialize();
