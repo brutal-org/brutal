@@ -22,13 +22,15 @@ void buf_deinit(Buf *self)
 
 void buf_ensure(Buf *self, size_t capacity)
 {
+    capacity = MAX(capacity, 16);
+
     if (capacity <= self->capacity)
         return;
 
-    self->capacity = MAX(self->capacity, 2);
+    self->capacity = MAX(self->capacity, 16);
 
     while (self->capacity < capacity)
-        self->capacity += self->capacity / 2;
+        self->capacity += self->capacity / 4;
 
     if (self->capacity == 0)
     {
