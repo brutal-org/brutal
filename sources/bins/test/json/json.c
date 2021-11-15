@@ -63,7 +63,7 @@ TEST(json_parse_object_in_object)
 
 TEST(json_parse_table)
 {
-    Str base = str$("{ \"hello\": [ \"oh\", \"rust\", \"is\", \"cool\" ] }");
+    Str base = str$("{ \"hello\": [ \"oh\", \"rust\", { \"is\" : \"not\" }, \"cool\" ] }");
     Json json = json_parse_str(base, test_alloc());
 
     assert_truth(json_is(json, JSON_OBJECT));
@@ -74,6 +74,6 @@ TEST(json_parse_table)
 
     assert_str_equal(res.array.data[0].string, str$("oh"));
     assert_str_equal(res.array.data[1].string, str$("rust"));
-    assert_str_equal(res.array.data[2].string, str$("is"));
+    assert_truth(json_is(res.array.data[2], JSON_OBJECT));
     assert_str_equal(res.array.data[3].string, str$("cool"));
 }

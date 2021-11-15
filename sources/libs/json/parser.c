@@ -38,6 +38,8 @@ Json json_parse_array(Scan *scan, Alloc *alloc)
 
         if (!scan_skip(scan, ','))
         {
+            scan_skip_space(scan);
+            scan_skip(scan, ']');
             return ret;
         }
 
@@ -67,6 +69,8 @@ Json json_parse_object(Scan *scan, Alloc *alloc)
 
         if (!scan_skip(scan, ','))
         {
+            scan_skip_space(scan);
+            scan_skip(scan, '}');
             return ret;
         }
 
@@ -95,7 +99,7 @@ Json json_parse(Scan *scan, Alloc *alloc)
     {
         return json_false();
     }
-    else if (scan_skip_word(scan, str$("null"))) // boolean (false)
+    else if (scan_skip_word(scan, str$("null"))) // null
     {
         return json_null();
     }
