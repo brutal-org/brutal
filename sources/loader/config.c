@@ -29,6 +29,14 @@ LoaderEntry config_entry_parse(Json json)
         }
     }
 
+    Json framebuffer;
+
+    if (json_try_get(json, str$("framebuffer"), &framebuffer))
+    {
+        entry.framebuffer.width = json_get(framebuffer, str$("width")).number;
+        entry.framebuffer.height = json_get(framebuffer, str$("height")).number;
+    }
+
     return entry;
 }
 

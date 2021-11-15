@@ -3,6 +3,12 @@
 		{
 			"name": "Brutal",
 			"kernel" : "/kernel.elf",
+
+			"framebuffer" : {
+				"width" : 1920,
+				"height": 1080
+			},
+
 			"modules" : [
 				{
 					"path" : "/servers/init",

@@ -11,9 +11,16 @@ typedef struct
 
 typedef struct
 {
+    size_t width;
+    size_t height;
+} LoaderFramebuffer;
+
+typedef struct
+{
     Str name;
     Str kernel;
     Vec(LoaderModule) modules;
+    LoaderFramebuffer framebuffer;
 } LoaderEntry;
 
 LoaderEntry config_get_entry(Str name, Str path);

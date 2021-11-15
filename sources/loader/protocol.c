@@ -113,22 +113,37 @@ uintptr_t get_rsdp()
     }
 }
 
-HandoverFramebuffer get_framebuffer(EFIBootServices *bs)
+static int get_gop_mode(EFIGraphicsOutputProtocol *gop, size_t req_width, size_t req_height)
+{
+    EFIGraphicsOutputModeInfo *info;
+    for (uint32_t i = 0; i < gop->mode->max_mode; i++)
+    {
+        size_t info_size = 0;
+        EFIStatus status = gop->query_mode(gop, i, &info_size, &info);
+        if (status == EFI_ERR)
+        {
+            log$("can't get info for: {}", i);
+        }
+
+        if (info->vertical_resolution == req_height && info->horizontal_resolution == req_width)
+        {
+            return i;
+        }
+    }
+
+    return 0;
+}
+
+HandoverFramebuffer get_framebuffer(EFIBootServices *bs, const LoaderFramebuffer *fb)
 {
     EFIGraphicsOutputProtocol *gop;
-    EFIGraphicsOutputModeInfo *info;
-    uint64_t size_of_info;
+    EFIStatus status;
 
     EFIGUID gop_guid = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
 
     bs->locate_protocol(&gop_guid, nullptr, (void **)&gop);
-
-    EFIStatus status = gop->query_mode(gop, gop->mode == nullptr ? 0 : gop->mode->mode, &size_of_info, &info);
-
-    if (status == EFI_NOT_STARTED)
-    {
-        status = gop->set_mode(gop, 0);
-    }
+    int mode = get_gop_mode(gop, fb->width, fb->height);
+    status = gop->set_mode(gop, mode);
 
     if (status != EFI_SUCCESS)
     {
@@ -194,7 +209,7 @@ Handover get_handover(const LoaderEntry *entry)
 {
 
     EFIBootServices *bs = efi_st()->boot_services;
-    HandoverFramebuffer fb = get_framebuffer(bs);
+    HandoverFramebuffer fb = get_framebuffer(bs, &entry->framebuffer);
     HandoverModules modules = get_handover_modules(entry);
     uintptr_t rsdp = get_rsdp();
     HandoverMmap mmap = get_mmap();
