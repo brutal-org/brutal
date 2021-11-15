@@ -47,6 +47,7 @@
   - Custom allocators
   - Generic data structures
   - Fibers
+- EFI Bootloader
 - Capability based micro-kernel
 - IDL compiler
 - C compiler

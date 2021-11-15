@@ -11,10 +11,11 @@ typedef struct
     IpcFn *fn;
 } BrEvCtx;
 
-void br_ev_handle(BrEvCtx *ctx)
+void *br_ev_handle(BrEvCtx *ctx)
 {
     BrMsg msg = *ctx->msg;
     ctx->fn(ctx->self, &msg, ctx->ctx);
+    return nullptr;
 }
 
 static void req_dispatch(IpcEv *self)
