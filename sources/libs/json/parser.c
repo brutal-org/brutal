@@ -11,9 +11,7 @@ static Str parse_str(Scan *scan)
 {
     scan_skip_space(scan);
     scan_expect(scan, '"');
-
     Str name = scan_skip_until(scan, is_closing_string);
-
     scan_expect(scan, '"');
     scan_skip_space(scan);
 
@@ -38,13 +36,13 @@ Json json_parse_array(Scan *scan, Alloc *alloc)
 
         if (!scan_skip(scan, ','))
         {
-            scan_skip_space(scan);
-            scan_skip(scan, ']');
-            return ret;
+            break;
         }
 
         scan_skip_space(scan);
     }
+
+    scan_expect(scan, ']');
 
     return ret;
 }
@@ -69,13 +67,14 @@ Json json_parse_object(Scan *scan, Alloc *alloc)
 
         if (!scan_skip(scan, ','))
         {
-            scan_skip_space(scan);
-            scan_skip(scan, '}');
-            return ret;
+            break;
         }
 
         scan_skip_space(scan);
     }
+
+    scan_expect(scan, '}');
+
     return ret;
 }
 
