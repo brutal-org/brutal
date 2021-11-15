@@ -95,10 +95,12 @@ loader: $(LOADER)
 
 run-loader: $(LOADER) $(SERVERS) $(KERNEL) $(BINDIR_LOADER)/tools/OVMF.fd
 	$(MKCWD)
-	mkdir -p $(BINDIR_LOADER)/image/EFI/BOOT/
-	mkdir -p $(BINDIR_LOADER)/image/servers
-	cp $(KERNEL) $(BINDIR_LOADER)/image/kernel.elf
+
+	cp -R sysroot $(BINDIR_LOADER)/image
 	cp $(SERVERS) $(BINDIR_LOADER)/image/servers
+
+	mkdir -p $(BINDIR_LOADER)/image/EFI/BOOT/
+	cp $(KERNEL) $(BINDIR_LOADER)/image/kernel.elf
 	cp sources/loader/config.json $(BINDIR_LOADER)/image/config.json
 	cp $(LOADER) $(BINDIR_LOADER)/image/EFI/BOOT/BOOTX64.EFI
 

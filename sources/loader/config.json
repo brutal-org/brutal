@@ -7,6 +7,30 @@
 				{
 					"path" : "/servers/init",
 					"name" : "init"
+				},
+				{
+					"path" : "/server/posix",
+					"name" : "posix"
+				},
+				{
+					"path" : "/server/echo",
+					"name" : "echo"
+				}, 
+				{
+					"path" : "/server/acpi",
+					"name" : "acpi"
+				},
+				{
+					"path" : "/server/pci",
+					"name" : "pci"
+				},
+				{
+					"path" : "/server/ps2",
+					"name" : "ps2"
+				},
+				{
+					"path" : "/boot/logo.tga",
+					"name" : "bootimg"
 				}
 			]
 		}
