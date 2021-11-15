@@ -17,7 +17,7 @@ static void display_bootimage(Handover const *handover)
         .type = BR_OBJECT_MEMORY,
         .mem_obj = {
             .addr = fb->addr,
-            .size = fb_size,
+            .size = ALIGN_UP(fb_size, 0x1000),
             .flags = BR_MEM_OBJ_PMM,
         },
     };
