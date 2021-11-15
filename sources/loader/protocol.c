@@ -131,6 +131,22 @@ static int get_gop_mode(EFIGraphicsOutputProtocol *gop, size_t req_width, size_t
         }
     }
 
+    log$("can't find efi gop mode for: {}x{}", req_width, req_height);
+    log$("available mode: ");
+    for (uint32_t i = 0; i < gop->mode->max_mode; i++)
+    {
+        size_t info_size = 0;
+        EFIStatus status = gop->query_mode(gop, i, &info_size, &info);
+        if (status == EFI_ERR)
+        {
+            log$(" - can't get info for: {}", i);
+        }
+        else
+        {
+            log$(" - {} = {}x{}", i, info->horizontal_resolution, info->vertical_resolution);
+        }
+    }
+    
     return 0;
 }
 
