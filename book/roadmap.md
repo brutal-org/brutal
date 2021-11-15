@@ -4,7 +4,7 @@ The following roadmap is always subject to change.
 
 ## Current Milestone
 
-### Milestone 3 - ACPI, PCIe, And BID
+### Milestone 3 - ACPI, PCIe, Bootloader And BID
 
 - [x] Fibers
 - [x] Event loop
@@ -21,6 +21,12 @@ The following roadmap is always subject to change.
     - [x] Server Code
     - [x] Serialization
 - [x] Mac support
+- [x] Bootloader
+  - [x] Load the kernel
+  - [x] Load modules
+  - [x] Pass handover information
+  - [x] Boot the kernel
+  - [x] Load modules
 
 ## Upcoming Milestones
 
@@ -125,10 +131,3 @@ The following roadmap is always subject to change.
 - [x] AST
 - [ ] Code gen (LLVM?)
 - [x] Code gen C
-
-### Bootloader
-
-- [x] Load the kernel
-- [x] Load modules
-- [x] Pass handover information
-- [ ] Boot the kernel
