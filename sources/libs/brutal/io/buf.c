@@ -22,20 +22,21 @@ void buf_deinit(Buf *self)
 
 void buf_ensure(Buf *self, size_t capacity)
 {
-    if (self->capacity >= capacity)
-    {
+    if (capacity <= self->capacity)
         return;
-    }
+
+    self->capacity = MAX(self->capacity, 2);
+
+    while (self->capacity < capacity)
+        self->capacity += self->capacity / 2;
 
     if (self->capacity == 0)
     {
-        self->data = (uint8_t *)alloc_calloc(self->alloc, 1, capacity);
-        self->capacity = capacity;
+        self->data = (uint8_t *)alloc_calloc(self->alloc, 1, self->capacity);
         return;
     }
 
-    self->data = (uint8_t *)alloc_resize(self->alloc, self->data, capacity);
-    self->capacity = capacity;
+    self->data = (uint8_t *)alloc_resize(self->alloc, self->data, self->capacity);
 }
 
 void buf_clear(Buf *self)
