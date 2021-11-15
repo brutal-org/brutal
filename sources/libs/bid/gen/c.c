@@ -76,7 +76,7 @@ static CType gen_func_method(BidMethod method, BidIface const iface, Alloc *allo
 {
     CType ctype = ctype_func(gen_type(iface.errors, alloc), alloc);
 
-    ctype_member(&ctype, str$("self"), ctype_ptr(ctype_name(str$("Srv"), alloc), alloc), alloc);
+    ctype_member(&ctype, str$("ev"), ctype_ptr(ctype_name(str$("IpcEv"), alloc), alloc), alloc);
 
     ctype_member(&ctype, str$("task"), ctype_name(str$("BrTask"), alloc), alloc);
 
@@ -309,6 +309,30 @@ CDecl gen_unpack_func(BidAlias alias, Alloc *alloc)
     return cdecl_func(name, type, body, alloc);
 }
 
+CStmt gen_method_body(BidMethod method, BidIface const iface, Alloc *alloc)
+{
+    CStmt block = cstmt_block(alloc);
+
+    CExpr pack_request = cexpr_call(alloc, cexpr_ident(str$("br_ev_req"), alloc));
+    cexpr_member(&pack_request, cexpr_ident(str$("ev"), alloc));
+    cexpr_member(&pack_request, cexpr_ident(str$("to"), alloc));
+    cexpr_member(&pack_request, cexpr_constant(cval_signed(iface.id)));
+
+    cexpr_member(&pack_request, cexpr_ident(str_fmt(alloc, "MSG_{case:constant}_REQ", method.mangled), alloc));
+    cexpr_member(&pack_request, cexpr_ident(str$("req"), alloc));
+    cexpr_member(&pack_request, cexpr_ident(gen_pack_name(method.request.primitive_.name, alloc), alloc));
+
+    cexpr_member(&pack_request, cexpr_ident(str_fmt(alloc, "MSG_{case:constant}_RESP", method.mangled), alloc));
+    cexpr_member(&pack_request, cexpr_ident(str$("resp"), alloc));
+    cexpr_member(&pack_request, cexpr_ident(gen_unpack_name(method.response.primitive_.name, alloc), alloc));
+
+    cexpr_member(&pack_request, cexpr_ident(str$("alloc"), alloc));
+
+    cstmt_block_add(&block, cstmt_return(pack_request));
+
+    return block;
+}
+
 CUnit bidgen_c_source(MAYBE_UNUSED BidIface const iface, Alloc *alloc)
 {
     CUnit unit = cunit(alloc);
@@ -319,6 +343,14 @@ CUnit bidgen_c_source(MAYBE_UNUSED BidIface const iface, Alloc *alloc)
     {
         cunit_decl(&unit, gen_pack_func(alias, alloc));
         cunit_decl(&unit, gen_unpack_func(alias, alloc));
+    }
+
+    vec_foreach(method, &iface.methods)
+    {
+        CType type = gen_func_method(method, iface, alloc);
+        CStmt body = gen_method_body(method, iface, alloc);
+
+        cunit_decl(&unit, cdecl_func(method.mangled, type, body, alloc));
     }
 
     return unit;

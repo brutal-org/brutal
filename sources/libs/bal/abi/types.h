@@ -204,7 +204,6 @@ typedef uint64_t BrTimeout;
 
 #define BR_MSG_NONE (0)
 #define BR_MSG_HND(I) (1 << (I))
-#define BR_MSG_ANY_HND (5 << 0)
 
 typedef uint32_t BrMsgFlags;
 
@@ -232,6 +231,8 @@ typedef struct
     BrMsgFlags flags;
     uint32_t seq;
     uint32_t prot;
+
+#define BR_MSG_ERROR (uint32_t)(-1)
     uint32_t type;
 
     union

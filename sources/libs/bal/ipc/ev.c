@@ -1,4 +1,5 @@
 #include <bal/abi.h>
+#include <bal/hw/shm.h>
 #include <bal/ipc/ev.h>
 #include <brutal/debug.h>
 
@@ -149,7 +150,7 @@ void br_ev_impl(IpcEv *self, uint32_t id, IpcFn *fn, void *ctx)
     vec_push(&self->protos, proto);
 }
 
-BrResult br_ev_req(IpcEv *self, BrId to, BrMsg *req, BrMsg *resp)
+BrResult br_ev_req_raw(IpcEv *self, BrId to, BrMsg *req, BrMsg *resp)
 {
     static uint32_t seq = 0;
     req->seq = seq++;
@@ -176,7 +177,56 @@ BrResult br_ev_req(IpcEv *self, BrId to, BrMsg *req, BrMsg *resp)
     return BR_SUCCESS;
 }
 
-BrResult br_ev_resp(MAYBE_UNUSED IpcEv *self, BrMsg const *req, BrMsg *resp)
+int br_ev_req(
+    IpcEv *self,
+    BrId to, int proto,
+    int req_id, void *req, BalPackFn *req_pack,
+    int resp_id, void *resp, BalUnpackFn *req_unpack,
+    Alloc *alloc)
+{
+
+    BrMsg req_msg = {};
+    BrMsg resp_msg = {};
+
+    // Packing
+
+    BalPack pack;
+    bal_pack_init(&pack);
+    req_pack(&pack, req);
+
+    req_msg.prot = proto;
+    req_msg.type = req_id;
+    req_msg.args[0] = pack.obj;
+    req_msg.flags = BR_MSG_HND(0);
+
+    br_ev_req_raw(self, to, &req_msg, &resp_msg);
+
+    // Error handeling
+
+    if (resp_msg.type == BR_MSG_ERROR)
+    {
+        return resp_msg.args[0];
+    }
+
+    // Unpacking
+
+    assert_equal(resp_msg.args[0], (BrArg)resp_id);
+
+    BalShm shm;
+    balshm_init_mobj(&shm, resp_msg.args[0]);
+
+    BalUnpack unpack;
+    bal_unpack_init(&unpack, shm.buf, shm.len);
+
+    req_unpack(&unpack, resp, alloc);
+
+    bal_pack_deinit(&pack);
+    balshm_deinit(&shm);
+
+    return 0;
+}
+
+BrResult br_ev_resp_raw(MAYBE_UNUSED IpcEv *self, BrMsg const *req, BrMsg *resp)
 {
     resp->seq = req->seq;
 

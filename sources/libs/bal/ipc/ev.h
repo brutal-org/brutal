@@ -1,6 +1,8 @@
 #pragma once
 
 #include <bal/abi.h>
+#include <bal/ipc/pack.h>
+#include <bal/ipc/unpack.h>
 #include <brutal/ds.h>
 #include <brutal/fibers.h>
 
@@ -43,9 +45,17 @@ void br_ev_deinit(IpcEv *self);
 
 void br_ev_impl(IpcEv *self, uint32_t id, IpcFn *fn, void *ctx);
 
-BrResult br_ev_req(IpcEv *self, BrId to, BrMsg *req, BrMsg *resp);
+BrResult br_ev_req_raw(IpcEv *self, BrId to, BrMsg *req, BrMsg *resp);
 
-BrResult br_ev_resp(IpcEv *self, BrMsg const *req, BrMsg *resp);
+int br_ev_req(
+    IpcEv *self,
+    BrId to,
+    int proto,
+    int req_id, void *req, BalPackFn *req_pack,
+    int resp_id, void *resp, BalUnpackFn *req_unpack,
+    Alloc *alloc);
+
+BrResult br_ev_resp_raw(IpcEv *self, BrMsg const *req, BrMsg *resp);
 
 int br_ev_run(IpcEv *self);
 
