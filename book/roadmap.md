@@ -37,9 +37,19 @@ The following roadmap is always subject to change.
 - [ ] Compositor
 - [ ] Shell
 
-### Milestone 5 - DOOM!
+### Milestone 5 - DOOM! / porting software
 
 - [ ] DOOM :rage2:
+- [ ] full libc implementation 
+  - [x] ctypes
+  - [x] math
+  - [x] assert
+  - [x] errno
+  - [ ] stdlib
+  - [ ] stdio
+  - [ ] string
+  - [ ] fenv 
+  - [ ] locale
 
 ## Past Milestones
 
