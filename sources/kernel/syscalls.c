@@ -346,7 +346,7 @@ BrResult sys_bind(BrBindArgs *args)
         return BR_BAD_CAPABILITY;
     }
 
-    return event_bind(task_self(), args->event, args->flags);
+    return event_bind(task_self(), args->event);
 }
 
 BrResult sys_unbind(BrUnbindArgs *args)

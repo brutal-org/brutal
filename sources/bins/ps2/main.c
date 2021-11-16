@@ -71,8 +71,8 @@ int br_entry_args(
     BrEvent keyboard_irq = {.type = BR_EVENT_IRQ, .irq = 1};
     BrEvent mouse_irq = {.type = BR_EVENT_IRQ, .irq = 16};
 
-    assert_br_success(br_bind(&(BrBindArgs){.event = keyboard_irq, .flags = BR_BIND_NONE}));
-    assert_br_success(br_bind(&(BrBindArgs){.event = mouse_irq, .flags = BR_BIND_NONE}));
+    assert_br_success(br_bind(&(BrBindArgs){.event = keyboard_irq}));
+    assert_br_success(br_bind(&(BrBindArgs){.event = mouse_irq}));
 
     BrIpcArgs ipc;
     ipc.flags = BR_IPC_RECV | BR_IPC_BLOCK;

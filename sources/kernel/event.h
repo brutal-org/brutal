@@ -8,13 +8,12 @@ typedef struct
 {
     Task const *task;
     BrEvent event;
-    BrBindFlags flags;
     bool ack;
 } EventBinding;
 
 void event_initialize(void);
 
-BrResult event_bind(Task const *task, BrEvent event, BrBindFlags flags);
+BrResult event_bind(Task const *task, BrEvent event);
 
 BrResult event_unbind(Task const *task, BrEvent event);
 

@@ -17,12 +17,14 @@ static EventBinding *event_binding_get(Task const *task, BrEvent event)
     {
         EventBinding *binding = bindings.data + i;
         if (binding->task == task && br_event_eq(binding->event, event))
+        {
             return binding;
+        }
     }
     return NULL;
 }
 
-BrResult event_bind(Task const *task, BrEvent event, BrBindFlags flags)
+BrResult event_bind(Task const *task, BrEvent event)
 {
     LOCK_RETAINER(&lock);
 
@@ -36,7 +38,6 @@ BrResult event_bind(Task const *task, BrEvent event, BrBindFlags flags)
     EventBinding binding = {
         .task = task,
         .event = event,
-        .flags = flags,
         .ack = true,
     };
 
@@ -103,11 +104,6 @@ void event_trigger(BrEvent event)
         {
             event_dispatch(binding.task, event);
             binding.ack = false;
-
-            if (binding.flags & BR_BIND_ONE_SHOT)
-            {
-                event_unbind_unlocked(binding.task, event);
-            }
         }
     }
 }
