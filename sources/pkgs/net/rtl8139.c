@@ -1,7 +1,7 @@
 #include <brutal/io.h>
-#include <brutal/log.h>
-#include <bal/io.h>
-#include <bal/helpers.h>
+#include <brutal/debug.h>
+#include <bal/hw.h>
+#include <bal/abi.h>
 #include <brutal/alloc.h>
 #include "driver.h"
 #include "rtl8139.h"
@@ -17,8 +17,8 @@ static const uint8_t tsad_reg[4] = {RTL8139_TSAD0,
 
 static void rtl8139_read_mac(RTL8139Device *dev)
 {
-    uint32_t mac1 = br_in32(dev->io_base + RTL8139_IDR0_REG);
-    uint16_t mac2 = br_in16(dev->io_base + RTL8139_IDR4_REG);
+    uint32_t mac1 = bal_io_in32(dev->io, RTL8139_IDR0_REG);
+    uint16_t mac2 = bal_io_in16(dev->io, RTL8139_IDR4_REG);
     dev->mac[0] = mac1 >> 0;
     dev->mac[1] = mac1 >> 8;
     dev->mac[2] = mac1 >> 16;
@@ -39,6 +39,7 @@ static void rtl8139_init_rx(RTL8139Device *dev)
         .type = BR_OBJECT_MEMORY,
         .mem_obj = {
             .size = ALIGN_UP(8192 + 16, MEM_PAGE_SIZE),
+            .flags = BR_MEM_OBJ_LOWER /* force lower memory */
         },
     };
 
@@ -53,38 +54,32 @@ static void rtl8139_init_rx(RTL8139Device *dev)
     assert_br_success(br_map(&map_args));
     dev->rx_buffer = (uint8_t *)map_args.vaddr;
 
-    br_out32(dev->io_base + RTL8139_RBSTART_REG, mem_obj_rx.mem_obj.addr);
+    bal_io_out32(dev->io, RTL8139_RBSTART_REG, mem_obj_rx.mem_obj.addr);
 }
 
 static void rtl8139_init_interrupt(RTL8139Device *dev)
 {
-    br_out16(dev->io_base + RTL8139_IMR_REG, RTL8139_IMR_ROK | RTL8139_IMR_TOK | RTL8139_IMR_RER | RTL8139_IMR_TER);
-    br_out32(dev->io_base + RTL8139_RCR_REG,
+    bal_io_out16(dev->io, RTL8139_IMR_REG, RTL8139_IMR_ROK | RTL8139_IMR_TOK | RTL8139_IMR_RER | RTL8139_IMR_TER);
+    bal_io_out32(dev->io, RTL8139_RCR_REG,
              RTL8139_RCR_ACCEPT_ALL | RTL8139_RCR_WRAP);
-    br_out8(dev->io_base + RTL8139_CR_REG, RTL8139_CR_TE | RTL8139_CR_RE);
+    bal_io_out8(dev->io, RTL8139_CR_REG, RTL8139_CR_TE | RTL8139_CR_RE);
 
-    BrCreateArgs rtl8139_irq = {
-        .type = BR_OBJECT_IRQ,
-        .irq = {
-            .irq = dev->int_line,
-        },
+    BrEvent rtl8139_irq = {
+        .type = BR_EVENT_IRQ,
+        .irq =  dev->int_line,
     };
-
-    assert_br_success(br_create(&rtl8139_irq));
 
     BrBindArgs rtl8139_bind = {
-        .handle = rtl8139_irq.handle,
-        .flags = BR_IRQ_NONE,
+        .event = rtl8139_irq,
+        .flags = BR_BIND_NONE,
     };
 
-    assert_br_success(br_bind(&rtl8139_bind));
-
-    dev->irq_handle = rtl8139_irq.handle;
+    br_bind(&rtl8139_bind);
 
     log$("interrupt initialized");
 }
 
-void rtl8139_handle_irq(void *ctx, uint16_t int_line)
+static void rtl8139_handle_irq(void *ctx, uint16_t int_line)
 {
     RTL8139Device *dev = (RTL8139Device *)ctx;
 
@@ -93,7 +88,7 @@ void rtl8139_handle_irq(void *ctx, uint16_t int_line)
         return;
     }
 
-    uint16_t status = br_in16(dev->io_base + RTL8139_ISR_REG);
+    uint16_t status = bal_io_in16(dev->io, RTL8139_ISR_REG);
     log$("status: {b}", status);
     if (status & RTL8139_ISR_ROK)
     {
@@ -109,11 +104,7 @@ void rtl8139_handle_irq(void *ctx, uint16_t int_line)
         log$("Packet not sent - error");
     }
 
-    br_out16(dev->io_base + RTL8139_ISR_REG, RTL8139_ISR_ROK | RTL8139_ISR_TOK);
-
-    br_ack(&(BrAckArgs){
-        .handle = dev->irq_handle,
-    });
+    bal_io_out16(dev->io, RTL8139_ISR_REG, RTL8139_ISR_ROK | RTL8139_ISR_TOK);
 }
 
 static void rtl8139_send(void *ctx, void *data, size_t len)
@@ -140,8 +131,8 @@ static void rtl8139_send(void *ctx, void *data, size_t len)
     mem_cpy(data_copy, data, len);
 
     log$("send packet (size: {})", len);
-    br_out32(dev->io_base + tsad_reg[dev->tx_curr], mem_obj_tx.mem_obj.addr);
-    br_out32(dev->io_base + tsd_reg[dev->tx_curr], len);
+    bal_io_out32(dev->io, tsad_reg[dev->tx_curr], mem_obj_tx.mem_obj.addr);
+    bal_io_out32(dev->io, tsd_reg[dev->tx_curr], len);
 
     dev->tx_curr  = (dev->tx_curr + 1) % 4;
 
@@ -150,7 +141,9 @@ static void rtl8139_send(void *ctx, void *data, size_t len)
         .vaddr = map_args.vaddr,
         .size = map_args.size,
     }));
-    assert_br_success(brh_close(mem_obj_tx.handle));
+    assert_br_success(br_close(&(BrCloseArgs){
+        .handle = mem_obj_tx.handle
+    }));
 }
 
 static void *rtl8139_init(uint32_t io_base, uint16_t int_line)
@@ -160,15 +153,15 @@ static void *rtl8139_init(uint32_t io_base, uint16_t int_line)
     dev = alloc_malloc(alloc_global(), sizeof(RTL8139Device));
     dev->tx_curr = 0;
 
-    dev->io_base = io_base;
+    dev->io = bal_io_port(io_base, 0 /* IDK lulz */);
     dev->int_line = int_line;
 
     log$("Turning on the RTL8139");
-    br_out8(dev->io_base + RTL8139_CONFIG1_REG, 0x0);
+    bal_io_out8(dev->io, RTL8139_CONFIG1_REG, 0x0);
 
     log$("SoftReset the RTL8139");
-    br_out8(dev->io_base + RTL8139_CR_REG, RTL8139_CONFIG1_LWACT);
-    WAIT_FOR((br_in8(dev->io_base + RTL8139_CR_REG) & RTL8139_CONFIG1_LWACT) == 0);
+    bal_io_out8(dev->io, RTL8139_CR_REG, RTL8139_CONFIG1_LWACT);
+    WAIT_FOR((bal_io_in8(dev->io, RTL8139_CR_REG) & RTL8139_CONFIG1_LWACT) == 0);
 
     log$("trying to read mac");
     rtl8139_read_mac(dev);

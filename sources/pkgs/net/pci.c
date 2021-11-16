@@ -1,8 +1,7 @@
-#include <acpi/acpi.h>
+#include <acpi/base.h>
 #include <brutal/alloc.h>
-#include <brutal/log.h>
+#include <brutal/debug.h>
 #include <pci/pci.h>
-#include <handover/handover.h>
 #include "pci.h"
 #include "driver.h"
 #include "interface.h"
