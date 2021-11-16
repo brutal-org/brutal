@@ -4,7 +4,10 @@
 #include <bal/abi.h>
 #include "pci.h"
 
-/* from: RTL8139D DataSheet p10-11 */
+/*
+ * from: RTL8139D DataSheet p10-11 
+ * http://realtek.info/pdf/rtl8139d.pdf
+*/
 #define RTL8139_IDR0_REG 0x0
 #define RTL8139_IDR4_REG 0x4
 #define RTL8139_TSD0 0x10
@@ -21,6 +24,7 @@
 #define RTL8139_ISR_REG 0x3E
 #define RTL8139_RCR_REG 0x44
 #define RTL8139_CONFIG1_REG 0x52
+#define RTL8139_END_REG 0xFF /* for bal io bound check */
 
 #define RTL8139_CR_TE 0x4 /* transmitter enable */
 #define RTL8139_CR_RE 0x8 /* receiver enable */

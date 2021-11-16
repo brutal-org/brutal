@@ -12,7 +12,8 @@
 /* devices ID --------------------------------------------------------------- */
 
 #define DEVID_RTL8100 0x8139 /* RTL-8100/8101L/8139 PCI Fast Eth Adapter */
-#define DEVID_E1000_QEMU 0x100E 
+#define DEVID_E1000_QEMU 0x100E
+#define DEVID_E1000_82544GC 0x100C
 
 /* nic drivers abstraction -------------------------------------------------- */
 
