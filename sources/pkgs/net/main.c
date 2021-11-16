@@ -1,6 +1,7 @@
 /* megalithicc network server */
-#include <brutal/io.h>
-#include <brutal/log.h>
+#include <bal/hw.h>
+#include <brutal/debug.h>
+#include "bal/abi/types.h"
 #include "interface.h"
 #include "pci.h"
 #include "rtl8139.h"
@@ -19,15 +20,19 @@ int br_entry_handover(Handover *handover)
         BrMsg msg = ipc.msg;
 
         log$("Receive IPC from {}", msg.from);
-        if (msg.from == BR_TASK_IRQ)
+        if (msg.from == BR_TASK_IRQ && msg.event.type == BR_EVENT_IRQ)
         {
-            BrIrq irq = msg.arg[0];
+            BrIrq irq = msg.args[0];
 
             log$("IRQ: {}", irq);
             vec_foreach(v, &interfaces)
             {
                 v.driver->handle(v.ctx, irq);
             }
+
+            br_ack(&(BrAckArgs){
+                .event = msg.event
+            });
         }
         else
         {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <brutal/base.h>
-#include <bal/syscalls.h>
+#include <bal/abi.h>
 #include "pci.h"
 
 /* from: RTL8139D DataSheet p10-11 */
@@ -54,10 +54,9 @@
 
 typedef struct
 {
-    uint32_t io_base;
+    BalIo io;
     uint8_t mac[6];
     uint8_t *rx_buffer;
-    BrHandle irq_handle;
     uint8_t tx_curr;
     uint16_t int_line;
 } RTL8139Device;

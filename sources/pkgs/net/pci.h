@@ -7,6 +7,6 @@
 
 #include <pci/pci.h>
 #include <pci/config.h>
-#include <handover/handover.h>
+#include <bal/boot/handover.h>
 
 void pci_get_network_cards(Handover *handover);
