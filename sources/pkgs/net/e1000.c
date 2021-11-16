@@ -4,6 +4,8 @@
 #include <bal/abi.h>
 #include <brutal/alloc.h>
 #include "bal/hw/io.h"
+#include "brutal/base/macros.h"
+#include "brutal/mem/units.h"
 #include "driver.h"
 #include "e1000.h"
 #include "net/pci.h"
@@ -55,7 +57,7 @@ static void e1000_detect_eeprom(E1000Device *dev)
 
 static void e1000_read_mac(E1000Device *dev)
 {
-    if (dev->has_eeprom)
+    if (!dev->has_eeprom)
     {
         log$("Reading from eeprom is unsupported for now");
     }
@@ -90,7 +92,6 @@ static void e1000_send(void *ctx, void *data, size_t len)
     (void)len;
 }
 
-/* XXX: don't work */
 static void *e1000_init(PciConfigType0 *pci_conf, uint16_t int_line)
 {
     E1000Device *dev;
@@ -105,13 +106,15 @@ static void *e1000_init(PciConfigType0 *pci_conf, uint16_t int_line)
     */
     if (!(pci_conf->bars[0].address & 0x1))
     {
-        dev->io = bal_io_mem(pci_conf->bars[0].address, 0 /* IDK lulz */);
+        br_mmio_init(&dev->mmio, pci_conf->bars[0].address, ALIGN_UP(E1000_END_REG, MEM_PAGE_SIZE));
+        dev->io = br_mmio_range(&dev->mmio);
     }
     else
     {
-        dev->io = bal_io_port(pci_get_io_base(pci_conf), 0 /* IDK lulz */);
+        dev->io = bal_io_port(pci_get_io_base(pci_conf), E1000_END_REG);
     }
 
+    log$("{}", bal_io_in32(dev->io, E1000_STATUS_REG));
     e1000_detect_eeprom(dev);
 
     log$("Trying to read mac");

@@ -3,6 +3,7 @@
 #include <bal/hw.h>
 #include <bal/abi.h>
 #include <brutal/alloc.h>
+#include "bal/abi/types.h"
 #include "driver.h"
 #include "rtl8139.h"
 
@@ -115,6 +116,7 @@ static void rtl8139_send(void *ctx, void *data, size_t len)
         .type = BR_OBJECT_MEMORY,
         .mem_obj = {
             .size = ALIGN_UP(8192 + 16 + 1500, MEM_PAGE_SIZE),
+            .flags = BR_MEM_OBJ_LOWER
         },
     };
 
@@ -153,7 +155,7 @@ static void *rtl8139_init(PciConfigType0 *pci_conf, uint16_t int_line)
     dev = alloc_malloc(alloc_global(), sizeof(RTL8139Device));
     dev->tx_curr = 0;
 
-    dev->io = bal_io_port(pci_get_io_base(pci_conf), 0 /* IDK lulz */);
+    dev->io = bal_io_port(pci_get_io_base(pci_conf), RTL8139_END_REG);
     dev->int_line = int_line;
 
     log$("Turning on the RTL8139");
