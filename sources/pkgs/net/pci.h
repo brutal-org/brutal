@@ -10,3 +10,4 @@
 #include <bal/boot/handover.h>
 
 void pci_get_network_cards(Handover *handover);
+uint32_t pci_get_io_base(PciConfigType0 *conf);

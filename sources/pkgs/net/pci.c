@@ -5,9 +5,8 @@
 #include "pci.h"
 #include "driver.h"
 #include "interface.h"
-#include "pci/config.h"
 
-static uint32_t pci_get_io_base(PciConfigType0 *conf)
+uint32_t pci_get_io_base(PciConfigType0 *conf)
 {
     for (int i = 0; i < 6; i++)
     {
@@ -37,7 +36,7 @@ static Iter pci_iter_net(void *data, void *ctx)
 
             Interface interface;
             interface.driver = nic_device_list[i].driver;
-            interface.ctx = interface.driver->init(pci_get_io_base(v), v->interrupt_line);
+            interface.ctx = interface.driver->init(v, v->interrupt_line);
             vec_push(&interfaces, interface);
         }
     }

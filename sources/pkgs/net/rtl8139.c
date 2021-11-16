@@ -146,14 +146,14 @@ static void rtl8139_send(void *ctx, void *data, size_t len)
     }));
 }
 
-static void *rtl8139_init(uint32_t io_base, uint16_t int_line)
+static void *rtl8139_init(PciConfigType0 *pci_conf, uint16_t int_line)
 {
     RTL8139Device *dev;
 
     dev = alloc_malloc(alloc_global(), sizeof(RTL8139Device));
     dev->tx_curr = 0;
 
-    dev->io = bal_io_port(io_base, 0 /* IDK lulz */);
+    dev->io = bal_io_port(pci_get_io_base(pci_conf), 0 /* IDK lulz */);
     dev->int_line = int_line;
 
     log$("Turning on the RTL8139");
