@@ -4,7 +4,7 @@
 			"name": "Brutal",
 			"kernel": "/boot/kernel.elf",
 			"framebuffer": {
-				"width": 465464,
+				"width": 1920,
 				"height": 1080
 			},
 			"modules": [
