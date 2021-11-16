@@ -2,6 +2,7 @@
 
 #include <brutal/base.h>
 #include <stdint.h>
+#include <pci/pci.h>
 
 /* vendors ------------------------------------------------------------------ */
 
@@ -16,7 +17,7 @@
 /* nic drivers abstraction -------------------------------------------------- */
 
 typedef struct {
-    void *(*init)(uint32_t, uint16_t);
+    void *(*init)(PciConfigType0 *, uint16_t);
     void (*deinit)(void *);
     void (*handle)(void *, uint16_t);
     void (*send)(void *, void *, size_t);
