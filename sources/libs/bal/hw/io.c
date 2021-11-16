@@ -1,5 +1,6 @@
 #include <bal/abi.h>
 #include <bal/hw/io.h>
+#include <brutal/debug.h>
 #include <brutal/mem.h>
 
 BalIo bal_io_mem(uintptr_t base, size_t size)
@@ -17,8 +18,18 @@ BalIo bal_io_slice(BalIo io, uintptr_t offset, size_t size)
     return (BalIo){io.type, io.base + offset, size};
 }
 
+void bal_io_check(BalIo io, size_t offset, size_t size)
+{
+    if (offset + size > io.size)
+    {
+        panic$("Out of bound IO access at offset {#x} with size {}", offset, size);
+    }
+}
+
 uint8_t bal_io_in8(BalIo io, size_t offset)
 {
+    bal_io_check(io, offset, 1);
+
     if (io.type == BAL_IO_PORTS)
     {
         BrIoArgs args = {
@@ -38,6 +49,8 @@ uint8_t bal_io_in8(BalIo io, size_t offset)
 
 uint16_t bal_io_in16(BalIo io, size_t offset)
 {
+    bal_io_check(io, offset, 2);
+
     if (io.type == BAL_IO_PORTS)
     {
         BrIoArgs args = {
@@ -57,6 +70,8 @@ uint16_t bal_io_in16(BalIo io, size_t offset)
 
 uint32_t bal_io_in32(BalIo io, size_t offset)
 {
+    bal_io_check(io, offset, 4);
+
     if (io.type == BAL_IO_PORTS)
     {
         BrIoArgs args = {
@@ -76,6 +91,8 @@ uint32_t bal_io_in32(BalIo io, size_t offset)
 
 uint64_t bal_io_in64(BalIo io, size_t offset)
 {
+    bal_io_check(io, offset, 8);
+
     if (io.type == BAL_IO_PORTS)
     {
         BrIoArgs args = {
@@ -95,6 +112,8 @@ uint64_t bal_io_in64(BalIo io, size_t offset)
 
 void bal_io_out8(BalIo io, size_t offset, uint8_t data)
 {
+    bal_io_check(io, offset, 1);
+
     if (io.type == BAL_IO_PORTS)
     {
         BrIoArgs args = {
@@ -113,6 +132,8 @@ void bal_io_out8(BalIo io, size_t offset, uint8_t data)
 
 void bal_io_out16(BalIo io, size_t offset, uint16_t data)
 {
+    bal_io_check(io, offset, 2);
+
     if (io.type == BAL_IO_PORTS)
     {
         BrIoArgs args = {
@@ -131,6 +152,8 @@ void bal_io_out16(BalIo io, size_t offset, uint16_t data)
 
 void bal_io_out32(BalIo io, size_t offset, uint32_t data)
 {
+    bal_io_check(io, offset, 4);
+
     if (io.type == BAL_IO_PORTS)
     {
         BrIoArgs args = {
@@ -149,6 +172,8 @@ void bal_io_out32(BalIo io, size_t offset, uint32_t data)
 
 void bal_io_out64(BalIo io, size_t offset, uint64_t data)
 {
+    bal_io_check(io, offset, 8);
+
     if (io.type == BAL_IO_PORTS)
     {
         BrIoArgs args = {
