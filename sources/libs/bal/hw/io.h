@@ -12,12 +12,12 @@ typedef struct
 {
     BalIoType type;
     size_t base;
-    size_t size;
+    size_t len;
 } BalIo;
 
-BalIo bal_io_mem(uintptr_t base, size_t size);
+BalIo bal_io_mem(uintptr_t base, size_t len);
 
-BalIo bal_io_port(uintptr_t base, size_t size);
+BalIo bal_io_port(uintptr_t base, size_t len);
 
 BalIo bal_io_slice(BalIo io, uintptr_t offset, size_t size);
 

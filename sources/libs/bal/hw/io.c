@@ -3,27 +3,29 @@
 #include <brutal/debug.h>
 #include <brutal/mem.h>
 
-BalIo bal_io_mem(uintptr_t base, size_t size)
+BalIo bal_io_mem(uintptr_t base, size_t len)
 {
-    return (BalIo){BAL_IO_MEMORY, base, size};
+    return (BalIo){BAL_IO_MEMORY, base, len};
 }
 
-BalIo bal_io_port(uintptr_t base, size_t size)
+BalIo bal_io_port(uintptr_t base, size_t len)
 {
-    return (BalIo){BAL_IO_PORTS, base, size};
-}
-
-BalIo bal_io_slice(BalIo io, uintptr_t offset, size_t size)
-{
-    return (BalIo){io.type, io.base + offset, size};
+    return (BalIo){BAL_IO_PORTS, base, len};
 }
 
 void bal_io_check(BalIo io, size_t offset, size_t size)
 {
-    if (offset + size > io.size)
+    if (offset + size > io.len)
     {
         panic$("Out of bound IO access at offset {#x} with size {}", offset, size);
     }
+}
+
+BalIo bal_io_slice(BalIo io, uintptr_t offset, size_t size)
+{
+    bal_io_check(io, offset, size);
+
+    return (BalIo){io.type, io.base + offset, size};
 }
 
 uint8_t bal_io_in8(BalIo io, size_t offset)
