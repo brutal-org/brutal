@@ -35,9 +35,11 @@ static CType gen_decl_struct(BidType type, Alloc *alloc)
 static CType gen_decl_vec(BidType type, Alloc *alloc)
 {
     CType ctype = ctype_struct(alloc);
+    CType buf_type = ctype_ptr(gen_decl_type(*type.vec_.subtype, alloc), alloc);
+    CType size_type = ctype_name(str$("size_t"), alloc);
 
-    ctype_member(&ctype, str$("buf"), ctype_ptr(gen_decl_type(*type.vec_.subtype, alloc), alloc), alloc);
-    ctype_member(&ctype, str$("len"), ctype_name(str$("size_t"), alloc), alloc);
+    ctype_member(&ctype, str$("buf"), buf_type, alloc);
+    ctype_member(&ctype, str$("len"), size_type, alloc);
 
     return ctype;
 }
@@ -82,14 +84,16 @@ static CType gen_func_method(BidMethod method, BidIface const iface, Alloc *allo
 
     if (method.request.type != BID_TYPE_NIL)
     {
-        ctype_member(&ctype, str$("req"), ctype_ptr(gen_type(method.request, alloc), alloc), alloc);
+        CType req_type = ctype_ptr(ctype_attr(gen_type(method.request, alloc), CTYPE_CONST), alloc);
+        ctype_member(&ctype, str$("req"), req_type, alloc);
     }
 
     if (method.response.type != BID_TYPE_NIL)
     {
-        ctype_member(&ctype, str$("resp"), ctype_ptr(gen_type(method.response, alloc), alloc), alloc);
+        CType res_type = ctype_ptr(gen_type(method.response, alloc), alloc);
+        ctype_member(&ctype, str$("resp"), res_type, alloc);
     }
-
+    
     ctype_member(&ctype, str$("alloc"), ctype_ptr(ctype_name(str$("Alloc"), alloc), alloc), alloc);
 
     return ctype;
@@ -98,8 +102,11 @@ static CType gen_func_method(BidMethod method, BidIface const iface, Alloc *allo
 static CType gen_func_impl(BidIface const iface, Alloc *alloc)
 {
     CType ctype = ctype_func(ctype_void(), alloc);
-    ctype_member(&ctype, str$("self"), ctype_ptr(ctype_name(str$("IpcEv"), alloc), alloc), alloc);
-    ctype_member(&ctype, str$("vtable"), ctype_ptr(ctype_name(str_fmt(alloc, "{}VTable", iface.name), alloc), alloc), alloc);
+    CType vtable_type = ctype_name(str_fmt(alloc, "{}VTable", iface.name), alloc);
+    CType ipc_type = ctype_name(str$("IpcEv"), alloc);
+
+    ctype_member(&ctype, str$("self"), ctype_ptr(ipc_type, alloc), alloc);
+    ctype_member(&ctype, str$("vtable"), ctype_ptr(vtable_type, alloc), alloc);
     return ctype;
 }
 
@@ -107,18 +114,21 @@ CUnit bidgen_c_header(MAYBE_UNUSED BidIface const iface, Alloc *alloc)
 {
     CUnit unit = cunit(alloc);
     cunit_pragma_once(&unit, alloc);
-    cunit_include(&unit, true, str_fmt(alloc, "bal/ipc.h", iface.name), alloc);
+
+    cunit_include(&unit, true, str_fmt(alloc, "brutal/base.h"), alloc);
+    cunit_include(&unit, true, str_fmt(alloc, "bal/ipc.h"), alloc);
 
     vec_foreach(alias, &iface.aliases)
     {
         cunit_decl(&unit, cdecl_type(alias.mangled, gen_decl_type(alias.type, alloc), alloc));
     }
 
-    int i = 0;
+    int enum_id = 0;
     CType vtable = ctype_struct(alloc);
     CType msgtype = ctype_enum(alloc);
 
-    ctype_constant(&msgtype, str_fmt(alloc, "MSG_{case:constant}_ERR", iface.name), cval_unsigned(i++), alloc);
+    ctype_constant(&msgtype, str_fmt(alloc, "MSG_{case:constant}_ERR", iface.name), cval_unsigned(enum_id++), alloc);
+
     vec_foreach(method, &iface.methods)
     {
         Str name = case_change_str(CASE_PASCAL, method.mangled, alloc);
@@ -128,8 +138,8 @@ CUnit bidgen_c_header(MAYBE_UNUSED BidIface const iface, Alloc *alloc)
         cunit_decl(&unit, cdecl_type(name, type, alloc));
         cunit_decl(&unit, cdecl_func(method.mangled, type, cstmt_empty(), alloc));
 
-        ctype_constant(&msgtype, str_fmt(alloc, "MSG_{case:constant}_REQ", method.mangled), cval_unsigned(i++), alloc);
-        ctype_constant(&msgtype, str_fmt(alloc, "MSG_{case:constant}_RESP", method.mangled), cval_unsigned(i++), alloc);
+        ctype_constant(&msgtype, str_fmt(alloc, "MSG_{case:constant}_REQ", method.mangled), cval_unsigned(enum_id++), alloc);
+        ctype_constant(&msgtype, str_fmt(alloc, "MSG_{case:constant}_RESP", method.mangled), cval_unsigned(enum_id++), alloc);
     }
 
     cunit_decl(&unit, cdecl_type(str_fmt(alloc, "{}Msgs", iface.name), msgtype, alloc));
