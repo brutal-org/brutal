@@ -186,19 +186,23 @@ int br_ev_req(
     Alloc *alloc)
 {
 
-    BrMsg req_msg = {};
     BrMsg resp_msg = {};
+    BrMsg req_msg = {};
 
     // Packing
 
-    BalPack pack;
-    bal_pack_init(&pack);
-    req_pack(&pack, req);
-
     req_msg.prot = proto;
     req_msg.type = req_id;
-    req_msg.args[0] = pack.obj;
-    req_msg.flags = BR_MSG_HND(0);
+
+    BalPack pack;
+    bal_pack_init(&pack);
+
+    if (req != nullptr)
+    {
+        req_pack(&pack, req);
+        req_msg.args[0] = pack.obj;
+        req_msg.flags = BR_MSG_HND(0);
+    }
 
     br_ev_req_raw(self, to, &req_msg, &resp_msg);
 
@@ -213,16 +217,18 @@ int br_ev_req(
 
     assert_equal(resp_msg.args[0], (BrArg)resp_id);
 
-    BalShm shm;
-    balshm_init_mobj(&shm, resp_msg.args[0]);
+    if (resp != nullptr)
+    {
+        BalShm shm;
+        balshm_init_mobj(&shm, resp_msg.args[0]);
 
-    BalUnpack unpack;
-    bal_unpack_init(&unpack, shm.buf, shm.len);
-
-    req_unpack(&unpack, resp, alloc);
+        BalUnpack unpack;
+        bal_unpack_init(&unpack, shm.buf, shm.len);
+        req_unpack(&unpack, resp, alloc);
+        balshm_deinit(&shm);
+    }
 
     bal_pack_deinit(&pack);
-    balshm_deinit(&shm);
 
     return 0;
 }

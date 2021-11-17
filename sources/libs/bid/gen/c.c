@@ -176,7 +176,7 @@ CType gen_pack_type(BidAlias alias, Alloc *alloc)
 CType gen_unpack_type(BidAlias alias, Alloc *alloc)
 {
     CType ctype = ctype_func(ctype_void(), alloc);
-    ctype_member(&ctype, str$("self"), ctype_ptr(ctype_name(str$("BalPack"), alloc), alloc), alloc);
+    ctype_member(&ctype, str$("self"), ctype_ptr(ctype_name(str$("BalUnpack"), alloc), alloc), alloc);
     ctype_member(&ctype, str$("data"), ctype_ptr(ctype_name(alias.mangled, alloc), alloc), alloc);
     ctype_member(&ctype, str$("alloc"), ctype_ptr(ctype_name(str$("Alloc"), alloc), alloc), alloc);
     return ctype;
@@ -225,7 +225,7 @@ void gen_pack_body(CStmt *block, BidType type, CExpr path, Alloc *alloc)
         CExpr expr = cexpr_call(alloc, cexpr_ident(str$("bal_pack_slice"), alloc));
         cexpr_member(&expr, cexpr_ident(str$("self"), alloc));
         cexpr_member(&expr, cexpr_ref(path, alloc));
-        cexpr_member(&expr, cexpr_ident(gen_pack_name(subtype.primitive_.name, alloc), alloc));
+        cexpr_member(&expr, cexpr_ident(gen_pack_name(subtype.primitive_.mangled, alloc), alloc));
         cstmt_block_add(block, cstmt_expr(expr));
     }
 
@@ -279,7 +279,7 @@ void gen_unpack_body(CStmt *block, BidType type, CExpr path, Alloc *alloc)
         CExpr expr = cexpr_call(alloc, cexpr_ident(str$("bal_unpack_slice"), alloc));
         cexpr_member(&expr, cexpr_ident(str$("self"), alloc));
         cexpr_member(&expr, cexpr_ref(path, alloc));
-        cexpr_member(&expr, cexpr_ident(gen_unpack_name(subtype.primitive_.name, alloc), alloc));
+        cexpr_member(&expr, cexpr_ident(gen_unpack_name(subtype.primitive_.mangled, alloc), alloc));
         cexpr_member(&expr, cexpr_ident(str$("alloc"), alloc));
         cstmt_block_add(block, cstmt_expr(expr));
     }
@@ -315,16 +315,34 @@ CStmt gen_method_body(BidMethod method, BidIface const iface, Alloc *alloc)
 
     CExpr pack_request = cexpr_call(alloc, cexpr_ident(str$("br_ev_req"), alloc));
     cexpr_member(&pack_request, cexpr_ident(str$("ev"), alloc));
-    cexpr_member(&pack_request, cexpr_ident(str$("to"), alloc));
+    cexpr_member(&pack_request, cexpr_ident(str$("task"), alloc));
     cexpr_member(&pack_request, cexpr_constant(cval_signed(iface.id)));
 
     cexpr_member(&pack_request, cexpr_ident(str_fmt(alloc, "MSG_{case:constant}_REQ", method.mangled), alloc));
-    cexpr_member(&pack_request, cexpr_ident(str$("req"), alloc));
-    cexpr_member(&pack_request, cexpr_ident(gen_pack_name(method.request.primitive_.name, alloc), alloc));
+
+    if (method.request.type != BID_TYPE_NIL)
+    {
+        cexpr_member(&pack_request, cexpr_ident(str$("req"), alloc));
+        cexpr_member(&pack_request, cexpr_ident(gen_pack_name(method.request.primitive_.mangled, alloc), alloc));
+    }
+    else
+    {
+        cexpr_member(&pack_request, cexpr_ident(str$("nullptr"), alloc));
+        cexpr_member(&pack_request, cexpr_ident(str$("nullptr"), alloc));
+    }
 
     cexpr_member(&pack_request, cexpr_ident(str_fmt(alloc, "MSG_{case:constant}_RESP", method.mangled), alloc));
-    cexpr_member(&pack_request, cexpr_ident(str$("resp"), alloc));
-    cexpr_member(&pack_request, cexpr_ident(gen_unpack_name(method.response.primitive_.name, alloc), alloc));
+
+    if (method.response.type != BID_TYPE_NIL)
+    {
+        cexpr_member(&pack_request, cexpr_ident(str$("resp"), alloc));
+        cexpr_member(&pack_request, cexpr_ident(gen_unpack_name(method.response.primitive_.mangled, alloc), alloc));
+    }
+    else
+    {
+        cexpr_member(&pack_request, cexpr_ident(str$("nullptr"), alloc));
+        cexpr_member(&pack_request, cexpr_ident(str$("nullptr"), alloc));
+    }
 
     cexpr_member(&pack_request, cexpr_ident(str$("alloc"), alloc));
 
