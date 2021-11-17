@@ -21,7 +21,7 @@ void *br_ev_handle(BrEvCtx *ctx)
 
 static void *req_dispatch(IpcEv *self)
 {
-    while (true)
+    do
     {
         BrIpcArgs ipc = {
             .flags = BR_IPC_RECV | BR_IPC_BLOCK,
@@ -80,7 +80,9 @@ static void *req_dispatch(IpcEv *self)
         }
 
         fiber_yield();
-    }
+    } while (self->running);
+
+    return nullptr;
 }
 
 static void queue_job(IpcEv *self, IpcJob *job)
@@ -134,7 +136,6 @@ static bool req_wait(ReqWaitCtx *ctx)
 
 void br_ev_init(IpcEv *self, Alloc *alloc)
 {
-    self->dispatcher = fiber_start((FiberFn *)req_dispatch, self);
     self->dispatcher->state = FIBER_IDLE;
     vec_init(&self->protos, alloc);
 }
@@ -238,20 +239,12 @@ BrResult br_ev_resp_raw(MAYBE_UNUSED IpcEv *self, BrMsg const *req, BrMsg *resp)
     });
 }
 
-static bool wait_exit(MAYBE_UNUSED IpcEv *self)
-{
-    return !self->running;
-}
-
 int br_ev_run(IpcEv *self)
 {
     self->running = true;
 
-    fiber_block((FiberBlocker){
-        .context = nullptr,
-        .function = (FiberBlockerFn *)wait_exit,
-        .deadline = BR_DEADLINE_INFINITY,
-    });
+    self->dispatcher = fiber_start((FiberFn *)req_dispatch, self);
+    fiber_await(self->dispatcher);
 
     return self->exit_code;
 }
