@@ -76,7 +76,10 @@ void cgen_c_type_start(Emit *emit, CType type)
             emit_fmt(emit, "union");
         }
 
-        emit_fmt(emit, "{} ", type.name);
+        if (str_any(type.name))
+        {
+            emit_fmt(emit, " {}", type.name);
+        }
 
         cgen_c_type_attr(emit, type.attr);
         emit_fmt(emit, "\n{{\n");
@@ -93,14 +96,20 @@ void cgen_c_type_start(Emit *emit, CType type)
     }
     else if (type.type == CTYPE_ENUM)
     {
-        emit_fmt(emit, "enum {} ", type.name);
+        emit_fmt(emit, "enum", type.name);
+
+        if (str_any(type.name))
+        {
+            emit_fmt(emit, " {}", type.name);
+        }
+
         emit_fmt(emit, "\n{{\n");
         emit_ident(emit);
 
         vec_foreach(v, &type.enum_.constants)
         {
             cgen_c_constant(emit, v);
-            emit_fmt(emit, ", \n");
+            emit_fmt(emit, ",\n");
         }
 
         emit_deident(emit);

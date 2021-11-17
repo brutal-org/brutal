@@ -134,3 +134,8 @@ int str_first_chr(Str const str, char chr)
 
     return -1;
 }
+
+bool str_any(Str const str)
+{
+    return str.len != 0;
+}

@@ -54,6 +54,8 @@ int str_first(Str const lStr, Str const rStr);
 
 int str_first_chr(Str const str, char chr);
 
+bool str_any(Str const str);
+
 /* --- Fix Size Strings ----------------------------------------------------- */
 
 #define StrFix(N)    \

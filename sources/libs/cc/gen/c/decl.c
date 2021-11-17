@@ -77,9 +77,15 @@ void cgen_c_decl(Emit *emit, CDecl decl)
         emit_fmt(emit, " {}", decl.name);
         cgen_c_type_end(emit, func_type);
 
-        emit_fmt(emit, "\n", decl.name);
-
         // Body
-        cgen_c_stmt(emit, decl.func_.body);
+        if (decl.func_.body.type != CSTMT_EMPTY)
+        {
+            emit_fmt(emit, "\n", decl.name);
+            cgen_c_stmt(emit, decl.func_.body);
+        }
+        else
+        {
+            emit_fmt(emit, ";", decl.name);
+        }
     }
 }
