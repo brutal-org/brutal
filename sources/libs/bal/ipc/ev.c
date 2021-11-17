@@ -19,7 +19,7 @@ void *br_ev_handle(BrEvCtx *ctx)
     return nullptr;
 }
 
-static void req_dispatch(IpcEv *self)
+static void *req_dispatch(IpcEv *self)
 {
     while (true)
     {
