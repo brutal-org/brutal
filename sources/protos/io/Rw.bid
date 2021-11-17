@@ -1,0 +1,5 @@
+interface Rw
+{
+    method write Buf -> Nil;
+    method read -> Buf;
+}

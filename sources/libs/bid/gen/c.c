@@ -98,7 +98,7 @@ static CType gen_func_method(BidMethod method, BidIface const iface, Alloc *allo
 static CType gen_func_impl(BidIface const iface, Alloc *alloc)
 {
     CType ctype = ctype_func(ctype_void(), alloc);
-    ctype_member(&ctype, str$("self"), ctype_ptr(ctype_name(str$("Srv"), alloc), alloc), alloc);
+    ctype_member(&ctype, str$("self"), ctype_ptr(ctype_name(str$("IpcEv"), alloc), alloc), alloc);
     ctype_member(&ctype, str$("vtable"), ctype_ptr(ctype_name(str_fmt(alloc, "{}VTable", iface.name), alloc), alloc), alloc);
     return ctype;
 }
@@ -337,7 +337,7 @@ CUnit bidgen_c_source(MAYBE_UNUSED BidIface const iface, Alloc *alloc)
 {
     CUnit unit = cunit(alloc);
 
-    cunit_include(&unit, true, str_fmt(alloc, "protos/{case:snake}.h", iface.name), alloc);
+    cunit_include(&unit, false, str_fmt(alloc, "{case:snake}.h", iface.name), alloc);
 
     vec_foreach(alias, &iface.aliases)
     {
