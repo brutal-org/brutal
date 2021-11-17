@@ -55,11 +55,35 @@ static void e1000_detect_eeprom(E1000Device *dev)
     while (i < 1000);
 }
 
+static uint16_t e1000_eeprom_read(E1000Device *dev, uint8_t addr)
+{
+    uint32_t tmp = ((uint32_t)addr & 0xff) << 8;
+    tmp |= 0x1;
+    e1000_io_write(dev, E1000_EEPROM_REG, tmp);
+    WAIT_FOR(e1000_io_read(dev, E1000_EEPROM_REG) & 0x10);
+
+    uint16_t data = e1000_io_read(dev, E1000_EEPROM_REG) >> 16;
+
+    tmp = e1000_io_read(dev, E1000_EEPROM_REG);
+    tmp &= ~0x1;
+    e1000_io_write(dev, E1000_EEPROM_REG, tmp);
+    return data;
+}
+
 static void e1000_read_mac(E1000Device *dev)
 {
-    if (!dev->has_eeprom)
+    if (dev->has_eeprom)
     {
-        log$("Reading from eeprom is unsupported for now");
+        log$("Reading MAC addr from eeprom");
+        uint16_t mac_part = e1000_eeprom_read(dev, 0x0);
+        dev->mac[0] = mac_part >> 0;
+        dev->mac[1] = mac_part >> 8;
+        mac_part = e1000_eeprom_read(dev, 0x1);
+        dev->mac[2] = mac_part >> 0;
+        dev->mac[3] = mac_part >> 8;
+        mac_part = e1000_eeprom_read(dev, 0x2);
+        dev->mac[4] = mac_part >> 0;
+        dev->mac[5] = mac_part >> 8;
     }
     else
     {
@@ -96,8 +120,6 @@ static void *e1000_init(PciConfigType0 *pci_conf, uint16_t int_line)
 {
     E1000Device *dev;
 
-    (void)int_line;
-
     dev = alloc_malloc(alloc_global(), sizeof(E1000Device));
 
     /* 
@@ -113,6 +135,8 @@ static void *e1000_init(PciConfigType0 *pci_conf, uint16_t int_line)
     {
         dev->io = bal_io_port(pci_get_io_base(pci_conf), E1000_END_REG);
     }
+
+    dev->int_line = int_line;
 
     log$("{}", bal_io_in32(dev->io, E1000_STATUS_REG));
     e1000_detect_eeprom(dev);
