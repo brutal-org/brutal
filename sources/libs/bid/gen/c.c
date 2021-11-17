@@ -37,7 +37,7 @@ static CType gen_decl_vec(BidType type, Alloc *alloc)
     CType ctype = ctype_struct(alloc);
 
     ctype_member(&ctype, str$("buf"), ctype_ptr(gen_decl_type(*type.vec_.subtype, alloc), alloc), alloc);
-    ctype_member(&ctype, str$("len"), ctype_name(str$("len"), alloc), alloc);
+    ctype_member(&ctype, str$("len"), ctype_name(str$("size_t"), alloc), alloc);
 
     return ctype;
 }
@@ -178,7 +178,6 @@ CType gen_unpack_type(BidAlias alias, Alloc *alloc)
     CType ctype = ctype_func(ctype_void(), alloc);
     ctype_member(&ctype, str$("self"), ctype_ptr(ctype_name(str$("BalUnpack"), alloc), alloc), alloc);
     ctype_member(&ctype, str$("data"), ctype_ptr(ctype_name(alias.mangled, alloc), alloc), alloc);
-    ctype_member(&ctype, str$("alloc"), ctype_ptr(ctype_name(str$("Alloc"), alloc), alloc), alloc);
     return ctype;
 }
 
@@ -203,7 +202,7 @@ void gen_pack_body(CStmt *block, BidType type, CExpr path, Alloc *alloc)
     {
         CExpr expr = cexpr_call(alloc, cexpr_ident(gen_pack_name(str$("Enum"), alloc), alloc));
         cexpr_member(&expr, cexpr_ident(str$("self"), alloc));
-        cexpr_member(&expr, cexpr_ref(path, alloc));
+        cexpr_member(&expr, cexpr_cast(cexpr_ref(path, alloc), ctype_ptr(ctype_name(str$("int"), alloc), alloc), alloc));
 
         cstmt_block_add(block, cstmt_expr(expr));
     }
@@ -246,7 +245,6 @@ void gen_unpack_body(CStmt *block, BidType type, CExpr path, Alloc *alloc)
         CExpr expr = cexpr_call(alloc, cexpr_ident(gen_unpack_name(type.primitive_.mangled, alloc), alloc));
         cexpr_member(&expr, cexpr_ident(str$("self"), alloc));
         cexpr_member(&expr, cexpr_ref(path, alloc));
-        cexpr_member(&expr, cexpr_ident(str$("alloc"), alloc));
 
         cstmt_block_add(block, cstmt_expr(expr));
     }
@@ -256,8 +254,7 @@ void gen_unpack_body(CStmt *block, BidType type, CExpr path, Alloc *alloc)
     {
         CExpr expr = cexpr_call(alloc, cexpr_ident(gen_unpack_name(str$("Enum"), alloc), alloc));
         cexpr_member(&expr, cexpr_ident(str$("self"), alloc));
-        cexpr_member(&expr, cexpr_ref(path, alloc));
-        cexpr_member(&expr, cexpr_ident(str$("alloc"), alloc));
+        cexpr_member(&expr, cexpr_cast(cexpr_ref(path, alloc), ctype_ptr(ctype_name(str$("int"), alloc), alloc), alloc));
 
         cstmt_block_add(block, cstmt_expr(expr));
     }
@@ -280,7 +277,6 @@ void gen_unpack_body(CStmt *block, BidType type, CExpr path, Alloc *alloc)
         cexpr_member(&expr, cexpr_ident(str$("self"), alloc));
         cexpr_member(&expr, cexpr_ref(path, alloc));
         cexpr_member(&expr, cexpr_ident(gen_unpack_name(subtype.primitive_.mangled, alloc), alloc));
-        cexpr_member(&expr, cexpr_ident(str$("alloc"), alloc));
         cstmt_block_add(block, cstmt_expr(expr));
     }
 

@@ -223,8 +223,8 @@ int br_ev_req(
         balshm_init_mobj(&shm, resp_msg.args[0]);
 
         BalUnpack unpack;
-        bal_unpack_init(&unpack, shm.buf, shm.len);
-        req_unpack(&unpack, resp, alloc);
+        bal_unpack_init(&unpack, shm.buf, shm.len, alloc);
+        req_unpack(&unpack, resp);
         balshm_deinit(&shm);
     }
 
