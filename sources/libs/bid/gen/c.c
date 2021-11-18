@@ -93,8 +93,11 @@ static CType gen_func_method(BidMethod method, BidIface const iface, Alloc *allo
         CType res_type = ctype_ptr(gen_type(method.response, alloc), alloc);
         ctype_member(&ctype, str$("resp"), res_type, alloc);
     }
-    
-    ctype_member(&ctype, str$("alloc"), ctype_ptr(ctype_name(str$("Alloc"), alloc), alloc), alloc);
+
+    if (method.response.type != BID_TYPE_NIL || method.request.type != BID_TYPE_NIL)
+    {
+        ctype_member(&ctype, str$("alloc"), ctype_ptr(ctype_name(str$("Alloc"), alloc), alloc), alloc);
+    }
 
     return ctype;
 }
@@ -115,7 +118,6 @@ CUnit bidgen_c_header(MAYBE_UNUSED BidIface const iface, Alloc *alloc)
     CUnit unit = cunit(alloc);
     cunit_pragma_once(&unit, alloc);
 
-    cunit_include(&unit, true, str_fmt(alloc, "brutal/base.h"), alloc);
     cunit_include(&unit, true, str_fmt(alloc, "bal/ipc.h"), alloc);
 
     vec_foreach(alias, &iface.aliases)
@@ -123,12 +125,10 @@ CUnit bidgen_c_header(MAYBE_UNUSED BidIface const iface, Alloc *alloc)
         cunit_decl(&unit, cdecl_type(alias.mangled, gen_decl_type(alias.type, alloc), alloc));
     }
 
-    int enum_id = 0;
     CType vtable = ctype_struct(alloc);
     CType msgtype = ctype_enum(alloc);
 
-    ctype_constant(&msgtype, str_fmt(alloc, "MSG_{case:constant}_ERR", iface.name), cval_unsigned(enum_id++), alloc);
-
+    int i = 0;
     vec_foreach(method, &iface.methods)
     {
         Str name = case_change_str(CASE_PASCAL, method.mangled, alloc);
@@ -138,8 +138,8 @@ CUnit bidgen_c_header(MAYBE_UNUSED BidIface const iface, Alloc *alloc)
         cunit_decl(&unit, cdecl_type(name, type, alloc));
         cunit_decl(&unit, cdecl_func(method.mangled, type, cstmt_empty(), alloc));
 
-        ctype_constant(&msgtype, str_fmt(alloc, "MSG_{case:constant}_REQ", method.mangled), cval_unsigned(enum_id++), alloc);
-        ctype_constant(&msgtype, str_fmt(alloc, "MSG_{case:constant}_RESP", method.mangled), cval_unsigned(enum_id++), alloc);
+        ctype_constant(&msgtype, str_fmt(alloc, "MSG_{case:constant}_REQ", method.mangled), cval_unsigned(i++), alloc);
+        ctype_constant(&msgtype, str_fmt(alloc, "MSG_{case:constant}_RESP", method.mangled), cval_unsigned(i++), alloc);
     }
 
     cunit_decl(&unit, cdecl_type(str_fmt(alloc, "{}Msgs", iface.name), msgtype, alloc));
@@ -319,7 +319,7 @@ CStmt gen_method_body(BidMethod method, BidIface const iface, Alloc *alloc)
 {
     CStmt block = cstmt_block(alloc);
 
-    CExpr pack_request = cexpr_call(alloc, cexpr_ident(str$("br_ev_req"), alloc));
+    CExpr pack_request = cexpr_call(alloc, cexpr_ident(str$("bid_hook_call"), alloc));
     cexpr_member(&pack_request, cexpr_ident(str$("ev"), alloc));
     cexpr_member(&pack_request, cexpr_ident(str$("task"), alloc));
     cexpr_member(&pack_request, cexpr_constant(cval_signed(iface.id)));
@@ -350,7 +350,14 @@ CStmt gen_method_body(BidMethod method, BidIface const iface, Alloc *alloc)
         cexpr_member(&pack_request, cexpr_ident(str$("nullptr"), alloc));
     }
 
-    cexpr_member(&pack_request, cexpr_ident(str$("alloc"), alloc));
+    if (method.request.type != BID_TYPE_NIL || method.response.type != BID_TYPE_NIL)
+    {
+        cexpr_member(&pack_request, cexpr_ident(str$("alloc"), alloc));
+    }
+    else
+    {
+        cexpr_member(&pack_request, cexpr_ident(str$("nullptr"), alloc));
+    }
 
     cstmt_block_add(&block, cstmt_return(pack_request));
 

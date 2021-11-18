@@ -1,11 +1,11 @@
 #include <bal/abi.h>
-#include <bal/hw/shm.h>
 #include <bal/ipc/ev.h>
 #include <brutal/debug.h>
 
 typedef struct
 {
     IpcEv *self;
+    BrId from;
     BrMsg *msg;
     void *ctx;
 
@@ -15,7 +15,7 @@ typedef struct
 void *br_ev_handle(BrEvCtx *ctx)
 {
     BrMsg msg = *ctx->msg;
-    ctx->fn(ctx->self, &msg, ctx->ctx);
+    ctx->fn(ctx->self, ctx->from, &msg, ctx->ctx);
     return nullptr;
 }
 
@@ -56,6 +56,7 @@ static void *req_dispatch(IpcEv *self)
                             (FiberFn *)br_ev_handle,
                             &(BrEvCtx){
                                 self,
+                                ipc.msg.from,
                                 &ipc.msg,
                                 proto.ctx,
                                 self->sink,
@@ -72,6 +73,7 @@ static void *req_dispatch(IpcEv *self)
                     (FiberFn *)br_ev_handle,
                     &(BrEvCtx){
                         self,
+                        ipc.msg.from,
                         &ipc.msg,
                         nullptr,
                         self->sink,
@@ -116,6 +118,23 @@ static void dequeue_job(IpcEv *self, IpcJob *job)
     }
 }
 
+void br_ev_init(IpcEv *self, Alloc *alloc)
+{
+    self->dispatcher->state = FIBER_IDLE;
+    vec_init(&self->protos, alloc);
+}
+
+void br_ev_deinit(IpcEv *self)
+{
+    vec_deinit(&self->protos);
+}
+
+void br_ev_impl(IpcEv *self, uint32_t id, IpcFn *fn, void *ctx)
+{
+    IpcProto proto = {id, fn, ctx};
+    vec_push(&self->protos, proto);
+}
+
 typedef struct
 {
     IpcEv *ev;
@@ -132,23 +151,6 @@ static bool req_wait(ReqWaitCtx *ctx)
     dequeue_job(ctx->ev, ctx->job);
 
     return true;
-}
-
-void br_ev_init(IpcEv *self, Alloc *alloc)
-{
-    self->dispatcher->state = FIBER_IDLE;
-    vec_init(&self->protos, alloc);
-}
-
-void br_ev_deinit(IpcEv *self)
-{
-    vec_deinit(&self->protos);
-}
-
-void br_ev_impl(IpcEv *self, uint32_t id, IpcFn *fn, void *ctx)
-{
-    IpcProto proto = {id, fn, ctx};
-    vec_push(&self->protos, proto);
 }
 
 BrResult br_ev_req_raw(IpcEv *self, BrId to, BrMsg *req, BrMsg *resp)
@@ -176,61 +178,6 @@ BrResult br_ev_req_raw(IpcEv *self, BrId to, BrMsg *req, BrMsg *resp)
     });
 
     return BR_SUCCESS;
-}
-
-int br_ev_req(
-    IpcEv *self,
-    BrId to, int proto,
-    int req_id, void *req, BalPackFn *req_pack,
-    int resp_id, void *resp, BalUnpackFn *req_unpack,
-    Alloc *alloc)
-{
-
-    BrMsg resp_msg = {};
-    BrMsg req_msg = {};
-
-    // Packing
-
-    req_msg.prot = proto;
-    req_msg.type = req_id;
-
-    BalPack pack;
-    bal_pack_init(&pack);
-
-    if (req != nullptr)
-    {
-        req_pack(&pack, req);
-        req_msg.args[0] = pack.obj;
-        req_msg.flags = BR_MSG_HND(0);
-    }
-
-    br_ev_req_raw(self, to, &req_msg, &resp_msg);
-
-    // Error handeling
-
-    if (resp_msg.type == BR_MSG_ERROR)
-    {
-        return resp_msg.args[0];
-    }
-
-    // Unpacking
-
-    assert_equal(resp_msg.args[0], (BrArg)resp_id);
-
-    if (resp != nullptr)
-    {
-        BalShm shm;
-        balshm_init_mobj(&shm, resp_msg.args[0]);
-
-        BalUnpack unpack;
-        bal_unpack_init(&unpack, shm.buf, shm.len, alloc);
-        req_unpack(&unpack, resp);
-        balshm_deinit(&shm);
-    }
-
-    bal_pack_deinit(&pack);
-
-    return 0;
 }
 
 BrResult br_ev_resp_raw(MAYBE_UNUSED IpcEv *self, BrMsg const *req, BrMsg *resp)

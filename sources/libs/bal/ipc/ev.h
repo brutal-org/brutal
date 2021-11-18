@@ -20,7 +20,7 @@ struct ipc_job
     struct ipc_job *prev;
 };
 
-typedef void IpcFn(struct ipc_ev *ev, BrMsg *req, void *ctx);
+typedef void IpcFn(struct ipc_ev *ev, BrId from, BrMsg *req, void *ctx);
 
 struct ipc_proto
 {
@@ -46,14 +46,6 @@ void br_ev_deinit(IpcEv *self);
 void br_ev_impl(IpcEv *self, uint32_t id, IpcFn *fn, void *ctx);
 
 BrResult br_ev_req_raw(IpcEv *self, BrId to, BrMsg *req, BrMsg *resp);
-
-int br_ev_req(
-    IpcEv *self,
-    BrId to,
-    int proto,
-    int req_id, void *req, BalPackFn *req_pack,
-    int resp_id, void *resp, BalUnpackFn *req_unpack,
-    Alloc *alloc);
 
 BrResult br_ev_resp_raw(IpcEv *self, BrMsg const *req, BrMsg *resp);
 
