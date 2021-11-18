@@ -11,4 +11,5 @@
 -Isources/libs/stdc/posix
 -Isources/libs/stdc/gnu
 -Isources/libs/stdc/bsd
+-Ibin/generated
 -Ithirdparty

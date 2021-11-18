@@ -33,7 +33,13 @@ int bid_hook_call(
 void bid_hook_handle(
     BidHandler handler,
     IpcEv *ev,
-    BrId from,
-    void *req, BrMsg *req_msg, BalUnpackFn *req_unpack,
-    void *resp, BrMsg *resp_msg, BalPackFn *resp_unpack,
+    BrMsg *msg,
+
+    void *req,
+    BalUnpackFn *req_unpack,
+
+    void *resp,
+    int resp_id,
+    BalPackFn *resp_pack,
+
     Alloc *alloc);

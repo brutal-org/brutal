@@ -114,7 +114,7 @@ void cgen_c_stmt(Emit *emit, CStmt stmt)
     case CSTMT_SWITCH:
         emit_fmt(emit, "switch (");
         cgen_c_expr(emit, stmt.while_.expr);
-        emit_fmt(emit, ") \n");
+        emit_fmt(emit, ")\n");
         cgen_c_stmt(emit, *stmt.while_.stmt);
         return;
 

@@ -183,6 +183,7 @@ BrResult br_ev_req_raw(IpcEv *self, BrId to, BrMsg *req, BrMsg *resp)
 BrResult br_ev_resp_raw(MAYBE_UNUSED IpcEv *self, BrMsg const *req, BrMsg *resp)
 {
     resp->seq = req->seq;
+    resp->prot = req->prot;
 
     return br_ipc(&(BrIpcArgs){
         .to = req->from,

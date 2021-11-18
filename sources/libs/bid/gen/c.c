@@ -364,6 +364,99 @@ CStmt gen_method_body(BidMethod method, BidIface const iface, Alloc *alloc)
     return block;
 }
 
+CType gen_dispatch_type(Alloc *alloc)
+{
+    CType ctype = ctype_func(ctype_void(), alloc);
+
+    ctype_member(&ctype, str$("ev"), ctype_ptr(ctype_name(str$("IpcEv"), alloc), alloc), alloc);
+    ctype_member(&ctype, str$("req"), ctype_ptr(ctype_name(str$("BrMsg"), alloc), alloc), alloc);
+    ctype_member(&ctype, str$("ctx"), ctype_ptr(ctype_void(), alloc), alloc);
+
+    return ctype;
+}
+
+CExpr gen_dispatch_handler(BidMethod method, Alloc *alloc)
+{
+    CExpr expr = cexpr_initializer(alloc);
+
+    cexpr_member(&expr, cexpr_ptr_access(cexpr_ident(str$("vtable"), alloc), cexpr_ident(method.name, alloc), alloc));
+
+    return cexpr_cast(expr, ctype_name(str$("BidHandler"), alloc), alloc);
+}
+
+void gen_dispatch_case(CStmt *block, BidMethod method, Alloc *alloc)
+{
+    CExpr call_handler = cexpr_call(alloc, cexpr_ident(str$("bid_hook_handle"), alloc));
+
+    cexpr_member(&call_handler, gen_dispatch_handler(method, alloc));
+    cexpr_member(&call_handler, cexpr_ident(str$("ev"), alloc));
+    cexpr_member(&call_handler, cexpr_ident(str$("req"), alloc));
+
+    if (method.request.type != BID_TYPE_NIL)
+    {
+        cstmt_block_add(block, cstmt_decl(cdecl_var(str$("req_buf"), ctype_name(method.request.primitive_.mangled, alloc), cexpr_empty(), alloc), alloc));
+
+        cexpr_member(&call_handler, cexpr_ident(str$("req_buf"), alloc));
+        cexpr_member(&call_handler, cexpr_ident(gen_unpack_name(method.request.primitive_.mangled, alloc), alloc));
+    }
+    else
+    {
+        cexpr_member(&call_handler, cexpr_ident(str$("nullptr"), alloc));
+        cexpr_member(&call_handler, cexpr_ident(str$("nullptr"), alloc));
+    }
+
+    if (method.response.type != BID_TYPE_NIL)
+    {
+        cstmt_block_add(block, cstmt_decl(cdecl_var(str$("resp_buf"), ctype_name(method.response.primitive_.mangled, alloc), cexpr_empty(), alloc), alloc));
+
+        cexpr_member(&call_handler, cexpr_ref(cexpr_ident(str$("resp_buf"), alloc), alloc));
+        cexpr_member(&call_handler, cexpr_ident(str_fmt(alloc, "MSG_{case:constant}_RESP", method.mangled), alloc));
+        cexpr_member(&call_handler, cexpr_ident(gen_pack_name(method.response.primitive_.mangled, alloc), alloc));
+    }
+    else
+    {
+        cexpr_member(&call_handler, cexpr_ident(str$("nullptr"), alloc));
+        cexpr_member(&call_handler, cexpr_ident(str_fmt(alloc, "-1", method.mangled), alloc));
+        cexpr_member(&call_handler, cexpr_ident(str$("nullptr"), alloc));
+    }
+
+    cstmt_block_add(block, cstmt_expr(call_handler));
+}
+
+CStmt gen_dispatch_body(BidIface const iface, Alloc *alloc)
+{
+    CStmt block = cstmt_block(alloc);
+    CType vtable_type = ctype_ptr(ctype_name(str_fmt(alloc, "{}VTable", iface.name), alloc), alloc);
+
+    cstmt_block_add(&block, cstmt_decl(cdecl_var(str$("vtable"), vtable_type, cexpr_cast(cexpr_ident(str$("ctx"), alloc), vtable_type, alloc), alloc), alloc));
+
+    CStmt dispatch_body = cstmt_block(alloc);
+
+    vec_foreach(method, &iface.methods)
+    {
+        CStmt case_body = cstmt_block(alloc);
+
+        cstmt_block_add(&dispatch_body, cstmt_case(cexpr_ident(str_fmt(alloc, "MSG_{case:upper}_REQ", method.mangled), alloc)));
+        gen_dispatch_case(&case_body, method, alloc);
+        cstmt_block_add(&dispatch_body, case_body);
+        cstmt_block_add(&dispatch_body, cstmt_break());
+    }
+
+    CStmt dispatch_switch = cstmt_switch(cexpr_ptr_access(cexpr_ident(str$("req"), alloc), cexpr_ident(str$("type"), alloc), alloc), dispatch_body, alloc);
+    cstmt_block_add(&block, dispatch_switch);
+
+    return block;
+}
+
+CDecl bidgen_c_dispatch_func(BidIface const iface, Alloc *alloc)
+{
+    Str name = str_fmt(alloc, "{case:snake}_dispatch", iface.name);
+    CType type = gen_dispatch_type(alloc);
+    CStmt body = gen_dispatch_body(iface, alloc);
+
+    return cdecl_func(name, type, body, alloc);
+}
+
 CUnit bidgen_c_source(MAYBE_UNUSED BidIface const iface, Alloc *alloc)
 {
     CUnit unit = cunit(alloc);
@@ -383,6 +476,8 @@ CUnit bidgen_c_source(MAYBE_UNUSED BidIface const iface, Alloc *alloc)
 
         cunit_decl(&unit, cdecl_func(method.mangled, type, body, alloc));
     }
+
+    cunit_decl(&unit, bidgen_c_dispatch_func(iface, alloc));
 
     return unit;
 }
