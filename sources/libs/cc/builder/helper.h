@@ -16,3 +16,6 @@ void cc_push_initializer_member(CExpr *targ, Str designator, CExpr value, Alloc 
 
 #define cexpr_str_op(type, strA, strB, ALLOC) \
     cexpr_##type(cexpr_ident(strA, ALLOC), cexpr_ident(strB, ALLOC), ALLOC)
+
+#define ctype_ptr_identifier(str, ALLOC) \
+    ctype_ptr(ctype_name(str, ALLOC), ALLOC)
