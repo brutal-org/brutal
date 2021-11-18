@@ -2,6 +2,32 @@
 #include <brutal/io.h>
 #include <json/parser.h>
 
+static bool json_skip_comment(Scan *scan)
+{
+    if (scan_curr(scan) == '/' && scan_peek(scan, 1) == '*')
+    {
+        while (!scan_ended(scan))
+        {
+            if (scan_curr(scan) == '*' && scan_peek(scan, 1) == '/')
+            {
+                scan_next_n(scan, 2);
+                return true;
+            }
+            scan_next(scan);
+        }
+
+        scan_throw(scan, str$("not closed comment"), str$("/*"));
+    }
+
+    return false;
+}
+
+static void json_skip_space_and_comment(Scan *scan)
+{
+    while (scan_skip_space(scan).len != 0 || json_skip_comment(scan))
+        ;
+}
+
 static int is_closing_string(int c)
 {
     return c != '"';
@@ -9,11 +35,11 @@ static int is_closing_string(int c)
 
 static Str parse_str(Scan *scan)
 {
-    scan_skip_space(scan);
+    json_skip_space_and_comment(scan);
     scan_expect(scan, '"');
     Str name = scan_skip_until(scan, is_closing_string);
     scan_expect(scan, '"');
-    scan_skip_space(scan);
+    json_skip_space_and_comment(scan);
 
     return name;
 }
@@ -30,7 +56,7 @@ Json json_parse_array(Scan *scan, Alloc *alloc)
 
         res = json_parse(scan, alloc);
 
-        scan_skip_space(scan);
+        json_skip_space_and_comment(scan);
 
         vec_push(&ret.array, res);
 
@@ -39,7 +65,7 @@ Json json_parse_array(Scan *scan, Alloc *alloc)
             break;
         }
 
-        scan_skip_space(scan);
+        json_skip_space_and_comment(scan);
     }
 
     scan_expect(scan, ']');
@@ -63,14 +89,14 @@ Json json_parse_object(Scan *scan, Alloc *alloc)
 
         map_put(&ret.object, name, value);
 
-        scan_skip_space(scan);
+        json_skip_space_and_comment(scan);
 
         if (!scan_skip(scan, ','))
         {
             break;
         }
 
-        scan_skip_space(scan);
+        json_skip_space_and_comment(scan);
     }
 
     scan_expect(scan, '}');
@@ -80,7 +106,7 @@ Json json_parse_object(Scan *scan, Alloc *alloc)
 
 Json json_parse(Scan *scan, Alloc *alloc)
 {
-    scan_skip_space(scan);
+    json_skip_space_and_comment(scan);
 
     if (scan_curr(scan) == '"') // string
     {

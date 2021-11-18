@@ -77,3 +77,16 @@ TEST(json_parse_table)
     assert_truth(json_is(res.array.data[2], JSON_OBJECT));
     assert_str_equal(res.array.data[3].string, str$("cool"));
 }
+
+TEST(json_parse_comment_test)
+{
+    Str base = str$("{ /* this is a beautiful comment */ \"hello\": /* am i here */ \"world\" } /*or here ???*/");
+    Json json = json_parse_str(base, test_alloc());
+
+    assert_truth(json_is(json, JSON_OBJECT));
+
+    Json res = json_get(json, str$("hello"));
+
+    assert_str_equal(res.string, str$("world"));
+}
+
