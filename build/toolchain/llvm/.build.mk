@@ -81,6 +81,6 @@ ifeq ($(GEN_COVERAGE), yes)
 		-fprofile-instr-generate -fcoverage-mapping
 	
 	HOST_LDFLAGS += \
-		-fprofile-instr-generate
+		-fprofile-instr-generate -fcoverage-mapping
 
 endif

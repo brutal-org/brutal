@@ -2,6 +2,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 TaskId host_task_self(void)
 {
@@ -24,7 +25,7 @@ void host_task_exit(TaskId handle, int result)
 {
     if (handle == TASK_THIS)
     {
-        _exit(result);
+        exit(result);
     }
 }
 
@@ -32,6 +33,6 @@ void host_task_abort(TaskId handle)
 {
     if (handle == TASK_THIS)
     {
-        _exit(TASK_EXIT_FAILURE);
+        exit(TASK_EXIT_FAILURE);
     }
 }
