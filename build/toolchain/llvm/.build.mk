@@ -32,45 +32,45 @@ endif
 
 HOST_ARFLAGS=rcs
 
-# --- Cross-Compiler --------------------------------------------------------- #
+# --- User-Compiler --------------------------------------------------------- #
 
-CROSS_CC=clang$(LLVM_VERSION) -target $(CONFIG_ARCH)-none-elf
+USER_CC=clang$(LLVM_VERSION) -target $(CONFIG_ARCH)-none-elf
 ifeq (, $(shell which clang$(LLVM_VERSION) 2> /dev/null))
-	CROSS_CC=clang -target $(CONFIG_ARCH)-none-elf
+	USER_CC=clang -target $(CONFIG_ARCH)-none-elf
 endif
 
-CROSS_CFLAGS= \
+USER_CFLAGS= \
 	-MD \
 	$(CFLAGS_STD) \
 	$(CFLAGS_OPT) \
 	$(CFLAGS_WARN) \
-	$(CROSS_CFLAGS_INC) \
+	$(USER_CFLAGS_INC) \
 	-ffreestanding
 
-CROSS_KCFLAGS= \
-	$(CROSS_CFLAGS) \
+USER_KCFLAGS= \
+	$(USER_CFLAGS) \
 	$(ARCH_KCFLAGS) \
 	-D__kernel__=1
 
-CROSS_UCFLAGS= \
-	$(CROSS_CFLAGS) \
+USER_UCFLAGS= \
+	$(USER_CFLAGS) \
 	-nostdlib \
 	-D__brutal__=1
 
-CROSS_LD=ld.lld
-CROSS_KLDFLAGS= \
+USER_LD=ld.lld
+USER_KLDFLAGS= \
 	-Tsources/embed/kernel/$(CONFIG_ARCH)/link.ld \
 	-z max-page-size=0x1000 \
 	$(ARCH_LDFLAGS)
 
-CROSS_ULDFLAGS= \
+USER_ULDFLAGS= \
 	-Tsources/embed/brutal/$(CONFIG_ARCH)/link.ld \
 	-z max-page-size=0x1000 \
 	$(ARCH_LDFLAGS)
 
-CROSS_AR?=llvm-ar$(LLVM_VERSION)
-ifeq (, $(shell which $(CROSS_AR) 2> /dev/null))
-	CROSS_AR=llvm-ar
+USER_AR?=llvm-ar$(LLVM_VERSION)
+ifeq (, $(shell which $(USER_AR) 2> /dev/null))
+	USER_AR=llvm-ar
 endif
 
-CROSS_ARFLAGS=rcs
+USER_ARFLAGS=rcs

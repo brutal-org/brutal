@@ -17,7 +17,7 @@ LOADER_CFLAGS= \
 	$(CFLAGS_STD) \
 	$(CFLAGS_OPT) \
 	$(CFLAGS_WARN) \
-	$(CROSS_CFLAGS_INC) \
+	$(USER_CFLAGS_INC) \
 	-ffreestanding \
 	-D__x86_64__ \
 	-D__efi__ \

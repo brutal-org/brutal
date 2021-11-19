@@ -1,3 +1,3 @@
 INIT_NAME = init
 
-CROSS_BINS += INIT
+USER_BINS += INIT

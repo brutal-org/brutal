@@ -31,7 +31,7 @@ $(BINDIR_HOST)/%.c.o: sources/%.c
 $(BINDIR_HOST)/%.s.o: sources/%.s
 	$(ECHO) "host   AS" $<
 	@$(MKCWD)
-	$(V)$(CROSS_AS) -o $@ $< $(CROSS_ASFLAGS)
+	$(V)$(USER_AS) -o $@ $< $(USER_ASFLAGS)
 
 $(LIBS_HOST_BIN): $(LIBS_HOST_OBJ)
 	$(ECHO) "host   AR" $@

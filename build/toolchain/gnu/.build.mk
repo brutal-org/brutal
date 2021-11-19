@@ -20,41 +20,41 @@ HOST_LDFLAGS=`pkg-config  sdl2 --libs`
 HOST_AR=ar
 HOST_ARFLAGS=rcs
 
-# --- Cross-Compiler --------------------------------------------------------- #
-CROSS_CC=$(CONFIG_ARCH)-elf-gcc
+# --- User-Compiler ---------------------------------------------------------- #
+USER_CC=$(CONFIG_ARCH)-elf-gcc
 
-CROSS_CFLAGS= \
+USER_CFLAGS= \
 	-MD \
 	$(CFLAGS_STD) \
 	$(CFLAGS_OPT) \
 	$(CFLAGS_WARN) \
 	$(ARCH_CFLAGS) \
-	$(CROSS_CFLAGS_INC) \
+	$(USER_CFLAGS_INC) \
 	-ffreestanding \
 	-D__brutal__=1
 
-CROSS_KCFLAGS= \
-	$(CROSS_CFLAGS) \
+USER_KCFLAGS= \
+	$(USER_CFLAGS) \
 	$(ARCH_KCFLAGS) \
 	-fno-stack-protector \
 	-D__kernel__=1
 
-CROSS_UCFLAGS= \
-	$(CROSS_CFLAGS) \
+USER_UCFLAGS= \
+	$(USER_CFLAGS) \
 	-nostdlib
 
-CROSS_LD=$(CONFIG_ARCH)-elf-ld
-CROSS_KLDFLAGS= \
+USER_LD=$(CONFIG_ARCH)-elf-ld
+USER_KLDFLAGS= \
 	-Tsources/embed/kernel/$(CONFIG_ARCH)/$(CONFIG_BOARD)/link.ld \
 	-z max-page-size=0x1000 \
 	$(ARCH_LDFLAGS) \
 	build/toolchain/gnu/local/lib/gcc/$(CONFIG_ARCH)-elf/11.1.0/libgcc.a 
 
-CROSS_ULDFLAGS= \
+USER_ULDFLAGS= \
 	-Tsources/embed/brutal/$(CONFIG_ARCH)/link.ld \
 	-z max-page-size=0x1000 \
 	$(ARCH_LDFLAGS) \
 	build/toolchain/gnu/local/lib/gcc/$(CONFIG_ARCH)-elf/11.1.0/libgcc.a 
 
-CROSS_AR=$(CONFIG_ARCH)-elf-ar
-CROSS_ARFLAGS=rcs
+USER_AR=$(CONFIG_ARCH)-elf-ar
+USER_ARFLAGS=rcs

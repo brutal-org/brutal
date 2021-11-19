@@ -12,8 +12,8 @@ ARCH_KCFLAGS = \
 ARCH_CFLAGS = \
 	-fsanitize=undefined
 
-CROSS_AS=nasm
-CROSS_ASFLAGS=-f elf64
+USER_AS=nasm
+USER_ASFLAGS=-f elf64
 
 QEMU_ARGS= \
 		-M q35 \

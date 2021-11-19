@@ -19,34 +19,34 @@ LIBS_SRC = \
 	$(wildcard sources/libs/ubsan/*.c)
 
 LIBS_OBJ = \
-	$(patsubst sources/%, $(BINDIR_CROSS)/%.o, $(LIBS_SRC))
+	$(patsubst sources/%, $(BINDIR_USER)/%.o, $(LIBS_SRC))
 
-LIBS_BIN=$(BINDIR_CROSS)/libbrutal.a
+LIBS_BIN=$(BINDIR_USER)/libbrutal.a
 
 DEPENDENCIES += $(LIBS_OBJ:.o=.d)
 
-$(BINDIR_CROSS)/%.c.o: sources/%.c
+$(BINDIR_USER)/%.c.o: sources/%.c
 	$(ECHO) "brutal CC" $<
 	@$(MKCWD)
-	$(V)$(CROSS_CC) -c -o $@ $< $(CROSS_UCFLAGS)
+	$(V)$(USER_CC) -c -o $@ $< $(USER_UCFLAGS)
 
-$(BINDIR_CROSS)/%.s.o: sources/%.s
+$(BINDIR_USER)/%.s.o: sources/%.s
 	$(ECHO) "brutal AS" $<
 	@$(MKCWD)
-	$(V)$(CROSS_AS) -o $@ $< $(CROSS_ASFLAGS)
+	$(V)$(USER_AS) -o $@ $< $(USER_ASFLAGS)
 
 $(LIBS_BIN): $(LIBS_OBJ)
 	$(ECHO) "brutal AR" $@
 	@$(MKCWD)
-	$(V)$(CROSS_AR) $(CROSS_ARFLAGS) $@ $^
+	$(V)$(USER_AR) $(USER_ARFLAGS) $@ $^
 
 define BIN_TEMPLATE
 
 $(1)_SRC = $$(wildcard sources/bins/$($(1)_NAME)/*.c)
 
-$(1)_OBJ = $$(patsubst sources/%, $(BINDIR_CROSS)/%.o, $$($(1)_SRC))
+$(1)_OBJ = $$(patsubst sources/%, $(BINDIR_USER)/%.o, $$($(1)_SRC))
 
-$(1)_BIN  = $(BINDIR_CROSS)/$($(1)_NAME)
+$(1)_BIN  = $(BINDIR_USER)/$($(1)_NAME)
 
 DEPENDENCIES += $$($(1)_OBJ:.o=.d)
 
@@ -56,13 +56,13 @@ ALL+=$$($(1)_BIN)
 $$($(1)_BIN): $$($(1)_OBJ) $(LIBS_BIN)
 	$$(ECHO) "brutal LD" $$@
 	@$$(MKCWD)
-	$(V)$(CROSS_LD) -o $$@ $$^ $(CROSS_ULDFLAGS)
+	$(V)$(USER_LD) -o $$@ $$^ $(USER_ULDFLAGS)
 
 endef
 
 -include sources/bins/*/.build.mk
 
-list-cross:
-	@echo $(CROSS_BINS)
+list-user:
+	@echo $(USER_BINS)
 
-$(foreach bin, $(CROSS_BINS), $(eval $(call BIN_TEMPLATE,$(bin))))
+$(foreach bin, $(USER_BINS), $(eval $(call BIN_TEMPLATE,$(bin))))

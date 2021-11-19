@@ -50,7 +50,7 @@ HOST_CFLAGS_INC ?= \
 	-Isources/ \
 	-Ithirdparty
 
-CROSS_CFLAGS_INC ?= \
+USER_CFLAGS_INC ?= \
 	$(INC_LIBS) \
 	$(INC_LIBBRUTAL) \
 	-Isources/libs/hw \
@@ -59,7 +59,7 @@ CROSS_CFLAGS_INC ?= \
 	-Ithirdparty
 
 BINDIR=bin/$(CONFIG_ARCH)-$(CONFIG_TOOLCHAIN)
-BINDIR_CROSS=bin/$(CONFIG_ARCH)-$(CONFIG_TOOLCHAIN)/cross
+BINDIR_USER=bin/$(CONFIG_ARCH)-$(CONFIG_TOOLCHAIN)/user
 BINDIR_HOST=bin/$(CONFIG_HOST_ARCH)-$(CONFIG_TOOLCHAIN)/host
 
 MKCWD=mkdir -p $(@D)
@@ -69,7 +69,7 @@ include build/toolchain/archs/$(CONFIG_ARCH).mk
 include build/toolchain/$(CONFIG_TOOLCHAIN)/.build.mk
 
 include sources/kernel/.build.mk
-include sources/bins/.cross.mk
+include sources/bins/.user.mk
 include sources/bins/.host.mk
 include sources/loader/.build.mk
 include sources/protos/.build.mk

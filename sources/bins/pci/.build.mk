@@ -1,3 +1,3 @@
 PCI_NAME = pci
 
-CROSS_BINS += PCI
+USER_BINS += PCI

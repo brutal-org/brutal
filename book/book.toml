@@ -4,3 +4,7 @@ language = "en"
 multilingual = false
 src = "."
 title = "The BRUTAL Handbook"
+
+[build]
+build-dir = "../bin/book"
+create-missing = true

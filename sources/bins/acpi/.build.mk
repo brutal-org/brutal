@@ -1,3 +1,3 @@
 ACPI_NAME = acpi
 
-CROSS_BINS += ACPI
+USER_BINS += ACPI

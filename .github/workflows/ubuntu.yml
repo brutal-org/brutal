@@ -37,7 +37,7 @@ jobs:
       - name: Cache Toolchain (${{matrix.toolchain}})
         uses: actions/cache@v2
         env:
-          cache-name: cached-cross-compiler
+          cache-name: cached-user-compiler
         with:
           path: |
             **/build/toolchain/${{matrix.toolchain}}/local
@@ -68,7 +68,7 @@ jobs:
       - name: Cache Toolchain (${{matrix.toolchain}})
         uses: actions/cache@v2
         env:
-          cache-name: cached-cross-compiler
+          cache-name: cached-user-compiler
         with:
           path: |
             **/build/toolchain/${{matrix.toolchain}}/local
