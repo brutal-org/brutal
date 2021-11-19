@@ -78,9 +78,9 @@ USER_ARFLAGS=rcs
 
 ifeq ($(GEN_COVERAGE), yes)
 	HOST_CFLAGS += \
-		-fprofile-arcs \
-		-ftest-coverage
+		-fprofile-instr-generate -fcoverage-mapping
 	
 	HOST_LDFLAGS += \
-		--coverage
+		-fprofile-instr-generate
+
 endif

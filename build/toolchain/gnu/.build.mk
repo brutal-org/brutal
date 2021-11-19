@@ -58,3 +58,11 @@ USER_ULDFLAGS= \
 
 USER_AR=$(CONFIG_ARCH)-elf-ar
 USER_ARFLAGS=rcs
+
+ifeq ($(GEN_COVERAGE), yes)
+	HOST_CFLAGS += \
+		-coverage -g
+	
+	HOST_LDFLAGS += \
+		-coverage
+endif
