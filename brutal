@@ -6,7 +6,7 @@ TOOLS="$(make list-host | tr '[:upper:]' '[:lower:]') "
 JOBS=""
 SILENT="-s"
 DEBUG=""
-
+COVERAGE=""
 export VERBOSE="no"
 
 if [[ -z "${CONFIG_TOOLCHAIN}" ]]; then
@@ -25,6 +25,7 @@ usage()
   echo "    -f, --fast     Do it fast"
   echo "        --fix      Run some common fixes"
   echo "    -h, --help     Show usage"
+  echo "    -o, --coverage Generate code coverage"
   echo "    -r, --run      Start the virtual machine"
   echo "    -v, --verbose  Enable detailed logging"
   echo ""
@@ -55,6 +56,10 @@ while [[ $1 == -* ]]; do
 
     "-n" | "--nuke")
       make $SILENT nuke
+      ;;
+
+    "-o" | "--coverage") 
+      COVERAGE="GEN_COVERAGE=yes"
       ;;
 
     "-f" | "--fast")
@@ -99,6 +104,7 @@ if [ $# -gt 0 ]; then
   fi
 
   PKGS=./bin/$(uname -m)-$CONFIG_TOOLCHAIN/host
-  make $JOBS $SILENT $PKGS/$1
+
+  make $JOBS $SILENT $PKGS/$1 $COVERAGE
   $DEBUG $PKGS/$@
 fi

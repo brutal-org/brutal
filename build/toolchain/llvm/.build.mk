@@ -74,3 +74,13 @@ ifeq (, $(shell which $(USER_AR) 2> /dev/null))
 endif
 
 USER_ARFLAGS=rcs
+
+
+ifeq ($(GEN_COVERAGE), yes)
+	HOST_CFLAGS += \
+		-fprofile-arcs \
+		-ftest-coverage
+	
+	HOST_LDFLAGS += \
+		--coverage
+endif
