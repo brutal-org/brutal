@@ -60,3 +60,4 @@ build/toolchain/gnu/local
 build/toolchain/gnu/tarballs
 
 book/brutal.pdf
+.DS_STORE
