@@ -8,7 +8,7 @@ int main(int argc, char const *argv[])
 {
     if (argc < 2)
     {
-        log$("bid usage [bid input] [c output]");
+        log$("usages: {} [input]", argv[0]);
         return 0;
     }
 
