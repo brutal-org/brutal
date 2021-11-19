@@ -38,6 +38,7 @@
 
 ## CI
 
+- [![codecov](https://codecov.io/gh/brutal-org/brutal/branch/main/graph/badge.svg?token=T4R6TEF56Z)](https://codecov.io/gh/brutal-org/brutal) (this number only includes code that can run on linux)
 - [![Build and Test (Ubuntu)](https://github.com/brutal-org/brutal/actions/workflows/ubuntu.yml/badge.svg)](https://github.com/brutal-org/brutal/actions/workflows/ubuntu.yml)
 - [![Build and Test (Darwin)](https://github.com/brutal-org/brutal/actions/workflows/darwin.yml/badge.svg)](https://github.com/brutal-org/brutal/actions/workflows/darwin.yml)
 
