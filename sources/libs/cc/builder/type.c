@@ -109,10 +109,10 @@ CType ctype_union(Alloc *alloc)
     return type;
 }
 
-void ctype_member(CType *self, Str name, CType type, Alloc *alloc)
+void ctype_member(CType *self, Str name, CType type)
 {
     CTypeMember member = {
-        .name = str_dup(name, alloc),
+        .name = name,
         .type = type,
     };
 
@@ -141,10 +141,10 @@ CType ctype_enum(Alloc *alloc)
     return type;
 }
 
-void ctype_constant(CType *self, Str name, CVal val, Alloc *alloc)
+void ctype_constant(CType *self, Str name, CVal val)
 {
     CTypeConstant constant = {
-        .name = str_dup(name, alloc),
+        .name = name,
         .value = val,
     };
 
@@ -170,11 +170,11 @@ CType ctype_func(CType ret, Alloc *alloc)
     return type;
 }
 
-CType ctype_name(Str name, Alloc *alloc)
+CType ctype_ident(Str name)
 {
     CType type = {
         .type = CTYPE_NAME,
-        .name = str_dup(name, alloc),
+        .name = name,
     };
 
     return type;
@@ -186,9 +186,9 @@ CType ctype_attr(CType type, CTypeAttr attr)
     return type;
 }
 
-CType ctype_named(CType type, Str name, Alloc *alloc)
+CType ctype_named(CType type, Str name)
 {
-    type.name = str_dup(name, alloc);
+    type.name = name;
     return type;
 }
 

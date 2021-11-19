@@ -25,4 +25,4 @@ CVal cval_unsigned(CUnsigned v);
 
 CVal cval_float(double v);
 
-CVal cval_string(Str str, Alloc *alloc);
+CVal cval_string(Str str);

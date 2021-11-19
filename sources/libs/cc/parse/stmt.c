@@ -102,7 +102,7 @@ CStmt cparse_stmt(Lex *lex, Alloc *alloc)
         {
             Str label = lex_curr(lex).str;
             lex_next(lex);
-            return cstmt_goto(label, alloc);
+            return cstmt_goto(label);
         }
         else
         {

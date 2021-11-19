@@ -15,7 +15,7 @@ CType cparse_type(Lex *lex, Alloc *alloc);
 
 CUnit cparse_unit(Lex *lex, Alloc *alloc);
 
-CVal cparse_val(Lex *lex, Alloc *alloc);
+CVal cparse_val(Lex *lex);
 
 /* --- Miscs ---------------------------------------------------------------- */
 

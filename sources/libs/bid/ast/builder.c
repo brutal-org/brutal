@@ -19,7 +19,7 @@ BidIface bid_iface_barebone(Str name, Alloc *alloc)
     BidIface iface;
 
     iface.errors = bid_nil();
-    iface.name = str_dup(name, alloc);
+    iface.name = name;
     iface.id = fnv_32(name.buf, name.len, FNV1_32_INIT);
 
     vec_init(&iface.aliases, alloc);

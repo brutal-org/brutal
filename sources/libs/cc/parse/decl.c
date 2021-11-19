@@ -12,7 +12,7 @@ CType cparse_declarator_postfix(Lex *lex, CType type, Alloc *alloc)
             do
             {
                 CDeclarator decl = cparse_declarator(lex, alloc);
-                ctype_member(&func, decl.name, decl.type, alloc);
+                ctype_member(&func, decl.name, decl.type);
             } while (cparse_skip_separator(lex, CLEX_COMMA));
 
             cparse_expect_separator(lex, CLEX_RPARENT);
@@ -150,7 +150,7 @@ CDecl cparse_decl(Lex *lex, Alloc *alloc)
         cparse_whitespace(lex);
         CDeclarator declarator = cparse_declarator(lex, alloc);
 
-        return cdecl_type(declarator.name, declarator.type, alloc);
+        return cdecl_type(declarator.name, declarator.type);
     }
     else
     {
@@ -163,12 +163,12 @@ CDecl cparse_decl(Lex *lex, Alloc *alloc)
             if (cparse_is_separator(lex, CLEX_LBRACE))
             {
                 CStmt body = cparse_stmt(lex, alloc);
-                return cdecl_attrib(cdecl_func(decl.name, decl.type, body, alloc), attr);
+                return cdecl_attrib(cdecl_func(decl.name, decl.type, body), attr);
             }
             else
             {
                 cparse_expect_separator(lex, CLEX_SEMICOLON);
-                return cdecl_attrib(cdecl_func(decl.name, decl.type, cstmt_empty(), alloc), attr);
+                return cdecl_attrib(cdecl_func(decl.name, decl.type, cstmt_empty()), attr);
             }
         }
         else
@@ -176,12 +176,12 @@ CDecl cparse_decl(Lex *lex, Alloc *alloc)
             if (cparse_skip_separator(lex, CLEX_EQUAL))
             {
                 CExpr init = cparse_expr(lex, CEXPR_MAX_PRECEDENCE, alloc);
-                return cdecl_var(decl.name, decl.type, init, alloc);
+                return cdecl_var(decl.name, decl.type, init);
             }
             else
             {
                 cparse_expect_separator(lex, CLEX_SEMICOLON);
-                return cdecl_attrib(cdecl_var(decl.name, decl.type, cexpr_empty(), alloc), attr);
+                return cdecl_attrib(cdecl_var(decl.name, decl.type, cexpr_empty()), attr);
             }
         }
     }

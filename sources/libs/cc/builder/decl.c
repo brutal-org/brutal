@@ -1,19 +1,19 @@
 #include <cc/builder/decl.h>
 
-CDecl cdecl_type(Str name, CType type, Alloc *alloc)
+CDecl cdecl_type(Str name, CType type)
 {
     return (CDecl){
         .type = CDECL_TYPE,
-        .name = str_dup(name, alloc),
+        .name = name,
         .type_.type = type,
     };
 }
 
-CDecl cdecl_var(Str name, CType type, CExpr expr, Alloc *alloc)
+CDecl cdecl_var(Str name, CType type, CExpr expr)
 {
     return (CDecl){
         .type = CDECL_VAR,
-        .name = str_dup(name, alloc),
+        .name = name,
         .var_ = {
             .type = type,
             .expr = expr,
@@ -21,11 +21,11 @@ CDecl cdecl_var(Str name, CType type, CExpr expr, Alloc *alloc)
     };
 }
 
-CDecl cdecl_func(Str name, CType type, CStmt body, Alloc *alloc)
+CDecl cdecl_func(Str name, CType type, CStmt body)
 {
     return (CDecl){
         .type = CDECL_FUNC,
-        .name = str_dup(name, alloc),
+        .name = name,
         .func_ = {
             .type = type,
             .body = body,

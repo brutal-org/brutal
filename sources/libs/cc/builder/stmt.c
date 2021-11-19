@@ -126,19 +126,19 @@ CStmt cstmt_return(CExpr expr)
     };
 }
 
-CStmt cstmt_goto(Str str, Alloc *alloc)
+CStmt cstmt_goto(Str label)
 {
     return (CStmt){
         .type = CSTMT_GOTO,
-        .goto_.label = str_dup(str, alloc),
+        .goto_.label = label,
     };
 }
 
-CStmt cstmt_label(Str label, Alloc *alloc)
+CStmt cstmt_label(Str label)
 {
     return (CStmt){
         .type = CSTMT_LABEL,
-        .label_.label = str_dup(label, alloc),
+        .label_.label = label,
     };
 }
 

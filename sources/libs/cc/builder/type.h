@@ -30,16 +30,19 @@ CType ctype_union(Alloc *alloc);
 
 CType ctype_enum(Alloc *alloc);
 
-void ctype_constant(CType *self, Str name, CVal val, Alloc *alloc);
+void ctype_constant(CType *self, Str name, CVal val);
 
 CType ctype_func(CType ret, Alloc *alloc);
 
-CType ctype_name(Str name, Alloc *alloc);
+CType ctype_ident(Str name);
+
+#define ctype_ident_ptr(IDENT, ALLOC) \
+    ctype_ptr(ctype_ident(IDENT), ALLOC)
 
 CType ctype_attr(CType type, CTypeAttr attr);
 
-CType ctype_named(CType type, Str name, Alloc *alloc);
+CType ctype_named(CType type, Str name);
 
-void ctype_member(CType *self, Str name, CType type, Alloc *alloc);
+void ctype_member(CType *self, Str name, CType type);
 
 void ctype_append(CType *type, CType new_tail);

@@ -63,4 +63,4 @@ Json json_error(void);
 
 Json json_number(long number);
 
-Json json_str(Str str, Alloc *alloc);
+Json json_str(Str str);

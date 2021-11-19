@@ -17,7 +17,7 @@ Json json_object(Alloc *alloc)
 Json json_object_with_type(Str type, Alloc *alloc)
 {
     Json object = json_object(alloc);
-    json_put(&object, str$("$type"), json_str(type, alloc));
+    json_put(&object, str$("$type"), json_str(type));
     return object;
 }
 
@@ -105,10 +105,10 @@ Json json_number(long number)
     };
 }
 
-Json json_str(Str str, Alloc *alloc)
+Json json_str(Str str)
 {
     return (Json){
         .type = JSON_STRING,
-        .string = str_dup(str, alloc),
+        .string = str,
     };
 }

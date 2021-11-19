@@ -22,10 +22,10 @@ void cunit_decl(CUnit *self, CDecl decl)
         });
 }
 
-void cunit_pragma(CUnit *self, Str value, Alloc *alloc)
+void cunit_pragma(CUnit *self, Str value)
 {
     CPragma pragma = {
-        .text = str_dup(value, alloc),
+        .text = value,
     };
 
     cunit_member(
@@ -36,12 +36,12 @@ void cunit_pragma(CUnit *self, Str value, Alloc *alloc)
         });
 }
 
-void cunit_pragma_once(CUnit *self, Alloc *alloc)
+void cunit_pragma_once(CUnit *self)
 {
-    cunit_pragma(self, str$("once"), alloc);
+    cunit_pragma(self, str$("once"));
 }
 
-void cunit_include(CUnit *self, bool system, Str path, Alloc *alloc)
+void cunit_include(CUnit *self, bool system, Str path)
 {
     cunit_member(
         self,
@@ -49,7 +49,7 @@ void cunit_include(CUnit *self, bool system, Str path, Alloc *alloc)
             .type = CUNIT_INCLUDE,
             ._include = (CInclude){
                 .is_system = system,
-                .path = str_dup(path, alloc),
+                .path = path,
             },
         });
 }
@@ -60,7 +60,7 @@ void cunit_define(CUnit *self, Str name, CExpr expression, Alloc *alloc)
         .type = CUNIT_DEFINE,
         ._define = (CDefine){
             .expression = expression,
-            .name = str_dup(name, alloc),
+            .name = name,
         },
     };
 

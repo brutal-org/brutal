@@ -5,8 +5,8 @@ Json bidgen_json_primitive(BidPrimitive primitive_, Alloc *alloc)
 {
     Json json = json_object_with_type(str$("BidPrimitive"), alloc);
 
-    json_put(&json, str$("name"), json_str(primitive_.name, alloc));
-    json_put(&json, str$("mangled"), json_str(primitive_.mangled, alloc));
+    json_put(&json, str$("name"), json_str(primitive_.name));
+    json_put(&json, str$("mangled"), json_str(primitive_.mangled));
 
     return json;
 }
@@ -20,8 +20,8 @@ Json bidgen_json_enum(BidEnum enum_, Alloc *alloc)
     {
         Json member_json = json_object(alloc);
 
-        json_put(&member_json, str$("name"), json_str(member.name, alloc));
-        json_put(&member_json, str$("mangled"), json_str(member.mangled, alloc));
+        json_put(&member_json, str$("name"), json_str(member.name));
+        json_put(&member_json, str$("mangled"), json_str(member.mangled));
 
         json_append(&members_json, member_json);
     }
@@ -40,7 +40,7 @@ Json bidgen_json_struct(BidStruct struct_, Alloc *alloc)
     {
         Json member_json = json_object(alloc);
 
-        json_put(&member_json, str$("name"), json_str(member.name, alloc));
+        json_put(&member_json, str$("name"), json_str(member.name));
         json_put(&member_json, str$("type"), bidgen_json_type(member.type, alloc));
 
         json_append(&members_json, member_json);
@@ -88,7 +88,7 @@ Json bidgen_json_alias(BidAlias const alias, Alloc *alloc)
 {
     Json json = json_object_with_type(str$("BidAlias"), alloc);
 
-    json_put(&json, str$("name"), json_str(alias.name, alloc));
+    json_put(&json, str$("name"), json_str(alias.name));
     json_put(&json, str$("type"), bidgen_json_type(alias.type, alloc));
 
     return json;
@@ -98,8 +98,8 @@ Json bidgen_json_method(BidMethod const method, Alloc *alloc)
 {
     Json json = json_object_with_type(str$("BidMethod"), alloc);
 
-    json_put(&json, str$("name"), json_str(method.name, alloc));
-    json_put(&json, str$("mangled"), json_str(method.mangled, alloc));
+    json_put(&json, str$("name"), json_str(method.name));
+    json_put(&json, str$("mangled"), json_str(method.mangled));
     json_put(&json, str$("request"), bidgen_json_type(method.request, alloc));
     json_put(&json, str$("response"), bidgen_json_type(method.response, alloc));
 
@@ -124,7 +124,7 @@ Json bidgen_json_iface(BidIface const iface, Alloc *alloc)
     Json iface_json = json_object_with_type(str$("BidIface"), alloc);
 
     json_put(&iface_json, str$("id"), json_number(iface.id));
-    json_put(&iface_json, str$("name"), json_str(iface.name, alloc));
+    json_put(&iface_json, str$("name"), json_str(iface.name));
     json_put(&iface_json, str$("errors"), bidgen_json_type(iface.errors, alloc));
     json_put(&iface_json, str$("aliases"), aliases_json);
     json_put(&iface_json, str$("methods"), methods_json);

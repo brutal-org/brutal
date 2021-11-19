@@ -23,11 +23,12 @@ CExpr cexpr_self(void)
     };
 }
 
-CExpr cexpr_ident(Str ident, Alloc *alloc)
+CExpr cexpr_ident(Str ident)
 {
     return (CExpr){
         .type = CEXPR_IDENT,
-        .ident_ = str_dup(ident, alloc)};
+        .ident_ = ident,
+    };
 }
 
 CExpr cexpr_call(Alloc *alloc, CExpr name)

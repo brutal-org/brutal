@@ -18,7 +18,7 @@ CType cparse_compound_type(Lex *lex, bool is_union, Alloc *alloc)
     if (lex_curr(lex).type == CLEX_IDENT)
     {
         Str name = lex_next(lex).str;
-        ctype_named(compound, name, alloc);
+        ctype_named(compound, name);
         cparse_whitespace(lex);
     }
 
@@ -32,7 +32,7 @@ CType cparse_compound_type(Lex *lex, bool is_union, Alloc *alloc)
     while (!lex_ended(lex) && lex_skip_type(lex, CLEX_SEMICOLON))
     {
         CDeclarator declarator = cparse_declarator(lex, alloc);
-        ctype_member(&compound, declarator.name, declarator.type, alloc);
+        ctype_member(&compound, declarator.name, declarator.type);
         cparse_whitespace(lex);
     }
 
@@ -62,7 +62,7 @@ CType cparse_type(Lex *lex, Alloc *alloc)
         if (lex_curr(lex).type == CLEX_IDENT)
         {
             Str name = lex_next(lex).str;
-            ctype_named(enum_type, name, alloc);
+            ctype_named(enum_type, name);
             cparse_whitespace(lex);
         }
 
@@ -94,6 +94,6 @@ CType cparse_type(Lex *lex, Alloc *alloc)
     }
     else
     {
-        return ctype_name(str$("FIXME"), alloc);
+        return ctype_ident(str$("FIXME"));
     }
 }

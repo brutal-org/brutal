@@ -24,10 +24,10 @@ CVal cval_float(double v)
     };
 }
 
-CVal cval_string(Str str, Alloc *alloc)
+CVal cval_string(Str str)
 {
     return (CVal){
         .type = CVAL_STRING,
-        .string_ = str_dup(str, alloc),
+        .string_ = str,
     };
 }

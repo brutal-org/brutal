@@ -110,7 +110,7 @@ Json json_parse(Scan *scan, Alloc *alloc)
 
     if (scan_curr(scan) == '"') // string
     {
-        return json_str(parse_str(scan), alloc);
+        return json_str(parse_str(scan));
     }
     else if (isdigit(scan_curr(scan)) || scan_curr(scan) == '-') // number
     {

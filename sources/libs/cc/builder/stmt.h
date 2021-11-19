@@ -27,9 +27,9 @@ CStmt cstmt_switch(CExpr expr, CStmt stmt, Alloc *alloc);
 
 CStmt cstmt_return(CExpr expr);
 
-CStmt cstmt_goto(Str str, Alloc *alloc);
+CStmt cstmt_goto(Str label);
 
-CStmt cstmt_label(Str label, Alloc *alloc);
+CStmt cstmt_label(Str label);
 
 CStmt cstmt_case(CExpr expr);
 

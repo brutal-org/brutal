@@ -8,7 +8,7 @@ CExpr cexpr_constant(CVal val);
 
 CExpr cexpr_self(void);
 
-CExpr cexpr_ident(Str ident, Alloc *alloc);
+CExpr cexpr_ident(Str ident);
 
 CExpr cexpr_call(Alloc *alloc, CExpr name);
 

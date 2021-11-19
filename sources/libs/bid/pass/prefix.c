@@ -63,7 +63,7 @@ static BidType prefix_type(BidType type, BidIface iface, Alloc *alloc)
 
 BidIface bid_pass_prefix(BidIface iface, Alloc *alloc)
 {
-    BidIface prefixed = bid_iface(str_dup(iface.name, alloc), alloc);
+    BidIface prefixed = bid_iface(iface.name, alloc);
 
     prefixed.id = iface.id;
 
