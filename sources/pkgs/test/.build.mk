@@ -1,3 +1,3 @@
 TEST_NAME = test
 
-HOST_BINS += TEST
+HOST_PKGS += TEST

@@ -43,9 +43,9 @@ DEPENDENCIES += $$(LIBS_HOST_OBJ:.o=.d)
 define HOST_TEMPLATE
 
 $(1)_HOST_SRC = \
-	$$(wildcard sources/bins/$($(1)_NAME)/*.c) \
-	$$(wildcard sources/bins/$($(1)_NAME)/*/*.c) \
-	$$(wildcard sources/bins/$($(1)_NAME)/*/*/*.c)
+	$$(wildcard sources/pkgs/$($(1)_NAME)/*.c) \
+	$$(wildcard sources/pkgs/$($(1)_NAME)/*/*.c) \
+	$$(wildcard sources/pkgs/$($(1)_NAME)/*/*/*.c)
 
 $(1)_HOST_OBJ = $$(patsubst sources/%, $(BINDIR_HOST)/%.o, $$($(1)_HOST_SRC))
 
@@ -62,6 +62,6 @@ $$($(1)_HOST_BIN): $$($(1)_HOST_OBJ) $(LIBS_HOST_BIN)
 endef
 
 list-host:
-	@echo $(HOST_BINS)
+	@echo $(HOST_PKGS)
 
-$(foreach bin, $(HOST_BINS), $(eval $(call HOST_TEMPLATE,$(bin))))
+$(foreach bin, $(HOST_PKGS), $(eval $(call HOST_TEMPLATE,$(bin))))

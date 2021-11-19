@@ -1,0 +1,3 @@
+PCI_NAME = pci
+
+USER_PKGS += PCI

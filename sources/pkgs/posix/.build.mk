@@ -1,3 +1,3 @@
 POSIX_NAME = posix
 
-USER_BINS += POSIX
+USER_PKGS += POSIX

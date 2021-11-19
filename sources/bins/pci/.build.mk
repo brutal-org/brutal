@@ -1,3 +1,0 @@
-PCI_NAME = pci
-
-USER_BINS += PCI

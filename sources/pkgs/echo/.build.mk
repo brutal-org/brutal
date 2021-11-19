@@ -1,3 +1,3 @@
 ECHO_NAME = echo
 
-USER_BINS += ECHO
+USER_PKGS += ECHO

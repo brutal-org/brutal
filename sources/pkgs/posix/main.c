@@ -6,7 +6,6 @@
 
 int main(int argc, char const *argv[])
 {
-
     log$("Hello from the posix server!");
 
     DateTime dt = timestamp_to_datetime(bal_globals()->time);

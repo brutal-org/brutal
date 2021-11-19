@@ -5,7 +5,7 @@ ISO=$(BINDIR)/sysroot.iso
 $(LIMINE):
 	make -C thirdparty/limine all
 
-$(SYSROOT): sysroot/boot/limine.cfg $(KERNEL) $(SERVERS)
+$(SYSROOT): sysroot/boot/limine.cfg $(KERNEL) $(PKGS)
 	$(MKCWD)
 	rm -rf $(SYSROOT)
 	cp -R sysroot                                $(SYSROOT)
@@ -15,7 +15,7 @@ $(SYSROOT): sysroot/boot/limine.cfg $(KERNEL) $(SERVERS)
 	cp thirdparty/limine/limine-cd.bin           $(SYSROOT)/boot/limine-cd.bin
 	cp thirdparty/limine/limine-eltorito-efi.bin $(SYSROOT)/boot/limine-eltorito-efi.bin
 
-	cp $(SERVERS)                                $(SYSROOT)/servers
+	cp $(PKGS)                                $(SYSROOT)/pkgs
 
 $(ISO): $(SYSROOT) $(LIMINE)
 	$(MKCWD)

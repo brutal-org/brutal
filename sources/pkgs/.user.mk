@@ -42,7 +42,7 @@ $(LIBS_BIN): $(LIBS_OBJ)
 
 define BIN_TEMPLATE
 
-$(1)_SRC = $$(wildcard sources/bins/$($(1)_NAME)/*.c)
+$(1)_SRC = $$(wildcard sources/pkgs/$($(1)_NAME)/*.c)
 
 $(1)_OBJ = $$(patsubst sources/%, $(BINDIR_USER)/%.o, $$($(1)_SRC))
 
@@ -50,7 +50,7 @@ $(1)_BIN  = $(BINDIR_USER)/$($(1)_NAME)
 
 DEPENDENCIES += $$($(1)_OBJ:.o=.d)
 
-SERVERS+=$$($(1)_BIN)
+PKGS+=$$($(1)_BIN)
 ALL+=$$($(1)_BIN)
 
 $$($(1)_BIN): $$($(1)_OBJ) $(LIBS_BIN)
@@ -60,9 +60,9 @@ $$($(1)_BIN): $$($(1)_OBJ) $(LIBS_BIN)
 
 endef
 
--include sources/bins/*/.build.mk
+-include sources/pkgs/*/.build.mk
 
 list-user:
-	@echo $(USER_BINS)
+	@echo $(USER_PKGS)
 
-$(foreach bin, $(USER_BINS), $(eval $(call BIN_TEMPLATE,$(bin))))
+$(foreach bin, $(USER_PKGS), $(eval $(call BIN_TEMPLATE,$(bin))))

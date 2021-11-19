@@ -4,7 +4,7 @@
 -Wextra
 -Werror
 -Isources/
--Isources/bins
+-Isources/pkgs
 -Isources/libs
 -Isources/libs/hw
 -Isources/libs/stdc/ansi

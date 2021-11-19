@@ -1,3 +1,3 @@
 INIT_NAME = init
 
-USER_BINS += INIT
+USER_PKGS += INIT

@@ -46,7 +46,7 @@ INC_LIBBRUTAL= \
 HOST_CFLAGS_INC ?= \
 	$(INC_LIBBRUTAL) \
 	-Isources/libs/hw \
-	-Isources/bins \
+	-Isources/pkgs \
 	-Isources/ \
 	-Ithirdparty
 
@@ -54,7 +54,7 @@ USER_CFLAGS_INC ?= \
 	$(INC_LIBS) \
 	$(INC_LIBBRUTAL) \
 	-Isources/libs/hw \
-	-Isources/bins \
+	-Isources/pkgs \
 	-Isources/ \
 	-Ithirdparty
 
@@ -69,8 +69,8 @@ include build/toolchain/archs/$(CONFIG_ARCH).mk
 include build/toolchain/$(CONFIG_TOOLCHAIN)/.build.mk
 
 include sources/kernel/.build.mk
-include sources/bins/.user.mk
-include sources/bins/.host.mk
+include sources/pkgs/.user.mk
+include sources/pkgs/.host.mk
 include sources/loader/.build.mk
 include sources/protos/.build.mk
 include sysroot/.build.mk

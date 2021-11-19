@@ -1,3 +1,3 @@
 DEMO_NAME = demo
 
-HOST_BINS += DEMO
+HOST_PKGS += DEMO

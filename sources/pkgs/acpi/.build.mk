@@ -1,3 +1,3 @@
 ACPI_NAME = acpi
 
-USER_BINS += ACPI
+USER_PKGS += ACPI
