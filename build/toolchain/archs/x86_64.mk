@@ -20,5 +20,3 @@ QEMU_ARGS= \
 		-smp 4 \
 		-m 256M \
 		-rtc base=localtime
-
-QEMU_BOOT_METHOD=iso

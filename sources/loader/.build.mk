@@ -71,30 +71,25 @@ ALL+=$(BINDIR_LOADER)/BOOTX64.EFI
 
 $(LOADER): $(LOADER_OBJS)
 	@$(MKCWD)
-	$(ECHO) "loader LD" $@
-	$(V)$(LOADER_LD) -o $@ $^ $(LOADER_LDFLAGS)
+	$(LOADER_LD) -o $@ $^ $(LOADER_LDFLAGS)
 
 $(BINDIR_LOADER)/%.c.o: sources/%.c
 	@$(MKCWD)
-	$(ECHO) "loader CC" $<
-	$(V)$(LOADER_CC) -c -o $@ $< $(LOADER_CFLAGS)
+	$(LOADER_CC) -c -o $@ $< $(LOADER_CFLAGS)
 
 $(BINDIR_LOADER)/libs/%.c.o: sources/libs/%.c
 	@$(MKCWD)
-	$(ECHO) "loader CC" $<
-	$(V)$(LOADER_CC) -c -o $@ $< $(LOADER_CFLAGS)
+	$(LOADER_CC) -c -o $@ $< $(LOADER_CFLAGS)
 
 $(BINDIR_LOADER)/tools/OVMF.fd:
 	$(MKCWD)
 	wget https://retrage.github.io/edk2-nightly/bin/DEBUGX64_OVMF.fd
 	mv DEBUGX64_OVMF.fd $@
 
-loader: $(LOADER)
-
-run-loader: $(LOADER) $(PKGS) $(KERNEL) $(BINDIR_LOADER)/tools/OVMF.fd
+run: $(LOADER) $(PKGS) $(KERNEL) $(BINDIR_LOADER)/tools/OVMF.fd
 	$(MKCWD)
 
-	cp -R sysroot $(BINDIR_LOADER)/image
+	cp -R sysroot/* $(BINDIR_LOADER)/image
 	cp $(PKGS) $(BINDIR_LOADER)/image/pkgs
 
 	mkdir -p $(BINDIR_LOADER)/image/EFI/BOOT/
@@ -102,8 +97,11 @@ run-loader: $(LOADER) $(PKGS) $(KERNEL) $(BINDIR_LOADER)/tools/OVMF.fd
 	cp $(LOADER) $(BINDIR_LOADER)/image/EFI/BOOT/BOOTX64.EFI
 
 	qemu-system-x86_64 \
-		-serial stdio \
-		-smp 4 -m 256 -no-reboot -no-shutdown\
+		$(QEMU_ARGS) \
+		-serial mon:stdio \
+		-no-reboot \
+		-no-shutdown \
+		-no-reboot -no-shutdown\
 		-bios $(BINDIR_LOADER)/tools/OVMF.fd \
 		-drive file=fat:rw:$(BINDIR_LOADER)/image,media=disk,format=raw
 

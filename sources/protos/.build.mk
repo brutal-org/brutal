@@ -11,11 +11,9 @@ GENERATED_HDR += $(PROTOS_HDR)
 GENERATED_SRC += $(PROTOS_SRC)
 
 $(GENDIR)/%.h: sources/%.bid $(BID_HOST_BIN)
-	$(ECHO) "brutal BID" $@
 	@$(MKCWD)
-	$(V)$(BID_HOST_BIN) $< --header > $@
+	$(BID_HOST_BIN) $< --header > $@
 
 $(GENDIR)/%.c: sources/%.bid $(BID_HOST_BIN)
-	$(ECHO) "brutal BID" $@
 	@$(MKCWD)
-	$(V)$(BID_HOST_BIN) $< --source > $@
+	$(BID_HOST_BIN) $< --source > $@

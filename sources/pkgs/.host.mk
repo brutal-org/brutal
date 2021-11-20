@@ -24,19 +24,16 @@ LIBS_HOST_OBJ = \
 LIBS_HOST_BIN=$(BINDIR_HOST)/libbrutal.a
 
 $(BINDIR_HOST)/%.c.o: sources/%.c
-	$(ECHO) "host   CC" $<
 	@$(MKCWD)
-	$(V)$(HOST_CC) -c -o $@ $< $(HOST_CFLAGS)
+	$(HOST_CC) -c -o $@ $< $(HOST_CFLAGS)
 
 $(BINDIR_HOST)/%.s.o: sources/%.s
-	$(ECHO) "host   AS" $<
 	@$(MKCWD)
-	$(V)$(USER_AS) -o $@ $< $(USER_ASFLAGS)
+	$(USER_AS) -o $@ $< $(USER_ASFLAGS)
 
 $(LIBS_HOST_BIN): $(LIBS_HOST_OBJ)
-	$(ECHO) "host   AR" $@
 	@$(MKCWD)
-	$(V)$(HOST_AR) $(HOST_ARFLAGS) $@ $^
+	$(HOST_AR) $(HOST_ARFLAGS) $@ $^
 
 DEPENDENCIES += $$(LIBS_HOST_OBJ:.o=.d)
 
@@ -55,9 +52,8 @@ ALL+=$$($(1)_HOST_BIN)
 DEPENDENCIES += $$($(1)_HOST_OBJ:.o=.d)
 
 $$($(1)_HOST_BIN): $$($(1)_HOST_OBJ) $(LIBS_HOST_BIN)
-	$$(ECHO) "host   LD" $$@
 	@$$(MKCWD)
-	$(V)$(HOST_CC) -o $$@ $$^ $(HOST_LDFLAGS) $(HOST_CFLAGS)
+	$(HOST_CC) -o $$@ $$^ $(HOST_LDFLAGS) $(HOST_CFLAGS)
 
 endef
 

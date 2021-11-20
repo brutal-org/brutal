@@ -7,5 +7,3 @@ USER_ASFLAGS=
 
 QEMU_ARGS= \
 		--machine sifive_u
-
-QEMU_BOOT_METHOD=kernel

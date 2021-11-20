@@ -27,24 +27,20 @@ LIBS_BIN=$(BINDIR_USER)/libbrutal.a
 DEPENDENCIES += $(LIBS_OBJ:.o=.d)
 
 $(BINDIR_USER)/%.c.o: $(GENDIR)/%.c $(GENERATED_HDR)
-	$(ECHO) "brutal CC" $<
 	@$(MKCWD)
-	$(V)$(USER_CC) -c -o $@ $< $(USER_UCFLAGS)
+	$(USER_CC) -c -o $@ $< $(USER_UCFLAGS)
 
 $(BINDIR_USER)/%.c.o: sources/%.c $(GENERATED_HDR)
-	$(ECHO) "brutal CC" $<
 	@$(MKCWD)
-	$(V)$(USER_CC) -c -o $@ $< $(USER_UCFLAGS)
+	$(USER_CC) -c -o $@ $< $(USER_UCFLAGS)
 
 $(BINDIR_USER)/%.s.o: sources/%.s
-	$(ECHO) "brutal AS" $<
 	@$(MKCWD)
-	$(V)$(USER_AS) -o $@ $< $(USER_ASFLAGS)
+	$(USER_AS) -o $@ $< $(USER_ASFLAGS)
 
 $(LIBS_BIN): $(LIBS_OBJ)
-	$(ECHO) "brutal AR" $@
 	@$(MKCWD)
-	$(V)$(USER_AR) $(USER_ARFLAGS) $@ $^
+	$(USER_AR) $(USER_ARFLAGS) $@ $^
 
 define BIN_TEMPLATE
 
@@ -60,9 +56,8 @@ PKGS+=$$($(1)_BIN)
 ALL+=$$($(1)_BIN)
 
 $$($(1)_BIN): $$($(1)_OBJ) $(LIBS_BIN)
-	$$(ECHO) "brutal LD" $$@
 	@$$(MKCWD)
-	$(V)$(USER_LD) -o $$@ $$^ $(USER_ULDFLAGS)
+	$(USER_LD) -o $$@ $$^ $(USER_ULDFLAGS)
 
 endef
 

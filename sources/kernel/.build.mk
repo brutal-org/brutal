@@ -38,18 +38,15 @@ KERNEL_OBJ= \
 DEPENDENCIES += $(KERNEL_OBJ:.o=.d)
 
 $(BINDIR_KERNEL)/%.c.o: sources/%.c
-	$(ECHO) "kernel CC" $<
 	@$(MKCWD)
-	$(V)$(USER_CC) -c -o $@ $< $(USER_KCFLAGS)
+	$(USER_CC) -c -o $@ $< $(USER_KCFLAGS)
 
 $(BINDIR_KERNEL)/%.s.o: sources/%.s
-	$(ECHO) "kernel AS" $<
 	@$(MKCWD)
-	$(V)$(USER_AS) -o $@ $< $(USER_ASFLAGS)
+	$(USER_AS) -o $@ $< $(USER_ASFLAGS)
 
 $(KERNEL): $(KERNEL_OBJ)
-	$(ECHO) "kernel LD" $@
 	@$(MKCWD)
-	$(V)$(USER_LD) -o $@ $^ $(USER_KLDFLAGS)
+	$(USER_LD) -o $@ $^ $(USER_KLDFLAGS)
 
 ALL+=$(KERNEL)

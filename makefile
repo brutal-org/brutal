@@ -5,12 +5,6 @@ SHELL := /bin/bash
 
 export LC_ALL=C
 
-ifndef ECHO
-ECHO = @echo
-endif
-
-V:=
-
 CFLAGS_STD ?= \
 	-std=gnu2x
 
@@ -64,7 +58,6 @@ include sources/pkgs/.host.mk
 include sources/protos/.build.mk
 include sources/pkgs/.user.mk
 include sources/loader/.build.mk
-include sysroot/.build.mk
 
 .PHONY: all
 all: $(ALL)
@@ -91,10 +84,6 @@ run: $(ISO)
 		-cdrom $(ISO)
 
 endif
-
-.PHONY: bochs
-bochs: $(ISO)
-	bochs
 
 .PHONY: clean
 clean:

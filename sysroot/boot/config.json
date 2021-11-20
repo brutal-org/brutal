@@ -21,6 +21,10 @@
           "path": "/pkgs/echo"
         },
         {
+          "name": "hello",
+          "path": "/pkgs/hello"
+        },
+        {
           "name": "acpi",
           "path": "/pkgs/acpi"
         },
