@@ -114,7 +114,7 @@ static CType gen_func_method(BidMethod method, BidIface const iface, Alloc *allo
     return ctype;
 }
 
-static CType gen_func_impl(BidIface const iface, Alloc *alloc)
+static CType gen_impl_type(BidIface const iface, Alloc *alloc)
 {
     CType ctype = ctype_func(ctype_void(), alloc);
     CType vtable_type = ctype_ident(str_fmt(alloc, "{}VTable", iface.name));
@@ -156,7 +156,7 @@ CUnit bidgen_c_header(MAYBE_UNUSED BidIface const iface, Alloc *alloc)
 
     cunit_decl(&unit, cdecl_type(str_fmt(alloc, "{}Msgs", iface.name), msgtype));
     cunit_decl(&unit, cdecl_type(str_fmt(alloc, "{}VTable", iface.name), vtable));
-    cunit_decl(&unit, cdecl_func(str_fmt(alloc, "{case:lower}_impl", iface.name), gen_func_impl(iface, alloc), cstmt_empty()));
+    cunit_decl(&unit, cdecl_func(str_fmt(alloc, "{case:lower}_impl", iface.name), gen_impl_type(iface, alloc), cstmt_empty()));
 
     return unit;
 }
@@ -499,11 +499,31 @@ CStmt gen_dispatch_body(BidIface const iface, Alloc *alloc)
     return block;
 }
 
-CDecl bidgen_c_dispatch_func(BidIface const iface, Alloc *alloc)
+CDecl gen_dispatch_func(BidIface const iface, Alloc *alloc)
 {
     Str name = str_fmt(alloc, "{case:snake}_dispatch", iface.name);
     CType type = gen_dispatch_type(alloc);
     CStmt body = gen_dispatch_body(iface, alloc);
+
+    return cdecl_func(name, type, body);
+}
+
+CDecl gen_impl_func(BidIface const iface, Alloc *alloc)
+{
+    Str name = str_fmt(alloc, "{case:lower}_impl", iface.name);
+    CType type = gen_impl_type(iface, alloc);
+
+    CStmt body = cstmt_block(alloc);
+    CExpr expr = cexpr_call(alloc, cexpr_ident(str$("br_ev_impl")));
+
+    // void br_ev_impl(IpcEv *self, uint32_t id, IpcFn *fn, void *ctx);
+
+    cexpr_member(&expr, cexpr_ident(str$("ev")));
+    cexpr_member(&expr, cexpr_constant(cval_unsigned(iface.id)));
+    cexpr_member(&expr, cexpr_ident(str_fmt(alloc, "{case:snake}_dispatch", iface.name)));
+    cexpr_member(&expr, cexpr_ident(str$("vtable")));
+
+    cstmt_block_add(&body, cstmt_expr(expr));
 
     return cdecl_func(name, type, body);
 }
@@ -528,7 +548,8 @@ CUnit bidgen_c_source(MAYBE_UNUSED BidIface const iface, Alloc *alloc)
         cunit_decl(&unit, cdecl_func(method.mangled, type, body));
     }
 
-    cunit_decl(&unit, bidgen_c_dispatch_func(iface, alloc));
+    cunit_decl(&unit, gen_dispatch_func(iface, alloc));
+    cunit_decl(&unit, gen_impl_func(iface, alloc));
 
     return unit;
 }

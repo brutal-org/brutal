@@ -20,7 +20,7 @@ struct ipc_job
     struct ipc_job *prev;
 };
 
-typedef void IpcFn(struct ipc_ev *ev, BrId from, BrMsg *req, void *ctx);
+typedef void IpcFn(struct ipc_ev *ev, BrMsg *req, void *ctx);
 
 struct ipc_proto
 {
