@@ -67,7 +67,7 @@ LOADER_OBJS = \
 
 LOADER=$(BINDIR_LOADER)/BOOTX64.EFI
 
-ALL+=$(BINDIR_LOADER)/BOOTX64.EFI
+ALL+=$(LOADER)
 
 $(LOADER): $(LOADER_OBJS)
 	@$(MKCWD)
@@ -89,7 +89,7 @@ $(BINDIR_LOADER)/tools/OVMF.fd:
 run: $(LOADER) $(PKGS) $(KERNEL) $(BINDIR_LOADER)/tools/OVMF.fd
 	$(MKCWD)
 
-	mkdir $(BINDIR_LOADER)/image
+	mkdir -p $(BINDIR_LOADER)/image
 	cp -R sysroot/* $(BINDIR_LOADER)/image
 	cp $(PKGS) $(BINDIR_LOADER)/image/pkgs
 

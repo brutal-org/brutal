@@ -124,7 +124,6 @@ BrResult srv_run(Handover const *handover, Str name, BrExecArgs const *args, BrT
 
 int br_entry_handover(Handover *handover)
 {
-
     if (handover->framebuffer.present)
     {
         display_bootimage(handover);
