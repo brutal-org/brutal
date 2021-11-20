@@ -4,42 +4,7 @@ The following roadmap is always subject to change.
 
 ## Current Milestone
 
-### Milestone 3 - ACPI, PCIe, Bootloader And BID
-
-- [x] Fibers
-- [x] Event loop
-- [x] IRQ routing to userspace
-- [x] ACPI Server
-  - [x] MCFG
-- [x] PCIe Server
-  - [x] Device enumeration
-- [ ] BID (Interface definition language)
-  - [x] Parser
-  - [ ] Sema
-  - [ ] C code gen
-    - [ ] Client Code
-    - [x] Server Code
-    - [x] Serialization
-- [x] Mac support
-- [x] Bootloader
-  - [x] Load the kernel
-  - [x] Load modules
-  - [x] Pass handover information
-  - [x] Boot the kernel
-  - [x] Load modules
-
-## Upcoming Milestones
-
-### Milestone 4 - Filesystem and User Interfaces
-
-- [ ] VFS
-- [ ] ext2
-- [ ] Compositor
-- [ ] Shell
-
-### Milestone 5 - DOOM! / porting software
-
-- [ ] DOOM :rage2:
+### Milestone 4 - TBD
 
 ## Past Milestones
 
@@ -77,6 +42,30 @@ The following roadmap is always subject to change.
 - [x] Userspace ELF loader
 - [x] IPC
 - [x] IDL
+
+### Milestone 3 - ACPI, PCIe, Bootloader And BID
+
+- [x] Fibers
+- [x] Event loop
+- [x] IRQ routing to userspace
+- [x] ACPI Server
+  - [x] MCFG
+- [x] PCIe Server
+  - [x] Device enumeration
+- [x] BID (Interface definition language)
+  - [x] Parser
+  - [x] Sema
+  - [x] C code gen
+    - [x] Client Code
+    - [x] Server Code
+    - [x] Serialization
+- [x] Mac support
+- [x] Bootloader
+  - [x] Load the kernel
+  - [x] Load modules
+  - [x] Pass handover information
+  - [x] Boot the kernel
+  - [x] Load modules
 
 # Backlog
 
@@ -163,3 +152,7 @@ The following roadmap is always subject to change.
 - [ ] uchar.h
 - [ ] wchar.h
 - [ ] wctype.h
+
+## Ports
+
+- [ ] DOOM :rage2:
