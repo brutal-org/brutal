@@ -4,7 +4,32 @@ The following roadmap is always subject to change.
 
 ## Current Milestone
 
-### Milestone 4 - TBD
+### Milestone 4 - Networking And Shell
+
+- [ ] BBus
+- [ ] TTy
+- [ ] Shell
+- [ ] Optimise IPCs
+- [ ] Networking
+  - [ ] NICs
+    - [ ] e1000
+    - [ ] Rtl8139
+  - [ ] Protocols
+    - [ ] Ethernet
+    - [ ] Arp
+    - [ ] IPv4 (v6?)
+    - [ ] UDP
+    - [ ] TCP
+    - [ ] HTTP
+    - [ ] ICMP
+    - [ ] IRC
+    - [ ] TELNET
+  - [ ] Tools
+    - [ ] ping
+    - [ ] irc
+    - [ ] telnet
+    - [ ] fetch
+    - [ ] httpd
 
 ## Past Milestones
 
@@ -90,27 +115,6 @@ The following roadmap is always subject to change.
   - [ ] Entropy device
   - [ ] Console device
   - [ ] Block device
-- [ ] Rtl8139
-- [ ] E1000
-
-### Network Stack
-
-- Protocols
-  - [ ] Ethernet
-  - [ ] Arp
-  - [ ] IPv4
-  - [ ] UDP
-  - [ ] TCP
-  - [ ] HTTP
-  - [ ] ICMP
-  - [ ] IRC
-  - [ ] TELNET
-- Tools
-  - [ ] ping
-  - [ ] irc
-  - [ ] telnet
-  - [ ] fetch
-  - [ ] httpd
 
 ### C Compiler
 
