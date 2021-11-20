@@ -1,4 +1,5 @@
 #include <bal/ipc/pack.h>
+#include <brutal/debug.h>
 #include <brutal/mem.h>
 
 void bal_pack_init(BalPack *self)
@@ -8,8 +9,8 @@ void bal_pack_init(BalPack *self)
 
 void bal_pack_deinit(BalPack *self)
 {
-    bal_unmap(BR_SPACE_SELF, self->buf, self->len);
-    bal_close(self->obj);
+    assert_br_success(bal_unmap(BR_SPACE_SELF, self->buf, self->len));
+    assert_br_success(bal_close(self->obj));
 }
 
 void bal_pack_ensure(BalPack *self, size_t cap)
@@ -27,20 +28,21 @@ void bal_pack_ensure(BalPack *self, size_t cap)
         },
     };
 
-    br_create(&memobj);
+    assert_br_success(br_create(&memobj));
 
     BrMapArgs memmap = {
+        .space = BR_SPACE_SELF,
         .mem_obj = memobj.handle,
         .flags = BR_MEM_READABLE | BR_MEM_WRITABLE,
     };
 
-    br_map(&memmap);
+    assert_br_success(br_map(&memmap));
 
     if (self->buf != nullptr)
     {
         mem_cpy((void *)memmap.vaddr, self->buf, self->curr);
         bal_unmap(BR_SPACE_SELF, self->buf, self->len);
-        bal_close(self->obj);
+        assert_br_success(bal_close(self->obj));
     }
 
     self->obj = memobj.handle;

@@ -56,6 +56,7 @@ USER_CFLAGS_INC ?= \
 	-Isources/libs/hw \
 	-Isources/pkgs \
 	-Isources/ \
+	-Ibin/generated \
 	-Ithirdparty
 
 BINDIR=bin/$(CONFIG_ARCH)-$(CONFIG_TOOLCHAIN)

@@ -42,7 +42,7 @@ BrResult parcel_unpack(Parcel *self, BrMsg *msg, Domain *domain)
     {
         if (self->objs[i])
         {
-            self->msg.args[i] = domain_add(domain, self->objs[i]);
+            msg->args[i] = domain_add(domain, self->objs[i]);
         }
     }
 

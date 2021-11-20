@@ -4,6 +4,8 @@
 #include <brutal/codec/tga.h>
 #include <brutal/debug.h>
 #include <brutal/gfx.h>
+#include <protos/test/hello.c>
+#include <protos/test/hello.h>
 
 static void display_bootimage(Handover const *handover)
 {
@@ -123,6 +125,7 @@ BrResult srv_run(Handover const *handover, Str name, BrExecArgs const *args, BrT
 
 int br_entry_handover(Handover *handover)
 {
+
     if (handover->framebuffer.present)
     {
         display_bootimage(handover);
@@ -176,22 +179,33 @@ int br_entry_handover(Handover *handover)
         },
         &ps2_server);
 
-    BrTaskInfos echo_server = {};
+    BrTaskInfos hello_server = {};
     srv_run(
         handover,
-        str$("echo"),
+        str$("hello"),
         &(BrExecArgs){
-            .type = BR_START_ARGS,
+            .type = BR_START_CMAIN,
+            .cmain = {
+                .argc = 5,
+                .argv = (Str[]){
+                    str$("Hello"),
+                    str$("world"),
+                    str$("my"),
+                    str$("friend"),
+                    str$(":^)"),
+                },
+            },
         },
-        &echo_server);
+        &hello_server);
 
-    while (true)
-    {
-        br_ipc(&(BrIpcArgs){
-            .flags = BR_IPC_RECV | BR_IPC_BLOCK,
-            .deadline = BR_DEADLINE_INFINITY,
-        });
-    }
+    IpcEv ev = {};
+    br_ev_init(&ev, alloc_global());
 
-    return 0;
+    Str req = str$("Hello!");
+    Str resp = nullstr;
+    HelloError result = hello_hello(&ev, hello_server.tid, &req, &resp, alloc_global());
+    log$("result is {}", result);
+    log$("message is {}", resp);
+
+    return br_ev_run(&ev);
 }

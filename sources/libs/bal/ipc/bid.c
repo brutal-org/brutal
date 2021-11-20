@@ -40,7 +40,7 @@ int bid_hook_call(
 
     // Unpacking
 
-    assert_equal(resp_msg.args[0], (BrArg)resp_id);
+    assert_equal(resp_msg.type, (BrArg)resp_id);
 
     if (resp != nullptr)
     {
@@ -120,8 +120,13 @@ void bid_hook_handle(
         resp_pack(&pack, resp);
 
         BrMsg resp_msg;
+
         resp_msg.type = resp_id;
+        resp_msg.flags = BR_MSG_HND(0);
         resp_msg.args[0] = pack.obj;
+
+        log$("handle is {}", pack.obj);
+
         br_ev_resp_raw(ev, msg, &resp_msg);
 
         bal_pack_deinit(&pack);
