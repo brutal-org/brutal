@@ -62,18 +62,13 @@ include sources/loader/.build.mk
 .PHONY: all
 all: $(ALL)
 
-ifeq ($(QEMU_BOOT_METHOD), kernel)
-
-run: $(ISO)
+run-riscv: $(KERNEL)
 	qemu-system-$(CONFIG_ARCH) \
 		 $(QEMU_ARGS) \
 		-serial mon:stdio \
 		-no-reboot \
 		-no-shutdown \
 		-kernel $(KERNEL)
-		-hda $(ISO)
-
-else ifeq ($(QEMU_BOOT_METHOD), iso)
 
 run: $(ISO)
 	qemu-system-$(CONFIG_ARCH) \
@@ -83,7 +78,6 @@ run: $(ISO)
 		-no-shutdown \
 		-cdrom $(ISO)
 
-endif
 
 .PHONY: clean
 clean:

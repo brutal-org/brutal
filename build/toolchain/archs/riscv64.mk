@@ -1,7 +1,9 @@
 
 ARCH_CFLAGS = \
 	-march=rv64imafdc \
-	-D__$(CONFIG_BOARD)=1 
+	-D__$(CONFIG_BOARD)=1 \
+	-mno-relax
+
 USER_AS=$(CONFIG_ARCH)-elf-as
 USER_ASFLAGS=
 

@@ -44,6 +44,7 @@ USER_CFLAGS= \
 	$(CFLAGS_STD) \
 	$(CFLAGS_OPT) \
 	$(CFLAGS_WARN) \
+	$(ARCH_CFLAGS) \
 	$(USER_CFLAGS_INC) \
 	-ffreestanding
 
@@ -59,12 +60,12 @@ USER_UCFLAGS= \
 
 USER_LD=ld.lld
 USER_KLDFLAGS= \
-	-Tsources/embed/kernel/$(CONFIG_ARCH)/link.ld \
+	-Tsources/embed/kernel/$(CONFIG_ARCH)/$(CONFIG_BOARD)/link.ld \
 	-z max-page-size=0x1000 \
 	$(ARCH_LDFLAGS)
 
 USER_ULDFLAGS= \
-	-Tsources/embed/brutal/$(CONFIG_ARCH)/link.ld \
+	-Tsources/embed/brutal/$(CONFIG_ARCH)/$(CONFIG_BOARD)/link.ld \
 	-z max-page-size=0x1000 \
 	$(ARCH_LDFLAGS)
 
@@ -74,7 +75,6 @@ ifeq (, $(shell which $(USER_AR) 2> /dev/null))
 endif
 
 USER_ARFLAGS=rcs
-
 
 ifeq ($(GEN_COVERAGE), yes)
 	HOST_CFLAGS += \

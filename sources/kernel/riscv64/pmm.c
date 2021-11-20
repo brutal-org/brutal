@@ -10,7 +10,7 @@ void pmm_initialize(MAYBE_UNUSED Handover const *handover)
 {
 }
 
-PmmResult pmm_alloc(MAYBE_UNUSED size_t size)
+PmmResult pmm_alloc(MAYBE_UNUSED size_t size, MAYBE_UNUSED bool upper)
 {
     return OK(PmmResult, (PmmRange){});
 }
