@@ -70,15 +70,6 @@ run-riscv: $(KERNEL)
 		-no-shutdown \
 		-kernel $(KERNEL)
 
-run: $(ISO)
-	qemu-system-$(CONFIG_ARCH) \
-		$(QEMU_ARGS) \
-		-serial mon:stdio \
-		-no-reboot \
-		-no-shutdown \
-		-cdrom $(ISO)
-
-
 .PHONY: clean
 clean:
 	rm -rf $(BINDIR)
