@@ -89,6 +89,7 @@ $(BINDIR_LOADER)/tools/OVMF.fd:
 run: $(LOADER) $(PKGS) $(KERNEL) $(BINDIR_LOADER)/tools/OVMF.fd
 	$(MKCWD)
 
+	mkdir $(BINDIR_LOADER)/image
 	cp -R sysroot/* $(BINDIR_LOADER)/image
 	cp $(PKGS) $(BINDIR_LOADER)/image/pkgs
 
