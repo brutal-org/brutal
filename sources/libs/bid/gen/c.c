@@ -7,6 +7,18 @@ static CType gen_decl_type(BidType type, Alloc *alloc);
 
 /* --- C Header ----------------------------------------- */
 
+static CType gen_decl_primitive(BidType type)
+{
+    BidBuiltinType *builtin = bid_lookup_builtin(type.primitive_.name);
+
+    if (builtin != nullptr)
+    {
+        return ctype_ident(builtin->cname);
+    }
+
+    return ctype_ident(type.primitive_.mangled);
+}
+
 static CType gen_decl_enum(BidType type, Alloc *alloc)
 {
     CType ctype = ctype_enum(alloc);
@@ -52,7 +64,7 @@ static CType gen_decl_type(BidType type, Alloc *alloc)
         return ctype_void();
 
     case BID_TYPE_PRIMITIVE:
-        return ctype_ident(type.primitive_.mangled);
+        return gen_decl_primitive(type);
 
     case BID_TYPE_ENUM:
         return gen_decl_enum(type, alloc);

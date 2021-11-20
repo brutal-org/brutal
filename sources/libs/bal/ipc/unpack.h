@@ -19,6 +19,8 @@ void bal_unpack(BalUnpack *self, void *buf, size_t len);
 
 void bal_unpack_enum(BalUnpack *self, int *s);
 
+void bal_unpack_size(BalUnpack *self, size_t *s);
+
 void bal_unpack_s8(BalUnpack *self, int8_t *s);
 
 void bal_unpack_u8(BalUnpack *self, uint8_t *u);

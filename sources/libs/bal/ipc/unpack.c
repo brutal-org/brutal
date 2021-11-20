@@ -19,6 +19,11 @@ void bal_unpack_enum(BalUnpack *self, int *v)
     bal_unpack(self, v, sizeof(*v));
 }
 
+void bal_unpack_size(BalUnpack *self, size_t *v)
+{
+    bal_unpack(self, v, sizeof(*v));
+}
+
 void bal_unpack_s8(BalUnpack *self, int8_t *v)
 {
     bal_unpack(self, v, sizeof(*v));

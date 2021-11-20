@@ -1,0 +1,22 @@
+interface Types
+{
+    type AllTypes : {
+        a : Size,
+        b : S8,
+        c : U8,
+
+        d : S16,
+        e : U16,
+
+        f : S32,
+        g : U32,
+
+        h : S64,
+        i : U64,
+
+        k : F32,
+        l : F64,
+
+        m : Str,
+    };
+}
