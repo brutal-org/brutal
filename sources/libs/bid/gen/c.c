@@ -175,6 +175,11 @@ Str gen_pack_name(Str name, Alloc *alloc)
     return str_fmt(alloc, "{case:snake}_pack", name);
 }
 
+CExpr gen_pack_ref(Str name, Alloc *alloc)
+{
+    return cexpr_cast(cexpr_ident(gen_pack_name(name, alloc)), ctype_ident_ptr(str$("BalPackFn"), alloc), alloc);
+}
+
 Str gen_unpack_name(Str name, Alloc *alloc)
 {
     BidBuiltinType *builtin = bid_lookup_builtin(name);
@@ -185,6 +190,11 @@ Str gen_unpack_name(Str name, Alloc *alloc)
     }
 
     return str_fmt(alloc, "{case:snake}_unpack", name);
+}
+
+CExpr gen_unpack_ref(Str name, Alloc *alloc)
+{
+    return cexpr_cast(cexpr_ident(gen_unpack_name(name, alloc)), ctype_ident_ptr(str$("BalUnpackFn"), alloc), alloc);
 }
 
 CType gen_pack_type(BidAlias alias, Alloc *alloc)
@@ -346,7 +356,7 @@ CStmt gen_method_body(BidMethod method, BidIface const iface, Alloc *alloc)
     if (method.request.type != BID_TYPE_NIL)
     {
         cexpr_member(&pack_request, cexpr_ident(str$("req")));
-        cexpr_member(&pack_request, cexpr_ident(gen_pack_name(method.request.primitive_.mangled, alloc)));
+        cexpr_member(&pack_request, gen_pack_ref(method.request.primitive_.mangled, alloc));
     }
     else
     {
@@ -359,7 +369,7 @@ CStmt gen_method_body(BidMethod method, BidIface const iface, Alloc *alloc)
     if (method.response.type != BID_TYPE_NIL)
     {
         cexpr_member(&pack_request, cexpr_ident(str$("resp")));
-        cexpr_member(&pack_request, cexpr_ident(gen_unpack_name(method.response.primitive_.mangled, alloc)));
+        cexpr_member(&pack_request, gen_unpack_ref(method.response.primitive_.mangled, alloc));
     }
     else
     {
@@ -396,7 +406,29 @@ CExpr gen_dispatch_handler(BidMethod method, Alloc *alloc)
 {
     CExpr expr = cexpr_initializer(alloc);
 
-    cexpr_member(&expr, cexpr_ptr_access(cexpr_ident(str$("vtable")), cexpr_ident(method.name), alloc));
+    Str handlerType;
+
+    if (method.request.type == BID_TYPE_NIL && method.response.type == BID_TYPE_NIL)
+    {
+        handlerType = str$("BID_HANDLER_NIL_NIL");
+    }
+    else if (method.request.type != BID_TYPE_NIL && method.response.type == BID_TYPE_NIL)
+    {
+        handlerType = str$("BID_HANDLER_REQ_NIL");
+    }
+    else if (method.request.type == BID_TYPE_NIL && method.response.type != BID_TYPE_NIL)
+    {
+        handlerType = str$("BID_HANDLER_NIL_RESP");
+    }
+    else
+    {
+        handlerType = str$("BID_HANDLER_REQ_RESP");
+    }
+
+    cexpr_member(&expr, cexpr_ident(handlerType));
+    CExpr vtable_field = cexpr_ptr_access(cexpr_ident(str$("vtable")), cexpr_ident(method.name), alloc);
+
+    cexpr_member(&expr, cexpr_cast(vtable_field, ctype_ident_ptr(str$("BidHandlerFn"), alloc), alloc));
 
     return cexpr_cast(expr, ctype_ident(str$("BidHandler")), alloc);
 }
@@ -415,8 +447,8 @@ void gen_dispatch_case(CStmt *block, BidMethod method, Alloc *alloc)
     {
         cstmt_block_add(block, cstmt_decl(cdecl_var(str$("req_buf"), ctype_ident(method.request.primitive_.mangled), cexpr_empty()), alloc));
 
-        cexpr_member(&call_handler, cexpr_ident(str$("req_buf")));
-        cexpr_member(&call_handler, cexpr_ident(gen_unpack_name(method.request.primitive_.mangled, alloc)));
+        cexpr_member(&call_handler, cexpr_ref(cexpr_ident(str$("req_buf")), alloc));
+        cexpr_member(&call_handler, gen_unpack_ref(method.request.primitive_.mangled, alloc));
     }
     else
     {
@@ -430,7 +462,7 @@ void gen_dispatch_case(CStmt *block, BidMethod method, Alloc *alloc)
 
         cexpr_member(&call_handler, cexpr_ref(cexpr_ident(str$("resp_buf")), alloc));
         cexpr_member(&call_handler, cexpr_ident(str_fmt(alloc, "MSG_{case:constant}_RESP", method.mangled)));
-        cexpr_member(&call_handler, cexpr_ident(gen_pack_name(method.response.primitive_.mangled, alloc)));
+        cexpr_member(&call_handler, gen_pack_ref(method.response.primitive_.mangled, alloc));
     }
     else
     {

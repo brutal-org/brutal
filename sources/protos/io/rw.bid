@@ -1,5 +1,7 @@
 interface Rw
 {
+    type Buf : U8[];
+
     method write Buf -> Nil;
     method read -> Buf;
 }

@@ -6,7 +6,7 @@ int bid_hook_call(
     IpcEv *self,
     BrId to,
     int proto,
-    int req_id, void *req, BalPackFn *req_pack,
+    int req_id, void const *req, BalPackFn *req_pack,
     int resp_id, void *resp, BalUnpackFn *req_unpack,
     Alloc *alloc)
 {
@@ -63,13 +63,13 @@ static int bid_handle_invoke(BidHandler handler, IpcEv *ev, BrTask from, void *r
     switch (handler.type)
     {
     case BID_HANDLER_REQ_RESP:
-        return handler.req_resp(ev, from, req, resp, alloc);
+        return handler.func(ev, from, req, resp, alloc);
     case BID_HANDLER_NIL_RESP:
-        return handler.nil_resp(ev, from, resp, alloc);
+        return handler.func(ev, from, resp, alloc);
     case BID_HANDLER_REQ_NIL:
-        return handler.req_nil(ev, from, req);
+        return handler.func(ev, from, req);
     case BID_HANDLER_NIL_NIL:
-        return handler.nil_nil(ev, from);
+        return handler.func(ev, from);
     default:
         panic$("Invalid handler type {}", handler.type);
     }
@@ -85,24 +85,25 @@ void bid_hook_handle(
 
     void *resp,
     int resp_id,
-    BalPackFn *resp_pack,
-
-    Alloc *alloc)
+    BalPackFn *resp_pack)
 {
+    HeapAlloc heap;
+    heap_alloc_init(&heap, NODE_DEFAULT);
+
     if (req != nullptr)
     {
         BalShm shm;
         balshm_init_mobj(&shm, msg->args[0]);
 
         BalUnpack unpack;
-        bal_unpack_init(&unpack, shm.buf, shm.len, alloc);
+        bal_unpack_init(&unpack, shm.buf, shm.len, base$(&heap));
         req_unpack(&unpack, req);
 
         balshm_deinit(&shm);
     }
 
     int result = bid_handle_invoke(
-        handler, ev, msg->from, req, resp, alloc);
+        handler, ev, msg->from, req, resp, base$(&heap));
 
     if (result != 0)
     {
@@ -125,4 +126,6 @@ void bid_hook_handle(
 
         bal_pack_deinit(&pack);
     }
+
+    heap_alloc_deinit(&heap);
 }
