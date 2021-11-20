@@ -6,21 +6,10 @@ SHELL := /bin/bash
 export LC_ALL=C
 
 ifndef ECHO
-T := $(shell $(MAKE) $(MAKECMDGOALS) --no-print-directory \
-      -nrRf $(firstword $(MAKEFILE_LIST)) \
-      ECHO="__COUNT_ME__" | grep -c "__COUNT_ME__")
-
-N := x
-C = $(words $N)$(eval N := x $N)
-
-ECHO = @echo -e "[$C/$T]"
+ECHO = @echo
 endif
 
-ifeq ($(VERBOSE), yes)
-	V:=
-else
-	V:=@
-endif
+V:=
 
 CFLAGS_STD ?= \
 	-std=gnu2x
@@ -69,11 +58,12 @@ include build/config/default.mk
 include build/toolchain/archs/$(CONFIG_ARCH).mk
 include build/toolchain/$(CONFIG_TOOLCHAIN)/.build.mk
 
+-include sources/pkgs/*/.build.mk
 include sources/kernel/.build.mk
-include sources/pkgs/.user.mk
 include sources/pkgs/.host.mk
-include sources/loader/.build.mk
 include sources/protos/.build.mk
+include sources/pkgs/.user.mk
+include sources/loader/.build.mk
 include sysroot/.build.mk
 
 .PHONY: all

@@ -4,7 +4,6 @@
 #include <brutal/codec/tga.h>
 #include <brutal/debug.h>
 #include <brutal/gfx.h>
-#include <protos/test/hello.c>
 #include <protos/test/hello.h>
 
 static void display_bootimage(Handover const *handover)

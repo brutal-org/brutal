@@ -7,16 +7,15 @@ PROTOS:= \
 PROTOS_HDR:=$(patsubst sources/%.bid, $(GENDIR)/%.h, $(PROTOS))
 PROTOS_SRC:=$(patsubst sources/%.bid, $(GENDIR)/%.c, $(PROTOS))
 
-PROTOS_GENERATED:=$(PROTOS_HDR) $(PROTOS_SRC)
+GENERATED_HDR += $(PROTOS_HDR)
+GENERATED_SRC += $(PROTOS_SRC)
 
 $(GENDIR)/%.h: sources/%.bid $(BID_HOST_BIN)
+	$(ECHO) "brutal BID" $@
 	@$(MKCWD)
-	@$(ECHO) "brutal BID" $@
-	@$(BID_HOST_BIN) $< --header > $@
+	$(V)$(BID_HOST_BIN) $< --header > $@
 
 $(GENDIR)/%.c: sources/%.bid $(BID_HOST_BIN)
+	$(ECHO) "brutal BID" $@
 	@$(MKCWD)
-	@$(ECHO) "brutal BID" $@
-	@$(BID_HOST_BIN) $< --source > $@
-
-all-protos: $(PROTOS_GENERATED)
+	$(V)$(BID_HOST_BIN) $< --source > $@

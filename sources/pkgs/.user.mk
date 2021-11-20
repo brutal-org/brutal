@@ -1,31 +1,37 @@
 LIBS_SRC = \
-	$(wildcard sources/embed/brutal/*.c)   \
+	$(wildcard sources/embed/brutal/*.c) \
 	$(wildcard sources/embed/brutal/$(CONFIG_ARCH)/*.c) \
 	$(wildcard sources/embed/brutal/$(CONFIG_ARCH)/*.s) \
 	$(wildcard sources/embed/$(CONFIG_ARCH)/*.c) \
 	$(wildcard sources/embed/$(CONFIG_ARCH)/*.s) \
 	$(wildcard sources/libs/bal/*.c) \
 	$(wildcard sources/libs/bal/*/*.c) \
-	$(wildcard sources/libs/brutal/*.c)   \
+	$(wildcard sources/libs/brutal/*.c) \
 	$(wildcard sources/libs/brutal/*/*.c) \
-	$(wildcard sources/libs/cc/*.c)       \
-	$(wildcard sources/libs/cc/*/*.c)       \
-	$(wildcard sources/libs/cc/*/*/*.c)  \
-	$(wildcard sources/libs/elf/*.c)      \
-	$(wildcard sources/libs/hw/acpi/*.c)     \
-	$(wildcard sources/libs/hw/pci/*.c)      \
-	$(wildcard sources/libs/json/*.c)     \
-	$(wildcard sources/libs/stdc/*/*.c)     \
+	$(wildcard sources/libs/cc/*.c) \
+	$(wildcard sources/libs/cc/*/*.c) \
+	$(wildcard sources/libs/cc/*/*/*.c) \
+	$(wildcard sources/libs/elf/*.c) \
+	$(wildcard sources/libs/hw/acpi/*.c) \
+	$(wildcard sources/libs/hw/pci/*.c) \
+	$(wildcard sources/libs/json/*.c) \
+	$(wildcard sources/libs/stdc/*/*.c) \
 	$(wildcard sources/libs/ubsan/*.c)
 
 LIBS_OBJ = \
-	$(patsubst sources/%, $(BINDIR_USER)/%.o, $(LIBS_SRC))
+	$(patsubst sources/%, $(BINDIR_USER)/%.o, $(LIBS_SRC)) \
+	$(patsubst $(GENDIR)/%, $(BINDIR_USER)/%.o, $(GENERATED_SRC))
 
 LIBS_BIN=$(BINDIR_USER)/libbrutal.a
 
 DEPENDENCIES += $(LIBS_OBJ:.o=.d)
 
-$(BINDIR_USER)/%.c.o: sources/%.c
+$(BINDIR_USER)/%.c.o: $(GENDIR)/%.c $(GENERATED_HDR)
+	$(ECHO) "brutal CC" $<
+	@$(MKCWD)
+	$(V)$(USER_CC) -c -o $@ $< $(USER_UCFLAGS)
+
+$(BINDIR_USER)/%.c.o: sources/%.c $(GENERATED_HDR)
 	$(ECHO) "brutal CC" $<
 	@$(MKCWD)
 	$(V)$(USER_CC) -c -o $@ $< $(USER_UCFLAGS)
@@ -59,8 +65,6 @@ $$($(1)_BIN): $$($(1)_OBJ) $(LIBS_BIN)
 	$(V)$(USER_LD) -o $$@ $$^ $(USER_ULDFLAGS)
 
 endef
-
--include sources/pkgs/*/.build.mk
 
 list-user:
 	@echo $(USER_PKGS)

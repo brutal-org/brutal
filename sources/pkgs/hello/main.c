@@ -1,9 +1,6 @@
 #include <brutal/debug.h>
 #include <protos/test/hello.h>
 
-// FIXME: include generated file into the build
-#include <protos/test/hello.c>
-
 static HelloError hello_hello_handler(IpcEv *ev, BrTask task, Str const *req, Str *resp, Alloc *alloc)
 {
     UNUSED(ev);
