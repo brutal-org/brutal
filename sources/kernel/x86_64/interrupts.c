@@ -71,7 +71,7 @@ static void dump_register(Regs const *regs)
     log_unlock("R15: {#016p}", regs->r15);
 }
 
-static void interrupt_error_handler(Regs *regs, uintptr_t rsp)
+static void interrupt_error_handler(Regs *regs)
 {
     lock_acquire(&error_lock);
 
@@ -80,7 +80,7 @@ static void interrupt_error_handler(Regs *regs, uintptr_t rsp)
     log_unlock("");
     log_unlock("------------------------------------------------------------");
     log_unlock("");
-    log_unlock("KERNEL PANIC ON CPU N°{}", cpu_self_id(), regs->rip, regs->rbp, rsp);
+    log_unlock("KERNEL PANIC ON CPU N°{}", cpu_self_id());
     log_unlock("");
     log_unlock("{}({}) with error_code={}!", _exception_messages[regs->int_no], regs->int_no, regs->error_code);
     log_unlock("");
@@ -115,7 +115,7 @@ uint64_t interrupt_handler(uint64_t rsp)
 
     if (regs->int_no < 32)
     {
-        interrupt_error_handler(regs, rsp);
+        interrupt_error_handler(regs);
     }
     else if (regs->int_no == 32)
     {

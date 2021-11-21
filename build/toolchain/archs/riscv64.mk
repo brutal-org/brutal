@@ -5,7 +5,7 @@ ARCH_CFLAGS = \
 	-mno-relax
 
 USER_AS=$(CONFIG_ARCH)-elf-as
-USER_ASFLAGS=
+USER_ASFLAGS=-mno-relax -march=rv64imafdc
 
 QEMU_ARGS= \
-		--machine sifive_u
+		--machine sifive_u -d cpu_reset
