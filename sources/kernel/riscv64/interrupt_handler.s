@@ -72,10 +72,12 @@
     addi sp, sp, 32*8
 .endm
 
-.align 16 
-interrupt_common: 
-    push_all 
+.align 16
+interrupt_common:
+    push_all
+
     addi a0, sp, 0
-    call interrupt_handler 
+    call interrupt_handler
+
     pop_all
     mret

@@ -1,6 +1,7 @@
 #include "kernel/riscv64/interrupts.h"
-#include "kernel/riscv64/asm.h"
 #include <brutal/debug.h>
+#include "kernel/riscv64/asm.h"
+
 extern void interrupt_common(void);
 
 static char *_exception_messages[] = {
@@ -22,13 +23,12 @@ static char *_exception_messages[] = {
     "Store/AMO page fault",
 };
 
-static char* _motivation_messages[] = 
-{
+static char *_motivation_messages[] = {
     "we'll patch this through micro-transaction",
-    "it just works !", 
+    "it just works !",
     "this is a feature",
     " TODO: fix this",
-    "[ insert a joke here ]", 
+    "[ insert a joke here ]",
     "[ insert a devse private joke here ]",
     "<< je connais cette théorie >> d0p1",
     "welcome to paging hell !",
@@ -44,19 +44,19 @@ static char* _motivation_messages[] =
     "what if everything was a dream ?",
     "if you do make clean the error will be fixed :tm:",
 };
+
 static void dump_register(RiscvRegs const *regs)
 {
     log_unlock("cpu registers:");
     log_unlock("pc : {#016p}", read_csr(CSR_SEPC));
     log_unlock("ra : {#016p} | sp : {#016p} | gp : {#016p} | tp : {#016p}", regs->ra, regs->sp, regs->gp, regs->tp);
-    
+
     log_unlock("");
-    
+
     log_unlock(" -- t0-t6 -- ");
-    
+
     log_unlock("t0 : {#016p} | t1 : {#016p} | t2 : {#016p} | t3 : {#016p}", regs->t[0], regs->t[1], regs->t[2], regs->t2[0]);
     log_unlock("t4 : {#016p} | t5 : {#016p} | t6 : {#016p} ", regs->t2[1], regs->t2[2], regs->t2[3]);
-
 
     log_unlock("");
     log_unlock(" -- s0-s11 -- ");
@@ -68,12 +68,10 @@ static void dump_register(RiscvRegs const *regs)
     log_unlock(" -- a0-a7 -- ");
     log_unlock("a0 : {#016p} | a1 : {#016p} | a2 : {#016p} | a3 : {#016p}", regs->a[0], regs->a[1], regs->a[2], regs->a[3]);
     log_unlock("a4 : {#016p} | a5 : {#016p} | a6 : {#016p} | a7 : {#016p}", regs->a[4], regs->a[5], regs->a[6], regs->a[7]);
-
-
 }
- void interrupt_error_handler(RiscvRegs *regs, int int_no)
- {
 
+void interrupt_error_handler(RiscvRegs const *regs, int int_no)
+{
 
     log_unlock("");
     log_unlock("------------------------------------------------------------");
@@ -84,26 +82,31 @@ static void dump_register(RiscvRegs const *regs)
     log_unlock("");
 
     dump_register(regs);
+
     log_unlock("");
     log_unlock(" - \"{}\"", _motivation_messages[regs->sp % (sizeof(_motivation_messages) / sizeof(_motivation_messages[0]))]);
-  
+
     log_unlock("");
     log_unlock("------------------------------------------------------------");
- 
- }
-void interrupt_handler(RiscvRegs* regs)
+}
+
+void interrupt_handler(RiscvRegs *regs)
 {
-    log$("interrupt received !");
     uint64_t cause = read_csr(CSR_SCAUSE);
-    if(cause & MCAUSE_INTERRUPT_MASK)
+    int interrupt_id = cause & SCAUSE_CODE_MASK;
+
+    if (cause & SCAUSE_INTERRUPT_MASK)
     {
-        log_unlock("received interrupt: {}", cause & MCAUSE_CODE_MASK);
+        log_unlock("received interrupt: {}", interrupt_id);
     }
     else
     {
-        log_unlock("received exception: {}", cause & MCAUSE_CODE_MASK);
-        interrupt_error_handler(regs, cause & MCAUSE_CODE_MASK);
-        while(true);
+        log_unlock("received exception: {}", interrupt_id);
+        interrupt_error_handler(regs, interrupt_id);
+
+        while (true)
+        {
+        };
     }
 }
 
