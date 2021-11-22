@@ -3,6 +3,8 @@
 .DEFAULT_GOAL := all
 SHELL := /bin/bash
 
+CONFIG ?= default
+
 export LC_ALL=C
 
 CFLAGS_STD ?= \
@@ -48,7 +50,7 @@ BINDIR_HOST=bin/$(CONFIG_HOST_ARCH)-$(CONFIG_TOOLCHAIN)/host
 
 MKCWD=mkdir -p $(@D)
 
-include build/config/default.mk
+include build/config/$(CONFIG).mk
 include build/toolchain/archs/$(CONFIG_ARCH).mk
 include build/toolchain/$(CONFIG_TOOLCHAIN)/.build.mk
 
