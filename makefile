@@ -57,7 +57,8 @@ include sources/kernel/.build.mk
 include sources/pkgs/.host.mk
 include sources/protos/.build.mk
 include sources/pkgs/.user.mk
-include build/run/$(CONFIG_ARCH)/$(CONFIG_BOARD)/.build.mk
+include sources/loader/.build.mk
+include build/run/$(CONFIG_BOOTLOADER).mk
 
 .PHONY: all
 all: $(ALL)
