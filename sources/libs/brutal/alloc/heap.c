@@ -110,18 +110,18 @@ void *heap_alloc_acquire(HeapAlloc *alloc, size_t req_size)
 
     while (maj != nullptr)
     {
-        size_t diff = maj->size - maj->usage;
+        size_t maj_diff = maj->size - maj->usage;
         // free memory in the block
 
-        if (bestSize < diff)
+        if (bestSize < maj_diff)
         {
             // Hmm.. this one has more memory then our bestBet. Remember!
             alloc->best = maj;
-            bestSize = diff;
+            bestSize = maj_diff;
         }
 
         // CASE 1:  There is not enough space in this major block.
-        if (diff < (size + MINOR_BLOCK_HEADER_SIZE))
+        if (maj_diff < (size + MINOR_BLOCK_HEADER_SIZE))
         {
 
             // Another major block next to this one?

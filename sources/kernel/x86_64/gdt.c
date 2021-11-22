@@ -1,7 +1,7 @@
 #include <brutal/sync.h>
 #include "kernel/x86_64/gdt.h"
 
-static struct tss tss = {
+static struct tss _tss = {
     .reserved = 0,
     .rsp = {},
     .reserved0 = 0,
@@ -43,16 +43,16 @@ struct gdt_entry gdt_entry_simple(uint8_t flags, uint8_t granularity)
     return gdt_entry(0, 0, granularity, flags);
 }
 
-struct gdt_tss_entry gdt_entry_tss(uintptr_t tss)
+struct gdt_tss_entry gdt_entry_tss(uintptr_t tss_addr)
 {
     return (struct gdt_tss_entry){
         .len = sizeof(struct tss),
-        .base_low16 = tss & 0xffff,
-        .base_mid8 = (tss >> 16) & 0xff,
+        .base_low16 = tss_addr & 0xffff,
+        .base_mid8 = (tss_addr >> 16) & 0xff,
         .flags1 = 0b10001001,
         .flags2 = 0,
-        .base_high8 = (tss >> 24) & 0xff,
-        .base_upper32 = tss >> 32,
+        .base_high8 = (tss_addr >> 24) & 0xff,
+        .base_upper32 = tss_addr >> 32,
         .reserved = 0,
     };
 }
@@ -67,7 +67,7 @@ void gdt_initialize(void)
     gdt.entries[GDT_USER_DATA] = gdt_entry_simple(GDT_PRESENT | GDT_SEGMENT | GDT_READWRITE | GDT_USER, 0);
     gdt.entries[GDT_USER_CODE] = gdt_entry_simple(GDT_PRESENT | GDT_SEGMENT | GDT_READWRITE | GDT_EXECUTABLE | GDT_USER, GDT_LONG_MODE_GRANULARITY);
 
-    gdt.tss = gdt_entry_tss((uintptr_t)&tss);
+    gdt.tss = gdt_entry_tss((uintptr_t)&_tss);
 
     gdt_update((uintptr_t)&gdt_descriptor);
 }

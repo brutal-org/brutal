@@ -11,12 +11,14 @@ CFLAGS_STD ?= \
 	-std=gnu2x
 
 CFLAGS_OPT ?= \
-	-g -O3
+	-g -O2
 
 CFLAGS_WARN ?= \
 	-Wall \
 	-Wextra \
-	-Werror
+	-Werror \
+	-Wundef \
+	-Wshadow
 
 INC_LIBS= \
 	-Isources/libs/stdc/ansi \

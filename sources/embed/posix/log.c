@@ -7,7 +7,7 @@
 #include <unistd.h>
 
 static bool log_initialized = false;
-static IoWriter log;
+static IoWriter _log;
 
 void host_log_lock(void)
 {
@@ -33,11 +33,11 @@ IoWriter *host_log_writer(void)
 {
     if (!log_initialized)
     {
-        log.write = host_log_write;
+        _log.write = host_log_write;
         log_initialized = true;
     }
 
-    return &log;
+    return &_log;
 }
 
 void host_log_panic(void)

@@ -133,15 +133,15 @@ void vec_swap_impl(VecImpl *impl, int idx1, int idx2);
         }                                             \
     } while (0)
 
-#define vec_foreach(VAR, SELF)                                          \
-    if ((SELF)->len)                                                    \
-        for (typeof((SELF)->data + 0) __once, __it = vec_begin(SELF); ( \
-                 {                                                      \
-                     __once = nullptr;                                  \
-                     __it != vec_end(SELF);                             \
-                 });                                                    \
-             __it++)                                                    \
-            for (typeof(*(SELF)->data) VAR = *__it; __once == nullptr; __once = (typeof((SELF)->data))1)
+#define vec_foreach(VAR, SELF)                                                    \
+    if ((SELF)->len)                                                              \
+        for (typeof((SELF)->data + 0) __once##VAR, __it##VAR = vec_begin(SELF); ( \
+                 {                                                                \
+                     __once##VAR = nullptr;                                       \
+                     __it##VAR != vec_end(SELF);                                  \
+                 });                                                              \
+             __it##VAR++)                                                         \
+            for (typeof(*(SELF)->data) VAR = *__it##VAR; __once##VAR == nullptr; __once##VAR = (typeof((SELF)->data))1)
 
 typedef Vec(void *) VecPtr;
 typedef Vec(int) VecInt;

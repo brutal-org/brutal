@@ -1,7 +1,7 @@
 #include <brutal/alloc.h>
 #include "kernel/object.h"
 
-static _Atomic BrHandle id = 1;
+static _Atomic BrHandle next_free_id = 1;
 static bool initialized = false;
 static VecObject global = {};
 static Lock lock = {};
@@ -10,7 +10,7 @@ void object_init(Object *self, BrObjectType type, ObjectDtor *dtor)
 {
     refcount_init(&self->refcount);
 
-    self->id = id++;
+    self->id = next_free_id++;
     self->type = type;
     self->dtor = dtor;
 

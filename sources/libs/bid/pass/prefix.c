@@ -86,17 +86,17 @@ BidIface bid_pass_prefix(BidIface iface, Alloc *alloc)
 
         if (prefixed_request.type != BID_TYPE_PRIMITIVE && prefixed_request.type != BID_TYPE_NIL)
         {
-            Str name = str_fmt(alloc, "{case:pascal}Request", iface.name, methods.name);
+            Str request_name = str_fmt(alloc, "{case:pascal}Request", iface.name, methods.name);
             Str mangled = str_fmt(alloc, "{case:pascal}{case:pascal}Request", iface.name, methods.name);
-            bid_alias_mangled(&prefixed, name, mangled, prefixed_request);
+            bid_alias_mangled(&prefixed, request_name, mangled, prefixed_request);
             prefixed_request = bid_primitive_mangled(name, mangled);
         }
 
         if (prefixed_response.type != BID_TYPE_PRIMITIVE && prefixed_response.type != BID_TYPE_NIL)
         {
-            Str name = str_fmt(alloc, "{case:pascal}Response", iface.name, methods.name);
+            Str response_name = str_fmt(alloc, "{case:pascal}Response", iface.name, methods.name);
             Str mangled = str_fmt(alloc, "{case:pascal}{case:pascal}Response", iface.name, methods.name);
-            bid_alias_mangled(&prefixed, name, mangled, prefixed_response);
+            bid_alias_mangled(&prefixed, response_name, mangled, prefixed_response);
             prefixed_response = bid_primitive_mangled(name, mangled);
         }
 

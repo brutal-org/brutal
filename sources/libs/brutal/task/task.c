@@ -2,17 +2,17 @@
 #include <embed/task.h>
 
 static bool task_initialized = false;
-static struct task task;
+static struct task self_task;
 
 struct task *task_self(void)
 {
     if (!task_initialized)
     {
-        task.handle = host_task_self();
+        self_task.handle = host_task_self();
         task_initialized = true;
     }
 
-    return &task;
+    return &self_task;
 }
 
 void task_fork(struct task *task)
