@@ -57,18 +57,10 @@ include sources/kernel/.build.mk
 include sources/pkgs/.host.mk
 include sources/protos/.build.mk
 include sources/pkgs/.user.mk
-include sources/loader/.build.mk
+include build/run/$(CONFIG_ARCH)/$(CONFIG_BOARD)/.build.mk
 
 .PHONY: all
 all: $(ALL)
-
-run-riscv: $(KERNEL)
-	qemu-system-$(CONFIG_ARCH) \
-		 $(QEMU_ARGS) \
-		-serial mon:stdio \
-		-no-reboot \
-		-no-shutdown \
-		-kernel $(KERNEL)
 
 .PHONY: clean
 clean:
