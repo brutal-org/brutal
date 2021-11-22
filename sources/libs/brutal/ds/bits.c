@@ -1,43 +1,43 @@
 #include <brutal/debug.h>
-#include <brutal/ds/bitmap.h>
+#include <brutal/ds/bits.h>
 #include <brutal/mem.h>
 
-void bitmap_init(Bitmap *self, void *data, size_t size)
+void bits_init(Bits *self, void *data, size_t size)
 {
-    *self = (Bitmap){
+    *self = (Bits){
         .data = (uint8_t *)data,
         .size = size,
     };
 }
 
-void bitmap_set_range(Bitmap *bitmap, USizeRange range, bool value)
+void bits_set_range(Bits *bits, USizeRange range, bool value)
 {
     for (size_t i = 0; i < range.size; i++)
     {
-        bitmap_set(bitmap, range.base + i, value);
+        bits_set(bits, range.base + i, value);
     }
 }
 
-void bitmap_fill(Bitmap *bitmap, bool value)
+void bits_fill(Bits *bits, bool value)
 {
     if (value)
     {
-        mem_set(bitmap->data, 0xff, bitmap->size);
+        mem_set(bits->data, 0xff, bits->size);
     }
     else
     {
-        mem_set(bitmap->data, 0, bitmap->size);
+        mem_set(bits->data, 0, bits->size);
     }
 }
 
-USizeRange bitmap_find_free(Bitmap const *bitmap, size_t start, size_t size, bool upper)
+USizeRange bits_find_free(Bits const *bits, size_t start, size_t size, bool upper)
 {
     if (start == (size_t)-1)
     {
-        start = bitmap_len(bitmap);
+        start = bits_len(bits);
     }
 
-    if (bitmap->size == 0)
+    if (bits->size == 0)
     {
         return (USizeRange){};
     }
@@ -46,10 +46,10 @@ USizeRange bitmap_find_free(Bitmap const *bitmap, size_t start, size_t size, boo
     size_t range_size = 0;
 
     for (size_t i = start;
-         upper ? i > 0 : i < bitmap_len(bitmap);
+         upper ? i > 0 : i < bits_len(bits);
          i += upper ? -1 : +1)
     {
-        if (bitmap_get(bitmap, i) == 0)
+        if (bits_get(bits, i) == 0)
         {
             if (range_size == 0 || upper)
             {

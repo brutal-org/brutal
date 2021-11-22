@@ -6,7 +6,7 @@
 #include "kernel/mmap.h"
 #include "kernel/pmm.h"
 
-static Bitmap pmm_bitmap = {};
+static Bits pmm_bitmap = {};
 
 static size_t best_bet_upper = 0;
 static size_t best_bet_lower = (size_t)-1;
@@ -43,12 +43,12 @@ static void pmm_bitmap_initialize(HandoverMmap const *memory_map)
         {
             log$("Allocated memory bitmap at {x}-{x}", entry.base, entry.base + bitmap_target_size - 1);
 
-            bitmap_init(&pmm_bitmap, (void *)mmap_phys_to_io(entry.base), bitmap_target_size);
+            bits_init(&pmm_bitmap, (void *)mmap_phys_to_io(entry.base), bitmap_target_size);
             break;
         }
     }
 
-    bitmap_fill(&pmm_bitmap, PMM_USED);
+    bits_fill(&pmm_bitmap, PMM_USED);
 }
 
 static void pmm_load_memory_map(HandoverMmap const *memory_map)
@@ -95,7 +95,7 @@ PmmResult pmm_alloc(size_t size, bool upper)
     used_memory += size;
 
     size_t page_size = size / MEM_PAGE_SIZE;
-    USizeRange page_range = bitmap_find_free(&pmm_bitmap, upper ? best_bet_upper : best_bet_lower, page_size, upper);
+    USizeRange page_range = bits_find_free(&pmm_bitmap, upper ? best_bet_upper : best_bet_lower, page_size, upper);
 
     if (range_empty(page_range))
     {
@@ -108,7 +108,7 @@ PmmResult pmm_alloc(size_t size, bool upper)
             best_bet_lower = 0;
         }
 
-        page_range = bitmap_find_free(&pmm_bitmap, upper ? -1 : 0, page_size, upper);
+        page_range = bits_find_free(&pmm_bitmap, upper ? -1 : 0, page_size, upper);
     }
 
     if (!range_any(page_range))
@@ -126,7 +126,7 @@ PmmResult pmm_alloc(size_t size, bool upper)
         best_bet_lower = range_end(page_range);
     }
 
-    bitmap_set_range(&pmm_bitmap, page_range, PMM_USED);
+    bits_set_range(&pmm_bitmap, page_range, PMM_USED);
 
     PmmRange pmm_range = range$(PmmRange, page_range);
 
@@ -147,7 +147,7 @@ PmmResult pmm_used(PmmRange range)
 
     USizeRange page_range = {page_base, page_size};
 
-    bitmap_set_range(&pmm_bitmap, page_range, PMM_USED);
+    bits_set_range(&pmm_bitmap, page_range, PMM_USED);
 
     return OK(PmmResult, range);
 }
@@ -169,7 +169,7 @@ PmmResult pmm_unused(PmmRange range)
     size_t page_size = range.size / MEM_PAGE_SIZE;
     USizeRange page_range = {page_base, page_size};
 
-    bitmap_set_range(&pmm_bitmap, page_range, PMM_UNUSED);
+    bits_set_range(&pmm_bitmap, page_range, PMM_UNUSED);
 
     if (best_bet_upper < range_end(page_range))
     {
