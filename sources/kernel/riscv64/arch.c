@@ -1,14 +1,14 @@
 #include "kernel/arch.h"
-#include "kernel/riscv64/uart.h"
+#include "kernel/riscv64/uart8250.h"
 
 static bool log_initialized = false;
 static IoWriter log;
 
 static IoResult arch_debug_write(MAYBE_UNUSED void *context, uint8_t const *data, MAYBE_UNUSED size_t offset, size_t size)
 {
-    for(size_t i = 0; i < size; i++)
+    for (size_t i = 0; i < size; i++)
     {
-        uart_putc(data[i]);
+        uart8250_putc(data[i]);
     }
 
     return OK(IoResult, size);
