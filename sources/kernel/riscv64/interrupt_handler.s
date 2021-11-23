@@ -80,4 +80,4 @@ interrupt_common:
     call interrupt_handler
 
     pop_all
-    mret
+    sret
