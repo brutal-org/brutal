@@ -42,6 +42,8 @@ static BrResult balshm_unmap(BalShm *self)
 
 MaybeError balshm_init_mobj(BalShm *self, BrMemObj obj)
 {
+    *self = (BalShm){};
+
     self->obj = obj;
     BrResult result = balshm_map(self);
 
