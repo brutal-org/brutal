@@ -41,7 +41,7 @@ static void fiber_free(Fiber *self)
     alloc_free(alloc_global(), self);
 }
 
-static void fiber_main(void)
+static void _fiber_entry(void)
 {
     fiber_ret(current->fn(current->args));
 }
@@ -59,7 +59,7 @@ Fiber *fiber_start(FiberFn fn, void *args)
     {
         self->stack = alloc_malloc(alloc_global(), FIBER_STACK_SIZE);
         self->ctx.rsp = (uint64_t)self->stack + (FIBER_STACK_SIZE - 8);
-        self->ctx.rip = (uint64_t)fiber_main;
+        self->ctx.rip = (uint64_t)_fiber_entry;
         self->ctx.fc_mxcsr = 0;
         self->ctx.fc_x86_cw = 0;
     }
@@ -100,7 +100,7 @@ static bool wait_fiber(FiberAwaitCtx *ctx)
     }
 
     ctx->fiber->state = FIBER_CANCELED;
-    ctx->fiber->ret = ctx->fiber->ret;
+    ctx->ret = ctx->fiber->ret;
 
     return true;
 }
