@@ -1,8 +1,5 @@
-#include "kernel/riscv64/fdt.h"
 #include <brutal/debug.h>
-#include <brutal/io/emit.h>
-#include <ctype.h>
-#include "kernel/arch.h"
+#include <hw/fdt/fdt.h>
 
 FdtBeginNode *fdt_root(FdtHeader *fdt)
 {
@@ -36,10 +33,8 @@ be_uint32_t *skip_fdt(be_uint32_t *cur)
     return cur;
 }
 
-void dump_fdt(FdtHeader *header, FdtBeginNode *current_fdt)
+void dump_fdt(Emit *emit, FdtHeader *header, FdtBeginNode *current_fdt)
 {
-    Emit emit;
-    emit_init(&emit, arch_debug());
 
     be_uint32_t *cur = (be_uint32_t *)current_fdt;
     uint32_t cur_type = load_be(*cur);
@@ -49,25 +44,23 @@ void dump_fdt(FdtHeader *header, FdtBeginNode *current_fdt)
         if (cur_type == FDT_BEGIN_NODE)
         {
             FdtBeginNode *node = (FdtBeginNode *)cur;
-            emit_fmt(&emit, " - \"{}\" \n", str$(node->name));
-            emit_ident(&emit);
+            emit_fmt(emit, " - \"{}\" \n", str$(node->name));
+            emit_ident(emit);
         }
         else if (cur_type == FDT_PROP)
         {
             FdtPropertiesNode *cnode = (FdtPropertiesNode *)cur;
             Str node_name = str$((const char *)((uintptr_t)header + load_be(header->strings_offset) + load_be(cnode->name_offset)));
-            emit_fmt(&emit, " - property: \"{}\" \n", node_name);
+            emit_fmt(emit, " - property: \"{}\" \n", node_name);
         }
         else if (cur_type == FDT_END_NODE)
         {
-            emit_deident(&emit);
+            emit_deident(emit);
         }
 
         cur = skip_fdt(cur);
         cur_type = load_be(*cur);
     }
-
-    emit_deinit(&emit);
 }
 
 FdtBeginNode *get_fdt_node(FdtBeginNode *current_fdt, Str entry)

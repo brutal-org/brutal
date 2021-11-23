@@ -1,6 +1,9 @@
 #pragma once
+
 #include <brutal/base.h>
 #include <brutal/base/endian.h>
+#include <brutal/io/emit.h>
+
 typedef struct PACKED
 {
     be_uint32_t magic;
@@ -30,7 +33,7 @@ typedef enum
     FDT_END = 9
 } FdtNodeType;
 
-typedef struct PACKED
+typedef struct PACKED ALIGNED(4)
 {
     be_uint32_t type;
     char name[];
@@ -55,7 +58,7 @@ typedef struct
 
 FdtBeginNode *fdt_root(FdtHeader *fdt);
 
-void dump_fdt(FdtHeader *header, FdtBeginNode *current_fdt);
+void dump_fdt(Emit *emit, FdtHeader *header, FdtBeginNode *current_fdt);
 
 FdtBeginNode *get_fdt_node(FdtBeginNode *node, Str entry);
 

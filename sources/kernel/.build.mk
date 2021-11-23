@@ -15,6 +15,7 @@ KERNEL_SRC += \
 	$(wildcard sources/libs/brutal/alloc/*.c)      \
 	$(wildcard sources/libs/brutal/ds/*.c)         \
 	$(wildcard sources/libs/brutal/hash/*.c)       \
+	$(wildcard sources/libs/hw/fdt/*.c)         \
 	$(wildcard sources/libs/brutal/io/buf.c)       \
 	$(wildcard sources/libs/brutal/io/fmt.c)       \
 	$(wildcard sources/libs/brutal/io/print.c)     \
