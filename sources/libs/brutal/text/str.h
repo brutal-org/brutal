@@ -124,4 +124,4 @@ static inline Str str_make_from_str_fix128(StrFix128 const *str_fix) { return (S
     })
 
 #define str_sub(str, start, end) \
-    str_n$(end - start, (char *)str.buf + start)
+    str_n$((end) - (start), (char *)str.buf + (start))
