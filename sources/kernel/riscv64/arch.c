@@ -1,24 +1,20 @@
 #include "kernel/arch.h"
-#include "kernel/riscv64/uart8250.h"
+#include "kernel/riscv64/arch.h"
 
 static bool log_initialized = false;
 static IoWriter log;
 
-static IoResult arch_debug_write(MAYBE_UNUSED void *context, uint8_t const *data, MAYBE_UNUSED size_t offset, size_t size)
+void set_arch_uart_device(GenericUartDevice *device)
 {
-    for (size_t i = 0; i < size; i++)
-    {
-        uart8250_putc(data[i]);
-    }
-
-    return OK(IoResult, size);
+    log_initialized = true;
+    log = uart_writer(device);
 }
 
 IoWriter *arch_debug(void)
 {
     if (!log_initialized)
     {
-        log.write = arch_debug_write;
+        log.write = NULL;
         log_initialized = true;
     }
 

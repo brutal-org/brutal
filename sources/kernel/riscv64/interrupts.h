@@ -1,10 +1,10 @@
-#pragma once 
+#pragma once
 
 #include <stdint.h>
 
-typedef struct 
+typedef struct
 {
-    uint64_t ra; 
+    uint64_t ra;
     uint64_t sp;
     uint64_t gp;
     uint64_t tp;
