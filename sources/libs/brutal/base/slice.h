@@ -27,3 +27,6 @@ typedef struct
     }
 
 typedef Slice(void) VoidSlice;
+
+#define slice$(type, buffer, size) \
+    (type) { .len = size, .buf = buffer }
