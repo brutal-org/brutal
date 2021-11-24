@@ -1,5 +1,9 @@
 #pragma once
 
+#include <hw/uart/uart.h>
+
+#define UART8250_BASE 0x10000000
+
 typedef enum
 {
     UART_8250_TRASMITTER_HOLDING_BUFFER = 0,
@@ -28,5 +32,4 @@ typedef enum
     UART_8250_LSR_DATA_READY = 0x01,
 } Uart8250LineStatus;
 
-void uart8250_init(void);
-void uart8250_putc(char c);
+GenericUartDevice *uart8250_init(void);
