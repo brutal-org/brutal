@@ -18,7 +18,8 @@ CFLAGS_WARN ?= \
 	-Wextra \
 	-Werror \
 	-Wundef \
-	-Wshadow
+	-Wshadow \
+	-Wvla
 
 INC_LIBS= \
 	-Isources/libs/stdc/ansi \
