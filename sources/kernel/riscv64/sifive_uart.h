@@ -2,7 +2,7 @@
 #include <hw/uart/uart.h>
 
 // todo: find uart addr from device tree
-#define SIFIVE_UART0_BASE 0x10000000
+#define SIFIVE_UART0_BASE 0x10010000
 #define SIFIVE_UART1_BASE 0x10011000
 
 enum sifive_uart_registers

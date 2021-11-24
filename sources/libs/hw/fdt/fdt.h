@@ -33,21 +33,21 @@ typedef enum
     FDT_END = 9
 } FdtNodeType;
 
-typedef be_uint32_t FdtTok ALIGNED(4);
+typedef be_uint32_t FdtTok;
 
-typedef struct PACKED ALIGNED(4)
+typedef struct
 {
     FdtTok token;
     char name[];
-} FdtRawNode;
+} FdtTokNode;
 
-typedef struct PACKED
+typedef struct
 {
     FdtTok token;
     be_uint32_t len;
     be_uint32_t name_offset;
     char value[];
-} FdtRawProp;
+} FdtTokProp;
 
 typedef struct
 {

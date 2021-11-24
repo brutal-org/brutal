@@ -1,12 +1,12 @@
 #include <brutal/debug.h>
 #include <hw/fdt/fdt.h>
 
-static FdtTok *fdt_node_begin(FdtRawNode *fdt)
+static FdtTok *fdt_node_begin(FdtTokNode *fdt)
 {
     return fdt_tok_next((FdtTok *)fdt);
 }
 
-static FdtTok *fdt_node_end(FdtRawNode *fdt, FdtHeader *header)
+static FdtTok *fdt_node_end(FdtTokNode *fdt, FdtHeader *header)
 {
     uint32_t cur_type = 0;
     int depth = 0;
@@ -30,7 +30,7 @@ static FdtTok *fdt_node_end(FdtRawNode *fdt, FdtHeader *header)
     return NULL;
 }
 
-static FdtNode fdt_raw2node(FdtRawNode *raw_node, FdtHeader *header)
+static FdtNode fdt_tok2node(FdtTokNode *raw_node, FdtHeader *header)
 {
     return (FdtNode){
         .fdt = header,
@@ -40,7 +40,7 @@ static FdtNode fdt_raw2node(FdtRawNode *raw_node, FdtHeader *header)
     };
 }
 
-static FdtProp fdt_raw2prop(FdtRawProp *raw_prop, FdtHeader *header)
+static FdtProp fdt_tok2prop(FdtTokProp *raw_prop, FdtHeader *header)
 {
     Str node_name = str$((const char *)((uintptr_t)header + load_be(header->strings_offset) + load_be(raw_prop->name_offset)));
 
@@ -67,12 +67,12 @@ FdtTok *fdt_tok_next(FdtTok *tok)
     uint32_t cur_type = load_be(*tok);
     if (cur_type == FDT_BEGIN_NODE)
     {
-        FdtRawNode *node = (FdtRawNode *)tok;
+        FdtTokNode *node = (FdtTokNode *)tok;
         tok += (ALIGN_UP(str$(node->name).len + 1, 4) / 4);
     }
     else if (cur_type == FDT_PROP)
     {
-        FdtRawProp *node = (FdtRawProp *)tok;
+        FdtTokProp *node = (FdtTokProp *)tok;
         tok += (ALIGN_UP(load_be(node->len), 4) / 4);
         tok += 2;
     }
@@ -108,11 +108,11 @@ Iter fdt_node_childs(FdtNode node, IterFn fn, void *ctx)
         cur_type = load_be(*cur);
         if (cur_type == FDT_BEGIN_NODE)
         {
-            FdtRawNode *raw_node = (FdtRawNode *)cur;
+            FdtTokNode *raw_node = (FdtTokNode *)cur;
 
             if (depth == 0)
             {
-                FdtNode res = fdt_raw2node(raw_node, node.fdt);
+                FdtNode res = fdt_tok2node(raw_node, node.fdt);
                 if (fn(&res, ctx) == ITER_STOP)
                 {
                     return ITER_STOP;
@@ -147,8 +147,8 @@ Iter fdt_node_props(FdtNode node, IterFn fn, void *ctx)
         }
         else if (cur_type == FDT_PROP && depth == 0)
         {
-            FdtRawProp *raw_prop = (FdtRawProp *)cur;
-            FdtProp prop = fdt_raw2prop(raw_prop, node.fdt);
+            FdtTokProp *raw_prop = (FdtTokProp *)cur;
+            FdtProp prop = fdt_tok2prop(raw_prop, node.fdt);
             if (fn(&prop, ctx) == ITER_STOP)
             {
                 return ITER_STOP;

@@ -23,6 +23,7 @@ GenericUartDevice *uart8250_init(void)
     uart8250_read(UART_8250_RECEIVER_BUFFER);
 
     _self.byte_size = 1;
-    _self.addr = UART8250_BASE;
+    _self.tx_addr = UART8250_BASE + UART_8250_TRASMITTER_HOLDING_BUFFER;
+    _self.rx_addr = UART8250_BASE + UART_8250_RECEIVER_BUFFER;
     return &_self;
 }
