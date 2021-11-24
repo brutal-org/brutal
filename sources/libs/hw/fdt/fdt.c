@@ -1,134 +1,124 @@
 #include <brutal/debug.h>
 #include <hw/fdt/fdt.h>
 
-FdtBeginNode *fdt_root(FdtHeader *fdt)
+static FdtTok *fdt_node_begin(FdtRawNode *fdt)
 {
-    FdtHeader *header = (FdtHeader *)fdt;
-
-    assert_equal(load_be(header->magic), FDT_MAGIC);
-
-    return (FdtBeginNode *)((uintptr_t)fdt + load_be(header->structure_offset));
+    return fdt_tok_next((FdtTok *)fdt);
 }
 
-be_uint32_t *skip_fdt(be_uint32_t *cur)
+static FdtTok *fdt_node_end(FdtRawNode *fdt, FdtHeader *header)
 {
-    uint32_t cur_type = load_be(*cur);
-    if (cur_type == FDT_BEGIN_NODE)
-    {
-        FdtBeginNode *node = (FdtBeginNode *)cur;
-        cur += (ALIGN_UP(str$(node->name).len + 1, 4) / 4);
-    }
-    else if (cur_type == FDT_PROP)
-    {
-        FdtPropertiesNode *node = (FdtPropertiesNode *)cur;
-        cur += (ALIGN_UP(load_be(node->len), 4) / 4);
-        cur += 2;
-    }
-    else if (cur_type == FDT_END)
-    {
-        return cur;
-    }
-    cur++;
-
-    return cur;
-}
-
-void dump_fdt(Emit *emit, FdtHeader *header, FdtBeginNode *current_fdt)
-{
-
-    be_uint32_t *cur = (be_uint32_t *)current_fdt;
-    uint32_t cur_type = load_be(*cur);
-
-    while (cur_type != FDT_END)
-    {
-        if (cur_type == FDT_BEGIN_NODE)
-        {
-            FdtBeginNode *node = (FdtBeginNode *)cur;
-            emit_fmt(emit, " - \"{}\" \n", str$(node->name));
-            emit_ident(emit);
-        }
-        else if (cur_type == FDT_PROP)
-        {
-            FdtPropertiesNode *cnode = (FdtPropertiesNode *)cur;
-            Str node_name = str$((const char *)((uintptr_t)header + load_be(header->strings_offset) + load_be(cnode->name_offset)));
-            emit_fmt(emit, " - property: \"{}\" \n", node_name);
-        }
-        else if (cur_type == FDT_END_NODE)
-        {
-            emit_deident(emit);
-        }
-
-        cur = skip_fdt(cur);
-        cur_type = load_be(*cur);
-    }
-}
-
-FdtBeginNode *get_fdt_node(FdtBeginNode *current_fdt, Str entry)
-{
-    be_uint32_t *cur = (be_uint32_t *)current_fdt;
     uint32_t cur_type = 0;
     int depth = 0;
 
-    while (cur_type != FDT_END && depth >= 0)
+    for (FdtTok *cur = fdt_node_begin(fdt); cur < fdt_tok_end(header); cur = fdt_tok_next(cur))
     {
-        cur = skip_fdt(cur);
         cur_type = load_be(*cur);
-
-        if (cur_type == FDT_BEGIN_NODE)
+        if (depth < 0 || cur_type == FDT_END)
         {
-            FdtBeginNode *node = (FdtBeginNode *)cur;
-            if (str_eq(str$(node->name), entry) && depth == 0)
-            {
-                return node;
-            }
-            else
-            {
-                depth++;
-            }
+            return (cur);
         }
-        else if (cur_type == FDT_END_NODE)
-        {
-            depth--;
-        }
-        else if (cur_type == FDT_END)
-        {
-            return NULL;
-        }
-    }
-
-    return NULL;
-}
-
-NodeProperty get_fdt_property(FdtHeader *header, FdtBeginNode *node, Str name)
-{
-    NodeProperty result;
-
-    be_uint32_t *cur = (be_uint32_t *)node;
-    uint32_t cur_type = 0;
-    int depth = 0;
-
-    while (cur_type != FDT_END && depth >= 0)
-    {
-        cur = skip_fdt(cur);
-        cur_type = load_be(*cur);
-
         if (cur_type == FDT_BEGIN_NODE)
         {
             depth++;
         }
-        else if (cur_type == FDT_PROP)
+        else if (cur_type == FDT_END_NODE)
         {
-            FdtPropertiesNode *cnode = (FdtPropertiesNode *)cur;
+            depth--;
+        }
+    }
+    return NULL;
+}
 
-            Str node_name = str$((const char *)((uintptr_t)header + load_be(header->strings_offset) + load_be(cnode->name_offset)));
+static FdtNode fdt_raw2node(FdtRawNode *raw_node, FdtHeader *header)
+{
+    return (FdtNode){
+        .fdt = header,
+        .begin = fdt_node_begin(raw_node),
+        .end = fdt_node_end(raw_node, header),
+        .name = str$(raw_node->name),
+    };
+}
 
-            if (str_eq(name, node_name) && depth == 0)
+static FdtProp fdt_raw2prop(FdtRawProp *raw_prop, FdtHeader *header)
+{
+    Str node_name = str$((const char *)((uintptr_t)header + load_be(header->strings_offset) + load_be(raw_prop->name_offset)));
+
+    return (FdtProp){
+        .name = node_name,
+        .value = slice$(VoidSlice, raw_prop->value, load_be(raw_prop->len)),
+    };
+}
+FdtHeader *fdt_from_data(void *raw_data)
+{
+    FdtHeader *header = (FdtHeader *)raw_data;
+
+    assert_equal(load_be(header->magic), FDT_MAGIC);
+    return header;
+}
+
+FdtTok *fdt_tok_begin(FdtHeader *fdt)
+{
+    return (FdtTok *)((uintptr_t)fdt + load_be(fdt->structure_offset));
+}
+
+FdtTok *fdt_tok_next(FdtTok *tok)
+{
+    uint32_t cur_type = load_be(*tok);
+    if (cur_type == FDT_BEGIN_NODE)
+    {
+        FdtRawNode *node = (FdtRawNode *)tok;
+        tok += (ALIGN_UP(str$(node->name).len + 1, 4) / 4);
+    }
+    else if (cur_type == FDT_PROP)
+    {
+        FdtRawProp *node = (FdtRawProp *)tok;
+        tok += (ALIGN_UP(load_be(node->len), 4) / 4);
+        tok += 2;
+    }
+    tok++;
+
+    return tok;
+}
+
+FdtTok *fdt_tok_end(FdtHeader *fdt)
+{
+    FdtTok *tok = fdt_tok_begin(fdt);
+    tok += (load_be(fdt->structure_size) / 4) + 1;
+    return tok;
+}
+
+FdtNode fdt_node_root(FdtHeader *fdt)
+{
+    return (FdtNode){
+        .fdt = fdt,
+        .begin = fdt_tok_begin(fdt),
+        .end = fdt_tok_end(fdt),
+        .name = str$(""),
+    };
+}
+
+Iter fdt_node_childs(FdtNode node, IterFn fn, void *ctx)
+{
+    uint32_t cur_type = 0;
+    int depth = 0;
+
+    for (FdtTok *cur = node.begin; cur < node.end; cur = fdt_tok_next(cur))
+    {
+        cur_type = load_be(*cur);
+        if (cur_type == FDT_BEGIN_NODE)
+        {
+            FdtRawNode *raw_node = (FdtRawNode *)cur;
+
+            if (depth == 0)
             {
-                result.property_name = node_name;
-                result.property_value_size = load_be(cnode->len);
-                result.property_value = cnode->value;
-                return result;
+                FdtNode res = fdt_raw2node(raw_node, node.fdt);
+                if (fn(&res, ctx) == ITER_STOP)
+                {
+                    return ITER_STOP;
+                }
             }
+            depth++;
         }
         else if (cur_type == FDT_END_NODE)
         {
@@ -136,5 +126,140 @@ NodeProperty get_fdt_property(FdtHeader *header, FdtBeginNode *node, Str name)
         }
     }
 
-    return (NodeProperty){};
+    return ITER_CONTINUE;
+}
+
+Iter fdt_node_props(FdtNode node, IterFn fn, void *ctx)
+{
+    uint32_t cur_type = 0;
+    int depth = 0;
+
+    for (FdtTok *cur = node.begin; cur < node.end; cur = fdt_tok_next(cur))
+    {
+        cur_type = load_be(*cur);
+        if (cur_type == FDT_BEGIN_NODE)
+        {
+            depth++;
+        }
+        else if (cur_type == FDT_END_NODE)
+        {
+            depth--;
+        }
+        else if (cur_type == FDT_PROP && depth == 0)
+        {
+            FdtRawProp *raw_prop = (FdtRawProp *)cur;
+            FdtProp prop = fdt_raw2prop(raw_prop, node.fdt);
+            if (fn(&prop, ctx) == ITER_STOP)
+            {
+                return ITER_STOP;
+            }
+        }
+    }
+
+    return ITER_CONTINUE;
+}
+
+typedef struct
+{
+    Str name;
+    FdtNode res;
+} FdtNodeLookupCtx;
+
+static Iter fdt_lookup_node_iter(FdtNode *node, FdtNodeLookupCtx *ctx)
+{
+    int part_end = str_first_chr(ctx->name, '/');
+
+    if (part_end < 0)
+    {
+        part_end = ctx->name.len;
+    }
+
+    Str node_name = str_sub(ctx->name, 0, part_end);
+
+    if (str_eq(node_name, node->name))
+    {
+        if (part_end == (int)ctx->name.len)
+        {
+            ctx->res = *node;
+            return ITER_STOP;
+        }
+        else
+        {
+            ctx->name = str_sub(ctx->name, part_end + 1, (int)ctx->name.len);
+
+            if (fdt_node_childs(*node, (IterFn *)fdt_lookup_node_iter, ctx) == ITER_STOP)
+            {
+                return ITER_STOP;
+            }
+        }
+    }
+
+    return ITER_CONTINUE;
+}
+
+FdtNode fdt_lookup_node(FdtHeader *fdt, Str path)
+{
+    FdtNode node = fdt_node_root(fdt);
+    FdtNodeLookupCtx ctx = {
+        .name = path,
+    };
+
+    fdt_node_childs(node, (IterFn *)fdt_lookup_node_iter, &ctx);
+
+    return ctx.res;
+}
+
+typedef struct
+{
+    Str name;
+    FdtProp res;
+} FdtPropCtx;
+
+static Iter fdt_lookup_prop_iter(FdtProp *node, FdtPropCtx *res)
+{
+    if (str_eq(node->name, res->name) == 0)
+    {
+        res->res = *node;
+        return ITER_STOP;
+    }
+
+    return ITER_CONTINUE;
+}
+
+FdtProp fdt_lookup_props(FdtNode node, Str name)
+{
+    FdtPropCtx ctx = {
+        .name = name,
+    };
+
+    fdt_node_props(node, (IterFn *)fdt_lookup_prop_iter, &ctx);
+
+    return ctx.res;
+}
+
+static Iter fdt_dump_props_iter(FdtProp *prop, Emit *out)
+{
+    emit_fmt(out, "- prop: {}\n", prop->name);
+    return ITER_CONTINUE;
+}
+
+static Iter fdt_dump_node_iter(FdtNode *node, Emit *out)
+{
+    emit_fmt(out, "node: {}\n", node->name);
+    emit_ident(out);
+    fdt_node_props(*node, (IterFn *)fdt_dump_props_iter, out);
+    fdt_node_childs(*node, (IterFn *)fdt_dump_node_iter, out);
+    emit_deident(out);
+    return ITER_CONTINUE;
+}
+
+void fdt_dump(FdtHeader *fdt, Emit *out)
+{
+    FdtNode root = fdt_node_root(fdt);
+    emit_fmt(out, "fdt-dump:\n");
+    emit_ident(out);
+
+    fdt_node_childs(root, (IterFn *)fdt_dump_node_iter, out);
+
+    emit_deident(out);
 }

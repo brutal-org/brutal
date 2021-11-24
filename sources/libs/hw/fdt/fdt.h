@@ -33,33 +33,51 @@ typedef enum
     FDT_END = 9
 } FdtNodeType;
 
+typedef be_uint32_t FdtTok ALIGNED(4);
+
 typedef struct PACKED ALIGNED(4)
 {
-    be_uint32_t type;
+    FdtTok token;
     char name[];
-} FdtBeginNode;
+} FdtRawNode;
 
 typedef struct PACKED
 {
-    be_uint32_t type;
+    FdtTok token;
     be_uint32_t len;
     be_uint32_t name_offset;
     char value[];
-} FdtPropertiesNode;
+} FdtRawProp;
 
 typedef struct
 {
-    Str property_name;
-    size_t property_value_size;
-    void *property_value;
-} NodeProperty;
+    Str name;
+
+    FdtHeader *fdt;
+    FdtTok *begin;
+    FdtTok *end;
+} FdtNode;
+
+typedef struct
+{
+    Str name;
+    VoidSlice value;
+} FdtProp;
 
 #define FDT_MAGIC 0xd00dfeed
 
-FdtBeginNode *fdt_root(FdtHeader *fdt);
+FdtHeader *fdt_from_data(void *raw_data);
 
-void dump_fdt(Emit *emit, FdtHeader *header, FdtBeginNode *current_fdt);
+FdtTok *fdt_tok_begin(FdtHeader *fdt);
+FdtTok *fdt_tok_next(FdtTok *tok);
+FdtTok *fdt_tok_end(FdtHeader *fdt);
 
-FdtBeginNode *get_fdt_node(FdtBeginNode *node, Str entry);
+FdtNode fdt_node_root(FdtHeader *fdt);
 
-NodeProperty get_fdt_property(FdtHeader *header, FdtBeginNode *node, Str name);
+Iter fdt_node_childs(FdtNode node, IterFn fn, void *ctx);
+Iter fdt_node_props(FdtNode node, IterFn fn, void *ctx);
+
+FdtNode fdt_lookup_node(FdtHeader *fdt, Str path);
+FdtProp fdt_lookup_props(FdtNode node, Str name);
+
+void fdt_dump(FdtHeader *fdt, Emit *out);
