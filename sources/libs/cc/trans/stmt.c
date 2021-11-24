@@ -1,4 +1,4 @@
-#include <cc/gen/c/c.h>
+#include <cc/trans.h>
 
 static bool cgen_c_should_stmt_endline(CStmtType type)
 {
