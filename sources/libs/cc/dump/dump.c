@@ -1,5 +1,5 @@
 #include <brutal/debug.h>
-#include <cc/gen/dump.h>
+#include <cc/dump.h>
 
 void cdump_value(Emit *emit, CVal value)
 {
@@ -148,9 +148,8 @@ void cdump_type(Emit *emit, CType type)
 
 void cdump_expr(Emit *emit, CExpr expr)
 {
-    emit_fmt(emit, "expr:{} ", cexpr_type_to_str(expr.type));
+    emit_fmt(emit, "expr:{}\n", cexpr_type_to_str(expr.type));
     emit_ident(emit);
-    emit_fmt(emit, "\n");
 
     switch (expr.type)
     {
@@ -221,6 +220,14 @@ void cdump_expr(Emit *emit, CExpr expr)
 
         break;
 
+    case CEXPR_LAMBDA:
+        emit_fmt(emit, "type: ");
+        cdump_type(emit, expr.lambda_.type);
+
+        emit_fmt(emit, "\nbody: ");
+        cdump_stmt(emit, *expr.lambda_.body);
+        break;
+
     default:
         panic$("unknown cexpr type {}", expr.type);
     }
@@ -230,10 +237,9 @@ void cdump_expr(Emit *emit, CExpr expr)
 
 void cdump_stmt(Emit *emit, CStmt stmt)
 {
-    emit_fmt(emit, "stmt:{}", cstmt_type_to_str(stmt.type));
+    emit_fmt(emit, "stmt:{}\n", cstmt_type_to_str(stmt.type));
     emit_ident(emit);
 
-    emit_fmt(emit, "\n");
     switch (stmt.type)
     {
     case CSTMT_INVALID:
@@ -326,6 +332,7 @@ void cdump_decl(Emit *emit, CDecl decl)
 {
     emit_fmt(emit, " decl:");
     emit_ident(emit);
+
     if (decl.type == CDECL_TYPE)
     {
         emit_fmt(emit, "typedef");
@@ -346,6 +353,7 @@ void cdump_decl(Emit *emit, CDecl decl)
         cdump_type(emit, decl.func_.type);
         cdump_stmt(emit, decl.func_.body);
     }
+
     emit_deident(emit);
 }
 
@@ -377,9 +385,9 @@ void cdump_unit(Emit *emit, CUnit unit)
         case CUNIT_DEFINE:
             emit_fmt(emit, " define {}: \n", entry._define.name);
             emit_ident(emit);
+
             if (entry._define.args.len != 0)
             {
-
                 emit_fmt(emit, " arg: \n");
 
                 vec_foreach_v(arg_name, &entry._define.args)
@@ -387,6 +395,7 @@ void cdump_unit(Emit *emit, CUnit unit)
                     emit_fmt(emit, " - {}\n", arg_name);
                 }
             }
+
             cdump_expr(emit, entry._define.expression);
             emit_deident(emit);
             break;

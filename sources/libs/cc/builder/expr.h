@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cc/ast/expr.h>
+#include <cc/ast/stmt.h>
 
 CExpr cexpr_empty(void);
 
@@ -15,6 +16,8 @@ CExpr cexpr_call(Alloc *alloc, CExpr name);
 CExpr cexpr_cast(CExpr expr, CType type, Alloc *alloc);
 
 CExpr cexpr_initializer(Alloc *alloc);
+
+CExpr cexpr_lambda(CType type, CStmt body, Alloc *alloc);
 
 void cexpr_member(CExpr *target, CExpr expr);
 

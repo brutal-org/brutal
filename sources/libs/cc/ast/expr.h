@@ -6,6 +6,8 @@
 
 #define CEXPR_MAX_PRECEDENCE (16)
 
+typedef struct cstmt CStmt;
+
 typedef enum
 {
     CEXPR_INVALID,
@@ -23,6 +25,7 @@ typedef enum
     CEXPR_CAST,
     CEXPR_TERNARY,
     CEXPR_INITIALIZER,
+    CEXPR_LAMBDA,
 
     CEXPR_COUNT
 } CExprType;
@@ -136,6 +139,12 @@ struct cexpr
         {
             Vec(CExpr) initializer;
         } initializer_;
+
+        struct
+        {
+            CType type;
+            CStmt *body;
+        } lambda_;
     };
 };
 

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <brutal/io.h>
 #include <cc/ast/unit.h>
 

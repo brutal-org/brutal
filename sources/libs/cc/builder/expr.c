@@ -112,6 +112,19 @@ CExpr cexpr_initializer(Alloc *alloc)
     return result;
 }
 
+CExpr cexpr_lambda(CType type, CStmt body, Alloc *alloc)
+{
+    CExpr result = {
+        .type = CEXPR_LAMBDA,
+        .lambda_ = {
+            .type = type,
+            .body = alloc_move(alloc, body),
+        },
+    };
+
+    return result;
+}
+
 // ++a
 CExpr cexpr_preinc(CExpr a, Alloc *alloc)
 {

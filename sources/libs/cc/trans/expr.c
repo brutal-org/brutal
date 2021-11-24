@@ -1,5 +1,5 @@
 #include <brutal/debug.h>
-#include <cc/gen/c/c.h>
+#include <cc/trans.h>
 
 static void cgen_c_op_fix(Emit *emit, COp op)
 {
