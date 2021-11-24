@@ -15,15 +15,11 @@ void arch_entry_main(uint64_t hart_id, uint64_t fdt_addr)
     log$("started cpu: {} with fdt: {}", hart_id, fdt_addr);
 
     // sifive_uart_init();
-    FdtHeader *header = (FdtHeader *)fdt_addr;
-    FdtBeginNode *node = fdt_root(header);
+    FdtHeader *header = (FdtHeader *)fdt_from_data((void *)fdt_addr);
+    Emit target;
+    emit_init(&target, arch_debug());
+    fdt_dump(header, &target);
 
-    Emit em;
-    emit_init(&em, arch_debug());
-    dump_fdt(&em, header, node);
-
-    node = get_fdt_node(node, str$("soc"));
-    node = get_fdt_node(node, str$("uart@10000000"));
     log$("booting...");
     init_interrupts();
     log$("loaded interrupts");
