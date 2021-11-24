@@ -200,6 +200,7 @@ void qsort(void *base, size_t nmemb, size_t size, int (*compar)(void const *, vo
 {
     // FIXME: Write real quick sort
 
+    char *tmp = alloc_malloc(alloc_global(), size);
     for (size_t i = 0; i + 1 < nmemb; i++)
     {
         for (size_t j = i + 1; i < nmemb; i++)
@@ -209,13 +210,13 @@ void qsort(void *base, size_t nmemb, size_t size, int (*compar)(void const *, vo
 
             if (compar(a, b) < 0)
             {
-                char tmp[size];
                 mem_cpy(tmp, a, size);
                 mem_cpy(a, b, size);
                 mem_cpy(b, tmp, size);
             }
         }
     }
+    alloc_free(alloc_global(), tmp);
 }
 
 /* --- 7.22.6 - Integer arithmetic functions -------------------------------- */
