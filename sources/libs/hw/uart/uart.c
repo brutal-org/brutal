@@ -5,15 +5,15 @@ void uart_putc(GenericUartDevice *dev, uint8_t data)
 {
     if (dev->byte_size == 1)
     {
-        volatile_write8(dev->addr, data);
+        volatile_write8(dev->tx_addr, data);
     }
     else if (dev->byte_size == 2)
     {
-        volatile_write16(dev->addr, data);
+        volatile_write16(dev->tx_addr, data);
     }
     else if (dev->byte_size == 4)
     {
-        volatile_write32(dev->addr, data);
+        volatile_write32(dev->tx_addr, data);
     }
 }
 
@@ -21,15 +21,15 @@ uint8_t uart_getc(GenericUartDevice *dev)
 {
     if (dev->byte_size == 1)
     {
-        return volatile_read8(dev->addr + 1 * dev->byte_size);
+        return volatile_read8(dev->rx_addr);
     }
     else if (dev->byte_size == 2)
     {
-        return volatile_read16(dev->addr + 1 * dev->byte_size);
+        return volatile_read16(dev->rx_addr);
     }
     else if (dev->byte_size == 4)
     {
-        return volatile_read32(dev->addr + 1 * dev->byte_size);
+        return volatile_read32(dev->rx_addr);
     }
     return 0;
 }

@@ -6,7 +6,8 @@
 typedef struct
 {
     uint8_t byte_size;
-    uintptr_t addr;
+    uintptr_t tx_addr;
+    uintptr_t rx_addr;
 } GenericUartDevice;
 
 void uart_putc(GenericUartDevice *dev, uint8_t data);
