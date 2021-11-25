@@ -1,6 +1,7 @@
 #pragma once
 
 #include <brutal/base.h>
+#include <bal/hw/mem.h>
 
 typedef enum
 {
@@ -15,7 +16,7 @@ typedef struct
     size_t len;
 } BalIo;
 
-BalIo bal_io_mem(uintptr_t base, size_t len);
+BalIo bal_io_mem(BalMem *mem);
 
 BalIo bal_io_port(uintptr_t base, size_t len);
 

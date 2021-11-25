@@ -20,7 +20,7 @@ void acpi_init(Acpi *acpi, uintptr_t rsdp)
 {
     *acpi = (Acpi){};
 
-    br_mmio_init(&acpi->mmio, 0, GiB(4));
+    bal_mem_init_pmm(&acpi->mem, 0, GiB(4));
 
     acpi->rsdp = (AcpiRsdp *)acpi_phys_to_virt(acpi, rsdp);
     acpi->rsdt = (AcpiRsdt *)acpi_phys_to_virt(acpi, acpi->rsdp->rsdt);
@@ -33,7 +33,7 @@ void acpi_deinit(Acpi *acpi)
 #ifdef __kernel__
     (void)acpi;
 #else
-    br_mmio_deinit(&acpi->mmio);
+    bal_mem_deinit(&acpi->mem);
 #endif
 }
 
@@ -42,6 +42,6 @@ uintptr_t acpi_phys_to_virt(Acpi *acpi, uintptr_t addr)
 #ifdef __kernel__
     return acpi->base + addr;
 #else
-    return acpi->mmio.base + addr;
+    return (uintptr_t)acpi->mem.buf + addr;
 #endif
 }
