@@ -26,7 +26,7 @@ void pci_init(Pci *pci, Acpi *acpi, Alloc *alloc)
             .bus_end = mcfg_rec.bus_end,
         };
 
-        br_mmio_init(&pci_group.mmio, mcfg_rec.address, (mcfg_rec.bus_end - mcfg_rec.bus_start) << PCI_BUS_SHIFT);
+        bal_mem_init_pmm(&pci_group.mem, mcfg_rec.address, (mcfg_rec.bus_end - mcfg_rec.bus_start) << PCI_BUS_SHIFT);
 
         vec_push(&pci->groups, pci_group);
     }
@@ -36,7 +36,7 @@ void pci_deinit(Pci *pci)
 {
     vec_foreach(group, &pci->groups)
     {
-        br_mmio_deinit(&group.mmio);
+        bal_mem_deinit(&group.mem);
     }
 
     vec_deinit(&pci->groups);

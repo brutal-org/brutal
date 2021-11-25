@@ -1,8 +1,8 @@
-#include <bal/hw/shm.h>
+#include <bal/hw/mem.h>
 #include <brutal/base.h>
 #include <brutal/debug.h>
 
-static BrResult balshm_map(BalShm *self)
+static BrResult bal_mem_map(BalMem *self)
 {
     assert_equal(self->buf, nullptr);
 
@@ -25,7 +25,7 @@ static BrResult balshm_map(BalShm *self)
     return BR_SUCCESS;
 }
 
-static BrResult balshm_unmap(BalShm *self)
+static BrResult bal_mem_unmap(BalMem *self)
 {
     assert_not_equal(self->buf, nullptr);
 
@@ -40,12 +40,12 @@ static BrResult balshm_unmap(BalShm *self)
     return br_unmap(&args);
 }
 
-MaybeError balshm_init_mobj(BalShm *self, BrMemObj obj)
+MaybeError bal_mem_init_mobj(BalMem *self, BrMemObj obj)
 {
-    *self = (BalShm){};
+    *self = (BalMem){};
 
     self->obj = obj;
-    BrResult result = balshm_map(self);
+    BrResult result = bal_mem_map(self);
 
     if (result != BR_SUCCESS)
     {
@@ -55,7 +55,37 @@ MaybeError balshm_init_mobj(BalShm *self, BrMemObj obj)
     return SUCCESS;
 }
 
-MaybeError balshm_init_size(BalShm *self, size_t size)
+MaybeError bal_mem_init_pmm(BalMem *self, uintptr_t addr, size_t size)
+{
+    BrCreateArgs mem_obj = {
+        .type = BR_OBJECT_MEMORY,
+        .mem_obj = {
+            .addr = addr,
+            .size = size,
+            .flags = BR_MEM_OBJ_PMM,
+        },
+    };
+
+    BrResult result = br_create(&mem_obj);
+
+    if (result != BR_SUCCESS)
+    {
+        return ERR(MaybeError, br_result_to_error(result));
+    }
+
+    self->obj = mem_obj.handle;
+
+    result = bal_mem_map(self);
+
+    if (result != BR_SUCCESS)
+    {
+        return ERR(MaybeError, br_result_to_error(result));
+    }
+
+    return SUCCESS;
+}
+
+MaybeError bal_mem_init_size(BalMem *self, size_t size)
 {
     BrCreateArgs mem_obj_args = {
         .type = BR_OBJECT_MEMORY,
@@ -72,12 +102,12 @@ MaybeError balshm_init_size(BalShm *self, size_t size)
         return ERR(MaybeError, br_result_to_error(result));
     }
 
-    return balshm_init_mobj(self, mem_obj_args.handle);
+    return bal_mem_init_mobj(self, mem_obj_args.handle);
 }
 
-MaybeError balshm_deinit(BalShm *self)
+MaybeError bal_mem_deinit(BalMem *self)
 {
-    balshm_unmap(self);
+    bal_mem_unmap(self);
 
     BrResult result = bal_close(self->obj);
 

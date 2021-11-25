@@ -13,7 +13,7 @@ PciConfig *pci_group_config(PciGroup *group, PciAddr addr)
             addr.slot << PCI_SLOT_SHIFT |
             addr.func << PCI_FUNC_SHIFT;
 
-        return (PciConfig *)(group->mmio.base + offset);
+        return (PciConfig *)(group->mem.buf + offset);
     }
 
     return nullptr;

@@ -21,7 +21,7 @@ typedef struct
 #ifdef __kernel__
     uintptr_t base;
 #else
-    BrMmio mmio;
+    BalMem mem;
 #endif
 
     AcpiRsdp *rsdp;

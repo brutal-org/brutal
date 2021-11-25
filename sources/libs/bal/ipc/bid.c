@@ -44,13 +44,13 @@ int bid_hook_call(
 
     if (resp != nullptr)
     {
-        BalShm shm;
-        balshm_init_mobj(&shm, resp_msg.args[0]);
+        BalMem shm;
+        bal_mem_init_mobj(&shm, resp_msg.args[0]);
 
         BalUnpack unpack;
         bal_unpack_init(&unpack, shm.buf, shm.len, alloc);
         req_unpack(&unpack, resp);
-        balshm_deinit(&shm);
+        bal_mem_deinit(&shm);
     }
 
     bal_pack_deinit(&pack);
@@ -92,14 +92,14 @@ void bid_hook_handle(
 
     if (req != nullptr)
     {
-        BalShm shm;
-        balshm_init_mobj(&shm, msg->args[0]);
+        BalMem shm;
+        bal_mem_init_mobj(&shm, msg->args[0]);
 
         BalUnpack unpack;
         bal_unpack_init(&unpack, shm.buf, shm.len, base$(&heap));
         req_unpack(&unpack, req);
 
-        balshm_deinit(&shm);
+        bal_mem_deinit(&shm);
     }
 
     int result = bid_handle_invoke(

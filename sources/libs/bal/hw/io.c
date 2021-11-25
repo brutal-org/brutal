@@ -3,9 +3,9 @@
 #include <brutal/debug.h>
 #include <brutal/mem.h>
 
-BalIo bal_io_mem(uintptr_t base, size_t len)
+BalIo bal_io_mem(BalMem *mem)
 {
-    return (BalIo){BAL_IO_MEMORY, base, len};
+    return (BalIo){BAL_IO_MEMORY, (uintptr_t)mem->buf, mem->len};
 }
 
 BalIo bal_io_port(uintptr_t base, size_t len)
