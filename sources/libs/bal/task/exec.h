@@ -2,6 +2,7 @@
 
 #include <bal/abi/types.h>
 #include <bal/boot/handover.h>
+#include <bal/hw/mem.h>
 
 #define BR_MAX_ARGC (256)
 
@@ -37,4 +38,4 @@ typedef struct
     BrTask handle;
 } BrTaskInfos;
 
-BrResult bal_exec(BrMemObj elf_obj, Str name, BrExecArgs const *args, BrTaskInfos *infos);
+BrResult bal_exec(BalMem *elf, Str name, BrExecArgs const *args, BrTaskInfos *infos);
