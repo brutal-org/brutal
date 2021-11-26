@@ -38,24 +38,24 @@ static void rtl8139_init_rx(RTL8139Device *dev)
     // FIXME: umap and close
     BrCreateArgs mem_obj_rx = {
         .type = BR_OBJECT_MEMORY,
-        .mem_obj = {
+        .memory = {
             .size = ALIGN_UP(8192 + 16, MEM_PAGE_SIZE),
-            .flags = BR_MEM_OBJ_LOWER /* force lower memory */
+            .flags = BR_MEM_LOWER /* force lower memory */
         },
     };
 
     assert_br_success(br_create(&mem_obj_rx));
 
     BrMapArgs map_args = {
-        .space = BR_SPACE_SELF,
-        .mem_obj = mem_obj_rx.handle,
+        .space = BR_HANDLE_SELF,
+        .memory = mem_obj_rx.handle,
         .flags = BR_MEM_WRITABLE,
     };
 
     assert_br_success(br_map(&map_args));
     dev->rx_buffer = (uint8_t *)map_args.vaddr;
 
-    bal_io_out32(dev->io, RTL8139_RBSTART_REG, mem_obj_rx.mem_obj.addr);
+    bal_io_out32(dev->io, RTL8139_RBSTART_REG, mem_obj_rx.memory.addr);
 }
 
 static void rtl8139_init_interrupt(RTL8139Device *dev)
@@ -72,7 +72,6 @@ static void rtl8139_init_interrupt(RTL8139Device *dev)
 
     BrBindArgs rtl8139_bind = {
         .event = rtl8139_irq,
-        .flags = BR_BIND_NONE,
     };
 
     br_bind(&rtl8139_bind);
@@ -114,17 +113,17 @@ static void rtl8139_send(void *ctx, void *data, size_t len)
 
     BrCreateArgs mem_obj_tx = {
         .type = BR_OBJECT_MEMORY,
-        .mem_obj = {
+        .memory = {
             .size = ALIGN_UP(8192 + 16 + 1500, MEM_PAGE_SIZE),
-            .flags = BR_MEM_OBJ_LOWER
+            .flags = BR_MEM_LOWER
         },
     };
 
     assert_br_success(br_create(&mem_obj_tx));
 
     BrMapArgs map_args = {
-        .space = BR_SPACE_SELF,
-        .mem_obj = mem_obj_tx.handle,
+        .space = BR_HANDLE_SELF,
+        .memory = mem_obj_tx.handle,
         .flags = BR_MEM_WRITABLE,
     };
 
@@ -133,13 +132,13 @@ static void rtl8139_send(void *ctx, void *data, size_t len)
     mem_cpy(data_copy, data, len);
 
     log$("send packet (size: {})", len);
-    bal_io_out32(dev->io, tsad_reg[dev->tx_curr], mem_obj_tx.mem_obj.addr);
+    bal_io_out32(dev->io, tsad_reg[dev->tx_curr], mem_obj_tx.memory.addr);
     bal_io_out32(dev->io, tsd_reg[dev->tx_curr], len);
 
     dev->tx_curr  = (dev->tx_curr + 1) % 4;
 
     assert_br_success(br_unmap(&(BrUnmapArgs){
-        .space = BR_SPACE_SELF,
+        .space = BR_HANDLE_SELF,
         .vaddr = map_args.vaddr,
         .size = map_args.size,
     }));

@@ -10,9 +10,9 @@ uint32_t pci_get_io_base(PciConfigType0 *conf)
 {
     for (int i = 0; i < 6; i++)
     {
-        if (conf->bars[i].address & 0x1)
+        if (conf->bars[i] & 0x1)
         {
-            return conf->bars[i].address & ~0x1;
+            return conf->bars[i] & ~0x1;
         }
     }
 

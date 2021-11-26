@@ -18,7 +18,7 @@
 typedef struct
 {
     BalIo io;
-    BrMmio mmio;
+    BalMem mmio;
     bool has_eeprom;
     uint16_t int_line;
     uint8_t mac[6];
