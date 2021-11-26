@@ -32,6 +32,7 @@ endif
 
 HOST_ARFLAGS=rcs
 
+USER_AS?=$(HOST_CC)
 # --- User-Compiler --------------------------------------------------------- #
 
 USER_CC=clang$(LLVM_VERSION) -target $(CONFIG_ARCH)-none-elf

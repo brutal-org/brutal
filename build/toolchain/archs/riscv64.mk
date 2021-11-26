@@ -5,8 +5,7 @@ ARCH_CFLAGS = \
 	-mno-relax \
 	-mcmodel=medany
 
-USER_AS=$(CONFIG_ARCH)-elf-as
-USER_ASFLAGS=-mno-relax -march=rv64imafdc
+USER_ASFLAGS=-mno-relax -march=rv64imafdc -target $(CONFIG_ARCH)-none-elf -c
 
 QEMU_ARGS= \
 		--machine virt -d cpu_reset

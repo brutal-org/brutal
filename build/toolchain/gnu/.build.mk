@@ -20,6 +20,10 @@ HOST_LDFLAGS=`pkg-config  sdl2 --libs`
 HOST_AR=ar
 HOST_ARFLAGS=rcs
 
+# default can be changed in archs
+
+USER_AS?=$(CONFIG_ARCH)-elf-as
+
 # --- User-Compiler ---------------------------------------------------------- #
 USER_CC=$(CONFIG_ARCH)-elf-gcc
 
