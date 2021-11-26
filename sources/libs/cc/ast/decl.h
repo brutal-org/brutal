@@ -7,7 +7,7 @@
 
 typedef enum
 {
-    CDECL_INVALID,
+    CDECL_NIL,
 
     CDECL_TYPE,
     CDECL_VAR,
