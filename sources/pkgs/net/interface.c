@@ -16,7 +16,7 @@ void interface_init(Handover *handover)
     size_t count = 0;
     vec_foreach(v, &interfaces)
     {
-        uint8_t *mac = v.driver->get_mac(v.ctx);
+        uint8_t *mac = v->driver->get_mac(v->ctx);
         log$("eth{} mac: {02x}:{02x}:{02x}:{02x}:{02x}:{02x}", count, mac[0], mac[1],
              mac[2], mac[3], mac[4], mac[5]);
         count++;

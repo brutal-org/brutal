@@ -122,14 +122,14 @@ static void *e1000_init(PciConfigType0 *pci_conf, uint16_t int_line)
 
     dev = alloc_malloc(alloc_global(), sizeof(E1000Device));
 
-    /* 
+    /*
     * TODO: crap and ugly code but you know in french we call that:
     * "flemme" and I think it's beautiful.
     */
-    if (!(pci_conf->bars[0].address & 0x1))
+    if (!(pci_conf->bars[0] & 0x1))
     {
-        br_mmio_init(&dev->mmio, pci_conf->bars[0].address, ALIGN_UP(E1000_END_REG, MEM_PAGE_SIZE));
-        dev->io = br_mmio_range(&dev->mmio);
+        bal_mem_init_pmm(&dev->mmio, pci_conf->bars[0], ALIGN_UP(E1000_END_REG, MEM_PAGE_SIZE));
+        dev->io = bal_io_mem(&dev->mmio);
     }
     else
     {
@@ -137,8 +137,6 @@ static void *e1000_init(PciConfigType0 *pci_conf, uint16_t int_line)
     }
 
     dev->int_line = int_line;
-
-    log$("{}", bal_io_in32(dev->io, E1000_STATUS_REG));
     e1000_detect_eeprom(dev);
 
     log$("Trying to read mac");
