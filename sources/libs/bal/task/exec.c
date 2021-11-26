@@ -178,16 +178,8 @@ static uintptr_t bal_exec_stack(BrSpace space, BrExecArgs const *exec_args, BrTa
     return sp;
 }
 
-BrResult bal_exec(BrMemObj elf_obj, Str name, BrExecArgs const *args, BrTaskInfos *infos)
+BrResult bal_exec(BalMem *elf, Str name, BrExecArgs const *args, BrTaskInfos *infos)
 {
-    BrMapArgs elf_map = {
-        .space = BR_SPACE_SELF,
-        .mem_obj = elf_obj,
-        .flags = BR_MEM_WRITABLE,
-    };
-
-    assert_br_success(br_map(&elf_map));
-
     BrCreateArgs elf_space = {
         .type = BR_OBJECT_SPACE,
         .space = {
@@ -208,9 +200,9 @@ BrResult bal_exec(BrMemObj elf_obj, Str name, BrExecArgs const *args, BrTaskInfo
 
     assert_br_success(br_create(&elf_task));
 
-    Elf64Header *elf_header = (Elf64Header *)elf_map.vaddr;
+    Elf64Header *elf_header = (Elf64Header *)elf->buf;
 
-    bal_exec_load(elf_space.handle, elf_header, elf_obj);
+    bal_exec_load(elf_space.handle, elf_header, elf->obj);
 
     BrTaskArgs task_args;
     uintptr_t sp = bal_exec_stack(elf_space.handle, args, &task_args);
@@ -225,14 +217,6 @@ BrResult bal_exec(BrMemObj elf_obj, Str name, BrExecArgs const *args, BrTaskInfo
     assert_br_success(br_start(&elf_start));
 
     assert_br_success(bal_close(elf_space.handle));
-
-    BrUnmapArgs elf_unmap = {
-        .space = BR_SPACE_SELF,
-        .vaddr = elf_map.vaddr,
-        .size = elf_map.size,
-    };
-
-    assert_br_success(br_unmap(&elf_unmap));
 
     infos->handle = elf_task.handle;
     infos->tid = elf_task.id;

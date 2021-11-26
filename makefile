@@ -57,12 +57,13 @@ include build/config/$(CONFIG).mk
 include build/toolchain/archs/$(CONFIG_ARCH).mk
 include build/toolchain/$(CONFIG_TOOLCHAIN)/.build.mk
 
--include sources/pkgs/*/.build.mk
+include sources/pkgs/*/.build.mk
 include sources/kernel/.build.mk
 include sources/pkgs/.host.mk
 include sources/protos/.build.mk
 include sources/pkgs/.user.mk
 include sources/loader/.build.mk
+
 include build/run/$(CONFIG_BOOTLOADER).mk
 
 .PHONY: all

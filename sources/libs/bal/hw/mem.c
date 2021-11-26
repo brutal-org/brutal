@@ -2,13 +2,15 @@
 #include <brutal/base.h>
 #include <brutal/debug.h>
 
-static BrResult bal_mem_map(BalMem *self)
+static BrResult bal_mem_map(BalMem *self, size_t size, size_t offset)
 {
     assert_equal(self->buf, nullptr);
 
     BrMapArgs args = {
         .space = BR_SPACE_SELF,
         .mem_obj = self->obj,
+        .size = size,
+        .offset = offset,
         .flags = BR_MEM_WRITABLE,
     };
 
@@ -42,10 +44,15 @@ static BrResult bal_mem_unmap(BalMem *self)
 
 MaybeError bal_mem_init_mobj(BalMem *self, BrMemObj obj)
 {
+    return bal_mem_init_mobj_offset(self, obj, 0, 0);
+}
+
+MaybeError bal_mem_init_mobj_offset(BalMem *self, BrMemObj obj, size_t offset, size_t len)
+{
     *self = (BalMem){};
 
     self->obj = obj;
-    BrResult result = bal_mem_map(self);
+    BrResult result = bal_mem_map(self, len, offset);
 
     if (result != BR_SUCCESS)
     {
@@ -73,16 +80,7 @@ MaybeError bal_mem_init_pmm(BalMem *self, uintptr_t addr, size_t size)
         return ERR(MaybeError, br_result_to_error(result));
     }
 
-    self->obj = mem_obj.handle;
-
-    result = bal_mem_map(self);
-
-    if (result != BR_SUCCESS)
-    {
-        return ERR(MaybeError, br_result_to_error(result));
-    }
-
-    return SUCCESS;
+    return bal_mem_init_mobj(self, mem_obj.handle);
 }
 
 MaybeError bal_mem_init_size(BalMem *self, size_t size)

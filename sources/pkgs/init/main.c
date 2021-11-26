@@ -1,4 +1,5 @@
 #include <bal/abi.h>
+#include <bal/hw.h>
 #include <bal/task.h>
 #include <brutal/alloc.h>
 #include <brutal/codec/tga.h>
@@ -14,31 +15,15 @@ static void display_bootimage(Handover const *handover)
 
     size_t fb_size = fb->height * fb->pitch;
 
-    BrCreateArgs fb_obj = {
-        .type = BR_OBJECT_MEMORY,
-        .mem_obj = {
-            .addr = fb->addr,
-            .size = ALIGN_UP(fb_size, 0x1000),
-            .flags = BR_MEM_OBJ_PMM,
-        },
-    };
-
-    assert_br_success(br_create(&fb_obj));
-
-    BrMapArgs fb_map = {
-        .space = BR_SPACE_SELF,
-        .mem_obj = fb_obj.handle,
-        .flags = BR_MEM_WRITABLE,
-    };
-
-    assert_br_success(br_map(&fb_map));
+    BalMem fb_mem;
+    bal_mem_init_pmm(&fb_mem, fb->addr, fb_size);
 
     GfxSurface fb_surface = {
         .width = fb->width,
         .height = fb->height,
         .pitch = fb->pitch,
         .format = GFX_PIXEL_FORMAT_BGRA8888,
-        .buf = (void *)fb_map.vaddr,
+        .buf = (void *)fb_mem.buf,
         .size = fb_size,
     };
 
@@ -47,26 +32,10 @@ static void display_bootimage(Handover const *handover)
     HandoverModule const *img = handover_find_module(handover, str$("bootimg"));
     assert_not_null(img);
 
-    BrCreateArgs img_obj = {
-        .type = BR_OBJECT_MEMORY,
-        .mem_obj = {
-            .addr = img->addr,
-            .size = img->size,
-            .flags = BR_MEM_OBJ_PMM,
-        },
-    };
+    BalMem img_mem;
+    bal_mem_init_pmm(&img_mem, img->addr, img->size);
 
-    assert_br_success(br_create(&img_obj));
-
-    BrMapArgs img_map = {
-        .space = BR_SPACE_SELF,
-        .mem_obj = img_obj.handle,
-        .flags = BR_MEM_WRITABLE,
-    };
-
-    assert_br_success(br_map(&img_map));
-
-    GfxSurface img_surface = tga_decode_in_memory((void *)img_map.vaddr, img_map.size);
+    GfxSurface img_surface = tga_decode_in_memory((void *)img_mem.buf, img_mem.len);
 
     // Display the image
 
@@ -80,42 +49,19 @@ static void display_bootimage(Handover const *handover)
 
     // Cleanup
 
-    bal_close(img_obj.handle);
-    bal_close(fb_obj.handle);
-
-    assert_br_success(br_unmap(&(BrUnmapArgs){
-        .space = BR_SPACE_SELF,
-        .vaddr = fb_map.vaddr,
-        .size = fb_map.size,
-    }));
-
-    assert_br_success(br_unmap(&(BrUnmapArgs){
-        .space = BR_SPACE_SELF,
-        .vaddr = img_map.vaddr,
-        .size = img_map.size,
-    }));
+    bal_mem_deinit(&img_mem);
+    bal_mem_deinit(&fb_mem);
 }
 
 BrResult srv_run(Handover const *handover, Str name, BrExecArgs const *args, BrTaskInfos *infos)
 {
     HandoverModule const *elf = handover_find_module(handover, name);
-
     assert_not_null(elf);
 
-    BrCreateArgs elf_obj = {
-        .type = BR_OBJECT_MEMORY,
-        .mem_obj = {
-            .addr = elf->addr,
-            .size = elf->size,
-            .flags = BR_MEM_OBJ_PMM,
-        },
-    };
-
-    assert_br_success(br_create(&elf_obj));
-
-    BrResult result = bal_exec(elf_obj.handle, name, args, infos);
-
-    bal_close(elf_obj.handle);
+    BalMem elf_mem;
+    bal_mem_init_pmm(&elf_mem, elf->addr, elf->size);
+    BrResult result = bal_exec(&elf_mem, name, args, infos);
+    bal_mem_deinit(&elf_mem);
 
     log$("Service '{}' created!", name);
 
@@ -136,12 +82,10 @@ int br_entry_handover(Handover *handover)
         &(BrExecArgs){
             .type = BR_START_CMAIN,
             .cmain = {
-                .argc = 5,
+                .argc = 3,
                 .argv = (Str[]){
                     str$("Hello"),
-                    str$("world"),
-                    str$("my"),
-                    str$("friend"),
+                    str$("friends"),
                     str$(":^)"),
                 },
             },
