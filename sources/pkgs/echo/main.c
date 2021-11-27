@@ -11,7 +11,7 @@ void br_event(IpcEv *ev, BrMsg const *msg)
 int br_entry()
 {
     IpcEv ev;
-    br_ev_init(&ev, alloc_global());
+    br_ev_init(&ev, nullptr, alloc_global());
 
     return br_ev_run(&ev);
 }

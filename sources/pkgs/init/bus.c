@@ -44,5 +44,7 @@ BrId bus_start(Bus *bus, Str name, BalArgs args)
 
     bal_mem_deinit(&elf_mem);
 
+    vec_push(&bus->serv, elf_task);
+
     return elf_task.id;
 }

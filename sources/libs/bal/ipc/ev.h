@@ -32,6 +32,7 @@ struct ipc_proto
 struct ipc_ev
 {
     Fiber *dispatcher;
+    void *ctx;
     IpcJob *jobs;
     Vec(IpcProto) protos;
     IpcFn *sink;
@@ -39,7 +40,7 @@ struct ipc_ev
     int exit_code;
 };
 
-void br_ev_init(IpcEv *self, Alloc *alloc);
+void br_ev_init(IpcEv *self, void *ctx, Alloc *alloc);
 
 void br_ev_deinit(IpcEv *self);
 

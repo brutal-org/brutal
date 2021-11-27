@@ -26,11 +26,11 @@ LIBS_BIN=$(BINDIR_USER)/libbrutal.a
 
 DEPENDENCIES += $(LIBS_OBJ:.o=.d)
 
-$(BINDIR_USER)/%.c.o: $(GENDIR)/%.c $(GENERATED_HDR)
+$(BINDIR_USER)/%.c.o: $(GENDIR)/%.c | $(GENERATED_HDR)
 	@$(MKCWD)
 	$(USER_CC) -c -o $@ $< $(USER_UCFLAGS)
 
-$(BINDIR_USER)/%.c.o: sources/%.c $(GENERATED_HDR)
+$(BINDIR_USER)/%.c.o: sources/%.c | $(GENERATED_HDR)
 	@$(MKCWD)
 	$(USER_CC) -c -o $@ $< $(USER_UCFLAGS)
 

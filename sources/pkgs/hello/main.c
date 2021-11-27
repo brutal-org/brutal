@@ -18,7 +18,7 @@ static HelloVTable vtable = {
 int main()
 {
     IpcEv ev = {};
-    br_ev_init(&ev, alloc_global());
+    br_ev_init(&ev, nullptr, alloc_global());
 
     hello_impl(&ev, &vtable);
 
