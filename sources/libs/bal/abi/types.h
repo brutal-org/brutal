@@ -29,22 +29,6 @@ typedef enum
         BR_SYSCALL_COUNT
 } BrSyscall;
 
-static inline const char *br_syscall_to_string(BrSyscall syscall)
-{
-    static const char *SYSCALL_NAMES[] = {
-#define ITER(SYSCALL) #SYSCALL,
-        FOREACH_SYSCALLS(ITER)
-#undef ITER
-    };
-
-    if (syscall >= BR_SYSCALL_COUNT)
-    {
-        return "INVALID";
-    }
-
-    return SYSCALL_NAMES[syscall];
-}
-
 #define FOREACH_RESULTS(RESULT) \
     RESULT(SUCCESS)             \
     RESULT(INTERRUPTED)         \
@@ -73,61 +57,6 @@ typedef enum
         BR_RESULT_COUNT
 } BrResult;
 
-static inline const char *br_result_to_string(BrResult result)
-{
-    static const char *RESULT_NAMES[] = {
-#define ITER(RESULT) #RESULT,
-        FOREACH_RESULTS(ITER)
-#undef ITER
-    };
-
-    if (result >= BR_RESULT_COUNT)
-    {
-        return "INVALID";
-    }
-
-    return RESULT_NAMES[result];
-}
-
-static inline Error br_result_to_error(BrResult result)
-{
-    switch (result)
-    {
-    case BR_SUCCESS:
-        return ERR_SUCCESS;
-
-    case BR_BAD_ADDRESS:
-        return ERR_BAD_ADDRESS;
-
-    case BR_OUT_OF_MEMORY:
-        return ERR_OUT_OF_MEMORY;
-
-    case BR_BAD_ARGUMENTS:
-        return ERR_BAD_ARGUMENTS;
-
-    case BR_BAD_CAPABILITY:
-        return ERR_DENIED;
-
-    case BR_BAD_HANDLE:
-        return ERR_BAD_HANDLE;
-
-    case BR_NOT_IMPLEMENTED:
-        return ERR_NOT_IMPLEMENTED;
-
-    case BR_BAD_SYSCALL:
-        return ERR_BAD_SYSCALL;
-
-    case BR_TIMEOUT:
-        return ERR_TIMEOUT;
-
-    case BR_WOULD_BLOCK:
-        return ERR_WOULD_BLOCK;
-
-    default:
-        return ERR_UNDEFINED;
-    }
-}
-
 typedef enum
 {
     BR_OBJECT_NONE,
@@ -141,9 +70,11 @@ typedef enum
 
 typedef uint64_t BrArg;
 
-#define BR_HANDLE_NIL ((BrHandle)0)
+#define BR_ID_NIL ((BrId)0)
 
 typedef uint64_t BrId;
+
+#define BR_HANDLE_NIL ((BrHandle)0)
 
 typedef uint64_t BrHandle;
 
@@ -173,7 +104,7 @@ typedef enum
     BR_MEM_OBJ_LOWER = 1 << 1,
 } BrMemObjFlags;
 
-#define BR_MEM_NONE ((BrMemFlags)0)
+#define BR_MEM_ZERO ((BrMemFlags)0)
 #define BR_MEM_READABLE ((BrMemFlags)(1 << 0))
 #define BR_MEM_WRITABLE ((BrMemFlags)(1 << 1))
 #define BR_MEM_EXECUTABLE ((BrMemFlags)(1 << 2))
@@ -189,7 +120,7 @@ typedef BrHandle BrTask;
 #define BR_TASK_INIT ((BrTask)-3)
 #define BR_TASK_IRQ ((BrTask)-4)
 
-#define BR_TASK_NONE (BrTaskFlags)(0)
+#define BR_TASK_ZERO (BrTaskFlags)(0)
 #define BR_TASK_USER (BrTaskFlags)(1 << 0)
 
 typedef uint8_t BrTaskFlags;
@@ -202,7 +133,7 @@ typedef uint64_t BrTimeout;
 
 #define BR_MSG_ARG_COUNT (5)
 
-#define BR_MSG_NONE (0)
+#define BR_MSG_ZERO (0)
 #define BR_MSG_HND(I) (1 << (I))
 
 typedef uint32_t BrMsgFlags;
@@ -242,21 +173,16 @@ typedef struct
     };
 } BrMsg;
 
-static inline bool br_event_eq(BrEvent a, BrEvent b)
-{
-    return a.type == b.type && a.irq == b.irq;
-}
-
 _Static_assert(sizeof(BrMsg) == 64, "");
 
-#define BR_IPC_NONE ((BrIpcFlags)(0))
+#define BR_IPC_ZERO ((BrIpcFlags)(0))
 #define BR_IPC_BLOCK ((BrIpcFlags)(1 << 0))
 #define BR_IPC_SEND ((BrIpcFlags)(1 << 1))
 #define BR_IPC_RECV ((BrIpcFlags)(1 << 2))
 
 typedef uint32_t BrIpcFlags;
 
-#define BR_CAP_NONE (0)
+#define BR_CAP_ZERO (0)
 #define BR_CAP_IRQ (1 << 0)
 #define BR_CAP_PMM (1 << 1)
 #define BR_CAP_LOG (1 << 2)
@@ -280,7 +206,7 @@ typedef struct
 
 typedef enum
 {
-    BR_START_INVALID,
+    BR_START_NONE,
     BR_START_CMAIN,
     BR_START_ARGS,
     BR_START_HANDOVER,

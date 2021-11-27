@@ -4,7 +4,7 @@
 #include "kernel/arch.h"
 #include "kernel/domain.h"
 #include "kernel/event.h"
-#include "kernel/global.h"
+#include "kernel/globals.h"
 #include "kernel/init.h"
 #include "kernel/memory.h"
 #include "kernel/sched.h"
