@@ -1,18 +1,77 @@
-#include <bal/abi.h>
-#include <brutal/debug.h>
+#include <bal/abi/helpers.h>
 
-BrResult bal_close(BrHandle handle)
+char const *br_syscall_to_string(BrSyscall syscall)
 {
-    return br_close(&(BrCloseArgs){
-        .handle = handle,
-    });
+    static char const *SYSCALL_NAMES[] = {
+#define ITER(SYSCALL) #SYSCALL,
+        FOREACH_SYSCALLS(ITER)
+#undef ITER
+    };
+
+    if (syscall >= BR_SYSCALL_COUNT)
+    {
+        return "INVALID";
+    }
+
+    return SYSCALL_NAMES[syscall];
 }
 
-BrResult bal_unmap(BrSpace space, void *base, size_t len)
+char const *br_result_to_string(BrResult result)
 {
-    return br_unmap(&(BrUnmapArgs){
-        space,
-        (uintptr_t)base,
-        len,
-    });
+    static char const *RESULT_NAMES[] = {
+#define ITER(RESULT) #RESULT,
+        FOREACH_RESULTS(ITER)
+#undef ITER
+    };
+
+    if (result >= BR_RESULT_COUNT)
+    {
+        return "INVALID";
+    }
+
+    return RESULT_NAMES[result];
+}
+
+Error br_result_to_error(BrResult result)
+{
+    switch (result)
+    {
+    case BR_SUCCESS:
+        return ERR_SUCCESS;
+
+    case BR_BAD_ADDRESS:
+        return ERR_BAD_ADDRESS;
+
+    case BR_OUT_OF_MEMORY:
+        return ERR_OUT_OF_MEMORY;
+
+    case BR_BAD_ARGUMENTS:
+        return ERR_BAD_ARGUMENTS;
+
+    case BR_BAD_CAPABILITY:
+        return ERR_DENIED;
+
+    case BR_BAD_HANDLE:
+        return ERR_BAD_HANDLE;
+
+    case BR_NOT_IMPLEMENTED:
+        return ERR_NOT_IMPLEMENTED;
+
+    case BR_BAD_SYSCALL:
+        return ERR_BAD_SYSCALL;
+
+    case BR_TIMEOUT:
+        return ERR_TIMEOUT;
+
+    case BR_WOULD_BLOCK:
+        return ERR_WOULD_BLOCK;
+
+    default:
+        return ERR_UNDEFINED;
+    }
+}
+
+bool br_event_eq(BrEvent a, BrEvent b)
+{
+    return a.type == b.type && a.irq == b.irq;
 }

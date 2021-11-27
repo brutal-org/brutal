@@ -2,6 +2,10 @@
 
 #include <bal/abi/types.h>
 
-BrResult bal_close(BrHandle handle);
+char const *br_syscall_to_string(BrSyscall syscall);
 
-BrResult bal_unmap(BrSpace space, void *base, size_t len);
+char const *br_result_to_string(BrResult result);
+
+Error br_result_to_error(BrResult result);
+
+bool br_event_eq(BrEvent a, BrEvent b);

@@ -5,7 +5,7 @@
 #include "kernel/context.h"
 #include "kernel/cpu.h"
 #include "kernel/event.h"
-#include "kernel/global.h"
+#include "kernel/globals.h"
 #include "kernel/sched.h"
 #include "kernel/x86_64/apic.h"
 #include "kernel/x86_64/asm.h"

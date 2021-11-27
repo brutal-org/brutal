@@ -1,7 +1,7 @@
 #include <brutal/debug.h>
 #include <brutal/mem.h>
 #include <brutal/sync.h>
-#include "kernel/global.h"
+#include "kernel/globals.h"
 
 Lock lock;
 HeapRange heap;

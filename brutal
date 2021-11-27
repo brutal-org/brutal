@@ -23,7 +23,6 @@ usage()
   echo "    -d, --debug    Run the tool inside a debuger"
   echo "    -n, --nuke     Nuke the build dir"
   echo "    -f, --fast     Do it fast"
-  echo "        --fix      Run some common fixes"
   echo "    -h, --help     Show usage"
   echo "    -o, --coverage Generate code coverage"
   echo "    -r, --run      Start the virtual machine"
@@ -64,14 +63,6 @@ while [[ $1 == -* ]]; do
 
     "-f" | "--fast")
       JOBS="-j"
-      ;;
-
-    "--fix")
-      echo "Cleaning up buildir..."
-      make $SILENT nuke
-      echo "Making we have all submodules..."
-      git submodule update --init --recursive
-      echo "Done!"
       ;;
 
     "-h" | "--help")

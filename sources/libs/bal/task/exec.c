@@ -1,5 +1,5 @@
 #include <bal/abi.h>
-#include <bal/task/exec.h>
+#include <bal/task/task.h>
 #include <brutal/debug.h>
 #include <elf/elf.h>
 
@@ -26,7 +26,7 @@ static void bal_exec_load(BrSpace space, Elf64Header const *elf_header, BrMemObj
                 .offset = prog_header->file_offset,
                 .size = size,
                 .vaddr = prog_header->virtual_address,
-                .flags = BR_MEM_NONE,
+                .flags = BR_MEM_ZERO,
             };
 
             assert_br_success(br_map(&prog_map));
@@ -80,7 +80,7 @@ static void bal_exec_load(BrSpace space, Elf64Header const *elf_header, BrMemObj
     }
 }
 
-static uintptr_t bal_exec_stack(BrSpace space, BrExecArgs const *exec_args, BrTaskArgs *start_args)
+static uintptr_t bal_exec_stack(BrSpace space, BalArgs exec_args, BrTaskArgs *start_args)
 {
     BrCreateArgs stack_obj = {
         .type = BR_OBJECT_MEMORY,
@@ -103,13 +103,13 @@ static uintptr_t bal_exec_stack(BrSpace space, BrExecArgs const *exec_args, BrTa
     uint8_t *base = (uint8_t *)local_stack_map.vaddr + 0x4000;
     uint8_t *head = base;
 
-    start_args->type = exec_args->type;
+    start_args->type = exec_args.type;
 
-    switch (exec_args->type)
+    switch (exec_args.type)
     {
     case BR_START_CMAIN:
     {
-        BrCMainArgs cmain = exec_args->cmain;
+        BrCMainArgs cmain = exec_args.cmain;
         uintptr_t argv[BR_MAX_ARGC + 1];
 
         for (int i = 0; i < cmain.argc; i++)
@@ -134,18 +134,18 @@ static uintptr_t bal_exec_stack(BrSpace space, BrExecArgs const *exec_args, BrTa
     case BR_START_ARGS:
     {
         // Nothing to copy
-        start_args->arg1 = exec_args->args.arg1;
-        start_args->arg2 = exec_args->args.arg2;
-        start_args->arg3 = exec_args->args.arg3;
-        start_args->arg4 = exec_args->args.arg4;
-        start_args->arg5 = exec_args->args.arg5;
+        start_args->arg1 = exec_args.args.arg1;
+        start_args->arg2 = exec_args.args.arg2;
+        start_args->arg3 = exec_args.args.arg3;
+        start_args->arg4 = exec_args.args.arg4;
+        start_args->arg5 = exec_args.args.arg5;
     }
     break;
 
     case BR_START_HANDOVER:
     {
         head -= ALIGN_UP(sizeof(Handover), 16);
-        mem_cpy(head, exec_args->handover, sizeof(Handover));
+        mem_cpy(head, exec_args.handover, sizeof(Handover));
         start_args->arg1 = 0xC0000000 - ((uintptr_t)base - (uintptr_t)head);
     }
     break;
@@ -178,7 +178,7 @@ static uintptr_t bal_exec_stack(BrSpace space, BrExecArgs const *exec_args, BrTa
     return sp;
 }
 
-BrResult bal_exec(BalMem *elf, Str name, BrExecArgs const *args, BrTaskInfos *infos)
+BrResult bal_task_exec(BalTask *task, BalMem *elf, BalArgs args)
 {
     BrCreateArgs elf_space = {
         .type = BR_OBJECT_SPACE,
@@ -192,7 +192,7 @@ BrResult bal_exec(BalMem *elf, Str name, BrExecArgs const *args, BrTaskInfos *in
     BrCreateArgs elf_task = {
         .type = BR_OBJECT_TASK,
         .task = {
-            .name = str_fix$(StrFix128, name),
+            .name = str_fix$(StrFix128, task->name),
             .space = elf_space.handle,
             .caps = BR_CAP_ALL,
         },
@@ -218,8 +218,8 @@ BrResult bal_exec(BalMem *elf, Str name, BrExecArgs const *args, BrTaskInfos *in
 
     assert_br_success(bal_close(elf_space.handle));
 
-    infos->handle = elf_task.handle;
-    infos->tid = elf_task.id;
+    task->id = elf_task.id;
+    task->handle = elf_task.handle;
 
     return BR_SUCCESS;
 }
