@@ -1,23 +1,17 @@
-#include <bal/task.h>
-#include <brutal/alloc.h>
+#include <bal/ipc.h>
 #include <brutal/debug.h>
-#include <brutal/io.h>
-#include <brutal/time.h>
+#include <protos/serv/bbus.h>
 
-int main(int argc, char const *argv[])
+int br_entry_args()
 {
-    log$("Hello from the posix server!");
+    IpcEv ev;
+    br_ev_init(&ev, nullptr, alloc_global());
 
-    DateTime dt = timestamp_to_datetime(bal_globals()->time);
-    log$("Time is {}/{}/{}", dt.day, dt.month, dt.year);
+    Str req = str$("pci");
+    uint64_t resp = 0;
+    bbus_locate(&ev, BR_TASK_INIT, &req, &resp, alloc_global());
 
-    log$("ARGC={}", argc);
-    log$("ARGV={#x}", (uintptr_t)argv);
+    log$("PCI id is {}", resp);
 
-    for (int i = 0; i < argc; i++)
-    {
-        log$("ARGV[{}]={}", i, argv[i]);
-    }
-
-    return 0;
+    return br_ev_run(&ev);
 }

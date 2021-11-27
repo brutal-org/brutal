@@ -1,0 +1,8 @@
+interface Bbus
+{
+    errors {
+        NOT_FOUND,
+    };
+
+    method locate Str -> U64;
+}

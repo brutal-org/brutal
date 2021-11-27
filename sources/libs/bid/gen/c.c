@@ -9,6 +9,8 @@ static CType gen_decl_type(BidType type, Alloc *alloc);
 
 static CType gen_decl_primitive(BidType type)
 {
+    assert_truth(type.type == BID_TYPE_PRIMITIVE);
+
     BidBuiltinType *builtin = bid_lookup_builtin(type.primitive_.name);
 
     if (builtin != nullptr)
@@ -80,15 +82,9 @@ static CType gen_decl_type(BidType type, Alloc *alloc)
     }
 }
 
-static CType gen_type(BidType type)
-{
-    assert_truth(type.type == BID_TYPE_PRIMITIVE);
-    return ctype_ident(type.primitive_.mangled);
-}
-
 static CType gen_func_method(BidMethod method, BidIface const iface, Alloc *alloc)
 {
-    CType ctype = ctype_func(gen_type(iface.errors), alloc);
+    CType ctype = ctype_func(gen_decl_primitive(iface.errors), alloc);
 
     ctype_member(&ctype, str$("ev"), ctype_ident_ptr(str$("IpcEv"), alloc));
 
@@ -96,13 +92,13 @@ static CType gen_func_method(BidMethod method, BidIface const iface, Alloc *allo
 
     if (method.request.type != BID_TYPE_NIL)
     {
-        CType req_type = ctype_ptr(ctype_attr(gen_type(method.request), CTYPE_CONST), alloc);
+        CType req_type = ctype_ptr(ctype_attr(gen_decl_primitive(method.request), CTYPE_CONST), alloc);
         ctype_member(&ctype, str$("req"), req_type);
     }
 
     if (method.response.type != BID_TYPE_NIL)
     {
-        CType res_type = ctype_ptr(gen_type(method.response), alloc);
+        CType res_type = ctype_ptr(gen_decl_primitive(method.response), alloc);
         ctype_member(&ctype, str$("resp"), res_type);
     }
 
@@ -445,7 +441,7 @@ void gen_dispatch_case(CStmt *block, BidMethod method, Alloc *alloc)
 
     if (method.request.type != BID_TYPE_NIL)
     {
-        cstmt_block_add(block, cstmt_decl(cdecl_var(str$("req_buf"), ctype_ident(method.request.primitive_.mangled), cexpr_empty()), alloc));
+        cstmt_block_add(block, cstmt_decl(cdecl_var(str$("req_buf"), gen_decl_primitive(method.request), cexpr_empty()), alloc));
 
         cexpr_member(&call_handler, cexpr_ref(cexpr_ident(str$("req_buf")), alloc));
         cexpr_member(&call_handler, gen_unpack_ref(method.request.primitive_.mangled, alloc));
@@ -458,7 +454,7 @@ void gen_dispatch_case(CStmt *block, BidMethod method, Alloc *alloc)
 
     if (method.response.type != BID_TYPE_NIL)
     {
-        cstmt_block_add(block, cstmt_decl(cdecl_var(str$("resp_buf"), ctype_ident(method.response.primitive_.mangled), cexpr_empty()), alloc));
+        cstmt_block_add(block, cstmt_decl(cdecl_var(str$("resp_buf"), gen_decl_primitive(method.response), cexpr_empty()), alloc));
 
         cexpr_member(&call_handler, cexpr_ref(cexpr_ident(str$("resp_buf")), alloc));
         cexpr_member(&call_handler, cexpr_ident(str_fmt(alloc, "MSG_{case:constant}_RESP", method.mangled)));

@@ -129,8 +129,9 @@ static void dequeue_job(IpcEv *self, IpcJob *job)
     }
 }
 
-void br_ev_init(IpcEv *self, Alloc *alloc)
+void br_ev_init(IpcEv *self, void *ctx, Alloc *alloc)
 {
+    self->ctx = ctx;
     self->running = true;
     self->dispatcher = fiber_start((FiberFn *)req_dispatch, self);
     self->dispatcher->state = FIBER_IDLE;
