@@ -262,4 +262,14 @@ void fdt_dump(FdtHeader *fdt, Emit *out)
     fdt_node_childs(root, (IterFn *)fdt_dump_node_iter, out);
 
     emit_deident(out);
+
+    emit_fmt(out, "fdt reserved memory:\n");
+    FdtReservationEntry *entry = ((void *)fdt) + load_be(fdt->memory_reservation_offset);
+    emit_ident(out);
+    while (load_be(entry->size) != 0 || load_be(entry->address) != 0)
+    {
+        emit_fmt(out, "- [{#x}] - [{#x}] \n", load_be(entry->address), load_be(entry->address) + load_be(entry->size));
+        entry++;
+    }
+    emit_deident(out);
 }
