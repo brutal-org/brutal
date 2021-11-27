@@ -9,7 +9,7 @@ KERNEL_SRC += \
 	$(wildcard sources/embed/$(CONFIG_ARCH)/*.c)   \
 	$(wildcard sources/embed/$(CONFIG_ARCH)/*.s)   \
 	$(wildcard sources/embed/kernel/*.c)           \
-	sources/libs/bal/abi/helpers.c 			   \
+	sources/libs/bal/abi/helpers.c                 \
 	$(wildcard sources/libs/stdc/ansi/ctype.c)     \
 	$(wildcard sources/libs/stdc/ansi/string.c)    \
 	$(wildcard sources/libs/hw/acpi/*.c)           \
