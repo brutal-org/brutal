@@ -11,7 +11,7 @@ ENTRY(_kstart)
 
 MEMORY
 {
-    testram (arwx) : ORIGIN = 0x81000000, LENGTH = 0x7000000
+    testram (arwx) : ORIGIN = 0x80100000, LENGTH = 0x7f00000
 }
 
 PHDRS
@@ -27,6 +27,7 @@ PHDRS
 
 SECTIONS
 {
+
     /* Each hart is allocated its own stack of size __stack_size. This value
      * can be overriden at build-time by adding the following to CFLAGS:
      *
@@ -87,7 +88,9 @@ SECTIONS
      * execution.
      */
 
+
     .init : {
+    PROVIDE(_kernel_start = .);
         /* The _enter symbol is placed in the .text.metal.init.enter section
          * and must be placed at the beginning of the program */
         KEEP (*(.text.metal.init.enter.xprop))
@@ -279,19 +282,8 @@ SECTIONS
         . += __stack_size; /* Hart 3 */
         . += __stack_size; /* Hart 4 */
         PROVIDE(metal_segment_stack_end = .);
-    } >testram :ram
-
-    .heap (NOLOAD) : ALIGN(8) {
+        PROVIDE(_kernel_end = .);
         PROVIDE( __end = . );
-        PROVIDE( __heap_start = . );
-        PROVIDE( metal_segment_heap_target_start = . );
-        /* If __heap_max is defined, grow the heap to use the rest of RAM,
-         * otherwise set the heap size to __heap_size */
-       . = DEFINED(__heap_max) ? MIN( LENGTH(testram) - ( . - ORIGIN(testram)) , 0x10000000) : . + __heap_size;
-
-        PROVIDE( metal_segment_heap_target_end = . );
-        PROVIDE( _heap_end = . );
-        PROVIDE( __heap_end = . );
     } >testram :ram
 
     /* C++ exception handling information is
@@ -302,4 +294,5 @@ SECTIONS
     /DISCARD/ : {
 	*(.eh_frame .eh_frame.*)
     }
+
 }
