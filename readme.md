@@ -1,11 +1,14 @@
 <br/>
 <br/>
 <br/>
+<br/>
+<br/>
 
 <p align="center">
   <img width="256" src="book/shared/logo.png">
 </p>
 
+<br/>
 <br/>
 <br/>
 
@@ -16,42 +19,36 @@
 
 <br/>
 <br/>
-
-<p align="center">
-    <a href="https://github.com/brutal-org/brutal/issues">
-      <img src="https://img.shields.io/github/issues/brutal-org/brutal">
-    </a>
-    <a href="https://github.com/brutal-org/brutal/network">
-      <img src="https://img.shields.io/github/forks/brutal-org/brutal">
-    </a>
-    <a href="https://github.com/brutal-org/brutal/stargazers">
-      <img src="https://img.shields.io/github/stars/brutal-org/brutal">
-    </a>
-    <a href="https://github.com/brutal-org/brutal/blob/main/license">
-      <img src="https://img.shields.io/github/license/brutal-org/brutal">
-    </a>
-</p>
-
 <br/>
 <br/>
 <br/>
 
-## CI
+# BRUTAL
 
-- [![codecov](https://codecov.io/gh/brutal-org/brutal/branch/main/graph/badge.svg?token=T4R6TEF56Z)](https://codecov.io/gh/brutal-org/brutal) (this number only includes code that can run on linux)
-- [![Build and Test (Ubuntu)](https://github.com/brutal-org/brutal/actions/workflows/ubuntu.yml/badge.svg)](https://github.com/brutal-org/brutal/actions/workflows/ubuntu.yml)
-- [![Build and Test (Darwin)](https://github.com/brutal-org/brutal/actions/workflows/darwin.yml/badge.svg)](https://github.com/brutal-org/brutal/actions/workflows/darwin.yml)
 
-## Features
+<a href="https://github.com/brutal-org/brutal/issues">
+  <img src="https://img.shields.io/github/issues/brutal-org/brutal">
+</a>
+<a href="https://github.com/brutal-org/brutal/network">
+  <img src="https://img.shields.io/github/forks/brutal-org/brutal">
+</a>
+<a href="https://github.com/brutal-org/brutal/stargazers">
+  <img src="https://img.shields.io/github/stars/brutal-org/brutal">
+</a>
+<a href="https://github.com/brutal-org/brutal/blob/main/license">
+  <img src="https://img.shields.io/github/license/brutal-org/brutal">
+</a>
+<a href="https://codecov.io/gh/brutal-org/brutal"><img src="https://codecov.io/gh/brutal-org/brutal/branch/main/graph/badge.svg?token=T4R6TEF56Z" alt="codecov"></a>
+<a href="https://github.com/brutal-org/brutal/actions/workflows/ubuntu.yml"><img src="https://github.com/brutal-org/brutal/actions/workflows/ubuntu.yml/badge.svg" alt="Build and Test (Ubuntu)"></a>
+<a href="https://github.com/brutal-org/brutal/actions/workflows/darwin.yml"><img src="https://github.com/brutal-org/brutal/actions/workflows/darwin.yml/badge.svg" alt="Build and Test (Darwin)"></a>
+<br>
+<br>
 
-- Rich and modern C library
-  - Custom allocators
-  - Generic data structures
-  - Fibers
-- EFI Bootloader
-- Capability based micro-kernel
-- IDL compiler
-- C compiler
+- **BRUTAL** is an operating system build from scratch in modern C.
+- **BRUTAL** is built on top of a capabilty based micro-kernel.
+- **BRUTAL** target x86_64, i686, RISC-V and ARM.
+- **BRUTAL** exposes its features to developers through clean APIs.
+- **BRUTAL** feature a rich and modern C library complete with fibers, custom allocators, generic data structures, and more...
 
 ## Build Instructions
 
