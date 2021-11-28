@@ -156,24 +156,24 @@ long double log10l(long double x)
         x = z / y;
         z = x * x;
         y = x * (z * __polevll(z, R, 3) / __p1evll(z, S, 3));
-        goto done;
-    }
-
-    /* logarithm using log(1+x) = x - .5x**2 + x**3 P(x)/Q(x) */
-    if (x < SQRTH)
-    {
-        e -= 1;
-        x = 2.0 * x - 1.0;
     }
     else
     {
-        x = x - 1.0;
+        /* logarithm using log(1+x) = x - .5x**2 + x**3 P(x)/Q(x) */
+        if (x < SQRTH)
+        {
+            e -= 1;
+            x = 2.0 * x - 1.0;
+        }
+        else
+        {
+            x = x - 1.0;
+        }
+        z = x * x;
+        y = x * (z * __polevll(x, P, 6) / __p1evll(x, Q, 7));
+        y = y - 0.5 * z;
     }
-    z = x * x;
-    y = x * (z * __polevll(x, P, 6) / __p1evll(x, Q, 7));
-    y = y - 0.5 * z;
 
-done:
     /* Multiply log of fraction by log10(e)
      * and base 2 exponent by log10(2).
      *
