@@ -17,8 +17,12 @@ double remquo(double x, double y, int *quo)
     uint64_t uxi = ux.i;
 
     *quo = 0;
+
     if (uy.i << 1 == 0 || isnan(y) || ex == 0x7ff)
+    {
         return (x * y) / (x * y);
+    }
+
     if (ux.i << 1 == 0)
         return x;
 
@@ -34,6 +38,7 @@ double remquo(double x, double y, int *quo)
         uxi &= -1ULL >> 12;
         uxi |= 1ULL << 52;
     }
+
     if (!ey)
     {
         for (i = uy.i << 12; i >> 63 == 0; ey--, i <<= 1)
@@ -47,37 +52,38 @@ double remquo(double x, double y, int *quo)
     }
 
     q = 0;
-    if (ex < ey)
+
+    if (ex < ey && ex + 1 != ey)
     {
-        if (ex + 1 == ey)
-            goto end;
         return x;
     }
-
-    /* x mod y */
-    for (; ex > ey; ex--)
+    else
     {
+        /* x mod y */
+        for (; ex > ey; ex--)
+        {
+            i = uxi - uy.i;
+            if (i >> 63 == 0)
+            {
+                uxi = i;
+                q++;
+            }
+            uxi <<= 1;
+            q <<= 1;
+        }
         i = uxi - uy.i;
         if (i >> 63 == 0)
         {
             uxi = i;
             q++;
         }
-        uxi <<= 1;
-        q <<= 1;
+        if (uxi == 0)
+            ex = -60;
+        else
+            for (; uxi >> 52 == 0; uxi <<= 1, ex--)
+                ;
     }
-    i = uxi - uy.i;
-    if (i >> 63 == 0)
-    {
-        uxi = i;
-        q++;
-    }
-    if (uxi == 0)
-        ex = -60;
-    else
-        for (; uxi >> 52 == 0; uxi <<= 1, ex--)
-            ;
-end:
+
     /* scale result and decide between |x| and |x|-|y| */
     if (ex > 0)
     {
@@ -88,15 +94,21 @@ end:
     {
         uxi >>= -ex + 1;
     }
+
     ux.i = uxi;
     x = ux.f;
+
     if (sy)
+    {
         y = -y;
+    }
+
     if (ex == ey || (ex + 1 == ey && (2 * x > y || (2 * x == y && q % 2))))
     {
         x -= y;
         q++;
     }
+
     q &= 0x7fffffff;
     *quo = sx ^ sy ? -(int)q : (int)q;
     return sx ? -x : x;

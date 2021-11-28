@@ -148,7 +148,13 @@ long double log2l(long double x)
         x = z / y;
         z = x * x;
         y = x * (z * __polevll(z, R, 3) / __p1evll(z, S, 3));
-        goto done;
+
+        z = y * LOG2EA;
+        z += x * LOG2EA;
+        z += y;
+        z += x;
+        z += e;
+        return z;
     }
 
     /* logarithm using log(1+x) = x - .5x**2 + x**3 P(x)/Q(x) */
@@ -165,7 +171,6 @@ long double log2l(long double x)
     y = x * (z * __polevll(x, P, 6) / __p1evll(x, Q, 7));
     y = y - 0.5 * z;
 
-done:
     /* Multiply log of fraction by log2(e)
      * and base 2 exponent by 1
      *

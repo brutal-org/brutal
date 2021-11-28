@@ -44,6 +44,48 @@ static const double
     pio2_3 = 2.02226624871116645580e-21,  /* 0x3BA3198A, 0x2E000000 */
     pio2_3t = 8.47842766036889956997e-32; /* 0x397B839A, 0x252049C1 */
 
+static inline int medium(double x, double *y)
+{
+    union
+    {
+        double f;
+        uint64_t i;
+    } u = {x};
+    double_t w, t, r, fn;
+    uint32_t ix;
+    int n, ex, ey;
+
+    ix = u.i >> 32 & 0x7fffffff;
+    fn = (double_t)x * invpio2 + toint - toint;
+    n = (int32_t)fn;
+    r = x - fn * pio2_1;
+    w = fn * pio2_1t; /* 1st round, good to 85 bits */
+    y[0] = r - w;
+    u.f = y[0];
+    ey = u.i >> 52 & 0x7ff;
+    ex = ix >> 20;
+    if (ex - ey > 16)
+    { /* 2nd round, good to 118 bits */
+        t = r;
+        w = fn * pio2_2;
+        r = t - w;
+        w = fn * pio2_2t - ((t - r) - w);
+        y[0] = r - w;
+        u.f = y[0];
+        ey = u.i >> 52 & 0x7ff;
+        if (ex - ey > 49)
+        { /* 3rd round, good to 151 bits, covers all cases */
+            t = r;
+            w = fn * pio2_3;
+            r = t - w;
+            w = fn * pio2_3t - ((t - r) - w);
+            y[0] = r - w;
+        }
+    }
+    y[1] = (r - y[0]) - w;
+    return n;
+}
+
 /* caller must handle the case when reduction is not needed: |x| ~<= pi/4 */
 int __rem_pio2(double x, double *y)
 {
@@ -52,17 +94,17 @@ int __rem_pio2(double x, double *y)
         double f;
         uint64_t i;
     } u = {x};
-    double_t z, w, t, r, fn;
+    double_t z;
     double tx[3], ty[2];
     uint32_t ix;
-    int sign, n, ex, ey, i;
+    int sign, n, i;
 
     sign = u.i >> 63;
     ix = u.i >> 32 & 0x7fffffff;
     if (ix <= 0x400f6a7a)
     {                                  /* |x| ~<= 5pi/4 */
         if ((ix & 0xfffff) == 0x921fb) /* |x| ~= pi/2 or 2pi/2 */
-            goto medium;               /* cancellation -- use medium case */
+            return medium(x, y);       /* cancellation -- use medium case */
         if (ix <= 0x4002d97c)
         { /* |x| ~<= 3pi/4 */
             if (!sign)
@@ -98,12 +140,12 @@ int __rem_pio2(double x, double *y)
             }
         }
     }
-    if (ix <= 0x401c463b)
+    else if (ix <= 0x401c463b)
     { /* |x| ~<= 9pi/4 */
         if (ix <= 0x4015fdbc)
         {                         /* |x| ~<= 7pi/4 */
             if (ix == 0x4012d97c) /* |x| ~= 3pi/2 */
-                goto medium;
+                return medium(x, y);
             if (!sign)
             {
                 z = x - 3 * pio2_1;
@@ -122,7 +164,7 @@ int __rem_pio2(double x, double *y)
         else
         {
             if (ix == 0x401921fb) /* |x| ~= 4pi/2 */
-                goto medium;
+                return medium(x, y);
             if (!sign)
             {
                 z = x - 4 * pio2_1;
@@ -141,36 +183,7 @@ int __rem_pio2(double x, double *y)
     }
     if (ix < 0x413921fb)
     { /* |x| ~< 2^20*(pi/2), medium size */
-    medium:
-        /* rint(x/(pi/2)), Assume round-to-nearest. */
-        fn = (double_t)x * invpio2 + toint - toint;
-        n = (int32_t)fn;
-        r = x - fn * pio2_1;
-        w = fn * pio2_1t; /* 1st round, good to 85 bits */
-        y[0] = r - w;
-        u.f = y[0];
-        ey = u.i >> 52 & 0x7ff;
-        ex = ix >> 20;
-        if (ex - ey > 16)
-        { /* 2nd round, good to 118 bits */
-            t = r;
-            w = fn * pio2_2;
-            r = t - w;
-            w = fn * pio2_2t - ((t - r) - w);
-            y[0] = r - w;
-            u.f = y[0];
-            ey = u.i >> 52 & 0x7ff;
-            if (ex - ey > 49)
-            { /* 3rd round, good to 151 bits, covers all cases */
-                t = r;
-                w = fn * pio2_3;
-                r = t - w;
-                w = fn * pio2_3t - ((t - r) - w);
-                y[0] = r - w;
-            }
-        }
-        y[1] = (r - y[0]) - w;
-        return n;
+        return medium(x, y);
     }
     /*
      * all other (large) arguments

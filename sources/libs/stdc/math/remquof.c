@@ -49,35 +49,38 @@ float remquof(float x, float y, int *quo)
     q = 0;
     if (ex < ey)
     {
-        if (ex + 1 == ey)
-            goto end;
-        return x;
+        if (ex + 1 != ey)
+        {
+            return x;
+        }
     }
-
-    /* x mod y */
-    for (; ex > ey; ex--)
+    else
     {
+        /* x mod y */
+        for (; ex > ey; ex--)
+        {
+            i = uxi - uy.i;
+            if (i >> 31 == 0)
+            {
+                uxi = i;
+                q++;
+            }
+            uxi <<= 1;
+            q <<= 1;
+        }
         i = uxi - uy.i;
         if (i >> 31 == 0)
         {
             uxi = i;
             q++;
         }
-        uxi <<= 1;
-        q <<= 1;
+        if (uxi == 0)
+            ex = -30;
+        else
+            for (; uxi >> 23 == 0; uxi <<= 1, ex--)
+                ;
     }
-    i = uxi - uy.i;
-    if (i >> 31 == 0)
-    {
-        uxi = i;
-        q++;
-    }
-    if (uxi == 0)
-        ex = -30;
-    else
-        for (; uxi >> 23 == 0; uxi <<= 1, ex--)
-            ;
-end:
+
     /* scale result and decide between |x| and |x|-|y| */
     if (ex > 0)
     {

@@ -876,93 +876,99 @@ int __rem_pio2_large(double *x, double *y, int e0, int nx, int prec)
     }
 
     jz = jk;
-recompute:
-    /* distill q[] into iq[] reversingly */
-    for (i = 0, j = jz, z = q[jz]; j > 0; i++, j--)
+
+    int recompute;
+
+    do
     {
-        fw = (double)(int32_t)(0x1p-24 * z);
-        iq[i] = (int32_t)(z - 0x1p24 * fw);
-        z = q[j - 1] + fw;
-    }
+        recompute = 0;
+        /* distill q[] into iq[] reversingly */
+        for (i = 0, j = jz, z = q[jz]; j > 0; i++, j--)
+        {
+            fw = (double)(int32_t)(0x1p-24 * z);
+            iq[i] = (int32_t)(z - 0x1p24 * fw);
+            z = q[j - 1] + fw;
+        }
 
-    /* compute n */
-    z = scalbn(z, q0);           /* actual value of z */
-    z -= 8.0 * floor(z * 0.125); /* trim off integer >= 8 */
-    n = (int32_t)z;
-    z -= (double)n;
-    ih = 0;
-    if (q0 > 0)
-    { /* need iq[jz-1] to determine n */
-        i = iq[jz - 1] >> (24 - q0);
-        n += i;
-        iq[jz - 1] -= i << (24 - q0);
-        ih = iq[jz - 1] >> (23 - q0);
-    }
-    else if (q0 == 0)
-        ih = iq[jz - 1] >> 23;
-    else if (z >= 0.5)
-        ih = 2;
+        /* compute n */
+        z = scalbn(z, q0);           /* actual value of z */
+        z -= 8.0 * floor(z * 0.125); /* trim off integer >= 8 */
+        n = (int32_t)z;
+        z -= (double)n;
+        ih = 0;
+        if (q0 > 0)
+        { /* need iq[jz-1] to determine n */
+            i = iq[jz - 1] >> (24 - q0);
+            n += i;
+            iq[jz - 1] -= i << (24 - q0);
+            ih = iq[jz - 1] >> (23 - q0);
+        }
+        else if (q0 == 0)
+            ih = iq[jz - 1] >> 23;
+        else if (z >= 0.5)
+            ih = 2;
 
-    if (ih > 0)
-    { /* q > 0.5 */
-        n += 1;
-        carry = 0;
-        for (i = 0; i < jz; i++)
-        { /* compute 1-q */
-            j = iq[i];
-            if (carry == 0)
-            {
-                if (j != 0)
+        if (ih > 0)
+        { /* q > 0.5 */
+            n += 1;
+            carry = 0;
+            for (i = 0; i < jz; i++)
+            { /* compute 1-q */
+                j = iq[i];
+                if (carry == 0)
                 {
-                    carry = 1;
-                    iq[i] = 0x1000000 - j;
+                    if (j != 0)
+                    {
+                        carry = 1;
+                        iq[i] = 0x1000000 - j;
+                    }
+                }
+                else
+                    iq[i] = 0xffffff - j;
+            }
+            if (q0 > 0)
+            { /* rare case: chance is 1 in 12 */
+                switch (q0)
+                {
+                case 1:
+                    iq[jz - 1] &= 0x7fffff;
+                    break;
+                case 2:
+                    iq[jz - 1] &= 0x3fffff;
+                    break;
                 }
             }
-            else
-                iq[i] = 0xffffff - j;
-        }
-        if (q0 > 0)
-        { /* rare case: chance is 1 in 12 */
-            switch (q0)
+            if (ih == 2)
             {
-            case 1:
-                iq[jz - 1] &= 0x7fffff;
-                break;
-            case 2:
-                iq[jz - 1] &= 0x3fffff;
-                break;
+                z = 1.0 - z;
+                if (carry != 0)
+                    z -= scalbn(1.0, q0);
             }
         }
-        if (ih == 2)
+
+        /* check if recomputation is needed */
+        if (z == 0.0)
         {
-            z = 1.0 - z;
-            if (carry != 0)
-                z -= scalbn(1.0, q0);
-        }
-    }
+            j = 0;
+            for (i = jz - 1; i >= jk; i--)
+                j |= iq[i];
+            if (j == 0)
+            { /* need recomputation */
+                for (k = 1; iq[jk - k] == 0; k++)
+                    ; /* k = no. of terms needed */
 
-    /* check if recomputation is needed */
-    if (z == 0.0)
-    {
-        j = 0;
-        for (i = jz - 1; i >= jk; i--)
-            j |= iq[i];
-        if (j == 0)
-        { /* need recomputation */
-            for (k = 1; iq[jk - k] == 0; k++)
-                ; /* k = no. of terms needed */
-
-            for (i = jz + 1; i <= jz + k; i++)
-            { /* add q[jz+1] to q[jz+k] */
-                f[jx + i] = (double)ipio2[jv + i];
-                for (j = 0, fw = 0.0; j <= jx; j++)
-                    fw += x[j] * f[jx + i - j];
-                q[i] = fw;
+                for (i = jz + 1; i <= jz + k; i++)
+                { /* add q[jz+1] to q[jz+k] */
+                    f[jx + i] = (double)ipio2[jv + i];
+                    for (j = 0, fw = 0.0; j <= jx; j++)
+                        fw += x[j] * f[jx + i - j];
+                    q[i] = fw;
+                }
+                jz += k;
+                recompute = 1;
             }
-            jz += k;
-            goto recompute;
         }
-    }
+    } while (recompute);
 
     /* chop off zero terms */
     if (z == 0.0)

@@ -204,7 +204,9 @@ long double tgammal(long double x)
     long double p, q, z;
 
     if (!isfinite(x))
+    {
         return x + INFINITY;
+    }
 
     q = fabsl(x);
     if (q > 13.0)
@@ -250,13 +252,29 @@ long double tgammal(long double x)
         x -= 1.0;
         z *= x;
     }
+
     while (x < -0.03125L)
     {
         z /= x;
         x += 1.0;
     }
+
     if (x <= 0.03125L)
-        goto small;
+    {
+        if (x == 0 && z != 1)
+            return x / x;
+
+        if (x < 0.0)
+        {
+            x = -x;
+            q = z / (x * __polevll(x, SN, 8));
+        }
+        else
+            q = z / (x * __polevll(x, S, 8));
+
+        return q;
+    }
+
     while (x < 2.0)
     {
         z /= x;
@@ -270,19 +288,6 @@ long double tgammal(long double x)
     q = __polevll(x, Q, 8);
     z = z * p / q;
     return z;
-
-small:
-    /* z==1 if x was originally +-0 */
-    if (x == 0 && z != 1)
-        return x / x;
-    if (x < 0.0)
-    {
-        x = -x;
-        q = z / (x * __polevll(x, SN, 8));
-    }
-    else
-        q = z / (x * __polevll(x, S, 8));
-    return q;
 }
 #elif LDBL_MANT_DIG == 113 && LDBL_MAX_EXP == 16384
 // TODO: broken implementation to make things compile
