@@ -26,6 +26,7 @@ typedef enum
     CEXPR_TERNARY,
     CEXPR_INITIALIZER,
     CEXPR_LAMBDA,
+    CEXPR_STATEMENT,
 
     CEXPR_COUNT
 } CExprType;

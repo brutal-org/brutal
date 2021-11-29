@@ -13,6 +13,8 @@ void cgen_c_type(Emit *emit, CType type);
 
 void cgen_c_type_start(Emit *emit, CType type);
 
+void cgen_c_func_params(Emit *emit, CType type);
+
 void cgen_c_type_end(Emit *emit, CType type);
 
 void cgen_c_unit(Emit *emit, CUnit unit);

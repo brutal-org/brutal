@@ -128,6 +128,23 @@ void cgen_c_type_start(Emit *emit, CType type)
     }
 }
 
+void cgen_c_func_params(Emit *emit, CType type)
+{
+    emit_fmt(emit, "(");
+
+    bool first = true;
+    vec_foreach(v, &type.func_.params)
+    {
+        if (!first)
+        {
+            emit_fmt(emit, ", ");
+        }
+        first = false;
+        cgen_c_member(emit, v);
+    }
+    emit_fmt(emit, ")");
+}
+
 void cgen_c_type_end(Emit *emit, CType type)
 {
     if (type.type == CTYPE_PTR)
@@ -141,20 +158,7 @@ void cgen_c_type_end(Emit *emit, CType type)
     }
     else if (type.type == CTYPE_FUNC)
     {
-        emit_fmt(emit, "(");
-
-        bool first = true;
-        vec_foreach_v(v, &type.func_.params)
-        {
-            if (!first)
-            {
-                emit_fmt(emit, ", ");
-            }
-            first = false;
-            cgen_c_member(emit, v);
-        }
-        emit_fmt(emit, ")");
-
+        cgen_c_func_params(emit, type);
         cgen_c_type_attr(emit, type.attr);
     }
     else if (type.type == CTYPE_ARRAY)

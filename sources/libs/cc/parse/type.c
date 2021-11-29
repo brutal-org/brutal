@@ -94,6 +94,7 @@ CType cparse_type(Lex *lex, Alloc *alloc)
     }
     else
     {
-        return ctype_ident(str$("FIXME"));
+        lex_throw(lex, str$("Unexpected token"));
+        return ctype_error();
     }
 }
