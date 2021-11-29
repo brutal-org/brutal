@@ -165,6 +165,19 @@ typedef struct
     FdtNode res;
 } FdtNodeLookupCtx;
 
+static bool node_name_eq(Str const searched, Str const node_name)
+{
+    if (str_last_chr(searched, '@') == (int)searched.len - 1 && searched.len != 0)
+    {
+        int node_name_end = str_first_chr(node_name, '@');
+        Str compared = str_sub(node_name, 0, node_name_end);
+
+        return str_eq(str_sub(searched, 0, searched.len - 1), compared);
+    }
+
+    return str_eq(searched, node_name);
+}
+
 static Iter fdt_lookup_node_iter(FdtNode *node, FdtNodeLookupCtx *ctx)
 {
     int part_end = str_first_chr(ctx->name, '/');
@@ -176,7 +189,7 @@ static Iter fdt_lookup_node_iter(FdtNode *node, FdtNodeLookupCtx *ctx)
 
     Str node_name = str_sub(ctx->name, 0, part_end);
 
-    if (str_eq(node_name, node->name))
+    if (node_name_eq(node_name, node->name))
     {
         if (part_end == (int)ctx->name.len)
         {
