@@ -16,7 +16,9 @@ CDecl cscope_lookup(CScope *self, Str name)
     for (CDecl *decl = vec_begin(&self->decls); decl != vec_end(&self->decls); ++decl)
     {
         if (str_eq(decl->name, name))
+        {
             return *decl;
+        }
     }
 
     return (CDecl){};
@@ -24,6 +26,5 @@ CDecl cscope_lookup(CScope *self, Str name)
 
 void cscope_add(CScope *self, CDecl decl)
 {
-    cseme_scope_enter(&self->decls);
     vec_push(&self->decls, decl);
 }

@@ -1,22 +1,27 @@
 #include <brutal/debug.h>
 #include <cc/parse/parser.h>
 
+void cparse_func_params(Lex *lex, CType *type, Alloc *alloc)
+{
+    if (!cparse_skip_separator(lex, CLEX_RPARENT))
+    {
+        do
+        {
+            CDeclarator decl = cparse_declarator(lex, alloc);
+            ctype_member(type, decl.name, decl.type);
+        } while (cparse_skip_separator(lex, CLEX_COMMA));
+
+        cparse_expect_separator(lex, CLEX_RPARENT);
+    }
+}
+
 CType cparse_declarator_postfix(Lex *lex, CType type, Alloc *alloc)
 {
     if (cparse_skip_separator(lex, CLEX_LPARENT))
     {
         CType func = ctype_func(ctype_tail(), alloc);
 
-        if (!cparse_skip_separator(lex, CLEX_RPARENT))
-        {
-            do
-            {
-                CDeclarator decl = cparse_declarator(lex, alloc);
-                ctype_member(&func, decl.name, decl.type);
-            } while (cparse_skip_separator(lex, CLEX_COMMA));
-
-            cparse_expect_separator(lex, CLEX_RPARENT);
-        }
+        cparse_func_params(lex, &func, alloc);
 
         CType ret = cparse_declarator_postfix(lex, type, alloc);
         ctype_append(&func, ret);

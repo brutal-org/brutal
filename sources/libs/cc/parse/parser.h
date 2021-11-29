@@ -11,6 +11,8 @@ CExpr cparse_expr(Lex *lex, int pre, Alloc *alloc);
 
 CStmt cparse_stmt(Lex *lex, Alloc *alloc);
 
+void cparse_func_params(Lex *lex, CType *type, Alloc *alloc);
+
 CType cparse_type(Lex *lex, Alloc *alloc);
 
 CUnit cparse_unit(Lex *lex, Alloc *alloc);
