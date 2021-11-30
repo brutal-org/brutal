@@ -2,6 +2,7 @@
 
 #include <bal/abi.h>
 #include <bal/boot.h>
+#include <brutal/ds/bits.h>
 
 #define PMM_USED (true)
 #define PMM_UNUSED (false)
@@ -10,7 +11,8 @@ typedef USizeRange PmmRange;
 
 typedef Result(BrResult, PmmRange) PmmResult;
 
-void pmm_initialize(Handover const *handover);
+// don't put void, because some implementations may uses different arguments
+void pmm_initialize();
 
 PmmResult pmm_alloc(size_t size, bool upper);
 
