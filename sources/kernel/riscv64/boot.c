@@ -18,7 +18,7 @@ void arch_entry_main(uint64_t hart_id, uint64_t fdt_addr)
     FdtHeader *header = (FdtHeader *)fdt_from_data((void *)fdt_addr);
     Emit target;
     emit_init(&target, arch_debug());
-    fdt_dump(header, &target);
+    fdt_dump(header, &target, false);
 
     log$("booting...");
     init_interrupts();
