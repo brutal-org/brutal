@@ -230,7 +230,7 @@ typedef struct
 
 static Iter fdt_lookup_prop_iter(FdtProp *node, FdtPropCtx *res)
 {
-    if (str_eq(node->name, res->name) == 0)
+    if (str_eq(node->name, res->name))
     {
         res->res = *node;
         return ITER_STOP;
@@ -250,29 +250,77 @@ FdtProp fdt_lookup_props(FdtNode node, Str name)
     return ctx.res;
 }
 
-static Iter fdt_dump_props_iter(FdtProp *prop, Emit *out)
+static void fdt_dump_props_value(FdtProp *prop, Emit *out)
 {
-    emit_fmt(out, "- prop: {}\n", prop->name);
+    if (prop->value.len % sizeof(uint32_t) == 0)
+    {
+        be_uint32_t *val = ((be_uint32_t *)prop->value.buf);
+        for (unsigned int i = 0; i < prop->value.len / sizeof(uint32_t); i++)
+        {
+            emit_fmt(out, "- as uint32_t: {#x} \n", load_be(val[i]));
+        }
+    }
+    if (prop->value.len % sizeof(uint64_t) == 0)
+    {
+        be_uint64_t *val = ((be_uint64_t *)prop->value.buf);
+        for (unsigned int i = 0; i < prop->value.len / sizeof(uint64_t); i++)
+        {
+            emit_fmt(out, "- as uint64_t: {#x}\n", load_be(val[i]));
+        }
+    }
+    if (prop->value.len > 2)
+    {
+        Str as_string = str_n$(prop->value.len, (char *)prop->value.buf);
+        emit_fmt(out, "- as string: {} \n", as_string);
+    }
+
+    emit_fmt(out, "- as data: ");
+    for (unsigned int i = 0; i < prop->value.len; i++)
+    {
+        emit_fmt(out, "{#x} ", ((uint8_t *)prop->value.buf)[i]);
+    }
+    emit_fmt(out, "\n");
+}
+
+typedef struct
+{
+    Emit *out;
+    bool dump_values;
+} IterDumpCtx;
+
+static Iter fdt_dump_props_iter(FdtProp *prop, IterDumpCtx *ctx)
+{
+    emit_fmt(ctx->out, "- prop: {}\n", prop->name);
+    emit_ident(ctx->out);
+    if (ctx->dump_values)
+    {
+        fdt_dump_props_value(prop, ctx->out);
+    }
+    emit_deident(ctx->out);
     return ITER_CONTINUE;
 }
 
-static Iter fdt_dump_node_iter(FdtNode *node, Emit *out)
+static Iter fdt_dump_node_iter(FdtNode *node, IterDumpCtx *ctx)
 {
-    emit_fmt(out, "node: {}\n", node->name);
-    emit_ident(out);
-    fdt_node_props(*node, (IterFn *)fdt_dump_props_iter, out);
-    fdt_node_childs(*node, (IterFn *)fdt_dump_node_iter, out);
-    emit_deident(out);
+    emit_fmt(ctx->out, "node: {}\n", node->name);
+    emit_ident(ctx->out);
+    fdt_node_props(*node, (IterFn *)fdt_dump_props_iter, ctx);
+    fdt_node_childs(*node, (IterFn *)fdt_dump_node_iter, ctx);
+    emit_deident(ctx->out);
     return ITER_CONTINUE;
 }
 
-void fdt_dump(FdtHeader *fdt, Emit *out)
+void fdt_dump(FdtHeader *fdt, Emit *out, bool dump_values)
 {
     FdtNode root = fdt_node_root(fdt);
+    IterDumpCtx ctx = {
+        .out = out,
+        .dump_values = dump_values,
+    };
+
     emit_fmt(out, "fdt-dump:\n");
     emit_ident(out);
-
-    fdt_node_childs(root, (IterFn *)fdt_dump_node_iter, out);
+    fdt_node_childs(root, (IterFn *)fdt_dump_node_iter, &ctx);
 
     emit_deident(out);
 
@@ -285,4 +333,11 @@ void fdt_dump(FdtHeader *fdt, Emit *out)
         entry++;
     }
     emit_deident(out);
+}
+
+USizeRange fdt_reg_get_range(FdtProp prop, MAYBE_UNUSED uintptr_t addr_size, MAYBE_UNUSED uintptr_t len_size)
+{
+    be_uint64_t *reg = (be_uint64_t *)prop.value.buf;
+    assert_not_null(reg);
+    return (USizeRange){.base = load_be(*reg), .size = load_be(*(reg + 1))};
 }
