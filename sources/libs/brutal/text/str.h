@@ -111,7 +111,7 @@ static inline Str str_make_from_str_fix128(StrFix128 const *str_fix) { return (S
 // clang-format on
 
 #define str_n$(n, str) \
-    (Str) { n, str }
+    (Str) { (n), (str) }
 
 // Create a new instance of a fix size string.
 #define str_fix$(T, str) (                              \

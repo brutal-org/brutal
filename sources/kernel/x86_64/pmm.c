@@ -64,12 +64,11 @@ static void pmm_load_memory_map(HandoverMmap const *memory_map)
             continue;
         }
 
-        size_t base = ALIGN_UP(entry.base, MEM_PAGE_SIZE);
-        size_t size = ALIGN_DOWN(entry.len, MEM_PAGE_SIZE);
+        PmmRange entry_range = {entry.base, entry.len};
 
-        pmm_unused((PmmRange){base, size});
+        pmm_unused(range_align_lower(entry_range, MEM_PAGE_SIZE));
 
-        available_memory += size;
+        available_memory += entry_range.size;
     }
 
     log$("Available Memory: {}kib", available_memory / KiB(1));
@@ -128,10 +127,7 @@ PmmResult pmm_alloc(size_t size, bool upper)
 
     bits_set_range(&pmm_bitmap, page_range, PMM_USED);
 
-    PmmRange pmm_range = range$(PmmRange, page_range);
-
-    pmm_range.base *= MEM_PAGE_SIZE;
-    pmm_range.size *= MEM_PAGE_SIZE;
+    PmmRange pmm_range = range_mul(range$(PmmRange, page_range), MEM_PAGE_SIZE);
 
     return OK(PmmResult, pmm_range);
 }
@@ -142,10 +138,7 @@ PmmResult pmm_used(PmmRange range)
 
     assert_truth(mem_is_range_page_aligned(range));
 
-    size_t page_base = range.base / MEM_PAGE_SIZE;
-    size_t page_size = range.size / MEM_PAGE_SIZE;
-
-    USizeRange page_range = {page_base, page_size};
+    USizeRange page_range = range$(USizeRange, range_div(range, MEM_PAGE_SIZE));
 
     bits_set_range(&pmm_bitmap, page_range, PMM_USED);
 
@@ -165,9 +158,7 @@ PmmResult pmm_unused(PmmRange range)
         return ERR(PmmResult, BR_BAD_ADDRESS);
     }
 
-    size_t page_base = range.base / MEM_PAGE_SIZE;
-    size_t page_size = range.size / MEM_PAGE_SIZE;
-    USizeRange page_range = {page_base, page_size};
+    USizeRange page_range = range$(USizeRange, range_div(range, MEM_PAGE_SIZE));
 
     bits_set_range(&pmm_bitmap, page_range, PMM_UNUSED);
 
