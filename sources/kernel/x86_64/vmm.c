@@ -82,6 +82,8 @@ static void vmm_load_memory_map(VmmSpace target, HandoverMmap const *memory_map)
     for (size_t i = 0; i < memory_map->size; i++)
     {
         HandoverMmapEntry entry = memory_map->entries[i];
+        USizeRange entry_range = {entry.base, entry.len};
+        PmmRange physical_range = range_align_higher(entry_range, MEM_PAGE_SIZE);
 
         log$("Loading kernel memory map {}/{} ({x} - {x})",
              i + 1,
@@ -92,27 +94,17 @@ static void vmm_load_memory_map(VmmSpace target, HandoverMmap const *memory_map)
         if (entry.type == HANDOVER_MMAP_KERNEL_MODULE)
         {
             log$(" - Mapped to kernel");
-            vmm_map(target,
-                    (VmmRange){
-                        .base = mmap_phys_to_kernel(ALIGN_DOWN(entry.base, MEM_PAGE_SIZE)),
-                        .size = ALIGN_UP(entry.len, MEM_PAGE_SIZE)},
-                    (PmmRange){
-                        .base = ALIGN_DOWN(entry.base, MEM_PAGE_SIZE),
-                        .size = ALIGN_UP(entry.len, MEM_PAGE_SIZE)},
-                    BR_MEM_WRITABLE);
+
+            VmmRange vrange = {mmap_phys_to_kernel(physical_range.base), physical_range.size};
+            vmm_map(target, vrange, physical_range, BR_MEM_WRITABLE);
         }
 
         if (entry.base >= GiB(4)) // The bottom 4Gio are already mapped
         {
             log$(" - Mapped to IO");
-            vmm_map(target,
-                    (VmmRange){
-                        .base = mmap_phys_to_io(ALIGN_DOWN(entry.base, MEM_PAGE_SIZE)),
-                        .size = ALIGN_UP(entry.len, MEM_PAGE_SIZE)},
-                    (PmmRange){
-                        .base = ALIGN_DOWN(entry.base, MEM_PAGE_SIZE),
-                        .size = ALIGN_UP(entry.len, MEM_PAGE_SIZE)},
-                    BR_MEM_WRITABLE);
+
+            VmmRange vrange = {mmap_phys_to_io(physical_range.base), physical_range.size};
+            vmm_map(target, vrange, physical_range, BR_MEM_WRITABLE);
         }
     }
 
@@ -257,8 +249,8 @@ VmmResult vmm_map(VmmSpace space, VmmRange virtual_range, PmmRange physical_rang
     {
         vmm_map_page(
             (Pml *)space,
-            i * MEM_PAGE_SIZE + ALIGN_DOWN(virtual_range.base, MEM_PAGE_SIZE),
-            i * MEM_PAGE_SIZE + ALIGN_DOWN(physical_range.base, MEM_PAGE_SIZE),
+            i * MEM_PAGE_SIZE + virtual_range.base,
+            i * MEM_PAGE_SIZE + physical_range.base,
             flags);
     }
 
