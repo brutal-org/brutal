@@ -24,7 +24,7 @@ static char *_exception_messages[] = {
 };
 
 static char *_motivation_messages[] = {
-    "we'll patch this through micro-transaction",
+    "we'll patch this threw micro-transaction",
     "it just works !",
     "this is a feature",
     " TODO: fix this",
@@ -49,6 +49,7 @@ static void dump_register(RiscvRegs const *regs)
 {
     log_unlock("cpu registers:");
     log_unlock("pc : {#016p}", read_csr(CSR_SEPC));
+    log_unlock("stval: {#016p}", read_csr(CSR_STVAL));
     log_unlock("ra : {#016p} | sp : {#016p} | gp : {#016p} | tp : {#016p}", regs->ra, regs->sp, regs->gp, regs->tp);
 
     log_unlock("");
