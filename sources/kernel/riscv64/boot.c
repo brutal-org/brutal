@@ -1,11 +1,17 @@
+#include <brutal/alloc.h>
 #include <brutal/debug.h>
+#include <brutal/ds.h>
 #include <hw/fdt/fdt.h>
 #include "kernel/arch.h"
+#include "kernel/pmm.h"
 #include "kernel/riscv64/arch.h"
 #include "kernel/riscv64/interrupts.h"
 #include "kernel/riscv64/uart8250.h"
 
 GenericUartDevice *_uart_device = NULL;
+
+extern uintptr_t _kernel_end;
+extern uintptr_t _kernel_start;
 
 void arch_entry_main(uint64_t hart_id, uint64_t fdt_addr)
 {
@@ -14,7 +20,6 @@ void arch_entry_main(uint64_t hart_id, uint64_t fdt_addr)
 
     log$("started cpu: {} with fdt: {}", hart_id, fdt_addr);
 
-    // sifive_uart_init();
     FdtHeader *header = (FdtHeader *)fdt_from_data((void *)fdt_addr);
     Emit target;
     emit_init(&target, arch_debug());
@@ -23,6 +28,14 @@ void arch_entry_main(uint64_t hart_id, uint64_t fdt_addr)
     log$("booting...");
     init_interrupts();
     log$("loaded interrupts");
+
+    pmm_initialize(header, (PmmRange){
+                               .base = (uintptr_t)&_kernel_start,
+                               .size = (uintptr_t)&_kernel_end - (uintptr_t)&_kernel_start,
+                           });
+
+    alloc_release(alloc_global(), alloc_acquire(alloc_global(), 10));
+
     while (1)
     {
     }
