@@ -4,6 +4,7 @@
 
 typedef struct
 {
+    uint64_t r0; // we will replace this with something else later on
     uint64_t ra;
     uint64_t sp;
     uint64_t gp;
