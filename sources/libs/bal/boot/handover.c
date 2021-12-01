@@ -21,18 +21,6 @@ void handover_dump(Handover const *handover)
         log$("not valid handover tag: {}", handover->tag);
     }
 
-    switch (handover->boolloader_from)
-    {
-    case HANDOVER_BOOT_SRC_STIVALE2:
-        log$("converted from stivale2");
-        break;
-    case HANDOVER_BOOT_SRC_BRUTAL_LOADER:
-        log$("booted from brutal loader");
-        break;
-    default:
-        log$("booted from an unknown loader");
-        break;
-    }
 
     log$("Memory Map:");
 

@@ -8,13 +8,6 @@
 
 typedef enum
 {
-    HANDOVER_BOOT_SRC_OTHER,
-    HANDOVER_BOOT_SRC_BRUTAL_LOADER,
-    HANDOVER_BOOT_SRC_STIVALE2,
-} HandoverBootSource;
-
-typedef enum
-{
     HANDOVER_MMAP_FREE,
     HANDOVER_MMAP_KERNEL_MODULE,
     HANDOVER_MMAP_RESERVED,
@@ -95,7 +88,6 @@ typedef struct
 typedef struct
 {
     uint64_t tag; // must be HANDOVER_TAG
-    HandoverBootSource boolloader_from;
 
     HandoverMmap mmap;
     HandoverFramebuffer framebuffer;
