@@ -24,8 +24,7 @@ CFLAGS_WARN ?= \
 INC_LIBS= \
 	-Isources/libs/stdc/ansi \
 	-Isources/libs/stdc/math \
-	-Isources/libs/stdc/bsd \
-	-Isources/libs/stdc/gnu \
+	-Isources/libs/stdc/ext \
 	-Isources/libs/stdc/posix
 
 INC_LIBBRUTAL= \

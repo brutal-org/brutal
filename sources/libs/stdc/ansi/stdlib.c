@@ -1,9 +1,12 @@
+#define _BRUTAL_SOURCE
+
 #include <brutal/alloc.h>
 #include <brutal/debug.h>
 #include <brutal/mem.h>
 #include <embed/log.h>
 #include <embed/task.h>
 #include <stdlib.h>
+#include <string.h>
 
 /* --- 7.22 - General utilities --------------------------------------------- */
 
@@ -200,7 +203,6 @@ void qsort(void *base, size_t nmemb, size_t size, int (*compar)(void const *, vo
 {
     // FIXME: Write real quick sort
 
-    char *tmp = alloc_malloc(alloc_global(), size);
     for (size_t i = 0; i + 1 < nmemb; i++)
     {
         for (size_t j = i + 1; i < nmemb; i++)
@@ -210,13 +212,10 @@ void qsort(void *base, size_t nmemb, size_t size, int (*compar)(void const *, vo
 
             if (compar(a, b) < 0)
             {
-                mem_cpy(tmp, a, size);
-                mem_cpy(a, b, size);
-                mem_cpy(b, tmp, size);
+                memswap(a, b, size);
             }
         }
     }
-    alloc_free(alloc_global(), tmp);
 }
 
 /* --- 7.22.6 - Integer arithmetic functions -------------------------------- */

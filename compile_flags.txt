@@ -9,7 +9,6 @@
 -Isources/libs/hw
 -Isources/libs/stdc/ansi
 -Isources/libs/stdc/posix
--Isources/libs/stdc/gnu
--Isources/libs/stdc/bsd
+-Isources/libs/stdc/ext
 -Ibin/generated
 -Ithirdparty
