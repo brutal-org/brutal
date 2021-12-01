@@ -69,7 +69,7 @@ typedef struct
 {
     size_t size;
     uintptr_t addr;
-    StrFix128 module_name;
+    StrFix32 module_name;
 } HandoverModule;
 
 typedef struct
@@ -82,7 +82,7 @@ typedef struct
 typedef struct
 {
     bool present;
-    StrFix128 cmd_line;
+    StrFix32 cmd_line;
 } HandoverCmdLines;
 
 typedef struct
