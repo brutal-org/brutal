@@ -5,14 +5,10 @@
 #include "kernel/arch.h"
 #include "kernel/pmm.h"
 #include "kernel/riscv64/arch.h"
+#include "kernel/riscv64/handover.h"
 #include "kernel/riscv64/interrupts.h"
 #include "kernel/riscv64/uart8250.h"
-
 GenericUartDevice *_uart_device = NULL;
-
-extern uintptr_t _kernel_end;
-extern uintptr_t _kernel_start;
-
 void arch_entry_main(uint64_t hart_id, uint64_t fdt_addr)
 {
     _uart_device = uart8250_init();
@@ -29,13 +25,10 @@ void arch_entry_main(uint64_t hart_id, uint64_t fdt_addr)
     init_interrupts();
     log$("loaded interrupts");
 
-    pmm_initialize(header, (PmmRange){
-                               .base = (uintptr_t)&_kernel_start,
-                               .size = (uintptr_t)&_kernel_end - (uintptr_t)&_kernel_start,
-                           });
+    Handover v = arch_create_handover(fdt_addr);
+    handover_dump(&v);
 
-    alloc_release(alloc_global(), alloc_acquire(alloc_global(), 10));
-
+    pmm_initialize(&v);
     while (1)
     {
     }

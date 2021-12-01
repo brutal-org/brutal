@@ -11,8 +11,7 @@ typedef USizeRange PmmRange;
 
 typedef Result(BrResult, PmmRange) PmmResult;
 
-// don't put void, because some implementations may uses different arguments
-void pmm_initialize();
+void pmm_initialize(Handover const *handover);
 
 PmmResult pmm_alloc(size_t size, bool upper);
 
