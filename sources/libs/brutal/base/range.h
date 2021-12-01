@@ -50,45 +50,45 @@
         range_from_start_and_end(typeof(LHS), __start, __end);      \
     })
 
-#define range_half_under(SELF, SPLIT) (         \
-    {                                           \
-        typeof(SELF) __self = (SELF);           \
-        typeof(SPLIT) __split = (SPLIT);        \
-                                                \
-        typeof(SELF) result = (typeof(SELF)){}; \
-                                                \
-        if (range_colide(__self, __split) &&    \
-            __self.base < __split.base)         \
-        {                                       \
-            result = (typeof(SELF)){            \
-                __self.base,                    \
-                __split.base - __self.base,     \
-            };                                  \
-        }                                       \
-                                                \
-        result;                                 \
+#define range_half_under(SELF, SPLIT) (             \
+    {                                               \
+        typeof(SELF) __self = (SELF);               \
+        typeof(SPLIT) __split = (SPLIT);            \
+                                                    \
+        typeof(SELF) result = (typeof(SELF)){};     \
+                                                    \
+        if (range_colide(__self, __split) &&        \
+            __self.base < __split.base)             \
+        {                                           \
+            result = (typeof(SELF)){                \
+                .base = __self.base,                \
+                .size = __split.base - __self.base, \
+            };                                      \
+        }                                           \
+                                                    \
+        result;                                     \
     })
 
-#define range_half_over(SELF, SPLIT) (                  \
-    {                                                   \
-        typeof(SELF) __self = (SELF);                   \
-        typeof(SPLIT) __split = (SPLIT);                \
-                                                        \
-        typeof(SELF) result = {};                       \
-                                                        \
-        if (range_colide(__self, __split) &&            \
-            range_end(__self) > range_end(__split))     \
-        {                                               \
-            result = (typeof(SELF)){                    \
-                range_end(__split),                     \
-                range_end(__self) - range_end(__split), \
-            };                                          \
-        }                                               \
-                                                        \
-        result;                                         \
+#define range_half_over(SELF, SPLIT) (                          \
+    {                                                           \
+        typeof(SELF) __self = (SELF);                           \
+        typeof(SPLIT) __split = (SPLIT);                        \
+                                                                \
+        typeof(SELF) result = {};                               \
+                                                                \
+        if (range_colide(__self, __split) &&                    \
+            range_end(__self) > range_end(__split))             \
+        {                                                       \
+            result = (typeof(SELF)){                            \
+                .base = range_end(__split),                     \
+                .size = range_end(__self) - range_end(__split), \
+            };                                                  \
+        }                                                       \
+                                                                \
+        result;                                                 \
     })
 
-#define range_eq(LHS, RHS) ((LHS).base == (RHS.base) && (LHS).size == (RHS).size)
+#define range_eq(LHS, RHS) ((LHS).base == (RHS).base && (LHS).size == (RHS).size)
 
 #define range_mul(SELF, VAL) ((typeof(SELF)){.base = (SELF).base * (VAL), .size = (SELF).size * (VAL)})
 
