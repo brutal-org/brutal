@@ -82,14 +82,14 @@ static void vmm_load_memory_map(VmmSpace target, HandoverMmap const *memory_map)
     for (size_t i = 0; i < memory_map->size; i++)
     {
         HandoverMmapEntry entry = memory_map->entries[i];
-        USizeRange entry_range = {entry.base, entry.len};
+        USizeRange entry_range = {entry.base, entry.size};
         PmmRange physical_range = range_align_higher(entry_range, MEM_PAGE_SIZE);
 
         log$("Loading kernel memory map {}/{} ({x} - {x})",
              i + 1,
              memory_map->size,
              entry.base,
-             entry.base + entry.len);
+             entry.base + entry.size);
 
         if (entry.type == HANDOVER_MMAP_KERNEL_MODULE)
         {

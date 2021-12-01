@@ -44,7 +44,7 @@ typedef struct
     HandoverMmapType type;
 
     uintptr_t base;
-    size_t len;
+    size_t size;
 } HandoverMmapEntry;
 
 typedef struct
@@ -93,6 +93,7 @@ typedef struct
     HandoverFramebuffer framebuffer;
     HandoverModules modules;
     uintptr_t rsdp;
+    uintptr_t fdt;
     HandoverCmdLines cmd_lines;
 } Handover;
 
