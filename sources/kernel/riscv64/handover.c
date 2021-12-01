@@ -131,6 +131,28 @@ static void arch_align_handover_mmap(Handover *self)
     }
 }
 
+static void arch_sort_handover_mmap(Handover *self)
+{
+    Handover res = {};
+
+    while (self->mmap.size > 0)
+    {
+        HandoverMmapEntry entry = {.base = (uintptr_t)-1};
+        for (size_t i = 0; i < self->mmap.size; i++)
+        {
+            if (self->mmap.entries[i].base < entry.base)
+            {
+                entry = self->mmap.entries[i];
+            }
+        }
+
+        handover_mmap_remove_entry(self, entry);
+        handover_mmap_push_entry(&res, entry);
+    }
+
+    *self = res;
+}
+
 static void arch_init_handover_mmap(Handover *self, FdtHeader *header)
 {
     arch_init_handover_memory(self, header);
@@ -144,6 +166,7 @@ static void arch_init_handover_mmap(Handover *self, FdtHeader *header)
     handover_mmap_push_entry(self, kernel_entry);
 
     arch_load_reserved_memory(header, self);
+    arch_sort_handover_mmap(self);
     arch_align_handover_mmap(self);
 }
 

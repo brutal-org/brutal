@@ -59,14 +59,14 @@ HandoverMmap get_mmap(void)
 
         if (previous_entry != nullptr &&
             previous_entry->type == type &&
-            (previous_entry->base + previous_entry->len) == desc->physical_start)
+            (previous_entry->base + previous_entry->size) == desc->physical_start)
         {
-            previous_entry->len += len;
+            previous_entry->size += len;
         }
         else
         {
             current->type = type;
-            current->len = len;
+            current->size = len;
             current->base = phys_base;
 
             previous_entry = current;
@@ -125,7 +125,7 @@ static int get_gop_mode(EFIGraphicsOutputProtocol *gop, size_t req_width, size_t
             log$("can't get info for: {}", i);
         }
 
-        if (info->vertical_resolution == req_height && info->horizontal_resolution == req_width && 
+        if (info->vertical_resolution == req_height && info->horizontal_resolution == req_width &&
             info->pixel_format == PIXEL_BGR_8_BIT)
         {
             return i;
