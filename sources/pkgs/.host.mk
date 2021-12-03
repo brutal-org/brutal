@@ -7,6 +7,7 @@ LIBS_HOST_SRC = \
 	$(wildcard sources/embed/$(CONFIG_HOST_ARCH)/*.c) \
 	$(wildcard sources/libs/brutal/*.c)   \
 	$(wildcard sources/libs/brutal/*/*.c) \
+	$(wildcard sources/libs/brutal/*/*/*.c) \
 	$(wildcard sources/libs/cc/*.c)       \
 	$(wildcard sources/libs/cc/*/*.c)       \
 	$(wildcard sources/libs/cc/*/*/*.c)       \

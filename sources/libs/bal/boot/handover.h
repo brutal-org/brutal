@@ -1,7 +1,7 @@
 #pragma once
 
 #include <brutal/text.h>
-#include "brutal/text/str.h"
+#include <hw/fdt/fdt.h>
 
 // "handover" in ascii
 #define HANDOVER_TAG 0x68616e646f766572
@@ -100,3 +100,11 @@ typedef struct
 HandoverModule const *handover_find_module(Handover const *handover, Str name);
 
 void handover_dump(Handover const *handover);
+
+void handover_mmap_remove_entry(HandoverMmap *self, HandoverMmapEntry entry);
+
+void handover_mmap_push_entry(HandoverMmap *self, HandoverMmapEntry entry);
+
+void handover_mmap_sanitize(HandoverMmap *self);
+
+void handover_init_from_fdt(Handover *handover, FdtHeader *header);

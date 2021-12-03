@@ -44,6 +44,9 @@ LOADER_SRC = \
 	sources/libs/brutal/parse/nums.c                \
 	sources/libs/brutal/parse/lex.c                 \
 	sources/libs/brutal/io/write.c                  \
+	sources/libs/brutal/io/emit.c                   \
+	sources/libs/hw/fdt/fdt.c                       \
+	sources/libs/bal/boot/handover.c                \
 	sources/libs/stdc/ansi/string.c			        \
 	sources/libs/stdc/ansi/ctype.c			        \
 	$(wildcard sources/loader/*.c) 					\
@@ -57,7 +60,6 @@ LOADER_SRC = \
 	$(wildcard sources/libs/brutal/debug/*.c)       \
 	$(wildcard sources/libs/brutal/mem/*.c)         \
 	$(wildcard sources/libs/brutal/text/*.c)        \
-	$(wildcard sources/libs/bal/boot/handover.c)    \
 	$(wildcard sources/libs/elf/elf.c) 				\
 	$(wildcard sources/libs/hw/efi/*/*.c)           \
 	$(wildcard sources/libs/hw/efi/*.c)
