@@ -12,6 +12,12 @@ Lex lex(Scan *scan, LexFn *fn, Alloc *alloc)
 
         Lexeme l = {fn(scan), scan_end(scan)};
 
+        if (l.type == LEXEME_INVALID)
+        {
+            scan_throw(scan, str$("invalid lexeme"), str$(""));
+            break;
+        }
+
         vec_push(&self.lexemes, l);
     }
 
