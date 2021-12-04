@@ -1,6 +1,8 @@
 #include <cc/builder.h>
 #include <cc/sema/visit.h>
 
+/*
+
 CVal csema_value(CSema *sema, CVal value, Alloc *alloc)
 {
 }
@@ -21,6 +23,7 @@ CDecl csema_decl(CSema *sema, CDecl decl, Alloc *alloc)
 {
 }
 
+
 CUnit csema_unit(CSema *sema, CUnit unit, Alloc *alloc)
 {
     CUnit result = cunit(alloc);
@@ -32,7 +35,7 @@ CUnit csema_unit(CSema *sema, CUnit unit, Alloc *alloc)
         if (entry.type == CUNIT_DECLARATION)
         {
             csema_scope_add(sema, entry._decl);
-            cunit_decl(&result, csema_decl(sema, entry._decl));
+            cunit_decl(&result, csema_decl(sema, entry._decl, alloc));
         }
     }
 
@@ -40,3 +43,5 @@ CUnit csema_unit(CSema *sema, CUnit unit, Alloc *alloc)
 
     return result;
 }
+
+*/
