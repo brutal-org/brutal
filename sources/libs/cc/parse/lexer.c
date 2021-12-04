@@ -78,11 +78,16 @@ struct
     {CLEX_SEMICOLON, ";"},
 };
 
+static int isidentchar(char v)
+{
+    return isalpha(v) || v == '_' || v == '$' || isdigit(v);
+}
+
 static LexemeType clex_impl(Scan *scan)
 {
     if (isspace(scan_curr(scan)))
     {
-        while (isspace(scan_curr(scan)))
+        while (isspace(scan_curr(scan)) && !scan_ended(scan))
         {
             scan_next(scan);
         }
@@ -136,16 +141,6 @@ static LexemeType clex_impl(Scan *scan)
         }
     }
 
-    if (isalpha(scan_curr(scan)) || scan_curr(scan) == '_')
-    {
-        while (isalnum(scan_curr(scan)) || scan_curr(scan) == '_')
-        {
-            scan_next(scan);
-        }
-
-        return (CLEX_IDENT);
-    }
-
     if (isdigit(scan_curr(scan)))
     {
         while (isdigit(scan_curr(scan)) && !scan_ended(scan))
@@ -154,6 +149,16 @@ static LexemeType clex_impl(Scan *scan)
         }
 
         return CLEX_INTEGER;
+    }
+
+    if (isidentchar(scan_curr(scan)))
+    {
+        while ((isidentchar(scan_curr(scan))) && !scan_ended(scan))
+        {
+            scan_next(scan);
+        }
+
+        return (CLEX_IDENT);
     }
 
     return (LEXEME_INVALID);
