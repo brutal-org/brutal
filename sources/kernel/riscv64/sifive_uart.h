@@ -1,5 +1,6 @@
 #pragma once
-#include <hw/uart/uart.h>
+
+#include <uart/uart.h>
 
 // todo: find uart addr from device tree
 #define SIFIVE_UART0_BASE 0x10010000
@@ -49,4 +50,4 @@ enum sifive_uart_int_pending_bit
 
 #define SIFIVE_UART_BAUD_DIV_BIT (0xfffff)
 
-GenericUartDevice *sifive_uart_init(void);
+Uart *sifive_uart_init(void);

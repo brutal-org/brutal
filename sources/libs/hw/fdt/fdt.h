@@ -24,14 +24,14 @@ typedef struct PACKED
     be_uint64_t size;
 } FdtReservationEntry;
 
-typedef enum
+enum
 {
     FDT_BEGIN_NODE = 1,
     FDT_END_NODE = 2,
     FDT_PROP = 3,
     FDT_NOP = 4,
     FDT_END = 9
-} FdtNodeType;
+};
 
 typedef be_uint32_t FdtTok;
 
@@ -39,7 +39,7 @@ typedef struct
 {
     FdtTok token;
     char name[];
-} FdtTokNode;
+} FdtTokBegin;
 
 typedef struct
 {
@@ -83,6 +83,6 @@ FdtProp fdt_lookup_props(FdtNode node, Str name);
 void fdt_dump(FdtHeader *fdt, Emit *out, bool dump_values);
 
 // FIXME: addr_size and len_size are not really supported for the moment
-// they should be used to determine the size of the address and length fields in 32bit count (so len_size == 2 
+// they should be used to determine the size of the address and length fields in 32bit count (so len_size == 2
 // then the size of the len register should be 64bits)
 USizeRange fdt_reg_get_range(FdtProp prop, uintptr_t addr_size, uintptr_t len_size);

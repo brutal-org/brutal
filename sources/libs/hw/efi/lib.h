@@ -11,4 +11,4 @@ EFIHandle efi_handle(void);
 EFISystemTable *efi_st(void);
 
 /* you should free EFIMemoryDescriptor if you don't need it */
-EFIMemoryDescriptor *get_efi_memory_map(size_t *size, size_t *desc_size);
+EFIMemoryDescriptor *efi_mmap_snapshot(size_t *size, size_t *desc_size);

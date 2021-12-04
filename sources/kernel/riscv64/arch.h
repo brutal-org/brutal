@@ -1,5 +1,5 @@
 #pragma once
 
-#include <hw/uart/uart.h>
+#include <uart/uart.h>
 
-void set_arch_uart_device(GenericUartDevice *device);
+void arch_use_uart(Uart *device);

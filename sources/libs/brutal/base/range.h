@@ -40,6 +40,8 @@
 
 #define range_colide(LHS, RHS) (range_begin(LHS) < range_end(RHS) && range_end(LHS) > range_begin(RHS))
 
+#define range_touch(LHS, RHS) ((range_colide(LHS, RHS) || range_contiguous(LHS, RHS)))
+
 #define range_from_start_and_end(T, START, END) \
     (T) { (START), (END - START) }
 
@@ -96,11 +98,11 @@
 
 // alignment with higher size
 // and lower address
-#define range_align_higher(SELF, ALIGN) ((typeof(SELF)){.base = ALIGN_DOWN((SELF).base, (ALIGN)), .size = ALIGN_UP((SELF).size, (ALIGN))})
+#define range_align_bigger(SELF, ALIGN) ((typeof(SELF)){.base = ALIGN_DOWN((SELF).base, (ALIGN)), .size = ALIGN_UP((SELF).size, (ALIGN))})
 
 // alignment with lower size
 // and higher address
-#define range_align_lower(SELF, ALIGN) ((typeof(SELF)){.base = ALIGN_UP((SELF).base, (ALIGN)), .size = ALIGN_DOWN((SELF).size, (ALIGN))})
+#define range_align_smaller(SELF, ALIGN) ((typeof(SELF)){.base = ALIGN_UP((SELF).base, (ALIGN)), .size = ALIGN_DOWN((SELF).size, (ALIGN))})
 
 typedef Range(uint8_t) U8Range;
 typedef Range(uint16_t) U16Range;

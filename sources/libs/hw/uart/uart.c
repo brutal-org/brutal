@@ -1,7 +1,7 @@
 #include <brutal/mem.h>
-#include <hw/uart/uart.h>
+#include <uart/uart.h>
 
-void uart_putc(GenericUartDevice *dev, uint8_t data)
+void uart_putc(Uart *dev, uint8_t data)
 {
     if (dev->byte_size == 1)
     {
@@ -17,7 +17,7 @@ void uart_putc(GenericUartDevice *dev, uint8_t data)
     }
 }
 
-uint8_t uart_getc(GenericUartDevice *dev)
+uint8_t uart_getc(Uart *dev)
 {
     if (dev->byte_size == 1)
     {
@@ -44,7 +44,7 @@ static IoResult arch_debug_write(void *context, uint8_t const *data, MAYBE_UNUSE
     return OK(IoResult, size);
 }
 
-IoWriter uart_writer(GenericUartDevice *dev)
+IoWriter uart_writer(Uart *dev)
 {
     return (IoWriter){
         .write = arch_debug_write,

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <brutal/text.h>
-#include <hw/fdt/fdt.h>
 
 // "handover" in ascii
 #define HANDOVER_TAG 0x68616e646f766572
@@ -9,10 +8,9 @@
 typedef enum
 {
     HANDOVER_MMAP_FREE,
-    HANDOVER_MMAP_KERNEL_MODULE,
-    HANDOVER_MMAP_RESERVED,
+    HANDOVER_MMAP_USED,
     HANDOVER_MMAP_RECLAIMABLE,
-    HANDOVER_MMAP_FRAMEBUFFER,
+    HANDOVER_MMAP_RESERVED,
 } HandoverMmapType;
 
 static inline Str ho_mmtype_to_str(HandoverMmapType type)
@@ -22,7 +20,7 @@ static inline Str ho_mmtype_to_str(HandoverMmapType type)
     case HANDOVER_MMAP_FREE:
         return str$("FREE");
 
-    case HANDOVER_MMAP_KERNEL_MODULE:
+    case HANDOVER_MMAP_USED:
         return str$("KERNEL");
 
     case HANDOVER_MMAP_RESERVED:
@@ -31,9 +29,6 @@ static inline Str ho_mmtype_to_str(HandoverMmapType type)
     case HANDOVER_MMAP_RECLAIMABLE:
         return str$("RECLAIMABLE");
 
-    case HANDOVER_MMAP_FRAMEBUFFER:
-        return str$("FRAMEBUFFER");
-
     default:
         return str$("UNKNOWN");
     }
@@ -41,10 +36,12 @@ static inline Str ho_mmtype_to_str(HandoverMmapType type)
 
 typedef struct
 {
+    union
+    {
+        Range(size_t);
+        USizeRange range;
+    };
     HandoverMmapType type;
-
-    uintptr_t base;
-    size_t size;
 } HandoverMmapEntry;
 
 typedef struct
@@ -101,10 +98,14 @@ HandoverModule const *handover_find_module(Handover const *handover, Str name);
 
 void handover_dump(Handover const *handover);
 
-void handover_mmap_remove_entry(HandoverMmap *self, HandoverMmapEntry entry);
+void handover_mmap_append(HandoverMmap *self, HandoverMmapEntry entry);
 
-void handover_mmap_push_entry(HandoverMmap *self, HandoverMmapEntry entry);
+static inline uintptr_t handover_mmap_base(HandoverMmap const *memory_map)
+{
+    return memory_map->entries[0].base;
+}
 
-void handover_mmap_sanitize(HandoverMmap *self);
-
-void handover_init_from_fdt(Handover *handover, FdtHeader *header);
+static inline uintptr_t handover_mmap_end(HandoverMmap const *memory_map)
+{
+    return range_end(memory_map->entries[memory_map->size - 1]);
+}

@@ -36,7 +36,7 @@
 
 struct _EFI_SIMPLE_TEXT_OUTPUT;
 
-#define DEF_TEXTO_EFI_FUNC(name, ...) typedef EFIStatus (*EFI_TEXTO_##name)(struct _EFI_SIMPLE_TEXT_OUTPUT * self IFN(__VA_ARGS__)(, ) __VA_ARGS__)
+#define DEF_TEXTO_EFI_FUNC(name, ...) typedef EfiStatus (*EFI_TEXTO_##name)(struct _EFI_SIMPLE_TEXT_OUTPUT * self IFN(__VA_ARGS__)(, ) __VA_ARGS__)
 
 DEF_TEXTO_EFI_FUNC(RESET, bool verification);
 DEF_TEXTO_EFI_FUNC(OUTPUT_STRING, char16 *string);

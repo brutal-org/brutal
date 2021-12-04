@@ -10,7 +10,7 @@ void bits_init(Bits *self, void *data, size_t size)
     };
 }
 
-void bits_set_range(Bits *bits, USizeRange range, bool value)
+void bits_set_range(Bits *bits, BitsRange range, bool value)
 {
     for (size_t i = 0; i < range.size; i++)
     {
@@ -30,7 +30,7 @@ void bits_fill(Bits *bits, bool value)
     }
 }
 
-USizeRange bits_find_free(Bits const *bits, size_t start, size_t size, bool upper)
+BitsRange bits_find_free(Bits const *bits, size_t start, size_t size, bool upper)
 {
     if (start == (size_t)-1)
     {
@@ -39,7 +39,7 @@ USizeRange bits_find_free(Bits const *bits, size_t start, size_t size, bool uppe
 
     if (bits->size == 0)
     {
-        return (USizeRange){};
+        return (BitsRange){};
     }
 
     size_t range_start = 0;
@@ -66,9 +66,9 @@ USizeRange bits_find_free(Bits const *bits, size_t start, size_t size, bool uppe
 
         if (size == range_size)
         {
-            return (USizeRange){range_start, range_size};
+            return (BitsRange){range_start, range_size};
         }
     }
 
-    return (USizeRange){};
+    return (BitsRange){};
 }

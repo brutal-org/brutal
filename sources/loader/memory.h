@@ -8,8 +8,6 @@ typedef uintptr_t Pages;
 typedef Range(uint64_t) VmmRange;
 typedef Range(uint64_t) PmmRange;
 
-#define UEFI_MEM_BRUTAL_KERNEL_MODULE (0x80000ff0)
-
 #define PAGE_SIZE (0x1000)
 
 #define PAGE_ADDR (~(((uint64_t)0b11111111111)))

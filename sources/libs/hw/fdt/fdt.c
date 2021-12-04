@@ -1,12 +1,12 @@
 #include <brutal/debug.h>
-#include <hw/fdt/fdt.h>
+#include <fdt/fdt.h>
 
-static FdtTok *fdt_node_begin(FdtTokNode *fdt)
+static FdtTok *fdt_node_begin(FdtTokBegin *fdt)
 {
     return fdt_tok_next((FdtTok *)fdt);
 }
 
-static FdtTok *fdt_node_end(FdtTokNode *fdt, FdtHeader *header)
+static FdtTok *fdt_node_end(FdtTokBegin *fdt, FdtHeader *header)
 {
     uint32_t cur_type = 0;
     int depth = 0;
@@ -30,7 +30,7 @@ static FdtTok *fdt_node_end(FdtTokNode *fdt, FdtHeader *header)
     return NULL;
 }
 
-static FdtNode fdt_tok2node(FdtTokNode *raw_node, FdtHeader *header)
+static FdtNode fdt_tok2node(FdtTokBegin *raw_node, FdtHeader *header)
 {
     return (FdtNode){
         .fdt = header,
@@ -67,7 +67,7 @@ FdtTok *fdt_tok_next(FdtTok *tok)
     uint32_t cur_type = load_be(*tok);
     if (cur_type == FDT_BEGIN_NODE)
     {
-        FdtTokNode *node = (FdtTokNode *)tok;
+        FdtTokBegin *node = (FdtTokBegin *)tok;
         tok += (ALIGN_UP(str$(node->name).len + 1, 4) / 4);
     }
     else if (cur_type == FDT_PROP)
@@ -108,7 +108,7 @@ Iter fdt_node_childs(FdtNode node, IterFn fn, void *ctx)
         cur_type = load_be(*cur);
         if (cur_type == FDT_BEGIN_NODE)
         {
-            FdtTokNode *raw_node = (FdtTokNode *)cur;
+            FdtTokBegin *raw_node = (FdtTokBegin *)cur;
 
             if (depth == 0)
             {

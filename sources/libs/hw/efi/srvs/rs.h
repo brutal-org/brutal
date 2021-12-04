@@ -30,7 +30,7 @@ typedef struct
 
 typedef struct
 {
-    EFIGUID capsule_guid;
+    EfiGuid capsule_guid;
     uint32_t header_size;
     uint32_t flags;
     uint32_t capsule_image_size;
@@ -42,11 +42,11 @@ DEF_EFI_FUNC(GET_WAKEUP_TIME, bool *, bool *, EFITime *);
 DEF_EFI_FUNC(SET_WAKEUP_TIME, bool, EFITime *);
 DEF_EFI_FUNC(SET_VIRTUAL_ADDRESS_MAP, uint64_t, uint64_t, uint32_t, EFIMemoryDescriptor *);
 DEF_EFI_FUNC(CONVERT_POINTER, uint64_t, void **);
-DEF_EFI_FUNC(GET_VARIABLE, char16 *, EFIGUID *, uint32_t *, uint64_t *, void *);
-DEF_EFI_FUNC(GET_NEXT_VARIABLE_NAME, uint64_t, char16 *, EFIGUID *);
-DEF_EFI_FUNC(SET_VARIABLE, char16 *, EFIGUID *, uint32_t, uint64_t, void *);
+DEF_EFI_FUNC(GET_VARIABLE, char16 *, EfiGuid *, uint32_t *, uint64_t *, void *);
+DEF_EFI_FUNC(GET_NEXT_VARIABLE_NAME, uint64_t, char16 *, EfiGuid *);
+DEF_EFI_FUNC(SET_VARIABLE, char16 *, EfiGuid *, uint32_t, uint64_t, void *);
 DEF_EFI_FUNC(GET_NEXT_HIGH_MONO_COUNT, uint32_t *);
-DEF_EFI_FUNC(RESET_SYSTEM, EFIResetType, EFIStatus, uint64_t, void *);
+DEF_EFI_FUNC(RESET_SYSTEM, EFIResetType, EfiStatus, uint64_t, void *);
 DEF_EFI_FUNC(UPDATE_CAPSULE, EFICapsuleHeader **, uint64_t, uint64_t);
 DEF_EFI_FUNC(QUERY_CAPSULE_CAPABILITIES, EFICapsuleHeader **, uint64_t, uint64_t *, EFIResetType *);
 DEF_EFI_FUNC(QUERY_VARIABLE_INFO, uint32_t, uint64_t *, uint64_t *, uint64_t *);

@@ -3,11 +3,29 @@
 #include <brutal/math/angle.h>
 #include <math.h>
 
-#define Vec2(T) \
-    struct      \
-    {           \
-        T x;    \
-        T y;    \
+#define Vec2(T)       \
+    union             \
+    {                 \
+        struct        \
+        {             \
+            T x;      \
+            T y;      \
+        };            \
+        struct        \
+        {             \
+            T u;      \
+            T v;      \
+        };            \
+        struct        \
+        {             \
+            T width;  \
+            T height; \
+        };            \
+        struct        \
+        {             \
+            T left;   \
+            T right;  \
+        };            \
     }
 
 typedef Vec2(int) Vec2i;
@@ -28,11 +46,27 @@ typedef Vec2(double) Vec2d;
         __v;                \
     })
 
+#define vec2_add_v(a, v) (  \
+    {                       \
+        AutoType __v = (a); \
+        __v.x += v;         \
+        __v.y += v;         \
+        __v;                \
+    })
+
 #define vec2_sub(a, b) (    \
     {                       \
         AutoType __v = (a); \
         __v.x -= (b).x;     \
         __v.y -= (b).y;     \
+        __v;                \
+    })
+
+#define vec2_sub_v(a, v) (  \
+    {                       \
+        AutoType __v = (a); \
+        __v.x -= v;         \
+        __v.y -= v;         \
         __v;                \
     })
 

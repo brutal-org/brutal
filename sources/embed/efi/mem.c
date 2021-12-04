@@ -5,7 +5,7 @@
 
 Error host_mem_acquire(size_t size, void **out_result, MAYBE_UNUSED enum host_mem_flag flags)
 {
-    EFIStatus status = efi_st()->boot_services->allocate_pool(EFI_BOOT_SERVICES_DATA, size, out_result);
+    EfiStatus status = efi_st()->boot_services->allocate_pool(EFI_BOOT_SERVICES_DATA, size, out_result);
 
     if (status != EFI_SUCCESS)
     {

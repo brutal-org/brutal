@@ -9,15 +9,15 @@ typedef struct
     uint16_t data2;
     uint16_t data3;
     uint8_t data4[8];
-} EFIGUID;
+} EfiGuid;
 
-static inline bool efi_guid_eq(EFIGUID lhs, EFIGUID rhs)
+static inline bool efi_guid_eq(EfiGuid lhs, EfiGuid rhs)
 {
-    return memcmp(&lhs, &rhs, sizeof(EFIGUID)) == 0;
+    return memcmp(&lhs, &rhs, sizeof(EfiGuid)) == 0;
 }
 
 typedef unsigned short char16;
-typedef uint64_t EFIStatus;
+typedef uint64_t EfiStatus;
 typedef void *EFIEvent;
 typedef void *EFIHandle;
 

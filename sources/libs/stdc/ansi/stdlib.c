@@ -1,5 +1,3 @@
-#define _BRUTAL_SOURCE
-
 #include <brutal/alloc.h>
 #include <brutal/debug.h>
 #include <brutal/mem.h>
@@ -199,24 +197,8 @@ _Noreturn void _Exit(int status)
 //               size_t size,
 //               int (*compar)(void const *, void const *));
 
-void qsort(void *base, size_t nmemb, size_t size, int (*compar)(void const *, void const *))
-{
-    // FIXME: Write real quick sort
-
-    for (size_t i = 0; i + 1 < nmemb; i++)
-    {
-        for (size_t j = i + 1; i < nmemb; i++)
-        {
-            void *a = base + (i * size);
-            void *b = base + (j * size);
-
-            if (compar(a, b) < 0)
-            {
-                memswap(a, b, size);
-            }
-        }
-    }
-}
+// void qsort(void *base, size_t nmemb, size_t size, int (*compar)(void const *, void const *))
+// In qsort.c
 
 /* --- 7.22.6 - Integer arithmetic functions -------------------------------- */
 
