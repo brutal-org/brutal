@@ -4,36 +4,36 @@
 #include "kernel/cpu.h"
 #include "kernel/sched.h"
 
-static Lock lock = {};
-static Vec(Task *) tasks = {};
-static _Atomic Tick tick = 0;
+static Lock _lock = {};
+static Vec(Task *) _tasks = {};
+static _Atomic Tick _tick = 0;
 
 void sched_initialize(void)
 {
     log$("Initializing scheduling...");
-    vec_init(&tasks, alloc_global());
+    vec_init(&_tasks, alloc_global());
 }
 
 Tick sched_tick(void)
 {
-    return tick;
+    return _tick;
 }
 
 static void sched_enqueue(Task *task)
 {
     task_ref(task);
-    vec_push(&tasks, task);
+    vec_push(&_tasks, task);
 }
 
 static void sched_dequeue(Task *task)
 {
-    vec_remove(&tasks, task);
+    vec_remove(&_tasks, task);
     task_deref(task);
 }
 
 void sched_start(Task *task, uintptr_t ip, uintptr_t sp, BrTaskArgs args)
 {
-    LOCK_RETAINER(&lock);
+    LOCK_RETAINER(&_lock);
 
     assert_truth(!task->is_started);
 
@@ -46,18 +46,18 @@ void sched_start(Task *task, uintptr_t ip, uintptr_t sp, BrTaskArgs args)
 
 void sched_stop(Task *task, uintptr_t result)
 {
-    lock_acquire(&lock);
+    lock_acquire(&_lock);
 
     if (task->is_stopped)
     {
-        lock_release(&lock);
+        lock_release(&_lock);
         return;
     }
 
     task->is_stopped = true;
     task->result = result;
 
-    lock_release(&lock);
+    lock_release(&_lock);
 
     if (task == task_self() && !task->in_syscall)
     {
@@ -67,12 +67,12 @@ void sched_stop(Task *task, uintptr_t result)
 
 BrResult sched_block(Blocker blocker)
 {
-    lock_acquire(&lock);
+    lock_acquire(&_lock);
 
     task_self()->blocker = blocker;
     task_self()->is_blocked = true;
 
-    lock_release(&lock);
+    lock_release(&_lock);
 
     sched_yield();
 
@@ -86,7 +86,7 @@ Tick sched_deadline(BrTimeout timeout)
         return -1;
     }
 
-    return tick + timeout;
+    return _tick + timeout;
 }
 
 /* --- Attach/Detach -------------------------------------------------------- */
@@ -111,7 +111,7 @@ void sched_detach(Task *task)
         return;
     }
 
-    task->time_end = tick;
+    task->time_end = _tick;
 
     for (int i = 0; i < cpu_count(); i++)
     {
@@ -129,7 +129,7 @@ void sched_attach(Task *task, Cpu *cpu)
         return;
     }
 
-    task->time_start = tick;
+    task->time_start = _tick;
     cpu->next = task;
 }
 
@@ -160,7 +160,7 @@ void sched_current(Task *task, Cpu *cpu)
 
 Task *sched_pick(Task *best, Task *other)
 {
-    if (!task_runnable(other) || sched_running(other) || other->time_end == tick)
+    if (!task_runnable(other) || sched_running(other) || other->time_end == _tick)
     {
         return best;
     }
@@ -178,7 +178,7 @@ Task *sched_peek(void)
 {
     Task *best = nullptr;
 
-    vec_foreach(task, &tasks)
+    vec_foreach(task, &_tasks)
     {
         best = sched_pick(best, task);
     }
@@ -218,7 +218,7 @@ static bool sched_dispatch_to_idle(Task *task)
 
 static size_t active_time(Task *task)
 {
-    return tick - task->time_start;
+    return _tick - task->time_start;
 }
 
 static bool sched_dispatch_to_active(Task *task)
@@ -259,7 +259,7 @@ static bool sched_dispatch(Task *task)
 
 static void sched_updated_blocked(void)
 {
-    vec_foreach(task, &tasks)
+    vec_foreach(task, &_tasks)
     {
         if (!task->is_blocked)
         {
@@ -274,7 +274,7 @@ static void sched_updated_blocked(void)
 
         bool has_reached_deadline =
             blocker->deadline != (Tick)-1 &&
-            blocker->deadline < tick;
+            blocker->deadline < _tick;
 
         if (has_reached_function)
         {
@@ -316,34 +316,34 @@ static void sched_switch_other(void)
 
 void sched_yield(void)
 {
-    lock_acquire(&lock);
+    lock_acquire(&_lock);
 
     sched_next(sched_peek() ?: cpu_self()->idle, cpu_self());
 
-    lock_release(&lock);
+    lock_release(&_lock);
 
     arch_yield();
 }
 
 void sched_schedule(void)
 {
-    tick++;
+    _tick++;
 
-    lock_acquire(&lock);
+    lock_acquire(&_lock);
 
     sched_updated_blocked();
 
     while (sched_dispatch(sched_peek()))
         ;
 
-    lock_release(&lock);
+    lock_release(&_lock);
 
     sched_switch_other();
 }
 
 void sched_switch(void)
 {
-    LOCK_RETAINER(&lock);
+    LOCK_RETAINER(&_lock);
 
     cpu_self()->current = cpu_self()->next;
 }
@@ -352,11 +352,11 @@ void sched_switch(void)
 
 void sched_finalize(void)
 {
-    LOCK_RETAINER(&lock);
+    LOCK_RETAINER(&_lock);
 
-    for (int i = 0; i < tasks.len; i++)
+    for (int i = 0; i < _tasks.len; i++)
     {
-        Task *task = tasks.data[i];
+        Task *task = _tasks.data[i];
 
         if (task->is_stopped && !sched_runnable(task) && !sched_running(task))
         {

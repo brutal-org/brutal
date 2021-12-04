@@ -20,11 +20,11 @@
 #include "kernel/x86_64/smp.h"
 #include "kernel/x86_64/syscall.h"
 
-static atomic_int other_ready = 0;
+static atomic_int _ready = 0;
 
 void arch_wait_other(void)
 {
-    WAIT_FOR(other_ready == cpu_count());
+    WAIT_FOR(_ready == cpu_count());
 }
 
 void arch_boot_other(void)
@@ -61,7 +61,7 @@ void arch_entry_main(Handover *handover)
     event_initialize();
     tasking_initialize();
 
-    other_ready++;
+    _ready++;
     arch_boot_other();
     arch_wait_other();
 
@@ -84,7 +84,7 @@ void arch_entry_other(void)
     cpu_initialize();
     syscall_initialize();
 
-    other_ready++;
+    _ready++;
     arch_wait_other();
 
     cpu_retain_enable();

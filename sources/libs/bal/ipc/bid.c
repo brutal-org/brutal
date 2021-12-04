@@ -64,12 +64,16 @@ static int bid_handle_invoke(BidHandler handler, IpcEv *ev, BrTask from, void *r
     {
     case BID_HANDLER_REQ_RESP:
         return handler.func(ev, from, req, resp, alloc);
+
     case BID_HANDLER_NIL_RESP:
         return handler.func(ev, from, resp, alloc);
+
     case BID_HANDLER_REQ_NIL:
         return handler.func(ev, from, req);
+
     case BID_HANDLER_NIL_NIL:
         return handler.func(ev, from);
+
     default:
         panic$("Invalid handler type {}", handler.type);
     }

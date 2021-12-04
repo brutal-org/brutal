@@ -16,7 +16,7 @@
 #include "kernel/x86_64/smp.h"
 #include "kernel/x86_64/syscall.h"
 
-Lock error_lock;
+static Lock _lock;
 
 static char *_exception_messages[32] = {
     "DivisionByZero",
@@ -73,7 +73,7 @@ static void dump_register(Regs const *regs)
 
 static void interrupt_error_handler(Regs *regs)
 {
-    lock_acquire(&error_lock);
+    lock_acquire(&_lock);
 
     smp_stop_all();
 

@@ -3,7 +3,7 @@
 #include <efi/lib.h>
 #include <embed/log.h>
 
-static IoWriter writer;
+static IoWriter _writer;
 
 static IoResult host_log_write(MAYBE_UNUSED void *context, uint8_t const *data, MAYBE_UNUSED size_t offset, size_t size)
 {
@@ -19,10 +19,8 @@ static IoResult host_log_write(MAYBE_UNUSED void *context, uint8_t const *data, 
 
 IoWriter *host_log_writer(void)
 {
-
-    writer.write = host_log_write;
-
-    return &writer;
+    _writer.write = host_log_write;
+    return &_writer;
 }
 
 void host_log_lock(void)

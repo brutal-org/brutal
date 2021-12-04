@@ -6,16 +6,16 @@
 
 extern uintptr_t __interrupt_vector[256];
 
-static struct idt idt = {};
+static Idt _idt = {};
 
-static struct idt_descriptor idt_descriptor = {
-    .size = sizeof(struct idt) - 1,
-    .offset = (uintptr_t)&idt,
+static IdtDesc _idt_desc = {
+    .size = sizeof(Idt) - 1,
+    .offset = (uintptr_t)&_idt,
 };
 
-struct idt_entry idt_entry(uintptr_t handler, uint8_t ist, uint8_t idt_flags)
+IdtEntry idt_entry(uintptr_t handler, uint8_t ist, uint8_t idt_flags)
 {
-    return (struct idt_entry){
+    return (IdtEntry){
         .attributes = idt_flags,
         .ist = ist,
 
@@ -32,13 +32,13 @@ void idt_initialize(void)
 {
     for (int i = 0; i < 256; i++)
     {
-        idt.entries[i] = idt_entry(__interrupt_vector[i], 0, IDT_GATE);
+        _idt.entries[i] = idt_entry(__interrupt_vector[i], 0, IDT_GATE);
     }
 
     // Specials cases for IPIs dans the timer IRQ.
-    idt.entries[32] = idt_entry(__interrupt_vector[32], 0, IDT_GATE);
-    idt.entries[IPI_RESCHED] = idt_entry(__interrupt_vector[IPI_RESCHED], 0, IDT_GATE);
-    idt.entries[IPI_STOP] = idt_entry(__interrupt_vector[IPI_STOP], 1, IDT_GATE);
+    _idt.entries[32] = idt_entry(__interrupt_vector[32], 0, IDT_GATE);
+    _idt.entries[IPI_RESCHED] = idt_entry(__interrupt_vector[IPI_RESCHED], 0, IDT_GATE);
+    _idt.entries[IPI_STOP] = idt_entry(__interrupt_vector[IPI_STOP], 1, IDT_GATE);
 
-    idt_update(&idt_descriptor);
+    idt_update(&_idt_desc);
 }

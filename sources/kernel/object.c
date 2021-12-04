@@ -1,30 +1,30 @@
 #include <brutal/alloc.h>
 #include "kernel/object.h"
 
-static _Atomic BrHandle next_free_id = 1;
-static bool initialized = false;
-static VecObject global = {};
-static Lock lock = {};
+static _Atomic BrHandle _id = 1;
+static bool _init = false;
+static VecObject _global = {};
+static Lock _lock = {};
 
 void object_init(Object *self, BrObjectType type, ObjectDtor *dtor)
 {
     refcount_init(&self->refcount);
 
-    self->id = next_free_id++;
+    self->id = _id++;
     self->type = type;
     self->dtor = dtor;
 
-    lock_acquire(&lock);
+    lock_acquire(&_lock);
 
-    if (!initialized)
+    if (!_init)
     {
-        vec_init(&global, alloc_global());
-        initialized = true;
+        vec_init(&_global, alloc_global());
+        _init = true;
     }
 
-    vec_push(&global, self);
+    vec_push(&_global, self);
 
-    lock_release(&lock);
+    lock_release(&_lock);
 }
 
 void object_ref(Object *self)
@@ -39,31 +39,31 @@ void object_deref(Object *self)
         return;
     }
 
-    lock_acquire(&lock);
+    lock_acquire(&_lock);
 
     if (refcount_deref(&self->refcount) == REFCOUNT_0)
     {
-        vec_remove(&global, self);
-        lock_release(&lock);
+        vec_remove(&_global, self);
+        lock_release(&_lock);
 
         self->dtor(self);
     }
     else
     {
-        lock_release(&lock);
+        lock_release(&_lock);
     }
 }
 
 Object *global_lookup(BrId id, BrObjectType type)
 {
-    LOCK_RETAINER(&lock);
+    LOCK_RETAINER(&_lock);
 
-    if (!initialized)
+    if (!_init)
     {
         return nullptr;
     }
 
-    vec_foreach(object, &global)
+    vec_foreach(object, &_global)
     {
         if (object->id == id && (object->type == type || type == BR_OBJECT_ANY))
         {

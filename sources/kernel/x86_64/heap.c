@@ -4,13 +4,13 @@
 #include "kernel/mmap.h"
 #include "kernel/pmm.h"
 
-static Lock heap_lock;
+static Lock _lock;
 
 HeapResult heap_alloc(size_t size)
 {
     size = ALIGN_UP(size, 4096);
 
-    LOCK_RETAINER(&heap_lock)
+    LOCK_RETAINER(&_lock)
 
     PmmRange pmm_range = TRY(HeapResult, pmm_alloc(size, true));
     pmm_range.base = mmap_phys_to_io(pmm_range.base);
@@ -21,7 +21,7 @@ HeapResult heap_alloc(size_t size)
 
 HeapResult heap_free(HeapRange range)
 {
-    LOCK_RETAINER(&heap_lock)
+    LOCK_RETAINER(&_lock)
 
     PmmRange pmm_range = range$(PmmRange, range);
     pmm_range.base = mmap_io_to_phys(pmm_range.base);

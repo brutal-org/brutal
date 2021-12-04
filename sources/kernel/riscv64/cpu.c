@@ -4,23 +4,22 @@
 #include "kernel/kernel.h"
 #include "kernel/riscv64/cpu.h"
 
-static size_t impl_count = 0;
-
-static CpuImpl cpus[MAX_CPU_COUNT] = {};
+static CpuImpl _cpus[MAX_CPU_COUNT] = {};
+static size_t _len = 0;
 
 CpuImpl *cpu_impl(CpuId id)
 {
-    return &cpus[id];
+    return &_cpus[id];
 }
 
 CpuImpl *cpu_impl_self(void)
 {
-    return &cpus[cpu_self_id()];
+    return &_cpus[cpu_self_id()];
 }
 
 void cpu_found(CpuId id, MAYBE_UNUSED int lapic)
 {
-    impl_count++;
+    _len++;
 
     cpu(id)->id = id;
     cpu(id)->present = true;

@@ -7,7 +7,7 @@
 
 typedef struct
 {
-    struct tss tss;
+    Tss tss;
     uint8_t lapic;
     Cpu base;
 } CpuImpl;

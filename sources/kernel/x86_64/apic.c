@@ -98,8 +98,8 @@ typedef struct
     uint32_t max_redirect;
 } Ioapic;
 
-int _ioapic_count = 0;
-Ioapic _ioapic[IOAPIC_MAX_COUNT] = {};
+static int _ioapic_count = 0;
+static Ioapic _ioapic[IOAPIC_MAX_COUNT] = {};
 
 static inline uint32_t ioapic_read(int index, uint32_t reg)
 {

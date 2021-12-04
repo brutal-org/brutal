@@ -1,6 +1,7 @@
-#include "kernel/riscv64/interrupts.h"
 #include <brutal/debug.h>
+#include <brutal/text.h>
 #include "kernel/riscv64/asm.h"
+#include "kernel/riscv64/interrupts.h"
 
 extern void interrupt_common(void);
 
@@ -23,29 +24,7 @@ static char *_exception_messages[] = {
     "Store/AMO page fault",
 };
 
-static char *_motivation_messages[] = {
-    "We'll patch this throught micro-transaction",
-    "It just works!",
-    "This is a feature",
-    "TODO: fix this",
-    "[ insert a joke here ]",
-    "[ insert a devse private joke here ]",
-    "<< Je connais cette théorie >> d0p1",
-    "Welcome to paging hell !",
-    "There is a bug in the matrix",
-    "Calm down!",
-    "RIP",
-    "One day brutal will be bug free :tm:",
-    "The error screen is my worst nightmare",
-    "It will be easy they said...",
-    "TIP: when pc = 0 there is a problem",
-    "Let me interject for a moment what you call errors are in fact  brutal/errors",
-    "Error don't exists",
-    "What if everything was a dream ?",
-    "If you do `make clean` the error will be fixed :tm:",
-};
-
-static void dump_register(RiscvRegs const *regs)
+static void dump_register(Regs const *regs)
 {
     log_unlock("cpu registers:");
     log_unlock("pc : {#016p}", read_csr(CSR_SEPC));
@@ -71,7 +50,7 @@ static void dump_register(RiscvRegs const *regs)
     log_unlock("a4 : {#016p} | a5 : {#016p} | a6 : {#016p} | a7 : {#016p}", regs->a[4], regs->a[5], regs->a[6], regs->a[7]);
 }
 
-void interrupt_error_handler(RiscvRegs const *regs, int int_no)
+void interrupt_error_handler(Regs const *regs, int int_no)
 {
 
     log_unlock("");
@@ -85,25 +64,25 @@ void interrupt_error_handler(RiscvRegs const *regs, int int_no)
     dump_register(regs);
 
     log_unlock("");
-    log_unlock(" - \"{}\"", _motivation_messages[regs->sp % (sizeof(_motivation_messages) / sizeof(_motivation_messages[0]))]);
+    log_unlock(" - \"{}\"", witty(regs->sp + regs->ra));
 
     log_unlock("");
     log_unlock("------------------------------------------------------------");
 }
 
-void interrupt_handler(RiscvRegs *regs)
+void interrupt_handler(Regs *regs)
 {
     uint64_t cause = read_csr(CSR_SCAUSE);
-    int interrupt_id = cause & SCAUSE_CODE_MASK;
+    int id = cause & SCAUSE_CODE_MASK;
 
     if (cause & SCAUSE_INTERRUPT_MASK)
     {
-        log_unlock("received interrupt: {}", interrupt_id);
+        log_unlock("Received interrupt: {}", id);
     }
     else
     {
-        log_unlock("received exception: {}", interrupt_id);
-        interrupt_error_handler(regs, interrupt_id);
+        log_unlock("Received exception: {}", id);
+        interrupt_error_handler(regs, id);
 
         while (true)
         {

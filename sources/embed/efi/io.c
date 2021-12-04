@@ -5,15 +5,15 @@
 #include <efi/protos.h>
 #include <embed/io.h>
 
-static EFILoadedImage *image_loader = nullptr;
-static EFISimpleFileSystemProtocol *rootfs = nullptr;
-static EfiFileProtocol *rootdir = nullptr;
+static EFILoadedImage *_image_loader = nullptr;
+static EFISimpleFileSystemProtocol *_rootfs = nullptr;
+static EfiFileProtocol *_rootdir = nullptr;
 
 static EFILoadedImage *efi_image_loader(void)
 {
-    if (image_loader)
+    if (_image_loader)
     {
-        return image_loader;
+        return _image_loader;
     }
 
     log$("Opening image loader...");
@@ -23,7 +23,7 @@ static EFILoadedImage *efi_image_loader(void)
     EfiStatus status = efi_st()->boot_services->open_protocol(
         efi_handle(),
         &guid,
-        (void **)&image_loader,
+        (void **)&_image_loader,
         efi_handle(),
         nullptr,
         EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL);
@@ -32,14 +32,14 @@ static EFILoadedImage *efi_image_loader(void)
 
     assert_truth(status == EFI_SUCCESS);
 
-    return image_loader;
+    return _image_loader;
 }
 
 static EFISimpleFileSystemProtocol *efi_rootfs(void)
 {
-    if (rootfs)
+    if (_rootfs)
     {
-        return rootfs;
+        return _rootfs;
     }
 
     EfiGuid guid = EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID;
@@ -47,28 +47,28 @@ static EFISimpleFileSystemProtocol *efi_rootfs(void)
     EfiStatus status = efi_st()->boot_services->open_protocol(
         efi_image_loader()->device_handle,
         &guid,
-        (void **)&rootfs,
+        (void **)&_rootfs,
         efi_handle(),
         nullptr,
         EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL);
 
     assert_truth(status == EFI_SUCCESS);
 
-    return rootfs;
+    return _rootfs;
 }
 
 EfiFileProtocol *efi_rootdir(void)
 {
-    if (rootdir)
+    if (_rootdir)
     {
-        return rootdir;
+        return _rootdir;
     }
 
-    EfiStatus status = efi_rootfs()->open_volume(efi_rootfs(), &rootdir);
+    EfiStatus status = efi_rootfs()->open_volume(efi_rootfs(), &_rootdir);
 
     assert_truth(status == EFI_SUCCESS);
 
-    return rootdir;
+    return _rootdir;
 }
 
 HostIoOpenFileResult host_io_file_open(Str path)
@@ -108,7 +108,7 @@ HostIoOpenFileResult host_io_file_create(Str path)
 
 MaybeError host_io_file_close(HostIoFile handle)
 {
-    rootdir->close((EfiFileProtocol *)handle);
+    _rootdir->close((EfiFileProtocol *)handle);
     return SUCCESS;
 }
 

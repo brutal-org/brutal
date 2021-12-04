@@ -10,16 +10,16 @@
 #include "kernel/riscv64/interrupts.h"
 #include "kernel/riscv64/uart8250.h"
 
-static Uart *_uart_device = NULL;
-static Handover boot_handover = {};
+static Uart *_uart = NULL;
+static Handover _handover = {};
 
 extern uintptr_t _kernel_end;
 extern uintptr_t _kernel_start;
 
 void arch_entry_main(uint64_t hart_id, uint64_t fdt_addr)
 {
-    _uart_device = uart8250_init();
-    arch_use_uart(_uart_device);
+    _uart = uart8250_init();
+    arch_use_uart(_uart);
 
     log$("started cpu: {} with fdt: {}", hart_id, fdt_addr);
 
@@ -38,12 +38,12 @@ void arch_entry_main(uint64_t hart_id, uint64_t fdt_addr)
         .type = HANDOVER_MMAP_USED,
     };
 
-    fdt_populate_handover(header, &boot_handover);
-    handover_mmap_append(&boot_handover.mmap, kernel_entry);
+    fdt_populate_handover(header, &_handover);
+    handover_mmap_append(&_handover.mmap, kernel_entry);
 
-    handover_dump(&boot_handover);
+    handover_dump(&_handover);
 
-    pmm_initialize(&boot_handover);
+    pmm_initialize(&_handover);
     while (1)
     {
     }

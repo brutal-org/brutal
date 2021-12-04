@@ -2,13 +2,13 @@
 #include <brutal/task.h>
 #include "test/test.h"
 
-static size_t tests_count = 0;
-static Test tests[1024] = {};
+static size_t _len = 0;
+static Test _tests[1024] = {};
 
 void test_register(Test test)
 {
-    tests[tests_count] = test;
-    tests_count++;
+    _tests[_len] = test;
+    _len++;
 }
 
 bool test_run(Test test)
@@ -55,11 +55,11 @@ bool test_run(Test test)
 
 void test_run_by_name(Str name)
 {
-    for (size_t i = 0; i < tests_count; i++)
+    for (size_t i = 0; i < _len; i++)
     {
-        if (str_eq(tests[i].name, name))
+        if (str_eq(_tests[i].name, name))
         {
-            test_run(tests[i]);
+            test_run(_tests[i]);
         }
     }
 }
@@ -69,12 +69,12 @@ int test_run_all(void)
     int pass_count = 0;
     int fail_count = 0;
 
-    log$("Running {} tests...", tests_count);
+    log$("Running {} tests...", _len);
     log$("");
 
-    for (size_t i = 0; i < tests_count; i++)
+    for (size_t i = 0; i < _len; i++)
     {
-        Test test = tests[i];
+        Test test = _tests[i];
 
         if (test_run(test))
         {
@@ -87,7 +87,7 @@ int test_run_all(void)
     }
 
     log$("");
-    log$("{} tests run, {} pass, {} fail", tests_count, pass_count, fail_count);
+    log$("{} tests run, {} pass, {} fail", _len, pass_count, fail_count);
     log$("");
 
     return fail_count != 0 ? TASK_EXIT_FAILURE : TASK_EXIT_SUCCESS;

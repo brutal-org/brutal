@@ -6,7 +6,7 @@
 #include <string.h>
 #include <unistd.h>
 
-static bool log_initialized = false;
+static bool _init = false;
 static IoWriter _log;
 
 void host_log_lock(void)
@@ -31,10 +31,10 @@ static IoResult host_log_write(MAYBE_UNUSED void *context, uint8_t const *data, 
 
 IoWriter *host_log_writer(void)
 {
-    if (!log_initialized)
+    if (!_init)
     {
         _log.write = host_log_write;
-        log_initialized = true;
+        _init = true;
     }
 
     return &_log;

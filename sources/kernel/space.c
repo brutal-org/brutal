@@ -4,17 +4,17 @@
 
 /* --- Memory Mappings ------------------------------------------------------ */
 
-static void memory_mapping_create(Space *space, MemObj *object, size_t offset, VmmRange vmm)
+static void space_mmap_create(Space *space, MemObj *object, size_t offset, VmmRange vmm)
 {
     mem_obj_ref(object);
 
-    MemoryMapping *mapping = alloc_make(alloc_global(), MemoryMapping);
+    Mmap *mapping = alloc_make(alloc_global(), Mmap);
 
     mapping->range = vmm;
     mapping->object = object;
     mapping->offset = offset;
 
-    vec_push(&space->mappings, mapping);
+    vec_push(&space->mmaps, mapping);
 
     PmmRange pmm = {mem_obj_base(object) + offset, vmm.size};
 
@@ -23,11 +23,11 @@ static void memory_mapping_create(Space *space, MemObj *object, size_t offset, V
     vmm_flush(space->vmm, vmm);
 }
 
-static void memory_mapping_destroy(Space *space, MemoryMapping *mapping)
+static void space_mmap_destroy(Space *space, Mmap *mapping)
 {
     vmm_unmap(space->vmm, mapping->range);
     mem_obj_deref(mapping->object);
-    vec_remove(&space->mappings, mapping);
+    vec_remove(&space->mmaps, mapping);
     alloc_free(alloc_global(), mapping);
 
     vmm_flush(space->vmm, mapping->range);
@@ -37,13 +37,13 @@ static void memory_mapping_destroy(Space *space, MemoryMapping *mapping)
 
 void space_destroy(Space *self)
 {
-    for (int i = 0; i < self->mappings.len; i++)
+    for (int i = 0; i < self->mmaps.len; i++)
     {
-        memory_mapping_destroy(self, self->mappings.data[i]);
+        space_mmap_destroy(self, self->mmaps.data[i]);
     }
 
     range_alloc_deinit(&self->alloc);
-    vec_deinit(&self->mappings);
+    vec_deinit(&self->mmaps);
     vmm_space_destroy(self->vmm);
 
     alloc_free(alloc_global(), self);
@@ -55,7 +55,7 @@ Space *space_create(BrSpaceFlags flags)
 
     self->flags = flags;
     self->vmm = vmm_space_create();
-    vec_init(&self->mappings, alloc_global());
+    vec_init(&self->mmaps, alloc_global());
 
     range_alloc_init(&self->alloc, alloc_global());
     range_alloc_unused(&self->alloc, (USizeRange){0x400000, 0x800000000000});
@@ -111,7 +111,7 @@ SpaceResult space_map(Space *self, MemObj *mem_obj, size_t offset, size_t size, 
         range_alloc_used(&self->alloc, range$(USizeRange, range));
     }
 
-    memory_mapping_create(self, mem_obj, offset, range);
+    space_mmap_create(self, mem_obj, offset, range);
 
     return OK(SpaceResult, range);
 }
@@ -120,13 +120,13 @@ SpaceResult space_unmap(Space *self, VmmRange range)
 {
     LOCK_RETAINER(&self->lock);
 
-    vec_foreach(mapping, &self->mappings)
+    vec_foreach(mapping, &self->mmaps)
     {
         if (mapping->range.base == range.base &&
             mapping->range.size == range.size)
         {
             range_alloc_unused(&self->alloc, range$(USizeRange, range));
-            memory_mapping_destroy(self, mapping);
+            space_mmap_destroy(self, mapping);
             return OK(SpaceResult, range);
         }
     }
@@ -138,7 +138,7 @@ void space_dump(Space *self)
 {
     log$("MemorySpace({})", self->id);
 
-    vec_foreach(mapping, &self->mappings)
+    vec_foreach(mapping, &self->mmaps)
     {
         VmmRange vmm_range = mapping->range;
 

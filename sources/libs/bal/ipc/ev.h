@@ -16,8 +16,8 @@ struct ipc_job
     bool ok;
     BrMsg *resp;
 
-    struct ipc_job *next;
-    struct ipc_job *prev;
+    IpcJob *next;
+    IpcJob *prev;
 };
 
 typedef void IpcFn(struct ipc_ev *ev, BrMsg *req, void *ctx);

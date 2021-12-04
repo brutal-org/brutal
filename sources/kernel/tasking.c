@@ -4,7 +4,7 @@
 #include "kernel/task.h"
 #include "kernel/tasking.h"
 
-void idle(void)
+static void idle(void)
 {
     while (true)
     {
@@ -12,7 +12,7 @@ void idle(void)
     }
 }
 
-static inline void finalizer(void)
+static void finalizer(void)
 {
     while (true)
     {

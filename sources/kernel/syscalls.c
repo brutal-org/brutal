@@ -359,25 +359,25 @@ BrResult sys_ack(BrAckArgs *args)
     return event_ack(task_self(), args->event);
 }
 
-BrResult sys_stat_memobj(BrInfoMemObj *args, MemObj *obj)
+static BrResult sys_stat_memobj(BrInfoMemObj *args, MemObj *obj)
 {
     args->range = obj->pmm;
     return BR_SUCCESS;
 }
 
-BrResult sys_stat_domain(BrInfoDomain *args, Domain *domain)
+static BrResult sys_stat_domain(BrInfoDomain *args, Domain *domain)
 {
     args->domain_object_count = slot_count(&domain->objects);
     return BR_SUCCESS;
 }
 
-BrResult sys_stat_space(BrInfoSpace *args, Space *space)
+static BrResult sys_stat_space(BrInfoSpace *args, Space *space)
 {
     args->flags = space->flags;
     return BR_SUCCESS;
 }
 
-BrResult sys_stat_task(BrInfoTask *args, Task *task)
+static BrResult sys_stat_task(BrInfoTask *args, Task *task)
 {
     args->blocked = task->is_blocked;
     args->started = task->is_started;

@@ -6,23 +6,22 @@
 #include "kernel/x86_64/asm.h"
 #include "kernel/x86_64/cpu.h"
 
-static size_t impl_count = 0;
-
-static CpuImpl cpus[MAX_CPU_COUNT] = {};
+static size_t _len = 0;
+static CpuImpl _cpus[MAX_CPU_COUNT] = {};
 
 CpuImpl *cpu_impl(CpuId id)
 {
-    return &cpus[id];
+    return &_cpus[id];
 }
 
 CpuImpl *cpu_impl_self(void)
 {
-    return &cpus[cpu_self_id()];
+    return &_cpus[cpu_self_id()];
 }
 
 void cpu_found(CpuId id, int lapic)
 {
-    impl_count++;
+    _len++;
 
     cpu(id)->id = id;
     cpu(id)->present = true;
@@ -41,7 +40,7 @@ void cpu_found(CpuId id, int lapic)
 
 int cpu_count(void)
 {
-    return impl_count;
+    return _len;
 }
 
 void cpu_initialize(void)

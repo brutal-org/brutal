@@ -2,7 +2,7 @@
 
 #include <brutal/base.h>
 
-enum idt_entry_flags
+enum
 {
     IDT_TRAP = 0xeF,
     IDT_USER = 0x60,
@@ -11,13 +11,13 @@ enum idt_entry_flags
 
 #define IDT_ENTRY_COUNT (256)
 
-struct PACKED idt_descriptor
+typedef struct PACKED
 {
     uint16_t size;
     uint64_t offset;
-};
+} IdtDesc;
 
-struct PACKED idt_entry
+typedef struct PACKED
 {
     uint16_t offset_0_16;
     uint16_t code_segment;
@@ -26,15 +26,15 @@ struct PACKED idt_entry
     uint16_t offset_16_32;
     uint32_t offset_32_63;
     uint32_t _zero;
-};
+} IdtEntry;
 
-struct PACKED idt
+typedef struct PACKED
 {
-    struct idt_entry entries[IDT_ENTRY_COUNT];
-};
+    IdtEntry entries[IDT_ENTRY_COUNT];
+} Idt;
 
-struct idt_entry idt_entry(uintptr_t handler, uint8_t ist, uint8_t idt_flags);
+IdtEntry idt_entry(uintptr_t handler, uint8_t ist, uint8_t idt_flags);
 
 void idt_initialize(void);
 
-void idt_update(struct idt_descriptor *idt_descriptor);
+void idt_update(IdtDesc *idt_descriptor);

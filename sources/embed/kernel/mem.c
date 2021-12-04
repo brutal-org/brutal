@@ -3,16 +3,16 @@
 #include <embed/mem.h>
 #include "kernel/heap.h"
 
-static Lock mem_lock;
+static Lock _lock ;
 
 void host_mem_lock(void)
 {
-    lock_acquire(&mem_lock);
+    lock_acquire(&_lock);
 }
 
 void host_mem_unlock(void)
 {
-    lock_release(&mem_lock);
+    lock_release(&_lock);
 }
 
 Error host_mem_acquire(size_t size, void **out_result, MAYBE_UNUSED enum host_mem_flag flags)

@@ -2,7 +2,7 @@
 #include "kernel/riscv64/platform.h"
 #include "kernel/riscv64/sifive_uart.h"
 
-Uart _self;
+static Uart _self;
 
 Uart *sifive_uart_init(void)
 {

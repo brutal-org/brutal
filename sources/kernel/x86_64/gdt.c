@@ -1,7 +1,7 @@
 #include <brutal/sync.h>
 #include "kernel/x86_64/gdt.h"
 
-static struct tss _tss = {
+static Tss _tss = {
     .reserved = 0,
     .rsp = {},
     .reserved0 = 0,
@@ -12,17 +12,17 @@ static struct tss _tss = {
     .iopb_offset = 0,
 };
 
-static Lock gdt_lock;
-static struct gdt gdt = {};
+static Lock _lock;
+static Gdt _gdt = {};
 
-static struct gdt_descriptor gdt_descriptor = {
-    .size = sizeof(struct gdt) - 1,
-    .offset = (uint64_t)&gdt,
+static GdtDesc _gdt_desc = {
+    .size = sizeof(Gdt) - 1,
+    .offset = (uint64_t)&_gdt,
 };
 
-struct gdt_entry gdt_entry(uint32_t base, uint32_t limit, uint8_t granularity, uint8_t flags)
+GdtEntry gdt_entry(uint32_t base, uint32_t limit, uint8_t granularity, uint8_t flags)
 {
-    return (struct gdt_entry){
+    return (GdtEntry){
         .limit0_15 = (uint16_t)((limit)&0xffff),
         .base0_15 = (uint16_t)((base)&0xffff),
         .base16_23 = (uint8_t)(((base) >> 16) & 0xff),
@@ -33,20 +33,20 @@ struct gdt_entry gdt_entry(uint32_t base, uint32_t limit, uint8_t granularity, u
     };
 }
 
-struct gdt_entry gdt_entry_null()
+GdtEntry gdt_entry_null()
 {
     return gdt_entry(0, 0, 0, 0);
 }
 
-struct gdt_entry gdt_entry_simple(uint8_t flags, uint8_t granularity)
+GdtEntry gdt_entry_simple(uint8_t flags, uint8_t granularity)
 {
     return gdt_entry(0, 0, granularity, flags);
 }
 
-struct gdt_tss_entry gdt_entry_tss(uintptr_t tss_addr)
+GdtTssEntry gdt_entry_tss(uintptr_t tss_addr)
 {
-    return (struct gdt_tss_entry){
-        .len = sizeof(struct tss),
+    return (GdtTssEntry){
+        .len = sizeof(Tss),
         .base_low16 = tss_addr & 0xffff,
         .base_mid8 = (tss_addr >> 16) & 0xff,
         .flags1 = 0b10001001,
@@ -59,22 +59,22 @@ struct gdt_tss_entry gdt_entry_tss(uintptr_t tss_addr)
 
 void gdt_initialize(void)
 {
-    gdt.entries[0] = gdt_entry_null();
+    _gdt.entries[0] = gdt_entry_null();
 
-    gdt.entries[GDT_KERNEL_CODE] = gdt_entry_simple(GDT_PRESENT | GDT_SEGMENT | GDT_READWRITE | GDT_EXECUTABLE, GDT_LONG_MODE_GRANULARITY);
-    gdt.entries[GDT_KERNEL_DATA] = gdt_entry_simple(GDT_PRESENT | GDT_SEGMENT | GDT_READWRITE, 0);
+    _gdt.entries[GDT_KERNEL_CODE] = gdt_entry_simple(GDT_PRESENT | GDT_SEGMENT | GDT_READWRITE | GDT_EXECUTABLE, GDT_LONG_MODE_GRANULARITY);
+    _gdt.entries[GDT_KERNEL_DATA] = gdt_entry_simple(GDT_PRESENT | GDT_SEGMENT | GDT_READWRITE, 0);
 
-    gdt.entries[GDT_USER_DATA] = gdt_entry_simple(GDT_PRESENT | GDT_SEGMENT | GDT_READWRITE | GDT_USER, 0);
-    gdt.entries[GDT_USER_CODE] = gdt_entry_simple(GDT_PRESENT | GDT_SEGMENT | GDT_READWRITE | GDT_EXECUTABLE | GDT_USER, GDT_LONG_MODE_GRANULARITY);
+    _gdt.entries[GDT_USER_DATA] = gdt_entry_simple(GDT_PRESENT | GDT_SEGMENT | GDT_READWRITE | GDT_USER, 0);
+    _gdt.entries[GDT_USER_CODE] = gdt_entry_simple(GDT_PRESENT | GDT_SEGMENT | GDT_READWRITE | GDT_EXECUTABLE | GDT_USER, GDT_LONG_MODE_GRANULARITY);
 
-    gdt.tss = gdt_entry_tss((uintptr_t)&_tss);
+    _gdt.tss = gdt_entry_tss((uintptr_t)&_tss);
 
-    gdt_update((uintptr_t)&gdt_descriptor);
+    gdt_update((uintptr_t)&_gdt_desc);
 }
 
-void gdt_load_tss(struct tss *tss)
+void gdt_load_tss(Tss *tss)
 {
-    LOCK_RETAINER(&gdt_lock);
-    gdt.tss = gdt_entry_tss((uintptr_t)tss);
+    LOCK_RETAINER(&_lock);
+    _gdt.tss = gdt_entry_tss((uintptr_t)tss);
     tss_update();
 }

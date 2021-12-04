@@ -8,7 +8,7 @@ typedef struct
     VmmRange range;
     MemObj *object;
     size_t offset;
-} MemoryMapping;
+} Mmap;
 
 typedef struct
 {
@@ -17,7 +17,7 @@ typedef struct
     BrSpaceFlags flags;
     Lock lock;
     VmmSpace vmm;
-    Vec(MemoryMapping *) mappings;
+    Vec(Mmap *) mmaps;
     RangeAlloc alloc;
 } Space;
 

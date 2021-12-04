@@ -6,8 +6,8 @@
 #include "kernel/x86_64/asm.h"
 #include "kernel/x86_64/paging.h"
 
-static Pml *kernel_pml = nullptr;
-static Lock vmm_lock;
+static Lock _lock;
+static Pml *_kpml;
 
 VmmResult vmm_flush(MAYBE_UNUSED VmmSpace space, VmmRange virtual_range)
 {
@@ -115,18 +115,18 @@ void vmm_initialize(Handover const *handover)
 {
     HeapRange heap_result = UNWRAP(heap_alloc(MEM_PAGE_SIZE));
 
-    kernel_pml = (Pml *)heap_result.base;
-    mem_set(kernel_pml, 0, MEM_PAGE_SIZE);
+    _kpml = (Pml *)heap_result.base;
+    mem_set(_kpml, 0, MEM_PAGE_SIZE);
 
-    vmm_load_memory_map(kernel_pml, &handover->mmap);
-    vmm_space_switch(kernel_pml);
+    vmm_load_memory_map(_kpml, &handover->mmap);
+    vmm_space_switch(_kpml);
 
     log$("Loaded kernel memory map!");
 }
 
 VmmSpace vmm_space_create(void)
 {
-    LOCK_RETAINER(&vmm_lock);
+    LOCK_RETAINER(&_lock);
 
     HeapRange heap_result = UNWRAP(heap_alloc(MEM_PAGE_SIZE));
 
@@ -142,7 +142,7 @@ VmmSpace vmm_space_create(void)
 
     for (size_t i = 255; i < 512; i++)
     {
-        pml_table->entries[i] = kernel_pml->entries[i];
+        pml_table->entries[i] = _kpml->entries[i];
     }
 
     return vmm_address_space;
@@ -177,14 +177,14 @@ void vmm_space_destroy(VmmSpace space)
 
 void vmm_space_switch(VmmSpace space)
 {
-    LOCK_RETAINER(&vmm_lock);
+    LOCK_RETAINER(&_lock);
 
     asm_write_cr3(mmap_io_to_phys((uintptr_t)space));
 }
 
 VmmSpace vmm_kernel_space(void)
 {
-    return (VmmSpace)kernel_pml;
+    return (VmmSpace)_kpml;
 }
 
 static VmmResult vmm_map_page(Pml *pml4, uintptr_t virtual_page, uintptr_t physical_page, BrMemFlags flags)
@@ -237,7 +237,7 @@ VmmResult vmm_map(VmmSpace space, VmmRange virtual_range, PmmRange physical_rang
     assert_truth(mem_is_range_page_aligned(virtual_range));
     assert_truth(mem_is_range_page_aligned(physical_range));
 
-    LOCK_RETAINER(&vmm_lock);
+    LOCK_RETAINER(&_lock);
 
     if (virtual_range.size != physical_range.size)
     {
@@ -261,7 +261,7 @@ VmmResult vmm_unmap(VmmSpace space, VmmRange virtual_range)
 {
     assert_truth(mem_is_range_page_aligned(virtual_range));
 
-    LOCK_RETAINER(&vmm_lock);
+    LOCK_RETAINER(&_lock);
 
     for (size_t i = 0; i < (virtual_range.size / MEM_PAGE_SIZE); i++)
     {
@@ -273,7 +273,7 @@ VmmResult vmm_unmap(VmmSpace space, VmmRange virtual_range)
 
 PmmResult vmm_virt2phys(VmmSpace space, VmmRange virtual_range)
 {
-    LOCK_RETAINER(&vmm_lock);
+    LOCK_RETAINER(&_lock);
 
     Pml *pml4 = (Pml *)space;
 

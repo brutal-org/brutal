@@ -2,11 +2,11 @@
 #include <embed/log.h>
 #include "kernel/arch.h"
 
-static Lock logger_lock;
+static Lock _lock;
 
 void host_log_lock(void)
 {
-    lock_acquire(&logger_lock);
+    lock_acquire(&_lock);
 }
 
 IoWriter *host_log_writer(void)
@@ -16,7 +16,7 @@ IoWriter *host_log_writer(void)
 
 void host_log_unlock(void)
 {
-    lock_release(&logger_lock);
+    lock_release(&_lock);
 }
 
 void host_log_panic(void)

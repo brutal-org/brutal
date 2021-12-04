@@ -18,7 +18,7 @@
 
 #define GDT_RING_3 (3)
 
-struct PACKED tss
+typedef struct PACKED
 {
     uint32_t reserved;
 
@@ -33,15 +33,15 @@ struct PACKED tss
     uint16_t reserved3;
 
     uint16_t iopb_offset;
-};
+} Tss;
 
-struct PACKED gdt_descriptor
+typedef struct PACKED
 {
     uint16_t size;
     uint64_t offset;
-};
+} GdtDesc;
 
-struct PACKED gdt_entry
+typedef struct PACKED
 {
     uint16_t limit0_15;
     uint16_t base0_15;
@@ -50,9 +50,9 @@ struct PACKED gdt_entry
     uint8_t limit16_19 : 4;
     uint8_t granularity : 4;
     uint8_t base24_31;
-};
+} GdtEntry;
 
-struct PACKED gdt_tss_entry
+typedef struct PACKED
 {
     uint16_t len;
     uint16_t base_low16;
@@ -62,26 +62,26 @@ struct PACKED gdt_tss_entry
     uint8_t base_high8;
     uint32_t base_upper32;
     uint32_t reserved;
-};
+} GdtTssEntry;
 
-struct PACKED gdt
+typedef struct PACKED
 {
-    struct gdt_entry entries[GDT_ENTRY_COUNT];
-    struct gdt_tss_entry tss;
-};
+    GdtEntry entries[GDT_ENTRY_COUNT];
+    GdtTssEntry tss;
+} Gdt;
 
-struct gdt_entry gdt_entry(uint32_t base, uint32_t limit, uint8_t granularity, uint8_t flags);
+GdtEntry gdt_entry(uint32_t base, uint32_t limit, uint8_t granularity, uint8_t flags);
 
-struct gdt_entry gdt_entry_null();
+GdtEntry gdt_entry_null(void);
 
-struct gdt_entry gdt_entry_simple(uint8_t flags, uint8_t granularity);
+GdtEntry gdt_entry_simple(uint8_t flags, uint8_t granularity);
 
-struct gdt_tss_entry gdt_entry_tss(uintptr_t tss);
+GdtTssEntry gdt_entry_tss(uintptr_t tss);
 
 void gdt_update(uint64_t descriptor);
 
 void gdt_initialize(void);
 
-void gdt_load_tss(struct tss *tss);
+void gdt_load_tss(Tss *tss);
 
 void tss_update(void);

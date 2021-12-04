@@ -1,24 +1,24 @@
 #include "kernel/arch.h"
 #include "kernel/riscv64/arch.h"
 
-static bool log_initialized = false;
-static IoWriter log;
+static bool _init = false;
+static IoWriter _lock;
 
 void arch_use_uart(Uart *device)
 {
-    log_initialized = true;
-    log = uart_writer(device);
+    _init = true;
+    _lock = uart_writer(device);
 }
 
 IoWriter *arch_debug(void)
 {
-    if (!log_initialized)
+    if (!_init)
     {
-        log.write = NULL;
-        log_initialized = true;
+        _lock.write = NULL;
+        _init = true;
     }
 
-    return &log;
+    return &_lock;
 }
 
 void arch_idle(void)

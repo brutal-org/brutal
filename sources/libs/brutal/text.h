@@ -8,3 +8,4 @@
 #include <brutal/text/utf16.h>
 #include <brutal/text/utf8.h>
 #include <brutal/text/vals.h>
+#include <brutal/text/witty.h>

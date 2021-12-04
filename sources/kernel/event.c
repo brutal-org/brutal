@@ -3,19 +3,19 @@
 #include <brutal/ds.h>
 #include "kernel/event.h"
 
-static Lock lock = {};
-static Vec(EventBinding) bindings = {};
+static Lock _lock = {};
+static Vec(EventBinding) _bindings = {};
 
 void event_initialize(void)
 {
-    vec_init(&bindings, alloc_global());
+    vec_init(&_bindings, alloc_global());
 }
 
 static EventBinding *event_binding_get(Task const *task, BrEvent event)
 {
-    for (int i = 0; i < bindings.len; ++i)
+    for (int i = 0; i < _bindings.len; ++i)
     {
-        EventBinding *binding = bindings.data + i;
+        EventBinding *binding = _bindings.data + i;
         if (binding->task == task && br_event_eq(binding->event, event))
         {
             return binding;
@@ -26,7 +26,7 @@ static EventBinding *event_binding_get(Task const *task, BrEvent event)
 
 BrResult event_bind(Task const *task, BrEvent event)
 {
-    LOCK_RETAINER(&lock);
+    LOCK_RETAINER(&_lock);
 
     EventBinding *existing = event_binding_get(task, event);
 
@@ -41,19 +41,19 @@ BrResult event_bind(Task const *task, BrEvent event)
         .ack = true,
     };
 
-    vec_push(&bindings, binding);
+    vec_push(&_bindings, binding);
 
     return BR_SUCCESS;
 }
 
 static BrResult event_unbind_unlocked(Task const *task, BrEvent event)
 {
-    for (int i = 0; i < bindings.len; i++)
+    for (int i = 0; i < _bindings.len; i++)
     {
-        if (bindings.data[i].task == task &&
-            br_event_eq(bindings.data[i].event, event))
+        if (_bindings.data[i].task == task &&
+            br_event_eq(_bindings.data[i].event, event))
         {
-            vec_splice(&bindings, i, 1);
+            vec_splice(&_bindings, i, 1);
             return BR_SUCCESS;
         }
     }
@@ -63,19 +63,19 @@ static BrResult event_unbind_unlocked(Task const *task, BrEvent event)
 
 BrResult event_unbind(Task const *task, BrEvent event)
 {
-    LOCK_RETAINER(&lock);
+    LOCK_RETAINER(&_lock);
     return event_unbind_unlocked(task, event);
 }
 
 BrResult event_unbind_all(Task const *task)
 {
-    LOCK_RETAINER(&lock);
+    LOCK_RETAINER(&_lock);
 
-    for (int i = 0; i < bindings.len; i++)
+    for (int i = 0; i < _bindings.len; i++)
     {
-        if (bindings.data[i].task == task)
+        if (_bindings.data[i].task == task)
         {
-            vec_splice(&bindings, i, 1);
+            vec_splice(&_bindings, i, 1);
         }
     }
 
@@ -96,9 +96,9 @@ static BrResult event_dispatch(Task const *task, BrEvent event)
 
 void event_trigger(BrEvent event)
 {
-    LOCK_RETAINER(&lock);
+    LOCK_RETAINER(&_lock);
 
-    vec_foreach(binding, &bindings)
+    vec_foreach(binding, &_bindings)
     {
         if (br_event_eq(binding.event, event) && binding.ack)
         {
@@ -110,7 +110,7 @@ void event_trigger(BrEvent event)
 
 BrResult event_ack(Task const *task, BrEvent event)
 {
-    LOCK_RETAINER(&lock);
+    LOCK_RETAINER(&_lock);
 
     EventBinding *binding = event_binding_get(task, event);
 

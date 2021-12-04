@@ -11,7 +11,7 @@ static HelloError hello_hello_handler(IpcEv *ev, BrTask task, Str const *req, St
     return HELLO_SUCCESS;
 }
 
-static HelloVTable vtable = {
+static HelloVTable _hello_vtable = {
     hello_hello_handler,
 };
 
@@ -20,7 +20,7 @@ int main()
     IpcEv ev = {};
     br_ev_init(&ev, nullptr, alloc_global());
 
-    hello_impl(&ev, &vtable);
+    hello_impl(&ev, &_hello_vtable);
 
     return br_ev_run(&ev);
 }

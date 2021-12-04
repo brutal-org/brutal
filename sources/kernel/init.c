@@ -6,7 +6,7 @@
 #include "kernel/mmap.h"
 #include "kernel/sched.h"
 
-static Task *init_task = nullptr;
+static Task *_task = nullptr;
 
 static bool elf_supported(Elf64Header const *header, size_t data_size)
 {
@@ -118,7 +118,7 @@ void init_start(Handover const *handover)
     uintptr_t hoaddr = init_pass(task, handover);
 
     task_ref(task);
-    init_task = task;
+    _task = task;
 
     sched_start(
         task,
@@ -135,7 +135,7 @@ void init_start(Handover const *handover)
 
 Task *init_get_task(void)
 {
-    assert_not_null(init_task);
-    task_ref(init_task);
-    return init_task;
+    assert_not_null(_task);
+    task_ref(_task);
+    return _task;
 }

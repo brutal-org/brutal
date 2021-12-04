@@ -13,7 +13,7 @@
 #include "kernel/x86_64/hpet.h"
 #include "kernel/x86_64/smp.h"
 
-atomic_bool cpu_ready = false;
+static atomic_bool _ready = false;
 
 extern uint32_t trampoline_start;
 extern uint32_t trampoline_end;
@@ -60,7 +60,7 @@ static void smp_trampoline_unmap(void)
 
 void smp_entry_other(void)
 {
-    cpu_ready = true;
+    _ready = true;
     arch_entry_other();
 }
 
@@ -104,12 +104,12 @@ void smp_boot_other(void)
 
         log$("Bootings CPU N°{}...", cpu);
 
-        cpu_ready = false;
+        _ready = false;
 
         smp_initialize_cpu_context();
         smp_start_cpu(cpu_impl(cpu)->lapic);
 
-        WAIT_FOR(cpu_ready);
+        WAIT_FOR(_ready);
     }
 
     smp_trampoline_unmap();
