@@ -63,7 +63,7 @@ typedef enum
 
 struct _EFI_GRAPHICS_OUTPUT_PROTOCOL;
 
-#define DEF_GOP_EFI_FUNC(name, ...) typedef EFIStatus (*EFI_GRAPHICS_OUTPUT_PROTOCOL_##name)(struct _EFI_GRAPHICS_OUTPUT_PROTOCOL * self IFN(__VA_ARGS__)(, ) __VA_ARGS__)
+#define DEF_GOP_EFI_FUNC(name, ...) typedef EfiStatus (*EFI_GRAPHICS_OUTPUT_PROTOCOL_##name)(struct _EFI_GRAPHICS_OUTPUT_PROTOCOL * self IFN(__VA_ARGS__)(, ) __VA_ARGS__)
 
 DEF_GOP_EFI_FUNC(QUERY_MODE, uint32_t, uint64_t *, EFIGraphicsOutputModeInfo **);
 DEF_GOP_EFI_FUNC(SET_MODE, uint32_t);

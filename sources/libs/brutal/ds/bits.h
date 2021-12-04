@@ -12,6 +12,8 @@ typedef struct
     size_t size;
 } Bits;
 
+typedef Range(size_t) BitsRange;
+
 static inline bool bits_get(Bits const *bits, size_t index)
 {
     size_t const byte_index = BITS_BYTE_INDEX(index);
@@ -37,7 +39,7 @@ static inline void bits_set(Bits *bits, size_t index, bool value)
 
 void bits_init(Bits *self, void *data, size_t size);
 
-void bits_set_range(Bits *bits, USizeRange range, bool value);
+void bits_set_range(Bits *bits, BitsRange range, bool value);
 
 static inline size_t bits_len(const Bits *bits)
 {
@@ -46,4 +48,4 @@ static inline size_t bits_len(const Bits *bits)
 
 void bits_fill(Bits *bits, bool value);
 
-USizeRange bits_find_free(Bits const *bits, size_t start, size_t size, bool upper);
+BitsRange bits_find_free(Bits const *bits, size_t start, size_t size, bool upper);

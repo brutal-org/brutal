@@ -83,7 +83,7 @@ static void vmm_load_memory_map(VmmSpace target, HandoverMmap const *memory_map)
     {
         HandoverMmapEntry entry = memory_map->entries[i];
         USizeRange entry_range = {entry.base, entry.size};
-        PmmRange physical_range = range_align_higher(entry_range, MEM_PAGE_SIZE);
+        PmmRange physical_range = range_align_smaller(entry_range, MEM_PAGE_SIZE);
 
         log$("Loading kernel memory map {}/{} ({x} - {x})",
              i + 1,
@@ -91,7 +91,7 @@ static void vmm_load_memory_map(VmmSpace target, HandoverMmap const *memory_map)
              entry.base,
              entry.base + entry.size);
 
-        if (entry.type == HANDOVER_MMAP_KERNEL_MODULE)
+        if (entry.type == HANDOVER_MMAP_USED)
         {
             log$(" - Mapped to kernel");
 

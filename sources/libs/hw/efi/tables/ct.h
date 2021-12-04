@@ -29,6 +29,6 @@
 
 typedef struct
 {
-    EFIGUID vendor_guid;
+    EfiGuid vendor_guid;
     void *vendor_table;
 } EFIConfigurationTable;

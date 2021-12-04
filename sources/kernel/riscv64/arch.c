@@ -4,7 +4,7 @@
 static bool log_initialized = false;
 static IoWriter log;
 
-void set_arch_uart_device(GenericUartDevice *device)
+void arch_use_uart(Uart *device)
 {
     log_initialized = true;
     log = uart_writer(device);

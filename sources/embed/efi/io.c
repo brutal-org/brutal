@@ -7,7 +7,7 @@
 
 static EFILoadedImage *image_loader = nullptr;
 static EFISimpleFileSystemProtocol *rootfs = nullptr;
-static EFIFileProtocol *rootdir = nullptr;
+static EfiFileProtocol *rootdir = nullptr;
 
 static EFILoadedImage *efi_image_loader(void)
 {
@@ -18,9 +18,9 @@ static EFILoadedImage *efi_image_loader(void)
 
     log$("Opening image loader...");
 
-    EFIGUID guid = EFI_LOADED_IMAGE_PROTOCOL_GUID;
+    EfiGuid guid = EFI_LOADED_IMAGE_PROTOCOL_GUID;
 
-    EFIStatus status = efi_st()->boot_services->open_protocol(
+    EfiStatus status = efi_st()->boot_services->open_protocol(
         efi_handle(),
         &guid,
         (void **)&image_loader,
@@ -42,9 +42,9 @@ static EFISimpleFileSystemProtocol *efi_rootfs(void)
         return rootfs;
     }
 
-    EFIGUID guid = EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID;
+    EfiGuid guid = EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID;
 
-    EFIStatus status = efi_st()->boot_services->open_protocol(
+    EfiStatus status = efi_st()->boot_services->open_protocol(
         efi_image_loader()->device_handle,
         &guid,
         (void **)&rootfs,
@@ -57,14 +57,14 @@ static EFISimpleFileSystemProtocol *efi_rootfs(void)
     return rootfs;
 }
 
-EFIFileProtocol *efi_rootdir(void)
+EfiFileProtocol *efi_rootdir(void)
 {
     if (rootdir)
     {
         return rootdir;
     }
 
-    EFIStatus status = efi_rootfs()->open_volume(efi_rootfs(), &rootdir);
+    EfiStatus status = efi_rootfs()->open_volume(efi_rootfs(), &rootdir);
 
     assert_truth(status == EFI_SUCCESS);
 
@@ -84,9 +84,9 @@ HostIoOpenFileResult host_io_file_open(Str path)
         }
     }
 
-    EFIFileProtocol *file = nullptr;
+    EfiFileProtocol *file = nullptr;
 
-    EFIStatus status = efi_rootdir()->open(efi_rootdir(), &file, cstr, EFI_FILE_MODE_READ, EFI_FILE_READ_ONLY);
+    EfiStatus status = efi_rootdir()->open(efi_rootdir(), &file, cstr, EFI_FILE_MODE_READ, EFI_FILE_READ_ONLY);
 
     alloc_free(alloc_global(), cstr);
 
@@ -108,15 +108,15 @@ HostIoOpenFileResult host_io_file_create(Str path)
 
 MaybeError host_io_file_close(HostIoFile handle)
 {
-    rootdir->close((EFIFileProtocol *)handle);
+    rootdir->close((EfiFileProtocol *)handle);
     return SUCCESS;
 }
 
 IoResult host_io_read_file(HostIoFile handle, uint8_t *data, size_t size)
 {
-    EFIFileProtocol *file = handle;
+    EfiFileProtocol *file = handle;
     uint64_t read_write_size = size;
-    EFIStatus status = file->read(file, &read_write_size, data);
+    EfiStatus status = file->read(file, &read_write_size, data);
 
     if (status != EFI_SUCCESS)
     {

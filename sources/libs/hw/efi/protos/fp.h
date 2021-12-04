@@ -61,14 +61,14 @@ typedef struct
 typedef struct
 {
     EFIEvent event;
-    EFIStatus status;
+    EfiStatus status;
     uint32_t buffer_size;
     void *buffer;
 } EFIFileIOToken;
 
 struct _EFI_FILE_IO;
 
-#define DEF_FILE_EFI_FUNC(name, ...) typedef EFIStatus (*EFI_FILE_##name)(struct _EFI_FILE_IO * self IFN(__VA_ARGS__)(, ) __VA_ARGS__)
+#define DEF_FILE_EFI_FUNC(name, ...) typedef EfiStatus (*EFI_FILE_##name)(struct _EFI_FILE_IO * self IFN(__VA_ARGS__)(, ) __VA_ARGS__)
 
 DEF_FILE_EFI_FUNC(OPEN, struct _EFI_FILE_IO **, char16 *, uint64_t, uint64_t);
 DEF_FILE_EFI_FUNC(CLOSE);
@@ -77,8 +77,8 @@ DEF_FILE_EFI_FUNC(READ, uint64_t *, void *);
 DEF_FILE_EFI_FUNC(WRITE, uint8_t, void *);
 DEF_FILE_EFI_FUNC(GET_POSITION, uint64_t *);
 DEF_FILE_EFI_FUNC(SET_POSITION, uint64_t);
-DEF_FILE_EFI_FUNC(GET_INFO, EFIGUID *, uint64_t *, void *);
-DEF_FILE_EFI_FUNC(SET_INFO, EFIGUID *, uint64_t, void *);
+DEF_FILE_EFI_FUNC(GET_INFO, EfiGuid *, uint64_t *, void *);
+DEF_FILE_EFI_FUNC(SET_INFO, EfiGuid *, uint64_t, void *);
 DEF_FILE_EFI_FUNC(FLUSH);
 DEF_FILE_EFI_FUNC(OPEN_EX, struct _EFI_FILE_IO **, char16 *, uint64_t, uint64_t, EFIFileIOToken *);
 DEF_FILE_EFI_FUNC(READ_EX, EFIFileIOToken *);
@@ -102,4 +102,4 @@ typedef struct _EFI_FILE_IO
     EFI_FILE_READ_EX read_ex;
     EFI_FILE_WRITE_EX write_ex;
     EFI_FILE_FLUSH_EX flush_ex;
-} EFIFileProtocol;
+} EfiFileProtocol;

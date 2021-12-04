@@ -9,7 +9,7 @@
 
 #define EFI_LOADED_IMAGE_PROTOCOL_REVISION 0x1000
 
-typedef EFIStatus (*EFI_IMAGE_UNLOAD)(EFIHandle);
+typedef EfiStatus (*EFI_IMAGE_UNLOAD)(EFIHandle);
 
 typedef struct EFI_LOADED_IMAGE_PROTOCOL
 {

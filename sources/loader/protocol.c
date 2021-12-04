@@ -25,63 +25,38 @@ static HandoverMmapType efi_mmap_type_to_handover[] = {
     [EFI_PERSISTENT_MEMORY] = HANDOVER_MMAP_RESERVED,
 };
 
-HandoverMmap get_mmap(void)
+static void efi_populate_mmap(HandoverMmap *mmap)
 {
-    size_t entry_count = 0;
-    size_t descriptor_size = 0;
-    EFIMemoryDescriptor *mmap = get_efi_memory_map(&entry_count, &descriptor_size);
+    mmap->size = 0;
 
-    HandoverMmap *h_mmap = alloc_malloc(alloc_global(), (sizeof(HandoverMmap) + (entry_count) * sizeof(HandoverMmapEntry)));
+    size_t desc_count = 0;
+    size_t desc_size = 0;
+    EFIMemoryDescriptor *desc = efi_mmap_snapshot(&desc_count, &desc_size);
 
-    mem_set(h_mmap, 0, sizeof(HandoverMmap) + (entry_count) * sizeof(HandoverMmapEntry));
-
-    HandoverMmapEntry *current = h_mmap->entries;
-    HandoverMmapEntry *previous_entry = nullptr;
-    uint64_t final_entry_count = 0;
-
-    for (uint64_t i = 0; i < entry_count; i++)
+    for (size_t i = 0; i < desc_count; i++)
     {
-        EFIMemoryDescriptor *desc = (EFIMemoryDescriptor *)((uint64_t)mmap + descriptor_size * i);
+        desc = (EFIMemoryDescriptor *)((void *)desc + desc_size);
 
-        uint64_t len = desc->num_pages << 12;
-        uint64_t phys_base = desc->physical_start;
+        uint64_t base = desc->physical_start;
+        uint64_t size = desc->num_pages << 12;
+        HandoverMmapType type = HANDOVER_MMAP_USED;
 
-        HandoverMmapType type;
-
-        if (desc->type == UEFI_MEM_BRUTAL_KERNEL_MODULE)
-        {
-            type = HANDOVER_MMAP_KERNEL_MODULE;
-        }
-        else
+        if (desc->type != EFI_USER_KERNEL_MEMORY)
         {
             type = efi_mmap_type_to_handover[desc->type];
         }
 
-        if (previous_entry != nullptr &&
-            previous_entry->type == type &&
-            (previous_entry->base + previous_entry->size) == desc->physical_start)
-        {
-            previous_entry->size += len;
-        }
-        else
-        {
-            current->type = type;
-            current->size = len;
-            current->base = phys_base;
-
-            previous_entry = current;
-
-            current++;
-            final_entry_count++;
-        }
+        handover_mmap_append(
+            mmap,
+            (HandoverMmapEntry){
+                .base = base,
+                .size = size,
+                .type = type,
+            });
     }
-
-    h_mmap->size = final_entry_count;
-
-    return *h_mmap;
 }
 
-EFIStatus get_system_config_table(EFIGUID table_guid, void **table)
+static EfiStatus efi_lookup_acpi(EfiGuid table_guid, void **table)
 {
     for (uint64_t i = 0; i < efi_st()->num_table_entries; i++)
     {
@@ -95,15 +70,15 @@ EFIStatus get_system_config_table(EFIGUID table_guid, void **table)
     return EFI_NOT_FOUND;
 }
 
-uintptr_t get_rsdp()
+static uintptr_t efi_find_rsdp(void)
 {
     void *acpi_table = nullptr;
 
-    EFIGUID guid = ACPI_TABLE_GUID;
-    EFIGUID guid2 = ACPI2_TABLE_GUID;
+    EfiGuid guid = ACPI_TABLE_GUID;
+    EfiGuid guid2 = ACPI2_TABLE_GUID;
 
-    if (get_system_config_table(guid, &acpi_table) == EFI_SUCCESS ||
-        get_system_config_table(guid2, &acpi_table) == EFI_SUCCESS)
+    if (efi_lookup_acpi(guid, &acpi_table) == EFI_SUCCESS ||
+        efi_lookup_acpi(guid2, &acpi_table) == EFI_SUCCESS)
     {
         return (uintptr_t)acpi_table;
     }
@@ -113,13 +88,13 @@ uintptr_t get_rsdp()
     }
 }
 
-static int get_gop_mode(EFIGraphicsOutputProtocol *gop, size_t req_width, size_t req_height)
+static int eif_gop_find_mode(EFIGraphicsOutputProtocol *gop, size_t req_width, size_t req_height)
 {
     EFIGraphicsOutputModeInfo *info;
     for (uint32_t i = 0; i < gop->mode->max_mode; i++)
     {
         size_t info_size = 0;
-        EFIStatus status = gop->query_mode(gop, i, &info_size, &info);
+        EfiStatus status = gop->query_mode(gop, i, &info_size, &info);
         if (status == EFI_ERR)
         {
             log$("can't get info for: {}", i);
@@ -137,7 +112,7 @@ static int get_gop_mode(EFIGraphicsOutputProtocol *gop, size_t req_width, size_t
     for (uint32_t i = 0; i < gop->mode->max_mode; i++)
     {
         size_t info_size = 0;
-        EFIStatus status = gop->query_mode(gop, i, &info_size, &info);
+        EfiStatus status = gop->query_mode(gop, i, &info_size, &info);
         if (status == EFI_ERR)
         {
             log$(" - can't get info for: {}", i);
@@ -151,16 +126,15 @@ static int get_gop_mode(EFIGraphicsOutputProtocol *gop, size_t req_width, size_t
     return 0;
 }
 
-static HandoverFramebuffer get_framebuffer(EFIBootServices *bs, LoaderFramebuffer const *fb)
+static void efi_populate_framebuffer(EFIBootServices *bs, HandoverFramebuffer *fb)
 {
     EFIGraphicsOutputProtocol *gop;
-    EFIStatus status;
-
-    EFIGUID gop_guid = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
+    EfiGuid gop_guid = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
 
     bs->locate_protocol(&gop_guid, nullptr, (void **)&gop);
-    int mode = get_gop_mode(gop, fb->width, fb->height);
-    status = gop->set_mode(gop, mode);
+
+    int mode = eif_gop_find_mode(gop, fb->width, fb->height);
+    EfiStatus status = gop->set_mode(gop, mode);
 
     if (status != EFI_SUCCESS)
     {
@@ -171,27 +145,22 @@ static HandoverFramebuffer get_framebuffer(EFIBootServices *bs, LoaderFramebuffe
 
     assert_truth(gop_info->pixel_format == PIXEL_BGR_8_BIT);
 
-    return (HandoverFramebuffer){
-        .present = true,
-        .addr = gop->mode->framebuffer_base,
-        .width = gop_info->horizontal_resolution,
-        .height = gop_info->vertical_resolution,
-        .pitch = gop_info->pixels_per_scan_line * sizeof(uint32_t),
-        .bpp = 32,
-    };
+    fb->present = true;
+    fb->addr = gop->mode->framebuffer_base;
+    fb->width = gop_info->horizontal_resolution;
+    fb->height = gop_info->vertical_resolution;
+    fb->pitch = gop_info->pixels_per_scan_line * sizeof(uint32_t);
+    fb->bpp = 32;
 }
 
-static void load_module_data(HandoverModule *target, Str path)
+static void efi_load_module(HandoverModule *target, Str path)
 {
     IoFile file;
-    IoReader reader;
-    Buf buf;
-
     io_file_open(&file, path);
-    reader = io_file_reader(&file);
+    IoReader reader = io_file_reader(&file);
 
     // TODO: make a kernel_module alloc instead of allocating 2 time (even if the first time is always freed)
-    buf = io_readall((&reader), alloc_global());
+    Buf buf = io_readall((&reader), alloc_global());
 
     uintptr_t buf_page_size = ALIGN_UP(buf.used, PAGE_SIZE) / PAGE_SIZE;
     uintptr_t module_addr = kernel_module_phys_alloc_page(buf_page_size);
@@ -203,41 +172,33 @@ static void load_module_data(HandoverModule *target, Str path)
 
     buf_deinit(&buf);
 
-    log$("Loading module data '{}' (size: {})...", path, target->size);
+    log$("Loaded module data '{}' (size: {})...", path, target->size);
 }
 
-static HandoverModules get_handover_modules(LoaderEntry const *entry)
+static void efi_load_modules(LoaderEntry const *entry, HandoverModules *modules)
 {
-    HandoverModules res = {};
     int id = 0;
     vec_foreach(module, &entry->modules)
     {
-        HandoverModule *target = &res.module[id];
+        HandoverModule *target = &modules->module[id];
 
         memcpy(target->module_name.buf, module.name.buf, module.name.len);
         target->module_name.len = module.name.len;
 
-        load_module_data(target, module.path);
+        efi_load_module(target, module.path);
 
         id++;
     }
 
-    res.size = id;
-
-    return res;
+    modules->size = id;
 }
 
-Handover get_handover(LoaderEntry const *entry)
+void efi_populate_handover(LoaderEntry const *entry, Handover *ho)
 {
-    HandoverFramebuffer fb = get_framebuffer(efi_st()->boot_services, &entry->framebuffer);
-    HandoverModules modules = get_handover_modules(entry);
-    uintptr_t rsdp = get_rsdp();
-    HandoverMmap mmap = get_mmap();
+    ho->tag = HANDOVER_TAG;
 
-    return (Handover){
-        .framebuffer = fb,
-        .rsdp = rsdp,
-        .mmap = mmap,
-        .modules = modules,
-    };
+    efi_populate_framebuffer(efi_st()->boot_services, &ho->framebuffer);
+    efi_load_modules(entry, &ho->modules);
+    efi_populate_mmap(&ho->mmap);
+    ho->rsdp = efi_find_rsdp();
 }

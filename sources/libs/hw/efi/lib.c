@@ -6,8 +6,7 @@
 static bool _init = false;
 static EFIHandle _handle;
 static EFISystemTable *_st;
-
-static uint64_t latest_map_key = 0;
+static uint64_t _mmap_key = 0;
 
 void efi_init(EFIHandle handle, EFISystemTable *st)
 {
@@ -32,30 +31,28 @@ EFISystemTable *efi_st(void)
 
 void efi_deinit(void)
 {
-    efi_st()->boot_services->exit_boot_services(efi_handle(), latest_map_key);
+    efi_st()->boot_services->exit_boot_services(efi_handle(), _mmap_key);
 }
 
-EFIMemoryDescriptor *get_efi_memory_map(size_t *size, size_t *desc_size)
+EFIMemoryDescriptor *efi_mmap_snapshot(size_t *size, size_t *desc_size)
 {
-    uint8_t tmp_mmap[1];
-    uint64_t mmap_size = sizeof(tmp_mmap);
-    uint64_t map_key = 0;
+    uint64_t mmap_size = 0;
     uint64_t descriptor_size = 0;
     uint32_t descriptor_version = 0;
 
-    efi_st()->boot_services->get_memory_map(&mmap_size, (EFIMemoryDescriptor *)tmp_mmap, &map_key, &descriptor_size, &descriptor_version);
+    efi_st()->boot_services->get_memory_map(&mmap_size, nullptr, &_mmap_key, &descriptor_size, &descriptor_version);
 
-    mmap_size += 4096;
+    // Allocating the pool creates at least one new descriptor... for the chunk of memory changed to EfiLoaderData
+    // Not sure that UEFI firmware must allocate on a memory type boundry... if not, then two descriptors might be created
+    // https://stackoverflow.com/questions/39407280/uefi-simple-example-of-using-exitbootservices-with-gnu-efi
+    mmap_size += 2 * descriptor_size;
 
     EFIMemoryDescriptor *mmap = alloc_malloc(alloc_global(), mmap_size);
 
-    efi_st()->boot_services->get_memory_map(&mmap_size, mmap, &map_key, &descriptor_size, &descriptor_version);
+    efi_st()->boot_services->get_memory_map(&mmap_size, mmap, &_mmap_key, &descriptor_size, &descriptor_version);
 
-    uint64_t entry_count = (mmap_size / descriptor_size);
-    *size = entry_count;
+    *size = (mmap_size / descriptor_size);
     *desc_size = descriptor_size;
-
-    latest_map_key = map_key;
 
     return mmap;
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <hw/uart/uart.h>
+#include <uart/uart.h>
 
 #define UART8250_BASE 0x10000000
 
@@ -32,4 +32,4 @@ typedef enum
     UART_8250_LSR_DATA_READY = 0x01,
 } Uart8250LineStatus;
 
-GenericUartDevice *uart8250_init(void);
+Uart *uart8250_init(void);

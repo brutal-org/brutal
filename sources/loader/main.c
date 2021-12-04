@@ -98,7 +98,7 @@ Handover *allocate_handover(void)
     return (Handover *)(handover_copy_phys + MMAP_KERNEL_BASE);
 }
 
-void loader_boot(LoaderEntry *entry)
+void loader_boot(LoaderEntry const *entry)
 {
     log$("Loading kernel...");
 
@@ -106,7 +106,7 @@ void loader_boot(LoaderEntry *entry)
 
     log$("Kernel loaded, jumping in to it...");
     Handover *handover = allocate_handover();
-    *handover = get_handover(entry);
+    efi_populate_handover(entry, handover);
 
     efi_deinit();
 
@@ -115,7 +115,7 @@ void loader_boot(LoaderEntry *entry)
     panic$("entry_point should no return!");
 }
 
-EFIStatus efi_main(EFIHandle handle, EFISystemTable *st)
+EfiStatus efi_main(EFIHandle handle, EFISystemTable *st)
 {
     efi_init(handle, st);
 

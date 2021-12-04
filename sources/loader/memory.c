@@ -12,7 +12,7 @@ uint64_t kernel_module_phys_alloc_page(size_t count)
     uint64_t res = 0;
 
     // type, memory type, pages, memory
-    EFIStatus status = efi_st()->boot_services->allocate_pages(ALLOCATE_ANY_PAGES, UEFI_MEM_BRUTAL_KERNEL_MODULE, count, &res);
+    EfiStatus status = efi_st()->boot_services->allocate_pages(ALLOCATE_ANY_PAGES, EFI_USER_KERNEL_MEMORY, count, &res);
 
     if (status != EFI_SUCCESS)
     {
@@ -30,7 +30,7 @@ uint64_t kernel_module_phys_alloc_page_addr(size_t count, uint64_t addr)
     uint64_t res = addr;
 
     // type, memory type, pages, memory
-    EFIStatus status = efi_st()->boot_services->allocate_pages(ALLOCATE_ADDRESS, UEFI_MEM_BRUTAL_KERNEL_MODULE, count, &res);
+    EfiStatus status = efi_st()->boot_services->allocate_pages(ALLOCATE_ADDRESS, EFI_USER_KERNEL_MEMORY, count, &res);
 
     if (status != EFI_SUCCESS)
     {
@@ -48,7 +48,7 @@ uint64_t loader_phys_alloc_page(size_t count)
     uint64_t res = 0;
 
     // type, memory type, pages, memory
-    EFIStatus status = efi_st()->boot_services->allocate_pages(ALLOCATE_ANY_PAGES, EFI_BOOT_SERVICES_DATA, count, &res);
+    EfiStatus status = efi_st()->boot_services->allocate_pages(ALLOCATE_ANY_PAGES, EFI_BOOT_SERVICES_DATA, count, &res);
 
     if (status != EFI_SUCCESS)
     {

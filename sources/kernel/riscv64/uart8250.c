@@ -2,7 +2,7 @@
 #include <brutal/base.h>
 #include <brutal/mem.h>
 
-static GenericUartDevice _self;
+static Uart _self;
 
 void uart8250_write(uint16_t reg, uint8_t value)
 {
@@ -13,7 +13,7 @@ uint8_t uart8250_read(uint16_t reg)
     return volatile_read8(UART8250_BASE + reg);
 }
 
-GenericUartDevice *uart8250_init(void)
+Uart *uart8250_init(void)
 {
     uart8250_write(UART_8250_INTERRUPT_ENABLE, 0);
     uart8250_write(UART_8250_LINE_CONTROL, 0x03);
