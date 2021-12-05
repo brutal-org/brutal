@@ -17,7 +17,7 @@ typedef struct
     BrSpaceFlags flags;
     Lock lock;
     VmmSpace vmm;
-    Vec(Mmap *) mmaps;
+    Vec(Mmap) mmaps;
     RangeAlloc alloc;
 } Space;
 

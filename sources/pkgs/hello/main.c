@@ -1,7 +1,7 @@
 #include <brutal/debug.h>
 #include <protos/test/hello.h>
 
-static HelloError hello_hello_handler(IpcEv *ev, BrTask task, Str const *req, Str *resp, Alloc *alloc)
+static HelloError handle_hello_hello(IpcEv *ev, BrTask task, Str const *req, Str *resp, Alloc *alloc)
 {
     UNUSED(ev);
     UNUSED(alloc);
@@ -12,7 +12,7 @@ static HelloError hello_hello_handler(IpcEv *ev, BrTask task, Str const *req, St
 }
 
 static HelloVTable _hello_vtable = {
-    hello_hello_handler,
+    handle_hello_hello,
 };
 
 int main()

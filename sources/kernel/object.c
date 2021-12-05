@@ -63,7 +63,7 @@ Object *global_lookup(BrId id, BrObjectType type)
         return nullptr;
     }
 
-    vec_foreach(object, &_global)
+    vec_foreach_v(object, &_global)
     {
         if (object->id == id && (object->type == type || type == BR_OBJECT_ANY))
         {

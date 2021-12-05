@@ -16,7 +16,7 @@ Json bidgen_json_enum(BidEnum enum_, Alloc *alloc)
     Json json = json_object_with_type(str$("BidEnum"), alloc);
     Json members_json = json_array(alloc);
 
-    vec_foreach(member, &enum_.members)
+    vec_foreach_v(member, &enum_.members)
     {
         Json member_json = json_object(alloc);
 
@@ -36,7 +36,7 @@ Json bidgen_json_struct(BidStruct struct_, Alloc *alloc)
     Json json = json_object_with_type(str$("BidStruct"), alloc);
     Json members_json = json_array(alloc);
 
-    vec_foreach(member, &struct_.members)
+    vec_foreach_v(member, &struct_.members)
     {
         Json member_json = json_object(alloc);
 
@@ -111,12 +111,12 @@ Json bidgen_json_iface(BidIface const iface, Alloc *alloc)
     Json aliases_json = json_array(alloc);
     Json methods_json = json_array(alloc);
 
-    vec_foreach(alias, &iface.aliases)
+    vec_foreach_v(alias, &iface.aliases)
     {
         json_append(&aliases_json, bidgen_json_alias(alias, alloc));
     }
 
-    vec_foreach(method, &iface.methods)
+    vec_foreach_v(method, &iface.methods)
     {
         json_append(&methods_json, bidgen_json_method(method, alloc));
     }

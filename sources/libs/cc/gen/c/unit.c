@@ -52,7 +52,7 @@ void cgen_c_unit(Emit *emit, CUnit unit)
 {
     CUnitType prev_type = CUNIT_NONE;
 
-    vec_foreach(entry, &unit.units)
+    vec_foreach_v(entry, &unit.units)
     {
         switch (entry.type)
         {

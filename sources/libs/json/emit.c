@@ -40,7 +40,7 @@ void json_emit(Json const json, Emit *emit)
     case JSON_ARRAY:
         emit_fmt(emit, "[");
         emit_ident(emit);
-        vec_foreach(el, &json.array)
+        vec_foreach_v(el, &json.array)
         {
             if (!first)
             {

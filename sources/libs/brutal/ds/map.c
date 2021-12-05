@@ -37,7 +37,7 @@ static MapNode *map_node(MapImpl *impl, Str key, uint32_t hash)
 {
     MapBucket *bucket = map_bucket(impl, hash);
 
-    vec_foreach(node, bucket)
+    vec_foreach_v(node, bucket)
     {
         if (node->hash == hash &&
             str_eq(key, str$(&node->key)))
@@ -68,9 +68,9 @@ void map_init_impl(MapImpl *impl, int data_size, Alloc *alloc)
 
 void map_deinit_impl(MapImpl *impl)
 {
-    vec_foreach(bucket, &impl->buckets)
+    vec_foreach_v(bucket, &impl->buckets)
     {
-        vec_foreach(node, &bucket)
+        vec_foreach_v(node, &bucket)
         {
             map_node_destroy(impl->alloc, node);
         }

@@ -16,7 +16,7 @@ void bus_deinit(Bus *bus)
 
 BrId bus_lookup(Bus *bus, Str name)
 {
-    vec_foreach(serv, &bus->serv)
+    vec_foreach_v(serv, &bus->serv)
     {
         if (str_eq(serv.name, name))
         {

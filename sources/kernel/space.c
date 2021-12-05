@@ -8,29 +8,28 @@ static void space_mmap_create(Space *space, MemObj *object, size_t offset, VmmRa
 {
     mem_obj_ref(object);
 
-    Mmap *mapping = alloc_make(alloc_global(), Mmap);
-
-    mapping->range = vmm;
-    mapping->object = object;
-    mapping->offset = offset;
+    Mmap mapping = {
+        .range = vmm,
+        .object = object,
+        .offset = offset,
+    };
 
     vec_push(&space->mmaps, mapping);
 
     PmmRange pmm = {mem_obj_base(object) + offset, vmm.size};
 
     vmm_map(space->vmm, vmm, pmm, BR_MEM_USER | BR_MEM_WRITABLE);
-
     vmm_flush(space->vmm, vmm);
 }
 
-static void space_mmap_destroy(Space *space, Mmap *mapping)
+static void space_mmap_destroy(Space *space, size_t index)
 {
-    vmm_unmap(space->vmm, mapping->range);
-    mem_obj_deref(mapping->object);
-    vec_remove(&space->mmaps, mapping);
-    alloc_free(alloc_global(), mapping);
+    Mmap mapping = vec_at(&space->mmaps, index);
 
-    vmm_flush(space->vmm, mapping->range);
+    vmm_unmap(space->vmm, mapping.range);
+    mem_obj_deref(mapping.object);
+    vec_splice(&space->mmaps, index, 1);
+    vmm_flush(space->vmm, mapping.range);
 }
 
 /* --- Memory Space --------------------------------------------------------- */
@@ -39,7 +38,7 @@ void space_destroy(Space *self)
 {
     for (int i = 0; i < self->mmaps.len; i++)
     {
-        space_mmap_destroy(self, self->mmaps.data[i]);
+        space_mmap_destroy(self, i);
     }
 
     range_alloc_deinit(&self->alloc);
@@ -120,13 +119,13 @@ SpaceResult space_unmap(Space *self, VmmRange range)
 {
     LOCK_RETAINER(&self->lock);
 
-    vec_foreach(mapping, &self->mmaps)
+    for (int i = 0; i < self->mmaps.len; i++)
     {
-        if (mapping->range.base == range.base &&
-            mapping->range.size == range.size)
+        Mmap *mapping = &vec_at(&self->mmaps, i);
+
+        if (range_eq(mapping->range, range))
         {
-            range_alloc_unused(&self->alloc, range$(USizeRange, range));
-            space_mmap_destroy(self, mapping);
+            space_mmap_destroy(self, i);
             return OK(SpaceResult, range);
         }
     }

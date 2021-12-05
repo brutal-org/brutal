@@ -26,7 +26,7 @@ static CType gen_decl_enum(BidType type, Alloc *alloc)
     CType ctype = ctype_enum(alloc);
 
     int i = 0;
-    vec_foreach(member, &type.enum_.members)
+    vec_foreach_v(member, &type.enum_.members)
     {
         ctype_constant(&ctype, member.mangled, cval_signed(i++));
     }
@@ -38,7 +38,7 @@ static CType gen_decl_struct(BidType type, Alloc *alloc)
 {
     CType ctype = ctype_struct(alloc);
 
-    vec_foreach(member, &type.struct_.members)
+    vec_foreach_v(member, &type.struct_.members)
     {
         ctype_member(&ctype, member.name, gen_decl_type(member.type, alloc));
     }
@@ -128,7 +128,7 @@ CUnit bidgen_c_header(MAYBE_UNUSED BidIface const iface, Alloc *alloc)
 
     cunit_include(&unit, true, str$("bal/ipc.h"));
 
-    vec_foreach(alias, &iface.aliases)
+    vec_foreach_v(alias, &iface.aliases)
     {
         cunit_decl(&unit, cdecl_type(alias.mangled, gen_decl_type(alias.type, alloc)));
     }
@@ -137,7 +137,7 @@ CUnit bidgen_c_header(MAYBE_UNUSED BidIface const iface, Alloc *alloc)
     CType msgtype = ctype_enum(alloc);
 
     int i = 0;
-    vec_foreach(method, &iface.methods)
+    vec_foreach_v(method, &iface.methods)
     {
         Str name = case_change_str(CASE_PASCAL, method.mangled, alloc);
         CType type = gen_func_method(method, iface, alloc);
@@ -238,7 +238,7 @@ void gen_pack_body(CStmt *block, BidType type, CExpr path, Alloc *alloc)
 
     case BID_TYPE_STRUCT:
     {
-        vec_foreach(member, &type.struct_.members)
+        vec_foreach_v(member, &type.struct_.members)
         {
             gen_pack_body(block, member.type, cexpr_ref(cexpr_ptr_access(path, cexpr_ident(member.name), alloc), alloc), alloc);
         }
@@ -291,7 +291,7 @@ void gen_unpack_body(CStmt *block, BidType type, CExpr path, Alloc *alloc)
 
     case BID_TYPE_STRUCT:
     {
-        vec_foreach(member, &type.struct_.members)
+        vec_foreach_v(member, &type.struct_.members)
         {
             gen_unpack_body(block, member.type, cexpr_ref(cexpr_ptr_access(path, cexpr_ident(member.name), alloc), alloc), alloc);
         }
@@ -479,7 +479,7 @@ CStmt gen_dispatch_body(BidIface const iface, Alloc *alloc)
 
     CStmt dispatch_body = cstmt_block(alloc);
 
-    vec_foreach(method, &iface.methods)
+    vec_foreach_v(method, &iface.methods)
     {
         CStmt case_body = cstmt_block(alloc);
 
@@ -530,13 +530,13 @@ CUnit bidgen_c_source(MAYBE_UNUSED BidIface const iface, Alloc *alloc)
 
     cunit_include(&unit, false, str_fmt(alloc, "{case:snake}.h", iface.name));
 
-    vec_foreach(alias, &iface.aliases)
+    vec_foreach_v(alias, &iface.aliases)
     {
         cunit_decl(&unit, gen_pack_func(alias, alloc));
         cunit_decl(&unit, gen_unpack_func(alias, alloc));
     }
 
-    vec_foreach(method, &iface.methods)
+    vec_foreach_v(method, &iface.methods)
     {
         CType type = gen_func_method(method, iface, alloc);
         CStmt body = gen_method_body(method, iface, alloc);
