@@ -4,7 +4,12 @@
 #include "init/boot.h"
 #include "init/bus.h"
 
-BbusError bbus_locate_handler(IpcEv *ev, MAYBE_UNUSED BrTask task, Str const *req, uint64_t *resp, MAYBE_UNUSED Alloc *alloc)
+BbusError handle_bbus_locate(
+    IpcEv *ev,
+    MAYBE_UNUSED BrTask task,
+    Str const *req,
+    uint64_t *resp,
+    MAYBE_UNUSED Alloc *alloc)
 {
     Bus *bus = ev->ctx;
     BrId id = bus_lookup(bus, *req);
@@ -21,7 +26,7 @@ BbusError bbus_locate_handler(IpcEv *ev, MAYBE_UNUSED BrTask task, Str const *re
 }
 
 static BbusVTable _bbus_vtable = {
-    .locate = bbus_locate_handler,
+    .locate = handle_bbus_locate,
 };
 
 int br_entry_handover(Handover *handover)

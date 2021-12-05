@@ -34,7 +34,7 @@ void pci_init(Pci *pci, Acpi *acpi, Alloc *alloc)
 
 void pci_deinit(Pci *pci)
 {
-    vec_foreach(group, &pci->groups)
+    vec_foreach_v(group, &pci->groups)
     {
         bal_mem_deinit(&group.mem);
     }
@@ -151,7 +151,7 @@ Iter pci_iter_group(PciGroup *group, PciAddr addr, IterFn fn, void *ctx)
 
 Iter pci_iter(Pci *pci, IterFn fn, void *ctx)
 {
-    vec_foreach(group, &pci->groups)
+    vec_foreach_v(group, &pci->groups)
     {
         if (pci_iter_group(&group, (PciAddr){group.seg, 0, 0, 0}, fn, ctx) == ITER_STOP)
         {
@@ -164,7 +164,7 @@ Iter pci_iter(Pci *pci, IterFn fn, void *ctx)
 
 PciConfig *pci_config(Pci *pci, PciAddr addr)
 {
-    vec_foreach(group, &pci->groups)
+    vec_foreach_v(group, &pci->groups)
     {
         if (group.seg == addr.seg)
         {

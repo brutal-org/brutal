@@ -114,7 +114,7 @@ void range_alloc_unused(RangeAlloc *self, USizeRange range)
 
 void range_alloc_dump(RangeAlloc *self)
 {
-    vec_foreach(range, self)
+    vec_foreach_v(range, self)
     {
         log$("- {p} {p}", range_begin(range), range_end(range));
     }

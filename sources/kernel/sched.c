@@ -178,7 +178,7 @@ Task *sched_peek(void)
 {
     Task *best = nullptr;
 
-    vec_foreach(task, &_tasks)
+    vec_foreach_v(task, &_tasks)
     {
         best = sched_pick(best, task);
     }
@@ -259,7 +259,7 @@ static bool sched_dispatch(Task *task)
 
 static void sched_updated_blocked(void)
 {
-    vec_foreach(task, &_tasks)
+    vec_foreach_v(task, &_tasks)
     {
         if (!task->is_blocked)
         {

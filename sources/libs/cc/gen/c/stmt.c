@@ -32,7 +32,7 @@ void cgen_c_stmt(Emit *emit, CStmt stmt)
         emit_fmt(emit, "{{\n");
         emit_ident(emit);
 
-        vec_foreach(v, &stmt.block_.stmts)
+        vec_foreach_v(v, &stmt.block_.stmts)
         {
             cgen_c_stmt(emit, v);
             if (cgen_c_should_stmt_endline(v.type))

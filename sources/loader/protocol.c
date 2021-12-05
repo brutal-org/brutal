@@ -178,7 +178,7 @@ static void efi_load_module(HandoverModule *target, Str path)
 static void efi_load_modules(LoaderEntry const *entry, HandoverModules *modules)
 {
     int id = 0;
-    vec_foreach(module, &entry->modules)
+    vec_foreach_v(module, &entry->modules)
     {
         HandoverModule *target = &modules->module[id];
 

@@ -33,7 +33,7 @@ void cdump_member(Emit *emit, CTypeMembers const *members)
     emit_fmt(emit, "members:\n");
     emit_ident(emit);
 
-    vec_foreach(member, members)
+    vec_foreach_v(member, members)
     {
         emit_fmt(emit, "member:{}\n", member.name);
         emit_ident(emit);
@@ -189,7 +189,7 @@ void cdump_expr(Emit *emit, CExpr expr)
 
         emit_ident(emit);
 
-        vec_foreach(v, &expr.call_.args)
+        vec_foreach_v(v, &expr.call_.args)
         {
             cdump_expr(emit, v);
         }
@@ -214,7 +214,7 @@ void cdump_expr(Emit *emit, CExpr expr)
         break;
 
     case CEXPR_INITIALIZER:
-        vec_foreach(v, &expr.initializer_.initializer)
+        vec_foreach_v(v, &expr.initializer_.initializer)
         {
             cdump_expr(emit, v);
         }
@@ -252,7 +252,7 @@ void cdump_stmt(Emit *emit, CStmt stmt)
         break;
 
     case CSTMT_BLOCK:
-        vec_foreach(inner, &stmt.block_.stmts)
+        vec_foreach_v(inner, &stmt.block_.stmts)
         {
             cdump_stmt(emit, inner);
         }
@@ -354,7 +354,7 @@ void cdump_unit(Emit *emit, CUnit unit)
     emit_fmt(emit, " cunit:\n");
     emit_ident(emit);
 
-    vec_foreach(entry, &unit.units)
+    vec_foreach_v(entry, &unit.units)
     {
         switch (entry.type)
         {
@@ -382,7 +382,7 @@ void cdump_unit(Emit *emit, CUnit unit)
 
                 emit_fmt(emit, " arg: \n");
 
-                vec_foreach(arg_name, &entry._define.args)
+                vec_foreach_v(arg_name, &entry._define.args)
                 {
                     emit_fmt(emit, " - {}\n", arg_name);
                 }

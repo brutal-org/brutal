@@ -22,16 +22,6 @@
 
 static atomic_int _ready = 0;
 
-void arch_wait_other(void)
-{
-    WAIT_FOR(_ready == cpu_count());
-}
-
-void arch_boot_other(void)
-{
-    smp_boot_other();
-}
-
 void arch_entry_main(Handover *handover)
 {
     cpu_disable_interrupts();
@@ -62,8 +52,8 @@ void arch_entry_main(Handover *handover)
     tasking_initialize();
 
     _ready++;
-    arch_boot_other();
-    arch_wait_other();
+    smp_boot_other();
+    WAIT_FOR(_ready == cpu_count());
 
     cpu_retain_enable();
     cpu_enable_interrupts();
@@ -85,7 +75,7 @@ void arch_entry_other(void)
     syscall_initialize();
 
     _ready++;
-    arch_wait_other();
+    WAIT_FOR(_ready == cpu_count());
 
     cpu_retain_enable();
     cpu_enable_interrupts();

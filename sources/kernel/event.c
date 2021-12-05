@@ -13,15 +13,15 @@ void event_initialize(void)
 
 static EventBinding *event_binding_get(Task const *task, BrEvent event)
 {
-    for (int i = 0; i < _bindings.len; ++i)
+    vec_foreach(binding, &_bindings)
     {
-        EventBinding *binding = _bindings.data + i;
         if (binding->task == task && br_event_eq(binding->event, event))
         {
             return binding;
         }
     }
-    return NULL;
+
+    return nullptr;
 }
 
 BrResult event_bind(Task const *task, BrEvent event)
@@ -100,10 +100,10 @@ void event_trigger(BrEvent event)
 
     vec_foreach(binding, &_bindings)
     {
-        if (br_event_eq(binding.event, event) && binding.ack)
+        if (br_event_eq(binding->event, event) && binding->ack)
         {
-            event_dispatch(binding.task, event);
-            binding.ack = false;
+            event_dispatch(binding->task, event);
+            binding->ack = false;
         }
     }
 }

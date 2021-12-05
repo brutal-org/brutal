@@ -83,7 +83,7 @@ bool lex_skip_type(Lex *lex, LexemeType type)
 
 void lex_dump(Lex *self, LexToStrFn fn)
 {
-    vec_foreach(l, &self->lexemes)
+    vec_foreach_v(l, &self->lexemes)
     {
         log$("({case:param} {})", fn(l.type), l.str);
     }

@@ -55,7 +55,7 @@ static void *req_dispatch(IpcEv *self)
             {
                 log$("No pending IpcJob, looking for a protocol to handle it...");
 
-                vec_foreach(proto, &self->protos)
+                vec_foreach_v(proto, &self->protos)
                 {
                     if (proto.id == ipc.msg.prot)
                     {

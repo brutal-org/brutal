@@ -30,7 +30,7 @@ static BidType prefix_type(BidType type, BidIface iface, Alloc *alloc)
     {
         prefixed = bid_enum(alloc);
 
-        vec_foreach(membr, &type.enum_.members)
+        vec_foreach_v(membr, &type.enum_.members)
         {
             Str mangled = str_fmt(alloc, "{case:constant}_{case:constant}", iface.name, membr.name);
             bid_enum_constant_mangled(&prefixed, membr.name, mangled);
@@ -43,7 +43,7 @@ static BidType prefix_type(BidType type, BidIface iface, Alloc *alloc)
     {
         prefixed = bid_struct(alloc);
 
-        vec_foreach(membr, &type.struct_.members)
+        vec_foreach_v(membr, &type.struct_.members)
         {
             bid_struct_member(&prefixed, membr.name, prefix_type(membr.type, iface, alloc));
         }
@@ -71,13 +71,13 @@ BidIface bid_pass_prefix(BidIface iface, Alloc *alloc)
     bid_alias_mangled(&prefixed, str$("Error"), error_name, prefix_type(iface.errors, iface, alloc));
     prefixed.errors = bid_primitive_mangled(str$("Error"), error_name);
 
-    vec_foreach(alias, &iface.aliases)
+    vec_foreach_v(alias, &iface.aliases)
     {
         Str name = str_fmt(alloc, "{case:pascal}{case:pascal}", iface.name, alias.name);
         bid_alias_mangled(&prefixed, alias.name, name, prefix_type(alias.type, iface, alloc));
     }
 
-    vec_foreach(methods, &iface.methods)
+    vec_foreach_v(methods, &iface.methods)
     {
         Str name = str_fmt(alloc, "{case:snake}_{case:snake}", iface.name, methods.name);
 

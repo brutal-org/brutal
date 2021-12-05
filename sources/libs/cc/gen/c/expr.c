@@ -62,7 +62,7 @@ static void cgen_c_expr_pre(Emit *emit, CExpr expr, int parent_pre)
         cgen_c_expr_pre(emit, *expr.call_.expr, pre);
         emit_fmt(emit, "(");
         bool first = true;
-        vec_foreach(v, &expr.call_.args)
+        vec_foreach_v(v, &expr.call_.args)
         {
             if (first)
             {
@@ -97,7 +97,7 @@ static void cgen_c_expr_pre(Emit *emit, CExpr expr, int parent_pre)
         emit_fmt(emit, "{{\n");
         emit_ident(emit);
 
-        vec_foreach(v, &expr.initializer_.initializer)
+        vec_foreach_v(v, &expr.initializer_.initializer)
         {
             cgen_c_expr_pre(emit, v, CEXPR_MAX_PRECEDENCE);
             emit_fmt(emit, ",\n");

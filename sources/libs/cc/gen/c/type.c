@@ -85,7 +85,7 @@ void cgen_c_type_start(Emit *emit, CType type)
         emit_fmt(emit, "\n{{\n");
         emit_ident(emit);
 
-        vec_foreach(v, &type.struct_.members)
+        vec_foreach_v(v, &type.struct_.members)
         {
             cgen_c_member(emit, v);
             emit_fmt(emit, ";\n");
@@ -106,7 +106,7 @@ void cgen_c_type_start(Emit *emit, CType type)
         emit_fmt(emit, "\n{{\n");
         emit_ident(emit);
 
-        vec_foreach(v, &type.enum_.constants)
+        vec_foreach_v(v, &type.enum_.constants)
         {
             cgen_c_constant(emit, v);
             emit_fmt(emit, ",\n");
@@ -144,7 +144,7 @@ void cgen_c_type_end(Emit *emit, CType type)
         emit_fmt(emit, "(");
 
         bool first = true;
-        vec_foreach(v, &type.func_.params)
+        vec_foreach_v(v, &type.func_.params)
         {
             if (!first)
             {
