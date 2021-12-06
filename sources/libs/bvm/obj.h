@@ -2,6 +2,9 @@
 
 #include <brutal/ds.h>
 
+typedef struct bvm Bvm;
+typedef struct bvm_frame BvmFrame;
+
 typedef enum bvm_val_type BvmValType;
 typedef struct bvm_val BvmVal;
 
@@ -13,14 +16,11 @@ typedef struct bvm_obj BvmObj;
 
 typedef struct bvm_sig BvmSig;
 
-typedef enum bvm_func_type BvmFuncType;
 typedef struct bvm_func BvmFunc;
 
 enum bvm_val_type
 {
     BVM_VAL_NIL,
-
-    BVM_VAL_BOOL,
 
     BVM_VAL_ISIZE,
     BVM_VAL_USIZE,
@@ -49,8 +49,6 @@ struct bvm_val
 
     union
     {
-        bool bool_;
-
         int8_t i8_;
         uint8_t u8_;
         int16_t i16_;
@@ -65,7 +63,6 @@ struct bvm_val
 
         BvmObj *obj_;
         BvmFunc *func_;
-
         BvmType *type_;
     };
 };
@@ -102,14 +99,7 @@ struct bvm_sig
 {
     BvmType *ret;
     Vec(BvmType *) args;
-};
-
-enum bvm_func_type
-{
-    BVM_FUNC_TYPE_NIL,
-
-    BVM_FUNC_TYPE_NATIVE,
-    BVM_FUNC_TYPE_MANAGED,
+    bool variadic;
 };
 
 struct bvm_func
@@ -120,6 +110,10 @@ struct bvm_func
     union
     {
         BvmVal (*native_)(Bvm *vm, BvmFrame *frame);
-        uintptr_t managed_;
+        struct
+        {
+            uintptr_t entry;
+            size_t size;
+        } managed_;
     };
 };

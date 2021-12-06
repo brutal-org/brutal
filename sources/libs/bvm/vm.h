@@ -18,6 +18,7 @@ typedef enum
 
     BVM_OP_CALL,
     BVM_OP_RET,
+    BVM_OP_YIELD,
     BVM_OP_HALT,
 
     BVM_OP_JMP,
@@ -48,7 +49,13 @@ typedef enum
     BVM_OP_BNOT,
 
     BVM_OP_NEW,
+
+    __BVM_OP_COUNT,
+
+    __BVM_OP_MAX = 0xff,
 } BvmOp;
+
+static_assert(__BVM_OP_COUNT <= __BVM_OP_MAX);
 
 typedef struct bvm
 {

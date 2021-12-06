@@ -29,10 +29,10 @@ void bvm_stack_push(BvmStack *stack, BvmVal val);
 
 BvmVal bvm_stack_pop(BvmStack *stack);
 
-void bvm_stack_call(BvmStack *stack, int args);
+BvmFrame *bvm_stack_call(BvmStack *stack, uintptr_t ret, int narg);
 
-void bvm_stack_ret(BvmStack *stack);
+uintptr_t bvm_stack_ret(BvmStack *stack, int nret);
 
 BvmVal bvm_stack_load(BvmStack *stack, int index);
 
-void bvm_stack_store(BvmStack *stack, int index);
+void bvm_stack_store(BvmStack *stack, int index, BvmVal val);
