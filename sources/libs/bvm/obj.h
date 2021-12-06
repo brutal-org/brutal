@@ -8,7 +8,7 @@ typedef struct bvm_val BvmVal;
 typedef struct bvm_field BvmField;
 typedef struct bvm_method BvmMethod;
 
-typedef struct bvm_class BvmClass;
+typedef struct bvm_type BvmType;
 typedef struct bvm_obj BvmObj;
 
 typedef struct bvm_sig BvmSig;
@@ -39,7 +39,7 @@ enum bvm_val_type
 
     BVM_VAL_OBJ,
     BVM_VAL_FUNC,
-    BVM_VAL_CLASS,
+    BVM_VAL_TYPE,
     BVM_VAL_SIGN,
 };
 
@@ -66,14 +66,14 @@ struct bvm_val
         BvmObj *obj_;
         BvmFunc *func_;
 
-        BvmClass *class_;
+        BvmType *type_;
     };
 };
 
 struct bvm_field
 {
     Str name;
-    BvmClass *class_;
+    BvmType *type_;
 };
 
 struct bvm_method
@@ -82,10 +82,11 @@ struct bvm_method
     BvmSig *sig;
 };
 
-struct bvm_class
+struct bvm_type
 {
     Str name;
-    BvmClass *super;
+
+    Vec(BvmType) extends;
     Vec(BvmField) fields;
     Vec(BvmMethod) methods;
 };
@@ -93,14 +94,14 @@ struct bvm_class
 struct bvm_obj
 {
     uint64_t gen;
-    BvmClass *class;
+    BvmType *type;
     Vec(BvmField) fields;
 };
 
 struct bvm_sig
 {
-    BvmClass *ret;
-    Vec(BvmClass *) args;
+    BvmType *ret;
+    Vec(BvmType *) args;
 };
 
 enum bvm_func_type
@@ -118,6 +119,7 @@ struct bvm_func
 
     union
     {
-        BvmVal (*native_)(BvmVal *ctx, BvmVal *args, size_t count);
+        BvmVal (*native_)(Bvm *vm, BvmFrame *frame);
+        uintptr_t managed_;
     };
 };
