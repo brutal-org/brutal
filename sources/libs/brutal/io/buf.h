@@ -22,6 +22,10 @@ void buf_clear(Buf *self);
 
 void buf_push_impl(Buf *self, uint8_t const *data, size_t size);
 
+uint8_t buf_load_u8(Buf *self, size_t off);
+
+void buf_store_u8(Buf *self, size_t off, uint8_t val);
+
 Str buf_str(Buf *self);
 
 #define buf_putc(SELF, CHR) \
