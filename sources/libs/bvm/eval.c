@@ -1,12 +1,19 @@
 #include <brutal/debug.h>
-#include <bvm/bvm.h>
+#include <bvm/eval.h>
 #include <math.h>
+
+BvmVal bvm_call(BvmLocal *local, BvmMem *mem, BvmFunc *func, int argc)
+{
+    bvm_local_call(local, func, argc);
+
+    while (bvm_eval(local, mem) == BVM_RES_RUN)
+        ;
+    return bvm_local_pop(local);
+}
 
 BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
 {
     BvmInstr instr = bvm_local_ifetch(local);
-
-    log$("{}:{x}(u:{08x}, s:{08x})", bvm_op_str(instr.opcode), instr.opcode, load_le(instr.uarg), load_le(instr.iarg));
 
     switch (instr.opcode)
     {
@@ -14,15 +21,15 @@ BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
         break;
 
     case BVM_OP_LOADG:
-        bvm_local_push(local, bvm_mem_load(mem, load_le(instr.uarg)));
+        bvm_local_push(local, bvm_mem_load(mem, instr.uarg));
         break;
 
     case BVM_OP_LOADL:
-        bvm_local_push(local, bvm_local_load_var(local, load_le(instr.uarg)));
+        bvm_local_push(local, bvm_local_load_var(local, instr.uarg));
         break;
 
     case BVM_OP_LOADA:
-        bvm_local_push(local, bvm_local_load_arg(local, load_le(instr.uarg)));
+        bvm_local_push(local, bvm_local_load_arg(local, instr.uarg));
         break;
 
     case BVM_OP_LOADO:
@@ -30,7 +37,7 @@ BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
             local,
             bvm_val_load(
                 bvm_local_pop(local),
-                load_le(instr.uarg)));
+                instr.uarg));
         break;
 
     case BVM_OP_LOADV:
@@ -38,19 +45,19 @@ BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
             local,
             bvm_val_loadv(
                 bvm_local_pop(local),
-                load_le(instr.uarg)));
+                instr.uarg));
         break;
 
     case BVM_OP_STOREG:
-        bvm_mem_store(mem, load_le(instr.uarg), bvm_local_pop(local));
+        bvm_mem_store(mem, instr.uarg, bvm_local_pop(local));
         break;
 
     case BVM_OP_STOREL:
-        bvm_local_store_var(local, load_le(instr.uarg), bvm_local_pop(local));
+        bvm_local_store_var(local, instr.uarg, bvm_local_pop(local));
         break;
 
     case BVM_OP_STOREA:
-        bvm_local_store_arg(local, load_le(instr.uarg), bvm_local_pop(local));
+        bvm_local_store_arg(local, instr.uarg, bvm_local_pop(local));
         break;
 
     case BVM_OP_STOREO:
@@ -58,10 +65,7 @@ BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
         BvmVal obj = bvm_local_pop(local);
         BvmVal val = bvm_local_pop(local);
 
-        bvm_val_store(
-            obj,
-            load_le(instr.uarg),
-            val);
+        bvm_val_store(obj, instr.uarg, val);
         break;
     }
 
@@ -70,10 +74,31 @@ BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
         BvmVal val = bvm_local_pop(local);
         BvmVal obj = bvm_local_pop(local);
 
-        bvm_val_storev(
-            obj,
-            load_le(instr.uarg),
-            val);
+        bvm_val_storev(obj, instr.uarg, val);
+        break;
+    }
+
+    case BVM_OP_PUSHI:
+    {
+        bvm_local_push(local, bvm_val_int(instr.iarg));
+        break;
+    }
+
+    case BVM_OP_PUSHU:
+    {
+        bvm_local_push(local, bvm_val_uint(instr.uarg));
+        break;
+    }
+
+    case BVM_OP_PUSHF:
+    {
+        bvm_local_push(local, bvm_val_uint(instr.farg));
+        break;
+    }
+
+    case BVM_OP_PUSHN:
+    {
+        bvm_local_push(local, bvm_val_nil());
         break;
     }
 
@@ -92,7 +117,7 @@ BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
     case BVM_OP_CALL:
     {
         BvmVal val = bvm_local_pop(local);
-        bvm_local_call(local, val.func_, load_le(instr.uarg));
+        bvm_local_call(local, val.func_, instr.uarg);
 
         if (val.func_->native)
         {
@@ -117,8 +142,7 @@ BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
 
     case BVM_OP_RET:
     {
-        bvm_local_ret(local, bvm_local_pop(local));
-        break;
+        return bvm_local_ret(local, bvm_local_pop(local));
     }
 
     case BVM_OP_ARGC:
@@ -131,68 +155,34 @@ BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
         return BVM_RES_HALT;
 
     case BVM_OP_JMP:
-        bvm_local_jump(local, load_le(instr.iarg));
+        bvm_local_jump(local, instr.iarg);
         break;
 
-    case BVM_OP_JEQ:
+    case BVM_OP_JMPF:
     {
         BvmVal val = bvm_local_pop(local);
 
-        if (val.int_ == 0)
+        if (!bvm_val_truthy(val))
         {
-            bvm_local_jump(local, load_le(instr.iarg));
+            bvm_local_jump(local, instr.iarg);
         }
         break;
     }
 
-    case BVM_OP_JGT:
+    case BVM_OP_EQ:
     {
-        BvmVal val = bvm_local_pop(local);
+        BvmVal rhs = bvm_local_pop(local);
+        BvmVal lhs = bvm_local_pop(local);
 
-        if (val.int_ > 0)
-        {
-            bvm_local_jump(local, load_le(instr.iarg));
-        }
-        break;
-    }
+        bvm_local_push(local, bvm_val_int(lhs.uint_ == rhs.uint_));
 
-    case BVM_OP_JLT:
-    {
-        BvmVal val = bvm_local_pop(local);
-
-        if (val.int_ < 0)
-        {
-            bvm_local_jump(local, load_le(instr.iarg));
-        }
-        break;
-    }
-
-    case BVM_OP_JGTEQ:
-    {
-        BvmVal val = bvm_local_pop(local);
-
-        if (val.int_ >= 0)
-        {
-            bvm_local_jump(local, load_le(instr.iarg));
-        }
-        break;
-    }
-
-    case BVM_OP_JLTEQ:
-    {
-        BvmVal val = bvm_local_pop(local);
-
-        if (val.int_ <= 0)
-        {
-            bvm_local_jump(local, load_le(instr.iarg));
-        }
         break;
     }
 
     case BVM_OP_ADDI:
     {
-        BvmVal lhs = bvm_local_pop(local);
         BvmVal rhs = bvm_local_pop(local);
+        BvmVal lhs = bvm_local_pop(local);
 
         bvm_local_push(local, bvm_val_int(lhs.int_ + rhs.int_));
         break;
@@ -200,8 +190,8 @@ BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
 
     case BVM_OP_SUBI:
     {
-        BvmVal lhs = bvm_local_pop(local);
         BvmVal rhs = bvm_local_pop(local);
+        BvmVal lhs = bvm_local_pop(local);
 
         bvm_local_push(local, bvm_val_int(lhs.int_ - rhs.int_));
         break;
@@ -209,8 +199,8 @@ BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
 
     case BVM_OP_DIVI:
     {
-        BvmVal lhs = bvm_local_pop(local);
         BvmVal rhs = bvm_local_pop(local);
+        BvmVal lhs = bvm_local_pop(local);
 
         bvm_local_push(local, bvm_val_int(lhs.int_ / rhs.int_));
         break;
@@ -218,8 +208,8 @@ BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
 
     case BVM_OP_MULI:
     {
-        BvmVal lhs = bvm_local_pop(local);
         BvmVal rhs = bvm_local_pop(local);
+        BvmVal lhs = bvm_local_pop(local);
 
         bvm_local_push(local, bvm_val_int(lhs.int_ * rhs.int_));
         break;
@@ -227,8 +217,8 @@ BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
 
     case BVM_OP_MODI:
     {
-        BvmVal lhs = bvm_local_pop(local);
         BvmVal rhs = bvm_local_pop(local);
+        BvmVal lhs = bvm_local_pop(local);
 
         bvm_local_push(local, bvm_val_int(lhs.int_ % rhs.int_));
         break;
@@ -242,30 +232,28 @@ BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
         break;
     }
 
-    case BVM_OP_CMPI:
+    case BVM_OP_GTI:
     {
-        BvmVal lhs = bvm_local_pop(local);
         BvmVal rhs = bvm_local_pop(local);
+        BvmVal lhs = bvm_local_pop(local);
 
-        if (lhs.int_ > rhs.int_)
-        {
-            bvm_local_push(local, bvm_val_int(1));
-        }
-        else if (lhs.int_ < rhs.int_)
-        {
-            bvm_local_push(local, bvm_val_int(-1));
-        }
-        else
-        {
-            bvm_local_push(local, bvm_val_int(0));
-        }
+        bvm_local_push(local, bvm_val_int(lhs.int_ > rhs.int_));
+        break;
+    }
+
+    case BVM_OP_GTEQI:
+    {
+        BvmVal rhs = bvm_local_pop(local);
+        BvmVal lhs = bvm_local_pop(local);
+
+        bvm_local_push(local, bvm_val_int(lhs.int_ >= rhs.int_));
         break;
     }
 
     case BVM_OP_ADDU:
     {
-        BvmVal lhs = bvm_local_pop(local);
         BvmVal rhs = bvm_local_pop(local);
+        BvmVal lhs = bvm_local_pop(local);
 
         bvm_local_push(local, bvm_val_uint(lhs.uint_ + rhs.uint_));
         break;
@@ -273,8 +261,8 @@ BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
 
     case BVM_OP_SUBU:
     {
-        BvmVal lhs = bvm_local_pop(local);
         BvmVal rhs = bvm_local_pop(local);
+        BvmVal lhs = bvm_local_pop(local);
 
         bvm_local_push(local, bvm_val_uint(lhs.uint_ - rhs.uint_));
         break;
@@ -282,8 +270,8 @@ BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
 
     case BVM_OP_DIVU:
     {
-        BvmVal lhs = bvm_local_pop(local);
         BvmVal rhs = bvm_local_pop(local);
+        BvmVal lhs = bvm_local_pop(local);
 
         bvm_local_push(local, bvm_val_uint(lhs.uint_ / rhs.uint_));
         break;
@@ -291,8 +279,8 @@ BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
 
     case BVM_OP_MULU:
     {
-        BvmVal lhs = bvm_local_pop(local);
         BvmVal rhs = bvm_local_pop(local);
+        BvmVal lhs = bvm_local_pop(local);
 
         bvm_local_push(local, bvm_val_uint(lhs.uint_ * rhs.uint_));
         break;
@@ -300,8 +288,8 @@ BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
 
     case BVM_OP_MODU:
     {
-        BvmVal lhs = bvm_local_pop(local);
         BvmVal rhs = bvm_local_pop(local);
+        BvmVal lhs = bvm_local_pop(local);
 
         bvm_local_push(local, bvm_val_uint(lhs.uint_ % rhs.uint_));
         break;
@@ -315,30 +303,28 @@ BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
         break;
     }
 
-    case BVM_OP_CMPU:
+    case BVM_OP_GTU:
     {
-        BvmVal lhs = bvm_local_pop(local);
         BvmVal rhs = bvm_local_pop(local);
+        BvmVal lhs = bvm_local_pop(local);
 
-        if (lhs.uint_ > rhs.uint_)
-        {
-            bvm_local_push(local, bvm_val_int(1));
-        }
-        else if (lhs.uint_ < rhs.uint_)
-        {
-            bvm_local_push(local, bvm_val_int(-1));
-        }
-        else
-        {
-            bvm_local_push(local, bvm_val_int(0));
-        }
+        bvm_local_push(local, bvm_val_int(lhs.uint_ > rhs.uint_));
+        break;
+    }
+
+    case BVM_OP_GTEQU:
+    {
+        BvmVal rhs = bvm_local_pop(local);
+        BvmVal lhs = bvm_local_pop(local);
+
+        bvm_local_push(local, bvm_val_int(lhs.uint_ >= rhs.uint_));
         break;
     }
 
     case BVM_OP_ADDN:
     {
-        BvmVal lhs = bvm_local_pop(local);
         BvmVal rhs = bvm_local_pop(local);
+        BvmVal lhs = bvm_local_pop(local);
 
         bvm_local_push(local, bvm_val_num(lhs.num_ + rhs.num_));
         break;
@@ -346,8 +332,8 @@ BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
 
     case BVM_OP_SUBN:
     {
-        BvmVal lhs = bvm_local_pop(local);
         BvmVal rhs = bvm_local_pop(local);
+        BvmVal lhs = bvm_local_pop(local);
 
         bvm_local_push(local, bvm_val_num(lhs.num_ - rhs.num_));
         break;
@@ -355,8 +341,8 @@ BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
 
     case BVM_OP_DIVN:
     {
-        BvmVal lhs = bvm_local_pop(local);
         BvmVal rhs = bvm_local_pop(local);
+        BvmVal lhs = bvm_local_pop(local);
 
         bvm_local_push(local, bvm_val_num(lhs.num_ / rhs.num_));
         break;
@@ -364,8 +350,8 @@ BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
 
     case BVM_OP_MULN:
     {
-        BvmVal lhs = bvm_local_pop(local);
         BvmVal rhs = bvm_local_pop(local);
+        BvmVal lhs = bvm_local_pop(local);
 
         bvm_local_push(local, bvm_val_num(lhs.num_ * rhs.num_));
         break;
@@ -373,8 +359,8 @@ BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
 
     case BVM_OP_MODN:
     {
-        BvmVal lhs = bvm_local_pop(local);
         BvmVal rhs = bvm_local_pop(local);
+        BvmVal lhs = bvm_local_pop(local);
 
         bvm_local_push(local, bvm_val_num(fmod(lhs.num_, rhs.num_)));
         break;
@@ -388,23 +374,21 @@ BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
         break;
     }
 
-    case BVM_OP_CMPN:
+    case BVM_OP_GTN:
     {
-        BvmVal lhs = bvm_local_pop(local);
         BvmVal rhs = bvm_local_pop(local);
+        BvmVal lhs = bvm_local_pop(local);
 
-        if (lhs.num_ > rhs.num_)
-        {
-            bvm_local_push(local, bvm_val_int(1));
-        }
-        else if (lhs.num_ < rhs.num_)
-        {
-            bvm_local_push(local, bvm_val_int(-1));
-        }
-        else
-        {
-            bvm_local_push(local, bvm_val_int(0));
-        }
+        bvm_local_push(local, bvm_val_int(lhs.num_ > rhs.num_));
+        break;
+    }
+
+    case BVM_OP_GTEQN:
+    {
+        BvmVal rhs = bvm_local_pop(local);
+        BvmVal lhs = bvm_local_pop(local);
+
+        bvm_local_push(local, bvm_val_int(lhs.num_ >= rhs.num_));
         break;
     }
 
@@ -482,8 +466,8 @@ BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
 
     case BVM_OP_AND:
     {
-        BvmVal lhs = bvm_local_pop(local);
         BvmVal rhs = bvm_local_pop(local);
+        BvmVal lhs = bvm_local_pop(local);
 
         bvm_local_push(local, bvm_val_int(bvm_val_truthy(lhs) && bvm_val_truthy(rhs)));
         break;
@@ -491,8 +475,8 @@ BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
 
     case BVM_OP_OR:
     {
-        BvmVal lhs = bvm_local_pop(local);
         BvmVal rhs = bvm_local_pop(local);
+        BvmVal lhs = bvm_local_pop(local);
 
         bvm_local_push(local, bvm_val_int(bvm_val_truthy(lhs) || bvm_val_truthy(rhs)));
         break;
@@ -508,8 +492,8 @@ BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
 
     case BVM_OP_LSHIFT:
     {
-        BvmVal lhs = bvm_local_pop(local);
         BvmVal rhs = bvm_local_pop(local);
+        BvmVal lhs = bvm_local_pop(local);
 
         bvm_local_push(local, bvm_val_uint(lhs.uint_ << rhs.uint_));
         break;
@@ -517,8 +501,8 @@ BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
 
     case BVM_OP_RSHIFT:
     {
-        BvmVal lhs = bvm_local_pop(local);
         BvmVal rhs = bvm_local_pop(local);
+        BvmVal lhs = bvm_local_pop(local);
 
         bvm_local_push(local, bvm_val_uint(lhs.uint_ >> rhs.uint_));
         break;
@@ -526,8 +510,8 @@ BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
 
     case BVM_OP_BAND:
     {
-        BvmVal lhs = bvm_local_pop(local);
         BvmVal rhs = bvm_local_pop(local);
+        BvmVal lhs = bvm_local_pop(local);
 
         bvm_local_push(local, bvm_val_uint(lhs.uint_ & rhs.uint_));
         break;
@@ -535,8 +519,8 @@ BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
 
     case BVM_OP_BOR:
     {
-        BvmVal lhs = bvm_local_pop(local);
         BvmVal rhs = bvm_local_pop(local);
+        BvmVal lhs = bvm_local_pop(local);
 
         bvm_local_push(local, bvm_val_uint(lhs.uint_ | rhs.uint_));
         break;
@@ -544,8 +528,8 @@ BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
 
     case BVM_OP_BXOR:
     {
-        BvmVal lhs = bvm_local_pop(local);
         BvmVal rhs = bvm_local_pop(local);
+        BvmVal lhs = bvm_local_pop(local);
 
         bvm_local_push(local, bvm_val_uint(lhs.uint_ ^ rhs.uint_));
         break;

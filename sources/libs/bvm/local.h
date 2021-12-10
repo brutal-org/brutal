@@ -1,5 +1,6 @@
 #pragma once
 
+#include <bvm/base.h>
 #include <bvm/mem.h>
 
 typedef struct bvm_frame
@@ -39,7 +40,7 @@ BvmVal bvm_local_pop(BvmLocal *self);
 
 BvmFrame *bvm_local_call(BvmLocal *self, BvmFunc *func, int argc);
 
-void bvm_local_ret(BvmLocal *self, BvmVal val);
+BvmRes bvm_local_ret(BvmLocal *self, BvmVal val);
 
 BvmVal bvm_local_load_var(BvmLocal *self, int index);
 
@@ -51,6 +52,8 @@ void bvm_local_store_arg(BvmLocal *self, int index, BvmVal val);
 
 BvmInstr bvm_local_ifetch(BvmLocal *self);
 
-void bvm_local_jump(BvmLocal *self, int offset);
+void bvm_local_jump(BvmLocal *self, uint64_t addr);
 
 void bvm_local_dump(BvmLocal *self);
+
+void bvm_local_dump(BvmLocal* self);

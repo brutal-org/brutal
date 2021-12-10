@@ -17,6 +17,10 @@
     ITER(STOREO)       \
     ITER(STOREV)       \
                        \
+    ITER(PUSHI)        \
+    ITER(PUSHU)        \
+    ITER(PUSHF)        \
+    ITER(PUSHN)        \
     ITER(DUP)          \
     ITER(POP)          \
                        \
@@ -27,11 +31,9 @@
     ITER(HALT)         \
                        \
     ITER(JMP)          \
-    ITER(JEQ)          \
-    ITER(JGT)          \
-    ITER(JLT)          \
-    ITER(JGTEQ)        \
-    ITER(JLTEQ)        \
+    ITER(JMPF)         \
+                       \
+    ITER(EQ)           \
                        \
     ITER(ADDI)         \
     ITER(SUBI)         \
@@ -39,7 +41,9 @@
     ITER(MULI)         \
     ITER(MODI)         \
     ITER(NEGI)         \
-    ITER(CMPI)         \
+                       \
+    ITER(GTI)          \
+    ITER(GTEQI)        \
                        \
     ITER(ADDU)         \
     ITER(SUBU)         \
@@ -47,7 +51,9 @@
     ITER(MULU)         \
     ITER(MODU)         \
     ITER(NEGU)         \
-    ITER(CMPU)         \
+                       \
+    ITER(GTU)          \
+    ITER(GTEQU)        \
                        \
     ITER(ADDN)         \
     ITER(SUBN)         \
@@ -55,7 +61,9 @@
     ITER(MULN)         \
     ITER(MODN)         \
     ITER(NEGN)         \
-    ITER(CMPN)         \
+                       \
+    ITER(GTN)          \
+    ITER(GTEQN)        \
                        \
     ITER(I2U)          \
     ITER(I2N)          \
@@ -107,11 +115,10 @@ typedef struct ALIGNED(4)
 
     union
     {
-        le_uint16_t uarg;
-        le_int16_t iarg;
+        uint64_t uarg;
+        int64_t iarg;
+        double farg;
     };
 } BvmInstr;
-
-static_assert(sizeof(BvmInstr) == 4);
 
 Str bvm_op_str(BvmOp op);

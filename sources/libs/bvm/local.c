@@ -25,9 +25,8 @@ void bvm_local_push(BvmLocal *self, BvmVal val)
 
 BvmVal bvm_local_pop(BvmLocal *self)
 {
-    BvmVal val = *self->stack_top;
     self->stack_top--;
-    return val;
+    return *self->stack_top;
 }
 
 BvmFrame *bvm_local_call(BvmLocal *self, BvmFunc *func, int argc)
@@ -58,16 +57,32 @@ BvmFrame *bvm_local_call(BvmLocal *self, BvmFunc *func, int argc)
     {
         frame->vars = self->stack_top + func->managed_.locals;
         frame->varc = func->managed_.locals;
+
+        for (size_t i = 0; i < frame->varc; i++)
+        {
+            frame->vars[i] = bvm_val_nil();
+        }
     }
 
     return frame;
 }
 
-void bvm_local_ret(BvmLocal *self, BvmVal val)
+BvmRes bvm_local_ret(BvmLocal *self, BvmVal val)
 {
     self->stack_top = self->frame->args;
-    self->frame--;
+
     bvm_local_push(self, val);
+
+    if (self->frame_curr == self->frame)
+    {
+        self->frame_curr = nullptr;
+        return BVM_RES_RET;
+    }
+    else
+    {
+        self->frame_curr--;
+        return BVM_RES_RUN;
+    }
 }
 
 BvmVal bvm_local_load_var(BvmLocal *self, int index)
@@ -94,11 +109,34 @@ BvmInstr bvm_local_ifetch(BvmLocal *self)
 {
     BvmFrame *frame = self->frame_curr;
     BvmInstr instr = vec_at(&frame->func->managed_.code, frame->ip);
+    // log$("IP={}, {} U:{08x}, S:{08x}", frame->ip, bvm_op_str(instr.opcode), instr.uarg, instr.iarg);
+
     frame->ip++;
+
     return instr;
 }
 
-void bvm_local_jump(BvmLocal *self, int offset)
+void bvm_local_jump(BvmLocal *self, uint64_t addr)
 {
-    self->frame_curr->ip += offset;
+    self->frame_curr->ip = addr;
+}
+
+void bvm_local_dump(BvmLocal *self)
+{
+    BvmFrame *frame = self->frame;
+
+    for (size_t i = 0; i < frame->argc; i++)
+    {
+        log$("ARG[{}]={}", i, frame->args[i].uint_);
+    }
+
+    for (size_t i = 0; i < frame->varc; i++)
+    {
+        log$("VAR[{}]={}", i, frame->vars[i].uint_);
+    }
+
+    for (BvmVal *s = self->stack_top; s >= frame->args + frame->argc; s--)
+    {
+        log$("- {}", s->uint_);
+    }
 }
