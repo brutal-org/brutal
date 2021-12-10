@@ -16,8 +16,12 @@ BvmFunc *bvm_func_create(BvmSig *sig, Alloc *alloc);
 
 int bvm_func_local(BvmFunc *self);
 
-void bvm_func_emit(BvmFunc *self, BvmOp op);
+uint64_t bvm_func_emit(BvmFunc *self, BvmOp op);
 
-void bvm_func_emitu(BvmFunc *self, BvmOp op, uint64_t u);
+uint64_t bvm_func_emitu(BvmFunc *self, BvmOp op, uint64_t u);
 
-void bvm_func_emiti(BvmFunc *self, BvmOp op, int64_t i);
+uint64_t bvm_func_emiti(BvmFunc *self, BvmOp op, int64_t i);
+
+uint64_t bvm_func_emitn(BvmFunc *self, BvmOp op, double n);
+
+void bvm_func_jump(BvmFunc *self, uint64_t addr, uint64_t dest);

@@ -58,20 +58,39 @@ int bvm_func_local(BvmFunc *self)
     return self->managed_.locals++;
 }
 
-void bvm_func_emit(BvmFunc *self, BvmOp op)
+uint64_t bvm_func_emit(BvmFunc *self, BvmOp op)
 {
-    BvmInstr instr = {.opcode = op, .iarg = le$(le_int16_t, 0)};
+    uint64_t addr = self->managed_.code.len;
+    BvmInstr instr = {.opcode = op, .iarg = 0};
     vec_push(&self->managed_.code, instr);
+    return addr;
 }
 
-void bvm_func_emitu(BvmFunc *self, BvmOp op, uint64_t u)
+uint64_t bvm_func_emitu(BvmFunc *self, BvmOp op, uint64_t u)
 {
-    BvmInstr instr = {.opcode = op, .uarg = le$(le_uint16_t, u)};
+    uint64_t addr = self->managed_.code.len;
+    BvmInstr instr = {.opcode = op, .uarg = u};
     vec_push(&self->managed_.code, instr);
+    return addr;
 }
 
-void bvm_func_emiti(BvmFunc *self, BvmOp op, int64_t i)
+uint64_t bvm_func_emiti(BvmFunc *self, BvmOp op, int64_t i)
 {
-    BvmInstr instr = {.opcode = op, .iarg = le$(le_int16_t, i)};
+    uint64_t addr = self->managed_.code.len;
+    BvmInstr instr = {.opcode = op, .iarg = i};
     vec_push(&self->managed_.code, instr);
+    return addr;
+}
+
+uint64_t bvm_func_emitn(BvmFunc *self, BvmOp op, double n)
+{
+    uint64_t addr = self->managed_.code.len;
+    BvmInstr instr = {.opcode = op, .farg = n};
+    vec_push(&self->managed_.code, instr);
+    return addr;
+}
+
+void bvm_func_jump(BvmFunc *self, uint64_t addr, uint64_t dest)
+{
+    vec_at(&self->managed_.code, addr).uarg = dest;
 }
