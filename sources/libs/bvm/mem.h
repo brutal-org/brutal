@@ -12,7 +12,6 @@ typedef struct
 typedef struct bvm_mem
 {
     Alloc *alloc;
-    Vec(BvmInstr) code;
     Vec(BvmSym) data;
 } BvmMem;
 
@@ -24,4 +23,8 @@ BvmVal bvm_mem_load(BvmMem *self, int index);
 
 void bvm_mem_store(BvmMem *self, int index, BvmVal val);
 
-BvmInstr bvm_mem_ifetch(BvmMem *self, size_t ip);
+int bvm_mem_add(BvmMem *self, Str name, BvmVal val);
+
+BvmVal bvm_mem_new(BvmMem *self, BvmType *type);
+
+BvmVal bvm_mem_new_native(BvmMem *self, BvmType *type, void *data, size_t size);
