@@ -58,8 +58,10 @@
     LEXEME(COMMA)               \
     LEXEME(LCHEVRON)            \
     LEXEME(RCHEVRON)            \
-    LEXEME(LCHEVRONCHEVRON)     \
-    LEXEME(RCHEVRONCHEVRON)     \
+    LEXEME(LCHEVRON_EQ)         \
+    LEXEME(RCHEVRON_EQ)         \
+    LEXEME(LSHIFT)              \
+    LEXEME(RSHIFT)              \
     LEXEME(POUND)               \
     LEXEME(PLUS)                \
     LEXEME(PLUSPLUS)            \
@@ -67,6 +69,16 @@
     LEXEME(MINUSMINUS)          \
     LEXEME(EQUALEQUAL)          \
     LEXEME(EQUAL)               \
+    LEXEME(PLUS_EQ)  /* += */   \
+    LEXEME(MINUS_EQ) /* -= */   \
+    LEXEME(STAR_EQ)  /* ... */  \
+    LEXEME(SLASH_EQ)            \
+    LEXEME(PERCENT_EQ)          \
+    LEXEME(AMPERSAND_EQ)        \
+    LEXEME(BAR_EQ)              \
+    LEXEME(CIRCUMFLEX_EQ)       \
+    LEXEME(LSHIFT_EQ)           \
+    LEXEME(RSHIFT_EQ)           \
     LEXEME(STAR)                \
     LEXEME(SLASH)               \
     LEXEME(PERCENT)             \
