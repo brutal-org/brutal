@@ -34,9 +34,8 @@ void lock_acquire(Lock *lock)
     {
 #ifdef ARCH_HAS_PAUSE
         arch_pause();
-#else
-        atomic_thread_fence(memory_order_seq_cst);
 #endif
+        atomic_thread_fence(memory_order_seq_cst);
     }
 
     atomic_thread_fence(memory_order_seq_cst);

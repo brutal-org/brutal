@@ -11,6 +11,8 @@ void sched_start(Task *task, uintptr_t ip, uintptr_t sp, BrTaskArgs args);
 
 void sched_stop(Task *task, uintptr_t result);
 
+void sched_crash(Task *task);
+
 void sched_finalize(void);
 
 BrResult sched_block(Blocker blocker);

@@ -6,7 +6,7 @@ typedef struct
 {
     OBJECT_HEADER;
 
-    Lock lock;
+    RwLock lock;
     SlotObject objects;
 } Domain;
 

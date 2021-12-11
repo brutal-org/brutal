@@ -38,36 +38,41 @@ void domain_deref(Domain *self)
 
 BrHandle domain_add(Domain *self, Object *object)
 {
-    LOCK_RETAINER(&self->lock);
+    rwlock_acquire_write(&self->lock);
 
     BrHandle handle = slot_alloc(&self->objects);
     object_ref(object);
     slot_at(&self->objects, handle) = object;
+
+    rwlock_release_write(&self->lock);
 
     return handle;
 }
 
 BrResult domain_remove(Domain *self, BrHandle handle)
 {
-    LOCK_RETAINER(&self->lock);
+    rwlock_acquire_write(&self->lock);
 
     if (!slot_used(&self->objects, handle))
     {
+        rwlock_release_write(&self->lock);
         return BR_BAD_HANDLE;
     }
 
     object_deref(slot_at(&self->objects, handle));
     slot_release(&self->objects, handle);
 
+    rwlock_release_write(&self->lock);
     return BR_SUCCESS;
 }
 
 Object *domain_lookup(Domain *self, BrHandle handle, BrObjectType type)
 {
-    LOCK_RETAINER(&self->lock);
+    rwlock_acquire_read(&self->lock);
 
     if (!slot_used(&self->objects, handle))
     {
+        rwlock_release_read(&self->lock);
         return nullptr;
     }
 
@@ -75,10 +80,12 @@ Object *domain_lookup(Domain *self, BrHandle handle, BrObjectType type)
 
     if (object->type != type && type != BR_OBJECT_ANY)
     {
+        rwlock_release_read(&self->lock);
         return nullptr;
     }
 
-    object_ref(slot_at(&self->objects, handle));
+    object_ref(object);
+    rwlock_release_read(&self->lock);
 
-    return slot_at(&self->objects, handle);
+    return object;
 }
