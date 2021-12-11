@@ -89,7 +89,7 @@ CDeclarator cparse_declarator_prefix(Lex *lex, CType type, Alloc *alloc)
     {
         return (CDeclarator){
             .type = type,
-            .name = str$(""),
+            .name = str$("unknown"),
         };
     }
 }
@@ -149,7 +149,7 @@ CDeclAttr cparse_decl_attr(Lex *lex)
     return attr;
 }
 
-CDecl cparse_decl(Lex *lex, Alloc *alloc)
+CDecl cparse_decl(Lex *lex, CUnit *context, Alloc *alloc)
 {
     if (lex_skip_type(lex, CLEX_TYPEDEF))
     {
@@ -168,7 +168,7 @@ CDecl cparse_decl(Lex *lex, Alloc *alloc)
         {
             if (cparse_is_separator(lex, CLEX_LBRACE))
             {
-                CStmt body = cparse_stmt(lex, alloc);
+                CStmt body = cparse_stmt(lex, context, alloc);
                 return cdecl_attrib(cdecl_func(decl.name, decl.type, body), attr);
             }
             else
@@ -181,7 +181,7 @@ CDecl cparse_decl(Lex *lex, Alloc *alloc)
         {
             if (cparse_skip_separator(lex, CLEX_EQUAL))
             {
-                CExpr init = cparse_expr(lex, CEXPR_MAX_PRECEDENCE, alloc);
+                CExpr init = cparse_expr(lex, CEXPR_MAX_PRECEDENCE, context, alloc);
                 return cdecl_var(decl.name, decl.type, init);
             }
             else
