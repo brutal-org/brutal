@@ -45,3 +45,5 @@ typedef struct
 {
     Vec(CUnitEntry) units;
 } CUnit;
+
+bool cunit_contains_type(CUnit *context, Str name);

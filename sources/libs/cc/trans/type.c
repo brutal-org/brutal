@@ -133,7 +133,7 @@ void cgen_c_func_params(Emit *emit, CType type)
     emit_fmt(emit, "(");
 
     bool first = true;
-    vec_foreach(v, &type.func_.params)
+    vec_foreach_v(v, &type.func_.params)
     {
         if (!first)
         {

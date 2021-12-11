@@ -1,18 +1,6 @@
 #include <brutal/debug.h>
 #include <cc/parse/parser.h>
 
-bool is_type_in_cunit(CUnit *context, Str name)
-{
-    vec_foreach(entry, &context->units)
-    {
-        if (entry.type == CUNIT_DECLARATION && str_eq(entry._decl.name, name))
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
 CStmt cparse_stmt(Lex *lex, CUnit *context, Alloc *alloc)
 {
     if (cparse_skip_separator(lex, CLEX_LBRACE))
@@ -130,7 +118,7 @@ CStmt cparse_stmt(Lex *lex, CUnit *context, Alloc *alloc)
     else if (cparse_is_separator(lex, CLEX_IDENT))
     {
         Str ident = lex_curr(lex).str;
-        if (is_type_in_cunit(context, ident))
+        if (cunit_contains_type(context, ident))
         {
             return cstmt_decl(cparse_decl(lex, context, alloc), alloc);
         }
