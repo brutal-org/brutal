@@ -8,8 +8,8 @@ int main(int argc, char const *argv[])
     UNUSED(argc);
     UNUSED(argv);
 
-    BvmMem mem;
-    bvm_mem_init(&mem, alloc_global());
+    BvmGlobal mem;
+    bvm_global_init(&mem, alloc_global());
 
     BvmLocal local;
     bvm_local_init(&local, alloc_global());
@@ -72,10 +72,10 @@ int main(int argc, char const *argv[])
     bvm_func_emit(func, BVM_OP_RET);
 
     bvm_local_push(&local, bvm_val_int(10));
-    bvm_call(&local, &mem, func, 1);
+    bvm_call(&local, &mem, func, 1, alloc_global());
 
     bvm_local_deinit(&local);
-    bvm_mem_deinit(&mem);
+    bvm_global_deinit(&mem);
 
     return 0;
 }

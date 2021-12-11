@@ -1,6 +1,28 @@
 #include <bvm/obj/obj.h>
 
-BvmVal bvm_val_load(BvmVal val, size_t index)
+BvmVal bvm_obj_create(BvmType *type, Alloc *alloc)
+{
+    return bvm_obj_create_native(type, nullptr, 0, alloc);
+}
+
+BvmVal bvm_obj_create_native(BvmType *type, void *data, size_t size, Alloc *alloc)
+{
+    size_t managed_size = type->fields.len * sizeof(BvmVal);
+
+    BvmObj *obj = alloc_malloc(alloc, sizeof(BvmObj) + managed_size + size);
+    obj->type = type;
+
+    obj->vals = (BvmVal *)((char *)obj + sizeof(BvmObj));
+    obj->vals_len = type->fields.len;
+
+    obj->nvals = ((char *)obj + sizeof(BvmObj) + managed_size);
+    obj->nvals_len = size;
+    mem_cpy(obj->nvals, data, size);
+
+    return bvm_val_obj(obj);
+}
+
+BvmVal bvm_obj_load(BvmVal val, size_t index)
 {
     if (val.type != BVM_VAL_OBJ)
     {
@@ -12,7 +34,7 @@ BvmVal bvm_val_load(BvmVal val, size_t index)
     return obj->vals[index];
 }
 
-BvmVal bvm_val_loadv(BvmVal val, size_t index)
+BvmVal bvm_obj_loadv(BvmVal val, size_t index)
 {
     if (val.type != BVM_VAL_OBJ)
     {
@@ -20,11 +42,10 @@ BvmVal bvm_val_loadv(BvmVal val, size_t index)
     }
 
     BvmType *type = val.obj_->type;
-
-    return vec_at(&type->vvals, index);
+    return bvm_type_loadv(type, index);
 }
 
-void bvm_val_store(BvmVal val, size_t index, BvmVal data)
+void bvm_obj_store(BvmVal val, size_t index, BvmVal data)
 {
     if (val.type != BVM_VAL_OBJ)
     {
@@ -36,7 +57,7 @@ void bvm_val_store(BvmVal val, size_t index, BvmVal data)
     obj->vals[index] = data;
 }
 
-void bvm_val_storev(BvmVal val, size_t index, BvmVal data)
+void bvm_obj_storev(BvmVal val, size_t index, BvmVal data)
 {
     if (val.type != BVM_VAL_OBJ)
     {
@@ -48,7 +69,7 @@ void bvm_val_storev(BvmVal val, size_t index, BvmVal data)
     vec_at(&type->vvals, index) = data;
 }
 
-BvmVal bvm_val_isa(BvmVal lhs, BvmVal rhs)
+BvmVal bvm_obj_isa(BvmVal lhs, BvmVal rhs)
 {
     if (lhs.type != BVM_VAL_OBJ || rhs.type != BVM_VAL_TYPE)
     {

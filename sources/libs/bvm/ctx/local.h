@@ -1,7 +1,7 @@
 #pragma once
 
 #include <bvm/base/res.h>
-#include <bvm/ctx/mem.h>
+#include <bvm/ctx/global.h>
 
 typedef struct bvm_frame
 {
