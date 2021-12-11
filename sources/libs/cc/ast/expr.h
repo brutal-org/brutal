@@ -78,7 +78,7 @@ typedef enum
     COP_REF,        // &
     COP_ACCESS,     // .
     COP_PTR_ACCESS, // ->
-
+    COP_CALL,       // (
     COP_COUNT,
 } COp;
 
@@ -148,6 +148,8 @@ struct cexpr
         } lambda_;
     };
 };
+
+COp str_to_cop(Str str);
 
 Str cop_to_str(COp type);
 

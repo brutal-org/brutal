@@ -92,6 +92,11 @@ CType cparse_type(Lex *lex, Alloc *alloc)
     {
         return ctype_bool();
     }
+    else if (lex_curr_type(lex) == CLEX_IDENT)
+    {
+        Str name = lex_next(lex).str;
+        return ctype_ident(name);
+    }
     else
     {
         lex_throw(lex, str$("Unexpected token"));

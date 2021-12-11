@@ -99,6 +99,7 @@ CDeclarator cparse_declarator(Lex *lex, Alloc *alloc)
     CType type = cparse_type(lex, alloc);
     cparse_whitespace(lex);
     CDeclarator decl = cparse_declarator_prefix(lex, type, alloc);
+
     decl.type = cparse_declarator_postfix(lex, decl.type, alloc);
     return decl;
 }

@@ -3,6 +3,8 @@
 #include <cc/ast/expr.h>
 #include <cc/ast/stmt.h>
 
+CExpr cexpr_infix(CExpr left, COp type, CExpr right, Alloc *alloc);
+
 CExpr cexpr_empty(void);
 
 CExpr cexpr_constant(CVal val);

@@ -117,6 +117,6 @@ CStmt cparse_stmt(Lex *lex, Alloc *alloc)
     }
     else
     {
-        return cstmt_empty();
+        return cstmt_expr(cparse_expr(lex, CEXPR_MAX_PRECEDENCE, alloc));
     }
 }

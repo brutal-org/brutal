@@ -58,6 +58,8 @@
     LEXEME(COMMA)               \
     LEXEME(LCHEVRON)            \
     LEXEME(RCHEVRON)            \
+    LEXEME(LCHEVRONCHEVRON)     \
+    LEXEME(RCHEVRONCHEVRON)     \
     LEXEME(POUND)               \
     LEXEME(PLUS)                \
     LEXEME(PLUSPLUS)            \
@@ -70,10 +72,12 @@
     LEXEME(PERCENT)             \
     LEXEME(AMPERSANDAMPERSAND)  \
     LEXEME(AMPERSAND)           \
+    LEXEME(BARBAR)              \
     LEXEME(BAR)                 \
     LEXEME(CIRCUMFLEX)          \
     LEXEME(TILDE)               \
     LEXEME(EXCLAMATION)         \
+    LEXEME(EXCLAMATIONEQUAL)    \
     LEXEME(DOT)                 \
     LEXEME(ARROW)               \
     LEXEME(SEMICOLON)           \
