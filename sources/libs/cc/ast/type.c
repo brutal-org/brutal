@@ -27,6 +27,6 @@ Str ctype_to_str(CTypeType type)
     }
     else
     {
-        return str$("unknown");
+        return str$("");
     }
 }

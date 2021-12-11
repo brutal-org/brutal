@@ -89,7 +89,7 @@ CDeclarator cparse_declarator_prefix(Lex *lex, CType type, Alloc *alloc)
     {
         return (CDeclarator){
             .type = type,
-            .name = str$("unknown"),
+            .name = str$(""),
         };
     }
 }
