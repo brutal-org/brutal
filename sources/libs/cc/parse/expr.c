@@ -3,16 +3,16 @@
 #include <cc/builder.h>
 #include <cc/parse/parser.h>
 
-static CExpr cparse_parent_expr(Lex *lex, Alloc *alloc)
+static CExpr cparse_parent_expr(Lex *lex, CUnit *context, Alloc *alloc)
 {
 
     CExpr result;
 
-    result = cparse_expr(lex, CEXPR_MAX_PRECEDENCE, alloc);
+    result = cparse_expr(lex, CEXPR_MAX_PRECEDENCE, context, alloc);
 
     return result;
 }
-static CExpr cparse_primary_expr(Lex *lex, Alloc *alloc)
+static CExpr cparse_primary_expr(Lex *lex, CUnit *context, Alloc *alloc)
 {
     if (cparse_is_separator(lex, CLEX_IDENT))
     {
@@ -30,7 +30,7 @@ static CExpr cparse_primary_expr(Lex *lex, Alloc *alloc)
 
     else if (cparse_skip_separator(lex, CLEX_LPARENT))
     {
-        CExpr expr = cparse_parent_expr(lex, alloc);
+        CExpr expr = cparse_parent_expr(lex, context, alloc);
         cparse_skip_separator(lex, CLEX_RPARENT);
         return expr;
     }
@@ -46,7 +46,7 @@ static CExpr cparse_primary_expr(Lex *lex, Alloc *alloc)
         cparse_func_params(lex, &type, alloc);
         cparse_skip_separator(lex, CLEX_RPARENT);
 
-        CStmt body = cparse_stmt(lex, alloc);
+        CStmt body = cparse_stmt(lex, context, alloc);
 
         return cexpr_lambda(type, body, alloc);
     }
@@ -58,31 +58,31 @@ static CExpr cparse_primary_expr(Lex *lex, Alloc *alloc)
     return cexpr_constant(cval$(0));
 }
 
-static void cparse_func_call_args(Lex *lex, CExpr *target, Alloc *alloc)
+static void cparse_func_call_args(Lex *lex, CExpr *target, CUnit *context, Alloc *alloc)
 {
 
     if (!cparse_skip_separator(lex, CLEX_RPARENT))
     {
         do
         {
-            CExpr expr = cparse_expr(lex, CEXPR_MAX_PRECEDENCE, alloc);
+            CExpr expr = cparse_expr(lex, CEXPR_MAX_PRECEDENCE, context, alloc);
             cexpr_member(target, expr);
         } while (cparse_skip_separator(lex, CLEX_COMMA));
 
         cparse_expect_separator(lex, CLEX_RPARENT);
     }
 }
-static void cparse_postfix_expr(Lex *lex, CExpr *target, Alloc *alloc)
+static void cparse_postfix_expr(Lex *lex, CExpr *target, CUnit *context, Alloc *alloc)
 {
 
     if (cparse_skip_separator(lex, CLEX_LPARENT))
     {
         *target = cexpr_call(alloc, *target);
-        cparse_func_call_args(lex, target, alloc);
+        cparse_func_call_args(lex, target, context, alloc);
     }
     else if (cparse_skip_separator(lex, CLEX_LBRACKET))
     {
-        CExpr expr = cparse_expr(lex, CEXPR_MAX_PRECEDENCE, alloc);
+        CExpr expr = cparse_expr(lex, CEXPR_MAX_PRECEDENCE, context, alloc);
         cparse_skip_separator(lex, CLEX_RBRACKET);
         *target = cexpr_index(*target, expr, alloc);
     }
@@ -95,7 +95,7 @@ static void cparse_postfix_expr(Lex *lex, CExpr *target, Alloc *alloc)
         *target = cexpr_postdec(*target, alloc);
     }
 }
-static CExpr cparse_prefix_expr(Lex *lex, Alloc *alloc)
+static CExpr cparse_prefix_expr(Lex *lex, CUnit *context, Alloc *alloc)
 {
     CExpr result;
 
@@ -103,32 +103,37 @@ static CExpr cparse_prefix_expr(Lex *lex, Alloc *alloc)
     if (cparse_skip_separator(lex, CLEX_MINUS))
     {
 
-        result = cparse_prefix_expr(lex, alloc);
+        result = cparse_prefix_expr(lex, context, alloc);
         result = cexpr_sub(cexpr_empty(), result, alloc);
     }
     else if (cparse_skip_separator(lex, CLEX_STAR))
     {
-        result = cparse_prefix_expr(lex, alloc);
+        result = cparse_prefix_expr(lex, context, alloc);
         result = cexpr_deref(result, alloc);
     }
     else
     {
-        result = cparse_primary_expr(lex, alloc);
-        cparse_postfix_expr(lex, &result, alloc);
+        result = cparse_primary_expr(lex, context, alloc);
+        cparse_postfix_expr(lex, &result, context, alloc);
     }
 
     return result;
 }
 
-CExpr cparse_expr(Lex *lex, int pre, Alloc *alloc)
+bool cparse_is_end_expr(LexemeType type)
 {
-    CExpr left = cparse_prefix_expr(lex, alloc);
+    return type == CLEX_RPARENT || type == CLEX_SEMICOLON || type == CLEX_COMMA || type == CLEX_RBRACKET;
+}
+
+CExpr cparse_expr(Lex *lex, int pre, CUnit *context, Alloc *alloc)
+{
+    CExpr left = cparse_prefix_expr(lex, context, alloc);
     CExpr right;
 
     cparse_whitespace(lex);
     Lexeme curr_lex = lex_curr(lex);
 
-    if (curr_lex.type == CLEX_RPARENT || curr_lex.type == CLEX_SEMICOLON || curr_lex.type == CLEX_COMMA || curr_lex.type == CLEX_RBRACKET)
+    if (cparse_is_end_expr(curr_lex.type))
     {
         return left;
     }
@@ -140,13 +145,13 @@ CExpr cparse_expr(Lex *lex, int pre, Alloc *alloc)
         lex_next(lex);
         cparse_whitespace(lex);
 
-        right = cparse_expr(lex, cop_pre(curr_cop), alloc);
+        right = cparse_expr(lex, cop_pre(curr_cop), context, alloc);
 
         left = cexpr_infix(left, curr_cop, right, alloc);
 
         curr_lex = lex_curr(lex);
 
-        if (curr_lex.type == CLEX_RPARENT || curr_lex.type == CLEX_SEMICOLON || curr_lex.type == CLEX_COMMA || curr_lex.type == CLEX_RBRACKET)
+        if (cparse_is_end_expr(curr_lex.type))
         {
             return left;
         }

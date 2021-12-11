@@ -111,6 +111,7 @@ static void cgen_c_expr_pre(Emit *emit, CExpr expr, int parent_pre)
         emit_fmt(emit, "[]");
         cgen_c_func_params(emit, expr.lambda_.type);
         cgen_c_stmt(emit, *expr.lambda_.body);
+        break;
 
     default:
         panic$("Unknown cexpr type {}", expr.type);

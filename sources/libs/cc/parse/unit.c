@@ -8,7 +8,7 @@ CUnit cparse_unit(Lex *lex, Alloc *alloc)
 
     while (!lex_ended(lex))
     {
-        cunit_decl(&unit, cparse_decl(lex, alloc));
+        cunit_decl(&unit, cparse_decl(lex,  &unit, alloc));
         cparse_expect_separator(lex, CLEX_SEMICOLON);
     }
 
