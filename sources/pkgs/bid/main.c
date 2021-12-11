@@ -4,7 +4,7 @@
 #include <brutal/alloc.h>
 #include <brutal/debug.h>
 #include <brutal/io.h>
-#include <cc/gen.h>
+#include <cc/trans.h>
 #include <json/emit.h>
 
 void bid_emit_json(BidIface const iface, IoWriter *writer)

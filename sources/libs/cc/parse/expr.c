@@ -5,10 +5,21 @@
 
 static CExpr cparse_parent_expr(Lex *lex, CUnit *context, Alloc *alloc)
 {
-
     CExpr result;
 
-    result = cparse_expr(lex, CEXPR_MAX_PRECEDENCE, context, alloc);
+    cparse_whitespace(lex);
+    if (lex_curr_type(lex) == CLEX_IDENT && cunit_contains_type(context, lex_curr(lex).str))
+    {
+        CType cast_type = cparse_declarator(lex, alloc).type;
+        cparse_skip_separator(lex, CLEX_RPARENT);
+        result = cparse_expr(lex, CEXPR_MAX_PRECEDENCE, context, alloc);
+        result = cexpr_cast(result, cast_type, alloc);
+    }
+    else
+    {
+        result = cparse_expr(lex, CEXPR_MAX_PRECEDENCE, context, alloc);
+        cparse_skip_separator(lex, CLEX_RPARENT);
+    }
 
     return result;
 }
@@ -31,7 +42,6 @@ static CExpr cparse_primary_expr(Lex *lex, CUnit *context, Alloc *alloc)
     else if (cparse_skip_separator(lex, CLEX_LPARENT))
     {
         CExpr expr = cparse_parent_expr(lex, context, alloc);
-        cparse_skip_separator(lex, CLEX_RPARENT);
         return expr;
     }
 
