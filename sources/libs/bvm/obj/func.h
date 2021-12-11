@@ -1,16 +1,39 @@
 #pragma once
 
-#include <bvm/mem.h>
+#include <bvm/eval/instr.h>
+#include <bvm/obj/type.h>
 
-BvmType *bvm_type_create(BvmType *super, Str name, Alloc *alloc);
+struct bvm_local;
+struct bvm_frame;
+struct bvm_mem;
 
-void bvm_type_vfield(BvmType *self, Str name, BvmType *type, Alloc *alloc);
-
-void bvm_type_field(BvmType *self, Str name, BvmType *type, Alloc *alloc);
+typedef struct
+{
+    BvmType *ret;
+    Vec(BvmType *) args;
+    bool variadic;
+} BvmSig;
 
 BvmSig *bvm_sig_create(BvmType *ret, bool variadic, Alloc *alloc);
 
 void bvm_sig_arg(BvmSig *self, BvmType *type);
+
+struct bvm_func
+{
+    bool native;
+    BvmSig *sig;
+
+    union
+    {
+        BvmVal (*native_)(struct bvm_local *local, struct bvm_mem *mem);
+
+        struct
+        {
+            size_t locals;
+            Vec(BvmInstr) code;
+        } managed_;
+    };
+};
 
 BvmFunc *bvm_func_create(BvmSig *sig, Alloc *alloc);
 

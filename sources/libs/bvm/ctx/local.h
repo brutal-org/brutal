@@ -1,7 +1,7 @@
 #pragma once
 
-#include <bvm/base.h>
-#include <bvm/mem.h>
+#include <bvm/base/res.h>
+#include <bvm/ctx/mem.h>
 
 typedef struct bvm_frame
 {
@@ -56,4 +56,4 @@ void bvm_local_jump(BvmLocal *self, uint64_t addr);
 
 void bvm_local_dump(BvmLocal *self);
 
-void bvm_local_dump(BvmLocal* self);
+void bvm_local_dump(BvmLocal *self);

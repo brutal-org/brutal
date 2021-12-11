@@ -1,5 +1,8 @@
 #include <brutal/debug.h>
-#include <bvm/eval.h>
+#include <bvm/eval/eval.h>
+#include <bvm/obj/func.h>
+#include <bvm/obj/obj.h>
+#include <bvm/obj/val.h>
 #include <math.h>
 
 BvmVal bvm_call(BvmLocal *local, BvmMem *mem, BvmFunc *func, int argc)

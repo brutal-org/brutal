@@ -1,7 +1,8 @@
 #pragma once
 
-#include <bvm/instr.h>
-#include <bvm/value.h>
+#include <brutal/ds.h>
+#include <bvm/eval/instr.h>
+#include <bvm/obj/val.h>
 
 typedef struct
 {
