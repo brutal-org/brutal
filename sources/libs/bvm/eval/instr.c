@@ -1,4 +1,4 @@
-#include <bvm/instr.h>
+#include <bvm/eval/instr.h>
 
 Str bvm_op_str(BvmOp op)
 {

@@ -1,4 +1,6 @@
-#include <bvm/mem.h>
+#include <bvm/ctx/mem.h>
+#include <bvm/obj/obj.h>
+#include <bvm/obj/type.h>
 
 void bvm_mem_init(BvmMem *self, Alloc *alloc)
 {

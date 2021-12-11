@@ -1,7 +1,7 @@
 #include <brutal/alloc.h>
 #include <brutal/debug.h>
-#include <bvm/builder.h>
 #include <bvm/eval.h>
+#include <bvm/obj.h>
 
 int main(int argc, char const *argv[])
 {
@@ -71,11 +71,8 @@ int main(int argc, char const *argv[])
     bvm_func_emitu(func, BVM_OP_LOADL, v_fnext);
     bvm_func_emit(func, BVM_OP_RET);
 
-    for (int i = 0; i < 1000000; i++)
-    {
-        bvm_local_push(&local, bvm_val_int(10));
-        bvm_call(&local, &mem, func, 1);
-    }
+    bvm_local_push(&local, bvm_val_int(10));
+    bvm_call(&local, &mem, func, 1);
 
     bvm_local_deinit(&local);
     bvm_mem_deinit(&mem);
