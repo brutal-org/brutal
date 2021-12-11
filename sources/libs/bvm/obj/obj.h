@@ -13,12 +13,16 @@ struct bvm_obj
     void *nvals;
 };
 
-BvmVal bvm_val_load(BvmVal val, size_t index);
+BvmVal bvm_obj_create(BvmType *type, Alloc *alloc);
 
-BvmVal bvm_val_loadv(BvmVal val, size_t index);
+BvmVal bvm_obj_create_native(BvmType *type, void *data, size_t size, Alloc *alloc);
 
-void bvm_val_store(BvmVal val, size_t index, BvmVal data);
+BvmVal bvm_obj_load(BvmVal val, size_t index);
 
-void bvm_val_storev(BvmVal val, size_t index, BvmVal data);
+BvmVal bvm_obj_loadv(BvmVal val, size_t index);
 
-BvmVal bvm_val_isa(BvmVal lhs, BvmVal rhs);
+void bvm_obj_store(BvmVal val, size_t index, BvmVal data);
+
+void bvm_obj_storev(BvmVal val, size_t index, BvmVal data);
+
+BvmVal bvm_obj_isa(BvmVal lhs, BvmVal rhs);

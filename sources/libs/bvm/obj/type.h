@@ -21,6 +21,10 @@ typedef struct bvm_type
 
 BvmType *bvm_type_create(BvmType *super, Str name, Alloc *alloc);
 
-void bvm_type_vfield(BvmType *self, Str name, BvmType *type, Alloc *alloc);
+void bvm_type_vfield(BvmType *self, Str name, BvmType *type, BvmVal val);
 
-void bvm_type_field(BvmType *self, Str name, BvmType *type, Alloc *alloc);
+void bvm_type_field(BvmType *self, Str name, BvmType *type);
+
+BvmVal bvm_type_loadv(BvmType *self, size_t index);
+
+void bvm_type_storev(BvmType *self, size_t index, BvmVal data);

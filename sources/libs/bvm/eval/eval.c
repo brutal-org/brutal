@@ -5,16 +5,17 @@
 #include <bvm/obj/val.h>
 #include <math.h>
 
-BvmVal bvm_call(BvmLocal *local, BvmMem *mem, BvmFunc *func, int argc)
+BvmVal bvm_call(BvmLocal *local, BvmGlobal *global, BvmFunc *func, int argc, Alloc *alloc)
 {
     bvm_local_call(local, func, argc);
 
-    while (bvm_eval(local, mem) == BVM_RES_RUN)
+    while (bvm_eval(local, global, alloc) == BVM_RES_RUN)
         ;
+
     return bvm_local_pop(local);
 }
 
-BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
+BvmRes bvm_eval(BvmLocal *local, BvmGlobal *global, Alloc *alloc)
 {
     BvmInstr instr = bvm_local_ifetch(local);
 
@@ -24,7 +25,7 @@ BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
         break;
 
     case BVM_OP_LOADG:
-        bvm_local_push(local, bvm_mem_load(mem, instr.uarg));
+        bvm_local_push(local, bvm_global_load(global, instr.uarg));
         break;
 
     case BVM_OP_LOADL:
@@ -38,7 +39,7 @@ BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
     case BVM_OP_LOADO:
         bvm_local_push(
             local,
-            bvm_val_load(
+            bvm_obj_load(
                 bvm_local_pop(local),
                 instr.uarg));
         break;
@@ -46,13 +47,13 @@ BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
     case BVM_OP_LOADV:
         bvm_local_push(
             local,
-            bvm_val_loadv(
+            bvm_obj_loadv(
                 bvm_local_pop(local),
                 instr.uarg));
         break;
 
     case BVM_OP_STOREG:
-        bvm_mem_store(mem, instr.uarg, bvm_local_pop(local));
+        bvm_global_store(global, instr.uarg, bvm_local_pop(local));
         break;
 
     case BVM_OP_STOREL:
@@ -68,7 +69,7 @@ BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
         BvmVal obj = bvm_local_pop(local);
         BvmVal val = bvm_local_pop(local);
 
-        bvm_val_store(obj, instr.uarg, val);
+        bvm_obj_store(obj, instr.uarg, val);
         break;
     }
 
@@ -77,7 +78,7 @@ BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
         BvmVal val = bvm_local_pop(local);
         BvmVal obj = bvm_local_pop(local);
 
-        bvm_val_storev(obj, instr.uarg, val);
+        bvm_obj_storev(obj, instr.uarg, val);
         break;
     }
 
@@ -124,7 +125,7 @@ BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
 
         if (val.func_->native)
         {
-            bvm_local_ret(local, val.func_->native_(local, mem));
+            bvm_local_ret(local, val.func_->native_(local, global));
         }
         break;
     }
@@ -138,7 +139,7 @@ BvmRes bvm_eval(BvmLocal *local, BvmMem *mem)
         }
         else
         {
-            bvm_local_push(local, bvm_mem_new(mem, val.type_));
+            bvm_local_push(local, bvm_obj_create(val.type_, alloc));
         }
         break;
     }

@@ -105,11 +105,11 @@ typedef enum
     __BVM_OP_MAX = 0xff,
 } BvmOp;
 
-static_assert(__BVM_OP_COUNT <= __BVM_OP_MAX);
+static_assert(__BVM_OP_COUNT <= __BVM_OP_MAX, "");
 
 // clang-format on
 
-typedef struct ALIGNED(4)
+typedef struct
 {
     uint8_t opcode;
 

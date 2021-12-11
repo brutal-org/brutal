@@ -5,7 +5,7 @@
 
 struct bvm_local;
 struct bvm_frame;
-struct bvm_mem;
+struct bvm_global;
 
 typedef struct
 {
@@ -25,7 +25,7 @@ struct bvm_func
 
     union
     {
-        BvmVal (*native_)(struct bvm_local *local, struct bvm_mem *mem);
+        BvmVal (*native_)(struct bvm_local *local, struct bvm_global *mem);
 
         struct
         {
