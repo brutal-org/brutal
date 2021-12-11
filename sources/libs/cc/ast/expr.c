@@ -1,6 +1,7 @@
 #include <cc/ast/expr.h>
 
 static const char *cop_type_to_str[COP_COUNT] = {
+    [COP_INVALID] = "invalid",
     [COP_INC] = "++",
     [COP_DEC] = "--",
     [COP_ASSIGN] = "=",
@@ -58,6 +59,7 @@ static const char *cexpr_type_to_str_raw[CEXPR_COUNT] = {
     [CEXPR_CAST] = "cast",
     [CEXPR_TERNARY] = "ternary",
     [CEXPR_INITIALIZER] = "initializer",
+    [CEXPR_LAMBDA] = "lambda",
 };
 
 Str cexpr_type_to_str(CExprType type)
