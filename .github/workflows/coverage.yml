@@ -66,14 +66,11 @@ jobs:
 
       - name: Run Tests
         run: |
-          find . -name "*.profraw"
-          VERBOSE=yes CONFIG_TOOLCHAIN=${{matrix.toolchain}} ./brutal --coverage test
+          CONFIG_TOOLCHAIN=${{matrix.toolchain}} ./brutal --coverage test
           llvm-profdata-12 merge -sparse `find . -name "*.profraw"` -o coverage.profdata
           llvm-cov-12 show ./bin/x86_64-${{matrix.toolchain}}/host/test -instr-profile=coverage.profdata -format=text> coverage.txt
 
       - name: Upload test coverage
         uses: codecov/codecov-action@v2
-        with: 
+        with:
           fail_ci_if_error: true
-
-

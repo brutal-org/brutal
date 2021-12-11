@@ -52,21 +52,21 @@ USER_KLDFLAGS= \
 	-Tsources/embed/kernel/$(CONFIG_ARCH)/$(CONFIG_BOARD)/link.ld \
 	-z max-page-size=0x1000 \
 	$(ARCH_LDFLAGS) \
-	build/toolchain/gnu/local/lib/gcc/$(CONFIG_ARCH)-elf/11.1.0/libgcc.a 
+	build/toolchain/gnu/local/lib/gcc/$(CONFIG_ARCH)-elf/11.1.0/libgcc.a
 
 USER_ULDFLAGS= \
-	-Tsources/embed/brutal/$(CONFIG_ARCH)/$(CONFIG_BOARD)/link.ld \
+	-Tsources/embed/brutal/$(CONFIG_ARCH)/link.ld \
 	-z max-page-size=0x1000 \
 	$(ARCH_LDFLAGS) \
-	build/toolchain/gnu/local/lib/gcc/$(CONFIG_ARCH)-elf/11.1.0/libgcc.a 
+	build/toolchain/gnu/local/lib/gcc/$(CONFIG_ARCH)-elf/11.1.0/libgcc.a
 
 USER_AR=$(CONFIG_ARCH)-elf-ar
 USER_ARFLAGS=rcs
 
-ifeq ($(GEN_COVERAGE), yes)
+ifeq ($(COVERAGE), yes)
 	HOST_CFLAGS += \
 		-coverage -g
-	
+
 	HOST_LDFLAGS += \
 		-coverage
 endif

@@ -66,7 +66,7 @@ USER_KLDFLAGS= \
 	$(ARCH_LDFLAGS)
 
 USER_ULDFLAGS= \
-	-Tsources/embed/brutal/$(CONFIG_ARCH)/$(CONFIG_BOARD)/link.ld \
+	-Tsources/embed/brutal/$(CONFIG_ARCH)/link.ld \
 	-z max-page-size=0x1000 \
 	$(ARCH_LDFLAGS)
 
@@ -77,10 +77,10 @@ endif
 
 USER_ARFLAGS=rcs
 
-ifeq ($(GEN_COVERAGE), yes)
+ifeq ($(COVERAGE), yes)
 	HOST_CFLAGS += \
 		-fprofile-instr-generate -fcoverage-mapping
-	
+
 	HOST_LDFLAGS += \
 		-fprofile-instr-generate -fcoverage-mapping
 

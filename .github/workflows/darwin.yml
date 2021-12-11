@@ -20,8 +20,8 @@ jobs:
 
       - name: Build All
         run: |
-          .github/workflows/env-darwin.sh make VERBOSE=yes all
+          .github/workflows/env-darwin.sh make all
 
       - name: Run Tests
         run: |
-          VERBOSE=yes .github/workflows/env-darwin.sh ./brutal test
+          .github/workflows/env-darwin.sh ./brutal test

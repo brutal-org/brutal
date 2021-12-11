@@ -79,8 +79,8 @@ jobs:
 
       - name: Build All
         run: |
-          make VERBOSE=yes CONFIG_TOOLCHAIN=${{matrix.toolchain}} all
+          CONFIG_TOOLCHAIN=${{matrix.toolchain}} make all
 
       - name: Run Tests
         run: |
-          VERBOSE=yes CONFIG_TOOLCHAIN=${{matrix.toolchain}} ./brutal test
+          CONFIG_TOOLCHAIN=${{matrix.toolchain}} ./brutal test

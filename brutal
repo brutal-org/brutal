@@ -6,8 +6,8 @@ TOOLS="$(make list-host | tr '[:upper:]' '[:lower:]') "
 JOBS=""
 SILENT="-s"
 DEBUG=""
-COVERAGE=""
-export VERBOSE="no"
+TARGET=""
+export COVERAGE=""
 
 if [[ -z "${CONFIG_TOOLCHAIN}" ]]; then
   CONFIG_TOOLCHAIN="llvm"
@@ -34,19 +34,15 @@ usage()
   exit 1
 }
 
-if [ -z "$1" ]; then
-  usage
-  exit 1
-fi
-
-while [[ $1 == -* ]]; do
+eval_arg()
+{
   case $1 in
     "-a" | "--all")
-      make $JOBS $SILENT all
+      TARGET=all
       ;;
 
     "-c" | "--clean")
-      make $SILENT clean
+      TARGET=clean
       ;;
 
     "-d" | "--debug")
@@ -54,11 +50,11 @@ while [[ $1 == -* ]]; do
       ;;
 
     "-n" | "--nuke")
-      make $SILENT nuke
+      TARGET=nuke
       ;;
 
-    "-o" | "--coverage") 
-      COVERAGE="GEN_COVERAGE=yes"
+    "-o" | "--coverage")
+      COVERAGE="yes"
       ;;
 
     "-f" | "--fast")
@@ -70,11 +66,10 @@ while [[ $1 == -* ]]; do
       ;;
 
     "-r" | "--run")
-      make $JOBS $SILENT run
+      TARGET=run
       ;;
 
     "-v" | "--verbose")
-      export VERBOSE=yes
       SILENT=""
       ;;
 
@@ -84,6 +79,15 @@ while [[ $1 == -* ]]; do
       usage
       ;;
   esac
+}
+
+if [ -z "$1" ]; then
+  usage
+  exit 1
+fi
+
+while [[ $1 == -* ]]; do
+  eval_arg $1
   shift
 done
 
@@ -96,6 +100,8 @@ if [ $# -gt 0 ]; then
 
   PKGS=./bin/$(uname -m)-$CONFIG_TOOLCHAIN/host
 
-  make $JOBS $SILENT $PKGS/$1 $COVERAGE
+  make $JOBS $SILENT $PKGS/$1
   $DEBUG $PKGS/$@
+else
+  make $JOBS $SILENT $TARGET
 fi
