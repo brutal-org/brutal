@@ -8,7 +8,7 @@ typedef struct
 {
     Task const *task;
     BrEvent event;
-    bool ack;
+    _Atomic bool ack;
 } EventBinding;
 
 void event_initialize(void);

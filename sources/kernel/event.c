@@ -3,7 +3,7 @@
 #include <brutal/ds.h>
 #include "kernel/event.h"
 
-static Lock _lock = {};
+static RwLock _lock = {};
 static Vec(EventBinding) _bindings = {};
 
 void event_initialize(void)
@@ -26,12 +26,12 @@ static EventBinding *event_binding_get(Task const *task, BrEvent event)
 
 BrResult event_bind(Task const *task, BrEvent event)
 {
-    LOCK_RETAINER(&_lock);
-
+    rwlock_acquire_write(&_lock);
     EventBinding *existing = event_binding_get(task, event);
 
     if (existing)
     {
+        rwlock_release_write(&_lock);
         return BR_ALREADY_BINDED;
     }
 
@@ -43,6 +43,7 @@ BrResult event_bind(Task const *task, BrEvent event)
 
     vec_push(&_bindings, binding);
 
+    rwlock_release_write(&_lock);
     return BR_SUCCESS;
 }
 
@@ -63,13 +64,18 @@ static BrResult event_unbind_unlocked(Task const *task, BrEvent event)
 
 BrResult event_unbind(Task const *task, BrEvent event)
 {
-    LOCK_RETAINER(&_lock);
-    return event_unbind_unlocked(task, event);
+    rwlock_acquire_write(&_lock);
+
+    BrResult result = event_unbind_unlocked(task, event);
+
+    rwlock_release_write(&_lock);
+
+    return result;
 }
 
 BrResult event_unbind_all(Task const *task)
 {
-    LOCK_RETAINER(&_lock);
+    rwlock_acquire_write(&_lock);
 
     for (int i = 0; i < _bindings.len; i++)
     {
@@ -78,6 +84,8 @@ BrResult event_unbind_all(Task const *task)
             vec_splice(&_bindings, i, 1);
         }
     }
+
+    rwlock_release_write(&_lock);
 
     return BR_SUCCESS;
 }
@@ -96,30 +104,36 @@ static BrResult event_dispatch(Task const *task, BrEvent event)
 
 void event_trigger(BrEvent event)
 {
-    LOCK_RETAINER(&_lock);
+    rwlock_acquire_read(&_lock);
 
     vec_foreach(binding, &_bindings)
     {
-        if (br_event_eq(binding->event, event) && binding->ack)
+        bool expected = true;
+        if (br_event_eq(binding->event, event) &&
+            atomic_compare_exchange_strong(&binding->ack, &expected, true))
         {
             event_dispatch(binding->task, event);
-            binding->ack = false;
         }
     }
+
+    rwlock_release_read(&_lock);
 }
 
 BrResult event_ack(Task const *task, BrEvent event)
 {
-    LOCK_RETAINER(&_lock);
+    rwlock_acquire_read(&_lock);
 
     EventBinding *binding = event_binding_get(task, event);
 
     if (binding == nullptr)
     {
+        rwlock_release_read(&_lock);
         return BR_NOT_BINDED;
     }
 
     binding->ack = true;
+
+    rwlock_release_read(&_lock);
 
     return BR_SUCCESS;
 }
