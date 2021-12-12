@@ -1,23 +1,21 @@
 #include <brutal/base/attributes.h>
 #include <brutal/io/file.h>
-#include <embed/io.h>
+#include <embed/file.h>
 
 MaybeError io_file_open(IoFile *self, Str path)
 {
-    self->handle = TRY(MaybeError, embed_io_file_open(path));
-    return SUCCESS;
+    return embed_file_open(&self->embed, path);
 }
 
 MaybeError io_file_create(IoFile *self, Str path)
 {
-    self->handle = TRY(MaybeError, embed_io_file_create(path));
-    return SUCCESS;
+    return embed_file_create(&self->embed, path);
 }
 
 static IoResult io_file_read_impl(IoFile *self, uint8_t *data, MAYBE_UNUSED size_t offset, size_t size)
 {
 
-    return embed_io_read_file(self->handle, data, size);
+    return embed_file_read(&self->embed, data, size);
 }
 
 IoReader io_file_reader(IoFile *self)
@@ -30,7 +28,7 @@ IoReader io_file_reader(IoFile *self)
 
 static IoResult io_file_write_impl(IoFile *self, uint8_t const *data, MAYBE_UNUSED size_t offset, size_t size)
 {
-    return embed_io_write_file(self->handle, data, size);
+    return embed_file_write(&self->embed, data, size);
 }
 
 IoWriter io_file_writer(IoFile *self)
@@ -43,5 +41,5 @@ IoWriter io_file_writer(IoFile *self)
 
 MaybeError io_file_close(IoFile *self)
 {
-    return embed_io_file_close(self->handle);
+    return embed_file_close(&self->embed);
 }

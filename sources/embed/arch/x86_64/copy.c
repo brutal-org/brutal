@@ -1,6 +1,6 @@
-#include <embed/arch.h>
+#include <embed/mem.h>
 
-void *arch_mem_copy(void *to, void const *from, size_t size)
+void *embed_mem_copy(void *to, void const *from, size_t size)
 {
     asm volatile("rep movsb"
                  : "=D"(to),

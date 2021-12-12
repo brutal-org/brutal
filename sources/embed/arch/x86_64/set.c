@@ -1,6 +1,6 @@
-#include <embed/arch.h>
+#include <embed/mem.h>
 
-void *arch_mem_set(void *d, uint8_t s, size_t c)
+void *embed_mem_set(void *d, uint8_t s, size_t c)
 {
     asm volatile(
         "rep stosb"

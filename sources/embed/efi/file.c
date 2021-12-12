@@ -3,7 +3,7 @@
 #include <brutal/text/utf16.h>
 #include <efi/lib.h>
 #include <efi/protos.h>
-#include <embed/io.h>
+#include <embed/file.h>
 
 static EFILoadedImage *_image_loader = nullptr;
 static EFISimpleFileSystemProtocol *_rootfs = nullptr;
@@ -71,7 +71,7 @@ EfiFileProtocol *efi_rootdir(void)
     return _rootdir;
 }
 
-EmbedIoOpenFileResult embed_io_file_open(Str path)
+MaybeError embed_file_open(EmbedFile *self, Str path)
 {
     uint16_t *cstr = str_to_cstr_utf16(path, alloc_global());
 
@@ -84,39 +84,37 @@ EmbedIoOpenFileResult embed_io_file_open(Str path)
         }
     }
 
-    EfiFileProtocol *file = nullptr;
-
-    EfiStatus status = efi_rootdir()->open(efi_rootdir(), &file, cstr, EFI_FILE_MODE_READ, EFI_FILE_READ_ONLY);
+    EfiStatus status = efi_rootdir()->open(efi_rootdir(), &self->proto, cstr, EFI_FILE_MODE_READ, EFI_FILE_READ_ONLY);
 
     alloc_free(alloc_global(), cstr);
 
     if (status != EFI_SUCCESS)
     {
-        return ERR(EmbedIoOpenFileResult, ERR_UNDEFINED);
+        return ERR(MaybeError, ERR_UNDEFINED);
     }
     else
     {
-        return OK(EmbedIoOpenFileResult, file);
+        return SUCCESS;
     }
 }
 
-EmbedIoOpenFileResult embed_io_file_create(Str path)
+MaybeError embed_file_create(EmbedFile *self, Str path)
 {
+    UNUSED(self);
     UNUSED(path);
-    panic$("embed_io_file_create() not implemented");
+    panic$("embed_file_create() not implemented");
 }
 
-MaybeError embed_io_file_close(EmbedFile handle)
+MaybeError embed_file_close(EmbedFile *self)
 {
-    _rootdir->close((EfiFileProtocol *)handle);
+    _rootdir->close((EfiFileProtocol *)self->proto);
     return SUCCESS;
 }
 
-IoResult embed_io_read_file(EmbedFile handle, uint8_t *data, size_t size)
+IoResult embed_file_read(EmbedFile *self, uint8_t *data, size_t size)
 {
-    EfiFileProtocol *file = handle;
     uint64_t read_write_size = size;
-    EfiStatus status = file->read(file, &read_write_size, data);
+    EfiStatus status = self->proto->read(self->proto, &read_write_size, data);
 
     if (status != EFI_SUCCESS)
     {
@@ -128,31 +126,10 @@ IoResult embed_io_read_file(EmbedFile handle, uint8_t *data, size_t size)
     }
 }
 
-IoResult embed_io_write_file(EmbedFile handle, uint8_t const *data, size_t size)
+IoResult embed_file_write(EmbedFile *self, uint8_t const *data, size_t size)
 {
-    UNUSED(handle);
+    UNUSED(self);
     UNUSED(data);
     UNUSED(size);
-    panic$("embed_io_write_file() not implemented");
-}
-
-IoResult embed_io_read_std(IoStdChannel channel, uint8_t *data, size_t size)
-{
-    UNUSED(channel);
-    UNUSED(data);
-    UNUSED(size);
-    panic$("embed_io_read_std() not implemented");
-}
-
-IoResult embed_io_write_std(IoStdChannel channel, uint8_t const *data, size_t size)
-{
-    assert_not_equal((int)channel, IO_STD_IN);
-
-    uint16_t *cstr = str_to_cstr_utf16_dos(str_n$(size, (char *)data), alloc_global());
-
-    efi_st()->console_out->output_string(efi_st()->console_out, cstr);
-
-    alloc_free(alloc_global(), cstr);
-
-    return OK(IoResult, size);
+    panic$("embed_file_write() not implemented");
 }

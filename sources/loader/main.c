@@ -15,7 +15,7 @@ void __chkstk() { return; }
 
 void loader_splash(void)
 {
-    print(io_std_out(), "Brutal boot\n");
+    print(io_chan_out(), "Brutal boot\n");
 }
 
 void loader_load(Elf64Header const *elf_header, void *base)

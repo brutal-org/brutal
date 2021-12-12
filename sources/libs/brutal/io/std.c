@@ -1,50 +1,50 @@
 #include <brutal/base/attributes.h>
-#include <brutal/base/cast.h>
 #include <brutal/io/std.h>
-#include <embed/io.h>
+#include <embed/chan.h>
+#include <embed/file.h>
 
-static IoResult std_io_read(IoStdChannel *channel, uint8_t *data, MAYBE_UNUSED size_t offset, size_t size)
+static IoResult io_chan_read(IoChan *channel, uint8_t *data, MAYBE_UNUSED size_t offset, size_t size)
 {
-    return embed_io_read_std(*channel, data, size);
+    return embed_chan_read(*channel, data, size);
 }
 
-static IoResult std_io_write(IoStdChannel *channel, uint8_t const *data, MAYBE_UNUSED size_t offset, size_t size)
+static IoResult io_chan_write(IoChan *channel, uint8_t const *data, MAYBE_UNUSED size_t offset, size_t size)
 {
-    return embed_io_write_std(*channel, data, size);
+    return embed_chan_write(*channel, data, size);
 }
 
-static IoStdChannel in_channel = IO_STD_IN;
+static IoChan in_channel = IO_CHAN_IN;
 
 static IoReader in_reader = {
-    .read = (IoRead *)std_io_read,
+    .read = (IoRead *)io_chan_read,
     .context = (void *)&in_channel,
 };
 
-static IoStdChannel out_channel = IO_STD_OUT;
+static IoChan out_channel = IO_CHAN_OUT;
 
 static IoWriter out_writer = {
-    .write = (IoWrite *)std_io_write,
+    .write = (IoWrite *)io_chan_write,
     .context = (void *)&out_channel,
 };
 
-static IoStdChannel err_channel = IO_STD_ERR;
+static IoChan err_channel = IO_CHAN_ERR;
 
 static IoWriter err_writer = {
-    .write = (IoWrite *)std_io_write,
+    .write = (IoWrite *)io_chan_write,
     .context = (void *)&err_channel,
 };
 
-IoReader *io_std_in(void)
+IoReader *io_chan_in(void)
 {
     return &in_reader;
 }
 
-IoWriter *io_std_out(void)
+IoWriter *io_chan_out(void)
 {
     return &out_writer;
 }
 
-IoWriter *io_std_err(void)
+IoWriter *io_chan_err(void)
 {
     return &err_writer;
 }

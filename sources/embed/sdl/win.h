@@ -2,7 +2,8 @@
 
 #include <SDL.h>
 
-struct embed_surface
+struct embed_win
 {
     SDL_Window *sdl_window;
 };
+

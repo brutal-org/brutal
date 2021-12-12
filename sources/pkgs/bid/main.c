@@ -89,7 +89,7 @@ int main(int argc, char const *argv[])
 
     BidIface iface = bid_parse(&scan, base$(&heap));
 
-    if (scan_dump_error(&scan, io_std_err()))
+    if (scan_dump_error(&scan, io_chan_err()))
     {
         return -1;
     }
@@ -97,17 +97,17 @@ int main(int argc, char const *argv[])
     if (str_eq(str$("--json"), str$(argv[2])))
     {
         iface = bid_pass_prefix(iface, base$(&heap));
-        bid_emit_json(iface, io_std_out());
+        bid_emit_json(iface, io_chan_out());
     }
     else if (str_eq(str$("--source"), str$(argv[2])))
     {
         iface = bid_pass_prefix(iface, base$(&heap));
-        bid_emit_source(iface, io_std_out());
+        bid_emit_source(iface, io_chan_out());
     }
     else if (str_eq(str$("--header"), str$(argv[2])))
     {
         iface = bid_pass_prefix(iface, base$(&heap));
-        bid_emit_header(iface, io_std_out());
+        bid_emit_header(iface, io_chan_out());
     }
     else
     {

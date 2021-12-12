@@ -1,4 +1,4 @@
-#include "embed/arch.h"
+#include <embed/debug.h>
 
 struct stackframe
 {
@@ -6,7 +6,7 @@ struct stackframe
     uint64_t rip;
 };
 
-static size_t arch_backtrace_impl(uintptr_t rbp, uintptr_t *buf, size_t cap)
+static size_t embed_debug_backtrace_impl(uintptr_t rbp, uintptr_t *buf, size_t cap)
 {
     struct stackframe *stackframe = (struct stackframe *)rbp;
 
@@ -21,10 +21,10 @@ static size_t arch_backtrace_impl(uintptr_t rbp, uintptr_t *buf, size_t cap)
     return i;
 }
 
-size_t arch_backtrace(uintptr_t *buf, size_t cap)
+size_t embed_debug_backtrace(uintptr_t *buf, size_t cap)
 {
     uintptr_t rbp;
     asm volatile("mov %%rbp, %0"
                  : "=r"(rbp));
-    return arch_backtrace_impl(rbp, buf, cap);
+    return embed_debug_backtrace_impl(rbp, buf, cap);
 }
