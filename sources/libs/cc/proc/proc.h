@@ -6,18 +6,23 @@
 typedef struct
 {
     Str name;
-    Lexemes lexemes;
+    Lexemes source;
     Vec(Str) args;
 } CProcMacro;
 
 typedef struct
 {
-    Lexemes lexemes;
+    Lexemes source;
     Str filename;
     Vec(CProcMacro) macros;
     Vec(Str) files_included;
     Vec(Str) include_path;
     Vec(Str) inside_macro;
+    Alloc *alloc;
 } CProcContext;
 
-Lex cproc_file(Lex *lex, Str filename, Alloc *alloc);
+void cproc_parse_token(Lex *result, Lex *source, CProcContext *context);
+
+void cproc_lex(Lex *out, Lex *source, CProcContext *ctx);
+
+Lex cproc_file(Lex *source, Str filename, Alloc *alloc);
