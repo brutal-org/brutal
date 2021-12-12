@@ -6,6 +6,15 @@ struct
     LexemeType type;
     char const *literal;
 } keywords[] = {
+    {CLEX_PRAGMA, "#pragma"},
+    {CLEX_DEFINE, "#define"},
+    {CLEX_INCLUDE, "#include"},
+    {CLEX_PRE_IFNDEF, "#ifdef"},
+    {CLEX_PRE_IFDEF, "#ifdef"},
+    {CLEX_PRE_IF, "#if"},
+    {CLEX_PRE_ELSE, "#else"},
+    {CLEX_PRE_ELIF, "#elif"},
+    {CLEX_NEWLINE, "\n"},
     {CLEX_AUTO, "auto"},
     {CLEX_BREAK, "break"},
     {CLEX_CASE, "case"},
@@ -99,9 +108,9 @@ static int isidentchar(char v)
 
 static LexemeType clex_impl(Scan *scan)
 {
-    if (isspace(scan_curr(scan)))
+    if (isspace(scan_curr(scan)) && scan_curr(scan) != '\n')
     {
-        while (isspace(scan_curr(scan)) && !scan_ended(scan))
+        while (isspace(scan_curr(scan)) && scan_curr(scan) != '\n' && !scan_ended(scan))
         {
             scan_next(scan);
         }

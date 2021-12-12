@@ -10,9 +10,11 @@ typedef struct
     Lexeme lexeme;
 } LexError;
 
+typedef Vec(Lexeme) Lexemes;
+
 typedef struct
 {
-    Vec(Lexeme) lexemes;
+    Lexemes lexemes;
     int head;
 
     bool has_error;
@@ -24,6 +26,8 @@ typedef LexemeType LexFn(Scan *scan);
 typedef Str LexToStrFn(LexemeType type);
 
 Lex lex(Scan *scan, LexFn *fn, Alloc *alloc);
+
+Lex lex_from_lexeme(Lexemes *from);
 
 void lex_deinit(Lex *self);
 

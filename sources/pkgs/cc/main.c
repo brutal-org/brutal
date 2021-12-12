@@ -3,6 +3,7 @@
 #include <brutal/io.h>
 #include <cc/dump.h>
 #include <cc/parse.h>
+#include <cc/proc/proc.h>
 #include <cc/trans.h>
 
 int main(int argc, char const *argv[])
@@ -31,14 +32,15 @@ int main(int argc, char const *argv[])
     Scan scan;
     scan_init(&scan, buf_str(&source_buf));
 
-    Lex lex = clex(&scan, base$(&heap));
+    Lex unprocessed = clex(&scan, base$(&heap));
+    Lex processed = cproc_file(&unprocessed, str$(argv[1]), base$(&heap));
 
     if (scan_dump_error(&scan, io_chan_err()))
     {
         return -1;
     }
 
-    CUnit unit = cparse_unit(&lex, base$(&heap));
+    CUnit unit = cparse_unit(&processed, base$(&heap));
 
     Emit emit;
     emit_init(&emit, io_chan_out());
