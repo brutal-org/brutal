@@ -2,6 +2,8 @@
 
 #include <cc/ast/decl.h>
 
+CDecl cdecl_empty(void);
+
 CDecl cdecl_type(Str name, CType type);
 
 CDecl cdecl_var(Str name, CType type, CExpr expr);
