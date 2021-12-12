@@ -14,13 +14,13 @@ static bool lock_try_acquire_impl(Lock *lock)
 
 bool lock_try_acquire(Lock *lock)
 {
-    host_enter_critical_section();
+    embed_enter_critical_section();
 
     int result = lock_try_acquire_impl(lock);
 
     if (!result)
     {
-        host_leave_critical_section();
+        embed_leave_critical_section();
     }
 
     return result;
@@ -28,7 +28,7 @@ bool lock_try_acquire(Lock *lock)
 
 void lock_acquire(Lock *lock)
 {
-    host_enter_critical_section();
+    embed_enter_critical_section();
 
     while (!lock_try_acquire_impl(lock))
     {
@@ -46,5 +46,5 @@ void lock_release(Lock *lock)
     atomic_thread_fence(memory_order_seq_cst);
     lock->locked = false;
 
-    host_leave_critical_section();
+    embed_leave_critical_section();
 }

@@ -98,7 +98,7 @@ static char *_witty[] = {
     "You've been pwned",
     "You've been terminated",
     "Hope. It is the quintessential human delusion",
-    "Remember, all I’m offering is the truth.Nothing more.",
+    "Remember, all I’m offering is the truth. Nothing more.",
     "It is remarkable how similar the pattern of programming are to the pattern of insanity.",
     "I have imagined this moment for a long time. Is it real?",
     "What happened happened and couldn’t have happened any other way.",

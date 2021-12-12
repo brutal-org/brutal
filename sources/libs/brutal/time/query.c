@@ -4,12 +4,12 @@
 
 Tick tick_now(void)
 {
-    return host_time_current_tick();
+    return embed_time_current_tick();
 }
 
 TimeStamp timestamp_now(void)
 {
-    return host_time_current_timestamp();
+    return embed_time_current_timestamp();
 }
 
 Date date_now(void)

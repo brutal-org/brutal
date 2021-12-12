@@ -164,7 +164,7 @@ void *realloc(void *ptr, size_t size)
 
 _Noreturn void abort(void)
 {
-    host_log_panic();
+    embed_log_panic();
 }
 
 // int atexit(void (*func)(void));
@@ -173,14 +173,14 @@ _Noreturn void abort(void)
 
 _Noreturn void exit(int status)
 {
-    host_task_exit(host_task_self(), status);
-    host_log_panic();
+    embed_task_exit(embed_task_self(), status);
+    embed_log_panic();
 }
 
 _Noreturn void _Exit(int status)
 {
-    host_task_exit(host_task_self(), status);
-    host_log_panic();
+    embed_task_exit(embed_task_self(), status);
+    embed_log_panic();
 }
 
 // char *getenv(char const *name);

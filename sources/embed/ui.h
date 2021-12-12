@@ -12,14 +12,14 @@
 #    error "Unsupported embedder!"
 #endif
 
-typedef struct host_ui_surface HostUiSurface;
+typedef struct embed_surface EmbedUiSurface;
 
-void host_ui_surface_init(HostUiSurface *self, int width, int height);
+void embed_surface_init(EmbedUiSurface *self, int width, int height);
 
-void host_ui_surface_deinit(HostUiSurface *self);
+void embed_surface_deinit(EmbedUiSurface *self);
 
-void host_ui_surface_visible(HostUiSurface *self, bool visible);
+void embed_surface_visible(EmbedUiSurface *self, bool visible);
 
-void host_ui_surface_flip(HostUiSurface *self, Recti rect);
+void embed_surface_flip(EmbedUiSurface *self, Recti rect);
 
-GfxSurface host_ui_surface_surface(HostUiSurface *self);
+GfxSurface embed_surface_surface(EmbedUiSurface *self);

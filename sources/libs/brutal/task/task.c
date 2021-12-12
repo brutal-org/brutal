@@ -8,7 +8,7 @@ struct task *task_self(void)
 {
     if (!task_initialized)
     {
-        self_task.handle = host_task_self();
+        self_task.handle = embed_task_self();
         task_initialized = true;
     }
 
@@ -33,7 +33,7 @@ void task_run(struct task *task)
     switch (task->type)
     {
     case TASK_FORK:
-        task->handle = host_task_fork();
+        task->handle = embed_task_fork();
         break;
 
     default:
@@ -43,15 +43,15 @@ void task_run(struct task *task)
 
 void task_exit(struct task *task, int result)
 {
-    host_task_exit(task->handle, result);
+    embed_task_exit(task->handle, result);
 }
 
 void task_abort(struct task *task)
 {
-    host_task_abort(task->handle);
+    embed_task_abort(task->handle);
 }
 
 TaskWaitResult task_wait(struct task *task)
 {
-    return OK(TaskWaitResult, host_task_wait(task->handle));
+    return OK(TaskWaitResult, embed_task_wait(task->handle));
 }

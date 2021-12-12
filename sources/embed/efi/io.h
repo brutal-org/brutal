@@ -1,3 +1,3 @@
 #pragma once
 
-typedef void *HostIoFile;
+typedef void *EmbedFile;

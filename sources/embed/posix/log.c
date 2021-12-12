@@ -9,17 +9,17 @@
 static bool _init = false;
 static IoWriter _log;
 
-void host_log_lock(void)
+void embed_log_lock(void)
 {
     // FIXME: no-op
 }
 
-void host_log_unlock(void)
+void embed_log_unlock(void)
 {
     // FIXME: no-op
 }
 
-static IoResult host_log_write(MAYBE_UNUSED void *context, uint8_t const *data, MAYBE_UNUSED size_t offset, size_t size)
+static IoResult embed_log_write(MAYBE_UNUSED void *context, uint8_t const *data, MAYBE_UNUSED size_t offset, size_t size)
 {
     if (write(2, data, size) == -1)
     {
@@ -29,18 +29,18 @@ static IoResult host_log_write(MAYBE_UNUSED void *context, uint8_t const *data, 
     return OK(IoResult, size);
 }
 
-IoWriter *host_log_writer(void)
+IoWriter *embed_log_writer(void)
 {
     if (!_init)
     {
-        _log.write = host_log_write;
+        _log.write = embed_log_write;
         _init = true;
     }
 
     return &_log;
 }
 
-void host_log_panic(void)
+void embed_log_panic(void)
 {
     abort();
 }

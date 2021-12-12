@@ -2,13 +2,13 @@
 
 void app_init(App *self)
 {
-    host_app_init(&self->host);
+    embed_app_init(&self->host);
     self->running = true;
 }
 
 void app_deinit(App *self)
 {
-    host_app_deinit(&self->host);
+    embed_app_deinit(&self->host);
 }
 
 int app_run(App *self)
@@ -25,7 +25,7 @@ int app_run(App *self)
 
 void app_pump(App *self)
 {
-    host_app_pump(&self->host);
+    embed_app_pump(&self->host);
 }
 
 void app_exit(App *self, int exit)

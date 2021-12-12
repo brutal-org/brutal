@@ -3,7 +3,7 @@
 #include <efi/srvs/bs.h>
 #include <embed/mem.h>
 
-Error host_mem_acquire(size_t size, void **out_result, MAYBE_UNUSED enum host_mem_flag flags)
+Error embed_mem_acquire(size_t size, void **out_result, MAYBE_UNUSED enum embed_mem_flag flags)
 {
     EfiStatus status = efi_st()->boot_services->allocate_pool(EFI_BOOT_SERVICES_DATA, size, out_result);
 
@@ -16,17 +16,17 @@ Error host_mem_acquire(size_t size, void **out_result, MAYBE_UNUSED enum host_me
     return ERR_SUCCESS;
 }
 
-Error host_mem_release(void *addr, MAYBE_UNUSED size_t size)
+Error embed_mem_release(void *addr, MAYBE_UNUSED size_t size)
 {
     efi_st()->boot_services->free_pool(addr);
 
     return ERR_SUCCESS;
 }
 
-void host_mem_lock(void)
+void embed_mem_lock(void)
 {
 }
 
-void host_mem_unlock(void)
+void embed_mem_unlock(void)
 {
 }

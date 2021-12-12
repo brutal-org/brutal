@@ -1,6 +1,6 @@
 #pragma once
 
-struct host_ui_surface
+struct embed_surface
 {
     int _dummy;
 };

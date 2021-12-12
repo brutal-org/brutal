@@ -1,6 +1,6 @@
 #include <embed/ui.h>
 
-void host_ui_surface_init(HostUiSurface *self, int width, int height)
+void embed_surface_init(EmbedUiSurface *self, int width, int height)
 {
     self->sdl_window = SDL_CreateWindow(
         "QEMU",
@@ -11,12 +11,12 @@ void host_ui_surface_init(HostUiSurface *self, int width, int height)
         SDL_WINDOW_HIDDEN | SDL_WINDOW_ALLOW_HIGHDPI);
 }
 
-void host_ui_surface_deinit(HostUiSurface *self)
+void embed_surface_deinit(EmbedUiSurface *self)
 {
     SDL_DestroyWindow(self->sdl_window);
 }
 
-void host_ui_surface_visible(HostUiSurface *self, bool visible)
+void embed_surface_visible(EmbedUiSurface *self, bool visible)
 {
     if (visible)
     {
@@ -28,13 +28,13 @@ void host_ui_surface_visible(HostUiSurface *self, bool visible)
     }
 }
 
-void host_ui_surface_flip(HostUiSurface *self, Recti rect)
+void embed_surface_flip(EmbedUiSurface *self, Recti rect)
 {
     SDL_Rect sdl_rect = {rect.x, rect.y, rect.w, rect.h};
     SDL_UpdateWindowSurfaceRects(self->sdl_window, &sdl_rect, 1);
 }
 
-GfxSurface host_ui_surface_surface(HostUiSurface *self)
+GfxSurface embed_surface_surface(EmbedUiSurface *self)
 {
     SDL_Surface *sdl_surface = SDL_GetWindowSurface(self->sdl_window);
 

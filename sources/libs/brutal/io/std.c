@@ -5,12 +5,12 @@
 
 static IoResult std_io_read(IoStdChannel *channel, uint8_t *data, MAYBE_UNUSED size_t offset, size_t size)
 {
-    return host_io_read_std(*channel, data, size);
+    return embed_io_read_std(*channel, data, size);
 }
 
 static IoResult std_io_write(IoStdChannel *channel, uint8_t const *data, MAYBE_UNUSED size_t offset, size_t size)
 {
-    return host_io_write_std(*channel, data, size);
+    return embed_io_write_std(*channel, data, size);
 }
 
 static IoStdChannel in_channel = IO_STD_IN;

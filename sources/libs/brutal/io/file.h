@@ -6,7 +6,7 @@
 
 typedef struct
 {
-    HostIoFile handle;
+    EmbedFile handle;
 } IoFile;
 
 MaybeError io_file_open(IoFile *self, Str path);

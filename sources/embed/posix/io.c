@@ -8,41 +8,41 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-HostIoOpenFileResult host_io_file_open(Str path)
+EmbedIoOpenFileResult embed_io_file_open(Str path)
 {
     char *cstr = (char *)str_to_cstr_utf8(path, alloc_global());
 
-    HostIoFile handle = open(cstr, O_RDONLY);
+    EmbedFile handle = open(cstr, O_RDONLY);
 
     alloc_free(alloc_global(), cstr);
 
     if (handle == -1)
     {
         Error error = error_from_errno();
-        return ERR(HostIoOpenFileResult, error);
+        return ERR(EmbedIoOpenFileResult, error);
     }
 
-    return OK(HostIoOpenFileResult, handle);
+    return OK(EmbedIoOpenFileResult, handle);
 }
 
-HostIoOpenFileResult host_io_file_create(Str path)
+EmbedIoOpenFileResult embed_io_file_create(Str path)
 {
     char *cstr = (char *)str_to_cstr_utf8(path, alloc_global());
 
-    HostIoFile handle = open(cstr, O_CREAT | O_WRONLY | O_TRUNC, 0666);
+    EmbedFile handle = open(cstr, O_CREAT | O_WRONLY | O_TRUNC, 0666);
 
     alloc_free(alloc_global(), cstr);
 
     if (handle == -1)
     {
         Error error = error_from_errno();
-        return ERR(HostIoOpenFileResult, error);
+        return ERR(EmbedIoOpenFileResult, error);
     }
 
-    return OK(HostIoOpenFileResult, handle);
+    return OK(EmbedIoOpenFileResult, handle);
 }
 
-MaybeError host_io_file_close(HostIoFile handle)
+MaybeError embed_io_file_close(EmbedFile handle)
 {
     int result = close(handle);
 
@@ -55,7 +55,7 @@ MaybeError host_io_file_close(HostIoFile handle)
     return SUCCESS;
 }
 
-IoResult host_io_read_file(HostIoFile handle, uint8_t *data, size_t size)
+IoResult embed_io_read_file(EmbedFile handle, uint8_t *data, size_t size)
 {
     ssize_t result = read(handle, data, size);
 
@@ -68,7 +68,7 @@ IoResult host_io_read_file(HostIoFile handle, uint8_t *data, size_t size)
     return OK(IoResult, result);
 }
 
-IoResult host_io_write_file(HostIoFile handle, uint8_t const *data, size_t size)
+IoResult embed_io_write_file(EmbedFile handle, uint8_t const *data, size_t size)
 {
     ssize_t result = write(handle, data, size);
 
@@ -81,7 +81,7 @@ IoResult host_io_write_file(HostIoFile handle, uint8_t const *data, size_t size)
     return OK(IoResult, result);
 }
 
-IoResult host_io_read_std(IoStdChannel channel, uint8_t *data, size_t size)
+IoResult embed_io_read_std(IoStdChannel channel, uint8_t *data, size_t size)
 {
     assert_equal((int)channel, IO_STD_IN);
 
@@ -96,7 +96,7 @@ IoResult host_io_read_std(IoStdChannel channel, uint8_t *data, size_t size)
     return OK(IoResult, result);
 }
 
-IoResult host_io_write_std(IoStdChannel channel, uint8_t const *data, size_t size)
+IoResult embed_io_write_std(IoStdChannel channel, uint8_t const *data, size_t size)
 {
     ssize_t result = write((int)channel, data, size);
 

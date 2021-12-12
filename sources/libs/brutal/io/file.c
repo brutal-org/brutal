@@ -4,20 +4,20 @@
 
 MaybeError io_file_open(IoFile *self, Str path)
 {
-    self->handle = TRY(MaybeError, host_io_file_open(path));
+    self->handle = TRY(MaybeError, embed_io_file_open(path));
     return SUCCESS;
 }
 
 MaybeError io_file_create(IoFile *self, Str path)
 {
-    self->handle = TRY(MaybeError, host_io_file_create(path));
+    self->handle = TRY(MaybeError, embed_io_file_create(path));
     return SUCCESS;
 }
 
 static IoResult io_file_read_impl(IoFile *self, uint8_t *data, MAYBE_UNUSED size_t offset, size_t size)
 {
 
-    return host_io_read_file(self->handle, data, size);
+    return embed_io_read_file(self->handle, data, size);
 }
 
 IoReader io_file_reader(IoFile *self)
@@ -30,7 +30,7 @@ IoReader io_file_reader(IoFile *self)
 
 static IoResult io_file_write_impl(IoFile *self, uint8_t const *data, MAYBE_UNUSED size_t offset, size_t size)
 {
-    return host_io_write_file(self->handle, data, size);
+    return embed_io_write_file(self->handle, data, size);
 }
 
 IoWriter io_file_writer(IoFile *self)
@@ -43,5 +43,5 @@ IoWriter io_file_writer(IoFile *self)
 
 MaybeError io_file_close(IoFile *self)
 {
-    return host_io_file_close(self->handle);
+    return embed_io_file_close(self->handle);
 }
