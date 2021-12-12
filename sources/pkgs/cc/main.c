@@ -33,7 +33,7 @@ int main(int argc, char const *argv[])
 
     Lex lex = clex(&scan, base$(&heap));
 
-    if (scan_dump_error(&scan, io_std_err()))
+    if (scan_dump_error(&scan, io_chan_err()))
     {
         return -1;
     }
@@ -41,7 +41,7 @@ int main(int argc, char const *argv[])
     CUnit unit = cparse_unit(&lex, base$(&heap));
 
     Emit emit;
-    emit_init(&emit, io_std_out());
+    emit_init(&emit, io_chan_out());
 
     emit_fmt(&emit, "\n");
 

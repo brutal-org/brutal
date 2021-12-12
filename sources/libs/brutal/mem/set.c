@@ -1,10 +1,10 @@
 #include <brutal/mem/funcs.h>
-#include <embed/arch.h>
+#include <embed/mem.h>
 
 void *mem_set(void *s, uint8_t c, size_t n)
 {
-#ifdef ARCH_HAS_MEMSET
-    return arch_mem_set(s, c, n);
+#ifdef EMBED_HAS_MEMSET
+    return embed_mem_set(s, c, n);
 #else
     uint8_t *dest = (uint8_t *)s;
 

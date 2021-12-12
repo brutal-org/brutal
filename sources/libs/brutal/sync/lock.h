@@ -1,5 +1,6 @@
 #pragma once
 
+#include <brutal/base/attributes.h>
 #include <brutal/base/keywords.h>
 #include <brutal/base/std.h>
 

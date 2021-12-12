@@ -1,5 +1,5 @@
 #include <brutal/debug.h>
-#include <embed/arch.h>
+#include <embed/debug.h>
 #include <embed/log.h>
 
 #ifdef __kernel__
@@ -41,7 +41,7 @@ noreturn void panic_impl(LogLevel level, SourceLocation location, Str fmt, Print
     print(embed_log_writer(), "Backtrace:\n");
 
     uintptr_t buf[128];
-    size_t len = arch_backtrace(buf, 128);
+    size_t len = embed_debug_backtrace(buf, 128);
 
     for (size_t i = 0; i < len; i++)
     {

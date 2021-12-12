@@ -1,6 +1,6 @@
 #pragma once
 
-struct embed_surface
+struct embed_win
 {
     int _dummy;
 };

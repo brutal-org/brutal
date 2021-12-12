@@ -1,9 +1,9 @@
-void embed_enter_critical_section(void)
+void embed_sync_enter(void)
 {
     /* no-op */
 }
 
-void embed_leave_critical_section(void)
+void embed_sync_leave(void)
 {
     /* no-op */
 }
