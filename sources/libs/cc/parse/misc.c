@@ -2,8 +2,7 @@
 
 void cparse_whitespace(Lex *lex)
 {
-    while (lex_curr_type(lex) == CLEX_COMMENT ||
-           lex_curr_type(lex) == CLEX_WHITESPACE)
+    while (lex_curr_type(lex) == CLEX_WHITESPACE)
     {
         lex_next(lex);
     }

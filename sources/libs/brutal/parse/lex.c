@@ -24,6 +24,14 @@ Lex lex(Scan *scan, LexFn *fn, Alloc *alloc)
     return self;
 }
 
+Lex lex_from_lexeme(Lexemes *from)
+{
+    Lex self = {};
+    self.lexemes = *from;
+
+    return self;
+}
+
 void lex_deinit(Lex *self)
 {
     vec_deinit(&self->lexemes);

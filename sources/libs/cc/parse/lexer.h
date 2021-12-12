@@ -5,6 +5,16 @@
 #define FOREACH_LEXEMES(LEXEME) \
     LEXEME(WHITESPACE)          \
     LEXEME(COMMENT)             \
+    LEXEME(PRAGMA)              \
+    LEXEME(DEFINE)              \
+    LEXEME(PRE_IF)              \
+    LEXEME(PRE_IFDEF)           \
+    LEXEME(PRE_IFNDEF)          \
+    LEXEME(PRE_ELIF)            \
+    LEXEME(PRE_ELSE)            \
+    LEXEME(PRE_ENDIF)           \
+    LEXEME(INCLUDE)             \
+    LEXEME(NEWLINE)             \
     LEXEME(IDENT)               \
     LEXEME(INTEGER)             \
     LEXEME(AUTO)                \
