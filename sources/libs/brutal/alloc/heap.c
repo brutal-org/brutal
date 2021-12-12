@@ -26,7 +26,7 @@ static HeapMajor *major_block_create(size_t size, NodeSize node_size)
     st = MAX(st, (size_t)node_size / MEM_PAGE_SIZE); // The number of pages to request per chunk.
 
     HeapMajor *maj;
-    if (host_mem_acquire(st * MEM_PAGE_SIZE, (void **)&maj, HOST_MEM_NONE).kind != ERR_KIND_SUCCESS)
+    if (embed_mem_acquire(st * MEM_PAGE_SIZE, (void **)&maj, EMBED_MEM_NONE).kind != ERR_KIND_SUCCESS)
     {
         panic$("Failled to allocate memory!");
     }
@@ -346,7 +346,7 @@ void heap_alloc_release(HeapAlloc *alloc, void *ptr)
             maj->next->prev = maj->prev;
         }
 
-        host_mem_release(maj, maj->pages * MEM_PAGE_SIZE);
+        embed_mem_release(maj, maj->pages * MEM_PAGE_SIZE);
     }
     else
     {
@@ -418,7 +418,7 @@ void heap_alloc_deinit(HeapAlloc *alloc)
     while (current)
     {
         HeapMajor *next = current->next;
-        host_mem_release(current, current->pages * MEM_PAGE_SIZE);
+        embed_mem_release(current, current->pages * MEM_PAGE_SIZE);
         current = next;
     }
 

@@ -71,7 +71,7 @@ EfiFileProtocol *efi_rootdir(void)
     return _rootdir;
 }
 
-HostIoOpenFileResult host_io_file_open(Str path)
+EmbedIoOpenFileResult embed_io_file_open(Str path)
 {
     uint16_t *cstr = str_to_cstr_utf16(path, alloc_global());
 
@@ -92,27 +92,27 @@ HostIoOpenFileResult host_io_file_open(Str path)
 
     if (status != EFI_SUCCESS)
     {
-        return ERR(HostIoOpenFileResult, ERR_UNDEFINED);
+        return ERR(EmbedIoOpenFileResult, ERR_UNDEFINED);
     }
     else
     {
-        return OK(HostIoOpenFileResult, file);
+        return OK(EmbedIoOpenFileResult, file);
     }
 }
 
-HostIoOpenFileResult host_io_file_create(Str path)
+EmbedIoOpenFileResult embed_io_file_create(Str path)
 {
     UNUSED(path);
-    panic$("host_io_file_create() not implemented");
+    panic$("embed_io_file_create() not implemented");
 }
 
-MaybeError host_io_file_close(HostIoFile handle)
+MaybeError embed_io_file_close(EmbedFile handle)
 {
     _rootdir->close((EfiFileProtocol *)handle);
     return SUCCESS;
 }
 
-IoResult host_io_read_file(HostIoFile handle, uint8_t *data, size_t size)
+IoResult embed_io_read_file(EmbedFile handle, uint8_t *data, size_t size)
 {
     EfiFileProtocol *file = handle;
     uint64_t read_write_size = size;
@@ -128,23 +128,23 @@ IoResult host_io_read_file(HostIoFile handle, uint8_t *data, size_t size)
     }
 }
 
-IoResult host_io_write_file(HostIoFile handle, uint8_t const *data, size_t size)
+IoResult embed_io_write_file(EmbedFile handle, uint8_t const *data, size_t size)
 {
     UNUSED(handle);
     UNUSED(data);
     UNUSED(size);
-    panic$("host_io_write_file() not implemented");
+    panic$("embed_io_write_file() not implemented");
 }
 
-IoResult host_io_read_std(IoStdChannel channel, uint8_t *data, size_t size)
+IoResult embed_io_read_std(IoStdChannel channel, uint8_t *data, size_t size)
 {
     UNUSED(channel);
     UNUSED(data);
     UNUSED(size);
-    panic$("host_io_read_std() not implemented");
+    panic$("embed_io_read_std() not implemented");
 }
 
-IoResult host_io_write_std(IoStdChannel channel, uint8_t const *data, size_t size)
+IoResult embed_io_write_std(IoStdChannel channel, uint8_t const *data, size_t size)
 {
     assert_not_equal((int)channel, IO_STD_IN);
 

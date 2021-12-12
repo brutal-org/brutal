@@ -9,17 +9,17 @@ static Lock _lock;
 static Buf _buf = {};
 static IoWriter _log = {};
 
-void host_log_lock(void)
+void embed_log_lock(void)
 {
     lock_acquire(&_lock);
 }
 
-void host_log_unlock(void)
+void embed_log_unlock(void)
 {
     lock_release(&_lock);
 }
 
-static IoResult host_log_write(MAYBE_UNUSED void *context, uint8_t const *data, MAYBE_UNUSED size_t offset, size_t size)
+static IoResult embed_log_write(MAYBE_UNUSED void *context, uint8_t const *data, MAYBE_UNUSED size_t offset, size_t size)
 {
     for (size_t i = 0; i < size; i++)
     {
@@ -39,11 +39,11 @@ static IoResult host_log_write(MAYBE_UNUSED void *context, uint8_t const *data, 
     return OK(IoResult, size);
 }
 
-IoWriter *host_log_writer(void)
+IoWriter *embed_log_writer(void)
 {
     if (!_initialized)
     {
-        _log.write = host_log_write;
+        _log.write = embed_log_write;
         buf_init(&_buf, 128, alloc_global());
         _initialized = true;
     }
@@ -51,7 +51,7 @@ IoWriter *host_log_writer(void)
     return &_log;
 }
 
-void host_log_panic(void)
+void embed_log_panic(void)
 {
     br_exit(&(BrExitArgs){
         .task = BR_TASK_SELF,

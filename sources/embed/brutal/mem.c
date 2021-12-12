@@ -1,17 +1,17 @@
 #include <bal/abi.h>
 #include <embed/mem.h>
 
-void host_mem_lock(void)
+void embed_mem_lock(void)
 {
     // NO-OP
 }
 
-void host_mem_unlock(void)
+void embed_mem_unlock(void)
 {
     // NO-OP
 }
 
-Error host_mem_acquire(size_t size, void **out_result, MAYBE_UNUSED enum host_mem_flag flags)
+Error embed_mem_acquire(size_t size, void **out_result, MAYBE_UNUSED enum embed_mem_flag flags)
 {
     // Create the memory object
 
@@ -55,7 +55,7 @@ Error host_mem_acquire(size_t size, void **out_result, MAYBE_UNUSED enum host_me
     return ERR_SUCCESS;
 }
 
-Error host_mem_release(void *addr, size_t size)
+Error embed_mem_release(void *addr, size_t size)
 {
     BrResult result = br_unmap(&(BrUnmapArgs){
         .space = BR_SPACE_SELF,

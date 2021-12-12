@@ -1,27 +1,27 @@
 #include <embed/task.h>
+#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include <stdlib.h>
 
-TaskId host_task_self(void)
+TaskId embed_task_self(void)
 {
     return getpid();
 }
 
-TaskId host_task_fork(void)
+TaskId embed_task_fork(void)
 {
     return fork();
 }
 
-int host_task_wait(TaskId handle)
+int embed_task_wait(TaskId handle)
 {
     int result = -1;
     waitpid(handle, &result, 0);
     return result;
 }
 
-void host_task_exit(TaskId handle, int result)
+void embed_task_exit(TaskId handle, int result)
 {
     if (handle == TASK_THIS)
     {
@@ -29,7 +29,7 @@ void host_task_exit(TaskId handle, int result)
     }
 }
 
-void host_task_abort(TaskId handle)
+void embed_task_abort(TaskId handle)
 {
     if (handle == TASK_THIS)
     {

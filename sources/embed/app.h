@@ -10,10 +10,10 @@
 #    error "Unsupported embedder!"
 #endif
 
-typedef struct host_app HostApp;
+typedef struct embed_app EmbedApp;
 
-void host_app_init(HostApp *self);
+void embed_app_init(EmbedApp *self);
 
-void host_app_deinit(HostApp *self);
+void embed_app_deinit(EmbedApp *self);
 
-void host_app_pump(HostApp *self);
+void embed_app_pump(EmbedApp *self);

@@ -20,18 +20,18 @@
 #    error "Unsupported embedder!"
 #endif
 
-typedef Result(Error, HostIoFile) HostIoOpenFileResult;
+typedef Result(Error, EmbedFile) EmbedIoOpenFileResult;
 
-HostIoOpenFileResult host_io_file_open(Str path);
+EmbedIoOpenFileResult embed_io_file_open(Str path);
 
-HostIoOpenFileResult host_io_file_create(Str path);
+EmbedIoOpenFileResult embed_io_file_create(Str path);
 
-MaybeError host_io_file_close(HostIoFile handle);
+MaybeError embed_io_file_close(EmbedFile handle);
 
-IoResult host_io_read_file(HostIoFile handle, uint8_t *data, size_t size);
+IoResult embed_io_read_file(EmbedFile handle, uint8_t *data, size_t size);
 
-IoResult host_io_write_file(HostIoFile handle, uint8_t const *data, size_t size);
+IoResult embed_io_write_file(EmbedFile handle, uint8_t const *data, size_t size);
 
-IoResult host_io_read_std(IoStdChannel channel, uint8_t *data, size_t size);
+IoResult embed_io_read_std(IoStdChannel channel, uint8_t *data, size_t size);
 
-IoResult host_io_write_std(IoStdChannel channel, uint8_t const *data, size_t size);
+IoResult embed_io_write_std(IoStdChannel channel, uint8_t const *data, size_t size);

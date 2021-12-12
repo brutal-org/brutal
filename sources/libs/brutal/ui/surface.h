@@ -5,7 +5,7 @@
 
 typedef struct
 {
-    HostUiSurface host;
+    EmbedUiSurface host;
 } UiSurface;
 
 void ui_surface_init(UiSurface *self, int width, int height);

@@ -5,7 +5,7 @@
 
 typedef struct
 {
-    HostApp host;
+    EmbedApp host;
 
     bool running;
     int exit_value;

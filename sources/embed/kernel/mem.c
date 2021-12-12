@@ -3,19 +3,19 @@
 #include <embed/mem.h>
 #include "kernel/heap.h"
 
-static Lock _lock ;
+static Lock _lock;
 
-void host_mem_lock(void)
+void embed_mem_lock(void)
 {
     lock_acquire(&_lock);
 }
 
-void host_mem_unlock(void)
+void embed_mem_unlock(void)
 {
     lock_release(&_lock);
 }
 
-Error host_mem_acquire(size_t size, void **out_result, MAYBE_UNUSED enum host_mem_flag flags)
+Error embed_mem_acquire(size_t size, void **out_result, MAYBE_UNUSED enum embed_mem_flag flags)
 {
     HeapResult alloc_result = heap_alloc(size);
 
@@ -29,7 +29,7 @@ Error host_mem_acquire(size_t size, void **out_result, MAYBE_UNUSED enum host_me
     return ERR_SUCCESS;
 }
 
-Error host_mem_release(void *addr, size_t size)
+Error embed_mem_release(void *addr, size_t size)
 {
     // We assumed that free succeed
     heap_free((HeapRange){(uintptr_t)addr, size});
