@@ -9,6 +9,7 @@ typedef enum
 {
     CDECL_NIL,
 
+    CDECL_EMPTY,
     CDECL_TYPE,
     CDECL_VAR,
     CDECL_FUNC,

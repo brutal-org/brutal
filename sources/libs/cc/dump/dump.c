@@ -353,6 +353,10 @@ void cdump_decl(Emit *emit, CDecl decl)
         cdump_type(emit, decl.func_.type);
         cdump_stmt(emit, decl.func_.body);
     }
+    else if (decl.type == CDECL_EMPTY)
+    {
+        emit_fmt(emit, "empty");
+    }
 
     emit_deident(emit);
 }

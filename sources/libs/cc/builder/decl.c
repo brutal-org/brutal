@@ -1,5 +1,12 @@
 #include <cc/builder/decl.h>
 
+CDecl cdecl_empty(void)
+{
+    return (CDecl){
+        .type = CDECL_EMPTY,
+    };
+}
+
 CDecl cdecl_type(Str name, CType type)
 {
     return (CDecl){
