@@ -14,8 +14,7 @@ int main(int argc, char const *argv[])
     BvmLocal local;
     bvm_local_init(&local, alloc_global());
 
-    BvmSig *sig = bvm_sig_create(nullptr, false, alloc_global());
-    BvmFunc *func = bvm_func_create(sig, alloc_global());
+    BvmFunc *func = bvm_func_create(alloc_global());
 
     /* long long int fibb(int n) {
     int fnow = 0, fnext = 1, tempf;

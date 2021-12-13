@@ -1,6 +1,5 @@
 #include <bvm/ctx/global.h>
 #include <bvm/obj/obj.h>
-#include <bvm/obj/type.h>
 
 void bvm_global_init(BvmGlobal *self, Alloc *alloc)
 {
@@ -28,4 +27,3 @@ int bvm_global_add(BvmGlobal *self, Str name, BvmVal val)
     vec_push(&self->data, sym);
     return self->data.len - 1;
 }
-

@@ -1,92 +1,87 @@
 #include <bvm/obj/obj.h>
 
-BvmVal bvm_obj_create(BvmType *type, Alloc *alloc)
+BvmObj *bvm_obj_create(size_t size, BvmObj *proto, Alloc *alloc)
 {
-    return bvm_obj_create_native(type, nullptr, 0, alloc);
+    size_t alloc_size = sizeof(BvmObj) + size * sizeof(BvmVal);
+
+    BvmObj *self = alloc_malloc(alloc, alloc_size);
+    self->proto = proto;
+    self->len = proto->len;
+
+    return self;
 }
 
-BvmVal bvm_obj_create_native(BvmType *type, void *data, size_t size, Alloc *alloc)
+BvmVal bvm_obj_load(BvmObj *self, size_t index)
 {
-    size_t managed_size = type->fields.len * sizeof(BvmVal);
-
-    BvmObj *obj = alloc_malloc(alloc, sizeof(BvmObj) + managed_size + size);
-    obj->type = type;
-
-    obj->vals = (BvmVal *)((char *)obj + sizeof(BvmObj));
-    obj->vals_len = type->fields.len;
-
-    obj->nvals = ((char *)obj + sizeof(BvmObj) + managed_size);
-    obj->nvals_len = size;
-    mem_cpy(obj->nvals, data, size);
-
-    return bvm_val_obj(obj);
-}
-
-BvmVal bvm_obj_load(BvmVal val, size_t index)
-{
-    if (val.type != BVM_VAL_OBJ)
+    if (index >= self->len)
     {
-        return bvm_val_nil();
+        return bvm_val_undef();
     }
 
-    BvmObj *obj = val.obj_;
-
-    return obj->vals[index];
+    return self->vals[index];
 }
 
-BvmVal bvm_obj_loadv(BvmVal val, size_t index)
+BvmVal bvm_obj_loadv(BvmObj *self, size_t index)
 {
-    if (val.type != BVM_VAL_OBJ)
+    if (!self)
     {
-        return bvm_val_nil();
+        return bvm_val_undef();
     }
 
-    BvmType *type = val.obj_->type;
-    return bvm_type_loadv(type, index);
+    if (index >= self->len)
+    {
+        return bvm_val_undef();
+    }
+
+    if (self->vals[index].type != BVM_UNDEF)
+    {
+        return self->vals[index];
+    }
+
+    return bvm_obj_loadv(self->proto, index);
 }
 
-void bvm_obj_store(BvmVal val, size_t index, BvmVal data)
+void bvm_obj_store(BvmObj *self, size_t index, BvmVal data)
 {
-    if (val.type != BVM_VAL_OBJ)
+    if (index >= self->len)
     {
         return;
     }
 
-    BvmObj *obj = val.obj_;
-
-    obj->vals[index] = data;
+    self->vals[index] = data;
 }
 
-void bvm_obj_storev(BvmVal val, size_t index, BvmVal data)
+void bvm_obj_storev(BvmObj *self, size_t index, BvmVal data)
 {
-    if (val.type != BVM_VAL_OBJ)
+    if (!self)
     {
         return;
     }
 
-    BvmType *type = val.obj_->type;
+    if (index >= self->len)
+    {
+        return;
+    }
 
-    vec_at(&type->vvals, index) = data;
+    if (self->vals[index].type != BVM_UNDEF)
+    {
+        self->vals[index] = data;
+    }
+
+    bvm_obj_storev(self->proto, index, data);
 }
 
-BvmVal bvm_obj_isa(BvmVal lhs, BvmVal rhs)
+bool bvm_obj_isa(BvmObj *self, BvmObj *proto)
 {
-    if (lhs.type != BVM_VAL_OBJ || rhs.type != BVM_VAL_TYPE)
+    if (!self)
     {
-        return bvm_val_int(0);
+        return false;
     }
 
-    BvmType *type = lhs.obj_->type;
-
-    while (type)
+    if (self->proto == proto)
     {
-        if (lhs.obj_->type == rhs.type_)
-        {
-            return bvm_val_int(1);
-        }
-
-        type = type->super;
+        return true;
     }
 
-    return bvm_val_int(0);
+    return bvm_obj_isa(self->proto, proto);
 }

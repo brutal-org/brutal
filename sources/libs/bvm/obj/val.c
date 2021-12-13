@@ -3,18 +3,18 @@
 
 BvmVal bvm_val_nil(void)
 {
-    return (BvmVal){.type = BVM_VAL_NIL};
+    return (BvmVal){.type = BVM_NIL};
 }
 
 BvmVal bvm_val_undef(void)
 {
-    return (BvmVal){.type = BVM_VAL_UNDEF};
+    return (BvmVal){.type = BVM_UNDEF};
 }
 
 BvmVal bvm_val_int(int64_t val)
 {
     return (BvmVal){
-        .type = BVM_VAL_INT,
+        .type = BVM_INT,
         .int_ = val,
     };
 }
@@ -22,7 +22,7 @@ BvmVal bvm_val_int(int64_t val)
 BvmVal bvm_val_uint(uint64_t val)
 {
     return (BvmVal){
-        .type = BVM_VAL_INT,
+        .type = BVM_INT,
         .uint_ = val,
     };
 }
@@ -30,7 +30,7 @@ BvmVal bvm_val_uint(uint64_t val)
 BvmVal bvm_val_num(double val)
 {
     return (BvmVal){
-        .type = BVM_VAL_INT,
+        .type = BVM_INT,
         .num_ = val,
     };
 }
@@ -43,7 +43,7 @@ BvmVal bvm_val_obj(BvmObj *obj)
     }
 
     return (BvmVal){
-        .type = BVM_VAL_OBJ,
+        .type = BVM_OBJ,
         .obj_ = obj,
     };
 }
@@ -56,21 +56,8 @@ BvmVal bvm_val_func(BvmFunc *func)
     }
 
     return (BvmVal){
-        .type = BVM_VAL_FUNC,
+        .type = BVM_FUNC,
         .func_ = func,
-    };
-}
-
-BvmVal bvm_val_type(BvmType *type)
-{
-    if (!type)
-    {
-        return bvm_val_nil();
-    }
-
-    return (BvmVal){
-        .type = BVM_VAL_TYPE,
-        .type_ = type,
     };
 }
 
@@ -78,22 +65,21 @@ bool bvm_val_truthy(BvmVal val)
 {
     switch (val.type)
     {
-    case BVM_VAL_NIL:
-    case BVM_VAL_UNDEF:
+    case BVM_NIL:
+    case BVM_UNDEF:
         return false;
 
-    case BVM_VAL_INT:
+    case BVM_INT:
         return !!val.int_;
 
-    case BVM_VAL_UINT:
+    case BVM_UINT:
         return !!val.uint_;
 
-    case BVM_VAL_NUM:
+    case BVM_NUM:
         return !!val.num_;
 
-    case BVM_VAL_OBJ:
-    case BVM_VAL_FUNC:
-    case BVM_VAL_TYPE:
+    case BVM_OBJ:
+    case BVM_FUNC:
         return true;
 
     default:
