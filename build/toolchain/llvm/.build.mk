@@ -23,7 +23,8 @@ HOST_CFLAGS= \
 	`pkg-config sdl2 --cflags`
 
 HOST_LD=ld.lld
-HOST_LDFLAGS=`pkg-config sdl2 --libs`
+HOST_LDFLAGS= \
+	`pkg-config sdl2 --libs`
 
 HOST_AR=llvm-ar$(LLVM_VERSION)
 ifeq (, $(shell which $(HOST_AR) 2> /dev/null))
@@ -33,6 +34,7 @@ endif
 HOST_ARFLAGS=rcs
 
 USER_AS?=$(HOST_CC)
+
 # --- User-Compiler --------------------------------------------------------- #
 
 USER_CC=clang$(LLVM_VERSION) -target $(CONFIG_ARCH)-none-elf
