@@ -6,16 +6,19 @@ HOST_CC=cc
 
 HOST_CFLAGS= \
 	-MD \
+	-fanalyzer \
 	$(CFLAGS_STD) \
 	$(CFLAGS_OPT) \
 	$(CFLAGS_WARN) \
 	$(HOST_CFLAGS_INC) \
 	-fsanitize=address \
-	-fsanitize=undefined -fanalyzer \
+	-fsanitize=undefined \
 	`pkg-config  sdl2 --cflags`
 
 HOST_LD=ld
-HOST_LDFLAGS=`pkg-config  sdl2 --libs`
+HOST_LDFLAGS= \
+	-lm \
+	`pkg-config  sdl2 --libs`
 
 HOST_AR=ar
 HOST_ARFLAGS=rcs
