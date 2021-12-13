@@ -1,28 +1,22 @@
 #pragma once
 
-#include <bvm/obj/type.h>
+#include <bvm/obj/val.h>
 
 struct bvm_obj
 {
-    BvmType *type;
-
-    size_t vals_len;
-    BvmVal *vals;
-
-    size_t nvals_len;
-    void *nvals;
+    BvmObj *proto;
+    size_t len;
+    BvmVal vals[];
 };
 
-BvmVal bvm_obj_create(BvmType *type, Alloc *alloc);
+BvmObj *bvm_obj_create(size_t size, BvmObj *proto, Alloc *alloc);
 
-BvmVal bvm_obj_create_native(BvmType *type, void *data, size_t size, Alloc *alloc);
+BvmVal bvm_obj_load(BvmObj *self, size_t index);
 
-BvmVal bvm_obj_load(BvmVal val, size_t index);
+BvmVal bvm_obj_loadv(BvmObj *self, size_t index);
 
-BvmVal bvm_obj_loadv(BvmVal val, size_t index);
+void bvm_obj_store(BvmObj *self, size_t index, BvmVal data);
 
-void bvm_obj_store(BvmVal val, size_t index, BvmVal data);
+void bvm_obj_storev(BvmObj *self, size_t index, BvmVal data);
 
-void bvm_obj_storev(BvmVal val, size_t index, BvmVal data);
-
-BvmVal bvm_obj_isa(BvmVal lhs, BvmVal rhs);
+bool bvm_obj_isa(BvmObj *self, BvmObj *proto);

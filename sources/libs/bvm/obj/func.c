@@ -1,27 +1,10 @@
 #include <bvm/obj/func.h>
 
-BvmSig *bvm_sig_create(BvmType *ret, bool variadic, Alloc *alloc)
-{
-    BvmSig *self = alloc_make(alloc, BvmSig);
-
-    self->ret = ret;
-    self->variadic = variadic;
-    vec_init(&self->args, alloc);
-
-    return self;
-}
-
-void bvm_sig_arg(BvmSig *self, BvmType *type)
-{
-    vec_push(&self->args, type);
-}
-
-BvmFunc *bvm_func_create(BvmSig *sig, Alloc *alloc)
+BvmFunc *bvm_func_create(Alloc *alloc)
 {
     BvmFunc *self = alloc_make(alloc, BvmFunc);
 
     self->native = false;
-    self->sig = sig;
     vec_init(&self->managed_.code, alloc);
 
     return self;

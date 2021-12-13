@@ -1,27 +1,16 @@
 #pragma once
 
+#include <brutal/ds.h>
 #include <bvm/eval/instr.h>
-#include <bvm/obj/type.h>
+#include <bvm/obj/val.h>
 
 struct bvm_local;
 struct bvm_frame;
 struct bvm_global;
 
-typedef struct
-{
-    BvmType *ret;
-    Vec(BvmType *) args;
-    bool variadic;
-} BvmSig;
-
-BvmSig *bvm_sig_create(BvmType *ret, bool variadic, Alloc *alloc);
-
-void bvm_sig_arg(BvmSig *self, BvmType *type);
-
 struct bvm_func
 {
     bool native;
-    BvmSig *sig;
 
     union
     {
@@ -35,7 +24,7 @@ struct bvm_func
     };
 };
 
-BvmFunc *bvm_func_create(BvmSig *sig, Alloc *alloc);
+BvmFunc *bvm_func_create(Alloc *alloc);
 
 int bvm_func_local(BvmFunc *self);
 

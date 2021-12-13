@@ -72,7 +72,8 @@
     ITER(N2I)          \
     ITER(N2U)          \
                        \
-    ITER(GETTYPE)      \
+    ITER(SUPER)        \
+                       \
     ITER(ISNIL)        \
     ITER(ISUNDEF)      \
     ITER(ISINT)        \

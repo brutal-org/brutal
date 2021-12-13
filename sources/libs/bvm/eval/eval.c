@@ -37,20 +37,32 @@ BvmRes bvm_eval(BvmLocal *local, BvmGlobal *global, Alloc *alloc)
         break;
 
     case BVM_OP_LOADO:
-        bvm_local_push(
-            local,
-            bvm_obj_load(
-                bvm_local_pop(local),
-                instr.uarg));
+    {
+        BvmVal val = bvm_local_pop(local);
+
+        if (val.type != BVM_OBJ)
+        {
+            bvm_local_push(local, bvm_val_undef());
+            break;
+        }
+
+        bvm_local_push(local, bvm_obj_load(val.obj_, instr.uarg));
         break;
+    }
 
     case BVM_OP_LOADV:
-        bvm_local_push(
-            local,
-            bvm_obj_loadv(
-                bvm_local_pop(local),
-                instr.uarg));
+    {
+        BvmVal val = bvm_local_pop(local);
+
+        if (val.type != BVM_OBJ)
+        {
+            bvm_local_push(local, bvm_val_undef());
+            break;
+        }
+
+        bvm_local_push(local, bvm_obj_loadv(val.obj_, instr.uarg));
         break;
+    }
 
     case BVM_OP_STOREG:
         bvm_global_store(global, instr.uarg, bvm_local_pop(local));
@@ -66,19 +78,29 @@ BvmRes bvm_eval(BvmLocal *local, BvmGlobal *global, Alloc *alloc)
 
     case BVM_OP_STOREO:
     {
-        BvmVal obj = bvm_local_pop(local);
+        BvmVal obj_val = bvm_local_pop(local);
         BvmVal val = bvm_local_pop(local);
 
-        bvm_obj_store(obj, instr.uarg, val);
+        if (obj_val.type != BVM_OBJ)
+        {
+            break;
+        }
+
+        bvm_obj_store(obj_val.obj_, instr.uarg, val);
         break;
     }
 
     case BVM_OP_STOREV:
     {
+        BvmVal obj_val = bvm_local_pop(local);
         BvmVal val = bvm_local_pop(local);
-        BvmVal obj = bvm_local_pop(local);
 
-        bvm_obj_storev(obj, instr.uarg, val);
+        if (obj_val.type != BVM_OBJ)
+        {
+            break;
+        }
+
+        bvm_obj_storev(obj_val.obj_, instr.uarg, val);
         break;
     }
 
@@ -133,13 +155,16 @@ BvmRes bvm_eval(BvmLocal *local, BvmGlobal *global, Alloc *alloc)
     case BVM_OP_NEW:
     {
         BvmVal val = bvm_local_pop(local);
-        if (val.type != BVM_VAL_TYPE)
+
+        if (val.type != BVM_OBJ)
         {
             bvm_local_push(local, bvm_val_nil());
         }
         else
         {
-            bvm_local_push(local, bvm_obj_create(val.type_, alloc));
+            BvmObj *obj = bvm_obj_create(instr.uarg, val.obj_, alloc);
+            BvmVal obj_val = bvm_val_obj(obj);
+            bvm_local_push(local, obj_val);
         }
         break;
     }
@@ -420,52 +445,48 @@ BvmRes bvm_eval(BvmLocal *local, BvmGlobal *global, Alloc *alloc)
         bvm_local_push(local, bvm_val_uint(bvm_local_pop(local).num_));
         break;
 
-    case BVM_OP_GETTYPE:
+    case BVM_OP_SUPER:
     {
         BvmVal val = bvm_local_pop(local);
 
-        if (val.type == BVM_VAL_OBJ && val.obj_)
+        if (val.type == BVM_OBJ && val.obj_)
         {
-            bvm_local_push(local, bvm_val_type(val.obj_->type));
+            bvm_local_push(local, bvm_val_obj(val.obj_->proto));
         }
         else
         {
-            bvm_local_push(local, bvm_val_nil());
+            bvm_local_push(local, bvm_val_undef());
         }
 
         break;
     }
 
     case BVM_OP_ISNIL:
-        bvm_local_push(local, bvm_val_int(bvm_local_pop(local).type == BVM_VAL_NIL));
+        bvm_local_push(local, bvm_val_int(bvm_local_pop(local).type == BVM_NIL));
         break;
 
     case BVM_OP_ISUNDEF:
-        bvm_local_push(local, bvm_val_int(bvm_local_pop(local).type == BVM_VAL_UNDEF));
+        bvm_local_push(local, bvm_val_int(bvm_local_pop(local).type == BVM_UNDEF));
         break;
 
     case BVM_OP_ISINT:
-        bvm_local_push(local, bvm_val_int(bvm_local_pop(local).type == BVM_VAL_INT));
+        bvm_local_push(local, bvm_val_int(bvm_local_pop(local).type == BVM_INT));
         break;
 
     case BVM_OP_ISUINT:
-        bvm_local_push(local, bvm_val_int(bvm_local_pop(local).type == BVM_VAL_UINT));
+        bvm_local_push(local, bvm_val_int(bvm_local_pop(local).type == BVM_UINT));
         break;
 
     case BVM_OP_ISNUM:
-        bvm_local_push(local, bvm_val_int(bvm_local_pop(local).type == BVM_VAL_NUM));
+        bvm_local_push(local, bvm_val_int(bvm_local_pop(local).type == BVM_NUM));
         break;
 
     case BVM_OP_ISOBJ:
-        bvm_local_push(local, bvm_val_int(bvm_local_pop(local).type == BVM_VAL_OBJ));
+        bvm_local_push(local, bvm_val_int(bvm_local_pop(local).type == BVM_OBJ));
         break;
 
     case BVM_OP_ISFUNC:
-        bvm_local_push(local, bvm_val_int(bvm_local_pop(local).type == BVM_VAL_FUNC));
-        break;
-
-    case BVM_OP_ISTYPE:
-        bvm_local_push(local, bvm_val_int(bvm_local_pop(local).type == BVM_VAL_TYPE));
+        bvm_local_push(local, bvm_val_int(bvm_local_pop(local).type == BVM_FUNC));
         break;
 
     case BVM_OP_AND:
