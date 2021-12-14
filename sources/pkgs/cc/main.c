@@ -63,7 +63,7 @@ int main(int argc, char const *argv[])
     emit_ident_size(&emit, 4);
 
     emit_fmt(&emit, "--- BEGIN CODE ---\n");
-    cgen_c_unit(&emit, unit);
+    ctran_unit(&emit, unit);
     emit_fmt(&emit, "--- END CODE ---\n");
     emit_fmt(&emit, "\n");
 

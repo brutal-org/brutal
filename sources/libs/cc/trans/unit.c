@@ -1,6 +1,6 @@
 #include <cc/trans.h>
 
-static void cgen_c_include(Emit *emit, CInclude path)
+static void ctran_include(Emit *emit, CInclude path)
 {
     emit_fmt(emit, "#include ");
 
@@ -14,14 +14,14 @@ static void cgen_c_include(Emit *emit, CInclude path)
     }
 }
 
-static void cgen_c_pragma(Emit *emit, CPragma pragma)
+static void ctran_pragma(Emit *emit, CPragma pragma)
 {
     emit_fmt(emit, "#pragma ");
     emit_fmt(emit, pragma.text);
     emit_fmt(emit, "\n");
 }
 
-static void cgen_c_define(Emit *emit, CDefine define)
+static void ctran_define(Emit *emit, CDefine define)
 {
     emit_fmt(emit, "#define ");
     emit_fmt(emit, define.name);
@@ -44,11 +44,11 @@ static void cgen_c_define(Emit *emit, CDefine define)
         emit_fmt(emit, ")");
     }
     emit_fmt(emit, " ");
-    cgen_c_expr(emit, define.expression);
+    ctran_expr(emit, define.expression);
     emit_fmt(emit, "\n");
 }
 
-void cgen_c_unit(Emit *emit, CUnit unit)
+void ctran_unit(Emit *emit, CUnit unit)
 {
     CUnitType prev_type = CUNIT_NONE;
 
@@ -62,17 +62,17 @@ void cgen_c_unit(Emit *emit, CUnit unit)
                 emit_fmt(emit, "\n");
             }
 
-            cgen_c_include(emit, entry._include);
+            ctran_include(emit, entry._include);
             break;
 
         case CUNIT_PRAGMA:
-            cgen_c_pragma(emit, entry._pragma);
+            ctran_pragma(emit, entry._pragma);
             break;
 
         case CUNIT_DECLARATION:
             emit_fmt(emit, "\n");
 
-            cgen_c_decl(emit, entry._decl);
+            ctran_decl(emit, entry._decl);
 
             if (entry._decl.type != CDECL_FUNC)
             {
@@ -88,7 +88,7 @@ void cgen_c_unit(Emit *emit, CUnit unit)
                 emit_fmt(emit, "\n");
             }
 
-            cgen_c_define(emit, entry._define);
+            ctran_define(emit, entry._define);
             break;
 
         default:
