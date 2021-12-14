@@ -1,24 +1,24 @@
 #include <cc/trans.h>
 
-static void cgen_c_member(Emit *emit, CTypeMember type)
+static void ctran_member(Emit *emit, CTypeMember type)
 {
-    cgen_c_type_start(emit, type.type);
+    ctran_type_start(emit, type.type);
     emit_fmt(emit, " {}", type.name);
-    cgen_c_type_end(emit, type.type);
+    ctran_type_end(emit, type.type);
 }
 
-static void cgen_c_constant(Emit *emit, CTypeConstant member)
+static void ctran_constant(Emit *emit, CTypeConstant member)
 {
     emit_fmt(emit, "{}", member.name);
 
     if (member.value.type != CVAL_INVALID)
     {
         emit_fmt(emit, " = ");
-        cgen_c_value(emit, member.value);
+        ctran_value(emit, member.value);
     }
 }
 
-static void cgen_c_type_attr(Emit *emit, CTypeAttr attr)
+static void ctran_type_attr(Emit *emit, CTypeAttr attr)
 {
     if (attr & CTYPE_CONST)
     {
@@ -36,33 +36,33 @@ static void cgen_c_type_attr(Emit *emit, CTypeAttr attr)
     }
 }
 
-void cgen_c_type(Emit *emit, CType type)
+void ctran_type(Emit *emit, CType type)
 {
-    cgen_c_type_start(emit, type);
-    cgen_c_type_end(emit, type);
+    ctran_type_start(emit, type);
+    ctran_type_end(emit, type);
 }
 
-void cgen_c_type_start(Emit *emit, CType type)
+void ctran_type_start(Emit *emit, CType type)
 {
     if (type.type == CTYPE_NAME)
     {
         emit_fmt(emit, type.name);
-        cgen_c_type_attr(emit, type.attr);
+        ctran_type_attr(emit, type.attr);
     }
     else if (type.type == CTYPE_PTR)
     {
-        cgen_c_type_start(emit, *type.ptr_.subtype);
+        ctran_type_start(emit, *type.ptr_.subtype);
         emit_fmt(emit, "*");
-        cgen_c_type_attr(emit, type.attr);
+        ctran_type_attr(emit, type.attr);
     }
     else if (type.type == CTYPE_PARENT)
     {
-        cgen_c_type_start(emit, *type.ptr_.subtype);
+        ctran_type_start(emit, *type.ptr_.subtype);
         emit_fmt(emit, "(");
     }
     else if (type.type == CTYPE_FUNC)
     {
-        cgen_c_type(emit, *type.func_.ret); // return
+        ctran_type(emit, *type.func_.ret); // return
     }
     else if ((type.type == CTYPE_STRUCT || type.type == CTYPE_UNION) &&
              type.struct_.members.len != 0)
@@ -81,13 +81,13 @@ void cgen_c_type_start(Emit *emit, CType type)
             emit_fmt(emit, " {}", type.name);
         }
 
-        cgen_c_type_attr(emit, type.attr);
+        ctran_type_attr(emit, type.attr);
         emit_fmt(emit, "\n{{\n");
         emit_ident(emit);
 
         vec_foreach_v(v, &type.struct_.members)
         {
-            cgen_c_member(emit, v);
+            ctran_member(emit, v);
             emit_fmt(emit, ";\n");
         }
 
@@ -108,19 +108,19 @@ void cgen_c_type_start(Emit *emit, CType type)
 
         vec_foreach_v(v, &type.enum_.constants)
         {
-            cgen_c_constant(emit, v);
+            ctran_constant(emit, v);
             emit_fmt(emit, ",\n");
         }
 
         emit_deident(emit);
         emit_fmt(emit, "}}");
 
-        cgen_c_type_attr(emit, type.attr);
+        ctran_type_attr(emit, type.attr);
     }
     else if (type.type == CTYPE_ARRAY)
     {
-        cgen_c_type_attr(emit, type.attr);
-        cgen_c_type_start(emit, *type.array_.subtype);
+        ctran_type_attr(emit, type.attr);
+        ctran_type_start(emit, *type.array_.subtype);
     }
     else
     {
@@ -128,7 +128,7 @@ void cgen_c_type_start(Emit *emit, CType type)
     }
 }
 
-void cgen_c_func_params(Emit *emit, CType type)
+void ctran_func_params(Emit *emit, CType type)
 {
     emit_fmt(emit, "(");
 
@@ -140,26 +140,26 @@ void cgen_c_func_params(Emit *emit, CType type)
             emit_fmt(emit, ", ");
         }
         first = false;
-        cgen_c_member(emit, v);
+        ctran_member(emit, v);
     }
     emit_fmt(emit, ")");
 }
 
-void cgen_c_type_end(Emit *emit, CType type)
+void ctran_type_end(Emit *emit, CType type)
 {
     if (type.type == CTYPE_PTR)
     {
-        cgen_c_type_end(emit, *type.ptr_.subtype);
+        ctran_type_end(emit, *type.ptr_.subtype);
     }
     else if (type.type == CTYPE_PARENT)
     {
         emit_fmt(emit, ")");
-        cgen_c_type_end(emit, *type.ptr_.subtype);
+        ctran_type_end(emit, *type.ptr_.subtype);
     }
     else if (type.type == CTYPE_FUNC)
     {
-        cgen_c_func_params(emit, type);
-        cgen_c_type_attr(emit, type.attr);
+        ctran_func_params(emit, type);
+        ctran_type_attr(emit, type.attr);
     }
     else if (type.type == CTYPE_ARRAY)
     {
@@ -171,6 +171,6 @@ void cgen_c_type_end(Emit *emit, CType type)
         {
             emit_fmt(emit, "[{}]", type.array_.size);
         }
-        cgen_c_type_end(emit, *type.ptr_.subtype);
+        ctran_type_end(emit, *type.ptr_.subtype);
     }
 }

@@ -33,7 +33,7 @@ void bid_emit_source(BidIface const iface, IoWriter *writer)
 
     Emit emit;
     emit_init(&emit, writer);
-    cgen_c_unit(&emit, unit);
+    ctran_unit(&emit, unit);
     emit_deinit(&emit);
 
     heap_alloc_deinit(&heap);
@@ -49,7 +49,7 @@ void bid_emit_header(BidIface const iface, IoWriter *writer)
 
     Emit emit;
     emit_init(&emit, writer);
-    cgen_c_unit(&emit, unit);
+    ctran_unit(&emit, unit);
     emit_deinit(&emit);
 
     heap_alloc_deinit(&heap);
