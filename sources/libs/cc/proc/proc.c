@@ -38,7 +38,13 @@ void cproc_parse_ident(Lex *out, Lex *source, CProcContext *ctx)
         lex_next(source);
         return;
     }
+
     lex_next(source);
+    if (cparse_peek_separator(source, 1).type != CLEX_LPARENT && macro->args.len != 0)
+    {
+        vec_push(&out->lexemes, lex_curr(source));
+        return;
+    }
 
     cproc_gen_macro(out, source, ctx, macro);
 }

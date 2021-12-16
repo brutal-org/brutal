@@ -14,6 +14,7 @@ struct
     {CLEX_PRE_IF, "#if"},
     {CLEX_PRE_ELSE, "#else"},
     {CLEX_PRE_ELIF, "#elif"},
+    {CLEX_DOUBLE_HASHTAG, "##"},
     {CLEX_NEWLINE, "\n"},
     {CLEX_AUTO, "auto"},
     {CLEX_BREAK, "break"},
