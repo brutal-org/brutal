@@ -68,10 +68,10 @@ See [credits.md](book/credits.md)
 
 ## License
 
-<a href="https://opensource.org/licenses/MIT">
-  <img align="right" height="96" alt="MIT License" src="book/shared/mit-license.png" />
+<a href="https://www.gnu.org/licenses/gpl-3.0.en.html">
+  <img align="right" height="96" alt="GPL3 License" src="book/shared/gpl-license.png"/>
 </a>
 
-The brutal operating system and its core components are licensed under the **MIT License**.
+The brutal operating system and its core components are licensed under the **GPLV3 License**.
 
-The full text of the license can be accessed via [this link](https://opensource.org/licenses/MIT) and is also included in the [license](license) file of this software package.
+The full text of the license can be accessed via [this link](https://www.gnu.org/licenses/gpl-3.0-standalone.html) and is also included in the [license](license) file of this software package.
