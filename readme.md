@@ -52,13 +52,15 @@
 
 ## Build Instructions
 
-You can find instructions about building BRUTAL [here](book/building.md).
+BRUTAL is pretty easy to to build from source using GNUMake, NASM and LLVM.
+
+See [building.md](book/building.md) for more details.
 
 ## Roadmap
 
 Right now the main goal of brutal is to run doom.
 
-See the [roadmap](book/roadmap.md) file for more information on how we plan to get there and where you can contribute.
+See [roadmap.md](book/roadmap.md) for more information on how we plan to get there and where you can contribute.
 
 ## Credits
 
