@@ -39,14 +39,14 @@ typedef Rect(float) Rectf;
 #define rect_collide_point(RECT, VEC) (      \
     {                                        \
         bool _result = false;                \
-        AutoType _rect = (RECTA);            \
+        AutoType _rect = (RECT);             \
         AutoType _point = (VEC);             \
         if (_rect.x + _rect.w <= _point.x && \
             _rect.x >= _point.x &&           \
             _rect.y + _rect.h <= _point.y && \
             _rect.y >= _point.y)             \
         {                                    \
-            result = true;                   \
+            _result = true;                  \
         }                                    \
         _result;                             \
     })
