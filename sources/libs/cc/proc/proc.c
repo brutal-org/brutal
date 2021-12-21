@@ -49,35 +49,66 @@ void cproc_parse_ident(Lex *out, Lex *source, CProcContext *ctx)
     cproc_gen_macro(out, source, ctx, macro);
 }
 
-void cproc_parse_token(Lex *result, Lex *source, CProcContext *context)
+void cproc_parse_directive(MAYBE_UNUSED Lex *result, Lex *source, CProcContext *context)
 {
-    Lexeme curr = lex_curr(source);
-    switch (curr.type)
+    lex_skip_type(source, CLEX_WHITESPACE);
+    if (lex_curr(source).type == CLEX_NEWLINE) // null directive
     {
-    case CLEX_COMMENT:
-    case CLEX_NEWLINE:
         lex_next(source);
-        break;
-    case CLEX_DEFINE:
-        cproc_parse_define(source, context);
-        lex_next(source);
-        break;
-    case CLEX_IDENT:
-        cproc_parse_ident(result, source, context);
-        break;
+        return;
+    }
+    if (lex_curr(source).type != CLEX_IDENT)
+    {
+        lex_throw(source, str$("expected identifier"));
+        return;
+    }
 
-    default:
-        vec_push(&result->lexemes, curr);
-        lex_next(source);
-        break;
+    if (str_eq(lex_curr(source).str, str$("define")))
+    {
+        cproc_parse_define(source, context);
+    }
+    else
+    {
+        lex_throw(source, str$("unknown directive"));
     }
 }
 
-void cproc_lex(Lex *out, Lex *source, CProcContext *ctx)
+void cproc_lex(Lex *result, Lex *source, CProcContext *ctx)
 {
+    bool can_be_directive = true;
     while (!lex_ended(source))
     {
-        cproc_parse_token(out, source, ctx);
+        Lexeme curr = lex_curr(source);
+
+        switch (curr.type)
+        {
+        case CLEX_COMMENT:
+            lex_next(source);
+            break;
+
+        case CLEX_NEWLINE:
+            lex_next(source);
+            can_be_directive = true;
+            break;
+
+        case CLEX_POUND:
+            if (can_be_directive)
+            {
+                lex_next(source);
+                cproc_parse_directive(result, source, ctx);
+                can_be_directive = false;
+            }
+            else
+            {
+                lex_throw(source, str$("'#' can be placed only at the start of a line"));
+            }
+            break;
+
+        default:
+            cproc_parse_ident(result, source, ctx);
+            can_be_directive = false;
+            break;
+        }
     }
 }
 
