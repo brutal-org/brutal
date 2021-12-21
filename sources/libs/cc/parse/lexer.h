@@ -6,16 +6,6 @@
     LEXEME(NONE)                \
     LEXEME(WHITESPACE)          \
     LEXEME(COMMENT)             \
-    LEXEME(PRAGMA)              \
-    LEXEME(DEFINE)              \
-    LEXEME(PRE_IF)              \
-    LEXEME(PRE_IFDEF)           \
-    LEXEME(PRE_IFNDEF)          \
-    LEXEME(PRE_ELIF)            \
-    LEXEME(PRE_ELSE)            \
-    LEXEME(PRE_ENDIF)           \
-    LEXEME(INCLUDE)             \
-    LEXEME(DOUBLE_HASHTAG)      \
     LEXEME(NEWLINE)             \
     LEXEME(IDENT)               \
     LEXEME(INTEGER)             \
@@ -75,6 +65,7 @@
     LEXEME(LSHIFT)              \
     LEXEME(RSHIFT)              \
     LEXEME(POUND)               \
+    LEXEME(DOUBLE_POUND)        \
     LEXEME(PLUS)                \
     LEXEME(PLUSPLUS)            \
     LEXEME(MINUS)               \

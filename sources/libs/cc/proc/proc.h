@@ -23,6 +23,6 @@ typedef struct
 
 void cproc_parse_token(Lex *result, Lex *source, CProcContext *context);
 
-void cproc_lex(Lex *out, Lex *source, CProcContext *ctx);
+void cproc_lex(Lex *result, Lex *source, CProcContext *ctx);
 
 Lex cproc_file(Lex *source, Str filename, Alloc *alloc);

@@ -3,23 +3,53 @@
 #include <cc/proc/macro.h>
 #include <cc/proc/proc.h>
 
-void cproc_parse_define(Lex *source, CProcContext *ctx)
+CProcMacro cproc_macro_init(CProcContext *ctx, Str name)
 {
     CProcMacro macro = {};
     vec_init(&macro.args, ctx->alloc);
     vec_init(&macro.source, ctx->alloc);
+    macro.name = name;
+    return macro;
+}
 
-    cparse_skip_separator(source, CLEX_DEFINE);
-
-    if (lex_curr(source).type != CLEX_IDENT)
+void cproc_macro_code(CProcMacro *target, Lex *source)
+{
+    while (lex_curr_type(source) != CLEX_NEWLINE && !lex_ended(source))
     {
-        lex_throw(source, str$("expected identifier"));
-        return;
+        vec_push(&target->source, lex_curr(source));
+        lex_next(source);
     }
+}
 
+CProcMacro *cproc_define(CProcContext *ctx, Str name, Str value)
+{
+    CProcMacro macro = cproc_macro_init(ctx, name);
+
+    Scan scan = {};
+
+    scan_init(&scan, value);
+    Lex source = lex(&scan, (LexFn *)clex, ctx->alloc);
+
+    cproc_macro_code(&macro, &source);
+
+    vec_push(&ctx->macros, macro);
+
+    return vec_end(&ctx->macros);
+}
+
+void cproc_define_arg(CProcMacro *targ, Str name)
+{
+    vec_push(&targ->args, name);
+}
+
+void cproc_parse_define(Lex *source, CProcContext *ctx)
+{
+    cparse_skip_separator(source, CLEX_IDENT); // # {define}
+
+    CProcMacro macro = cproc_macro_init(ctx, lex_curr(source).str);
     macro.name = lex_curr(source).str;
 
-    lex_skip_type(source, CLEX_IDENT);
+    lex_next(source);
 
     // argument parsing, there should not have any space between the macro name and argument
     // A(a,b) != A (a,b)
@@ -41,12 +71,7 @@ void cproc_parse_define(Lex *source, CProcContext *ctx)
         }
     }
 
-    while (lex_curr_type(source) != CLEX_NEWLINE && !lex_ended(source))
-    {
-        vec_push(&macro.source, lex_curr(source));
-        lex_next(source);
-    }
-
+    cproc_macro_code(&macro, source);
     vec_push(&ctx->macros, macro);
 }
 
@@ -176,7 +201,7 @@ static void cproc_gen_concatenation(Lex *out, Lex *macro_source, CProcContext *c
     {
         if (lex_curr_type(macro_source) != CLEX_WHITESPACE)
         {
-            if (lex_curr_type(macro_source) == CLEX_DOUBLE_HASHTAG) // if we detect '##' then the next token should handle it
+            if (lex_curr_type(macro_source) == CLEX_DOUBLE_POUND) // if we detect '##' then the next token should handle it
             {
                 concatenating = true;
                 lex_next(macro_source);
