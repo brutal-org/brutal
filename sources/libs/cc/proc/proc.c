@@ -54,7 +54,6 @@ void cproc_parse_directive(MAYBE_UNUSED Lex *result, Lex *source, CProcContext *
     lex_skip_type(source, CLEX_WHITESPACE);
     if (lex_curr(source).type == CLEX_NEWLINE) // null directive
     {
-        lex_next(source);
         return;
     }
     if (lex_curr(source).type != CLEX_IDENT)
@@ -76,6 +75,7 @@ void cproc_parse_directive(MAYBE_UNUSED Lex *result, Lex *source, CProcContext *
 void cproc_lex(Lex *result, Lex *source, CProcContext *ctx)
 {
     bool can_be_directive = true;
+
     while (!lex_ended(source))
     {
         Lexeme curr = lex_curr(source);

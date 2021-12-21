@@ -28,7 +28,7 @@ CProcMacro *cproc_define(CProcContext *ctx, Str name, Str value)
     Scan scan = {};
 
     scan_init(&scan, value);
-    Lex source = lex(&scan, (LexFn *)clex, ctx->alloc);
+    Lex source = clex(&scan, ctx->alloc);
 
     cproc_macro_code(&macro, &source);
 
@@ -148,7 +148,7 @@ static Lex cproc_gen_extended_macro_code(CProcMacro *macro, Lex *macro_code, CPr
 
     cproc_lex(&output, macro_code, ctx); // process the macro source code and put it in macro_lex
 
-    vec_pop(&ctx->inside_macro);
+    (void)vec_pop(&ctx->inside_macro);
 
     return output;
 }
@@ -187,9 +187,9 @@ static void cproc_remove_last_non_space_keyword(Lex *lex)
 
     while (vec_last(&lex->lexemes).type == CLEX_WHITESPACE)
     {
-        vec_pop(&lex->lexemes);
+        (void)vec_pop(&lex->lexemes);
     }
-    vec_pop(&lex->lexemes); // we pop the last token to fusion it with the next one
+    (void)vec_pop(&lex->lexemes); // we pop the last token to fusion it with the next one
 }
 
 static void cproc_gen_concatenation(Lex *out, Lex *macro_source, CProcContext *ctx)

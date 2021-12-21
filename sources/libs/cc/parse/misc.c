@@ -33,11 +33,9 @@ bool cparse_is_separator(Lex *lex, LexemeType type)
 Lexeme cparse_peek_separator(Lex *lex, int offset)
 {
     int off = 0;
-    int count = 0;
-    while (lex_peek_type(lex, off) == CLEX_WHITESPACE && count != offset && !lex_ended(lex))
+    while (lex_peek_type(lex, off) == CLEX_WHITESPACE && off != offset && !lex_ended(lex))
     {
         off++;
-        count++;
     }
 
     return lex_peek(lex, off);

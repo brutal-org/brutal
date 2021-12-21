@@ -207,8 +207,12 @@ bool scan_dump_error(Scan *self, IoWriter *writer)
     int line_start = str_last_chr(str_sub(src, 0, err.position), '\n') + 1;
     int line_end = str_first_chr(str_sub(src, line_start, src.len), '\n') + line_start;
 
-    Str line = str_sub(src, line_start, line_end);
+    if (line_end == -1)
+    {
+        line_end = src.len;
+    }
 
+    Str line = str_sub(src, line_start, line_end);
     print(writer, "    :\n");
     print(writer, "{3d} | {}\n", line_number, line);
     print(writer, "    : ");

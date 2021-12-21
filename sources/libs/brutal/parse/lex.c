@@ -14,7 +14,7 @@ Lex lex(Scan *scan, LexFn *fn, Alloc *alloc)
 
         if (l.type == LEXEME_INVALID)
         {
-            scan_throw(scan, str$("invalid lexeme"), str$(""));
+            scan_throw(scan, str$("invalid lexeme"), l.str);
             break;
         }
 
