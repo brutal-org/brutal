@@ -174,3 +174,45 @@ PciConfig *pci_config(Pci *pci, PciAddr addr)
 
     return nullptr;
 }
+
+PciBarInfo pci_get_bar(Pci *pci, PciAddr addr, int bar)
+{
+    PciBarInfo res = {};
+
+    PciConfig *config = pci_config(pci, addr);
+    volatile uint32_t *bar_ptr = 0;
+    if ((config->header_type & 0x7f) == 0)
+    {
+        PciConfigType0 *v = (PciConfigType0 *)config;
+        bar_ptr = &v->bars[bar];
+    }
+    uint32_t value = *bar_ptr;
+    uint64_t base = 0;
+
+    if ((value & 0b0111) == 0b0110)
+    {
+        res.type = PCI_BAR_MMIO_64;
+        base = value & 0xFFFFFFF0;
+        //   base = bar_ptr[1] & 0xFFFFFFF0; FIXME: check specification
+    }
+    else if ((value & 0b0111) == 0b0000)
+    {
+        res.type = PCI_BAR_MMIO_32;
+        base = value & 0xFFFFFFF0;
+    }
+    else if ((value & 0b0111) == 0b0001)
+    {
+        res.type = PCI_BAR_PIO;
+        base = value & 0xFFFFFFFC;
+    }
+
+    res.base = base;
+
+    *bar_ptr = 0xFFFFFFFF;
+
+    res.size = ~(*bar_ptr & 0xFFFFFFF0) + 1;
+
+    *bar_ptr = value;
+
+    return res;
+}
