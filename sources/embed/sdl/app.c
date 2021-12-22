@@ -32,7 +32,5 @@ void embed_app_pump(MAYBE_UNUSED UiApp *self)
         case SDL_KEYUP:
             break;
         }
-
-        
     }
 }

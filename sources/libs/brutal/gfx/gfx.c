@@ -214,10 +214,15 @@ static inline Rect path_bound(Vec2 const *edges, size_t len)
 
 void gfx_rast(Gfx *self, Vec2 const *edges, size_t len, GfxFillRule rule)
 {
-    // FIXME: better sheape bound calculation;
     Rect pbound = path_bound(edges, len);
     Rect rbound = gfx_buf_bound(self->buf);
     rbound = rect_clip_rect(rbound, pbound);
+    rbound = rect_clip_rect(rbound, gfx_peek(self)->clip);
+
+    if (rect_empty(rbound))
+    {
+        return;
+    }
 
     for (int y = rect_top(rbound); y < rect_bottom(rbound); y++)
     {
@@ -276,10 +281,6 @@ void gfx_rast(Gfx *self, Vec2 const *edges, size_t len, GfxFillRule rule)
                 color.a = color.a * alpha;
 
                 gfx_buf_blend(self->buf, x, y, color);
-            }
-            else
-            {
-                gfx_buf_blend(self->buf, x, y, GFX_MAGENTA);
             }
         }
     }

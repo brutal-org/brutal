@@ -10,17 +10,24 @@ typedef struct demo_win
 
 void demo_win_paint(DemoWin *win, Gfx *gfx)
 {
-    gfx_clear(gfx, GFX_CORNFLOWER_BLUE);
+    gfx_clear(gfx, GFX_BLACK);
 
     gfx_fill(
         gfx,
         gfx_paint_gradient((GfxGradient){
             .stops = {
-                {0.0, GFX_BLUE},
-                {0.5, GFX_WHITE},
-                {1.0, GFX_RED},
+                {0.0, GFX_LIGHT_BLUE},
+                {0.2, GFX_LIGHT_BLUE},
+                {0.2, GFX_PINK},
+                {0.4, GFX_PINK},
+                {0.4, GFX_WHITE},
+                {0.6, GFX_WHITE},
+                {0.6, GFX_PINK},
+                {0.8, GFX_PINK},
+                {0.8, GFX_LIGHT_BLUE},
+                {1.0, GFX_LIGHT_BLUE},
             },
-            .len = 3,
+            .len = 10,
         }));
 
     gfx_poly(
