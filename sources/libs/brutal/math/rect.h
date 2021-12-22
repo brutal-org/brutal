@@ -3,53 +3,13 @@
 #include <brutal/base.h>
 #include <brutal/math/vec2.h>
 
-#define Rect(T) \
-    struct      \
-    {           \
-        T x;    \
-        T y;    \
-        T w;    \
-        T h;    \
-    }
-
-typedef Rect(int) Recti;
-typedef Rect(float) Rectf;
-
-#define rect_create(T, x, y, w, h) \
-    ((T){(x), (y), (w), (h)})
-
-#define rect$(T, RECT) \
-    rect_create(T, (RECT).x, (RECT).y, (RECT).w, (RECT).h)
-
-#define rect_collide(RECTA, RECTB) (              \
-    {                                             \
-        bool _result = false;                     \
-        AutoType _rect_a = (RECTA);               \
-        AutoType _rect_b = (RECTB);               \
-        if (_rect_a.x + _rect_a.w >= _rect_b.x && \
-            _rect_a.x <= _rect_b.x + _rect_b.w && \
-            _rect_a.y + _rect_b.h >= _rect_b.y && \
-            _rect_a.y <= _rect_b.y + _rect_b.h)   \
-        {                                         \
-            result = true;                        \
-        }                                         \
-        _result;                                  \
-    })
-
-#define rect_collide_point(RECT, VEC) (      \
-    {                                        \
-        bool _result = false;                \
-        AutoType _rect = (RECT);             \
-        AutoType _point = (VEC);             \
-        if (_rect.x + _rect.w <= _point.x && \
-            _rect.x >= _point.x &&           \
-            _rect.y + _rect.h <= _point.y && \
-            _rect.y >= _point.y)             \
-        {                                    \
-            _result = true;                  \
-        }                                    \
-        _result;                             \
-    })
+typedef struct
+{
+    float x;
+    float y;
+    float w;
+    float h;
+} Rect;
 
 #define rect_top(RECT) ((RECT).y)
 
@@ -58,3 +18,64 @@ typedef Rect(float) Rectf;
 #define rect_left(RECT) ((RECT).x)
 
 #define rect_right(RECT) ((RECT).x + (RECT).w)
+
+static inline bool rect_collide_rect(Rect recta, Rect rectb)
+{
+    return recta.x + recta.w >= rectb.x &&
+           recta.x <= rectb.x + rectb.w &&
+           recta.y + rectb.h >= rectb.y &&
+           recta.y <= rectb.y + rectb.h;
+}
+
+static inline bool rect_collide_point(Rect rect, Vec2 p)
+{
+    return rect.x + rect.w <= p.x &&
+           rect.x >= p.x &&
+           rect.y + rect.h <= p.y &&
+           rect.y >= p.y;
+}
+
+static inline Rect rect_from_points(Vec2 a, Vec2 b)
+{
+    return (Rect){
+        MIN(a.x, b.x),
+        MIN(a.y, b.y),
+        MAX(a.x, b.x),
+        MAX(a.y, b.y),
+    };
+}
+
+static inline Rect rect_merge_rect(Rect recta, Rect rectb)
+{
+    Vec2 p0 = {
+        MIN(recta.x, rectb.x),
+        MIN(recta.y, rectb.y),
+    };
+
+    Vec2 p1 = {
+        MAX(recta.x + recta.w, rectb.x + rectb.w),
+        MAX(recta.y + recta.h, rectb.y + rectb.h),
+    };
+
+    return rect_from_points(p0, p1);
+}
+
+static inline Rect rect_clip_rect(Rect recta, Rect rectb)
+{
+    if (!rect_collide_rect(recta, rectb))
+    {
+        return (Rect){};
+    }
+
+    Vec2 p0 = {
+        MAX(recta.x, rectb.x),
+        MAX(recta.y, rectb.y),
+    };
+
+    Vec2 p1 = {
+        MIN(recta.x + recta.w, rectb.x + rectb.w),
+        MIN(recta.y + recta.h, rectb.y + rectb.h),
+    };
+
+    return rect_from_points(p0, p1);
+}

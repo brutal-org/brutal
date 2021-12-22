@@ -79,12 +79,12 @@ GfxCtx *gfx_peek(Gfx *self)
     return &vec_last(&self->ctx);
 }
 
-void gfx_clip(Gfx *self, Recti rect)
+void gfx_clip(Gfx *self, Rect rect)
 {
     gfx_peek(self)->clip = rect;
 }
 
-void gfx_origine(Gfx *self, Vec2i pos)
+void gfx_origine(Gfx *self, Vec2 pos)
 {
     gfx_peek(self)->origine = pos;
 }
@@ -106,9 +106,9 @@ void gfx_clear(Gfx *self, GfxColor color)
     gfx_buf_clear(self->buf, color);
 }
 
-void gfx_dot(Gfx *self, Vec2f dot, float size)
+void gfx_dot(Gfx *self, Vec2 dot, float size)
 {
-    Vec2f vert[4] = {
+    Vec2 vert[4] = {
         {dot.x - size, dot.x - size},
         {dot.y - size, dot.y + size},
         {dot.x + size, dot.x + size},
@@ -134,7 +134,7 @@ void gfx_line(Gfx *self, Edgef line, float weight)
     float ny = dy / len;
     float w = weight / 2;
 
-    Vec2f vert[4] = {
+    Vec2 vert[4] = {
         {x - ny * w, y + nx * w},
         {x + ny * w, y - nx * w},
         {x + ny * w, y - nx * w},
@@ -144,9 +144,9 @@ void gfx_line(Gfx *self, Edgef line, float weight)
     gfx_poly(self, vert, 4);
 }
 
-void gfx_rect(Gfx *self, Rectf rect)
+void gfx_rect(Gfx *self, Rect rect)
 {
-    Vec2f edges[4] = {
+    Vec2 edges[4] = {
         {rect.x, rect.y},
         {rect.x + rect.w, rect.y},
         {rect.x + rect.w, rect.y + rect.h},
@@ -156,15 +156,15 @@ void gfx_rect(Gfx *self, Rectf rect)
     gfx_poly(self, edges, 4);
 }
 
-void gfx_ellipsis(Gfx *self, Rectf rect)
+void gfx_ellipsis(Gfx *self, Rect rect)
 {
-    Vec2f edges[64];
+    Vec2 edges[64];
 
     for (size_t i = 0; i < 64; i++)
     {
         float angle = (2 * M_PI * i) / 64;
 
-        edges[i] = (Vec2f){
+        edges[i] = (Vec2){
             rect.x + rect.w * cosf(angle),
             rect.y + rect.h * sinf(angle),
         };
@@ -173,19 +173,19 @@ void gfx_ellipsis(Gfx *self, Rectf rect)
     gfx_poly(self, edges, 64);
 }
 
-void gfx_rast(Gfx *self, Vec2f const *edges, size_t len, GfxFillRule rule);
+void gfx_rast(Gfx *self, Vec2 const *edges, size_t len, GfxFillRule rule);
 
-void gfx_poly(Gfx *self, Vec2f const *points, size_t len)
+void gfx_poly(Gfx *self, Vec2 const *points, size_t len)
 {
     vec_clear(&self->edges);
 
     for (size_t i = 0; i < len; i++)
     {
-        Vec2f p = vec2_add(points[i], gfx_peek(self)->origine);
+        Vec2 p = vec2_add(points[i], gfx_peek(self)->origine);
         vec_push(&self->edges, p);
     }
 
-    Vec2f s = vec2_add(points[0], gfx_peek(self)->origine);
+    Vec2 s = vec2_add(points[0], gfx_peek(self)->origine);
     vec_push(&self->edges, s);
 
     gfx_rast(self, self->edges.data, self->edges.len, GFX_RAST_EVENODD);
@@ -200,12 +200,26 @@ static int float_cmp(void const *lhs, void const *rhs)
     return *lhsf - *rhsf;
 }
 
-void gfx_rast(Gfx *self, Vec2f const *edges, size_t len, GfxFillRule rule)
+static inline Rect path_bound(Vec2 const *edges, size_t len)
+{
+    Rect rect = rect_from_points(edges[0], edges[1]);
+
+    for (size_t i = 1; i + 1 < len; i++)
+    {
+        rect = rect_merge_rect(rect, rect_from_points(edges[i], edges[i + 1]));
+    }
+
+    return rect;
+}
+
+void gfx_rast(Gfx *self, Vec2 const *edges, size_t len, GfxFillRule rule)
 {
     // FIXME: better sheape bound calculation;
-    Rectf bound = rect$(Rectf, gfx_buf_bound(self->buf));
+    Rect pbound = path_bound(edges, len);
+    Rect rbound = gfx_buf_bound(self->buf);
+    rbound = rect_clip_rect(rbound, pbound);
 
-    for (int y = rect_top(bound); y < rect_bottom(bound); y++)
+    for (int y = rect_top(rbound); y < rect_bottom(rbound); y++)
     {
         mem_set(self->scanline, 0, sizeof(*self->scanline) * self->scanline_len);
 
@@ -232,11 +246,10 @@ void gfx_rast(Gfx *self, Vec2f const *edges, size_t len, GfxFillRule rule)
             qsort(self->active.data, self->active.len, sizeof(float), float_cmp);
 
             bool odd_even = true;
-
             for (int i = 0; i + 1 < self->active.len; i++)
             {
-                float start = MAX(self->active.data[i], rect_left(bound));
-                float end = MIN(self->active.data[i + 1], rect_right(bound));
+                float start = MAX(self->active.data[i], rect_left(rbound));
+                float end = MIN(self->active.data[i + 1], rect_right(rbound));
 
                 if (odd_even || rule == GFX_RAST_NONZERO)
                 {
@@ -250,19 +263,23 @@ void gfx_rast(Gfx *self, Vec2f const *edges, size_t len, GfxFillRule rule)
             }
         }
 
-        for (int x = rect_left(bound); x < rect_right(bound); x++)
+        for (int x = rect_left(rbound); x < rect_right(rbound); x++)
         {
             float alpha = math_clamp(self->scanline[x] / (RAST_AA * RAST_AA), 0, 1);
 
             if (alpha >= 0.003f)
             {
-                float sx = (x - bound.x) / bound.w;
-                float sy = (y - bound.y) / bound.w;
+                float sx = (x - pbound.x) / pbound.w;
+                float sy = (y - pbound.y) / pbound.w;
 
                 GfxColor color = gfx_paint_sample(gfx_peek(self)->fill, sx, sy);
                 color.a = color.a * alpha;
 
                 gfx_buf_blend(self->buf, x, y, color);
+            }
+            else
+            {
+                gfx_buf_blend(self->buf, x, y, GFX_MAGENTA);
             }
         }
     }

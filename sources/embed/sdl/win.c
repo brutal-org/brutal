@@ -1,6 +1,6 @@
 #include <embed/win.h>
 
-void embed_win_init(UiWin *self, Recti bound)
+void embed_win_init(UiWin *self, Rect bound)
 {
     self->embed.sdl_window = SDL_CreateWindow(
         "QEMU",
@@ -31,7 +31,7 @@ bool embed_win_visible(UiWin *self)
     return SDL_GetWindowFlags(self->embed.sdl_window) & SDL_WINDOW_SHOWN;
 }
 
-void embed_win_flip(UiWin *self, Recti rect)
+void embed_win_flip(UiWin *self, Rect rect)
 {
     SDL_Rect sdl_rect = {rect.x, rect.y, rect.w, rect.h};
     SDL_UpdateWindowSurfaceRects(self->embed.sdl_window, &sdl_rect, 1);

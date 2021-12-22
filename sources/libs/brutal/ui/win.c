@@ -6,7 +6,7 @@
 
 /* --- Lifecycle ------------------------------------------------------------ */
 
-void ui_win_init(UiWin *self, UiApp *app, Recti bound, int flags)
+void ui_win_init(UiWin *self, UiApp *app, Rect bound, int flags)
 {
     self->flags = flags;
     self->app = app;
@@ -45,9 +45,9 @@ bool ui_win_visible(UiWin *self)
     return embed_win_visible(self);
 }
 
-Recti ui_win_bound(UiWin *self)
+Rect ui_win_bound(UiWin *self)
 {
-    return (Recti){
+    return (Rect){
         0,
         0,
         embed_win_gfx(self).width,
@@ -76,7 +76,7 @@ void ui_win_repaint(UiWin *self)
     ui_win_flip_full(self);
 }
 
-void ui_win_flip(UiWin *self, Recti rect)
+void ui_win_flip(UiWin *self, Rect rect)
 {
     return embed_win_flip(self, rect);
 }

@@ -15,7 +15,7 @@ TEST(gfx_draw_rectangle)
     gfx_clear(&canvas);
 
     gfx_fill(&canvas, gfx_paint_fill(GFX_RED));
-    gfx_rect(&canvas, (Rectf){64, 64, 384, 384});
+    gfx_rect(&canvas, (Rect){64, 64, 384, 384});
 
     gfx_end(&canvas);
 

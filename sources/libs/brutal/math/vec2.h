@@ -3,16 +3,11 @@
 #include <brutal/math/angle.h>
 #include <math.h>
 
-#define Vec2(T) \
-    struct      \
-    {           \
-        T x;    \
-        T y;    \
-    }
-
-typedef Vec2(int) Vec2i;
-typedef Vec2(float) Vec2f;
-typedef Vec2(double) Vec2d;
+typedef struct
+{
+    float x;
+    float y;
+} Vec2;
 
 #define vec_create(T, x, y) \
     ((T){(x), (y)})
