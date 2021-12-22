@@ -19,12 +19,17 @@ typedef struct
 
 #define rect_right(RECT) ((RECT).x + (RECT).w)
 
+static inline bool rect_empty(Rect rect)
+{
+    return (int)rect.w == 0 || (int)rect.h == 0;
+}
+
 static inline bool rect_collide_rect(Rect recta, Rect rectb)
 {
-    return recta.x + recta.w >= rectb.x &&
-           recta.x <= rectb.x + rectb.w &&
-           recta.y + rectb.h >= rectb.y &&
-           recta.y <= rectb.y + rectb.h;
+    return recta.x < rectb.x + rectb.w &&
+           recta.x + recta.w > rectb.x &&
+           recta.y < rectb.y + rectb.h &&
+           recta.h + recta.y > rectb.y;
 }
 
 static inline bool rect_collide_point(Rect rect, Vec2 p)
@@ -40,8 +45,8 @@ static inline Rect rect_from_points(Vec2 a, Vec2 b)
     return (Rect){
         MIN(a.x, b.x),
         MIN(a.y, b.y),
-        MAX(a.x, b.x),
-        MAX(a.y, b.y),
+        MAX(a.x, b.x) - MIN(a.x, b.x),
+        MAX(a.y, b.y) - MIN(a.y, b.y),
     };
 }
 
