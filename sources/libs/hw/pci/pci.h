@@ -5,6 +5,7 @@
 #include <pci/addr.h>
 #include <pci/config.h>
 #include <pci/group.h>
+#include <protos/hw/pci.h>
 
 typedef struct
 {
@@ -18,3 +19,5 @@ void pci_deinit(Pci *pci);
 Iter pci_iter(Pci *pci, IterFn fn, void *ctx);
 
 PciConfig *pci_config(Pci *pci, PciAddr addr);
+
+PciBarInfo pci_get_bar(Pci *pci, PciAddr addr, int bar);

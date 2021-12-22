@@ -1,0 +1,41 @@
+interface Pci
+{
+    type Identifier:
+    {
+        vendor: U16,
+        classcode: U8,
+        subclass: U8,
+    };
+
+    type bar_types: enum
+    {
+        INVALID,
+        BAR_MMIO_32,
+        BAR_MMIO_64,
+        BAR_PIO,
+    };
+
+    type Addr:
+    {
+        seg: U16,
+        bus: U8,
+        slot: U8,
+        func: U8,
+    };
+
+    type BarInfo:
+    {
+        base: U64,
+        size: U32,
+        type: bar_types,
+    };
+    errors
+    {
+        NOT_FOUND,
+        INVALID_ADDR,
+    };
+
+    method find_device { identifier: Identifier} -> Addr;
+
+    method bar { addr: Addr, num: U8} -> BarInfo;
+}
