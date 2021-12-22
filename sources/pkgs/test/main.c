@@ -27,17 +27,12 @@ bool test_run(Test test)
     }
     else
     {
-
         int result = UNWRAP(task_wait(&runner));
-        bool pass;
+        bool pass = result == TASK_EXIT_SUCCESS;
 
         if (test.flags & TEST_EXPECTED_TO_FAIL)
         {
             pass = result != TASK_EXIT_SUCCESS;
-        }
-        else
-        {
-            pass = result == TASK_EXIT_SUCCESS;
         }
 
         if (pass)

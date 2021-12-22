@@ -45,7 +45,7 @@ typedef struct ui_win
 
 /* --- Lifecycle ------------------------------------------------------------ */
 
-void ui_win_init(UiWin *win, UiApp *app, Recti bound, int flags);
+void ui_win_init(UiWin *win, UiApp *app, Rect bound, int flags);
 
 void ui_win_destroy(UiWin *self);
 
@@ -57,9 +57,9 @@ void ui_win_show(UiWin *self);
 
 bool ui_win_visible(UiWin *self);
 
-void ui_win_resize(UiWin *self, Recti bound);
+void ui_win_resize(UiWin *self, Rect bound);
 
-Recti ui_win_bound(UiWin *self);
+Rect ui_win_bound(UiWin *self);
 
 /* --- Paint ---------------------------------------------------------------- */
 
@@ -67,7 +67,7 @@ GfxBuf ui_win_gfx(UiWin *self);
 
 void ui_win_repaint(UiWin *self);
 
-void ui_win_flip(UiWin *self, Recti rect);
+void ui_win_flip(UiWin *self, Rect rect);
 
 void ui_win_flip_full(UiWin *self);
 

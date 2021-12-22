@@ -33,22 +33,51 @@ typedef struct
 
     union
     {
-        GfxColor fill;
-        GfxGradient gradient;
+        GfxColor fill_;
+
+        GfxGradient gradient_;
+
         struct
         {
-
-            Rectf source;
             GfxBuf image;
+            Rect source;
         } image_;
     };
 } GfxPaint;
 
-#define gfx_paint_none() \
-    ((GfxPaint){.type = GFX_PAINT_NONE})
+static inline GfxPaint gfx_paint_none(void)
+{
+    return (GfxPaint){
+        .type = GFX_PAINT_NONE,
+    };
+}
 
-#define gfx_paint_fill(COLOR) \
-    ((GfxPaint){.type = GFX_PAINT_FILL, .fill = (COLOR)})
+static inline GfxPaint gfx_paint_fill(GfxColor color)
+{
+    return (GfxPaint){
+        .type = GFX_PAINT_FILL,
+        .fill_ = color,
+    };
+}
+
+static inline GfxPaint gfx_paint_gradient(GfxGradient grad)
+{
+    return (GfxPaint){
+        .type = GFX_PAINT_GRADIENT,
+        .gradient_ = grad,
+    };
+}
+
+static inline GfxPaint gfx_paint_image(GfxBuf buf, Rect source)
+{
+    return (GfxPaint){
+        .type = GFX_PAINT_IMAGE,
+        .image_ = {
+            buf,
+            source,
+        },
+    };
+}
 
 static inline GfxColor gfx_paint_sample(GfxPaint paint, float x, float y)
 {
@@ -60,11 +89,11 @@ static inline GfxColor gfx_paint_sample(GfxPaint paint, float x, float y)
         return GFX_MAGENTA;
 
     case GFX_PAINT_FILL:
-        return paint.fill;
+        return paint.fill_;
 
     case GFX_PAINT_GRADIENT:
     {
-        GfxGradient gradient = paint.gradient;
+        GfxGradient gradient = paint.gradient_;
 
         if (gradient.len == 0)
         {
@@ -100,5 +129,3 @@ static inline GfxColor gfx_paint_sample(GfxPaint paint, float x, float y)
         panic$("Unkown paint type {}.", paint.type);
     }
 }
-
-

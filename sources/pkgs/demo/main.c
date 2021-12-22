@@ -11,13 +11,26 @@ typedef struct demo_win
 void demo_win_paint(DemoWin *win, Gfx *gfx)
 {
     gfx_clear(gfx, GFX_CORNFLOWER_BLUE);
-    gfx_fill(gfx, gfx_paint_fill(GFX_WHITE));
-    gfx_poly(gfx, (Vec2f[]){
-                      {win->x, win->y},
-                      {win->x + 128, win->y + 128},
-                      {win->x - 128, win->y + 128},
-                  },
-             3);
+
+    gfx_fill(
+        gfx,
+        gfx_paint_gradient((GfxGradient){
+            .stops = {
+                {0.0, GFX_BLUE},
+                {0.5, GFX_WHITE},
+                {1.0, GFX_RED},
+            },
+            .len = 3,
+        }));
+
+    gfx_poly(
+        gfx,
+        (Vec2[]){
+            {win->x, win->y},
+            {win->x + 128, win->y + 128},
+            {win->x - 128, win->y + 128},
+        },
+        3);
 
     win->x++;
     win->y++;
@@ -35,7 +48,7 @@ UiWin *demo_win_create(UiApp *app, Alloc *alloc)
     self->paint = demo_win_paint;
     self->event = demo_win_event;
 
-    ui_win_init(base$(self), app, (Recti){0, 0, 800, 600}, UI_WIN_ANIMATED);
+    ui_win_init(base$(self), app, (Rect){0, 0, 800, 600}, UI_WIN_ANIMATED);
     return base$(self);
 }
 
