@@ -16,7 +16,7 @@ void efi_tty_clear(void)
     efi_st()->console_out->clear_screen(efi_st()->console_out);
 }
 
-EFIInputKey efi_tty_get_key(void)
+EFIInputKey efi_tty_read_key(void)
 {
     EFIInputKey key = {};
     uint64_t key_event = 0;

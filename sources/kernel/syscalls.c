@@ -262,7 +262,7 @@ BrResult sys_ipc(BrIpcArgs *args)
 
         if (args->to == BR_TASK_INIT)
         {
-            task = init_get_task();
+            task = init_task();
         }
         else
         {

@@ -1,10 +1,10 @@
 #pragma once
 
-extern int *_get_errno(void);
+extern int *_errno(void);
 
 /* --- 7.5 Errors ----------------------------------------------------------- */
 
-#define errno (*_get_errno())
+#define errno (*_errno())
 
 /* Mathematics argument out of domain of function. */
 #define EDOM 18

@@ -41,7 +41,7 @@ void bits_init(Bits *self, void *data, size_t size);
 
 void bits_set_range(Bits *bits, BitsRange range, bool value);
 
-static inline size_t bits_len(const Bits *bits)
+static inline size_t bits_len(Bits const *bits)
 {
     return bits->size * 8;
 }

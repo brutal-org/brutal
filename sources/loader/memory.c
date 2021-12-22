@@ -63,7 +63,6 @@ uint64_t loader_phys_alloc_page(size_t count)
 
 uint64_t get_page_or_map(Pages *dir, size_t idx)
 {
-
     if (dir[idx] & PAGE_PRESENT)
     {
         return dir[idx] & PAGE_ADDR;

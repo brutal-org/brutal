@@ -1,8 +1,8 @@
 #include <errno.h>
 
-int _errno = 0;
+int _errno_value = 0;
 
-int *_get_errno(void)
+int *_errno(void)
 {
-    return &_errno;
+    return &_errno_value;
 }

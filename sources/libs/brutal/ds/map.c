@@ -6,7 +6,7 @@ static uint32_t map_hash(Str key)
     return fnv_32(key.buf, key.len, FNV1_32_INIT);
 }
 
-static MapNode *map_node_create(Alloc *alloc, Str key, const void *data, int data_size)
+static MapNode *map_node_create(Alloc *alloc, Str key, void const *data, int data_size)
 {
     int node_size = sizeof(MapNode) + ALIGN_UP(key.len, 16) + data_size;
     MapNode *node = (MapNode *)alloc_malloc(alloc, node_size);
@@ -81,7 +81,7 @@ void map_deinit_impl(MapImpl *impl)
     vec_deinit(&impl->buckets);
 }
 
-bool map_put_impl(MapImpl *impl, Str key, const void *data)
+bool map_put_impl(MapImpl *impl, Str key, void const *data)
 {
     uint32_t hash = map_hash(key);
     MapNode *node = map_node(impl, key, hash);

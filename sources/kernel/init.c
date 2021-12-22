@@ -98,7 +98,7 @@ void init_start(Handover const *handover)
 
     HandoverModule const *elf_module = handover_find_module(handover, name);
 
-    if(elf_module == nullptr)
+    if (elf_module == nullptr)
     {
         panic$("can't find 'init' handover module !");
     }
@@ -133,7 +133,7 @@ void init_start(Handover const *handover)
     mem_obj_deref(elf_obj);
 }
 
-Task *init_get_task(void)
+Task *init_task(void)
 {
     assert_not_null(_task);
     task_ref(_task);

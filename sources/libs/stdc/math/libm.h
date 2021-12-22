@@ -240,7 +240,7 @@ long double __cosl(long double, long double);
 long double __tanl(long double, long double, int);
 
 /* polynomial evaluation */
-long double __polevll(long double, const long double *, int);
-long double __p1evll(long double, const long double *, int);
+long double __polevll(long double, long double const *, int);
+long double __p1evll(long double, long double const *, int);
 
 #endif
