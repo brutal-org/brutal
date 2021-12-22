@@ -1,13 +1,13 @@
 #include <embed/win.h>
 
-void embed_win_init(UiWin *self, int width, int height)
+void embed_win_init(UiWin *self, Recti bound)
 {
     self->embed.sdl_window = SDL_CreateWindow(
         "QEMU",
         SDL_WINDOWPOS_UNDEFINED,
         SDL_WINDOWPOS_UNDEFINED,
-        width,
-        height,
+        bound.w,
+        bound.h,
         SDL_WINDOW_HIDDEN | SDL_WINDOW_ALLOW_HIGHDPI);
 }
 
@@ -16,16 +16,19 @@ void embed_win_deinit(UiWin *self)
     SDL_DestroyWindow(self->embed.sdl_window);
 }
 
-void embed_win_visible(UiWin *self, bool visible)
+void embed_win_show(UiWin *self)
 {
-    if (visible)
-    {
-        SDL_ShowWindow(self->embed.sdl_window);
-    }
-    else
-    {
-        SDL_HideWindow(self->embed.sdl_window);
-    }
+    SDL_ShowWindow(self->embed.sdl_window);
+}
+
+void embed_win_hide(UiWin *self)
+{
+    SDL_HideWindow(self->embed.sdl_window);
+}
+
+bool embed_win_visible(UiWin *self)
+{
+    return SDL_GetWindowFlags(self->embed.sdl_window) & SDL_WINDOW_SHOWN;
 }
 
 void embed_win_flip(UiWin *self, Recti rect)
@@ -34,15 +37,15 @@ void embed_win_flip(UiWin *self, Recti rect)
     SDL_UpdateWindowSurfaceRects(self->embed.sdl_window, &sdl_rect, 1);
 }
 
-GfxSurface embed_win_gfx(UiWin *self)
+GfxBuf embed_win_gfx(UiWin *self)
 {
     SDL_Surface *sdl_surface = SDL_GetWindowSurface(self->embed.sdl_window);
 
-    return (GfxSurface){
+    return (GfxBuf){
         .width = sdl_surface->w,
         .height = sdl_surface->h,
         .pitch = sdl_surface->pitch,
-        .format = GFX_PIXEL_FORMAT_BGRA8888,
+        .fmt = GFX_FMT_BGRA8888,
         .buf = sdl_surface->pixels,
     };
 }

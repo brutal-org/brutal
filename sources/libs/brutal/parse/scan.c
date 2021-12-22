@@ -124,15 +124,15 @@ bool scan_skip_word(Scan *self, Str word)
 
 bool scan_eat(Scan *self, ScanMatch *match)
 {
-    bool any = false;
+    bool result = false;
 
     while (match(scan_curr(self)) && !scan_ended(self))
     {
-        any = true;
+        result = true;
         scan_next(self);
     }
 
-    return any;
+    return result;
 }
 
 void scan_begin(Scan *self)
