@@ -4,10 +4,12 @@
 #include <brutal/base/macros.h>
 #include <brutal/base/std.h>
 
+// x+0 is for removing the const qualifier
+
 #define bswap(VALUE) (                       \
     {                                        \
-        typeof(VALUE) _v = (VALUE);          \
-        typeof(VALUE) _result = 0;           \
+        typeof(VALUE + 0) _v = (VALUE);      \
+        typeof(VALUE + 0) _result = 0;       \
         if (sizeof(_v) == 8)                 \
             _result = __builtin_bswap64(_v); \
         if (sizeof(_v) == 4)                 \
