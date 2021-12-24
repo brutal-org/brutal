@@ -2,7 +2,7 @@
 
 set -e
 
-TOOLS="$(make list-host | tr '[:upper:]' '[:lower:]') "
+TOOLS="$(make list-host) "
 JOBS=""
 SILENT="-s"
 DEBUG=""
