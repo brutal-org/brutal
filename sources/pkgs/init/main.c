@@ -6,7 +6,7 @@
 
 BbusError handle_bbus_locate(
     IpcEv *ev,
-    MAYBE_UNUSED BrTask task,
+    MAYBE_UNUSED BrId task,
     Str const *req,
     uint64_t *resp,
     MAYBE_UNUSED Alloc *alloc)

@@ -9,7 +9,7 @@ int br_entry_args()
 
     Str req = str$("pci");
     uint64_t resp = 0;
-    bbus_locate(&ev, BR_TASK_INIT, &req, &resp, alloc_global());
+    bbus_locate(&ev, BR_ID_SUPER, &req, &resp, alloc_global());
 
     log$("PCI id is {}", resp);
 

@@ -4,9 +4,9 @@
 
 /* --- Memory Mappings ------------------------------------------------------ */
 
-static void space_mmap_create(Space *space, MemObj *object, size_t offset, VmmRange vmm)
+static void space_mmap_create(Space *space, Memory *object, size_t offset, VmmRange vmm)
 {
-    mem_obj_ref(object);
+    memory_ref(object);
 
     Mmap mapping = {
         .range = vmm,
@@ -16,7 +16,7 @@ static void space_mmap_create(Space *space, MemObj *object, size_t offset, VmmRa
 
     vec_push(&space->mmaps, mapping);
 
-    PmmRange pmm = {mem_obj_base(object) + offset, vmm.size};
+    PmmRange pmm = {memory_base(object) + offset, vmm.size};
 
     vmm_map(space->vmm, vmm, pmm, BR_MEM_USER | BR_MEM_WRITABLE);
     vmm_flush(space->vmm, vmm);
@@ -27,7 +27,7 @@ static void space_mmap_destroy(Space *space, size_t index)
     Mmap mapping = vec_at(&space->mmaps, index);
 
     vmm_unmap(space->vmm, mapping.range);
-    mem_obj_deref(mapping.object);
+    memory_deref(mapping.object);
     vec_splice(&space->mmaps, index, 1);
     vmm_flush(space->vmm, mapping.range);
 }
@@ -79,14 +79,14 @@ void space_switch(Space *self)
     vmm_space_switch(self->vmm);
 }
 
-SpaceResult space_map(Space *self, MemObj *mem_obj, size_t offset, size_t size, uintptr_t vaddr)
+SpaceResult space_map(Space *self, Memory *memory, size_t offset, size_t size, uintptr_t vaddr)
 {
     if (size == 0)
     {
-        size = mem_obj_size(mem_obj);
+        size = memory_size(memory);
     }
 
-    if (offset + size > mem_obj_size(mem_obj))
+    if (offset + size > memory_size(memory))
     {
         return ERR(SpaceResult, BR_BAD_ARGUMENTS);
     }
@@ -110,7 +110,7 @@ SpaceResult space_map(Space *self, MemObj *mem_obj, size_t offset, size_t size, 
         range_alloc_used(&self->alloc, range$(USizeRange, range));
     }
 
-    space_mmap_create(self, mem_obj, offset, range);
+    space_mmap_create(self, memory, offset, range);
 
     return OK(SpaceResult, range);
 }
@@ -144,7 +144,7 @@ void space_dump(Space *self)
         log$("\trange:{#p}-{#p} offset:{} size:{}",
              vmm_range.base, vmm_range.base + vmm_range.size - 1, mapping->offset, vmm_range.size);
 
-        if (mapping->object->type == MEM_OBJ_HEAP)
+        if (mapping->object->type == MEMORY_HEAP)
         {
             HeapRange heap_range = mapping->object->heap;
             log$("\t  ->  id:{} range:{#p}-{#p} size:{}", mapping->object->id, heap_range.base, heap_range.base + heap_range.size - 1, heap_range.size);

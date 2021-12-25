@@ -266,7 +266,7 @@ int br_entry_args(
     {
         BrMsg msg = ipc.msg;
 
-        if (msg.from == BR_TASK_IRQ && msg.event.type == BR_EVENT_IRQ)
+        if (msg.from == BR_ID_EVENT && msg.event.type == BR_EVENT_IRQ)
         {
             ps2_handle_irq(&ps2);
 

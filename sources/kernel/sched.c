@@ -6,7 +6,7 @@
 
 static Lock _lock = {};
 static Vec(Task *) _tasks = {};
-static _Atomic Tick _tick = 0;
+static Tick _tick = 0;
 
 void sched_initialize(void)
 {
@@ -35,12 +35,12 @@ void sched_start(Task *task, uintptr_t ip, uintptr_t sp, BrTaskArgs args)
 {
     LOCK_RETAINER(&_lock);
 
-    assert_truth(!task->is_started);
+    assert_truth(!task->started);
 
-    log$("Starting task {}({})", str$(&task->name), task->id);
+    log$("Starting task {}", task->id);
 
     context_start(task->context, ip, sp, range_end(task->stack), args, task->flags);
-    task->is_started = true;
+    task->started = true;
     sched_enqueue(task);
 }
 
@@ -48,13 +48,13 @@ void sched_stop(Task *task, uintptr_t result)
 {
     lock_acquire(&_lock);
 
-    if (task->is_stopped)
+    if (task->stopped)
     {
         lock_release(&_lock);
         return;
     }
 
-    task->is_stopped = true;
+    task->stopped = true;
     task->result = result;
 
     lock_release(&_lock);
@@ -70,7 +70,7 @@ BrResult sched_block(Blocker blocker)
     lock_acquire(&_lock);
 
     task_self()->blocker = blocker;
-    task_self()->is_blocked = true;
+    task_self()->blocked = true;
 
     lock_release(&_lock);
 
@@ -135,8 +135,8 @@ void sched_attach(Task *task, Cpu *cpu)
 
 bool sched_runnable(Task *task)
 {
-    return (task->is_started && !task->is_blocked) ||
-           (task->is_started && task->is_stopped && !task->in_syscall);
+    return (task->started && !task->blocked) ||
+           (task->started && task->stopped && !task->in_syscall);
 }
 
 bool sched_running(Task *task)
@@ -261,7 +261,7 @@ static void sched_updated_blocked(void)
 {
     vec_foreach_v(task, &_tasks)
     {
-        if (!task->is_blocked)
+        if (!task->blocked)
         {
             continue;
         }
@@ -279,17 +279,17 @@ static void sched_updated_blocked(void)
         if (has_reached_function)
         {
             blocker->result = BR_SUCCESS;
-            task->is_blocked = false;
+            task->blocked = false;
         }
         else if (has_reached_deadline)
         {
             blocker->result = BR_TIMEOUT;
-            task->is_blocked = false;
+            task->blocked = false;
         }
-        else if (task->is_stopped)
+        else if (task->stopped)
         {
             blocker->result = BR_INTERRUPTED;
-            task->is_blocked = false;
+            task->blocked = false;
         }
     }
 
@@ -358,9 +358,9 @@ void sched_finalize(void)
     {
         Task *task = _tasks.data[i];
 
-        if (task->is_stopped && !sched_runnable(task) && !sched_running(task))
+        if (task->stopped && !sched_runnable(task) && !sched_running(task))
         {
-            log$("Finalizing task({}) {}", task->id, str$(&task->name));
+            log$("Finalizing task {}", task->id);
             sched_dequeue(task);
             i--;
         }

@@ -21,19 +21,21 @@ SYSCALL(log) (BrLogArgs* args);
 
 typedef struct
 {
-    BrSpace space;
-    BrMemObj mem_obj;
+    BrHandle space;
+    BrHandle memory;
+
     size_t offset;
     size_t size;
     uintptr_t vaddr;
-    BrMemFlags flags;
+    BrMemoryFlags flags;
 } BrMapArgs;
 
 SYSCALL(map) (BrMapArgs* args);
 
 typedef struct
 {
-    BrSpace space;
+    BrHandle space;
+
     uintptr_t vaddr;
     size_t size;
 } BrUnmapArgs;
@@ -42,35 +44,34 @@ SYSCALL(unmap) (BrUnmapArgs* args);
 
 typedef struct
 {
-    StrFix128 name;
-    BrSpace space;
-    BrCap caps;
+    BrHandle space;
+    BrRight rights;
     BrTaskFlags flags;
-} BrCreateTaskArgs;
+} BrTaskProps;
 
 typedef struct
 {
     uintptr_t addr;
     size_t size;
-    BrMemObjFlags flags;
-} BrCreateMemObjArgs;
+    BrMemoryFlags flags;
+} BrMemoryProps;
 
 typedef struct
 {
     BrSpaceFlags flags;
-} BrCreateSpaceArgs;
+} BrSpaceProps;
 
 typedef struct
 {
-    BrObjectType type;
     BrId id;
+    BrType type;
     BrHandle handle;
 
     union
     {
-        BrCreateTaskArgs task;
-        BrCreateMemObjArgs mem_obj;
-        BrCreateSpaceArgs space;
+        BrTaskProps task;
+        BrMemoryProps memory;
+        BrSpaceProps space;
     };
 } BrCreateArgs;
 
@@ -78,7 +79,7 @@ SYSCALL(create) (BrCreateArgs* args);
 
 typedef struct
 {
-    BrTask task;
+    BrHandle handle;
     uintptr_t ip;
     uintptr_t sp;
     BrTaskArgs args;
@@ -88,15 +89,21 @@ SYSCALL(start) (BrStartArgs* args);
 
 typedef struct
 {
-    BrTask task;
-    uintptr_t exit_value;
+    BrHandle handle;
+    uintptr_t result;
 } BrExitArgs;
 
 SYSCALL(exit) (BrExitArgs* args);
 
+#define BR_IPC_BLOCK ((BrIpcFlags)(1 << 0))
+#define BR_IPC_SEND ((BrIpcFlags)(1 << 1))
+#define BR_IPC_RECV ((BrIpcFlags)(1 << 2))
+
+typedef uint32_t BrIpcFlags;
+
 typedef struct
 {
-    BrTask to;
+    BrId to;
     BrMsg msg;
     BrDeadline deadline;
     BrIpcFlags flags;
@@ -106,8 +113,8 @@ SYSCALL(ipc) (BrIpcArgs* args);
 
 typedef struct
 {
-    BrTask task;
-    BrCap cap;
+    BrHandle handle;
+    BrRight cap;
 } BrDropArgs;
 
 SYSCALL(drop) (BrDropArgs* args);
@@ -142,11 +149,43 @@ SYSCALL(ack) (BrAckArgs* args);
 
 typedef struct
 {
-    BrHandle handle;
-    BrHandleInfo info;
-} BrStatArgs;
+    BrRight rights;
+    bool stopped;
+    bool started;
+    bool blocked;
+} BrTaskInfos;
 
-SYSCALL(stat)(BrStatArgs* args);
+typedef struct
+{
+    size_t domain_object_count;
+} BrDomainInfos;
+
+typedef struct
+{
+    USizeRange range;
+} BrMemoryInfos;
+
+typedef struct
+{
+    BrSpaceFlags flags;
+} BrSpaceInfos;
+
+typedef struct
+{
+    BrId id;
+    BrHandle handle;
+    BrType type;
+
+    union
+    {
+        BrMemoryInfos memory;
+        BrDomainInfos domain;
+        BrSpaceInfos space;
+        BrTaskInfos task;
+    };
+} BrInspectArgs;
+
+SYSCALL(inspect)(BrInspectArgs* args);
 
 typedef struct
 {

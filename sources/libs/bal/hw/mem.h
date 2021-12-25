@@ -8,18 +8,18 @@ typedef struct
 {
     size_t len;
     void *buf;
-    BrMemObj obj;
+    BrHandle handle;
 } BalMem;
 
-static inline BrMemObj bal_mem_handle(BalMem const *self)
+static inline BrHandle bal_mem_handle(BalMem const *self)
 {
-    return self->obj;
+    return self->handle;
 }
 
-// The shm will take owner ship of the MemObj
-MaybeError bal_mem_init_mobj(BalMem *self, BrMemObj obj);
+// The shm will take owner ship of the Memory
+MaybeError bal_mem_init_mobj(BalMem *self, BrHandle handle);
 
-MaybeError bal_mem_init_mobj_offset(BalMem *self, BrMemObj obj, size_t offset, size_t len);
+MaybeError bal_mem_init_mobj_offset(BalMem *self, BrHandle handle, size_t offset, size_t len);
 
 MaybeError bal_mem_init_pmm(BalMem *self, uintptr_t addr, size_t size);
 

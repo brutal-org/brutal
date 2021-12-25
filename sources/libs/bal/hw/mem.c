@@ -7,8 +7,8 @@ static BrResult bal_mem_map(BalMem *self, size_t size, size_t offset)
     assert_equal(self->buf, nullptr);
 
     BrMapArgs args = {
-        .space = BR_SPACE_SELF,
-        .mem_obj = self->obj,
+        .space = BR_HANDLE_SELF,
+        .memory = self->handle,
         .size = size,
         .offset = offset,
         .flags = BR_MEM_WRITABLE,
@@ -32,7 +32,7 @@ static BrResult bal_mem_unmap(BalMem *self)
     assert_not_equal(self->buf, nullptr);
 
     BrUnmapArgs args = {
-        .space = BR_SPACE_SELF,
+        .space = BR_HANDLE_SELF,
         .size = self->len,
         .vaddr = (uintptr_t)self->buf,
     };
@@ -42,16 +42,16 @@ static BrResult bal_mem_unmap(BalMem *self)
     return br_unmap(&args);
 }
 
-MaybeError bal_mem_init_mobj(BalMem *self, BrMemObj obj)
+MaybeError bal_mem_init_mobj(BalMem *self, BrHandle handle)
 {
-    return bal_mem_init_mobj_offset(self, obj, 0, 0);
+    return bal_mem_init_mobj_offset(self, handle, 0, 0);
 }
 
-MaybeError bal_mem_init_mobj_offset(BalMem *self, BrMemObj obj, size_t offset, size_t len)
+MaybeError bal_mem_init_mobj_offset(BalMem *self, BrHandle handle, size_t offset, size_t len)
 {
     *self = (BalMem){};
 
-    self->obj = obj;
+    self->handle = handle;
     BrResult result = bal_mem_map(self, len, offset);
 
     if (result != BR_SUCCESS)
@@ -64,50 +64,50 @@ MaybeError bal_mem_init_mobj_offset(BalMem *self, BrMemObj obj, size_t offset, s
 
 MaybeError bal_mem_init_pmm(BalMem *self, uintptr_t addr, size_t size)
 {
-    BrCreateArgs mem_obj = {
+    BrCreateArgs memory = {
         .type = BR_OBJECT_MEMORY,
-        .mem_obj = {
+        .memory = {
             .addr = addr,
             .size = size,
-            .flags = BR_MEM_OBJ_PMM,
+            .flags = BR_MEM_PMM,
         },
     };
 
-    BrResult result = br_create(&mem_obj);
+    BrResult result = br_create(&memory);
 
     if (result != BR_SUCCESS)
     {
         return ERR(MaybeError, br_result_to_error(result));
     }
 
-    return bal_mem_init_mobj(self, mem_obj.handle);
+    return bal_mem_init_mobj(self, memory.handle);
 }
 
 MaybeError bal_mem_init_size(BalMem *self, size_t size)
 {
-    BrCreateArgs mem_obj_args = {
+    BrCreateArgs memory_args = {
         .type = BR_OBJECT_MEMORY,
-        .mem_obj = {
+        .memory = {
             .size = ALIGN_UP(size, 4096),
             .flags = 0,
         },
     };
 
-    BrResult result = br_create(&mem_obj_args);
+    BrResult result = br_create(&memory_args);
 
     if (result != BR_SUCCESS)
     {
         return ERR(MaybeError, br_result_to_error(result));
     }
 
-    return bal_mem_init_mobj(self, mem_obj_args.handle);
+    return bal_mem_init_mobj(self, memory_args.handle);
 }
 
 MaybeError bal_mem_deinit(BalMem *self)
 {
     bal_mem_unmap(self);
 
-    BrResult result = bal_close(self->obj);
+    BrResult result = bal_close(self->handle);
 
     if (result != BR_SUCCESS)
     {

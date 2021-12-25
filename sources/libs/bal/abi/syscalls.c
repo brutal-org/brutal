@@ -99,9 +99,9 @@ BrResult br_ack(BrAckArgs *args)
     return br_syscall(BR_SC_ACK, (BrArg)args, 0, 0, 0, 0);
 }
 
-BrResult br_stat(BrStatArgs *args)
+BrResult br_inspect(BrInspectArgs *args)
 {
-    return br_syscall(BR_SC_STAT, (BrArg)args, 0, 0, 0, 0);
+    return br_syscall(BR_SC_INSPECT, (BrArg)args, 0, 0, 0, 0);
 }
 
 BrResult br_in(BrIoArgs *args)

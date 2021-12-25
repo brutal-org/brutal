@@ -4,7 +4,6 @@
 #include "kernel/arch.h"
 #include "kernel/domain.h"
 #include "kernel/event.h"
-#include "kernel/globals.h"
 #include "kernel/init.h"
 #include "kernel/memory.h"
 #include "kernel/sched.h"
@@ -14,7 +13,6 @@
 BrResult sys_log(BrLogArgs *args)
 {
     embed_log_lock();
-    print(embed_log_writer(), "cpu{}: {}({}): ", cpu_self_id(), str$(&task_self()->name), task_self()->id);
     io_write(embed_log_writer(), (uint8_t *)args->message, args->size);
     embed_log_unlock();
 
@@ -25,7 +23,7 @@ BrResult sys_map(BrMapArgs *args)
 {
     Space *space = nullptr;
 
-    if (args->space == BR_SPACE_SELF)
+    if (args->space == BR_HANDLE_SELF)
     {
         space_ref(task_self()->space);
         space = task_self()->space;
@@ -40,30 +38,21 @@ BrResult sys_map(BrMapArgs *args)
         return BR_BAD_HANDLE;
     }
 
-    MemObj *mem_obj = nullptr;
+    Memory *memory = (Memory *)domain_lookup(task_self()->domain, args->memory, BR_OBJECT_MEMORY);
 
-    if (args->mem_obj == BR_MEM_OBJ_GINFO)
-    {
-        mem_obj = global_create_obj();
-    }
-    else
-    {
-        mem_obj = (MemObj *)domain_lookup(task_self()->domain, args->mem_obj, BR_OBJECT_MEMORY);
-    }
-
-    if (mem_obj == nullptr)
+    if (memory == nullptr)
     {
         space_deref(space);
 
         return BR_BAD_HANDLE;
     }
 
-    SpaceResult map_result = space_map(space, mem_obj, args->offset, args->size, args->vaddr);
+    SpaceResult map_result = space_map(space, memory, args->offset, args->size, args->vaddr);
 
     if (!map_result.succ)
     {
         space_deref(space);
-        mem_obj_deref(mem_obj);
+        memory_deref(memory);
 
         return map_result.err;
     }
@@ -78,7 +67,7 @@ BrResult sys_unmap(BrUnmapArgs *args)
 {
     Space *space = nullptr;
 
-    if (args->space == BR_SPACE_SELF)
+    if (args->space == BR_HANDLE_SELF)
     {
         space_ref(task_self()->space);
         space = task_self()->space;
@@ -104,11 +93,11 @@ BrResult sys_unmap(BrUnmapArgs *args)
     return BR_SUCCESS;
 }
 
-BrResult sys_create_task(BrId *id, BrTask *handle, BrCreateTaskArgs *args)
+BrResult sys_create_task(BrId *id, BrHandle *handle, BrTaskProps *args)
 {
     Space *space = nullptr;
 
-    if (args->space == BR_SPACE_SELF)
+    if (args->space == BR_HANDLE_SELF)
     {
         space_ref(task_self()->space);
         space = task_self()->space;
@@ -124,9 +113,8 @@ BrResult sys_create_task(BrId *id, BrTask *handle, BrCreateTaskArgs *args)
     }
 
     Task *task = UNWRAP(task_create(
-        str$(&args->name),
         space,
-        args->caps & task_self()->caps,
+        args->rights & task_self()->rights,
         args->flags | BR_TASK_USER));
 
     *id = task->id;
@@ -139,41 +127,41 @@ BrResult sys_create_task(BrId *id, BrTask *handle, BrCreateTaskArgs *args)
     return BR_SUCCESS;
 }
 
-BrResult sys_create_mem_obj(BrId *id, BrMemObj *handle, BrCreateMemObjArgs *args)
+BrResult sys_create_memory(BrId *id, BrHandle *handle, BrMemoryProps *args)
 {
-    MemObj *mem_obj = nullptr;
+    Memory *memory = nullptr;
 
-    if (args->flags & BR_MEM_OBJ_PMM)
+    if (args->flags & BR_MEM_PMM)
     {
-        if (!(task_self()->caps & BR_CAP_PMM))
+        if (!(task_self()->rights & BR_RIGHT_PMM))
         {
             return BR_BAD_CAPABILITY;
         }
 
-        mem_obj = mem_obj_pmm((PmmRange){args->addr, args->size}, MEM_OBJ_NONE);
+        memory = memory_pmm((PmmRange){args->addr, args->size}, MEMORY_NONE);
     }
     else
     {
-        PmmResult pmm_result = pmm_alloc(args->size, !(args->flags & BR_MEM_OBJ_LOWER));
+        PmmResult pmm_result = pmm_alloc(args->size, !(args->flags & BR_MEM_LOWER));
 
         if (!pmm_result.succ)
         {
             return pmm_result.err;
         }
 
-        mem_obj = mem_obj_pmm(UNWRAP(pmm_result), MEM_OBJ_OWNING);
+        memory = memory_pmm(UNWRAP(pmm_result), MEMORY_OWNING);
         args->addr = UNWRAP(pmm_result).base;
     }
 
-    *id = mem_obj->id;
-    *handle = domain_add(task_self()->domain, base$(mem_obj));
+    *id = memory->id;
+    *handle = domain_add(task_self()->domain, base$(memory));
 
-    mem_obj_deref(mem_obj);
+    memory_deref(memory);
 
     return BR_SUCCESS;
 }
 
-BrResult sys_create_space(BrId *id, BrSpace *handle, BrCreateSpaceArgs *args)
+BrResult sys_create_space(BrId *id, BrHandle *handle, BrSpaceProps *args)
 {
     Space *space = space_create(args->flags);
 
@@ -187,7 +175,7 @@ BrResult sys_create_space(BrId *id, BrSpace *handle, BrCreateSpaceArgs *args)
 
 BrResult sys_create(BrCreateArgs *args)
 {
-    if (!(task_self()->caps & BR_CAP_TASK))
+    if (!(task_self()->rights & BR_RIGHT_TASK))
     {
         return BR_BAD_CAPABILITY;
     }
@@ -201,7 +189,7 @@ BrResult sys_create(BrCreateArgs *args)
         return sys_create_space(&args->id, &args->handle, &args->space);
 
     case BR_OBJECT_MEMORY:
-        return sys_create_mem_obj(&args->id, &args->handle, &args->mem_obj);
+        return sys_create_memory(&args->id, &args->handle, &args->memory);
 
     default:
         return BR_BAD_ARGUMENTS;
@@ -210,7 +198,7 @@ BrResult sys_create(BrCreateArgs *args)
 
 BrResult sys_start(BrStartArgs *args)
 {
-    Task *task = (Task *)domain_lookup(task_self()->domain, args->task, BR_OBJECT_TASK);
+    Task *task = (Task *)domain_lookup(task_self()->domain, args->handle, BR_OBJECT_TASK);
 
     if (!task)
     {
@@ -228,14 +216,14 @@ BrResult sys_exit(BrExitArgs *args)
 {
     Task *task = nullptr;
 
-    if (args->task == BR_TASK_SELF)
+    if (args->handle == BR_HANDLE_SELF)
     {
         task = task_self();
         task_ref(task);
     }
     else
     {
-        task = (Task *)domain_lookup(task_self()->domain, args->task, BR_OBJECT_TASK);
+        task = (Task *)domain_lookup(task_self()->domain, args->handle, BR_OBJECT_TASK);
     }
 
     if (!task)
@@ -243,7 +231,7 @@ BrResult sys_exit(BrExitArgs *args)
         return BR_BAD_HANDLE;
     }
 
-    sched_stop(task, args->exit_value);
+    sched_stop(task, args->result);
 
     task_deref(task);
 
@@ -260,7 +248,7 @@ BrResult sys_ipc(BrIpcArgs *args)
 
         Task *task CLEANUP(object_cleanup) = nullptr;
 
-        if (args->to == BR_TASK_INIT)
+        if (args->to == BR_ID_SUPER)
         {
             task = init_task();
         }
@@ -305,14 +293,14 @@ BrResult sys_drop(BrDropArgs *args)
 {
     Task *task = nullptr;
 
-    if (args->task == BR_TASK_SELF)
+    if (args->handle == BR_HANDLE_SELF)
     {
         task_ref(task_self());
         task = task_self();
     }
     else
     {
-        task = (Task *)domain_lookup(task_self()->domain, args->task, BR_OBJECT_TASK);
+        task = (Task *)domain_lookup(task_self()->domain, args->handle, BR_OBJECT_TASK);
     }
 
     if (!task)
@@ -320,13 +308,13 @@ BrResult sys_drop(BrDropArgs *args)
         return BR_BAD_HANDLE;
     }
 
-    if (!(task->caps & args->cap))
+    if (!(task->rights & args->cap))
     {
         task_deref(task);
         return BR_BAD_CAPABILITY;
     }
 
-    task->caps = task->caps & ~args->cap;
+    task->rights = task->rights & ~args->cap;
 
     task_deref(task);
 
@@ -341,7 +329,7 @@ BrResult sys_close(BrCloseArgs *args)
 
 BrResult sys_bind(BrBindArgs *args)
 {
-    if (args->event.type == BR_EVENT_IRQ && !(task_self()->caps & BR_CAP_IRQ))
+    if (args->event.type == BR_EVENT_IRQ && !(task_self()->rights & BR_RIGHT_IRQ))
     {
         return BR_BAD_CAPABILITY;
     }
@@ -359,41 +347,39 @@ BrResult sys_ack(BrAckArgs *args)
     return event_ack(task_self(), args->event);
 }
 
-static BrResult sys_stat_memobj(BrInfoMemObj *args, MemObj *obj)
+static BrResult sys_stat_memory(BrMemoryInfos *args, Memory *obj)
 {
     args->range = obj->pmm;
     return BR_SUCCESS;
 }
 
-static BrResult sys_stat_domain(BrInfoDomain *args, Domain *domain)
+static BrResult sys_stat_domain(BrDomainInfos *args, Domain *domain)
 {
     args->domain_object_count = slot_count(&domain->objects);
     return BR_SUCCESS;
 }
 
-static BrResult sys_stat_space(BrInfoSpace *args, Space *space)
+static BrResult sys_stat_space(BrSpaceInfos *args, Space *space)
 {
     args->flags = space->flags;
     return BR_SUCCESS;
 }
 
-static BrResult sys_stat_task(BrInfoTask *args, Task *task)
+static BrResult sys_stat_task(BrTaskInfos *args, Task *task)
 {
-    args->blocked = task->is_blocked;
-    args->started = task->is_started;
-    args->stopped = task->is_stopped;
-    args->caps = task->caps;
-    args->name = task->name;
-    args->id = task->id;
+    args->blocked = task->blocked;
+    args->started = task->started;
+    args->stopped = task->stopped;
+    args->rights = task->rights;
 
     return BR_SUCCESS;
 }
 
-BrResult sys_stat(BrStatArgs *args)
+BrResult sys_inspect(BrInspectArgs *args)
 {
     Object *object = nullptr;
 
-    if (args->handle == BR_TASK_SELF)
+    if (args->handle == BR_HANDLE_SELF)
     {
         object = (Object *)task_self();
     }
@@ -407,21 +393,23 @@ BrResult sys_stat(BrStatArgs *args)
         return BR_BAD_HANDLE;
     }
 
-    args->info.type = object->type;
+    args->type = object->type;
+    args->handle = args->handle;
+    args->id = object->id;
 
     switch (object->type)
     {
     case BR_OBJECT_MEMORY:
-        return sys_stat_memobj(&args->info.memobj, (MemObj *)object);
+        return sys_stat_memory(&args->memory, (Memory *)object);
 
     case BR_OBJECT_DOMAIN:
-        return sys_stat_domain(&args->info.domainobj, (Domain *)object);
+        return sys_stat_domain(&args->domain, (Domain *)object);
 
     case BR_OBJECT_SPACE:
-        return sys_stat_space(&args->info.spaceobj, (Space *)object);
+        return sys_stat_space(&args->space, (Space *)object);
 
     case BR_OBJECT_TASK:
-        return sys_stat_task(&args->info.taskobj, (Task *)object);
+        return sys_stat_task(&args->task, (Task *)object);
 
     default:
         panic$("Unknow object type {}", object->type);
@@ -430,7 +418,7 @@ BrResult sys_stat(BrStatArgs *args)
 
 BrResult sys_in(BrIoArgs *args)
 {
-    if (!(task_self()->caps & BR_CAP_IO))
+    if (!(task_self()->rights & BR_RIGHT_IO))
     {
         return BR_BAD_CAPABILITY;
     }
@@ -442,7 +430,7 @@ BrResult sys_in(BrIoArgs *args)
 
 BrResult sys_out(BrIoArgs *args)
 {
-    if (!(task_self()->caps & BR_CAP_IO))
+    if (!(task_self()->rights & BR_RIGHT_IO))
     {
         return BR_BAD_CAPABILITY;
     }
@@ -467,7 +455,7 @@ BrSyscallFn *syscalls[BR_SYSCALL_COUNT] = {
     [BR_SC_BIND] = sys_bind,
     [BR_SC_UNBIND] = sys_unbind,
     [BR_SC_ACK] = sys_ack,
-    [BR_SC_STAT] = sys_stat,
+    [BR_SC_INSPECT] = sys_inspect,
     [BR_SC_IN] = sys_in,
     [BR_SC_OUT] = sys_out,
 };
@@ -485,8 +473,7 @@ BrResult syscall_dispatch(BrSyscall syscall, BrArg args)
 
     if (result != BR_SUCCESS)
     {
-        log$("Syscall: {}({}): {}({#p}) -> {}",
-             str$(&task_self()->name),
+        log$("Syscall: Task({}): {}({#p}) -> {}",
              task_self()->id,
              str$(br_syscall_to_string(syscall)),
              args,

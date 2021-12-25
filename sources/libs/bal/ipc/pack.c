@@ -9,8 +9,8 @@ void bal_pack_init(BalPack *self)
 
 void bal_pack_deinit(BalPack *self)
 {
-    assert_br_success(bal_unmap(BR_SPACE_SELF, self->buf, self->len));
-    assert_br_success(bal_close(self->obj));
+    assert_br_success(bal_unmap(BR_HANDLE_SELF, self->buf, self->len));
+    assert_br_success(bal_close(self->handle));
 }
 
 void bal_pack_ensure(BalPack *self, size_t cap)
@@ -20,19 +20,18 @@ void bal_pack_ensure(BalPack *self, size_t cap)
         return;
     }
 
-    BrCreateArgs memobj = {
+    BrCreateArgs memory = {
         .type = BR_OBJECT_MEMORY,
-        .mem_obj = {
+        .memory = {
             .size = ALIGN_UP(cap, MEM_PAGE_SIZE),
-            .flags = BR_MEM_OBJ_NONE,
         },
     };
 
-    assert_br_success(br_create(&memobj));
+    assert_br_success(br_create(&memory));
 
     BrMapArgs memmap = {
-        .space = BR_SPACE_SELF,
-        .mem_obj = memobj.handle,
+        .space = BR_HANDLE_SELF,
+        .memory = memory.handle,
         .flags = BR_MEM_READABLE | BR_MEM_WRITABLE,
     };
 
@@ -41,11 +40,11 @@ void bal_pack_ensure(BalPack *self, size_t cap)
     if (self->buf != nullptr)
     {
         mem_cpy((void *)memmap.vaddr, self->buf, self->curr);
-        bal_unmap(BR_SPACE_SELF, self->buf, self->len);
-        assert_br_success(bal_close(self->obj));
+        bal_unmap(BR_HANDLE_SELF, self->buf, self->len);
+        assert_br_success(bal_close(self->handle));
     }
 
-    self->obj = memobj.handle;
+    self->handle = memory.handle;
     self->buf = (void *)memmap.vaddr;
     self->len = ALIGN_UP(cap, MEM_PAGE_SIZE);
 }

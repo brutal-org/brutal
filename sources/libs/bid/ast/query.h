@@ -5,4 +5,3 @@
 
 bool bid_type_in_interface(BidIface const *iface, Str name);
 
-bool bid_type_is_handle(BidType *type);

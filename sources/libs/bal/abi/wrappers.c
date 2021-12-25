@@ -9,7 +9,7 @@ BrResult bal_close(BrHandle handle)
     });
 }
 
-BrResult bal_unmap(BrSpace space, void *base, size_t len)
+BrResult bal_unmap(BrHandle space, void *base, size_t len)
 {
     return br_unmap(&(BrUnmapArgs){
         space,
