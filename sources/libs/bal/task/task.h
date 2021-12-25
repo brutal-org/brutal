@@ -6,7 +6,7 @@
 typedef struct
 {
     BrId id;
-    BrTask handle;
+    BrHandle handle;
     Str name;
 } BalTask;
 

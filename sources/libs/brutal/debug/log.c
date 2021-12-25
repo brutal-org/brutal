@@ -13,7 +13,7 @@ void log_unlock_impl(LogLevel level, SourceLocation location, Str fmt, PrintArgs
 
     if (task_self())
     {
-        print(embed_log_writer(), "{}({}): ", str$(&task_self()->name), task_self()->id);
+        print(embed_log_writer(), "{}: ", task_self()->id);
     }
 #endif
 

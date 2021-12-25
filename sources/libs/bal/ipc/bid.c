@@ -25,7 +25,7 @@ int bid_hook_call(
     if (req != nullptr)
     {
         req_pack(&pack, req);
-        req_msg.args[0] = pack.obj;
+        req_msg.args[0] = pack.handle;
         req_msg.flags = BR_MSG_HND(0);
     }
 
@@ -58,7 +58,7 @@ int bid_hook_call(
     return 0;
 }
 
-static int bid_handle_invoke(BidHandler handler, IpcEv *ev, BrTask from, void *req, void *resp, Alloc *alloc)
+static int bid_handle_invoke(BidHandler handler, IpcEv *ev, BrId from, void *req, void *resp, Alloc *alloc)
 {
     switch (handler.type)
     {
@@ -127,9 +127,9 @@ void bid_hook_handle(
 
         resp_msg.type = resp_id;
         resp_msg.flags = BR_MSG_HND(0);
-        resp_msg.args[0] = pack.obj;
+        resp_msg.args[0] = pack.handle;
 
-        log$("handle is {}", pack.obj);
+        log$("handle is {}", pack.handle);
 
         br_ev_resp_raw(ev, msg, &resp_msg);
 

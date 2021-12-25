@@ -9,11 +9,11 @@
   - [Object Management](#object-management)
     - [br_create](#br_create)
     - [br_create with task](#br_create-with-task)
-    - [br_create with mem_obj](#br_create-with-mem_obj)
+    - [br_create with memory](#br_create-with-memory)
     - [br_create with space](#br_create-with-space)
     - [br_create with irq](#br_create-with-irq)
     - [br_close](#br_close)
-    - [br_stat](#br_stat)
+    - [br_inspect](#br_inspect)
   - [Task Management](#task-management)
     - [br_start](#br_start)
     - [br_exit](#br_exit)
@@ -48,12 +48,12 @@ This syscall display a message in the kernel logs. It's useful when trying to de
 
 - Arguments:
 
-  - `BrSpace space`: Target memory space.
-  - `BrMemObj mem_obj`: Memory object source.
-  - `size_t offset`: Offset from `mem_obj` base.
+  - `BrHandle space`: Target memory space.
+  - `BrHandle memory`: Memory object source.
+  - `size_t offset`: Offset from `memory` base.
   - (out/in) `size_t size`: Virtual mapping size.
   - (out/in) `uintptr_t vaddr`: Virtual address.
-  - `BrMemFlags flags`: Mapping flags:
+  - `BrMemoryFlags flags`: Mapping flags:
     - `BR_MEM_READABLE` : Make the memory readable.
     - `BR_MEM_WRITABLE` : Make the memory writable.
     - `BR_MEM_EXECUTABLE` : Make the memory executable.
@@ -61,15 +61,15 @@ This syscall display a message in the kernel logs. It's useful when trying to de
 
 - Result:
   - `BR_SUCCESS`: The mapping was successfully created.
-  - `BR_BAD_HANDLE`: `mem_obj` or space was not a valid handle.
+  - `BR_BAD_HANDLE`: `memory` or space was not a valid handle.
   - `BR_BAD_ARGUMENT`: The `offset` and `size` where not valid.
   - `BR_OUT_OF_MEMORY`: The syscall wasn't able to allocate memory.
 
-This syscall is used for mapping a `BrMemObj` in `space`. The memory will look like:
+This syscall is used for mapping a `BrHandle` in `space`. The memory will look like:
 
 - Physical:
-  - (addr) mem_obj.addr
-  - (size) mem_obj.size
+  - (addr) memory.addr
+  - (size) memory.size
 - Virtual:
   - (addr) vaddr
   - (size) size
@@ -81,7 +81,7 @@ If `size` is equal to 0, the kernel will use the memory object size instead.
 
 - Arguments:
 
-  - `BrSpace space`: Address space where the memory will be unmapped.
+  - `BrHandle space`: Address space where the memory will be unmapped.
   - `uintptr_t vaddr`: Start of the range that will be unmapped.
   - `size_t size`: Size of the range that will be unmapped.
 
@@ -98,13 +98,13 @@ This syscall unmaps a memory range from an address space.
 
 - Arguments:
 
-  - `BrObjectType type`: The object type.
+  - `BrType type`: The object type.
   - (out) `BrId id`: The resulting object id.
   - (out) `BrHandle handle`: The resulting object handle.
   - (out/in) `...`: See br_create object arg.
 
 - Result:
-  - `BR_BAD_CAPABILITY`: The task hasn't the `BR_CAP_TASK` capability.
+  - `BR_BAD_CAPABILITY`: The task hasn't the `BR_RIGHT_TASK` capability.
   - `...` See br_create object type result.
 
 This syscall is used for making different kernel object (task, memory_space, memory object, irq mapping...).
@@ -114,25 +114,25 @@ This syscall is used for making different kernel object (task, memory_space, mem
 - Arguments:
 
   - `StrFix128 name`: Task name.
-  - `BrSpace space`: Task memory space.
-  - `BrCap caps`: Task capabilities.
+  - `BrHandle space`: Task memory space.
+  - `BrRight rights`: Task capabilities.
   - `BrTaskFlags flags`: flags.
     - `BR_TASK_USER`: User task.
 
 - Result:
   - `BR_BAD_HANDLE`: `space` is not a valid handle.
 
-### br_create with mem_obj
+### br_create with memory
 
 - Arguments:
 
   - (out/in) `uintptr_t addr`: Memory object physical addr.
   - `size_t size`: Memory object size.
-  - `BrMemObjFlags flags`: Flags.
-    - `BR_MEM_OBJ_PMM`: Used if you want to specify the physical addr.
+  - `BrMapFlags flags`: Flags.
+    - `BR_MAP_PMM`: Used if you want to specify the physical addr.
 
 - Result:
-  - `BR_BAD_CAPABILITY`: The task tried to create a mem object with `BR_MEM_OBJ_PMM` flag while not having the `BR_CAP_PMM` capability.
+  - `BR_BAD_CAPABILITY`: The task tried to create a mem object with `BR_MAP_PMM` flag while not having the `BR_RIGHT_PMM` capability.
   - `BR_OUT_OF_MEMORY`: Failed to allocate memory.
 
 Create a memory object. If `addr` is equal to 0, let the kernel choose the physical address.
@@ -158,12 +158,12 @@ Create a memory object. If `addr` is equal to 0, let the kernel choose the physi
 
 Closes an handle.
 
-### br_stat
+### br_inspect
 
 - Arguments:
 
   - `BrHandle handle`: Object handle.
-  - (out) `BrHandleInfo info`: Object result info.
+  - (out) `BrInspectArgs info`: Object result info.
 
 - Result:
   - `BR_SUCCESS`
@@ -177,7 +177,7 @@ Used for getting information about an object.
 
 - Arguments:
 
-  - `BrTask task`: Task to start.
+  - `BrId task`: Task to start.
   - `uintptr_t ip`: The instruction pointer of the task.
   - `uintptr_t sp`: The stack pointer of the task.
   - `BrTaskArgs args`: The task argument.
@@ -193,8 +193,8 @@ The syscall begins the execution of a task.
 
 - Arguments:
 
-  - `BrTask task`: Task to exit.
-  - `uintptr_t exit_value`: The exit value of the task.
+  - `BrId task`: Task to exit.
+  - `uintptr_t result`: The exit value of the task.
 
 - Result:
   - `BR_SUCCESS`
@@ -206,8 +206,8 @@ This syscall stops the execution of a task.
 
 - Arguments:
 
-  - `BrTask task_handle`: Target task.
-  - `BrCap cap`: The capability to remove.
+  - `BrId task_handle`: Target task.
+  - `BrRight rights`: The capabilities to remove.
 
 - Result:
   - `BR_SUCCESS`
@@ -248,7 +248,7 @@ This syscall is used for any IPC action. `deadline` is in tick (or currently in 
 
 - Result:
   - `BR_SUCCESS`
-  - `BR_BAD_CAPABILITY`: The task has not the `BR_CAP_IRQ` capability.
+  - `BR_BAD_CAPABILITY`: The task has not the `BR_RIGHT_IRQ` capability.
   - `BR_BAD_HANDLE`: `handle` is not a valid handle.
 
 Bind an irq for this current task.
@@ -262,7 +262,7 @@ Bind an irq for this current task.
 
 - Result:
   - `BR_SUCCESS`
-  - `BR_BAD_CAPABILITY`: The task has not the `BR_CAP_IRQ` capability.
+  - `BR_BAD_CAPABILITY`: The task has not the `BR_RIGHT_IRQ` capability.
   - `BR_BAD_HANDLE`: `handle` is not a valid handle.
 
 Unbind an irq for this current task.
@@ -276,7 +276,7 @@ Unbind an irq for this current task.
 
 - Result:
   - `BR_SUCCESS`
-  - `BR_BAD_CAPABILITY`: The task has not the `BR_CAP_IRQ` capability.
+  - `BR_BAD_CAPABILITY`: The task has not the `BR_RIGHT_IRQ` capability.
   - `BR_BAD_HANDLE`: `handle` is not a valid handle.
 
 Ack an irq for this current task.
@@ -294,7 +294,7 @@ Used for getting an interrupt again, after receiving one.
 
 - Result:
   - `BR_SUCCESS`
-  - `BR_BAD_CAPABILITY`: the process has not the `BR_CAP_IO` capability.
+  - `BR_BAD_CAPABILITY`: the process has not the `BR_RIGHT_IO` capability.
 
 This syscall is used to do `inb`/`inl`/`inw` for x86.
 
@@ -308,6 +308,6 @@ This syscall is used to do `inb`/`inl`/`inw` for x86.
 
 - Result:
   - `BR_SUCCESS`
-  - `BR_BAD_CAPABILITY`: the process has not the `BR_CAP_IO` capability.
+  - `BR_BAD_CAPABILITY`: the process has not the `BR_RIGHT_IO` capability.
 
 This syscall is used to do `outb`/`outl`/`outw` for x86.

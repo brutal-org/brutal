@@ -54,8 +54,8 @@ IoWriter *embed_log_writer(void)
 void embed_log_panic(void)
 {
     br_exit(&(BrExitArgs){
-        .task = BR_TASK_SELF,
-        .exit_value = -1,
+        .handle = BR_HANDLE_SELF,
+        .result = -1,
     });
 
     __builtin_unreachable();

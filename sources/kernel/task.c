@@ -13,7 +13,7 @@ Task *task_self(void)
 
 void task_destroy(Task *task)
 {
-    log$("Destroying task {}({})", str$(&task->name), task->id);
+    log$("Destroying task {}", task->id);
 
     event_unbind_all(task);
     context_destroy(task->context);
@@ -25,16 +25,14 @@ void task_destroy(Task *task)
     alloc_free(alloc_global(), task);
 }
 
-TaskCreateResult task_create(Str name, Space *space, BrCap caps, BrTaskFlags flags)
+TaskCreateResult task_create(Space *space, BrRight rights, BrTaskFlags flags)
 {
-    log$("Creating Task {}...", name);
 
     Task *task = alloc_make(alloc_global(), Task);
 
-    task->name = str_fix$(StrFix128, name);
     task->flags = flags;
 
-    task->caps = caps;
+    task->rights = rights;
     task->context = context_create();
     space_ref(space);
     task->space = space;
@@ -46,8 +44,6 @@ TaskCreateResult task_create(Str name, Space *space, BrCap caps, BrTaskFlags fla
     task->sp = range_end(task->stack);
 
     object_init(base$(task), BR_OBJECT_TASK, (ObjectDtor *)task_destroy);
-
-    log$("Task {}({}) created...", str$(&task->name), task->id);
 
     return OK(TaskCreateResult, task);
 }
@@ -64,7 +60,7 @@ void task_deref(Task *self)
 
 void task_begin_syscall(void)
 {
-    if (task_self()->is_stopped)
+    if (task_self()->stopped)
     {
         sched_yield();
     }
@@ -76,7 +72,7 @@ void task_end_syscall(void)
 {
     task_self()->in_syscall = false;
 
-    if (task_self()->is_stopped)
+    if (task_self()->stopped)
     {
         sched_yield();
     }

@@ -95,7 +95,7 @@ size_t schedule_count = MIN(cpu_count(), running - cpu_count());
 
 (where running is the number of running process)
 
-we can't switch higher than the cpu_count (we can't switch for 6 process using 5 cpu) and we can't switch more process than there is cpu (we can't switch for 1 process for 5 cpu). 
+We can't switch higher than the cpu_count (we can't switch for 6 process using 5 cpu) and we can't switch more process than there is cpu (we can't switch for 1 process for 5 cpu).
 
 For each `schedule_count` we get the process that has run the longest and replace it with the process that waited the longest. But we can still have the case where we have a idle cpu. For exemple if a process is deleted or sleeping so when we get the most waiting process, we check if there is no idle cpu. If there is one, put the most waiting process in the idle cpu. If there is not replace the most running process with the most waiting process.
 

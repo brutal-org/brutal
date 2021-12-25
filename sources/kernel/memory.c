@@ -2,11 +2,11 @@
 #include <brutal/debug.h>
 #include "kernel/memory.h"
 
-void mem_obj_destroy(MemObj *self)
+void memory_destroy(Memory *self)
 {
-    if (self->flags & MEM_OBJ_OWNING)
+    if (self->flags & MEMORY_OWNING)
     {
-        if (self->type == MEM_OBJ_HEAP)
+        if (self->type == MEMORY_HEAP)
         {
             heap_free(self->heap);
         }
@@ -19,45 +19,45 @@ void mem_obj_destroy(MemObj *self)
     alloc_free(alloc_global(), self);
 }
 
-MemObj *mem_obj_heap(HeapRange heap, MemObjFlags flags)
+Memory *memory_heap(HeapRange heap, MemoryFlags flags)
 {
-    MemObj *self = alloc_make(alloc_global(), MemObj);
+    Memory *self = alloc_make(alloc_global(), Memory);
 
-    self->type = MEM_OBJ_HEAP;
+    self->type = MEMORY_HEAP;
     self->flags = flags;
     self->heap = heap;
 
-    object_init(base$(self), BR_OBJECT_MEMORY, (ObjectDtor *)mem_obj_destroy);
+    object_init(base$(self), BR_OBJECT_MEMORY, (ObjectDtor *)memory_destroy);
 
     return self;
 }
 
-MemObj *mem_obj_pmm(PmmRange pmm, MemObjFlags flags)
+Memory *memory_pmm(PmmRange pmm, MemoryFlags flags)
 {
-    MemObj *self = alloc_make(alloc_global(), MemObj);
+    Memory *self = alloc_make(alloc_global(), Memory);
 
-    self->type = MEM_OBJ_PMM;
+    self->type = MEMORY_PMM;
     self->flags = flags;
     self->pmm = pmm;
 
-    object_init(base$(self), BR_OBJECT_MEMORY, (ObjectDtor *)mem_obj_destroy);
+    object_init(base$(self), BR_OBJECT_MEMORY, (ObjectDtor *)memory_destroy);
 
     return self;
 }
 
-void mem_obj_ref(MemObj *self)
+void memory_ref(Memory *self)
 {
     object_ref(base$(self));
 }
 
-void mem_obj_deref(MemObj *self)
+void memory_deref(Memory *self)
 {
     object_deref(base$(self));
 }
 
-PmmRange mem_obj_range(MemObj *self)
+PmmRange memory_range(Memory *self)
 {
-    if (self->type == MEM_OBJ_HEAP)
+    if (self->type == MEMORY_HEAP)
     {
         return heap_to_pmm(self->heap);
     }
@@ -67,12 +67,12 @@ PmmRange mem_obj_range(MemObj *self)
     }
 }
 
-uintptr_t mem_obj_base(MemObj *self)
+uintptr_t memory_base(Memory *self)
 {
-    return mem_obj_range(self).base;
+    return memory_range(self).base;
 }
 
-size_t mem_obj_size(MemObj *self)
+size_t memory_size(Memory *self)
 {
-    return mem_obj_range(self).size;
+    return memory_range(self).size;
 }

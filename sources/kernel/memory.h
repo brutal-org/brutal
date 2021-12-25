@@ -8,40 +8,40 @@
 
 typedef enum
 {
-    MEM_OBJ_PMM,
-    MEM_OBJ_HEAP,
-} MemObjType;
+    MEMORY_PMM,
+    MEMORY_HEAP,
+} MemoryType;
 
 typedef enum
 {
-    MEM_OBJ_NONE,
-    MEM_OBJ_OWNING,
-} MemObjFlags;
+    MEMORY_NONE,
+    MEMORY_OWNING,
+} MemoryFlags;
 
 typedef struct
 {
     OBJECT_HEADER;
 
-    MemObjType type;
-    MemObjFlags flags;
+    MemoryType type;
+    MemoryFlags flags;
 
     union
     {
         HeapRange heap;
         PmmRange pmm;
     };
-} MemObj;
+} Memory;
 
-MemObj *mem_obj_heap(HeapRange heap, MemObjFlags flags);
+Memory *memory_heap(HeapRange heap, MemoryFlags flags);
 
-MemObj *mem_obj_pmm(PmmRange range, MemObjFlags flags);
+Memory *memory_pmm(PmmRange range, MemoryFlags flags);
 
-void mem_obj_ref(MemObj *self);
+void memory_ref(Memory *self);
 
-void mem_obj_deref(MemObj *self);
+void memory_deref(Memory *self);
 
-PmmRange mem_obj_range(MemObj *self);
+PmmRange memory_range(Memory *self);
 
-uintptr_t mem_obj_base(MemObj *self);
+uintptr_t memory_base(Memory *self);
 
-size_t mem_obj_size(MemObj *self);
+size_t memory_size(Memory *self);

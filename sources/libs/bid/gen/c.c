@@ -88,7 +88,7 @@ static CType gen_func_method(BidMethod method, BidIface const iface, Alloc *allo
 
     ctype_member(&ctype, str$("ev"), ctype_ident_ptr(str$("IpcEv"), alloc));
 
-    ctype_member(&ctype, str$("task"), ctype_ident(str$("BrTask")));
+    ctype_member(&ctype, str$("from"), ctype_ident(str$("BrId")));
 
     if (method.request.type != BID_TYPE_NIL)
     {
@@ -342,7 +342,7 @@ CStmt gen_method_body(BidMethod method, BidIface const iface, Alloc *alloc)
 
     CExpr pack_request = cexpr_call(alloc, cexpr_ident(str$("bid_hook_call")));
     cexpr_member(&pack_request, cexpr_ident(str$("ev")));
-    cexpr_member(&pack_request, cexpr_ident(str$("task")));
+    cexpr_member(&pack_request, cexpr_ident(str$("from")));
     cexpr_member(&pack_request, cexpr_constant(cval_signed(iface.id)));
 
     cexpr_member(&pack_request, cexpr_ident(str_fmt(alloc, "MSG_{case:constant}_REQ", method.mangled)));
