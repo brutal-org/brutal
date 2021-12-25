@@ -89,6 +89,7 @@ struct ubsan_array_out_of_bounds_data
 
 void __ubsan_handle_out_of_bounds(struct ubsan_array_out_of_bounds_data *data)
 {
+    log$(" for: {} at index: {}", (const char *)data->array_type->name, data->index_type->info);
     ubsan_print_location("array out of bounds", data->location);
 }
 

@@ -52,6 +52,7 @@ MaybeError bal_mem_init_mobj_offset(BalMem *self, BrHandle handle, size_t offset
     *self = (BalMem){};
 
     self->handle = handle;
+
     BrResult result = bal_mem_map(self, len, offset);
 
     if (result != BR_SUCCESS)
@@ -75,12 +76,17 @@ MaybeError bal_mem_init_pmm(BalMem *self, uintptr_t addr, size_t size)
 
     BrResult result = br_create(&memory);
 
+    self->paddr = memory.memory.addr;
+
     if (result != BR_SUCCESS)
     {
         return ERR(MaybeError, br_result_to_error(result));
     }
 
-    return bal_mem_init_mobj(self, memory.handle);
+    TRY(MaybeError, bal_mem_init_mobj(self, memory.handle));
+
+    self->paddr = memory.memory.addr;
+    return SUCCESS;
 }
 
 MaybeError bal_mem_init_size(BalMem *self, size_t size)
@@ -100,7 +106,10 @@ MaybeError bal_mem_init_size(BalMem *self, size_t size)
         return ERR(MaybeError, br_result_to_error(result));
     }
 
-    return bal_mem_init_mobj(self, memory_args.handle);
+    TRY(MaybeError, bal_mem_init_mobj(self, memory_args.handle));
+
+    self->paddr = memory_args.memory.addr;
+    return SUCCESS;
 }
 
 MaybeError bal_mem_deinit(BalMem *self)
@@ -113,6 +122,24 @@ MaybeError bal_mem_deinit(BalMem *self)
     {
         return ERR(MaybeError, br_result_to_error(result));
     }
+
+    return SUCCESS;
+}
+
+MaybeError bal_memobj_paddr(BrMemObj obj, uintptr_t *paddr)
+{
+    BrStatArgs args = {
+        .handle = obj,
+    };
+
+    BrResult res = br_stat(&args);
+
+    if (res != BR_SUCCESS)
+    {
+        return ERR(MaybeError, br_result_to_error(res));
+    }
+
+    *paddr = args.info.memobj.range.base;
 
     return SUCCESS;
 }

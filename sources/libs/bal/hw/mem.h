@@ -9,6 +9,7 @@ typedef struct
     size_t len;
     void *buf;
     BrHandle handle;
+    uintptr_t paddr;
 } BalMem;
 
 static inline BrHandle bal_mem_handle(BalMem const *self)
@@ -26,3 +27,5 @@ MaybeError bal_mem_init_pmm(BalMem *self, uintptr_t addr, size_t size);
 MaybeError bal_mem_init_size(BalMem *self, size_t size);
 
 MaybeError bal_mem_deinit(BalMem *self);
+
+MaybeError bal_memobj_paddr(BrMemObj obj, uintptr_t *paddr);
