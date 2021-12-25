@@ -33,9 +33,13 @@ interface Pci
     {
         NOT_FOUND,
         INVALID_ADDR,
+        NO_IRQ_FOR_DEVICE,
+        IRQ_ALREADY_ENABLED
     };
 
     method find_device { identifier: Identifier} -> Addr;
 
     method bar { addr: Addr, num: U8} -> BarInfo;
+    
+    method enable_irq { addr: Addr } -> U8;
 }

@@ -42,6 +42,7 @@ int br_entry_handover(Handover *handover)
     bus_start(&bus, str$("posix"), bal_args1(0));
     bus_start(&bus, str$("acpi"), bal_args_handover(handover));
     bus_start(&bus, str$("pci"), bal_args_handover(handover));
+    bus_start(&bus, str$("ahci"), bal_args1(0));
     bus_start(&bus, str$("ps2"), bal_args1(0));
 
     bbus_impl(&ev, &_bbus_vtable);

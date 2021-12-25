@@ -1,0 +1,9 @@
+interface Disk
+{
+    type Buf : U8[];
+    
+    method write {buf: Buf, pos: U64}  -> Nil;
+    method read {pos: U64, len: U64}  -> Buf;
+
+
+}

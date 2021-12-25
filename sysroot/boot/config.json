@@ -17,6 +17,10 @@
           "path": "/pkgs/posix"
         },
         {
+          "name": "ahci",
+          "path": "/pkgs/ahci"
+        },
+        {
           "name": "echo",
           "path": "/pkgs/echo"
         },

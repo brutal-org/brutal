@@ -216,3 +216,18 @@ PciBarInfo pci_get_bar(Pci *pci, PciAddr addr, int bar)
 
     return res;
 }
+bool pci_set_msi(uint8_t cpu, uint8_t vector, PciCapability *pci_msi_cap)
+{
+
+    if ((pci_msi_cap->msi.control & MSI_CTRL_64_BIT) == 0)
+    {
+        panic$("we don't support non 64 bit msi");
+        return false;
+    }
+    pci_msi_cap->msi.address = (0xfee << 20) | (cpu << 12);
+    pci_msi_cap->msi.data = vector;
+    pci_msi_cap->msi.control |= MSI_CTRL_ENABLE;
+    pci_msi_cap->msi.control &= ~(0b111 << MSI_CTRL_MME_OFF);
+
+    return true;
+}
