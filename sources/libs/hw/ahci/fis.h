@@ -1,5 +1,6 @@
 #pragma once
-#include <stdint.h>
+
+#include <brutal/base.h>
 
 typedef enum
 {
@@ -52,7 +53,7 @@ typedef enum
     FIS_CMD_WRITE_SECTORS_EXT = 0x34,
 } FisCommands;
 
-typedef volatile struct __attribute__((packed))
+typedef volatile struct PACKED
 {
     uint8_t fis_type;
     uint8_t port_multiplier : 4;
@@ -73,7 +74,7 @@ typedef volatile struct __attribute__((packed))
     uint8_t _reserved2[4];
 } FisHost2Dev;
 
-typedef volatile struct __attribute__((packed))
+typedef volatile struct PACKED
 {
     uint8_t fis_type;
     uint8_t port_multiplier : 4;
@@ -93,7 +94,7 @@ typedef volatile struct __attribute__((packed))
     // FIFDIDIDI
 } FisDev2Host;
 
-typedef volatile struct __attribute__((packed))
+typedef volatile struct PACKED
 {
     uint8_t fis_type;
     uint8_t port_multiplier : 4;
@@ -103,7 +104,7 @@ typedef volatile struct __attribute__((packed))
     uint32_t data[];
 } FisData;
 
-typedef volatile struct __attribute__((packed))
+typedef volatile struct PACKED
 {
     uint8_t fis_type;
     uint8_t port_multiplier : 4;
@@ -127,7 +128,7 @@ typedef volatile struct __attribute__((packed))
 
 } FisPioSetup;
 
-typedef volatile struct __attribute__((packed))
+typedef volatile struct PACKED
 {
     uint8_t fis_type;
     uint8_t port_multiplier : 4;
@@ -144,7 +145,7 @@ typedef volatile struct __attribute__((packed))
     uint32_t _reserved3;
 } FisDmaSetup;
 
-typedef volatile struct __attribute__((packed))
+typedef volatile struct PACKED
 {
     FisDmaSetup dma_setup_fis;
     uint8_t _pad[4];

@@ -21,6 +21,6 @@ Iter pci_iter(Pci *pci, IterFn fn, void *ctx);
 
 PciConfig *pci_config(Pci *pci, PciAddr addr);
 
-PciBarInfo pci_get_bar(Pci *pci, PciAddr addr, int bar);
+PciBarInfo pci_read_bar(Pci *pci, PciAddr addr, int bar);
 
-bool pci_set_msi(uint8_t cpu, uint8_t vector, PciCapability *pci_msi_cap);
+bool pci_bind_msi(uint8_t cpu, uint8_t vector, PciCapability *pci_msi_cap);

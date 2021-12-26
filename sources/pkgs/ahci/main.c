@@ -1,7 +1,7 @@
+#include <ahci/ahci.h>
+#include <ahci/device.h>
 #include <bal/ipc.h>
 #include <brutal/debug.h>
-#include <hw/ahci/ahci.h>
-#include <hw/ahci/ahci_device.h>
 #include <protos/hw/pci.h>
 #include <protos/serv/bbus.h>
 int br_entry_args(
@@ -50,26 +50,31 @@ int br_entry_args(
     while (true)
     {
 
-        if (ahci_io_cmd(&dev, sample.obj, off, 1, false) != true)
+        if (ahci_device_io_command(&dev, sample.obj, off, 1, false) != true)
         {
             panic$("");
         }
-        if (ahci_io_cmd(&dev, sample.obj, off, 1, false) != true)
+
+        if (ahci_device_io_command(&dev, sample.obj, off, 1, false) != true)
         {
             panic$("");
         }
-        if (ahci_io_cmd(&dev, sample.obj, off, 1, false) != true)
+
+        if (ahci_device_io_command(&dev, sample.obj, off, 1, false) != true)
         {
             panic$("");
         }
-        if (ahci_io_cmd(&dev, sample.obj, off, 1, false) != true)
+
+        if (ahci_device_io_command(&dev, sample.obj, off, 1, false) != true)
         {
             panic$("");
         }
-        if (ahci_io_cmd(&dev, sample.obj, off, 1, false) != true)
+
+        if (ahci_device_io_command(&dev, sample.obj, off, 1, false) != true)
         {
             panic$("");
         }
+
         for (int i = 0; i < 512; i++)
         {
             if (*(char *)(sample.buf + i) != 0)
@@ -77,11 +82,13 @@ int br_entry_args(
         }
 
         ((uint8_t *)sample.buf)[0] = 0xff;
-        if (ahci_io_cmd(&dev, sample.obj, off, 1, true) != true)
+
+        if (ahci_device_io_command(&dev, sample.obj, off, 1, true) != true)
         {
             panic$("");
         }
-        if (ahci_io_cmd(&dev, sample.obj, off, 1, false) != true)
+
+        if (ahci_device_io_command(&dev, sample.obj, off, 1, false) != true)
         {
             panic$("");
         }
@@ -91,10 +98,9 @@ int br_entry_args(
             if (*(char *)(sample.buf + i) != 0)
                 log$("[{}] = {} {#x}", i + off * 512, *(((char *)sample.buf) + i), *(((uint8_t *)sample.buf) + i));
         }
+
         off++;
     }
-    while (true)
-    {
-    }
+
     return 0;
 }

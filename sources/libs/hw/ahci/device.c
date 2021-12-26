@@ -1,4 +1,4 @@
-#include <ahci/ahci_device.h>
+#include <ahci/device.h>
 #include <ahci/fis.h>
 #include <brutal/debug.h>
 
@@ -22,7 +22,7 @@ static void init_hba_command_header(HbaCommand *command, bool write, uint32_t fi
 
 static void init_hba_command_table(AhciCommand *command, uintptr_t data_phys_addr, size_t count)
 {
-    mem_set((void *)command->table, 0, sizeof(HbaCommandTable) + (command->command->physical_region_descriptor_count - 1) * sizeof(HbaPrdtEntry));
+    mem_set((void *)command->table, 0, sizeof(HbaCommandTable) + (command->command->physical_region_descriptor_count) * sizeof(HbaPrdtEntry));
 
     command->table->entry[0].data_base_low = data_phys_addr;
     command->table->entry[0].data_base_up = data_phys_addr >> 32;
@@ -34,6 +34,7 @@ static void init_fis_reg_command(FisHost2Dev *command, bool write, uint64_t curs
 {
     command->fis_type = FIS_TYPE_REG_HOST2DEV;
     command->ctrl_or_cmd = 1;
+
     if (write)
     {
         command->command = FIS_CMD_WRITE_DMA_EXT;
@@ -87,7 +88,7 @@ static int ahci_find_command_port(AhciDevice *self)
 }
 
 // wait for the device to stop running and start a command
-void start_ahci_device_command(AhciDevice *self)
+void ahci_device_start_command(AhciDevice *self)
 {
     self->port->command_and_status &= ~HBA_CMD_START;
     while (self->port->command_and_status & HBA_CMD_CMD_LIST_RUNNING)
@@ -96,8 +97,9 @@ void start_ahci_device_command(AhciDevice *self)
     self->port->command_and_status |= HBA_CMD_FIS_RECEIVE_ENABLE;
     self->port->command_and_status |= HBA_CMD_START;
 }
+
 // stop the command and the fis receiving
-void end_ahci_device_command(AhciDevice *self)
+void ahci_device_end_command(AhciDevice *self)
 {
     self->port->command_and_status &= ~((uint32_t)HBA_CMD_START);
 
@@ -107,7 +109,7 @@ void end_ahci_device_command(AhciDevice *self)
     self->port->command_and_status &= ~((uint32_t)HBA_CMD_FIS_RECEIVE_ENABLE);
 }
 
-static void init_ahci_device_command(AhciDevice *self)
+static void ahci_device_init_command(AhciDevice *self)
 {
     bal_mem_init_size(&self->command_mem, sizeof(HbaCommand) * 32);
     self->port->command_list_addr_low = self->command_mem.paddr;
@@ -140,11 +142,13 @@ static void init_ahci_device_command(AhciDevice *self)
     }
 }
 
-bool ahci_identify(AhciDevice *self, uint8_t command)
+bool ahci_device_identify(AhciDevice *self, uint8_t command)
 {
 
     int command_slot = ahci_find_command_port(self);
-    log$("using slot: {}", command_slot);
+
+    log$("Using slot: {}", command_slot);
+
     if (command_slot == -1)
     {
 
@@ -167,8 +171,9 @@ bool ahci_identify(AhciDevice *self, uint8_t command)
     read_command->ctrl_or_cmd = 1;
     ahci_wait_busy_drq(self);
 
-    start_ahci_device_command(self);
+    ahci_device_start_command(self);
     self->port->command_issue = 1 << command_slot;
+
     while (true)
     {
 
@@ -185,17 +190,17 @@ bool ahci_identify(AhciDevice *self, uint8_t command)
 
     if (self->port->interrupt_status & HBA_INT_TASK_FILE_ERROR_STATUS)
     {
-        log$("int-status: {#b}", self->port->interrupt_status);
-        log$("sata-status: {#b}", self->port->sata_status);
-        log$("cmd-status: {#b}", self->port->command_and_status);
-        log$("task-file: {#b}", self->port->task_file_data);
-        log$("error: {#b}", self->port->sata_error);
-        panic$("task error while {} at: {}", "getting ahci information", command);
+        log$("Int status: {#b}", self->port->interrupt_status);
+        log$("Sata status: {#b}", self->port->sata_status);
+        log$("Command status: {#b}", self->port->command_and_status);
+        log$("Task file: {#b}", self->port->task_file_data);
+        log$("Error: {#b}", self->port->sata_error);
+        panic$("Task error while {} at: {}", "getting ahci information", command);
     }
 
     log$("{#b}", self->port->interrupt_status);
-    ;
-    end_ahci_device_command(self);
+
+    ahci_device_end_command(self);
 
     for (int i = 0; i < 255; i++)
     {
@@ -204,7 +209,7 @@ bool ahci_identify(AhciDevice *self, uint8_t command)
     return true;
 }
 
-void init_ahci_device(AhciDevice *device, HbaPort *port, int idx)
+void ahci_device_init(AhciDevice *device, HbaPort *port, int idx)
 {
     *device = (AhciDevice){};
     device->idx = idx;
@@ -230,12 +235,12 @@ void init_ahci_device(AhciDevice *device, HbaPort *port, int idx)
     atomic_signal_fence(memory_order_acq_rel);
     atomic_thread_fence(memory_order_acq_rel);
     port->command_and_status |= HBA_CMD_SPIN_UP;
-    init_ahci_device_command(device);
+    ahci_device_init_command(device);
 
-    // ahci_identify(device, 0xec);
+    // ahci_device_identify(device, 0xec);
 }
 
-bool ahci_io_cmd(AhciDevice *self, BrMemObj target, uint64_t cursor, uint64_t count, bool write)
+bool ahci_device_io_command(AhciDevice *self, BrMemObj target, uint64_t cursor, uint64_t count, bool write)
 {
     self->port->interrupt_status = 0xFFFFFFFF;
 
@@ -259,13 +264,15 @@ bool ahci_io_cmd(AhciDevice *self, BrMemObj target, uint64_t cursor, uint64_t co
 
     ahci_wait_busy_drq(self);
 
-    start_ahci_device_command(self);
+    ahci_device_start_command(self);
     atomic_signal_fence(memory_order_acq_rel);
     atomic_thread_fence(memory_order_acq_rel);
+
     self->port->command_issue |= 1 << command_slot;
 
     atomic_signal_fence(memory_order_acq_rel);
     atomic_thread_fence(memory_order_acq_rel);
+
     while (true)
     {
         if (!(self->port->command_issue & (1 << command_slot)))
@@ -292,7 +299,7 @@ bool ahci_io_cmd(AhciDevice *self, BrMemObj target, uint64_t cursor, uint64_t co
         log$("error2: {#b}", fis->d2h_fis.status);
         panic$("task error while {} at: {} count: {}", write ? "writing" : "reading", cursor, count);
     }
-    end_ahci_device_command(self);
+    ahci_device_end_command(self);
 
     return true;
 }

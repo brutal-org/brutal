@@ -1,8 +1,9 @@
 #pragma once
+
+#include <ahci/device.h>
+#include <ahci/hba.h>
 #include <brutal/ds.h>
-#include <hw/ahci/ahci_device.h>
-#include <hw/ahci/hba.h>
-#include <hw/pci/pci.h>
+#include <pci/pci.h>
 
 typedef struct
 {
@@ -20,4 +21,5 @@ typedef enum
     AHCI_DEVICE_PM,
     AHCI_DEVICE_UNCONNECTED,
 } AhciDeviceType;
+
 void ahci_init(Ahci *ahci, PciBarInfo *bar, Alloc *alloc);
