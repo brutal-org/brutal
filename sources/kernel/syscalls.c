@@ -308,13 +308,13 @@ BrResult sys_drop(BrDropArgs *args)
         return BR_BAD_HANDLE;
     }
 
-    if (!(task->rights & args->cap))
+    if (!(task->rights & args->rights))
     {
         task_deref(task);
         return BR_NOT_PERMITTED;
     }
 
-    task->rights = task->rights & ~args->cap;
+    task->rights = task->rights & ~args->rights;
 
     task_deref(task);
 

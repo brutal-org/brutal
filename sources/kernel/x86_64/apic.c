@@ -186,7 +186,7 @@ static Iter iso_iterate(AcpiMadtIsoRecord *record, IrqRedirectCtx *ctx)
 {
     if (record->irq == ctx->irq)
     {
-        log$("   - apic: using iso interrupt base: {}", record->gsi);
+        log$("   - Using iso interrupt base: {}", record->gsi);
 
         ioapic_create_redirect(
             record->irq + 0x20,
@@ -203,7 +203,7 @@ static Iter iso_iterate(AcpiMadtIsoRecord *record, IrqRedirectCtx *ctx)
 
 static void ioapic_redirect_irq_to_cpu(Acpi *acpi, CpuId id, uint8_t irq, bool enable)
 {
-    log$(" - apic: setting ipi {#p} redirection for cpu: {}", irq, id);
+    log$(" - Setting ipi {#p} redirection for cpu: {}", irq, id);
 
     IrqRedirectCtx ctx = {id, irq, enable};
 

@@ -129,8 +129,6 @@ void bid_hook_handle(
         resp_msg.flags = BR_MSG_HND(0);
         resp_msg.args[0] = pack.handle;
 
-        log$("handle is {}", pack.handle);
-
         br_ev_resp_raw(ev, msg, &resp_msg);
 
         bal_pack_deinit(&pack);

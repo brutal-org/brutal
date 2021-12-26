@@ -114,7 +114,7 @@ SYSCALL(ipc) (BrIpcArgs* args);
 typedef struct
 {
     BrHandle handle;
-    BrRight cap;
+    BrRight rights;
 } BrDropArgs;
 
 SYSCALL(drop) (BrDropArgs* args);

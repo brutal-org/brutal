@@ -29,7 +29,7 @@ static size_t smp_trampoline_size(void)
 static void smp_trampoline_map(void)
 {
     log$("Initializing cpu trampoline");
-    log$("trampoline is {x} bytes in size", smp_trampoline_size());
+    log$("Trampoline is {x} bytes in size", smp_trampoline_size());
 
     uint64_t trampoline_len = smp_trampoline_size();
 

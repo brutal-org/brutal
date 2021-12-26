@@ -43,7 +43,7 @@ void loader_load(Elf64Header const *elf_header, void *base)
         }
         else
         {
-            log$("unkown header: {}", prog_header->type);
+            log$("Unkown program header: {}", prog_header->type);
         }
 
         prog_header = (Elf64ProgramHeader *)((void *)prog_header + elf_header->programs_size);
