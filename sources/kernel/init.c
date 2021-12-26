@@ -39,9 +39,9 @@ static bool elf_supported(Elf64Header const *header, size_t data_size)
 
 static void elf_load_program(Task *task, Elf64Header const *elf_header, Memory *elf_obj)
 {
-    Elf64ProgramHeader *prog_header = (Elf64ProgramHeader *)((uint8_t *)elf_header + elf_header->program_header_table_file_offset);
+    Elf64ProgramHeader *prog_header = (Elf64ProgramHeader *)((uint8_t *)elf_header + elf_header->programs_offset);
 
-    for (size_t i = 0; i < elf_header->program_header_table_entry_count; i++)
+    for (size_t i = 0; i < elf_header->programs_count; i++)
     {
         if (prog_header->type != ELF_PROGRAM_HEADER_LOAD)
         {
@@ -69,7 +69,7 @@ static void elf_load_program(Task *task, Elf64Header const *elf_header, Memory *
             memory_deref(prog_obj);
         }
 
-        prog_header = (Elf64ProgramHeader *)((uint8_t *)prog_header + elf_header->program_header_table_entry_size);
+        prog_header = (Elf64ProgramHeader *)((uint8_t *)prog_header + elf_header->programs_size);
     }
 }
 

@@ -20,9 +20,9 @@ void loader_splash(void)
 
 void loader_load(Elf64Header const *elf_header, void *base)
 {
-    Elf64ProgramHeader *prog_header = (Elf64ProgramHeader *)(base + elf_header->program_header_table_file_offset);
+    Elf64ProgramHeader *prog_header = (Elf64ProgramHeader *)(base + elf_header->programs_offset);
 
-    for (int i = 0; i < elf_header->program_header_table_entry_count; i++)
+    for (int i = 0; i < elf_header->programs_count; i++)
     {
         if (prog_header->type == ELF_PROGRAM_HEADER_LOAD)
         {
@@ -46,7 +46,7 @@ void loader_load(Elf64Header const *elf_header, void *base)
             log$("unkown header: {}", prog_header->type);
         }
 
-        prog_header = (Elf64ProgramHeader *)((void *)prog_header + elf_header->program_header_table_entry_size);
+        prog_header = (Elf64ProgramHeader *)((void *)prog_header + elf_header->programs_size);
     }
 }
 

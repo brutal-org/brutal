@@ -135,7 +135,7 @@ BrResult sys_create_memory(BrId *id, BrHandle *handle, BrMemoryProps *args)
     {
         if (!(task_self()->rights & BR_RIGHT_PMM))
         {
-            return BR_BAD_CAPABILITY;
+            return BR_NOT_PERMITTED;
         }
 
         memory = memory_pmm((PmmRange){args->addr, args->size}, MEMORY_NONE);
@@ -175,14 +175,14 @@ BrResult sys_create_space(BrId *id, BrHandle *handle, BrSpaceProps *args)
 
 BrResult sys_create(BrCreateArgs *args)
 {
-    if (!(task_self()->rights & BR_RIGHT_TASK))
-    {
-        return BR_BAD_CAPABILITY;
-    }
-
     switch (args->type)
     {
     case BR_OBJECT_TASK:
+        if (!(task_self()->rights & BR_RIGHT_TASK))
+        {
+            return BR_NOT_PERMITTED;
+        }
+
         return sys_create_task(&args->id, &args->handle, &args->task);
 
     case BR_OBJECT_SPACE:
@@ -311,7 +311,7 @@ BrResult sys_drop(BrDropArgs *args)
     if (!(task->rights & args->cap))
     {
         task_deref(task);
-        return BR_BAD_CAPABILITY;
+        return BR_NOT_PERMITTED;
     }
 
     task->rights = task->rights & ~args->cap;
@@ -331,7 +331,7 @@ BrResult sys_bind(BrBindArgs *args)
 {
     if (args->event.type == BR_EVENT_IRQ && !(task_self()->rights & BR_RIGHT_IRQ))
     {
-        return BR_BAD_CAPABILITY;
+        return BR_NOT_PERMITTED;
     }
 
     return event_bind(task_self(), args->event);
@@ -420,7 +420,7 @@ BrResult sys_in(BrIoArgs *args)
 {
     if (!(task_self()->rights & BR_RIGHT_IO))
     {
-        return BR_BAD_CAPABILITY;
+        return BR_NOT_PERMITTED;
     }
 
     args->data = arch_in(args->port, args->size);
@@ -432,7 +432,7 @@ BrResult sys_out(BrIoArgs *args)
 {
     if (!(task_self()->rights & BR_RIGHT_IO))
     {
-        return BR_BAD_CAPABILITY;
+        return BR_NOT_PERMITTED;
     }
 
     arch_out(args->port, args->size, args->data);

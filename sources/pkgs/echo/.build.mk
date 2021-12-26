@@ -1,3 +1,0 @@
-ECHO_NAME = echo
-
-USER_PKGS += ECHO

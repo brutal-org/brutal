@@ -72,6 +72,8 @@ USER_ULDFLAGS= \
 	-z max-page-size=0x1000 \
 	$(ARCH_LDFLAGS)
 
+USER_OBJCOPY=llvm-objcopy
+
 USER_AR?=llvm-ar$(LLVM_VERSION)
 ifeq (, $(shell which $(USER_AR) 2> /dev/null))
 	USER_AR=llvm-ar

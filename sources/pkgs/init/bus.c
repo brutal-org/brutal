@@ -40,7 +40,7 @@ BrId bus_start(Bus *bus, Str name, BalArgs args)
     BalTask elf_task;
     bal_task_init(&elf_task, name);
 
-    bal_task_exec(&elf_task, &elf_mem, args);
+    bal_task_exec(&elf_task, &elf_mem, BR_RIGHT_IO | BR_RIGHT_LOG | BR_RIGHT_PMM | BR_RIGHT_IRQ, args);
 
     bal_mem_deinit(&elf_mem);
 
