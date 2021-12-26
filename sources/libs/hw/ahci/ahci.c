@@ -108,6 +108,6 @@ void ahci_init(Ahci *ahci, PciBarInfo *bar, Alloc *alloc)
     atomic_signal_fence(memory_order_acq_rel);
     atomic_thread_fence(memory_order_acq_rel);
     ahci->hba_mem->global_host_control |= (uint32_t)1 << 31 | 1 << 1;
-
+    ahci->hba_mem->bios_handoff_control_status |= 1 << 1;
     ahci_init_ports(ahci);
 }
