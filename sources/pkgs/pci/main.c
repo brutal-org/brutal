@@ -62,7 +62,7 @@ static PciError pci_impl_bar(IpcEv *ev, BrTask task, PciBarRequest const *req, P
     }
     config->command |= 1 << 2 | 1 << 4;
     log$("{}", config->command);
-    *resp = pci_get_bar(ev->ctx, req->addr, req->num);
+    *resp = pci_read_bar(ev->ctx, req->addr, req->num);
 
     return PCI_SUCCESS;
 }
@@ -104,7 +104,7 @@ static PciError pci_impl_enable_irq(IpcEv *ev, BrTask task, PciEnableIrqRequest 
             return PCI_NO_IRQ_FOR_DEVICE;
         }
 
-        pci_set_msi(0, 30, cap);
+        pci_bind_msi(0, 30, cap);
 
         *resp = 30;
     }

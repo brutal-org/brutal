@@ -26,7 +26,7 @@ typedef enum
     PCI_CAP_SATA = 0x12,
 } PciCapabilities;
 
-typedef struct __attribute__((packed))
+typedef struct PACKED
 {
 
     uint8_t cap_id;

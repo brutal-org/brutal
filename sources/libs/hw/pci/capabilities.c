@@ -1,4 +1,4 @@
-#include <hw/pci/capabilities.h>
+#include <pci/capabilities.h>
 
 const char *caps[] =
     {

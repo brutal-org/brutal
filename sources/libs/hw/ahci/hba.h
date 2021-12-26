@@ -1,5 +1,6 @@
 #pragma once
-#include <stdint.h>
+
+#include <brutal/base.h>
 
 typedef enum
 {
@@ -60,7 +61,7 @@ typedef enum
     HBA_INT_TASK_FILE_ERROR_STATUS = 1 << 30,
 } HbaInterruptStatus;
 
-typedef volatile struct __attribute__((packed))
+typedef volatile struct PACKED
 {
     uint8_t command_len : 5; // multiplied by 4 byte
     uint8_t atapi : 1;
@@ -81,7 +82,7 @@ typedef volatile struct __attribute__((packed))
     uint32_t _reserved1[4];
 } HbaCommand;
 
-typedef volatile struct __attribute__((packed))
+typedef volatile struct PACKED
 {
     uint32_t command_list_addr_low;
     uint32_t command_list_addr_up;
@@ -115,7 +116,7 @@ typedef volatile struct __attribute__((packed))
     uint32_t vendor[4];
 } HbaPort;
 
-typedef volatile struct __attribute__((packed))
+typedef volatile struct PACKED
 {
     uint32_t capability;
 
@@ -141,7 +142,7 @@ typedef volatile struct __attribute__((packed))
     HbaPort ports[32];
 } HbaMemory;
 
-typedef volatile struct __attribute__((packed))
+typedef volatile struct PACKED
 {
     uint32_t data_base_low;
     uint32_t data_base_up;
@@ -150,10 +151,10 @@ typedef volatile struct __attribute__((packed))
     uint16_t _reserved1 : 8;
     uint8_t interrupt_on_complete : 1;
 } HbaPrdtEntry;
-typedef volatile struct __attribute__((packed))
+typedef volatile struct PACKED
 {
     uint8_t command_fis[64];
     uint8_t atapi_command[16];
     uint8_t _reserved[48];
-    HbaPrdtEntry entry[1];
+    HbaPrdtEntry entry[];
 } HbaCommandTable;
