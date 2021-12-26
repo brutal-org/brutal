@@ -63,6 +63,8 @@ USER_ULDFLAGS= \
 	$(ARCH_LDFLAGS) \
 	build/toolchain/gnu/local/lib/gcc/$(CONFIG_ARCH)-elf/11.1.0/libgcc.a
 
+USER_OBJCOPY=$(CONFIG_ARCH)-objcopy
+
 USER_AR=$(CONFIG_ARCH)-elf-ar
 USER_ARFLAGS=rcs
 

@@ -23,6 +23,7 @@ LIBS_OBJ = \
 	$(patsubst sources/%, $(BINDIR_USER)/%.o, $(LIBS_SRC)) \
 	$(patsubst $(GENDIR)/%, $(BINDIR_USER)/%.o, $(GENERATED_SRC))
 
+
 LIBS_BIN=$(BINDIR_USER)/libbrutal.a
 
 DEPENDENCIES += $(LIBS_OBJ:.o=.d)
@@ -45,7 +46,9 @@ $(LIBS_BIN): $(LIBS_OBJ)
 
 define BIN_TEMPLATE
 
-$(1)_SRC = $$(wildcard sources/pkgs/$($(1)_NAME)/*.c)
+$(1)_PKG = sources/pkgs/$($(1)_NAME)
+
+$(1)_SRC = $$(wildcard $$($(1)_PKG)/*.c)
 
 $(1)_OBJ = $$(patsubst sources/%, $(BINDIR_USER)/%.o, $$($(1)_SRC))
 
@@ -59,6 +62,10 @@ ALL+=$$($(1)_BIN)
 $$($(1)_BIN): $$($(1)_OBJ) $(LIBS_BIN)
 	@$$(MKCWD)
 	$(USER_LD) -o $$@ $$^ $(USER_ULDFLAGS)
+	$(USER_OBJCOPY) \
+        --add-section .brutal.manifest=$$($(1)_PKG)/manifest.json \
+        --set-section-flags .brutal.manifest=readonly,contents \
+        $$@
 
 endef
 

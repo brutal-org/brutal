@@ -42,9 +42,9 @@ typedef uint64_t BrArg;
     RESULT(ALREADY_BINDED)      \
     RESULT(ALREADY_ACK)         \
     RESULT(NOT_BINDED)          \
+    RESULT(NOT_PERMITTED)       \
     RESULT(BAD_ADDRESS)         \
     RESULT(BAD_ARGUMENTS)       \
-    RESULT(BAD_CAPABILITY)      \
     RESULT(BAD_HANDLE)          \
     RESULT(BAD_ID)              \
     RESULT(BAD_SYSCALL)         \
@@ -124,11 +124,11 @@ typedef struct
 {
     BrStartType type;
 
-    uintptr_t arg1;
-    uintptr_t arg2;
-    uintptr_t arg3;
-    uintptr_t arg4;
-    uintptr_t arg5;
+    BrArg arg1;
+    BrArg arg2;
+    BrArg arg3;
+    BrArg arg4;
+    BrArg arg5;
 } BrTaskArgs;
 
 /* --- IPCs ----------------------------------------------------------------- */

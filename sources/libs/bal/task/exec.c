@@ -5,9 +5,9 @@
 
 static void bal_exec_load(BrHandle space, Elf64Header const *elf_header, BrHandle elf_memory)
 {
-    Elf64ProgramHeader *prog_header = (Elf64ProgramHeader *)((uint8_t *)elf_header + elf_header->program_header_table_file_offset);
+    Elf64ProgramHeader *prog_header = (Elf64ProgramHeader *)((uint8_t *)elf_header + elf_header->programs_offset);
 
-    for (size_t i = 0; i < elf_header->program_header_table_entry_count; i++)
+    for (size_t i = 0; i < elf_header->programs_count; i++)
     {
         if (prog_header->type != ELF_PROGRAM_HEADER_LOAD)
         {
@@ -74,7 +74,7 @@ static void bal_exec_load(BrHandle space, Elf64Header const *elf_header, BrHandl
             assert_br_success(bal_close(prog_obj.handle));
         }
 
-        prog_header = (Elf64ProgramHeader *)((uint8_t *)prog_header + elf_header->program_header_table_entry_size);
+        prog_header = (Elf64ProgramHeader *)((uint8_t *)prog_header + elf_header->programs_size);
     }
 }
 

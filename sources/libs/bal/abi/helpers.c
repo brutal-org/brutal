@@ -48,7 +48,7 @@ Error br_result_to_error(BrResult result)
     case BR_BAD_ARGUMENTS:
         return ERR_BAD_ARGUMENTS;
 
-    case BR_BAD_CAPABILITY:
+    case BR_NOT_PERMITTED:
         return ERR_DENIED;
 
     case BR_BAD_HANDLE:

@@ -66,20 +66,20 @@ typedef struct PACKED
 
     uint64_t entry;
 
-    uint64_t program_header_table_file_offset;
-    uint64_t section_header_table_file_offset;
+    uint64_t programs_offset;
+    uint64_t sections_offset;
 
     uint32_t flags;
 
-    uint16_t elf_header_size;
+    uint16_t size;
 
-    uint16_t program_header_table_entry_size;
-    uint16_t program_header_table_entry_count;
+    uint16_t programs_size;
+    uint16_t programs_count;
 
-    uint16_t section_header_table_entry_size;
-    uint16_t section_header_table_entry_count;
+    uint16_t sections_size;
+    uint16_t sections_count;
 
-    uint16_t section_header_string_table_idx;
+    uint16_t strings_section_index;
 } Elf64Header;
 
 typedef struct PACKED
@@ -97,4 +97,27 @@ typedef struct PACKED
     uint64_t alignment;
 } Elf64ProgramHeader;
 
+typedef struct PACKED
+{
+    uint32_t name;
+    uint32_t type;
+    uint64_t flags;
+
+    uint64_t virtual_address;
+    uint64_t file_offset;
+    uint64_t file_size;
+    uint32_t link;
+    uint32_t info;
+    uint64_t addralign;
+    uint64_t entry_size;
+} Elf64SectionHeader;
+
 bool elf_validate(Elf64Header const *header);
+
+Str elf_string(Elf64Header const *header, size_t offset);
+
+Str elf_manifest(Elf64Header const *header);
+
+Elf64SectionHeader const *elf_section_by_index(Elf64Header const *header, size_t index);
+
+Elf64SectionHeader const *elf_section_by_name(Elf64Header const *header, Str name);
