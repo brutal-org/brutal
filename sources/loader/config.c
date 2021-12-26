@@ -25,7 +25,7 @@ LoaderEntry config_entry_parse(Json json)
 
             vec_push(&entry.modules, current_module);
 
-            log$("detected module: {} path: {}", current_module.name, current_module.path);
+            log$("Detected module: {} path: {}", current_module.name, current_module.path);
         }
     }
 

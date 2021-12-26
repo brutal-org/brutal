@@ -83,7 +83,7 @@ void memory_map(uint64_t phys, uint64_t virt, Pages *pml4)
 
     if (pml1[pml1_idx] & PAGE_PRESENT)
     {
-        panic$("page: {} already mapped to: {}", virt, pml1[pml1_idx]);
+        panic$("Page: {} already mapped to: {}", virt, pml1[pml1_idx]);
     }
 
     pml1[pml1_idx] = phys | LOADER_PAGING_FLAGS;
@@ -99,10 +99,11 @@ void memory_map_range(VmmRange vmm_range, PmmRange pmm_range)
 
 void memory_init(void)
 {
-    log$("allocated: {x}", sizeof(Pages));
+    log$("Allocated: {x}", sizeof(Pages));
+
     pages = (Pages *)loader_phys_alloc_page(1);
 
-    log$("loading bootloader memory map");
+    log$("Loading bootloader memory map");
 
     memory_map_range((VmmRange){
                          .base = memory_phys_to_io(0),

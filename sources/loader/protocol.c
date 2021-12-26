@@ -97,7 +97,7 @@ static int eif_gop_find_mode(EFIGraphicsOutputProtocol *gop, size_t req_width, s
         EfiStatus status = gop->query_mode(gop, i, &info_size, &info);
         if (status == EFI_ERR)
         {
-            log$("can't get info for: {}", i);
+            log$("Can't get info for: {}", i);
         }
 
         if (info->vertical_resolution == req_height && info->horizontal_resolution == req_width &&
@@ -107,8 +107,8 @@ static int eif_gop_find_mode(EFIGraphicsOutputProtocol *gop, size_t req_width, s
         }
     }
 
-    log$("can't find efi gop mode for: {}x{}", req_width, req_height);
-    log$("available mode: ");
+    log$("Can't find efi gop mode for: {}x{}", req_width, req_height);
+    log$("Available mode: ");
     for (uint32_t i = 0; i < gop->mode->max_mode; i++)
     {
         size_t info_size = 0;
@@ -123,7 +123,7 @@ static int eif_gop_find_mode(EFIGraphicsOutputProtocol *gop, size_t req_width, s
         }
     }
 
-    return 0;
+    return gop->mode->max_mode - 1;
 }
 
 static void efi_populate_framebuffer(EFIBootServices *bs, HandoverFramebuffer *fb)

@@ -16,8 +16,6 @@ static EFILoadedImage *efi_image_loader(void)
         return _image_loader;
     }
 
-    log$("Opening image loader...");
-
     EfiGuid guid = EFI_LOADED_IMAGE_PROTOCOL_GUID;
 
     EfiStatus status = efi_st()->boot_services->open_protocol(
@@ -27,8 +25,6 @@ static EFILoadedImage *efi_image_loader(void)
         efi_handle(),
         nullptr,
         EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL);
-
-    log$("Opening image loader... ok");
 
     assert_truth(status == EFI_SUCCESS);
 

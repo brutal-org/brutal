@@ -10,7 +10,7 @@ int main(int argc, char const *argv[])
 {
     if (argc < 2)
     {
-        log$("usages: {} [input]", argv[0]);
+        log$("Usages: {} [input]", argv[0]);
         return 0;
     }
 

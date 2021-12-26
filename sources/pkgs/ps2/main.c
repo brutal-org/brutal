@@ -16,12 +16,12 @@ typedef struct
 
 void ps2_keyboard_handle_key(KbKey key, KbMotion motion)
 {
-    log$("PS2KB: KEY={} MOTION{}", kbkey_to_str(key), motion ? "UP" : "DOWN");
+    log$("ps2kb: key={} motion={}", kbkey_to_str(key), motion ? "up" : "down");
 }
 
 void ps2_mouse_handle_event(MouseEvent event)
 {
-    log$("PS2MOUSE: OFFX={} OFFY={} VSCROLL={}, BTNS={03b}", event.offx, event.offy, event.vscroll, event.btns);
+    log$("ps2mouse: offx={} offy={} vscroll={}, btns={03b}", event.offx, event.offy, event.vscroll, event.btns);
 }
 
 void ps2_keyboard_handle_code(Ps2 *ps2, uint8_t packet)

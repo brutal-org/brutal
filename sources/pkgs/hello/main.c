@@ -6,7 +6,7 @@ static HelloError handle_hello_hello(IpcEv *ev, BrId task, Str const *req, Str *
     UNUSED(ev);
     UNUSED(alloc);
 
-    log$("task n°{} send us '{}'", task, *req);
+    log$("Task n°{} send us '{}'", task, *req);
     *resp = str$("world");
     return HELLO_SUCCESS;
 }
