@@ -12,6 +12,11 @@
 
 BrResult sys_log(BrLogArgs *args)
 {
+    if (!(task_self()->rights & BR_RIGHT_LOG))
+    {
+        return BR_NOT_PERMITTED;
+    }
+
     embed_log_lock();
     io_write(embed_log_writer(), (uint8_t *)args->message, args->size);
     embed_log_unlock();

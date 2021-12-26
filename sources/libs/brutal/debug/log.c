@@ -1,20 +1,24 @@
+#include <bal/abi.h>
 #include <brutal/debug.h>
 #include <embed/debug.h>
 #include <embed/log.h>
 
-#ifdef __kernel__
+#ifdef SYSTEM_KERNEL
 #    include "kernel/cpu.h"
 #endif
 
 void log_unlock_impl(LogLevel level, SourceLocation location, Str fmt, PrintArgs args)
 {
-#ifdef __kernel__
+#ifdef SYSTEM_KERNEL
     print(embed_log_writer(), "cpu{}: ", cpu_self_id());
 
     if (task_self())
     {
         print(embed_log_writer(), "{}: ", task_self()->id);
     }
+
+#elif defined(SYSTEM_BRUTAL)
+    print(embed_log_writer(), "user: {}: ", bal_self_id());
 #endif
 
     if (level == LOG_PANIC)
