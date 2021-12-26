@@ -100,6 +100,8 @@ int br_entry_args(
         }
 
         off++;
+
+        break;
     }
 
     return 0;

@@ -15,7 +15,7 @@ static void init_hba_command_header(HbaCommand *command, bool write, uint32_t fi
     else
     {
         command->prefetchable = 0;
-        command->clear_on_ok = 0;
+        command->clear_on_ok = 1;
     }
     command->physical_region_descriptor_count = 1;
 }
@@ -90,7 +90,7 @@ static int ahci_find_command_port(AhciDevice *self)
 // wait for the device to stop running and start a command
 void ahci_device_start_command(AhciDevice *self)
 {
-    self->port->command_and_status &= ~HBA_CMD_START;
+    self->port->command_and_status &= ~((uint32_t)HBA_CMD_START);
     while (self->port->command_and_status & HBA_CMD_CMD_LIST_RUNNING)
         ;
 
@@ -220,21 +220,14 @@ void ahci_device_init(AhciDevice *device, HbaPort *port, int idx)
     {
         log$("setting device to idle");
         device->port->command_and_status &= ~((uint32_t)(HBA_CMD_START | HBA_CMD_FIS_RECEIVE_ENABLE));
-        while (device->port->command_and_status & (HBA_CMD_CMD_LIST_RUNNING | HBA_CMD_CMD_LIST_RUNNING))
+        while (device->port->command_and_status & (HBA_CMD_CMD_LIST_RUNNING))
         {
         }
     }
-    port->command_and_status |= 1 << 28;
+    device->port->sata_control |= 1;
+    device->port->command_and_status |= 1 << 28;
     atomic_signal_fence(memory_order_acq_rel);
     atomic_thread_fence(memory_order_acq_rel);
-
-    if (port->command_and_status & HBA_CMD_COLD_PRESENCE_STATE)
-    {
-        log$("cold !");
-    }
-    atomic_signal_fence(memory_order_acq_rel);
-    atomic_thread_fence(memory_order_acq_rel);
-    port->command_and_status |= HBA_CMD_SPIN_UP;
     ahci_device_init_command(device);
 
     // ahci_device_identify(device, 0xec);
@@ -286,17 +279,8 @@ bool ahci_device_io_command(AhciDevice *self, BrMemObj target, uint64_t cursor, 
         }
     }
 
-    if (self->port->interrupt_status & HBA_INT_TASK_FILE_ERROR_STATUS)
+    if (self->port->interrupt_status & (uint32_t)HBA_INT_TASK_FILE_ERROR_STATUS)
     {
-        log$("int-status: {#b}", self->port->interrupt_status);
-        log$("sata-status: {#b}", self->port->sata_status);
-        log$("sata-error: {#b}", self->port->sata_error);
-        log$("cmd-status: {#b}", self->port->command_and_status);
-        log$("task-file: {#b}", self->port->task_file_data);
-        log$("error: {#b}", self->port->sata_error);
-        Fis *fis = (Fis *)self->fis_mem.buf;
-        log$("error2: {#b}", fis->d2h_fis.error);
-        log$("error2: {#b}", fis->d2h_fis.status);
         panic$("task error while {} at: {} count: {}", write ? "writing" : "reading", cursor, count);
     }
     ahci_device_end_command(self);
