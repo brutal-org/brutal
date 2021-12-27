@@ -5,6 +5,8 @@
 
 #ifdef SYSTEM_KERNEL
 #    include "kernel/cpu.h"
+#else
+#    include <embed/task.h>
 #endif
 
 void log_unlock_impl(LogLevel level, SourceLocation location, Str fmt, PrintArgs args)
@@ -17,8 +19,8 @@ void log_unlock_impl(LogLevel level, SourceLocation location, Str fmt, PrintArgs
         print(embed_log_writer(), "{}: ", task_self()->id);
     }
 
-#elif defined(SYSTEM_BRUTAL)
-    print(embed_log_writer(), "user: {}: ", bal_self_id());
+#else
+    print(embed_log_writer(), "user: {}: ", embed_task_self());
 #endif
 
     if (level == LOG_PANIC)
