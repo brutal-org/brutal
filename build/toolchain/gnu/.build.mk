@@ -37,8 +37,8 @@ USER_CFLAGS= \
 	$(CFLAGS_WARN) \
 	$(ARCH_CFLAGS) \
 	$(USER_CFLAGS_INC) \
-	-ffreestanding \
-	-D__brutal__=1
+	-D__brutal__=1 \
+	-ffreestanding
 
 USER_KCFLAGS= \
 	$(USER_CFLAGS) \

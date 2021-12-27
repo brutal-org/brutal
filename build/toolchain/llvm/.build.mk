@@ -49,6 +49,7 @@ USER_CFLAGS= \
 	$(CFLAGS_WARN) \
 	$(ARCH_CFLAGS) \
 	$(USER_CFLAGS_INC) \
+	-D__brutal__=1 \
 	-ffreestanding
 
 USER_KCFLAGS= \
@@ -58,8 +59,7 @@ USER_KCFLAGS= \
 
 USER_UCFLAGS= \
 	$(USER_CFLAGS) \
-	-nostdlib \
-	-D__brutal__=1
+	-nostdlib
 
 USER_LD=ld.lld
 USER_KLDFLAGS= \

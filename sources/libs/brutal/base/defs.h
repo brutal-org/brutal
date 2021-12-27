@@ -19,8 +19,9 @@
 
 #if defined(__brutal__)
 #    define SYSTEM_BRUTAL
-#elif defined(__kernel__)
-#    define SYSTEM_KERNEL
+#    if defined(__kernel__)
+#        define SYSTEM_KERNEL
+#    endif
 #elif defined(__efi__)
 #    define SYSTEM_EFI
 #elif defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
