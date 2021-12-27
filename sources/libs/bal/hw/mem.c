@@ -126,20 +126,20 @@ MaybeError bal_mem_deinit(BalMem *self)
     return SUCCESS;
 }
 
-MaybeError bal_memobj_paddr(BrMemObj obj, uintptr_t *paddr)
+MaybeError bal_memobj_paddr(BrHandle obj, uintptr_t *paddr)
 {
-    BrStatArgs args = {
+    BrInspectArgs args = {
         .handle = obj,
     };
 
-    BrResult res = br_stat(&args);
+    BrResult res = br_inspect(&args);
 
     if (res != BR_SUCCESS)
     {
         return ERR(MaybeError, br_result_to_error(res));
     }
 
-    *paddr = args.info.memobj.range.base;
+    *paddr = args.memory.range.base;
 
     return SUCCESS;
 }

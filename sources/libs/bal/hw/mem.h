@@ -28,4 +28,4 @@ MaybeError bal_mem_init_size(BalMem *self, size_t size);
 
 MaybeError bal_mem_deinit(BalMem *self);
 
-MaybeError bal_memobj_paddr(BrMemObj obj, uintptr_t *paddr);
+MaybeError bal_memobj_paddr(BrHandle obj, uintptr_t *paddr);

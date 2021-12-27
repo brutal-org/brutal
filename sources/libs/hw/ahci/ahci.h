@@ -22,4 +22,6 @@ typedef enum
     AHCI_DEVICE_UNCONNECTED,
 } AhciDeviceType;
 
+Str ahci_device_type_to_str(AhciDeviceType type);
+
 void ahci_init(Ahci *ahci, PciBarInfo *bar, Alloc *alloc);

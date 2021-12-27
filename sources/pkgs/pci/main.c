@@ -34,7 +34,7 @@ static Iter iter_pci_find(void *data, PciGetDevIterCtx *ctx)
     return ITER_CONTINUE;
 }
 
-PciError pci_impl_find_device(IpcEv *ev, BrTask task, PciFindDeviceRequest const *req, PciAddr *resp, Alloc *alloc)
+PciError pci_impl_find_device(IpcEv *ev, BrHandle task, PciFindDeviceRequest const *req, PciAddr *resp, Alloc *alloc)
 {
     UNUSED(task);
     UNUSED(alloc);
@@ -49,7 +49,7 @@ PciError pci_impl_find_device(IpcEv *ev, BrTask task, PciFindDeviceRequest const
     return PCI_SUCCESS;
 }
 
-static PciError pci_impl_bar(IpcEv *ev, BrTask task, PciBarRequest const *req, PciBarInfo *resp, Alloc *alloc)
+static PciError pci_impl_bar(IpcEv *ev, BrHandle task, PciBarRequest const *req, PciBarInfo *resp, Alloc *alloc)
 {
     UNUSED(alloc);
     UNUSED(task);
@@ -67,7 +67,7 @@ static PciError pci_impl_bar(IpcEv *ev, BrTask task, PciBarRequest const *req, P
     return PCI_SUCCESS;
 }
 
-static PciError pci_impl_enable_irq(IpcEv *ev, BrTask task, PciEnableIrqRequest const *req, uint8_t *resp, Alloc *alloc)
+static PciError pci_impl_enable_irq(IpcEv *ev, BrHandle task, PciEnableIrqRequest const *req, uint8_t *resp, Alloc *alloc)
 {
     UNUSED(alloc);
     UNUSED(task);

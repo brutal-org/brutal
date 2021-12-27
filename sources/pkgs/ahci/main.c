@@ -16,7 +16,8 @@ int br_entry_args(
 
     Str req = str$("pci");
     uint64_t resp = 0;
-    bbus_locate(&ev, BR_TASK_INIT, &req, &resp, alloc_global());
+    while (bbus_locate(&ev, BR_ID_SUPER, &req, &resp, alloc_global()) == BBUS_NOT_FOUND)
+        ;
 
     PciFindDeviceRequest r = {
         .identifier = {
@@ -43,66 +44,7 @@ int br_entry_args(
     ahci_init(&ahci, &b, alloc_global());
     AhciDevice dev = ahci.devs.data[0];
 
-    BalMem sample;
-    bal_mem_init_size(&sample, 4096);
-    int off = 0;
-
-    while (true)
-    {
-
-        if (ahci_device_io_command(&dev, sample.obj, off, 1, false) != true)
-        {
-            panic$("");
-        }
-
-        if (ahci_device_io_command(&dev, sample.obj, off, 1, false) != true)
-        {
-            panic$("");
-        }
-
-        if (ahci_device_io_command(&dev, sample.obj, off, 1, false) != true)
-        {
-            panic$("");
-        }
-
-        if (ahci_device_io_command(&dev, sample.obj, off, 1, false) != true)
-        {
-            panic$("");
-        }
-
-        if (ahci_device_io_command(&dev, sample.obj, off, 1, false) != true)
-        {
-            panic$("");
-        }
-
-        for (int i = 0; i < 512; i++)
-        {
-            if (*(char *)(sample.buf + i) != 0)
-                log$("[{}] = {} {#x}", i + off * 512, *(((char *)sample.buf) + i), *(((uint8_t *)sample.buf) + i));
-        }
-
-        ((uint8_t *)sample.buf)[0] = 0xff;
-
-        if (ahci_device_io_command(&dev, sample.obj, off, 1, true) != true)
-        {
-            panic$("");
-        }
-
-        if (ahci_device_io_command(&dev, sample.obj, off, 1, false) != true)
-        {
-            panic$("");
-        }
-
-        for (int i = 0; i < 512; i++)
-        {
-            if (*(char *)(sample.buf + i) != 0)
-                log$("[{}] = {} {#x}", i + off * 512, *(((char *)sample.buf) + i), *(((uint8_t *)sample.buf) + i));
-        }
-
-        off++;
-
-        break;
-    }
+    UNUSED(dev);
 
     return 0;
 }
