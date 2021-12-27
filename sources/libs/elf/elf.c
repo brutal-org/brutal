@@ -11,12 +11,24 @@ bool elf_validate(Elf64Header const *header)
 Str elf_string(Elf64Header const *header, size_t offset)
 {
     Elf64SectionHeader const *strings = elf_section_by_index(header, header->strings_section_index);
+
+    if (!strings)
+    {
+        return nullstr;
+    }
+
     return str$((char const *)header + strings->file_offset + offset);
 }
 
 Str elf_manifest(Elf64Header const *header)
 {
     Elf64SectionHeader const *manifest_section = elf_section_by_name(header, str$(".brutal.manifest"));
+
+    if (!manifest_section)
+    {
+        return nullstr;
+    }
+
     char const *str_base = (char const *)header + manifest_section->file_offset;
     size_t str_len = manifest_section->file_size;
     return str_n$(str_len, str_base);
