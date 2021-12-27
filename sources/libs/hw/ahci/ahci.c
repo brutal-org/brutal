@@ -36,6 +36,23 @@ static AhciDeviceType ahci_device_type(HbaPort *port)
     }
 }
 
+Str ahci_device_type_to_str(AhciDeviceType type)
+{
+    switch (type)
+    {
+    case AHCI_DEVICE_SATA:
+        return str$("SATA");
+    case AHCI_DEVICE_PM:
+        return str$("PM");
+    case AHCI_DEVICE_SEMB:
+        return str$("SEMB");
+    case AHCI_DEVICE_SATAPI:
+        return str$("SATAPI");
+    default:
+        return str$("UNCONNECTED");
+    }
+}
+
 static void ahci_init_ports(Ahci *ahci)
 {
     volatile uint32_t curr_port = ahci->hba_mem->port_implemented;
@@ -60,30 +77,7 @@ static void ahci_init_ports(Ahci *ahci)
 
         port_type = ahci_device_type(port);
 
-        if (port_type == AHCI_DEVICE_SATA)
-        {
-            log$("Detected device SATA at: {}", i);
-        }
-
-        if (port_type == AHCI_DEVICE_PM)
-        {
-            log$("Detected device PM at: {}", i);
-        }
-
-        if (port_type == AHCI_DEVICE_SEMB)
-        {
-            log$("Detected device SEMB at: {}", i);
-        }
-
-        if (port_type == AHCI_DEVICE_SATAPI)
-        {
-            log$("Detected device SATAPI at: {}", i);
-        }
-
-        if (port_type == AHCI_DEVICE_UNCONNECTED)
-        {
-            log$("Detected device UNCONNECTED at: {}", i);
-        }
+        log$("Detected device {} at: {}", ahci_device_type_to_str(port_type), i);
 
         vec_push(&ahci->devs, dev);
 

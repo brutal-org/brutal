@@ -40,6 +40,10 @@ typedef enum
     HBA_CMD_ENABLE_DRIVE_LED = 1 << 25,
     HBA_CMD_AGGRESSIVE_LINK_ENABLE = 1 << 26,
     HBA_CMD_AGGRSSIVE_SLUMBER = 1 << 27,
+    HBA_CMD_ICC_SET_ACTIVE = 1 << 28,
+    HBA_CMD_ICC_SET_PARTIAL = 2 << 28,
+    HBA_CMD_ICC_SET_SLUMBER = 6 << 28,
+    HBA_CMD_ICC_SET_SLEEP = 8 << 28,
 } HbaPortCommandStatus;
 
 typedef enum
@@ -60,6 +64,15 @@ typedef enum
     HBA_INT_DEV_MECHANICAL_PRESENCE_STATUS = 1 << 7,
     HBA_INT_TASK_FILE_ERROR_STATUS = 1 << 30,
 } HbaInterruptStatus;
+
+typedef enum
+{
+    HBA_SCONTROL_RESET = 1 << 0,
+    HBA_SCONTROL_DISABLE = 1 << 2,
+    HBA_SCONTROL_RESTRICT_SPEED_GEN1 = 1 << 3,
+    HBA_SCONTROL_RESTRICT_SPEED_GEN2 = 2 << 3,
+    HBA_SCONTROL_RESTRICT_SPEED_GEN3 = 3 << 3,
+} HbaSataControls;
 
 typedef volatile struct PACKED
 {
