@@ -71,7 +71,7 @@ void gfx_push(Gfx *self)
 
 void gfx_pop(Gfx *self)
 {
-    vec_pop(&self->ctx);
+    (void)vec_pop(&self->ctx);
 }
 
 GfxCtx *gfx_peek(Gfx *self)
