@@ -13,7 +13,7 @@ image: $(LOADER) $(PKGS) $(KERNEL) $(BINDIR_LOADER)/tools/OVMF.fd
 	cp $(LOADER) $(BINDIR_LOADER)/image/EFI/BOOT/BOOTX64.EFI
 
 $(DISK): image
-	./build/utils/make-disk.sh
+	./build/utils/make-maindisk.sh
 
 run: $(DISK)
 	$(MKCWD)
