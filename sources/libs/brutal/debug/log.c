@@ -3,25 +3,9 @@
 #include <embed/debug.h>
 #include <embed/log.h>
 
-#ifdef SYSTEM_KERNEL
-#    include "kernel/cpu.h"
-#else
-#    include <embed/task.h>
-#endif
-
 void log_unlock_impl(LogLevel level, SourceLocation location, Str fmt, PrintArgs args)
 {
-#ifdef SYSTEM_KERNEL
-    print(embed_log_writer(), "cpu{}: ", cpu_self_id());
-
-    if (task_self())
-    {
-        print(embed_log_writer(), "{}: ", task_self()->id);
-    }
-
-#else
-    print(embed_log_writer(), "user: {}: ", embed_task_self());
-#endif
+    embed_log_prefix(embed_log_writer());
 
     if (level == LOG_PANIC)
     {
