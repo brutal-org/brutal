@@ -24,7 +24,7 @@ func my_function(param1: type) -> return_type
 
 ### To be reviewed:
 - Maybe single-statement functions could be written as `func add_two_nums(param: int, param1: int) = param + param1;` ?
-- What about generic functions? `func generic_func(param: T)` like OCaml (without the need of specifying <T> or something) ?
+- What about generic functions? `func generic_func(param: T)` like OCaml (without the need of specifying `<T>` or something) ?
 
 ## Conditionals
 Every test/check returns a boolean, here are the different tests:
