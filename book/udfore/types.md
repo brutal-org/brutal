@@ -18,6 +18,7 @@
 - ISize
 - F32
 - F64
+- Char
 
 ## List
 Lists are an immutable sequence of values

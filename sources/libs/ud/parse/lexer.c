@@ -25,7 +25,8 @@ struct
     {UDLEX_EQUAL, "="},
     {UDLEX_SEMICOLON, ";"},
     {UDLEX_INT, "int"},
-    {UDLEX_UINT, "uint"}};
+    {UDLEX_UINT, "uint"},
+    {UDLEX_CHAR, "char"}};
 
 static int isidentchar(char v)
 {
