@@ -13,7 +13,7 @@ Str ud_read_line(Str prompt)
 #ifdef USE_READLINE
     return str$(readline(prompt.buf));
 #else
-    panic$("BRUTAL does not support readline");
+    log$("BRUTAL does not support readline");
     return prompt;
 #endif
 }

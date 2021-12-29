@@ -1,3 +1,7 @@
+#include <bvm/eval.h>
+#include <ud/ast/expr.h>
+#include <ud/gen/expr.h>
+#include <ud/parse/parse.h>
 #include <ud/repl.h>
 
 Str shift(int *argc, char ***argv)
@@ -20,6 +24,13 @@ void repl_eval_builtin(Str command)
     }
 }
 
+void eval(Str expr)
+{
+    ud_gen_expr(nullptr, ud_parse(expr));
+
+    //bvm_eval(nullptr, nullptr, nullptr);
+}
+
 void repl()
 {
     Str prompt = str$("ud \033[1;32m# \033[0m");
@@ -38,6 +49,13 @@ void repl()
 
             repl_eval_builtin(expr);
         }
+
+        else
+        {
+            eval(expr);
+        }
+
+        ud_do_repl_cleanup(expr);
     }
 }
 
