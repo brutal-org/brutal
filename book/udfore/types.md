@@ -19,16 +19,16 @@
 - F32
 - F64
 
-
-## Vector
+## List
+Lists are an immutable sequence of values
 
 ```
 U32[3]
 ```
 
-## Dynamic Vector
+## Dynamic List AKA Vector
 
-Values can be pushed and poped inserted and removed
+Values can be pushed and popped, inserted and removed
 
 ```
 U32[]
@@ -37,7 +37,7 @@ U32[]
 ## Tuple/struct
 
 ```
-type XYTuple = (x : F64, y : F64);
+type XYTuple = (x: F64, y: F64);
 type XYTuple = (F64, F64);
 
 struct MyXYStruct {
@@ -77,8 +77,14 @@ object MyCoolObject : MyCoolBaseObject
 
 ## Func
 
+Used to represent higher-order functions, meaning that functions can be passed as parameters to other functions
+
 ```
 InputType -> OutputType
+
+// For example: 
+// Func(F32, F32) -> F64
+
 ```
 
 
@@ -86,6 +92,14 @@ InputType -> OutputType
 
 ```
 type Maybe(T) = T | Nil
+```
+
+## User-defined types
+
+Note that types can also define their own values, for example, here is a simple Boolean implementation:
+
+```
+type Boolean = True | False
 ```
 
 ## Strong types
