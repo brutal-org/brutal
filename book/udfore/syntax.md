@@ -29,8 +29,10 @@ func my_function(param1: type) -> return_type
 ## Conditionals
 Every test/check returns a boolean, here are the different tests:
 
-- `==` and `is`: test if equal
-- `!=` and `not`: test if not equal
+- `==`: test if values are equal
+- `!=`: test if values are not equal
+- `is`: test if types are equal
+- `not`: test if types are not equal
 - `>=`: greater or equal than
 - `<=`: smaller or equal than
 - `>`: greater than
