@@ -36,7 +36,8 @@
     LEXEME(STAR)                \
     LEXEME(INTEGER)             \
     LEXEME(STRING)              \
-    LEXEME(CHARACTER)
+    LEXEME(CHARACTER)           \
+    LEXEME(CHAR)
 
 // clang-format off
 
