@@ -1,6 +1,8 @@
+#include <brutal/alloc.h>
 #include <bvm/eval.h>
 #include <ud/ast/expr.h>
 #include <ud/gen/expr.h>
+#include <ud/parse/lexer.h>
 #include <ud/parse/parse.h>
 #include <ud/repl.h>
 
@@ -24,14 +26,23 @@ void repl_eval_builtin(Str command)
     }
 }
 
-void eval(Str expr)
+void eval(Str expr, Alloc *alloc)
 {
-    ud_gen_expr(nullptr, ud_parse(expr));
 
+    Scan scan;
+
+    scan_init(&scan, expr);
+
+    Lex lex = ud_lex(&scan, alloc);
+
+    for (int i = 0; i < lex.lexemes.len; i++)
+    {
+        log$("{}", udlex_to_str(lex.lexemes.data[i].type));
+    }
     //bvm_eval(nullptr, nullptr, nullptr);
 }
 
-void repl()
+void repl(Alloc *alloc)
 {
     Str prompt = str$("ud \033[1;32m# \033[0m");
 
@@ -52,7 +63,7 @@ void repl()
 
         else
         {
-            eval(expr);
+            eval(expr, alloc);
         }
 
         ud_do_repl_cleanup(expr);
@@ -61,6 +72,8 @@ void repl()
 
 int main(int argc, char **argv)
 {
+    HeapAlloc heap;
+    heap_alloc_init(&heap, NODE_DEFAULT);
 
     bool do_repl = false;
 
@@ -76,7 +89,7 @@ int main(int argc, char **argv)
 
     if (do_repl)
     {
-        repl();
+        repl(base$(&heap));
     }
 
     return 0;
