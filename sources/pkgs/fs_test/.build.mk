@@ -1,0 +1,4 @@
+FS_TEST_NAME = fs_test
+
+HOST_PKGS += FS_TEST
+
