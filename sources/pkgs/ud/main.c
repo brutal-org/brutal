@@ -1,7 +1,7 @@
 #include <brutal/alloc.h>
-#include <bvm/eval.h>
-#include <ud/ast/expr.h>
-#include <ud/gen/expr.h>
+#include <brutal/debug.h>
+#include <brutal/io.h>
+#include <ud/ast.h>
 #include <ud/parse/lexer.h>
 #include <ud/parse/parse.h>
 #include <ud/repl.h>
@@ -26,8 +26,10 @@ void repl_eval_builtin(Str command)
     }
 }
 
-void eval(Str expr, Alloc *alloc)
+void eval(Str expr, Alloc *alloc, Emit *emit)
 {
+
+    (void)emit;
 
     Scan scan;
 
@@ -40,12 +42,17 @@ void eval(Str expr, Alloc *alloc)
         log$("{}", udlex_to_str(lex.lexemes.data[i].type));
     }*/
 
-    ud_parse(&lex, alloc);
+    UdAst ret = ud_parse(&lex, alloc);
+
+    vec_foreach(node, &ret)
+    {
+        ud_print_stmt(alloc, node->stmt);
+    }
 
     //bvm_eval(nullptr, nullptr, nullptr);
 }
 
-void repl(Alloc *alloc)
+void repl(Emit *emit, Alloc *alloc)
 {
     Str prompt = str$("ud \033[1;32m# \033[0m");
 
@@ -66,7 +73,7 @@ void repl(Alloc *alloc)
 
         else
         {
-            eval(expr, alloc);
+            eval(expr, alloc, emit);
         }
 
         ud_do_repl_cleanup(expr);
@@ -75,8 +82,12 @@ void repl(Alloc *alloc)
 
 int main(int argc, char **argv)
 {
+
     HeapAlloc heap;
     heap_alloc_init(&heap, NODE_DEFAULT);
+
+    Emit emit;
+    emit_init(&emit, io_std_out());
 
     bool do_repl = false;
 
@@ -92,7 +103,7 @@ int main(int argc, char **argv)
 
     if (do_repl)
     {
-        repl(base$(&heap));
+        repl(&emit, base$(&heap));
     }
 
     return 0;

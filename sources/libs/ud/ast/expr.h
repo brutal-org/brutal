@@ -45,6 +45,12 @@ typedef enum
 
 typedef struct ud_expr UdExpr;
 
+typedef struct
+{
+    Str name;
+    Vec(UdExpr) params;
+} UdFuncCall;
+
 struct ud_expr
 {
     UdExprType type;
@@ -62,10 +68,6 @@ struct ud_expr
             UdOp op;
         } bin_op;
 
-        struct
-        {
-            Str name;
-            Vec(UdExpr) params;
-        } func_call;
+        UdFuncCall func_call;
     };
 };

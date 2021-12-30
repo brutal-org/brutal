@@ -30,6 +30,10 @@ Str str_from_expr(Alloc *alloc, UdExpr expr)
 
     case UD_EXPR_REFERENCE:
         return expr.reference;
+
+    case UD_EXPR_FUNC_CALL:
+        return str_fmt(alloc, "name={} params=[");
+
     case UD_EXPR_BINOP:
         return str_fmt(alloc, "{} {} {}", str_from_expr(alloc, *expr.bin_op.left), expr.bin_op.op, str_from_expr(alloc, *expr.bin_op.right));
 
@@ -38,7 +42,7 @@ Str str_from_expr(Alloc *alloc, UdExpr expr)
     }
 }
 
-void print_stmt(Alloc *alloc, UdStmt stmt)
+void ud_print_stmt(Alloc *alloc, UdStmt stmt)
 {
     switch (stmt.type)
     {
@@ -76,7 +80,38 @@ UdVal get_val_from_lexeme(Lexeme lexeme)
     return ret;
 }
 
-UdAstNode ud_parse_expr(Lex *lex)
+UdFuncCall ud_parse_func_call(Lex *lex, Alloc *alloc)
+{
+    UdFuncCall ret = {};
+
+    vec_init(&ret.params, alloc);
+
+    ret.name = lex_curr(lex).str;
+
+    lex_next(lex);
+
+    ud_parse_whitespace(lex);
+
+    lex_next(lex);
+
+    while (lex_curr(lex).type != UDLEX_RPAREN)
+    {
+        vec_push(&ret.params, ud_parse_expr(lex, alloc).expr);
+
+        if (lex_peek(lex, 1).type != UDLEX_RPAREN)
+        {
+            lex_next(lex);
+
+            ud_expect(lex, UDLEX_COMMA);
+        }
+
+        lex_next(lex);
+    }
+
+    return ret;
+}
+
+UdAstNode ud_parse_expr(Lex *lex, Alloc *alloc)
 {
     UdAstNode ret = {};
 
@@ -89,70 +124,21 @@ UdAstNode ud_parse_expr(Lex *lex)
         ret.expr.const_ = get_val_from_lexeme(lex_curr(lex));
     }
 
-    else if (lex_curr(lex).type == UDLEX_IDENT)
+    else if (lex_curr(lex).type == UDLEX_IDENT && lex_peek(lex, 1).type != UDLEX_LPAREN)
     {
         ret.expr.type = UD_EXPR_REFERENCE;
         ret.expr.reference = lex_curr(lex).str;
     }
 
+    else if (lex_curr(lex).type == UDLEX_IDENT && lex_peek(lex, 1).type == UDLEX_LPAREN)
+    {
+        ret.expr.type = UD_EXPR_FUNC_CALL;
+        ret.expr.func_call = ud_parse_func_call(lex, alloc);
+    }
+
     else
     {
         log$("Cannot parse '{}' yet", lex_curr(lex).str);
-    }
-
-    return ret;
-}
-
-UdAstNode ud_parse_decl(Lex *lex)
-{
-    UdAstNode ret = {};
-
-    ret.type = UD_NODE_STMT;
-    ret.stmt.type = UD_STMT_DECL;
-    ret.stmt.decl_.type = UD_DECL_VAR;
-
-    if (lex_expect(lex, UDLEX_LET))
-    {
-        lex_next(lex);
-
-        UdVarDecl *decl = &ret.stmt.decl_.var;
-
-        ud_parse_whitespace(lex);
-
-        if (lex_curr(lex).type == UDLEX_IDENT)
-        {
-            decl->name = lex_curr(lex).str;
-
-            lex_next(lex);
-        }
-
-        ud_parse_whitespace(lex);
-
-        if (lex_expect(lex, UDLEX_COLON))
-        {
-            ud_parse_whitespace(lex);
-
-            ud_expect(lex, UDLEX_IDENT);
-
-            decl->type.name = lex_peek(lex, -1).str;
-        }
-
-        else
-        {
-            decl->type.name = str$("inferred");
-        }
-
-        ud_parse_whitespace(lex);
-
-        ud_expect(lex, UDLEX_EQUAL);
-
-        ud_parse_whitespace(lex);
-
-        decl->value = ud_parse_expr(lex).expr;
-
-        lex_next(lex);
-
-        ud_expect(lex, UDLEX_SEMICOLON);
     }
 
     return ret;
@@ -164,12 +150,6 @@ UdAst ud_parse(Lex *lex, Alloc *alloc)
 
     vec_init(&ret, alloc);
 
-    vec_push(&ret, ud_parse_decl(lex));
-
-    vec_foreach(node, &ret)
-    {
-        print_stmt(alloc, node->stmt);
-    }
-
+    vec_push(&ret, ud_parse_decl(lex, alloc));
     return ret;
 }
