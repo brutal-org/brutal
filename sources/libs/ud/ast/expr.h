@@ -10,6 +10,7 @@ typedef enum
     UD_EXPR_BINOP,
     UD_EXPR_FUNC_CALL,
     UD_EXPR_CONDITION,
+    UD_EXPR_REFERENCE,
 
 } UdExprType;
 
@@ -51,6 +52,8 @@ struct ud_expr
     union
     {
         UdVal const_;
+
+        Str reference;
 
         struct
         {
