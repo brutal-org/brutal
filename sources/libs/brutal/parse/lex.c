@@ -19,12 +19,9 @@ Lex lex(Scan *scan, LexFn *fn, Alloc *alloc)
             self.line++;
         }
 
-        else
-        {
-            self.col = scan->head;
-        }
-
         Lexeme l = {fn(scan), scan_end(scan), self.line, self.col};
+
+        self.col = scan->head;
 
         if (l.type == LEXEME_INVALID)
         {
