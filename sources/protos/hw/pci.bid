@@ -3,7 +3,7 @@ interface Pci
     type Identifier:
     {
         vendor: U16,
-        classcode: U8,
+        class: U8,
         subclass: U8,
     };
 
@@ -29,6 +29,7 @@ interface Pci
         size: U32,
         type: bar_types,
     };
+
     errors
     {
         NOT_FOUND,
@@ -40,6 +41,6 @@ interface Pci
     method find_device { identifier: Identifier} -> Addr;
 
     method bar { addr: Addr, num: U8} -> BarInfo;
-    
+
     method enable_irq { addr: Addr } -> U8;
 }

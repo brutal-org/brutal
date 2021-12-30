@@ -22,7 +22,7 @@ int br_entry_args(
     PciFindDeviceRequest r = {
         .identifier = {
             .vendor = 0x8086,
-            .classcode = 1,
+            .class = 1,
             .subclass = 6,
         }};
 

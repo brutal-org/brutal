@@ -141,7 +141,7 @@ static void ahci_device_dump(AhciDevice *self)
     log$("Interrupt-status: {#b}", self->port->interrupt_status);
     log$("Sata-status: {#b}", self->port->sata_status);
     log$("Sata-error: {#b}", self->port->sata_error);
-    log$("Command&Status: {#b}", self->port->command_and_status);
+    log$("Command & Status: {#b}", self->port->command_and_status);
     log$("Task-file: {#b}", self->port->task_file_data);
 }
 
@@ -153,8 +153,9 @@ void ahci_device_init(AhciDevice *device, HbaPort *port, int idx)
 
     if (device->port->command_and_status & (HBA_CMD_CMD_LIST_RUNNING | HBA_CMD_START | HBA_CMD_FIS_RECEIVE_RUNNING | HBA_CMD_FIS_RECEIVE_ENABLE))
     {
-        log$("setting device to idle");
+        log$("Idling device");
         device->port->command_and_status &= ~((uint32_t)(HBA_CMD_START | HBA_CMD_FIS_RECEIVE_ENABLE));
+
         while (device->port->command_and_status & (HBA_CMD_CMD_LIST_RUNNING))
         {
         }
@@ -167,7 +168,7 @@ void ahci_device_init(AhciDevice *device, HbaPort *port, int idx)
     ahci_device_init_command(device);
 }
 
-bool ahci_device_rw_command(AhciDevice *self, BrHandle target, uint64_t cursor, uint64_t count, bool write)
+bool ahci_device_rw(AhciDevice *self, BrHandle target, uint64_t cursor, uint64_t count, bool write)
 {
     self->port->interrupt_status = 0xFFFFFFFF;
 

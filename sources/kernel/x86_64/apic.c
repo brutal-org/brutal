@@ -134,7 +134,7 @@ static int ioapic_from_gsi(uint32_t interrupt_base)
         }
     }
 
-    panic$("Ioapic interrupt base not founded for base {}", interrupt_base);
+    panic$("Ioapic interrupt base not found for base {}", interrupt_base);
 }
 
 static void ioapic_create_redirect(

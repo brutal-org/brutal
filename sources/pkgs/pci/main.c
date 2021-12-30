@@ -19,7 +19,7 @@ static Iter iter_pci_find(void *data, PciGetDevIterCtx *ctx)
     Pci *pci = ctx->pci;
     PciConfig *config = pci_config(pci, *addr);
 
-    if (config->classcode == ctx->identifier.classcode &&
+    if (config->class == ctx->identifier.class &&
         config->subclass == ctx->identifier.subclass &&
         config->vendor == ctx->identifier.vendor)
     {
@@ -27,10 +27,12 @@ static Iter iter_pci_find(void *data, PciGetDevIterCtx *ctx)
             .bus = addr->bus,
             .func = addr->func,
             .seg = addr->seg,
-            .slot = addr->slot};
+            .slot = addr->slot,
+        };
 
         return ITER_STOP;
     }
+
     return ITER_CONTINUE;
 }
 
@@ -61,7 +63,6 @@ static PciError pci_impl_bar(IpcEv *ev, BrHandle task, PciBarRequest const *req,
         return PCI_INVALID_ADDR;
     }
     config->command |= 1 << 2 | 1 << 4;
-    log$("{}", config->command);
     *resp = pci_read_bar(ev->ctx, req->addr, req->num);
 
     return PCI_SUCCESS;
@@ -84,7 +85,7 @@ static PciError pci_impl_enable_irq(IpcEv *ev, BrHandle task, PciEnableIrqReques
         PciConfigType0 *v = (PciConfigType0 *)config;
 
         uint8_t cap_offset = v->capabilities_pointer;
-        bool founded = false;
+        bool found = false;
         PciCapability *cap = (PciCapability *)((uint8_t *)config + cap_offset);
 
         while (cap_offset)
@@ -93,13 +94,13 @@ static PciError pci_impl_enable_irq(IpcEv *ev, BrHandle task, PciEnableIrqReques
             cap_offset = cap->next;
             if (value == PCI_CAP_MSI)
             {
-                founded = true;
+                found = true;
                 break;
             }
             cap = (PciCapability *)((uint8_t *)config + cap_offset);
         }
 
-        if (!founded)
+        if (!found)
         {
             return PCI_NO_IRQ_FOR_DEVICE;
         }
@@ -130,7 +131,7 @@ static Iter iter_pci(void *data, void *ctx)
 
     log$("Seg: {} Bus: {} Slot: {} Func: {]", addr->seg, addr->bus, addr->slot, addr->func);
     log$("    VENDOR:{#04x} DEVICE  :{#04x}", config->vendor, config->device);
-    log$("    CLASS :{#04x} SUBCLASS:{#04x}", config->classcode, config->subclass);
+    log$("    CLASS :{#04x} SUBCLASS:{#04x}", config->class, config->subclass);
 
     if ((config->header_type & 0x7f) == 0)
     {
