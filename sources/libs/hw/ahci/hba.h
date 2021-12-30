@@ -9,7 +9,7 @@ typedef enum
     HBA_SIG_SEMB = 0xC33C0101,
     HBA_SIG_PM = 0x96690101,
     HBA_SIG_UNCONNECTED = 0xFFFFFFFF
-} HbaSignatureType;
+} HbaPortSig;
 
 typedef enum
 {

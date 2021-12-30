@@ -20,9 +20,9 @@ typedef struct
     BalMem identify;
 } AhciDevice;
 
-void ahci_device_init(AhciDevice *device, HbaPort *port, int idx);
-
 #define AHCI_WRITE true
 #define AHCI_READ false
 
-bool ahci_device_rw_command(AhciDevice *self, BrHandle target, uint64_t cursor, uint64_t count, bool write);
+void ahci_device_init(AhciDevice *device, HbaPort *port, int idx);
+
+bool ahci_device_rw(AhciDevice *self, BrHandle target, uint64_t cursor, uint64_t count, bool write);

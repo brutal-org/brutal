@@ -53,7 +53,7 @@ Iter pci_iter_func(PciGroup *group, PciAddr addr, IterFn fn, void *ctx)
 
     PciConfig *config = pci_group_config(group, addr);
 
-    if (config->classcode == 0x06 && config->subclass == 0x04)
+    if (config->class == 0x06 && config->subclass == 0x04)
     {
         PciConfigType1 *bridge_config = (PciConfigType1 *)config;
         PciAddr bridge_addr = {

@@ -11,7 +11,7 @@ typedef struct PACKED
     uint8_t revison;
     uint8_t progif;
     uint8_t subclass;
-    uint8_t classcode;
+    uint8_t class;
     uint8_t cache_line_size;
     uint8_t latency_timer;
     uint8_t header_type;

@@ -2,51 +2,32 @@
 #include <ahci/device.h>
 #include <brutal/debug.h>
 
-static AhciDeviceType ahci_device_type(HbaPort *port)
+static HbaPortSig ahci_device_type(HbaPort *port)
 {
     uint32_t status = port->sata_status;
     uint8_t ipm = (status >> 8) & 0x0f;
     uint8_t det = status & 0x0f;
 
-    if (ipm != HBA_PORT_IPM_ACTIVE || det != HBA_PORT_DET_PRESENT)
+    if (ipm != HBA_PORT_IPM_ACTIVE ||
+        det != HBA_PORT_DET_PRESENT)
     {
-        return AHCI_DEVICE_NONE;
+        return HBA_SIG_UNCONNECTED;
     }
 
-    switch (port->signature)
-    {
-    case HBA_SIG_ATAPI:
-        return AHCI_DEVICE_SATAPI;
-
-    case HBA_SIG_SEMB:
-        return AHCI_DEVICE_SEMB;
-
-    case HBA_SIG_PM:
-        return AHCI_DEVICE_PM;
-
-    case HBA_SIG_ATA:
-        return AHCI_DEVICE_SATA;
-
-    case HBA_SIG_UNCONNECTED:
-        return AHCI_DEVICE_UNCONNECTED;
-
-    default:
-        panic$("Unkown port signature: {#x}", port->signature);
-        return AHCI_DEVICE_NONE;
-    }
+    return port->signature;
 }
 
-Str ahci_device_type_to_str(AhciDeviceType type)
+Str ahci_port_sig_to_str(HbaPortSig type)
 {
     switch (type)
     {
-    case AHCI_DEVICE_SATA:
+    case HBA_SIG_ATA:
         return str$("SATA");
-    case AHCI_DEVICE_PM:
+    case HBA_SIG_PM:
         return str$("PM");
-    case AHCI_DEVICE_SEMB:
+    case HBA_SIG_SEMB:
         return str$("SEMB");
-    case AHCI_DEVICE_SATAPI:
+    case HBA_SIG_ATAPI:
         return str$("SATAPI");
     default:
         return str$("UNCONNECTED");
@@ -65,10 +46,10 @@ static void ahci_init_ports(Ahci *ahci)
         }
 
         HbaPort *port = &ahci->hba_mem->ports[i];
-        AhciDeviceType port_type = ahci_device_type(port);
+        HbaPortSig port_type = ahci_device_type(port);
         AhciDevice dev = {};
 
-        if (port_type == AHCI_DEVICE_NONE)
+        if (port_type == HBA_SIG_UNCONNECTED)
         {
             continue;
         }
@@ -77,7 +58,7 @@ static void ahci_init_ports(Ahci *ahci)
 
         port_type = ahci_device_type(port);
 
-        log$("Detected device {} at: {}", ahci_device_type_to_str(port_type), i);
+        log$("Detected device {} at: {}", ahci_port_sig_to_str(port_type), i);
 
         vec_push(&ahci->devs, dev);
 
@@ -86,7 +67,7 @@ static void ahci_init_ports(Ahci *ahci)
 
     if (ahci->devs.len == 0)
     {
-        log$("no device founded");
+        log$("no device found");
     }
 }
 

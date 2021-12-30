@@ -12,16 +12,6 @@ typedef struct
     Vec(AhciDevice) devs;
 } Ahci;
 
-typedef enum
-{
-    AHCI_DEVICE_NONE,
-    AHCI_DEVICE_SATA,
-    AHCI_DEVICE_SATAPI,
-    AHCI_DEVICE_SEMB,
-    AHCI_DEVICE_PM,
-    AHCI_DEVICE_UNCONNECTED,
-} AhciDeviceType;
-
-Str ahci_device_type_to_str(AhciDeviceType type);
+Str ahci_port_sig_to_str(HbaPortSig type);
 
 void ahci_init(Ahci *ahci, PciBarInfo *bar, Alloc *alloc);

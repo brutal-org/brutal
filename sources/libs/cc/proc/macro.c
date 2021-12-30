@@ -159,7 +159,7 @@ static void cproc_gen_macro_args_replacement(CProcMacro *macro, MacroArgsCodes *
 
     vec_foreach(entry, &macro_source->lexemes)
     {
-        bool founded_arg = false;
+        bool found_arg = false;
         int arg_id = 0;
         vec_foreach(arg, &macro->args)
         {
@@ -169,13 +169,13 @@ static void cproc_gen_macro_args_replacement(CProcMacro *macro, MacroArgsCodes *
                 Lex v = lex_from_lexeme(&arg_lex);
                 // process argument
                 cproc_lex(out, &v, ctx);
-                founded_arg = true;
+                found_arg = true;
                 break;
             }
             arg_id++;
         }
 
-        if (!founded_arg)
+        if (!found_arg)
         {
             vec_push(&out->lexemes, *entry);
         }
