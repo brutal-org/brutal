@@ -31,7 +31,7 @@ VmmSpace vmm_kernel_space(void)
     return nullptr;
 }
 
-VmmResult vmm_map(MAYBE_UNUSED VmmSpace space, MAYBE_UNUSED VmmRange virtual_range, MAYBE_UNUSED PmmRange physical_range, MAYBE_UNUSED BrMemFlags flags)
+VmmResult vmm_map(MAYBE_UNUSED VmmSpace space, MAYBE_UNUSED VmmRange virtual_range, MAYBE_UNUSED PmmRange physical_range, MAYBE_UNUSED BrMemoryFlags flags)
 {
     return OK(VmmResult, virtual_range);
 }

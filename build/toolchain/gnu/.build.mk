@@ -37,8 +37,8 @@ USER_CFLAGS= \
 	$(CFLAGS_WARN) \
 	$(ARCH_CFLAGS) \
 	$(USER_CFLAGS_INC) \
-	-ffreestanding \
-	-D__brutal__=1
+	-D__brutal__=1 \
+	-ffreestanding
 
 USER_KCFLAGS= \
 	$(USER_CFLAGS) \
@@ -62,6 +62,8 @@ USER_ULDFLAGS= \
 	-z max-page-size=0x1000 \
 	$(ARCH_LDFLAGS) \
 	build/toolchain/gnu/local/lib/gcc/$(CONFIG_ARCH)-elf/11.1.0/libgcc.a
+
+USER_OBJCOPY=$(CONFIG_ARCH)-elf-objcopy
 
 USER_AR=$(CONFIG_ARCH)-elf-ar
 USER_ARFLAGS=rcs

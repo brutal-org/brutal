@@ -5,7 +5,7 @@
 
 static IoWriter _writer;
 
-static IoResult host_log_write(MAYBE_UNUSED void *context, uint8_t const *data, MAYBE_UNUSED size_t offset, size_t size)
+static IoResult embed_log_write(MAYBE_UNUSED void *context, uint8_t const *data, MAYBE_UNUSED size_t offset, size_t size)
 {
 
     uint16_t *cstr = str_to_cstr_utf16_dos(str_n$(size, (char *)data), alloc_global());
@@ -17,23 +17,23 @@ static IoResult host_log_write(MAYBE_UNUSED void *context, uint8_t const *data, 
     return OK(IoResult, size);
 }
 
-IoWriter *host_log_writer(void)
+IoWriter *embed_log_writer(void)
 {
-    _writer.write = host_log_write;
+    _writer.write = embed_log_write;
     return &_writer;
 }
 
-void host_log_lock(void)
+void embed_log_lock(void)
 {
     return;
 }
 
-void host_log_unlock(void)
+void embed_log_unlock(void)
 {
     return;
 }
 
-void host_log_panic(void)
+void embed_log_panic(void)
 {
     while (1)
         ;

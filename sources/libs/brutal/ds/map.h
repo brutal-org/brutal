@@ -32,7 +32,7 @@ void map_init_impl(MapImpl *impl, int data_size, Alloc *alloc);
 
 void map_deinit_impl(MapImpl *impl);
 
-bool map_put_impl(MapImpl *impl, Str key, const void *data);
+bool map_put_impl(MapImpl *impl, Str key, void const *data);
 
 bool map_get_impl(MapImpl *impl, Str key, void *data);
 

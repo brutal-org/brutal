@@ -5,13 +5,13 @@
 
 typedef enum
 {
-    IO_STD_IN,
-    IO_STD_OUT,
-    IO_STD_ERR,
-} IoStdChannel;
+    IO_CHAN_IN,
+    IO_CHAN_OUT,
+    IO_CHAN_ERR,
+} IoChan;
 
-IoReader *io_std_in(void);
+IoReader *io_chan_in(void);
 
-IoWriter *io_std_out(void);
+IoWriter *io_chan_out(void);
 
-IoWriter *io_std_err(void);
+IoWriter *io_chan_err(void);

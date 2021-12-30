@@ -96,7 +96,7 @@ static BrResult event_dispatch(Task const *task, BrEvent event)
         task->channel,
         nullptr,
         &(BrMsg){
-            .from = BR_TASK_IRQ,
+            .from = BR_ID_EVENT,
             .event = event,
         },
         0, BR_IPC_SEND);

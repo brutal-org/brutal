@@ -30,18 +30,14 @@ static void *req_dispatch(IpcEv *self)
 
         BrResult result = br_ipc(&ipc);
 
-        log$("Got message from {} with proto={} and type={}", ipc.msg.from, ipc.msg.prot, ipc.msg.type);
-
         if (result == BR_SUCCESS)
         {
             bool message_handeled = false;
 
-            log$("Trying to dispatch to pending IpcJobs...");
             for (IpcJob *j = self->jobs; j; j = j->next)
             {
                 if (j->seq == ipc.msg.seq)
                 {
-                    log$("Found a pending IPC job, resolving it...");
 
                     *j->resp = ipc.msg;
                     j->ok = true;
@@ -53,13 +49,11 @@ static void *req_dispatch(IpcEv *self)
 
             if (!message_handeled)
             {
-                log$("No pending IpcJob, looking for a protocol to handle it...");
 
                 vec_foreach_v(proto, &self->protos)
                 {
                     if (proto.id == ipc.msg.prot)
                     {
-                        log$("Proto {} can handle it :)", proto.id);
 
                         fiber_start(
                             (FiberFn *)br_ev_handle,
@@ -78,7 +72,6 @@ static void *req_dispatch(IpcEv *self)
 
             if (!message_handeled && self->sink)
             {
-                log$("No one can handle it, sending to the sink...");
 
                 fiber_start(
                     (FiberFn *)br_ev_handle,

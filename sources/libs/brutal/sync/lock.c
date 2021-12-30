@@ -1,5 +1,4 @@
 #include <brutal/sync/lock.h>
-#include <embed/arch.h>
 #include <embed/sync.h>
 
 static bool lock_try_acquire_impl(Lock *lock)
@@ -14,13 +13,13 @@ static bool lock_try_acquire_impl(Lock *lock)
 
 bool lock_try_acquire(Lock *lock)
 {
-    host_enter_critical_section();
+    embed_sync_enter();
 
     int result = lock_try_acquire_impl(lock);
 
     if (!result)
     {
-        host_leave_critical_section();
+        embed_sync_leave();
     }
 
     return result;
@@ -28,12 +27,12 @@ bool lock_try_acquire(Lock *lock)
 
 void lock_acquire(Lock *lock)
 {
-    host_enter_critical_section();
+    embed_sync_enter();
 
     while (!lock_try_acquire_impl(lock))
     {
-#ifdef ARCH_HAS_PAUSE
-        arch_pause();
+#ifdef EMBED_HAS_PAUSE
+        embed_sync_pause();
 #endif
         atomic_thread_fence(memory_order_seq_cst);
     }
@@ -46,5 +45,5 @@ void lock_release(Lock *lock)
     atomic_thread_fence(memory_order_seq_cst);
     lock->locked = false;
 
-    host_leave_critical_section();
+    embed_sync_leave();
 }

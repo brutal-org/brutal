@@ -53,7 +53,7 @@ Iter pci_iter_func(PciGroup *group, PciAddr addr, IterFn fn, void *ctx)
 
     PciConfig *config = pci_group_config(group, addr);
 
-    if (config->classcode == 0x06 && config->subclass == 0x04)
+    if (config->class == 0x06 && config->subclass == 0x04)
     {
         PciConfigType1 *bridge_config = (PciConfigType1 *)config;
         PciAddr bridge_addr = {
@@ -173,4 +173,63 @@ PciConfig *pci_config(Pci *pci, PciAddr addr)
     }
 
     return nullptr;
+}
+
+PciBarInfo pci_read_bar(Pci *pci, PciAddr addr, int bar)
+{
+    PciBarInfo res = {};
+
+    PciConfig *config = pci_config(pci, addr);
+    volatile uint32_t *bar_ptr = 0;
+    if ((config->header_type & 0x7f) == 0)
+    {
+        PciConfigType0 *v = (PciConfigType0 *)config;
+        bar_ptr = &v->bars[bar];
+    }
+    uint32_t value = *bar_ptr;
+    uint64_t base = 0;
+
+    if ((value & 0b0111) == 0b0110)
+    {
+        res.type = PCI_BAR_MMIO_64;
+        base = value & 0xFFFFFFF0;
+        //   base = bar_ptr[1] & 0xFFFFFFF0; FIXME: check specification
+    }
+    else if ((value & 0b0111) == 0b0000)
+    {
+        res.type = PCI_BAR_MMIO_32;
+        base = value & 0xFFFFFFF0;
+    }
+    else if ((value & 0b0111) == 0b0001)
+    {
+        res.type = PCI_BAR_PIO;
+        base = value & 0xFFFFFFFC;
+    }
+
+    res.base = base;
+
+    *bar_ptr = 0xFFFFFFFF;
+
+    res.size = ~(*bar_ptr & 0xFFFFFFF0) + 1;
+
+    *bar_ptr = value;
+
+    return res;
+}
+
+bool pci_bind_msi(uint8_t cpu, uint8_t vector, PciCapability *pci_msi_cap)
+{
+
+    if ((pci_msi_cap->msi.control & MSI_CTRL_64_BIT) == 0)
+    {
+        panic$("64 bit MSI not supported");
+        return false;
+    }
+
+    pci_msi_cap->msi.address = (0xfee << 20) | (cpu << 12);
+    pci_msi_cap->msi.data = vector;
+    pci_msi_cap->msi.control |= MSI_CTRL_ENABLE;
+    pci_msi_cap->msi.control &= ~(0b111 << MSI_CTRL_MME_OFF);
+
+    return true;
 }

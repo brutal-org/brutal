@@ -1,7 +1,6 @@
 #include <brutal/codec/tga.h>
-#include "brutal/base/endian.h"
 
-IoResult tga_encode(IoWriter *writer, GfxSurface surface)
+IoResult tga_encode(IoWriter *writer, GfxBuf surface)
 {
     TgaHeader header = (TgaHeader){
         .data_type_code = le$(le_int8_t, TGA_DATATYPE_UNCOMPRESSED_RGB),
@@ -11,7 +10,7 @@ IoResult tga_encode(IoWriter *writer, GfxSurface surface)
         .image_descriptor = le$(le_int8_t, 0), // by default don't use an alpha channel
     };
 
-    if (surface.format == GFX_PIXEL_FORMAT_RGBA8888) // set the number of bit for the alpha channel
+    if (surface.fmt == GFX_FMT_RGBA8888) // set the number of bit for the alpha channel
     {
         header.image_descriptor = le$(le_int8_t, TGA_IMGDESC_ALPHA_BITS);
     }
@@ -24,18 +23,18 @@ IoResult tga_encode(IoWriter *writer, GfxSurface surface)
     return OK(IoResult, written);
 }
 
-GfxSurface tga_decode_in_memory(void *addr, size_t size)
+GfxBuf tga_decode_in_memory(void *addr, size_t size)
 {
     assert_greater_than(size, sizeof(TgaHeader));
 
     TgaHeader *header = (TgaHeader *)addr;
     void *buf = header + 1;
 
-    return (GfxSurface){
+    return (GfxBuf){
         .width = load_le(header->width),
         .height = load_le(header->height),
         .pitch = load_le(header->width) * (load_le(header->bits_per_pixel) / 8),
-        .format = GFX_PIXEL_FORMAT_RGBA8888,
+        .fmt = GFX_FMT_RGBA8888,
         .buf = buf,
         .size = size - sizeof(TgaHeader),
     };

@@ -4,11 +4,6 @@
 
 typedef struct PACKED
 {
-    uint32_t address;
-} PciBar;
-
-typedef struct PACKED
-{
     uint16_t vendor;
     uint16_t device;
     uint16_t command;
@@ -16,7 +11,7 @@ typedef struct PACKED
     uint8_t revison;
     uint8_t progif;
     uint8_t subclass;
-    uint8_t classcode;
+    uint8_t class;
     uint8_t cache_line_size;
     uint8_t latency_timer;
     uint8_t header_type;
@@ -27,7 +22,7 @@ typedef struct PACKED
 {
     PciConfig base;
 
-    PciBar bars[6];
+    uint32_t bars[6];
     uint32_t cardbus_cis_pointer;
     uint16_t subsystem_vendor;
     uint16_t subsystem_id;
@@ -45,7 +40,7 @@ typedef struct PACKED
 {
     PciConfig base;
 
-    PciBar bars[2];
+    uint32_t bars[2];
     uint8_t primary_bus_number;
     uint8_t secondary_bus_number;
     uint8_t subordinate_bus_number;

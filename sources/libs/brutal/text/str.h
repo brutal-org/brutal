@@ -40,6 +40,8 @@ typedef struct
 
 Str str_dup(Str const str, Alloc *alloc);
 
+Str str_concat(Str const lhs, Str const rhs, Alloc *alloc);
+
 bool str_eq(Str const lhs, Str const rhs);
 
 int str_count(Str const lStr, Str const rStr);

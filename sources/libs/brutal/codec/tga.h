@@ -1,8 +1,7 @@
 #pragma once
 
-#include <brutal/base/endian.h>
-#include <brutal/gfx/surface.h>
-#include <brutal/io/write.h>
+#include <brutal/gfx/buf.h>
+#include <brutal/io.h>
 
 // using http://tfc.duke.free.fr/coding/tga_specs.pdf
 
@@ -35,6 +34,6 @@ typedef struct PACKED
     le_int8_t image_descriptor;
 } TgaHeader;
 
-IoResult tga_encode(IoWriter *writer, GfxSurface surface);
+IoResult tga_encode(IoWriter *writer, GfxBuf surface);
 
-GfxSurface tga_decode_in_memory(void *addr, size_t size);
+GfxBuf tga_decode_in_memory(void *addr, size_t size);

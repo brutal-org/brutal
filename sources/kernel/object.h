@@ -17,7 +17,7 @@ typedef struct
 {
     BrId id;
     RefCount refcount;
-    BrObjectType type;
+    BrType type;
 
     ObjectDtor *dtor;
 } Object;
@@ -25,13 +25,13 @@ typedef struct
 typedef Vec(Object *) VecObject;
 typedef Slot(Object *) SlotObject;
 
-void object_init(Object *self, BrObjectType type, ObjectDtor *dtor);
+void object_init(Object *self, BrType type, ObjectDtor *dtor);
 
 void object_ref(Object *self);
 
 void object_deref(Object *self);
 
-Object *global_lookup(BrId id, BrObjectType type);
+Object *global_lookup(BrId id, BrType type);
 
 static inline void object_cleanup(void *object)
 {

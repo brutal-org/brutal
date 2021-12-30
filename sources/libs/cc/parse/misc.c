@@ -2,8 +2,7 @@
 
 void cparse_whitespace(Lex *lex)
 {
-    while (lex_curr_type(lex) == CLEX_COMMENT ||
-           lex_curr_type(lex) == CLEX_WHITESPACE)
+    while (lex_curr_type(lex) == CLEX_WHITESPACE)
     {
         lex_next(lex);
     }
@@ -29,4 +28,15 @@ bool cparse_is_separator(Lex *lex, LexemeType type)
 {
     cparse_whitespace(lex);
     return lex_curr_type(lex) == type;
+}
+
+Lexeme cparse_peek_separator(Lex *lex, int offset)
+{
+    int off = 0;
+    while (lex_peek_type(lex, off) == CLEX_WHITESPACE && off != offset && !lex_ended(lex))
+    {
+        off++;
+    }
+
+    return lex_peek(lex, off);
 }

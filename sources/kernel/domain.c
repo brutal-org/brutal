@@ -66,7 +66,7 @@ BrResult domain_remove(Domain *self, BrHandle handle)
     return BR_SUCCESS;
 }
 
-Object *domain_lookup(Domain *self, BrHandle handle, BrObjectType type)
+Object *domain_lookup(Domain *self, BrHandle handle, BrType type)
 {
     rwlock_acquire_read(&self->lock);
 

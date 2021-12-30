@@ -1,6 +1,6 @@
 #pragma once
 
-struct host_app
+struct embed_app
 {
     int _dummy;
 };

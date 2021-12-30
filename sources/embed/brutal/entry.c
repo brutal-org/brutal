@@ -42,20 +42,20 @@ void _entry(BrStartType type, long arg1, long arg2, long arg3, long arg4, long a
 {
     fiber_start(nullptr, nullptr);
 
-    int exit_value = -1;
+    int result = -1;
 
     switch (type)
     {
     case BR_START_ARGS:
-        exit_value = br_entry_args(arg1, arg2, arg3, arg4, arg5);
+        result = br_entry_args(arg1, arg2, arg3, arg4, arg5);
         break;
 
     case BR_START_CMAIN:
-        exit_value = br_entry_cmain((int)arg1, (char **)arg2, (char **)arg3);
+        result = br_entry_cmain((int)arg1, (char **)arg2, (char **)arg3);
         break;
 
     case BR_START_HANDOVER:
-        exit_value = br_entry_handover((Handover *)arg1);
+        result = br_entry_handover((Handover *)arg1);
         break;
 
     default:
@@ -63,7 +63,7 @@ void _entry(BrStartType type, long arg1, long arg2, long arg3, long arg4, long a
     }
 
     br_exit(&(BrExitArgs){
-        .task = BR_TASK_SELF,
-        .exit_value = exit_value,
+        .handle = BR_HANDLE_SELF,
+        .result = result,
     });
 }

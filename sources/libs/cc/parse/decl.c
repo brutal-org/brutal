@@ -151,7 +151,12 @@ CDeclAttr cparse_decl_attr(Lex *lex)
 
 CDecl cparse_decl(Lex *lex, CUnit *context, Alloc *alloc)
 {
-    if (lex_skip_type(lex, CLEX_TYPEDEF))
+    if (cparse_is_separator(lex, CLEX_SEMICOLON))
+    {
+        cparse_skip_separator(lex, CLEX_SEMICOLON);
+        return cdecl_empty();
+    }
+    else if (lex_skip_type(lex, CLEX_TYPEDEF))
     {
         cparse_whitespace(lex);
         CDeclarator declarator = cparse_declarator(lex, alloc);

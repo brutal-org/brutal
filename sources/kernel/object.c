@@ -6,7 +6,7 @@ static _Atomic bool _init = false;
 static VecObject _global = {};
 static RwLock _lock = {};
 
-void object_init(Object *self, BrObjectType type, ObjectDtor *dtor)
+void object_init(Object *self, BrType type, ObjectDtor *dtor)
 {
     refcount_init(&self->refcount);
 
@@ -54,7 +54,7 @@ void object_deref(Object *self)
     }
 }
 
-Object *global_lookup(BrId id, BrObjectType type)
+Object *global_lookup(BrId id, BrType type)
 {
     if (!_init)
     {

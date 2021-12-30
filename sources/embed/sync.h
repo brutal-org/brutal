@@ -1,5 +1,11 @@
 #pragma once
 
-void host_enter_critical_section(void);
+#if defined(__x86_64__)
+#    define EMBED_HAS_PAUSE 1
+#endif
 
-void host_leave_critical_section(void);
+void embed_sync_enter(void);
+
+void embed_sync_leave(void);
+
+void embed_sync_pause(void);

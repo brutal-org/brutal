@@ -8,7 +8,7 @@ typedef struct
     void *buf;
     size_t len;
     size_t curr;
-    BrMemObj obj;
+    BrHandle handle;
 } BalPack;
 
 typedef void BalPackFn(BalPack *self, void const *buf);

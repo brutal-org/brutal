@@ -1,6 +1,21 @@
 #include <brutal/base/keywords.h>
 #include <brutal/text/str.h>
 
+Str str_concat(Str const lhs, Str const rhs, Alloc *alloc)
+{
+    Str result = {
+        .len = lhs.len + rhs.len,
+    };
+
+    char *buf = alloc_malloc(alloc, result.len);
+
+    mem_cpy(buf, lhs.buf, lhs.len);
+    mem_cpy(buf + lhs.len, rhs.buf, rhs.len);
+
+    result.buf = buf;
+    return result;
+}
+
 Str str_dup(Str const str, Alloc *alloc)
 {
     if (is_nullstr(str))

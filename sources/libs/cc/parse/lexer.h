@@ -3,8 +3,10 @@
 #include <brutal/parse.h>
 
 #define FOREACH_LEXEMES(LEXEME) \
+    LEXEME(NONE)                \
     LEXEME(WHITESPACE)          \
     LEXEME(COMMENT)             \
+    LEXEME(NEWLINE)             \
     LEXEME(IDENT)               \
     LEXEME(INTEGER)             \
     LEXEME(AUTO)                \
@@ -63,6 +65,7 @@
     LEXEME(LSHIFT)              \
     LEXEME(RSHIFT)              \
     LEXEME(POUND)               \
+    LEXEME(DOUBLE_POUND)        \
     LEXEME(PLUS)                \
     LEXEME(PLUSPLUS)            \
     LEXEME(MINUS)               \

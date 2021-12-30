@@ -3,8 +3,6 @@
 #include <brutal/base.h>
 /* --- */
 #include <brutal/ds/bits.h>
-#include <brutal/ds/grid.h>
-#include <brutal/ds/linear.h>
 #include <brutal/ds/map.h>
 #include <brutal/ds/range.h>
 #include <brutal/ds/ring.h>

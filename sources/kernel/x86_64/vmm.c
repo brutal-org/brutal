@@ -187,7 +187,7 @@ VmmSpace vmm_kernel_space(void)
     return (VmmSpace)_kpml;
 }
 
-static VmmResult vmm_map_page(Pml *pml4, uintptr_t virtual_page, uintptr_t physical_page, BrMemFlags flags)
+static VmmResult vmm_map_page(Pml *pml4, uintptr_t virtual_page, uintptr_t physical_page, BrMemoryFlags flags)
 {
     VmmRange pml3_range = TRY(VmmResult, vmm_get_pml_or_alloc(pml4, PML4_GET_INDEX(virtual_page), flags | BR_MEM_WRITABLE | BR_MEM_USER));
     Pml *pml3 = (Pml *)(pml3_range.base);
@@ -232,7 +232,7 @@ static VmmResult vmm_unmap_page(Pml *pml4, uintptr_t virtual_page)
     return OK(VmmResult, range);
 }
 
-VmmResult vmm_map(VmmSpace space, VmmRange virtual_range, PmmRange physical_range, BrMemFlags flags)
+VmmResult vmm_map(VmmSpace space, VmmRange virtual_range, PmmRange physical_range, BrMemoryFlags flags)
 {
     assert_truth(mem_is_range_page_aligned(virtual_range));
     assert_truth(mem_is_range_page_aligned(physical_range));

@@ -124,15 +124,15 @@ bool scan_skip_word(Scan *self, Str word)
 
 bool scan_eat(Scan *self, ScanMatch *match)
 {
-    bool any = false;
+    bool result = false;
 
     while (match(scan_curr(self)) && !scan_ended(self))
     {
-        any = true;
+        result = true;
         scan_next(self);
     }
 
-    return any;
+    return result;
 }
 
 void scan_begin(Scan *self)
@@ -207,8 +207,12 @@ bool scan_dump_error(Scan *self, IoWriter *writer)
     int line_start = str_last_chr(str_sub(src, 0, err.position), '\n') + 1;
     int line_end = str_first_chr(str_sub(src, line_start, src.len), '\n') + line_start;
 
-    Str line = str_sub(src, line_start, line_end);
+    if (line_end == -1)
+    {
+        line_end = src.len;
+    }
 
+    Str line = str_sub(src, line_start, line_end);
     print(writer, "    :\n");
     print(writer, "{3d} | {}\n", line_number, line);
     print(writer, "    : ");

@@ -44,21 +44,23 @@
 <br>
 <br>
 
-- **BRUTAL** is an operating system build from scratch in modern C.
+- **BRUTAL** is an operating system built from scratch in modern C.
 - **BRUTAL** is built on top of a capabilty based micro-kernel.
-- **BRUTAL** target x86_64, i686, RISC-V and ARM.
+- **BRUTAL** targets x86_64, i686, RISC-V and ARM.
 - **BRUTAL** exposes its features to developers through clean APIs.
-- **BRUTAL** feature a rich and modern C library complete with fibers, custom allocators, generic data structures, and more...
+- **BRUTAL** features a rich and modern C library complete with fibers, custom allocators, generic data structures, and more...
 
 ## Build Instructions
 
-You can find instructions about building BRUTAL [here](book/building.md).
+BRUTAL is pretty easy to to build from source using GNUMake, NASM and LLVM.
+
+See [building.md](book/building.md) for more details.
 
 ## Roadmap
 
 Right now the main goal of brutal is to run doom.
 
-See the [roadmap](book/roadmap.md) file for more information on how we plan to get there and where you can contribute.
+See [roadmap.md](book/roadmap.md) for more information on how we plan to get there and where you can contribute.
 
 ## Credits
 

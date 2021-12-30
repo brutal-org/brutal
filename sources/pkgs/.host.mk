@@ -1,10 +1,8 @@
 LIBS_HOST_SRC = \
 	$(wildcard sources/embed/posix/*.c)    \
-	$(wildcard sources/embed/posix/$(CONFIG_HOST_ARCH)/*.s) \
-	$(wildcard sources/embed/posix/$(CONFIG_HOST_ARCH)/*.c) \
 	$(wildcard sources/embed/sdl/*.c) \
-	$(wildcard sources/embed/$(CONFIG_HOST_ARCH)/*.s) \
-	$(wildcard sources/embed/$(CONFIG_HOST_ARCH)/*.c) \
+	$(wildcard sources/embed/arch/$(CONFIG_HOST_ARCH)/*.s) \
+	$(wildcard sources/embed/arch/$(CONFIG_HOST_ARCH)/*.c) \
 	$(wildcard sources/libs/brutal/*.c)   \
 	$(wildcard sources/libs/brutal/*/*.c) \
 	$(wildcard sources/libs/brutal/*/*/*.c) \
@@ -51,6 +49,7 @@ $(1)_HOST_OBJ = $$(patsubst sources/%, $(BINDIR_HOST)/%.o, $$($(1)_HOST_SRC))
 
 $(1)_HOST_BIN  = $(BINDIR_HOST)/$($(1)_NAME)
 ALL+=$$($(1)_HOST_BIN)
+HOST_NAMES+=$($(1)_NAME)
 
 DEPENDENCIES += $$($(1)_HOST_OBJ:.o=.d)
 
@@ -61,6 +60,6 @@ $$($(1)_HOST_BIN): $$($(1)_HOST_OBJ) $(LIBS_HOST_BIN)
 endef
 
 list-host:
-	@echo $(HOST_PKGS)
+	@echo $(HOST_NAMES)
 
 $(foreach bin, $(HOST_PKGS), $(eval $(call HOST_TEMPLATE,$(bin))))

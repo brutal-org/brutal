@@ -25,12 +25,20 @@ Lex lex(Scan *scan, LexFn *fn, Alloc *alloc)
 
         if (l.type == LEXEME_INVALID)
         {
-            scan_throw(scan, str$("invalid lexeme"), str$(""));
+            scan_throw(scan, str$("invalid lexeme"), l.str);
             break;
         }
 
         vec_push(&self.lexemes, l);
     }
+
+    return self;
+}
+
+Lex lex_from_lexeme(Lexemes *from)
+{
+    Lex self = {};
+    self.lexemes = *from;
 
     return self;
 }

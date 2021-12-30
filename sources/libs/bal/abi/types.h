@@ -3,6 +3,8 @@
 #include <brutal/base/range.h>
 #include <brutal/time.h>
 
+/* --- Syscalls IDs --------------------------------------------------------- */
+
 #define FOREACH_SYSCALLS(SYSCALL) \
     SYSCALL(LOG)                  \
     SYSCALL(MAP)                  \
@@ -16,7 +18,7 @@
     SYSCALL(BIND)                 \
     SYSCALL(UNBIND)               \
     SYSCALL(ACK)                  \
-    SYSCALL(STAT)                 \
+    SYSCALL(INSPECT)              \
     SYSCALL(IN)                   \
     SYSCALL(OUT)
 
@@ -29,6 +31,10 @@ typedef enum
         BR_SYSCALL_COUNT
 } BrSyscall;
 
+typedef uint64_t BrArg;
+
+/* --- Syscalls Results ----------------------------------------------------- */
+
 #define FOREACH_RESULTS(RESULT) \
     RESULT(SUCCESS)             \
     RESULT(INTERRUPTED)         \
@@ -36,9 +42,9 @@ typedef enum
     RESULT(ALREADY_BINDED)      \
     RESULT(ALREADY_ACK)         \
     RESULT(NOT_BINDED)          \
+    RESULT(NOT_PERMITTED)       \
     RESULT(BAD_ADDRESS)         \
     RESULT(BAD_ARGUMENTS)       \
-    RESULT(BAD_CAPABILITY)      \
     RESULT(BAD_HANDLE)          \
     RESULT(BAD_ID)              \
     RESULT(BAD_SYSCALL)         \
@@ -57,6 +63,19 @@ typedef enum
         BR_RESULT_COUNT
 } BrResult;
 
+/* --- Kernels Objects ------------------------------------------------------ */
+
+typedef uint64_t BrId;
+#define BR_ID_NIL ((BrId)0)
+#define BR_ID_ERR ((BrId)-1)
+#define BR_ID_SUPER ((BrId)-3)
+#define BR_ID_EVENT ((BrId)-4)
+
+typedef uint64_t BrHandle;
+#define BR_HANDLE_NIL ((BrHandle)0)
+#define BR_HANDLE_ERR ((BrHandle)-1)
+#define BR_HANDLE_SELF ((BrHandle)-2)
+
 typedef enum
 {
     BR_OBJECT_NONE,
@@ -66,143 +85,32 @@ typedef enum
     BR_OBJECT_DOMAIN,
     BR_OBJECT_SPACE,
     BR_OBJECT_TASK,
-} BrObjectType;
+} BrType;
 
-typedef uint64_t BrArg;
+// Memory Objects
 
-#define BR_ID_NIL ((BrId)0)
+#define BR_MEM_READABLE ((BrMemoryFlags)(1 << 0))
+#define BR_MEM_WRITABLE ((BrMemoryFlags)(1 << 1))
+#define BR_MEM_EXECUTABLE ((BrMemoryFlags)(1 << 2))
+#define BR_MEM_USER ((BrMemoryFlags)(1 << 3))
+#define BR_MEM_LOWER ((BrMemoryFlags)(1 << 4))
+#define BR_MEM_PMM ((BrMemoryFlags)(1 << 5))
 
-typedef uint64_t BrId;
+typedef uint64_t BrMemoryFlags;
 
-#define BR_HANDLE_NIL ((BrHandle)0)
+// Domain Objects
 
-typedef uint64_t BrHandle;
+typedef uint64_t BrDomainFlags;
 
-typedef BrHandle BrSpace;
+// Space Objects
 
-#define BR_SPACE_NIL ((BrSpace)0)
-#define BR_SPACE_ERROR ((BrSpace)-1)
-#define BR_SPACE_SELF ((BrSpace)-2)
+typedef uint64_t BrSpaceFlags;
 
-typedef enum
-{
-    BR_SPACE_NONE = 0,
-} BrSpaceFlags;
+/// Task Objects
 
-typedef BrHandle BrMemObj;
-
-#define BR_MEM_OBJ_NIL ((BrMemObj)0)
-#define BR_MEM_OBJ_ERROR ((BrMemObj)-1)
-#define BR_MEM_OBJ_GINFO ((BrMemObj)-2)
-#define BR_MEM_OBJ_LINFO ((BrMemObj)-3)
-
-typedef enum
-{
-    BR_MEM_OBJ_NONE = 0,
-
-    BR_MEM_OBJ_PMM = 1 << 0,
-    BR_MEM_OBJ_LOWER = 1 << 1,
-} BrMemObjFlags;
-
-#define BR_MEM_ZERO ((BrMemFlags)0)
-#define BR_MEM_READABLE ((BrMemFlags)(1 << 0))
-#define BR_MEM_WRITABLE ((BrMemFlags)(1 << 1))
-#define BR_MEM_EXECUTABLE ((BrMemFlags)(1 << 2))
-#define BR_MEM_USER ((BrMemFlags)(1 << 3))
-
-typedef uint32_t BrMemFlags;
-
-typedef BrHandle BrTask;
-
-#define BR_TASK_NIL ((BrTask)0)
-#define BR_TASK_ERROR ((BrTask)-1)
-#define BR_TASK_SELF ((BrTask)-2)
-#define BR_TASK_INIT ((BrTask)-3)
-#define BR_TASK_IRQ ((BrTask)-4)
-
-#define BR_TASK_ZERO (BrTaskFlags)(0)
 #define BR_TASK_USER (BrTaskFlags)(1 << 0)
 
-typedef uint8_t BrTaskFlags;
-
-#define BR_DEADLINE_INFINITY ((BrDeadline)-1)
-typedef uint64_t BrDeadline;
-
-#define BR_TIMEOUT_INFINITY ((BrTimeout)-1)
-typedef uint64_t BrTimeout;
-
-#define BR_MSG_ARG_COUNT (5)
-
-#define BR_MSG_ZERO (0)
-#define BR_MSG_HND(I) (1 << (I))
-
-typedef uint32_t BrMsgFlags;
-
-typedef BrHandle BrIrq;
-
-typedef enum
-{
-    BR_EVENT_INVALID,
-
-    BR_EVENT_IRQ,
-} BrEventType;
-
-typedef struct
-{
-    BrEventType type;
-    union
-    {
-        BrIrq irq;
-    };
-} BrEvent;
-
-typedef struct
-{
-    BrId from;
-    BrMsgFlags flags;
-    uint32_t seq;
-    uint32_t prot;
-
-#define BR_MSG_ERROR (uint32_t)(-1)
-    uint32_t type;
-
-    union
-    {
-        BrArg args[BR_MSG_ARG_COUNT];
-        BrEvent event;
-    };
-} BrMsg;
-
-_Static_assert(sizeof(BrMsg) == 64, "");
-
-#define BR_IPC_ZERO ((BrIpcFlags)(0))
-#define BR_IPC_BLOCK ((BrIpcFlags)(1 << 0))
-#define BR_IPC_SEND ((BrIpcFlags)(1 << 1))
-#define BR_IPC_RECV ((BrIpcFlags)(1 << 2))
-
-typedef uint32_t BrIpcFlags;
-
-#define BR_CAP_ZERO (0)
-#define BR_CAP_IRQ (1 << 0)
-#define BR_CAP_PMM (1 << 1)
-#define BR_CAP_LOG (1 << 2)
-#define BR_CAP_TASK (1 << 3)
-#define BR_CAP_IO (1 << 4)
-#define BR_CAP_ALL (0xffffffff)
-
-typedef uint32_t BrCap;
-
-typedef struct
-{
-    Tick tick;
-    TimeStamp time;
-} BrGlobals;
-
-typedef struct
-{
-    BrTask task;
-    StrFix128 name;
-} BrLocals;
+typedef uint64_t BrTaskFlags;
 
 typedef enum
 {
@@ -216,47 +124,74 @@ typedef struct
 {
     BrStartType type;
 
-    uintptr_t arg1;
-    uintptr_t arg2;
-    uintptr_t arg3;
-    uintptr_t arg4;
-    uintptr_t arg5;
+    BrArg arg1;
+    BrArg arg2;
+    BrArg arg3;
+    BrArg arg4;
+    BrArg arg5;
 } BrTaskArgs;
 
-typedef struct
+/* --- IPCs ----------------------------------------------------------------- */
+
+#define BR_MSG_ZERO (0)
+#define BR_MSG_HND(I) (1 << (I))
+
+typedef uint32_t BrMsgFlags;
+
+// Time
+
+#define BR_DEADLINE_INFINITY ((BrDeadline)-1)
+typedef uint64_t BrDeadline;
+
+#define BR_TIMEOUT_INFINITY ((BrTimeout)-1)
+typedef uint64_t BrTimeout;
+
+// Events
+
+typedef enum
 {
-    StrFix128 name;
-    BrCap caps;
-    bool stopped;
-    bool started;
-    bool blocked;
-    BrTask id;
-} BrInfoTask;
+    BR_EVENT_INVALID,
+
+    BR_EVENT_IRQ,
+} BrEventType;
 
 typedef struct
 {
-    size_t domain_object_count;
-} BrInfoDomain;
+    BrEventType type;
+    union
+    {
+        int irq;
+    };
+} BrEvent;
+
+// Messages
 
 typedef struct
 {
-    USizeRange range;
-} BrInfoMemObj;
+    BrId from;
+    BrMsgFlags flags;
+    uint32_t seq;
+    uint32_t prot;
 
-typedef struct
-{
-    BrSpaceFlags flags;
-} BrInfoSpace;
-
-typedef struct
-{
-    BrObjectType type;
+#define BR_MSG_ERROR (uint32_t)(-1)
+    uint32_t type;
 
     union
     {
-        BrInfoMemObj memobj;
-        BrInfoDomain domainobj;
-        BrInfoSpace spaceobj;
-        BrInfoTask taskobj;
+#define BR_MSG_ARG_COUNT (5)
+        BrArg args[BR_MSG_ARG_COUNT];
+        BrEvent event;
     };
-} BrHandleInfo;
+} BrMsg;
+
+_Static_assert(sizeof(BrMsg) == 64, "");
+
+// Rights
+
+#define BR_RIGHT_IRQ (1 << 0)
+#define BR_RIGHT_PMM (1 << 1)
+#define BR_RIGHT_LOG (1 << 2)
+#define BR_RIGHT_TASK (1 << 3)
+#define BR_RIGHT_IO (1 << 4)
+
+typedef uint32_t BrRight;

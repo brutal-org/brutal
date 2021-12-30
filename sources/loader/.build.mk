@@ -56,7 +56,7 @@ LOADER_SRC = \
 	$(wildcard sources/libs/brutal/ds/*.c) 		    \
 	$(wildcard sources/libs/brutal/hash/*.c)	    \
 	$(wildcard sources/embed/efi/*.c)	            \
-	$(wildcard sources/embed/$(CONFIG_ARCH)/*.c)    \
+	$(wildcard sources/embed/arch/$(CONFIG_ARCH)/*.c)    \
 	$(wildcard sources/libs/brutal/debug/*.c)       \
 	$(wildcard sources/libs/brutal/mem/*.c)         \
 	$(wildcard sources/libs/brutal/text/*.c)        \

@@ -49,6 +49,7 @@ USER_CFLAGS= \
 	$(CFLAGS_WARN) \
 	$(ARCH_CFLAGS) \
 	$(USER_CFLAGS_INC) \
+	-D__brutal__=1 \
 	-ffreestanding
 
 USER_KCFLAGS= \
@@ -58,8 +59,7 @@ USER_KCFLAGS= \
 
 USER_UCFLAGS= \
 	$(USER_CFLAGS) \
-	-nostdlib \
-	-D__brutal__=1
+	-nostdlib
 
 USER_LD=ld.lld
 USER_KLDFLAGS= \
@@ -71,6 +71,11 @@ USER_ULDFLAGS= \
 	-Tsources/embed/brutal/$(CONFIG_ARCH)/link.ld \
 	-z max-page-size=0x1000 \
 	$(ARCH_LDFLAGS)
+
+USER_OBJCOPY=llvm-objcopy$(LLVM_VERSION)
+ifeq (, $(shell which $(USER_OBJCOPY) 2> /dev/null))
+	USER_OBJCOPY=llvm-objcopy
+endif
 
 USER_AR?=llvm-ar$(LLVM_VERSION)
 ifeq (, $(shell which $(USER_AR) 2> /dev/null))

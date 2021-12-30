@@ -23,20 +23,19 @@ typedef struct
 {
     OBJECT_HEADER;
 
-    StrFix128 name;
     BrTaskFlags flags;
 
     Blocker blocker;
 
     bool in_syscall;
-    bool is_stopped;
-    bool is_blocked;
-    bool is_started;
+    bool stopped;
+    bool blocked;
+    bool started;
 
     size_t time_start;
     size_t time_end;
 
-    BrCap caps;
+    BrRight rights;
     Context *context;
     Space *space;
     Domain *domain;
@@ -52,7 +51,7 @@ typedef Result(BrResult, Task *) TaskCreateResult;
 
 Task *task_self(void);
 
-TaskCreateResult task_create(Str name, Space *space, BrCap caps, BrTaskFlags flags);
+TaskCreateResult task_create(Space *space, BrRight rights, BrTaskFlags flags);
 
 void task_ref(Task *self);
 
@@ -64,6 +63,6 @@ void task_end_syscall(void);
 
 static inline bool task_runnable(Task *self)
 {
-    bool blocked_or_stopped = self->is_blocked || (self->is_stopped && !self->in_syscall);
-    return self->is_started && (!blocked_or_stopped);
+    bool blocked_or_stopped = self->blocked || (self->stopped && !self->in_syscall);
+    return self->started && (!blocked_or_stopped);
 }

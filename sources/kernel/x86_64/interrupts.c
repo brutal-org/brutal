@@ -5,7 +5,6 @@
 #include "kernel/context.h"
 #include "kernel/cpu.h"
 #include "kernel/event.h"
-#include "kernel/globals.h"
 #include "kernel/sched.h"
 #include "kernel/x86_64/apic.h"
 #include "kernel/x86_64/asm.h"
@@ -87,7 +86,7 @@ static void interrupt_error_handler(Regs *regs)
 
     if (task_self() != nullptr)
     {
-        log_unlock("Running task is {}({})", str$(&task_self()->name), task_self()->id);
+        log_unlock("Running task is {}", task_self()->id);
         log_unlock("");
     }
 
@@ -119,12 +118,6 @@ uint64_t interrupt_handler(uint64_t rsp)
     }
     else if (regs->int_no == 32)
     {
-        global()->tick++;
-        if (global()->tick % 500)
-        {
-            global()->time = datetime_to_timestamp(cmos_read_rtc());
-        }
-
         context_save(task_self()->context, regs);
         sched_schedule();
         sched_switch();

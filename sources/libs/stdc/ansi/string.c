@@ -97,7 +97,7 @@ char *strncat(char *restrict s1, char const *restrict s2, size_t n)
 
 /* --- 7.24.4 - Comparison functions ---------------------------------------- */
 
-int memcmp(void const *s1, const void *s2, size_t n)
+int memcmp(void const *s1, void const *s2, size_t n)
 {
     for (size_t i = 0; i < n; i++)
     {

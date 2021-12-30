@@ -92,6 +92,5 @@ void interrupt_handler(Regs *regs)
 
 void init_interrupts(void)
 {
-    log$("loading interrupt handler : {x}", (uint64_t)interrupt_common);
     write_csr(CSR_STVEC, (uint64_t)interrupt_common);
 }

@@ -1,21 +1,131 @@
 #pragma once
 
-#include <brutal/gfx/paint.h>
-#include <brutal/gfx/stroke.h>
-#include <brutal/gfx/surface.h>
+#include <brutal/gfx/buf.h>
 #include <brutal/math/edge.h>
 #include <brutal/math/trans2.h>
 
 typedef enum
 {
-    GFX_RAST_EVENODD,
-    GFX_RAST_NONZERO,
-} GfxRastRule;
+    GFX_PAINT_NONE,
 
-void gfx_rast_fill(
-    GfxSurface surface,
-    Edgesf edges,
-    Recti clip,
-    GfxPaint paint,
-    GfxRastRule rule,
-    Alloc *alloc);
+    GFX_PAINT_FILL,
+    GFX_PAINT_GRADIENT,
+    GFX_PAINT_IMAGE,
+} GfxPaintType;
+
+typedef struct
+{
+    float loc;
+    GfxColor color;
+} GfxGradientStop;
+
+#define GFX_GRADIENT_MAX_STOPS (16)
+
+typedef struct
+{
+    size_t len;
+    GfxGradientStop stops[GFX_GRADIENT_MAX_STOPS];
+} GfxGradient;
+
+typedef struct
+{
+    GfxPaintType type;
+
+    union
+    {
+        GfxColor fill_;
+
+        GfxGradient gradient_;
+
+        struct
+        {
+            GfxBuf image;
+            Rect source;
+        } image_;
+    };
+} GfxPaint;
+
+static inline GfxPaint gfx_paint_none(void)
+{
+    return (GfxPaint){
+        .type = GFX_PAINT_NONE,
+    };
+}
+
+static inline GfxPaint gfx_paint_fill(GfxColor color)
+{
+    return (GfxPaint){
+        .type = GFX_PAINT_FILL,
+        .fill_ = color,
+    };
+}
+
+static inline GfxPaint gfx_paint_gradient(GfxGradient grad)
+{
+    return (GfxPaint){
+        .type = GFX_PAINT_GRADIENT,
+        .gradient_ = grad,
+    };
+}
+
+static inline GfxPaint gfx_paint_image(GfxBuf buf, Rect source)
+{
+    return (GfxPaint){
+        .type = GFX_PAINT_IMAGE,
+        .image_ = {
+            buf,
+            source,
+        },
+    };
+}
+
+static inline GfxColor gfx_paint_sample(GfxPaint paint, float x, float y)
+{
+    UNUSED(y);
+
+    switch (paint.type)
+    {
+    case GFX_PAINT_NONE:
+        return GFX_MAGENTA;
+
+    case GFX_PAINT_FILL:
+        return paint.fill_;
+
+    case GFX_PAINT_GRADIENT:
+    {
+        GfxGradient gradient = paint.gradient_;
+
+        if (gradient.len == 0)
+        {
+            return GFX_MAGENTA;
+        }
+        else if (gradient.len == 1 || x <= gradient.stops[0].loc)
+        {
+            return gradient.stops[0].color;
+        }
+        else if (x >= gradient.stops[gradient.len - 1].loc)
+        {
+            return gradient.stops[gradient.len - 1].color;
+        }
+        else
+        {
+            for (size_t i = 0; i + 1 < gradient.len; i++)
+            {
+                GfxGradientStop a = gradient.stops[i];
+                GfxGradientStop b = gradient.stops[i + 1];
+
+                if (a.loc <= x && x < b.loc)
+                {
+                    float l = ((x - a.loc) / (b.loc - a.loc));
+                    return gfx_lerp(a.color, b.color, l);
+                }
+            }
+
+            return GFX_MAGENTA;
+        }
+    }
+
+    default:
+        panic$("Unkown paint type {}.", paint.type);
+    }
+}

@@ -72,7 +72,7 @@ all: $(ALL)
 clean:
 	rm -rf $(BINDIR)
 
-.PHONY: clean
+.PHONY: nuke
 nuke:
 	rm -rf bin/
 

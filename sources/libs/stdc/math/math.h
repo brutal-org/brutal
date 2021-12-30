@@ -332,9 +332,9 @@ double copysign(double x, double sign);
 float copysignf(float x, float sign);
 long double copysignl(long double x, long double sign);
 
-double nan(const char *tag);
-float nanf(const char *tag);
-long double nanl(const char *tag);
+double nan(char const *tag);
+float nanf(char const *tag);
+long double nanl(char const *tag);
 
 double nextafter(double x, double dir);
 float nextafterf(float x, float dir);
