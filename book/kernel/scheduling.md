@@ -90,7 +90,7 @@ If the number of processes is lower than the number of cpu we don't need to swit
 If the number of processes is higher than the number of cpu we need to switch X process. Were X is equal to:
 
 ```c
-size_t schedule_count = MIN(cpu_count(), running - cpu_count());
+size_t schedule_count = m_min(cpu_count(), running - cpu_count());
 ```
 
 (where running is the number of running process)

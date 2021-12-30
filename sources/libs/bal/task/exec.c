@@ -15,7 +15,7 @@ static void bal_exec_load(BrHandle space, Elf64Header const *elf_header, BrHandl
             continue;
         }
 
-        size_t size = ALIGN_UP(MAX(prog_header->memory_size, prog_header->file_size), MEM_PAGE_SIZE);
+        size_t size = ALIGN_UP(m_max(prog_header->memory_size, prog_header->file_size), MEM_PAGE_SIZE);
 
         if (!(prog_header->flags & ELF_PROGRAM_HEADER_WRITABLE) &&
             prog_header->file_size == prog_header->memory_size)

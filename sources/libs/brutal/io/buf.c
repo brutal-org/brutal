@@ -1,6 +1,7 @@
 #include <brutal/base/attributes.h>
 #include <brutal/base/macros.h>
 #include <brutal/io/buf.h>
+#include <brutal/math/clamp.h>
 
 void buf_init(Buf *self, size_t capacity, Alloc *alloc)
 {
@@ -22,12 +23,12 @@ void buf_deinit(Buf *self)
 
 void buf_ensure(Buf *self, size_t capacity)
 {
-    capacity = MAX(capacity, 16);
+    capacity = m_max(capacity, 16);
 
     if (capacity <= self->capacity)
         return;
 
-    self->capacity = MAX(self->capacity, 16);
+    self->capacity = m_max(self->capacity, 16);
 
     while (self->capacity < capacity)
         self->capacity += self->capacity / 4;
@@ -61,7 +62,7 @@ Str buf_str(Buf *self)
 
 static IoResult buf_read_impl(Buf *self, char *data, size_t offset, size_t size)
 {
-    size_t read = MIN(size, self->used - offset);
+    size_t read = m_min(size, self->used - offset);
 
     for (size_t i = 0; i < read; i++)
     {

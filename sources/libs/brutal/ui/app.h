@@ -3,9 +3,9 @@
 #include <brutal/ds.h>
 #include <embed/app-decl.h>
 
-typedef struct ui_win UiWin;
+typedef struct _UiWin UiWin;
 
-typedef struct ui_app
+typedef struct _UiApp
 {
     bool alive;
     int result;

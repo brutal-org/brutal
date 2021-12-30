@@ -34,3 +34,8 @@ void embed_app_pump(MAYBE_UNUSED UiApp *self)
         }
     }
 }
+
+void embed_app_wait(MAYBE_UNUSED UiApp *self)
+{
+    SDL_WaitEventTimeout(nullptr, 1000);
+}

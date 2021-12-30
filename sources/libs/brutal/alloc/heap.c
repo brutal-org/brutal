@@ -23,7 +23,7 @@ static HeapMajor *major_block_create(size_t size, NodeSize node_size)
     }
 
     // Make sure it's >= the minimum size.
-    st = MAX(st, (size_t)node_size / MEM_PAGE_SIZE); // The number of pages to request per chunk.
+    st = m_max(st, (size_t)node_size / MEM_PAGE_SIZE); // The number of pages to request per chunk.
 
     HeapMajor *maj;
     if (embed_mem_acquire(st * MEM_PAGE_SIZE, (void **)&maj, EMBED_MEM_NONE).kind != ERR_KIND_SUCCESS)

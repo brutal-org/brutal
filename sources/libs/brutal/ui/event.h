@@ -12,6 +12,7 @@ typedef enum
 typedef struct
 {
     UiEventType type;
+    bool captured;
 
     union
     {

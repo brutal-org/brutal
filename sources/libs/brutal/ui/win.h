@@ -1,14 +1,11 @@
 #pragma once
 
-#include <brutal/alloc/base.h>
-#include <brutal/gfx/buf.h>
 #include <brutal/gfx/gfx.h>
-#include <brutal/ui/app.h>
 #include <brutal/ui/event.h>
 #include <embed/win-decl.h>
 
-typedef struct ui_app UiApp;
-typedef struct ui_body UiBody;
+typedef struct _UiApp UiApp;
+typedef struct _UiWin UiWin;
 
 enum
 {
@@ -18,38 +15,31 @@ enum
     UI_WIN_ANIMATED = 1 << 1,
 };
 
-#define UI_WIN_FIELDS(SELF)                      \
-    int flags;                                   \
-    EmbedWin embed;                              \
-    UiApp *app;                                  \
-    Gfx gfx;                                     \
-                                                 \
-    void (*paint)(SELF * self, Gfx * painter);   \
-    void (*event)(SELF * self, UiEvent * event); \
-    void (*deinit)(SELF * self);
-
-typedef struct ui_win
+struct _UiWin
 {
-    UI_WIN_FIELDS(struct ui_win);
-} UiWin;
+    int refcount;
 
-#define UI_WIN_BASE(SELF)       \
-    union                       \
-    {                           \
-        UiWin base;             \
-        struct                  \
-        {                       \
-            UI_WIN_FIELDS(SELF) \
-        };                      \
-    }
+    int flags;
+    EmbedWin embed;
+    Gfx gfx;
+
+    void (*deinit)(UiWin *self);
+    void (*paint)(UiWin *self, Gfx *gfx);
+    void (*event)(UiWin *self, UiEvent *event);
+
+    struct _UiApp *app;
+    struct _UiView *root;
+};
 
 /* --- Lifecycle ------------------------------------------------------------ */
 
-void ui_win_init(UiWin *win, UiApp *app, Rect bound, int flags);
+UiWin *ui_win_create(UiApp *app, MRect bound, int flags);
 
-void ui_win_destroy(UiWin *self);
+void ui_win_ref(UiWin *self);
 
-/* --- Properties --------------------------------------------------------------- */
+void ui_win_deref(UiWin *self);
+
+/* --- Properties ----------------------------------------------------------- */
 
 void ui_win_hide(UiWin *self);
 
@@ -57,19 +47,33 @@ void ui_win_show(UiWin *self);
 
 bool ui_win_visible(UiWin *self);
 
-void ui_win_resize(UiWin *self, Rect bound);
+void ui_win_resize(UiWin *self, MRect bound);
 
-Rect ui_win_bound(UiWin *self);
+MRect ui_win_bound(UiWin *self);
+
+MRect ui_win_content(UiWin *self);
+
+void ui_win_mount(UiWin *self, struct _UiView *view);
 
 /* --- Paint ---------------------------------------------------------------- */
 
 GfxBuf ui_win_gfx(UiWin *self);
 
+void ui_win_should_repaint(UiWin *self);
+
+void ui_win_should_repaint_rect(UiWin *self, MRect rect);
+
 void ui_win_repaint(UiWin *self);
 
-void ui_win_flip(UiWin *self, Rect rect);
+void ui_win_flip(UiWin *self, MRect rect);
 
 void ui_win_flip_full(UiWin *self);
+
+/* --- Layout --------------------------------------------------------------- */
+
+void ui_win_should_relayout(UiWin *self);
+
+void ui_win_relayout(UiWin *self);
 
 /* --- Events --------------------------------------------------------------- */
 

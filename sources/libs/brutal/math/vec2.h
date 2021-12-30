@@ -3,90 +3,66 @@
 #include <brutal/math/angle.h>
 #include <math.h>
 
-typedef struct
+typedef union
 {
-    float x;
-    float y;
-} Vec2;
+    struct
+    {
+        float x;
+        float y;
+    };
 
-#define vec_create(T, x, y) \
-    ((T){(x), (y)})
+    struct
+    {
+        float width;
+        float height;
+    };
 
-#define vec$(T, VEC) \
-    vec_create((T), (VEC).x, (VEC).y)
+    struct
+    {
+        float left;
+        float right;
+    };
 
-#define vec2_add(a, b) (    \
-    {                       \
-        AutoType __v = (a); \
-        __v.x += (b).x;     \
-        __v.y += (b).y;     \
-        __v;                \
-    })
+    float elements[2];
+} MVec2;
 
-#define vec2_add_v(a, v) (  \
-    {                       \
-        AutoType __v = (a); \
-        __v.x += v;         \
-        __v.y += v;         \
-        __v;                \
-    })
+static inline MVec2 m_vec2(float x, float y)
+{
+    return (MVec2){{x, y}};
+}
 
-#define vec2_sub(a, b) (    \
-    {                       \
-        AutoType __v = (a); \
-        __v.x -= (b).x;     \
-        __v.y -= (b).y;     \
-        __v;                \
-    })
+#define M_VEC2_FUNC(NAME, OP)                                 \
+                                                              \
+    static inline MVec2 m_vec2_##NAME(MVec2 lhs, MVec2 rhs)   \
+    {                                                         \
+        return m_vec2(lhs.x OP rhs.x, lhs.y OP rhs.y);        \
+    }                                                         \
+                                                              \
+    static inline MVec2 m_vec2_##NAME##_v(MVec2 lhs, float v) \
+    {                                                         \
+        return m_vec2(lhs.x OP v, lhs.y OP v);                \
+    }
 
-#define vec2_sub_v(a, v) (  \
-    {                       \
-        AutoType __v = (a); \
-        __v.x -= v;         \
-        __v.y -= v;         \
-        __v;                \
-    })
+M_VEC2_FUNC(add, +)
+M_VEC2_FUNC(sub, -)
+M_VEC2_FUNC(mul, *)
+M_VEC2_FUNC(div, /)
 
-#define vec2_mul(a, b) (    \
-    {                       \
-        AutoType __v = (a); \
-        __v.x *= (b).x;     \
-        __v.y *= (b).y;     \
-        __v;                \
-    })
+static inline float m_vec2_len_squared(MVec2 vec)
+{
+    return vec.x * vec.x + vec.y * vec.y;
+}
 
-#define vec2_mul_v(a, v) (  \
-    {                       \
-        AutoType __v = (a); \
-        __v.x *= v;         \
-        __v.y *= v;         \
-        __v;                \
-    })
+static inline float m_vec2_len(MVec2 vec)
+{
+    return sqrt(m_vec2_len_squared(vec));
+}
 
-#define vec2_div(a, b) (    \
-    {                       \
-        AutoType __v = (a); \
-        __v.x /= (b).x;     \
-        __v.y /= (b).y;     \
-        __v;                \
-    })
+static inline float m_vec2_dist(MVec2 a, MVec2 b)
+{
+    return m_vec2_len(m_vec2_sub(b, a));
+}
 
-#define vec2_div_v(a, v) (  \
-    {                       \
-        AutoType __v = (a); \
-        __v.x /= v;         \
-        __v.y /= v;         \
-        __v;                \
-    })
-
-#define vec2_len_squared(a) \
-    ((a).x * (a).x + (a).y * (a).y)
-
-#define vec2_len(a) \
-    sqrt(vec2_len_squared(a))
-
-#define vec2_distance(a, b) \
-    vec2_len(vec2_sub(b, a))
-
-#define vec2_angle(a) \
+#define m_vec2_angle(a) \
     deg2rad(atan2f((a).y, (a).x))
+

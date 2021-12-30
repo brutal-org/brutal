@@ -91,7 +91,7 @@ void memory_map(uint64_t phys, uint64_t virt, Pages *pml4)
 
 void memory_map_range(VmmRange vmm_range, PmmRange pmm_range)
 {
-    for (size_t i = 0; i < MIN(vmm_range.size, pmm_range.size); i += PAGE_SIZE)
+    for (size_t i = 0; i < m_min(vmm_range.size, pmm_range.size); i += PAGE_SIZE)
     {
         memory_map(i + pmm_range.base, i + vmm_range.base, pages);
     }
@@ -113,6 +113,7 @@ void memory_init(void)
                          .base = 0,
                          .size = GiB(4),
                      });
+
     memory_map_range((VmmRange){
                          .base = (0),
                          .size = GiB(4),

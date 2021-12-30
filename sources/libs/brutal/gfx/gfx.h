@@ -7,8 +7,8 @@
 
 typedef struct
 {
-    Rect clip;
-    Vec2 origine;
+    MRect clip;
+    MVec2 origin;
     GfxPaint fill;
 } GfxCtx;
 
@@ -24,7 +24,7 @@ typedef struct
     Alloc *alloc;
     GfxBuf buf;
     Vec(GfxCtx) ctx;
-    Vec(Vec2) edges;
+    Vec(MVec2) edges;
     Vec(float) active;
 
     float *scanline;
@@ -43,9 +43,9 @@ void gfx_push(Gfx *self);
 
 void gfx_pop(Gfx *self);
 
-void gfx_clip(Gfx *self, Rect rect);
+void gfx_clip(Gfx *self, MRect rect);
 
-void gfx_origine(Gfx *self, Vec2 pos);
+void gfx_origin(Gfx *self, MVec2 pos);
 
 void gfx_fill(Gfx *self, GfxPaint paint);
 
@@ -53,12 +53,12 @@ void gfx_no_fill(Gfx *self);
 
 void gfx_clear(Gfx *self, GfxColor color);
 
-void gfx_dot(Gfx *self, Vec2 dot, float size);
+void gfx_dot(Gfx *self, MVec2 dot, float size);
 
-void gfx_line(Gfx *self, Edgef line, float weight);
+void gfx_line(Gfx *self, MEdge line, float weight);
 
-void gfx_rect(Gfx *self, Rect rect);
+void gfx_rect(Gfx *self, MRect rect);
 
-void gfx_ellipse(Gfx *self, Rect rect);
+void gfx_ellipse(Gfx *self, MRect rect);
 
-void gfx_poly(Gfx *self, Vec2 const *points, size_t len);
+void gfx_poly(Gfx *self, MVec2 const *points, size_t len);

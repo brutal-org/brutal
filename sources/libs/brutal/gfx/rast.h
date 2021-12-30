@@ -40,7 +40,7 @@ typedef struct
         struct
         {
             GfxBuf image;
-            Rect source;
+            MRect source;
         } image_;
     };
 } GfxPaint;
@@ -68,7 +68,7 @@ static inline GfxPaint gfx_paint_gradient(GfxGradient grad)
     };
 }
 
-static inline GfxPaint gfx_paint_image(GfxBuf buf, Rect source)
+static inline GfxPaint gfx_paint_image(GfxBuf buf, MRect source)
 {
     return (GfxPaint){
         .type = GFX_PAINT_IMAGE,

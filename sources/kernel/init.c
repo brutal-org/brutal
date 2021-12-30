@@ -46,7 +46,7 @@ static void elf_load_program(Task *task, Elf64Header const *elf_header, Memory *
             continue;
         }
 
-        size_t size = ALIGN_UP(MAX(prog_header->memory_size, prog_header->file_size), MEM_PAGE_SIZE);
+        size_t size = ALIGN_UP(m_max(prog_header->memory_size, prog_header->file_size), MEM_PAGE_SIZE);
 
         if (!(prog_header->flags & ELF_PROGRAM_HEADER_WRITABLE) &&
             prog_header->file_size == prog_header->memory_size)
