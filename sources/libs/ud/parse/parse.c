@@ -120,16 +120,22 @@ UdFuncCall ud_parse_func_call(Lex *lex, Alloc *alloc)
 
         vec_push(&ret.params, ud_parse_expr(lex, alloc).expr);
 
-        if (lex_peek(lex, 1).type != UDLEX_RPAREN)
+        ud_parse_whitespace(lex);
+
+        if (lex_peek(lex, 1).type != UDLEX_RPAREN && lex_peek(lex, 1).type != UDLEX_WHITESPACE)
         {
             lex_next(lex);
+
             ud_parse_whitespace(lex);
+
             ud_expect(lex, UDLEX_COMMA);
         }
 
         else
         {
             lex_next(lex);
+
+            ud_parse_whitespace(lex);
         }
     }
 
