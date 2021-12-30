@@ -3,84 +3,97 @@
 #include <brutal/base.h>
 #include <brutal/math/vec2.h>
 
-typedef struct
+typedef union
 {
-    float x;
-    float y;
-    float w;
-    float h;
-} Rect;
 
-#define rect_top(RECT) ((RECT).y)
+    struct
+    {
+        float x;
+        float y;
+        float width;
+        float height;
+    };
 
-#define rect_bottom(RECT) ((RECT).y + (RECT).h)
+    struct
+    {
+        MVec2 pos;
+        MVec2 size;
+    };
 
-#define rect_left(RECT) ((RECT).x)
+    float elements[4];
+} MRect;
 
-#define rect_right(RECT) ((RECT).x + (RECT).w)
-
-static inline bool rect_empty(Rect rect)
+static inline MRect m_rect(float x, float y, float z, float w)
 {
-    return (int)rect.w == 0 || (int)rect.h == 0;
+    return (MRect){{x, y, z, w}};
 }
 
-static inline bool rect_collide_rect(Rect recta, Rect rectb)
+#define m_rect_top(RECT) ((RECT).y)
+
+#define m_rect_bottom(RECT) ((RECT).y + (RECT).height)
+
+#define m_rect_start(RECT) ((RECT).x)
+
+#define m_rect_end(RECT) ((RECT).x + (RECT).width)
+
+static inline bool m_rect_empty(MRect rect)
 {
-    return recta.x < rectb.x + rectb.w &&
-           recta.x + recta.w > rectb.x &&
-           recta.y < rectb.y + rectb.h &&
-           recta.h + recta.y > rectb.y;
+    return (int)rect.width == 0 || (int)rect.height == 0;
 }
 
-static inline bool rect_collide_point(Rect rect, Vec2 p)
+static inline bool m_rect_collide_rect(MRect recta, MRect rectb)
 {
-    return rect.x + rect.w <= p.x &&
+    return recta.x < rectb.x + rectb.width &&
+           recta.x + recta.width > rectb.x &&
+           recta.y < rectb.y + rectb.height &&
+           recta.height + recta.y > rectb.y;
+}
+
+static inline bool m_rect_collide_point(MRect rect, MVec2 p)
+{
+    return rect.x + rect.width <= p.x &&
            rect.x >= p.x &&
-           rect.y + rect.h <= p.y &&
+           rect.y + rect.height <= p.y &&
            rect.y >= p.y;
 }
 
-static inline Rect rect_from_points(Vec2 a, Vec2 b)
+static inline MRect m_rect_from_points(MVec2 a, MVec2 b)
 {
-    return (Rect){
-        MIN(a.x, b.x),
-        MIN(a.y, b.y),
-        MAX(a.x, b.x) - MIN(a.x, b.x),
-        MAX(a.y, b.y) - MIN(a.y, b.y),
-    };
+    return (MRect){{
+        m_min(a.x, b.x),
+        m_min(a.y, b.y),
+        m_max(a.x, b.x) - m_min(a.x, b.x),
+        m_max(a.y, b.y) - m_min(a.y, b.y),
+    }};
 }
 
-static inline Rect rect_merge_rect(Rect recta, Rect rectb)
+static inline MRect m_rect_merge_rect(MRect recta, MRect rectb)
 {
-    Vec2 p0 = {
-        MIN(recta.x, rectb.x),
-        MIN(recta.y, rectb.y),
-    };
+    MVec2 p0 = m_vec2(
+        m_min(recta.x, rectb.x),
+        m_min(recta.y, rectb.y));
 
-    Vec2 p1 = {
-        MAX(recta.x + recta.w, rectb.x + rectb.w),
-        MAX(recta.y + recta.h, rectb.y + rectb.h),
-    };
+    MVec2 p1 = m_vec2(
+        m_max(recta.x + recta.width, rectb.x + rectb.width),
+        m_max(recta.y + recta.height, rectb.y + rectb.height));
 
-    return rect_from_points(p0, p1);
+    return m_rect_from_points(p0, p1);
 }
 
-static inline Rect rect_clip_rect(Rect recta, Rect rectb)
+static inline MRect m_rect_clip_rect(MRect recta, MRect rectb)
 {
-    if (!rect_collide_rect(recta, rectb))
+    if (!m_rect_collide_rect(recta, rectb))
     {
-        return (Rect){};
+        return (MRect){};
     }
 
-    Vec2 p0 = {
-        MAX(recta.x, rectb.x),
-        MAX(recta.y, rectb.y),
-    };
+    MVec2 p0 = m_vec2(
+        m_max(recta.x, rectb.x),
+        m_max(recta.y, rectb.y));
 
-    Vec2 p1 = {
-        MIN(recta.x + recta.w, rectb.x + rectb.w),
-        MIN(recta.y + recta.h, rectb.y + rectb.h),
-    };
+    MVec2 p1 = m_vec2(
+        m_min(recta.x + recta.width, rectb.x + rectb.width),
+        m_min(recta.y + recta.height, rectb.y + rectb.height));
 
-    return rect_from_points(p0, p1);
+    return m_rect_from_points(p0, p1);
 }

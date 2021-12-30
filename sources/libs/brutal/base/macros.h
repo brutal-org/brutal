@@ -1,9 +1,5 @@
 #pragma once
 
-#define MIN(x, y) ((x) < (y) ? (x) : (y))
-
-#define MAX(x, y) ((x) > (y) ? (x) : (y))
-
 #define __CONCAT_IMPL(LHS, RHS) LHS##RHS
 #define CONCAT(LHS, RHS) __CONCAT_IMPL(LHS, RHS)
 

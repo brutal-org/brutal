@@ -39,7 +39,7 @@ bool vec_realloc_impl(VecImpl *impl, int new_len)
 
     if (impl->data != nullptr)
     {
-        mem_cpy(ptr, impl->data, MIN(impl->len, new_len) * impl->data_size);
+        mem_cpy(ptr, impl->data, m_min(impl->len, new_len) * impl->data_size);
         alloc_release(impl->alloc, impl->data);
     }
 

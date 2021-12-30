@@ -81,7 +81,7 @@ static inline void gfx_buf_clear(GfxBuf self, GfxColor color)
     }
 }
 
-static inline Rect gfx_buf_bound(GfxBuf self)
+static inline MRect gfx_buf_bound(GfxBuf self)
 {
-    return (Rect){0, 0, self.width, self.height};
+    return m_rect(0, 0, self.width, self.height);
 }

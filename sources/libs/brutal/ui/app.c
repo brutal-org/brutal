@@ -22,6 +22,7 @@ int ui_app_run(UiApp *self)
     {
         ui_app_pump(self);
         ui_app_animate(self);
+        embed_app_wait(self);
     }
 
     ui_app_deinit(self);

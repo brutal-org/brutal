@@ -1,62 +1,95 @@
 #include <brutal/alloc.h>
+#include <brutal/io.h>
 #include <brutal/ui.h>
 
-typedef struct demo_win
+UiWin *demo_win_create(UiApp *app)
 {
-    UI_WIN_BASE(struct demo_win);
+    UiWin *self = ui_win_create(app, m_rect(0, 0, 800, 600), 0);
 
-    int x, y;
-} DemoWin;
+    UiView *container = ui_panel_create(GFX_DARK_GRAY);
+    ui_view_style(
+        container,
+        (UiStyle){
+            .layout = UI_LAYOUT_DOCK,
+            .flow = M_FLOW_TOP_TO_BOTTOM,
+        });
 
-void demo_win_paint(DemoWin *win, Gfx *gfx)
-{
-    gfx_clear(gfx, GFX_BLACK);
+    UiView *toolbar = ui_panel_create(GFX_BLUE);
+    ui_view_style(
+        toolbar,
+        (UiStyle){
+            .layout = UI_LAYOUT_DOCK,
+            .dock = UI_DOCK_TOP,
+            .padding = (UiSpacing){6, 6, 6, 6},
+            .size.max.height = 48,
+        });
 
-    gfx_fill(
-        gfx,
-        gfx_paint_gradient((GfxGradient){
-            .stops = {
-                {0.0, GFX_LIGHT_BLUE},
-                {0.2, GFX_LIGHT_BLUE},
-                {0.2, GFX_PINK},
-                {0.4, GFX_PINK},
-                {0.4, GFX_WHITE},
-                {0.6, GFX_WHITE},
-                {0.6, GFX_PINK},
-                {0.8, GFX_PINK},
-                {0.8, GFX_LIGHT_BLUE},
-                {1.0, GFX_LIGHT_BLUE},
-            },
-            .len = 10,
-        }));
+    ui_view_mount(container, toolbar);
 
-    gfx_poly(
-        gfx,
-        (Vec2[]){
-            {win->x, win->y},
-            {win->x + 128, win->y + 128},
-            {win->x - 128, win->y + 128},
-        },
-        3);
+    UiView *footer = ui_panel_create(GFX_GREEN);
+    ui_view_style(
+        footer,
+        (UiStyle){
+            .layout = UI_LAYOUT_DOCK,
+            .dock = UI_DOCK_BOTTOM,
+            .padding = (UiSpacing){6, 6, 6, 6},
+            .size.max.height = 48,
+        });
 
-    win->x++;
-    win->y++;
-}
+    ui_view_mount(container, footer);
 
-void demo_win_event(MAYBE_UNUSED DemoWin *win, MAYBE_UNUSED UiEvent *event)
-{
-    log$("EVENT");
-}
+    UiView *right_sidebar = ui_panel_create(GFX_RED);
+    ui_view_style(
+        right_sidebar,
+        (UiStyle){
+            .layout = UI_LAYOUT_DOCK,
+            .dock = UI_DOCK_END,
+            .padding = (UiSpacing){6, 6, 6, 6},
+            .size.max.width = 48,
+        });
 
-UiWin *demo_win_create(UiApp *app, Alloc *alloc)
-{
-    DemoWin *self = alloc_make(alloc, DemoWin);
+    ui_view_mount(container, right_sidebar);
 
-    self->paint = demo_win_paint;
-    self->event = demo_win_event;
+    UiView *left_sidebar = ui_panel_create(GFX_YELLOW);
+    ui_view_style(
+        left_sidebar,
+        (UiStyle){
+            .layout = UI_LAYOUT_DOCK,
+            .dock = UI_DOCK_START,
+            .padding = (UiSpacing){6, 6, 6, 6},
+            .size.max.width = 48,
+        });
 
-    ui_win_init(base$(self), app, (Rect){0, 0, 800, 600}, UI_WIN_ANIMATED);
-    return base$(self);
+    ui_view_mount(container, left_sidebar);
+
+    UiView *test = ui_panel_create(GFX_WHITE);
+    ui_view_style(
+        test,
+        (UiStyle){
+            .layout = UI_LAYOUT_DOCK,
+            .dock = UI_DOCK_FILL,
+            .padding = (UiSpacing){6, 6, 6, 6},
+        });
+
+    ui_view_mount(container, test);
+
+    for (int i = 0; i < 5; i++)
+    {
+        UiView *item = ui_panel_create(GFX_DARK_MAGENTA);
+        ui_view_style(
+            item,
+            (UiStyle){
+                .dock = UI_DOCK_END,
+                .margin.start = 4,
+                .size.square = true,
+            });
+
+        ui_view_mount(toolbar, item);
+    }
+
+    ui_win_mount(self, container);
+
+    return self;
 }
 
 int main(int argc, char const *argv[])
@@ -67,8 +100,10 @@ int main(int argc, char const *argv[])
     UiApp app;
     ui_app_init(&app);
 
-    UiWin *win = demo_win_create(&app, alloc_global());
+    UiWin *win = demo_win_create(&app);
     ui_win_show(win);
-
+    Emit emit;
+    emit_init(&emit, io_chan_out());
+    ui_view_dump(win->root, &emit);
     return ui_app_run(&app);
 }

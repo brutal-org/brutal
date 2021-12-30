@@ -1,21 +1,33 @@
 #pragma once
 
 #include <brutal/io/buf.h>
-#include <brutal/math/min_max.h>
+#include <brutal/math/clamp.h>
 #include <brutal/math/rect.h>
 #include <brutal/math/vec2.h>
 
-#define Edge(T) \
-    struct      \
-    {           \
-        T sx;   \
-        T sy;   \
-        T ex;   \
-        T ey;   \
-    }
+typedef union
+{
+    struct
+    {
+        float sx;
+        float sy;
+        float ex;
+        float ey;
+    };
 
-typedef Edge(int) Edgei;
-typedef Edge(float) Edgef;
+    struct
+    {
+        MVec2 start;
+        MVec2 end;
+    };
+} MEdge;
 
-#define edge_min_y(EDGE) math_min((EDGE).sy, (EDGE).ey)
-#define edge_max_y(EDGE) math_max((EDGE).sy, (EDGE).ey)
+static inline MEdge m_edge(float sx, float sy, float ex, float ey)
+{
+    return (MEdge){{sx, sy, ex, ey}};
+}
+
+#define m_edge_min_x(EDGE) m_min((EDGE).sx, (EDGE).ex)
+#define m_edge_max_x(EDGE) m_max((EDGE).sx, (EDGE).ex)
+#define m_edge_min_y(EDGE) m_min((EDGE).sy, (EDGE).ey)
+#define m_edge_max_y(EDGE) m_max((EDGE).sy, (EDGE).ey)
