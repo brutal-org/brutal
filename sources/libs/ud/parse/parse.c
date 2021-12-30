@@ -1,6 +1,5 @@
 #include <brutal/debug.h>
 #include <brutal/ds.h>
-#include <embed/log.h>
 #include <ud/ast.h>
 #include <ud/parse/lexer.h>
 #include <ud/parse/parse.h>
@@ -31,6 +30,8 @@ Str str_from_expr(Alloc *alloc, UdExpr expr)
 
     case UD_EXPR_REFERENCE:
         return expr.reference;
+    case UD_EXPR_BINOP:
+        return str_fmt(alloc, "{} {} {}", str_from_expr(alloc, *expr.bin_op.left), expr.bin_op.op, str_from_expr(alloc, *expr.bin_op.right));
 
     default:
         return str$("unknown");
@@ -45,10 +46,10 @@ void print_stmt(Alloc *alloc, UdStmt stmt)
     {
         if (stmt.decl_.type == UD_DECL_VAR)
         {
-            log$("=== Var definition ===");
-            log$("-> name: {}", stmt.decl_.var.name);
-            log$("-> type: {}", stmt.decl_.var.type.name);
-            log$("-> value: {}", str_from_expr(alloc, stmt.decl_.var.value));
+            log$("=== Var declaration ===");
+            log$("\t -> name: {}", stmt.decl_.var.name);
+            log$("\t -> type: {}", stmt.decl_.var.type.name);
+            log$("\t -> value: {}", str_from_expr(alloc, stmt.decl_.var.value));
         }
     }
 
@@ -102,18 +103,6 @@ UdAstNode ud_parse_expr(Lex *lex)
     return ret;
 }
 
-bool ud_expect(Lex *lex, LexemeType type)
-{
-    if (lex_expect(lex, type))
-    {
-        return true;
-    }
-
-    print(host_log_writer(), "Error while parsing: expected '{}' at {}:{}\n", udlex_to_str(type), lex_curr(lex).line, lex_curr(lex).col);
-
-    return false;
-}
-
 UdAstNode ud_parse_decl(Lex *lex)
 {
     UdAstNode ret = {};
@@ -122,7 +111,7 @@ UdAstNode ud_parse_decl(Lex *lex)
     ret.stmt.type = UD_STMT_DECL;
     ret.stmt.decl_.type = UD_DECL_VAR;
 
-    if (ud_expect(lex, UDLEX_LET))
+    if (lex_expect(lex, UDLEX_LET))
     {
         lex_next(lex);
 

@@ -1,3 +1,4 @@
+#include <embed/log.h>
 #include <ud/ast.h>
 #include <ud/parse/lexer.h>
 
@@ -33,4 +34,16 @@ bool ud_parse_is_separator(Lex *lex, LexemeType type)
 {
     ud_parse_whitespace(lex);
     return lex_curr_type(lex) == type;
+}
+
+bool ud_expect(Lex *lex, LexemeType type)
+{
+    if (lex_expect(lex, type))
+    {
+        return true;
+    }
+
+    print(host_log_writer(), "Error while parsing: expected '{}' at {}:{}\n", udlex_to_str(type), lex_curr(lex).line, lex_curr(lex).col);
+
+    return false;
 }
