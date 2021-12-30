@@ -4,9 +4,54 @@ The following roadmap is always subject to change.
 
 ## Current Milestone
 
-### Milestone 4 - Networking And Shell
+## Milestone 4 - FileSystem, Capabilities and Graphics
 
 - [ ] BBus
+    - [ ] Capabilities
+- [] Graphic Library
+    - [x] SDL Backend
+        - [x] Render
+        - [ ] Events
+    - [ ] Brutal Backend
+        - [ ] Compositor
+            - [ ] Tilling Mode
+            - [ ] Floating Mode
+        - [ ] Client
+            - [x] Render
+            - [ ] Events
+    - [x] Paint
+        - [x] Dots
+        - [x] Lines
+        - [x] Rect
+        - [x] Poly
+    - [ ] Event
+        - [ ] Mouse Events
+        - [ ] Keyboard Events
+    - [ ] Layout
+        - [x] LTR/RTL Layout
+        - [x] Dock Layout
+        - [ ] Flex Layout
+        - [ ] Grid Layout
+    - [ ] Views
+        - [x] Panel
+        - [ ] Icon
+        - [ ] Button
+        - [ ] Label
+        - [ ] Frame
+        - [ ] Image
+        - [ ] Splitter
+        - [ ] Toggle
+        - [ ] Slider
+- [ ] Files System
+    - [x] Ahci
+        - [x] Read
+        - [x] Write
+    - [ ] Ext2Fs
+        - [ ] Read
+        - [ ] Write
+
+### Milestone 5 - Networking and Shell
+
 - [ ] TTy
 - [ ] Shell
 - [ ] Optimise IPCs
