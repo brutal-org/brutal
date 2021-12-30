@@ -21,15 +21,19 @@ Str str_from_constant(Alloc *alloc, UdVal val)
 
     return str$("");
 }
-void print_expr(Alloc *alloc, UdExpr expr)
+
+Str str_from_expr(Alloc *alloc, UdExpr expr)
 {
     switch (expr.type)
     {
     case UD_EXPR_CONSTANT:
-        log$("{}", str_from_constant(alloc, expr.const_));
-        break;
+        return str_from_constant(alloc, expr.const_);
+
+    case UD_EXPR_REFERENCE:
+        return expr.reference;
+
     default:
-        break;
+        return str$("unknown");
     }
 }
 
@@ -44,7 +48,7 @@ void print_stmt(Alloc *alloc, UdStmt stmt)
             log$("=== Var definition ===");
             log$("-> name: {}", stmt.decl_.var.name);
             log$("-> type: {}", stmt.decl_.var.type.name);
-            log$("-> value: {}", str_from_constant(alloc, stmt.decl_.var.value.const_));
+            log$("-> value: {}", str_from_expr(alloc, stmt.decl_.var.value));
         }
     }
 
@@ -76,8 +80,24 @@ UdAstNode ud_parse_expr(Lex *lex)
     UdAstNode ret = {};
 
     ret.type = UD_NODE_EXPR;
-    ret.expr.type = UD_EXPR_CONSTANT;
-    ret.expr.const_ = get_val_from_lexeme(lex_curr(lex));
+
+    if (lex_curr(lex).type == UDLEX_INTEGER || lex_curr(lex).type == UDLEX_STRING)
+    {
+        ret.expr.type = UD_EXPR_CONSTANT;
+
+        ret.expr.const_ = get_val_from_lexeme(lex_curr(lex));
+    }
+
+    else if (lex_curr(lex).type == UDLEX_IDENT)
+    {
+        ret.expr.type = UD_EXPR_REFERENCE;
+        ret.expr.reference = lex_curr(lex).str;
+    }
+
+    else
+    {
+        log$("Cannot parse '{}' yet", lex_curr(lex).str);
+    }
 
     return ret;
 }
