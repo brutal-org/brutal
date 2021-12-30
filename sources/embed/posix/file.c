@@ -108,3 +108,9 @@ IoResult embed_file_write(IoFile *self, uint8_t const *data, size_t size)
 
     return OK(IoResult, result);
 }
+
+IoResult embed_file_seek(EmbedFile *self, int off, int type)
+{
+    ssize_t result = lseek(*self, off, type);
+    return OK(IoResult, result);
+}
