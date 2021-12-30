@@ -1,5 +1,6 @@
 #include <brutal/debug.h>
 #include <brutal/ds.h>
+#include <brutal/io.h>
 #include <ud/ast.h>
 #include <ud/parse/lexer.h>
 #include <ud/parse/parse.h>
@@ -21,28 +22,45 @@ Str str_from_constant(Alloc *alloc, UdVal val)
     return str$("");
 }
 
-Str str_from_expr(Alloc *alloc, UdExpr expr)
+void emit_expr(Emit *emit, Alloc *alloc, UdExpr expr)
 {
     switch (expr.type)
     {
     case UD_EXPR_CONSTANT:
-        return str_from_constant(alloc, expr.const_);
+        emit_fmt(emit, "{}", str_from_constant(alloc, expr.const_));
+        break;
 
     case UD_EXPR_REFERENCE:
-        return expr.reference;
+        emit_fmt(emit, "{}", expr.reference);
+        break;
 
     case UD_EXPR_FUNC_CALL:
-        return str_fmt(alloc, "name={} params=[");
+        emit_fmt(emit, "call(name = {}, params = [", expr.func_call.name);
+
+        int i = 0;
+
+        vec_foreach(param, &expr.func_call.params)
+        {
+            emit_expr(emit, alloc, *param);
+
+            if (i + 1 != expr.func_call.params.len)
+                emit_fmt(emit, ",");
+            i++;
+        }
+
+        emit_fmt(emit, "])");
+
+        break;
 
     case UD_EXPR_BINOP:
-        return str_fmt(alloc, "{} {} {}", str_from_expr(alloc, *expr.bin_op.left), expr.bin_op.op, str_from_expr(alloc, *expr.bin_op.right));
+        break;
 
     default:
-        return str$("unknown");
+        emit_fmt(emit, "unknown\n");
     }
 }
 
-void ud_print_stmt(Alloc *alloc, UdStmt stmt)
+void ud_print_stmt(Emit *emit, Alloc *alloc, UdStmt stmt)
 {
     switch (stmt.type)
     {
@@ -50,10 +68,12 @@ void ud_print_stmt(Alloc *alloc, UdStmt stmt)
     {
         if (stmt.decl_.type == UD_DECL_VAR)
         {
-            log$("=== Var declaration ===");
-            log$("\t -> name: {}", stmt.decl_.var.name);
-            log$("\t -> type: {}", stmt.decl_.var.type.name);
-            log$("\t -> value: {}", str_from_expr(alloc, stmt.decl_.var.value));
+            emit_fmt(emit, "=== Var declaration ===\n");
+            emit_fmt(emit, "\t -> name: {}\n", stmt.decl_.var.name);
+            emit_fmt(emit, "\t -> type: {}\n", stmt.decl_.var.type.name);
+            emit_fmt(emit, "\t -> value: ");
+            emit_expr(emit, alloc, stmt.decl_.var.value);
+            emit_fmt(emit, "\n");
         }
     }
 
@@ -105,7 +125,10 @@ UdFuncCall ud_parse_func_call(Lex *lex, Alloc *alloc)
             ud_expect(lex, UDLEX_COMMA);
         }
 
-        lex_next(lex);
+        else
+        {
+            lex_next(lex);
+        }
     }
 
     return ret;

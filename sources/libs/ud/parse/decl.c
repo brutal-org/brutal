@@ -1,3 +1,4 @@
+#include <brutal/debug.h>
 #include <ud/ast.h>
 #include <ud/parse/lexer.h>
 #include <ud/parse/parse.h>
@@ -12,14 +13,13 @@ UdAstNode ud_parse_decl(Lex *lex, Alloc *alloc)
 
     if (lex_expect(lex, UDLEX_LET))
     {
-        lex_next(lex);
-
         UdVarDecl *decl = &ret.stmt.decl_.var;
 
         ud_parse_whitespace(lex);
 
         if (lex_curr(lex).type == UDLEX_IDENT)
         {
+
             decl->name = lex_curr(lex).str;
 
             lex_next(lex);

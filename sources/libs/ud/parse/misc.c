@@ -43,7 +43,7 @@ bool ud_expect(Lex *lex, LexemeType type)
         return true;
     }
 
-    print(host_log_writer(), "Error while parsing: expected '{}' at {}:{}\n", udlex_to_str(type), lex_curr(lex).line, lex_curr(lex).col);
+    print(embed_log_writer(), "Error while parsing: expected '{}' at {}:{}\n", udlex_to_str(type), lex_curr(lex).line, lex_curr(lex).col);
 
     return false;
 }

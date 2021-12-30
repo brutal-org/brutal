@@ -46,7 +46,7 @@ void eval(Str expr, Alloc *alloc, Emit *emit)
 
     vec_foreach(node, &ret)
     {
-        ud_print_stmt(alloc, node->stmt);
+        ud_print_stmt(emit, alloc, node->stmt);
     }
 
     //bvm_eval(nullptr, nullptr, nullptr);
@@ -87,7 +87,7 @@ int main(int argc, char **argv)
     heap_alloc_init(&heap, NODE_DEFAULT);
 
     Emit emit;
-    emit_init(&emit, io_std_out());
+    emit_init(&emit, io_chan_out());
 
     bool do_repl = false;
 
