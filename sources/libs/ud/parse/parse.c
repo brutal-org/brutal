@@ -89,9 +89,7 @@ bool ud_expect(Lex *lex, LexemeType type)
         return true;
     }
 
-    log$("!! Error while parsing: expected {}", udlex_to_str(type));
-    log$("lex_curr is {}", udlex_to_str(lex_curr(lex).type));
-    log$("At {}:{}", lex_curr(lex).line, lex_curr(lex).col);
+    print(host_log_writer(), "\033[1;31mError while parsing\033[0m: expected '{}' at {}:{}\n", udlex_to_str(type), lex_curr(lex).line, lex_curr(lex).col);
 
     return false;
 }
@@ -127,9 +125,7 @@ UdAstNode ud_parse_decl(Lex *lex)
 
             ud_expect(lex, UDLEX_IDENT);
 
-            decl->type.name = lex_curr(lex).str;
-
-            //lex_next(lex);
+            decl->type.name = lex_peek(lex, -1).str;
         }
 
         else
