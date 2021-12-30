@@ -6,18 +6,11 @@
 typedef enum
 {
     UD_EXPR_NIL,
+    UD_EXPR_CONSTANT,
+    UD_EXPR_BINOP,
+    UD_EXPR_FUNC_CALL,
+    UD_EXPR_CONDITION,
 
-    UD_EXPR_VAL,
-    UD_EXPR_PREFIX,
-    UD_EXPR_INFIX,
-    UD_EXPR_POSTFIX,
-
-    UD_EXPR_IF,
-    UD_EXPR_DO,
-    UD_EXPR_WHILE,
-    UD_EXPR_BLOCK,
-
-    UD_EXPR_RET,
 } UdExprType;
 
 typedef enum
@@ -57,37 +50,19 @@ struct ud_expr
 
     union
     {
-        UdVal val_;
+        UdVal const_;
 
         struct
         {
+            UdExpr *left;
+            UdExpr *right;
             UdOp op;
-            UdExpr *lhs;
-            UdExpr *rhs;
-        } infix_;
+        } bin_op;
 
         struct
         {
-            UdOp op;
-            UdExpr *expr;
-        } prefix_, postfix_;
-
-        struct
-        {
-            UdExpr *cond;
-            UdExpr *then;
-            UdExpr *else_;
-        } if_;
-
-        struct
-        {
-            UdExpr *cond;
-            UdExpr *expr;
-        } while_, do_;
-
-        struct
-        {
-            Vec(UdExpr) exprs;
-        } block_;
+            Str name;
+            Vec(UdExpr) params;
+        } func_call;
     };
 };
