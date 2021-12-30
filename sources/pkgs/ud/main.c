@@ -35,10 +35,13 @@ void eval(Str expr, Alloc *alloc)
 
     Lex lex = ud_lex(&scan, alloc);
 
-    for (int i = 0; i < lex.lexemes.len; i++)
+    /*for (int i = 0; i < lex.lexemes.len; i++)
     {
         log$("{}", udlex_to_str(lex.lexemes.data[i].type));
-    }
+    }*/
+
+    ud_parse(&lex, alloc);
+
     //bvm_eval(nullptr, nullptr, nullptr);
 }
 

@@ -12,7 +12,6 @@ struct
     {UDLEX_PLUS, "+"},
     {UDLEX_STAR, "*"},
     {UDLEX_SLASH, "/"},
-    {UDLEX_BOOL, "bool"},
     {UDLEX_LPAREN, "("},
     {UDLEX_RPAREN, ")"},
     {UDLEX_LBRACKET, "["},
@@ -23,10 +22,7 @@ struct
     {UDLEX_THIN_ARROW, "->"},
     {UDLEX_DOUBLE_EQUAL, "=="},
     {UDLEX_EQUAL, "="},
-    {UDLEX_SEMICOLON, ";"},
-    {UDLEX_INT, "int"},
-    {UDLEX_UINT, "uint"},
-    {UDLEX_CHAR, "char"}};
+    {UDLEX_SEMICOLON, ";"}};
 
 static int isidentchar(char v)
 {

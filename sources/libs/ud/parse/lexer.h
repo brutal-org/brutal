@@ -7,13 +7,6 @@
     LEXEME(COMMENT)             \
     LEXEME(IDENT)               \
     LEXEME(NIL)                 \
-    LEXEME(BOOL)                \
-    LEXEME(U8)                  \
-    LEXEME(U16)                 \
-    LEXEME(U32)                 \
-    LEXEME(U64)                 \
-    LEXEME(INT)                 \
-    LEXEME(UINT)                \
     LEXEME(STRUCT)              \
     LEXEME(SEMICOLON)           \
     LEXEME(FUNC)                \
@@ -36,8 +29,7 @@
     LEXEME(STAR)                \
     LEXEME(INTEGER)             \
     LEXEME(STRING)              \
-    LEXEME(CHARACTER)           \
-    LEXEME(CHAR)
+    LEXEME(CHARACTER)
 
 // clang-format off
 

@@ -4,6 +4,7 @@
 // clang-format off
 #    include <stdio.h>
 #    include <readline/readline.h>
+# 	 include <readline/history.h>
 #	 include <stdlib.h>
 // clang-format on
 #endif
@@ -11,7 +12,11 @@
 Str ud_read_line(Str prompt)
 {
 #ifdef USE_READLINE
-    return str$(readline(prompt.buf));
+    char *str = readline(prompt.buf);
+
+    add_history(str);
+
+    return str$(str);
 #else
     log$("BRUTAL does not support readline");
     return prompt;
