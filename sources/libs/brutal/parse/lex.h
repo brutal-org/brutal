@@ -8,6 +8,9 @@ typedef struct
 {
     Str message;
     Lexeme lexeme;
+
+    int line, col;
+
 } LexError;
 
 typedef struct
@@ -17,6 +20,8 @@ typedef struct
 
     bool has_error;
     LexError error;
+
+    int line, col;
 } Lex;
 
 typedef LexemeType LexFn(Scan *scan);
