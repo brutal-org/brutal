@@ -8,13 +8,4 @@
 
 typedef uint8_t MsBtns;
 
-typedef struct
-{
-    int offx;
-    int offy;
 
-    int vscroll;
-    int hscroll;
-
-    MsBtns btns;
-} MouseEvent;

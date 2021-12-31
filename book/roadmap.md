@@ -11,7 +11,7 @@ The following roadmap is always subject to change.
 - [] Graphic Library
     - [x] SDL Backend
         - [x] Render
-        - [ ] Events
+        - [x] Events
     - [ ] Brutal Backend
         - [ ] Compositor
             - [ ] Tilling Mode
@@ -36,7 +36,7 @@ The following roadmap is always subject to change.
     - [ ] Views
         - [x] Panel
         - [ ] Icon
-        - [ ] Button
+        - [x] Button
         - [x] Text
         - [ ] Frame
         - [ ] Image

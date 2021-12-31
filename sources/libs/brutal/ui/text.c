@@ -8,12 +8,6 @@ void ui_text_paint(UiView *self, Gfx *gfx)
     MRect centered = m_gravity_apply(M_GRAVITY_CENTER, M_FLOW_LEFT_TO_RIGHT, mesures.bound, ui_view_content(self));
     MVec2 orgin = m_vec2_add(centered.pos, mesures.baseline);
 
-    gfx_fill(gfx, gfx_paint_fill(GFX_MAGENTA));
-    gfx_rect(gfx, ui_view_container(self));
-
-    gfx_fill(gfx, gfx_paint_fill(GFX_CYAN));
-    gfx_rect(gfx, centered);
-
     gfx_color(gfx, GFX_BLACK);
     gfx_text(gfx, orgin, ui_text$(self)->text);
 }

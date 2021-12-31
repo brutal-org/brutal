@@ -1,6 +1,7 @@
 #pragma once
 
-#include <brutal/ds.h>
+#include <brutal/ds/vec.h>
+#include <brutal/ui/event.h>
 #include <embed/app-decl.h>
 
 typedef struct _UiWin UiWin;
@@ -24,6 +25,8 @@ int ui_app_run(UiApp *self);
 void ui_app_pump(UiApp *self);
 
 void ui_app_animate(UiApp *self);
+
+void ui_app_dispatch(UiApp *self, UiEvent event);
 
 void ui_app_attach_win(UiApp *self, UiWin *win);
 

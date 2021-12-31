@@ -46,6 +46,17 @@ void ui_app_animate(UiApp *self)
     }
 }
 
+void ui_app_dispatch(UiApp *self, UiEvent event)
+{
+    vec_foreach_v(w, &self->windows)
+    {
+        if (w->handle == event.handle)
+        {
+            ui_win_dispatch(w, &event);
+        }
+    }
+}
+
 void ui_app_attach_win(UiApp *self, UiWin *win)
 {
     vec_push(&self->windows, win);
