@@ -1,14 +1,17 @@
+#include <SDL.h>
 #include <embed/win.h>
 
 void embed_win_init(UiWin *self, MRect bound)
 {
     self->embed.sdl_window = SDL_CreateWindow(
-        "QEMU",
+        "BRUTAL",
         SDL_WINDOWPOS_UNDEFINED,
         SDL_WINDOWPOS_UNDEFINED,
         bound.width,
         bound.height,
         SDL_WINDOW_HIDDEN | SDL_WINDOW_ALLOW_HIGHDPI);
+
+    self->handle = SDL_GetWindowID(self->embed.sdl_window);
 }
 
 void embed_win_deinit(UiWin *self)

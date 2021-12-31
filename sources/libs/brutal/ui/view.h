@@ -7,6 +7,7 @@
 
 #define UI_VIEW_VISIBLE (1 << 0)
 #define UI_VIEW_ENABLED (1 << 1)
+#define UI_VIEW_GREEDY (1 << 2)
 
 typedef uint64_t UiFlags;
 
@@ -64,6 +65,8 @@ void ui_view_unmounted(UiView *self);
 
 /* --- Properties ----------------------------------------------------------- */
 
+MVec2 ui_view_orgin(UiView* self);
+
 MRect ui_view_bound(UiView *self);
 
 MRect ui_view_content(UiView *self);
@@ -95,5 +98,7 @@ void ui_view_place(UiView *self, MRect container);
 void ui_view_layout(UiView *self);
 
 /* --- Events --------------------------------------------------------------- */
+
+UiView *ui_view_lookup(UiView *self, MVec2 pos);
 
 void ui_view_event(UiView *self, UiEvent *event);

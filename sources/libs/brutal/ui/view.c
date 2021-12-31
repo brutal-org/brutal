@@ -81,6 +81,11 @@ void ui_view_unmounted(UiView *self)
 
 /* --- Properties ----------------------------------------------------------- */
 
+MVec2 ui_view_orgin(UiView *self)
+{
+    return m_vec2_add(self->scroll, self->bound.pos);
+}
+
 MRect ui_view_bound(UiView *self)
 {
     return self->bound;
@@ -152,7 +157,7 @@ void ui_view_should_repaint_rect(UiView *self, MRect dirty)
 void ui_view_paint(UiView *self, Gfx *gfx)
 {
     gfx_push(gfx);
-    gfx_origin(gfx, m_vec2_add(self->scroll, self->bound.pos));
+    gfx_origin(gfx, ui_view_orgin(self));
     gfx_clip(gfx, m_rect(0, 0, self->bound.width, self->bound.height));
 
     if (self->paint)
@@ -264,6 +269,26 @@ void ui_view_layout(UiView *self)
 
 /* --- Events --------------------------------------------------------------- */
 
+UiView *ui_view_lookup(UiView *self, MVec2 pos)
+{
+    if (self->flags & UI_VIEW_GREEDY)
+    {
+        return self;
+    }
+
+    vec_foreach_v(child, &self->children)
+    {
+        pos = m_vec2_sub(pos, ui_view_orgin(child));
+
+        if (m_rect_collide_point(ui_view_bound(child), pos))
+        {
+            return ui_view_lookup(child, pos);
+        }
+    }
+
+    return self;
+}
+
 void ui_view_event(UiView *self, UiEvent *event)
 {
     if (self->event)
@@ -273,6 +298,6 @@ void ui_view_event(UiView *self, UiEvent *event)
 
     if (!event->captured && self->parent)
     {
-        ui_view_event(self, event);
+        ui_view_event(self->parent, event);
     }
 }

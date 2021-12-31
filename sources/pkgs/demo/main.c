@@ -42,15 +42,16 @@ UiWin *demo_win_create(UiApp *app)
 
     ui_win_mount(self, container);
 
-    UiView *text = ui_text_create(str$("☺☺☺☺☺☺☺☺"));
+    UiView *button = ui_button_create_with_text(str$("HELLO WORLD!"));
     ui_view_style(
-        text,
+        button,
         (UiStyle){
-            .padding = (UiSpacing){8, 8, 8, 8},
-            .dock = UI_DOCK_END,
+            .margin.start = 4,
+            .dock = UI_DOCK_START,
+            .size.max.width = 160,
         });
 
-    ui_view_mount(toolbar, text);
+    ui_view_mount(toolbar, button);
 
     return self;
 }

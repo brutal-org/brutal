@@ -148,10 +148,3 @@ typedef enum
 
 typedef uint8_t KbMod;
 
-typedef struct
-{
-    KbKey key;
-    KbMod mod;
-    KbMotion motion;
-    Rune rune;
-} KeyboardEvent;

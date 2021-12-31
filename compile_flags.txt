@@ -12,5 +12,5 @@
 -Isources/libs/stdc/ext
 -Ibin/generated
 -Ithirdparty
-
-
+-I/usr/include/SDL2
+-D_REENTRANT

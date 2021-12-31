@@ -17,6 +17,7 @@ enum
 
 struct _UiWin
 {
+    UiWinHandle handle;
     int refcount;
 
     int flags;
@@ -26,6 +27,10 @@ struct _UiWin
     void (*deinit)(UiWin *self);
     void (*paint)(UiWin *self, Gfx *gfx);
     void (*event)(UiWin *self, UiEvent *event);
+
+    struct _UiView *over;
+    struct _UiView *grab;
+    struct _UiView *focus;
 
     struct _UiApp *app;
     struct _UiView *root;
