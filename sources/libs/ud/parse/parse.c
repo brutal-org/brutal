@@ -22,7 +22,7 @@ Str str_from_constant(Alloc *alloc, UdVal val)
     return str$("");
 }
 
-void emit_expr(Emit *emit, Alloc *alloc, UdExpr expr)
+void ud_print_expr(Emit *emit, Alloc *alloc, UdExpr expr)
 {
     switch (expr.type)
     {
@@ -35,13 +35,13 @@ void emit_expr(Emit *emit, Alloc *alloc, UdExpr expr)
         break;
 
     case UD_EXPR_FUNC_CALL:
-        emit_fmt(emit, "call(name = {}, params = [", expr.func_call.name);
+        emit_fmt(emit, "call(name={}, params=[", expr.func_call.name);
 
         int i = 0;
 
         vec_foreach(param, &expr.func_call.params)
         {
-            emit_expr(emit, alloc, *param);
+            ud_print_expr(emit, alloc, *param);
 
             if (i + 1 != expr.func_call.params.len)
                 emit_fmt(emit, ",");
@@ -68,12 +68,9 @@ void ud_print_stmt(Emit *emit, Alloc *alloc, UdStmt stmt)
     {
         if (stmt.decl_.type == UD_DECL_VAR)
         {
-            emit_fmt(emit, "=== Var declaration ===\n");
-            emit_fmt(emit, "\t -> name: {}\n", stmt.decl_.name);
-            emit_fmt(emit, "\t -> type: {}\n", stmt.decl_.var.type.name);
-            emit_fmt(emit, "\t -> value: ");
-            emit_expr(emit, alloc, stmt.decl_.var.value);
-            emit_fmt(emit, "\n");
+            emit_fmt(emit, "VarDecl(name={}, type={}, value=", stmt.decl_.name, stmt.decl_.var.type.name);
+            ud_print_expr(emit, alloc, stmt.decl_.var.value);
+            emit_fmt(emit, ")\n");
         }
     }
 
@@ -181,6 +178,17 @@ UdAst ud_parse(Lex *lex, Alloc *alloc)
 
     vec_init(&ret, alloc);
 
-    vec_push(&ret, ud_parse_decl(lex, alloc));
+    UdAstNode out = ud_parse_decl(lex, alloc);
+
+    if (out.stmt.decl_.type == UD_DECL_NONE)
+    {
+        out = ud_parse_expr(lex, alloc);
+
+        lex_next(lex);
+        ud_expect(lex, UDLEX_SEMICOLON);
+    }
+
+    vec_push(&ret, out);
+
     return ret;
 }

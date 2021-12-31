@@ -36,6 +36,18 @@ bool ud_parse_is_separator(Lex *lex, LexemeType type)
     return lex_curr_type(lex) == type;
 }
 
+bool has_error = false;
+
+bool ud_get_error()
+{
+    return has_error;
+}
+
+void ud_set_error()
+{
+    has_error = true;
+}
+
 bool ud_expect(Lex *lex, LexemeType type)
 {
     if (lex_expect(lex, type))
@@ -44,6 +56,8 @@ bool ud_expect(Lex *lex, LexemeType type)
     }
 
     print(embed_log_writer(), "Error while parsing: expected '{}' at {}:{}\n", udlex_to_str(type), lex_curr(lex).line, lex_curr(lex).col);
+
+    ud_set_error();
 
     return false;
 }

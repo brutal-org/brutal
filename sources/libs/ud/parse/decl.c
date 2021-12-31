@@ -9,10 +9,12 @@ UdAstNode ud_parse_decl(Lex *lex, Alloc *alloc)
 
     ret.type = UD_NODE_STMT;
     ret.stmt.type = UD_STMT_DECL;
-    ret.stmt.decl_.type = UD_DECL_VAR;
+    ret.stmt.decl_.type = UD_DECL_NONE;
 
     if (lex_expect(lex, UDLEX_LET))
     {
+        ret.stmt.decl_.type = UD_DECL_VAR;
+
         UdVarDecl *decl = &ret.stmt.decl_.var;
 
         ud_parse_whitespace(lex);

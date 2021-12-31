@@ -20,4 +20,8 @@ UdAstNode ud_parse_decl(Lex *lex, Alloc *alloc);
 
 UdAstNode ud_parse_expr(Lex *lex, Alloc *alloc);
 
+void ud_print_expr(Emit *emit, Alloc *alloc, UdExpr expr);
 void ud_print_stmt(Emit *, Alloc *, UdStmt);
+
+bool ud_get_error();
+void ud_set_error();
