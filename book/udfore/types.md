@@ -16,13 +16,29 @@
 - Char
 
 ## List
-Lists are an immutable sequence of values
+Lists are immutable sequences of values
 
 ```
 U32[3]
 ```
+### To be reviewed:
+- I believe this kind of list breaks the power of lists in functional languages
+- Making them immutable is a good idea but we shouldn't limit the number of elements
 
-## Dynamic List AKA Vector
+```
+match some_list 
+{
+    head :: tail -> print(tail),
+}
+```
+We should be able to do this ^ as well as passing lists as parameters to functions
+
+```
+func map(list: List(T), fn: Func(T) -> T) -> List(T)
+```
+Like this
+
+## Queues
 
 Values can be pushed and popped, inserted and removed
 
