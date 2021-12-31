@@ -262,13 +262,11 @@ MRect m_flow_set_y(MFlow flow, MRect rect, float value)
     case M_FLOW_LEFT_TO_RIGHT:
     case M_FLOW_RIGHT_TO_LEFT:
         rect.y += d;
-        rect.height += d;
         return rect;
 
     case M_FLOW_TOP_TO_BOTTOM:
     case M_FLOW_BOTTOM_TO_TOP:
         rect.x += d;
-        rect.height += d;
         return rect;
     }
 }

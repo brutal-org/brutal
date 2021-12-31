@@ -3,12 +3,14 @@
 #include <brutal/alloc/base.h>
 #include <brutal/text/rune.h>
 
-StrFix8 rune_to_utf8(Rune rune);
+StrFix8 utf8_from_rune(Rune rune);
 
-size_t rune_len_utf8(Rune rune);
+size_t utf8_rune_len(Rune rune);
 
 Rune utf8_to_rune(Str str);
 
-size_t utf8_len(uint8_t str);
+size_t utf8_byte_len(uint8_t str);
 
-uint8_t *str_to_cstr_utf8(Str str, Alloc *alloc);
+uint8_t *utf8_str_to_cstr(Str str, Alloc *alloc);
+
+bool uft8_next_rune(Str *str, Rune *rune);

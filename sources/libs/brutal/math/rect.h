@@ -51,10 +51,10 @@ static inline bool m_rect_collide_rect(MRect recta, MRect rectb)
 
 static inline bool m_rect_collide_point(MRect rect, MVec2 p)
 {
-    return rect.x + rect.width <= p.x &&
-           rect.x >= p.x &&
-           rect.y + rect.height <= p.y &&
-           rect.y >= p.y;
+    return rect.x + rect.width > p.x &&
+           rect.x <= p.x &&
+           rect.y + rect.height > p.y &&
+           rect.y <= p.y;
 }
 
 static inline MRect m_rect_from_points(MVec2 a, MVec2 b)

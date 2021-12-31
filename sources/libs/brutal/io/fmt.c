@@ -367,7 +367,7 @@ IoResult fmt_char(Fmt self, IoWriter *writer, unsigned int character)
         break;
     }
 
-    StrFix8 utf8 = rune_to_utf8((Rune)character);
+    StrFix8 utf8 = utf8_from_rune((Rune)character);
 
     written += TRY(IoResult, io_print(writer, str$(&utf8)));
 

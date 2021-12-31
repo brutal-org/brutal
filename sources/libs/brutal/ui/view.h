@@ -25,7 +25,7 @@ struct _UiView
     void (*deinit)(UiView *self);
     void (*paint)(UiView *self, Gfx *painter);
     void (*event)(UiView *self, UiEvent *event);
-    MRect (*size)(UiView *self, MRect parent);
+    MRect (*size)(UiView *self);
     void (*layout)(UiView *self);
 
     struct _UiApp *app;

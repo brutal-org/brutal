@@ -179,7 +179,8 @@ MRect ui_view_size(MAYBE_UNUSED UiView *self, MAYBE_UNUSED MRect parent)
 
     if (self->size)
     {
-        result = self->size(self, parent);
+        result = self->size(self);
+        result = ui_spacing_grow(style.padding, style.flow, result);
     }
 
     if (size.min.width)

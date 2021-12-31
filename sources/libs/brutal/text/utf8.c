@@ -1,6 +1,6 @@
 #include <brutal/text/utf8.h>
 
-StrFix8 rune_to_utf8(Rune rune)
+StrFix8 utf8_from_rune(Rune rune)
 {
     if (rune <= 0x7F)
     {
@@ -53,7 +53,7 @@ StrFix8 rune_to_utf8(Rune rune)
     }
 }
 
-size_t rune_len_utf8(Rune rune)
+size_t utf8_rune_len(Rune rune)
 {
     if (rune <= 0x7F)
     {
@@ -77,10 +77,14 @@ size_t rune_len_utf8(Rune rune)
     }
 }
 
+static bool utf8_valid(Str str)
+{
+    return !is_nullstr(str) && str.len >= utf8_byte_len(str.buf[0]);
+}
+
 Rune utf8_to_rune(Str str)
 {
-    if (is_nullstr(str) ||
-        utf8_len(str.buf[0]) > str.len)
+    if (!utf8_valid(str))
     {
         return U'�';
     }
@@ -109,7 +113,7 @@ Rune utf8_to_rune(Str str)
     }
 }
 
-size_t utf8_len(uint8_t first)
+size_t utf8_byte_len(uint8_t first)
 {
     if ((first & 0xf8) == 0xf0)
     {
@@ -129,7 +133,7 @@ size_t utf8_len(uint8_t first)
     }
 }
 
-uint8_t *str_to_cstr_utf8(Str str, Alloc *alloc)
+uint8_t *utf8_str_to_cstr(Str str, Alloc *alloc)
 {
     uint8_t *cstr = (uint8_t *)alloc_malloc(alloc, str.len + 1);
 
@@ -137,4 +141,20 @@ uint8_t *str_to_cstr_utf8(Str str, Alloc *alloc)
     cstr[str.len] = '\0';
 
     return cstr;
+}
+
+bool uft8_next_rune(Str *str, Rune *rune)
+{
+    if (!utf8_valid(*str))
+    {
+        return false;
+    }
+
+    uint8_t len = utf8_byte_len(str->buf[0]);
+    *rune = utf8_to_rune(*str);
+
+    str->buf += len;
+    str->len -= len;
+
+    return true;
 }

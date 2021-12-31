@@ -11,10 +11,10 @@ UiWin *demo_win_create(UiApp *app)
         container,
         (UiStyle){
             .layout = UI_LAYOUT_DOCK,
-            .flow = M_FLOW_TOP_TO_BOTTOM,
+            .flow = M_FLOW_LEFT_TO_RIGHT,
         });
 
-    UiView *toolbar = ui_panel_create(GFX_BLUE);
+    UiView *toolbar = ui_panel_create(GFX_GRAY);
     ui_view_style(
         toolbar,
         (UiStyle){
@@ -26,60 +26,13 @@ UiWin *demo_win_create(UiApp *app)
 
     ui_view_mount(container, toolbar);
 
-    UiView *footer = ui_panel_create(GFX_GREEN);
-    ui_view_style(
-        footer,
-        (UiStyle){
-            .layout = UI_LAYOUT_DOCK,
-            .dock = UI_DOCK_BOTTOM,
-            .padding = (UiSpacing){6, 6, 6, 6},
-            .size.max.height = 48,
-        });
-
-    ui_view_mount(container, footer);
-
-    UiView *right_sidebar = ui_panel_create(GFX_RED);
-    ui_view_style(
-        right_sidebar,
-        (UiStyle){
-            .layout = UI_LAYOUT_DOCK,
-            .dock = UI_DOCK_END,
-            .padding = (UiSpacing){6, 6, 6, 6},
-            .size.max.width = 48,
-        });
-
-    ui_view_mount(container, right_sidebar);
-
-    UiView *left_sidebar = ui_panel_create(GFX_YELLOW);
-    ui_view_style(
-        left_sidebar,
-        (UiStyle){
-            .layout = UI_LAYOUT_DOCK,
-            .dock = UI_DOCK_START,
-            .padding = (UiSpacing){6, 6, 6, 6},
-            .size.max.width = 48,
-        });
-
-    ui_view_mount(container, left_sidebar);
-
-    UiView *test = ui_panel_create(GFX_WHITE);
-    ui_view_style(
-        test,
-        (UiStyle){
-            .layout = UI_LAYOUT_DOCK,
-            .dock = UI_DOCK_FILL,
-            .padding = (UiSpacing){6, 6, 6, 6},
-        });
-
-    ui_view_mount(container, test);
-
     for (int i = 0; i < 5; i++)
     {
-        UiView *item = ui_panel_create(GFX_DARK_MAGENTA);
+        UiView *item = ui_panel_create(GFX_DIM_GRAY);
         ui_view_style(
             item,
             (UiStyle){
-                .dock = UI_DOCK_END,
+                .dock = UI_DOCK_START,
                 .margin.start = 4,
                 .size.square = true,
             });
@@ -88,6 +41,16 @@ UiWin *demo_win_create(UiApp *app)
     }
 
     ui_win_mount(self, container);
+
+    UiView *text = ui_text_create(str$("☺☺☺☺☺☺☺☺"));
+    ui_view_style(
+        text,
+        (UiStyle){
+            .padding = (UiSpacing){8, 8, 8, 8},
+            .dock = UI_DOCK_END,
+        });
+
+    ui_view_mount(toolbar, text);
 
     return self;
 }

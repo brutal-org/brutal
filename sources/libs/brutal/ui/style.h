@@ -2,6 +2,7 @@
 
 #include <brutal/gfx/color.h>
 #include <brutal/math/flow.h>
+#include <brutal/math/gravity.h>
 #include <brutal/math/rect.h>
 
 /* --- Spacing -------------------------------------------------------------- */
@@ -32,73 +33,6 @@ static inline MRect ui_spacing_grow(UiSpacing spacing, MFlow flow, MRect rect)
     rect = m_flow_set_bottom(flow, rect, m_flow_get_bottom(flow, rect) + spacing.bottom);
 
     return rect;
-}
-
-/* --- Gravity -------------------------------------------------------------- */
-
-#define UI_GRAVITY_START (1 << 0)
-#define UI_GRAVITY_TOP (1 << 1)
-
-#define UI_GRAVITY_END (1 << 2)
-#define UI_GRAVITY_BOTTOM (1 << 3)
-
-#define UI_GRAVITY_VSTRETCH (1 << 4)
-#define UI_GRAVITY_HSTRETCH (1 << 5)
-
-#define UI_GRAVITY_VCENTER (1 << 6)
-#define UI_GRAVITY_HCENTER (1 << 7)
-
-#define UI_GRAVITY_VFILL (UI_GRAVITY_VSTRETCH | UI_GRAVITY_START)
-#define UI_GRAVITY_HFILL (UI_GRAVITY_HSTRETCH | UI_GRAVITY_TOP)
-
-#define M_GRAVITY_CENTER (M_GRAVITY_HCENTER | M_GRAVITY_VCENTER)
-#define M_GRAVITY_FILL (M_GRAVITY_VFILL | M_GRAVITY_HFILL)
-
-typedef uint64_t UiGravity;
-
-static inline MRect ui_gravity_apply(UiGravity gravity, MFlow flow, MRect content, MRect container)
-{
-    if (gravity & UI_GRAVITY_START)
-    {
-        content = m_flow_set_start(flow, content, m_flow_get_start(flow, container));
-    }
-
-    if (gravity & UI_GRAVITY_TOP)
-    {
-        content = m_flow_set_top(flow, content, m_flow_get_top(flow, container));
-    }
-
-    if (gravity & UI_GRAVITY_END)
-    {
-        content = m_flow_set_start(flow, content, m_flow_get_end(flow, container) - m_flow_get_width(flow, container));
-    }
-
-    if (gravity & UI_GRAVITY_BOTTOM)
-    {
-        content = m_flow_set_top(flow, content, m_flow_get_bottom(flow, container) - m_flow_get_height(flow, container));
-    }
-
-    if (gravity & UI_GRAVITY_VSTRETCH)
-    {
-        content = m_flow_set_width(flow, content, m_flow_get_width(flow, container));
-    }
-
-    if (gravity & UI_GRAVITY_HSTRETCH)
-    {
-        content = m_flow_set_height(flow, content, m_flow_get_height(flow, container));
-    }
-
-    if (gravity & UI_GRAVITY_HCENTER)
-    {
-        content = m_flow_set_start(flow, content, m_flow_get_hcenter(flow, container) - m_flow_get_width(flow, content) / 2);
-    }
-
-    if (gravity & UI_GRAVITY_VCENTER)
-    {
-        content = m_flow_set_top(flow, content, m_flow_get_vcenter(flow, container) - m_flow_get_height(flow, content) / 2);
-    }
-
-    return content;
 }
 
 /* --- Dock ----------------------------------------------------------------- */
