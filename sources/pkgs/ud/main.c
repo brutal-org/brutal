@@ -5,6 +5,7 @@
 #include <ud/parse/lexer.h>
 #include <ud/parse/parse.h>
 #include <ud/repl.h>
+#include <ud/sema/sema.h>
 
 Str shift(int *argc, char ***argv)
 {
@@ -26,7 +27,7 @@ void repl_eval_builtin(Str command)
     }
 }
 
-void eval(Str expr, Alloc *alloc, Emit *emit)
+void eval(Str expr, Alloc *alloc, Emit *emit, UdSema *sema)
 {
 
     (void)emit;
@@ -49,10 +50,12 @@ void eval(Str expr, Alloc *alloc, Emit *emit)
         ud_print_stmt(emit, alloc, node->stmt);
     }
 
+    ud_sema_analyze(sema, &ret);
+
     //bvm_eval(nullptr, nullptr, nullptr);
 }
 
-void repl(Emit *emit, Alloc *alloc)
+void repl(Emit *emit, Alloc *alloc, UdSema *sema)
 {
     Str prompt = str$("ud \033[1;32m# \033[0m");
 
@@ -73,7 +76,7 @@ void repl(Emit *emit, Alloc *alloc)
 
         else
         {
-            eval(expr, alloc, emit);
+            eval(expr, alloc, emit, sema);
         }
 
         ud_do_repl_cleanup(expr);
@@ -89,6 +92,10 @@ int main(int argc, char **argv)
     Emit emit;
     emit_init(&emit, io_chan_out());
 
+    UdSema sema;
+
+    ud_sema_init(&sema, base$(&heap));
+
     bool do_repl = false;
 
     while (argc != 0)
@@ -103,7 +110,7 @@ int main(int argc, char **argv)
 
     if (do_repl)
     {
-        repl(&emit, base$(&heap));
+        repl(&emit, base$(&heap), &sema);
     }
 
     return 0;

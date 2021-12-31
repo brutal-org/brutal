@@ -20,7 +20,7 @@ UdAstNode ud_parse_decl(Lex *lex, Alloc *alloc)
         if (lex_curr(lex).type == UDLEX_IDENT)
         {
 
-            decl->name = lex_curr(lex).str;
+            ret.stmt.decl_.name = str_dup(lex_curr(lex).str, alloc);
 
             lex_next(lex);
         }
@@ -33,7 +33,7 @@ UdAstNode ud_parse_decl(Lex *lex, Alloc *alloc)
 
             ud_expect(lex, UDLEX_IDENT);
 
-            decl->type.name = lex_peek(lex, -1).str;
+            decl->type.name = str_dup(lex_peek(lex, -1).str, alloc);
         }
 
         else

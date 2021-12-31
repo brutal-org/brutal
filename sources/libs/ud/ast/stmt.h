@@ -11,13 +11,13 @@ typedef enum
 
 typedef struct
 {
-    Str name;
     UdExpr value;
     UdType type;
 } UdVarDecl;
 
 typedef enum
 {
+    UD_DECL_NONE,
     UD_DECL_FUNC,
     UD_DECL_VAR,
     UD_DECL_TYPE,
@@ -25,18 +25,25 @@ typedef enum
 
 typedef struct
 {
+
+    UdDeclType type;
+
+    Str name;
+
+    union
+    {
+        UdVarDecl var;
+    };
+
+} UdDecl;
+
+typedef struct
+{
     UdStmtType type;
 
     union
     {
-        struct
-        {
-            UdDeclType type;
-            union
-            {
-                UdVarDecl var;
-            };
-        } decl_;
+        UdDecl decl_;
     };
 
 } UdStmt;

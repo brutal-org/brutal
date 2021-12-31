@@ -69,7 +69,7 @@ void ud_print_stmt(Emit *emit, Alloc *alloc, UdStmt stmt)
         if (stmt.decl_.type == UD_DECL_VAR)
         {
             emit_fmt(emit, "=== Var declaration ===\n");
-            emit_fmt(emit, "\t -> name: {}\n", stmt.decl_.var.name);
+            emit_fmt(emit, "\t -> name: {}\n", stmt.decl_.name);
             emit_fmt(emit, "\t -> type: {}\n", stmt.decl_.var.type.name);
             emit_fmt(emit, "\t -> value: ");
             emit_expr(emit, alloc, stmt.decl_.var.value);
