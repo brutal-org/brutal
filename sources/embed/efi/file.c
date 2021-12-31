@@ -69,7 +69,7 @@ EfiFileProtocol *efi_rootdir(void)
 
 MaybeError embed_file_open(EmbedFile *self, Str path)
 {
-    uint16_t *cstr = str_to_cstr_utf16(path, alloc_global());
+    uint16_t *cstr = utf16_str_to_cstr(path, alloc_global());
 
     // HACK: EFI expect \ instead of /.
     for (size_t i = 0; cstr[i]; i++)

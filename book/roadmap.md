@@ -24,6 +24,7 @@ The following roadmap is always subject to change.
         - [x] Lines
         - [x] Rect
         - [x] Poly
+        - [x] Text
     - [ ] Event
         - [ ] Mouse Events
         - [ ] Keyboard Events
@@ -36,7 +37,7 @@ The following roadmap is always subject to change.
         - [x] Panel
         - [ ] Icon
         - [ ] Button
-        - [ ] Label
+        - [x] Text
         - [ ] Frame
         - [ ] Image
         - [ ] Splitter

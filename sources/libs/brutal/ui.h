@@ -8,3 +8,4 @@
 #include <brutal/ui/win.h>
 /* --- */
 #include <brutal/ui/panel.h>
+#include <brutal/ui/text.h>

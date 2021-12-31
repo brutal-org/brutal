@@ -9,7 +9,7 @@
 
 MaybeError embed_file_open(EmbedFile *self, Str path)
 {
-    char *cstr = (char *)str_to_cstr_utf8(path, alloc_global());
+    char *cstr = (char *)utf8_str_to_cstr(path, alloc_global());
 
     *self = open(cstr, O_RDONLY);
 
@@ -26,7 +26,7 @@ MaybeError embed_file_open(EmbedFile *self, Str path)
 
 MaybeError embed_file_create(EmbedFile *self, Str path)
 {
-    char *cstr = (char *)str_to_cstr_utf8(path, alloc_global());
+    char *cstr = (char *)utf8_str_to_cstr(path, alloc_global());
 
     *self = open(cstr, O_CREAT | O_WRONLY | O_TRUNC, 0666);
 

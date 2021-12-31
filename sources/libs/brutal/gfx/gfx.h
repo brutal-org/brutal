@@ -10,6 +10,7 @@ typedef struct
     MRect clip;
     MVec2 origin;
     GfxPaint fill;
+    GfxColor color;
 } GfxCtx;
 
 typedef enum
@@ -51,6 +52,8 @@ void gfx_fill(Gfx *self, GfxPaint paint);
 
 void gfx_no_fill(Gfx *self);
 
+void gfx_color(Gfx *self, GfxColor color);
+
 void gfx_clear(Gfx *self, GfxColor color);
 
 void gfx_dot(Gfx *self, MVec2 dot, float size);
@@ -62,3 +65,5 @@ void gfx_rect(Gfx *self, MRect rect);
 void gfx_ellipse(Gfx *self, MRect rect);
 
 void gfx_poly(Gfx *self, MVec2 const *points, size_t len);
+
+void gfx_text(Gfx *self, MVec2 origin, Str text);

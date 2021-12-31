@@ -2,7 +2,7 @@
 #include <brutal/parse/scan.h>
 #include <brutal/text/case.h>
 
-uint16_t *str_to_cstr_utf16(Str str, Alloc *alloc)
+uint16_t *utf16_str_to_cstr(Str str, Alloc *alloc)
 {
     size_t size = (str.len + 1) * 2;
     uint16_t *utf16 = (uint16_t *)alloc_malloc(alloc, size);
@@ -17,7 +17,7 @@ uint16_t *str_to_cstr_utf16(Str str, Alloc *alloc)
     return utf16;
 }
 
-uint16_t *str_to_cstr_utf16_dos(Str str, Alloc *alloc)
+uint16_t *utf16_str_to_cstr_dos(Str str, Alloc *alloc)
 {
     Buf buf;
     buf_init(&buf, (str.len + 1) * 2, alloc);

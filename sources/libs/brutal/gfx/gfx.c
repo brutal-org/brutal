@@ -1,3 +1,4 @@
+#include <brutal/font/font.h>
 #include <brutal/gfx/gfx.h>
 #include <stdlib.h>
 
@@ -48,6 +49,7 @@ void gfx_begin(Gfx *self, GfxBuf buf)
         .clip = gfx_buf_bound(buf),
         .origin = {},
         .fill = gfx_paint_fill(GFX_WHITE),
+        .color = GFX_WHITE,
     };
 
     vec_push(&self->ctx, ctx);
@@ -99,6 +101,11 @@ void gfx_fill(Gfx *self, GfxPaint paint)
 void gfx_no_fill(Gfx *self)
 {
     gfx_fill(self, gfx_paint_fill(GFX_BLACK));
+}
+
+void gfx_color(Gfx *self, GfxColor color)
+{
+    gfx_peek(self)->color = color;
 }
 
 /* --- Drawing -------------------------------------------------------------- */
@@ -280,4 +287,10 @@ FLATTEN void gfx_rast(Gfx *self, MVec2 const *edges, size_t len, GfxFillRule rul
             }
         }
     }
+}
+
+void gfx_text(Gfx *self, MVec2 origin, Str text)
+{
+    origin = m_vec2_add(origin, gfx_peek(self)->origin);
+    bfont_render_str(bfont_builtin(), text, origin, self->buf, gfx_peek(self)->clip, gfx_peek(self)->color);
 }
