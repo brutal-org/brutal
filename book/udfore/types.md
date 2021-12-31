@@ -3,9 +3,6 @@
 ## Primitives Types
 
 - Nil
-- Any
-- Never
-- Bool
 - U8
 - U16
 - U32
@@ -14,8 +11,6 @@
 - I16
 - I32
 - I64
-- USize
-- ISize
 - F32
 - F64
 - Char
