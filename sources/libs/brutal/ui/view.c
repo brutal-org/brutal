@@ -278,10 +278,9 @@ UiView *ui_view_lookup(UiView *self, MVec2 pos)
 
     vec_foreach_v(child, &self->children)
     {
-        pos = m_vec2_sub(pos, ui_view_orgin(child));
-
         if (m_rect_collide_point(ui_view_bound(child), pos))
         {
+            pos = m_vec2_sub(pos, ui_view_orgin(child));
             return ui_view_lookup(child, pos);
         }
     }
@@ -289,7 +288,7 @@ UiView *ui_view_lookup(UiView *self, MVec2 pos)
     return self;
 }
 
-void ui_view_event(UiView *self, UiEvent *event)
+void ui_view_dispatch(UiView *self, UiEvent *event)
 {
     if (self->event)
     {
@@ -298,6 +297,6 @@ void ui_view_event(UiView *self, UiEvent *event)
 
     if (!event->captured && self->parent)
     {
-        ui_view_event(self->parent, event);
+        ui_view_dispatch(self->parent, event);
     }
 }

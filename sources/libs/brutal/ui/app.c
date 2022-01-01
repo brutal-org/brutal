@@ -25,8 +25,6 @@ int ui_app_run(UiApp *self)
         embed_app_wait(self);
     }
 
-    ui_app_deinit(self);
-
     return self->result;
 }
 

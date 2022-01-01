@@ -28,25 +28,25 @@ void ui_button_event(UiView *self, UiEvent *event)
 {
     switch (event->type)
     {
-    case UI_EVENT_MOUSE_DOWN:
-        ui_button$(self)->press = true;
-        ui_view_should_repaint(self);
-        event->captured = true;
-        break;
-
     case UI_EVENT_MOUSE_UP:
         ui_button$(self)->press = false;
         ui_view_should_repaint(self);
         event->captured = true;
         break;
 
-    case UI_EVENT_MOUSE_ENTER:
+    case UI_EVENT_MOUSE_DOWN:
+        ui_button$(self)->press = true;
+        ui_view_should_repaint(self);
+        event->captured = true;
+        break;
+
+    case UI_EVENT_ENTER:
         ui_button$(self)->over = true;
         ui_view_should_repaint(self);
         event->captured = true;
         break;
 
-    case UI_EVENT_MOUSE_LEAVE:
+    case UI_EVENT_LEAVE:
         ui_button$(self)->over = false;
         ui_view_should_repaint(self);
         event->captured = true;

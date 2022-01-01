@@ -53,6 +53,17 @@ UiWin *demo_win_create(UiApp *app)
 
     ui_view_mount(toolbar, button);
 
+    UiView *button1 = ui_button_create_with_text(str$("HELLO FRIENDS!"));
+    ui_view_style(
+        button1,
+        (UiStyle){
+            .margin.start = 4,
+            .dock = UI_DOCK_START,
+            .size.max.width = 160,
+        });
+
+    ui_view_mount(toolbar, button1);
+
     return self;
 }
 
@@ -66,8 +77,11 @@ int main(int argc, char const *argv[])
 
     UiWin *win = demo_win_create(&app);
     ui_win_show(win);
-    Emit emit;
-    emit_init(&emit, io_chan_out());
-    ui_view_dump(win->root, &emit);
-    return ui_app_run(&app);
+
+    int result = ui_app_run(&app);
+
+    ui_win_deref(win);
+    ui_app_deinit(&app);
+
+    return result;
 }
