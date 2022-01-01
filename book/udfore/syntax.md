@@ -3,29 +3,60 @@
 ## Variables
 Variables are defined with `let`
 
-```
+```rs
 let name: type = value;
 ```
 
+Note that variable types can be inferred, like this:
+
+```rs
+let name = value;
+```
+
 ### To be reviewed:
-- Maybe the variable's type could be omitted, as well as `let`?
 - Maybe for mutable variables, we could use `:=` instead of `=` (but that's just me memeing)
 
 
 ## Functions
 Functions are defined with the `func` keyword, for example:
 
-```
+```go
 func my_function(param1: type) -> return_type 
 {
   return 0;
 }
 ```
 
-### To be reviewed:
-- Maybe single-statement functions could be written as `func add_two_nums(param: int, param1: int) = param + param1;` ?
-- What about generic functions? `func generic_func(param: T)` like OCaml (without the need of specifying `<T>` or something) ?
+Note that the return type can also be inferred:
 
+```go
+func my_function()
+{
+  return 0;
+}
+```
+
+### Generic functions
+
+Functions can be made generic by specifying an undefined type as type.
+
+`T` here is an undefined type, note that types can have any name such as `foo` or `bar`
+
+```go
+func my_function(generic_parameter: T) -> T
+```
+
+Here, `T` holds the type of `generic_parameter`
+
+## Lambdas
+Lambdas are anonymous functions.
+
+```py
+lambda (name: type)
+{
+    return 10;
+}
+```
 ## Conditionals
 Every test/check returns a boolean, here are the different tests:
 
@@ -41,7 +72,7 @@ Every test/check returns a boolean, here are the different tests:
 ### If
 If statements are defined with the `if` keyword, like this:
      
-```
+```c
 if (condition)
 {
 // body
@@ -50,16 +81,38 @@ if (condition)
 ### Match
 Match statements allow for pattern matching, similar to OCaml and Haskell:
 
-```
-match x with 
+```rs
+match x 
 {
   3 -> 4, // If x == 3
   _ -> 3 // Else (similar to default: )
 }
 ```
-### To be reviewed:
-- Maybe remove `with` in match?
 
-## Disclaimer
-This file is just a draft written by a guy that makes weird design choices
+## Lists
 
+List is a powerful data type, here are some operations you can do on it:
+
+### Constructing
+
+To construct lists, there are a few operators you can use:
+
+- `::`-> cons operator, `1 :: [2,3,4]` is `[1,2,3,4]`
+- `++` -> concatenate two lists
+
+### Deconstructing
+
+The cons operator can also be used to deconstruct lists for pattern matching
+
+```rs
+match list
+{
+    head :: tail -> print(head), // Note that to discard the tail, you can do head :: _
+}
+```
+
+Here, in the `head :: tail` case, we're matching a non-empty list and deconstructing it.
+
+```
+[1,2,3,4] // 1 :: [2,3,4]
+```
