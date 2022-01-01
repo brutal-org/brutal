@@ -13,9 +13,11 @@ Note that variable types can be inferred, like this:
 let name = value;
 ```
 
-### To be reviewed:
-- Maybe for mutable variables, we could use `:=` instead of `=` (but that's just me memeing)
+Mutable variables are defined with `:=` instead of `=`
 
+```rs
+let name := value;
+```
 
 ## Functions
 Functions are defined with the `func` keyword, for example:
@@ -44,12 +46,12 @@ func return_1() = 1;
 
 ### Generic functions
 
-Functions can be made generic by specifying an undefined type as type.
+Functions can be made generic by adding `@` to the type name.
 
-`T` here is an undefined type; also note that types can have any name such as `foo` or `bar`
+`@T` here means that we want to have the type of `generic_parameter` stored in `T`
 
 ```go
-func my_function(generic_parameter: T) -> T
+func my_function(generic_parameter: @T) -> T
 ```
 
 Here, `T` holds the type of `generic_parameter`
@@ -79,7 +81,7 @@ Every test/check returns a boolean, here are the different tests:
 If statements are defined with the `if` keyword, like this:
      
 ```c
-if (condition)
+if condition
 {
 // body
 }

@@ -24,14 +24,7 @@ T[]
 
 Where T is the type.
 
-## Queues
-
-Values can be pushed and popped, inserted and removed
-
-```
-Queue(T)
-```
-Where T is the type
+Lists can be made dynamic by using `:=` when binding them
 
 ## Tuple/struct
 
