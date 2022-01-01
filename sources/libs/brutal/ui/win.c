@@ -105,30 +105,41 @@ GfxBuf ui_win_gfx(UiWin *self)
 
 void ui_win_should_repaint(MAYBE_UNUSED UiWin *self)
 {
+    ui_win_should_repaint_rect(self, ui_win_bound(self));
 }
 
-void ui_win_should_repaint_rect(MAYBE_UNUSED UiWin *self, MAYBE_UNUSED MRect rect)
+void ui_win_should_repaint_rect(UiWin *self, MAYBE_UNUSED MRect rect)
 {
+    ui_win_repaint_rect(self, rect);
+    ui_win_flip_full(self);
 }
 
 void ui_win_repaint(UiWin *self)
 {
+    ui_win_repaint_rect(self, ui_win_bound(self));
+}
+
+void ui_win_repaint_rect(UiWin *self, MRect rect)
+{
     gfx_begin(&self->gfx, ui_win_gfx(self));
     gfx_clear(&self->gfx, GFX_BLACK);
+    gfx_clip(&self->gfx, rect);
 
     if (self->paint)
     {
+        gfx_push(&self->gfx);
         self->paint(self, &self->gfx);
+        gfx_pop(&self->gfx);
     }
 
     if (self->root)
     {
+        gfx_push(&self->gfx);
         ui_view_paint(self->root, &self->gfx);
+        gfx_pop(&self->gfx);
     }
 
     gfx_end(&self->gfx);
-
-    ui_win_flip_full(self);
 }
 
 void ui_win_flip(UiWin *self, MRect rect)
@@ -156,15 +167,136 @@ void ui_win_relayout(UiWin *self)
 
 /* --- Events --------------------------------------------------------------- */
 
-void ui_win_dispatch(UiWin *self, UiEvent *event)
+void ui_win_update_overing(UiWin *self, UiEvent *event)
 {
-    if (self->event)
+    UiView *overing = ui_view_lookup(self->root, event->mouse.position);
+
+    if (self->overing != overing)
     {
-        self->event(self, event);
+        if (self->overing)
+        {
+            UiEvent mouse_leave_event = {
+                .type = UI_EVENT_LEAVE,
+                .mouse = event->mouse,
+            };
+
+            ui_view_dispatch(self->overing, &mouse_leave_event);
+
+            ui_view_deref(self->overing);
+            self->overing = nullptr;
+        }
+
+        if (overing)
+        {
+            UiEvent mouse_enter_event = {
+                .type = UI_EVENT_ENTER,
+                .mouse = event->mouse,
+            };
+
+            ui_view_dispatch(overing, &mouse_enter_event);
+
+            ui_view_ref(overing);
+            self->overing = overing;
+        }
+    }
+}
+
+void ui_win_handle_keyboard_up(UiWin *self, UiEvent *event)
+{
+    if (self->focus)
+    {
+        ui_view_dispatch(self->overing, event);
+    }
+}
+
+void ui_win_handle_keyboard_down(UiWin *self, UiEvent *event)
+{
+    if (self->focus)
+    {
+        ui_view_dispatch(self->overing, event);
+    }
+}
+
+void ui_win_handle_mouse_up(UiWin *self, UiEvent *event)
+{
+    self->grabbed = false;
+
+    if (self->overing)
+    {
+        ui_view_dispatch(self->overing, event);
     }
 
-    if (self->root)
+    ui_win_update_overing(self, event);
+}
+
+void ui_win_handle_mouse_down(UiWin *self, UiEvent *event)
+{
+    if (self->focus != self->overing)
     {
-        ui_view_event(self->root, event);
+        if (self->focus)
+        {
+            ui_view_deref(self->focus);
+            self->focus = nullptr;
+        }
+
+        if (self->overing)
+        {
+            ui_view_ref(self->overing);
+            self->focus = self->overing;
+        }
+    }
+
+    self->grabbed = true;
+
+    if (self->overing)
+    {
+        ui_view_dispatch(self->overing, event);
+    }
+}
+
+void ui_win_handle_mouse_move(UiWin *self, UiEvent *event)
+{
+    if (!self->grabbed)
+    {
+        ui_win_update_overing(self, event);
+    }
+
+    if (self->overing)
+    {
+        ui_view_dispatch(self->overing, event);
+    }
+}
+
+void ui_win_dispatch(UiWin *self, UiEvent *event)
+{
+    switch (event->type)
+    {
+    case UI_EVENT_KEYBOARD_UP:
+        ui_win_handle_keyboard_up(self, event);
+        break;
+
+    case UI_EVENT_KEYBOARD_DOWN:
+        ui_win_handle_keyboard_down(self, event);
+        break;
+
+    case UI_EVENT_MOUSE_UP:
+        ui_win_handle_mouse_up(self, event);
+        break;
+
+    case UI_EVENT_MOUSE_DOWN:
+        ui_win_handle_mouse_down(self, event);
+        break;
+
+    case UI_EVENT_MOUSE_MOVE:
+        ui_win_handle_mouse_move(self, event);
+        break;
+
+    default:
+        break;
+    }
+
+    if (!event->captured && self->event)
+    {
+        self->event(self, event);
     }
 }

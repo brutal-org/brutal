@@ -65,7 +65,7 @@ void ui_view_unmounted(UiView *self);
 
 /* --- Properties ----------------------------------------------------------- */
 
-MVec2 ui_view_orgin(UiView* self);
+MVec2 ui_view_orgin(UiView *self);
 
 MRect ui_view_bound(UiView *self);
 
@@ -101,4 +101,4 @@ void ui_view_layout(UiView *self);
 
 UiView *ui_view_lookup(UiView *self, MVec2 pos);
 
-void ui_view_event(UiView *self, UiEvent *event);
+void ui_view_dispatch(UiView *self, UiEvent *event);

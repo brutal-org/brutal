@@ -197,3 +197,5 @@ static inline GfxColor gfx_lerp(GfxColor a, GfxColor b, float t)
         a.b + (b.b - a.b) * t,
         a.a + (b.a - a.a) * t);
 }
+
+GfxColor gfx_color_rand(uint8_t alpha);

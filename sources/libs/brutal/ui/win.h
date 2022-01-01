@@ -28,8 +28,8 @@ struct _UiWin
     void (*paint)(UiWin *self, Gfx *gfx);
     void (*event)(UiWin *self, UiEvent *event);
 
-    struct _UiView *over;
-    struct _UiView *grab;
+    bool grabbed;
+    struct _UiView *overing;
     struct _UiView *focus;
 
     struct _UiApp *app;
@@ -69,6 +69,8 @@ void ui_win_should_repaint(UiWin *self);
 void ui_win_should_repaint_rect(UiWin *self, MRect rect);
 
 void ui_win_repaint(UiWin *self);
+
+void ui_win_repaint_rect(UiWin *self, MRect rect);
 
 void ui_win_flip(UiWin *self, MRect rect);
 

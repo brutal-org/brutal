@@ -62,7 +62,7 @@ UiEvent sdl_event_to_ui_event(SDL_Event e)
             return result;
         }
 
-        result.type = UI_EVENT_MOUSE_DOWN;
+        result.type = UI_EVENT_MOUSE_UP;
         result.handle = e.button.windowID;
         result.mouse.position = _last_mouse_pos;
 
@@ -77,7 +77,7 @@ UiEvent sdl_event_to_ui_event(SDL_Event e)
             return result;
         }
 
-        result.type = UI_EVENT_MOUSE_UP;
+        result.type = UI_EVENT_MOUSE_DOWN;
         result.handle = e.button.windowID;
         result.mouse.position = _last_mouse_pos;
 
