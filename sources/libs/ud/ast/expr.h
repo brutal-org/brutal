@@ -2,7 +2,12 @@
 
 #include <brutal/ds.h>
 #include <ud/ast/val.h>
+#include <ud/ast/type.h>
 
+typedef struct ast_node UdAstNode;
+typedef struct ud_expr UdExpr;
+
+// ------------- Enums -----------
 typedef enum
 {
     UD_EXPR_NIL,
@@ -11,6 +16,7 @@ typedef enum
     UD_EXPR_FUNC_CALL,
     UD_EXPR_CONDITION,
     UD_EXPR_REFERENCE,
+    UD_EXPR_DECL,
 
 } UdExprType;
 
@@ -43,8 +49,7 @@ typedef enum
     UD_OP_BNOT,
 } UdOp;
 
-typedef struct ud_expr UdExpr;
-
+// ------------- Structs -----------
 typedef struct
 {
     Str name;
@@ -57,6 +62,52 @@ typedef struct
     UdExpr *right;
     UdOp op;
 } UdBinOp;
+
+typedef struct
+{
+    UdExpr *value;
+    UdType type;
+} UdVarDecl;
+
+typedef enum
+{
+    UD_DECL_NONE,
+    UD_DECL_FUNC,
+    UD_DECL_VAR,
+    UD_DECL_TYPE,
+} UdDeclType;
+
+typedef struct
+{
+    Str name;
+    UdType type;
+} UdFuncParam;
+
+typedef struct
+{
+    Vec(UdAstNode) body;
+    Vec(UdFuncParam) params;
+
+    UdType return_type;
+
+} UdFuncDecl;
+
+
+typedef struct
+{
+
+    UdDeclType type;
+
+    Str name;
+
+    union
+    {
+        UdVarDecl var;
+        UdFuncDecl func;
+    };
+
+} UdDecl;
+
 
 struct ud_expr
 {
@@ -71,5 +122,7 @@ struct ud_expr
         UdBinOp bin_op;
 
         UdFuncCall func_call;
+
+        UdDecl decl;
     };
 };

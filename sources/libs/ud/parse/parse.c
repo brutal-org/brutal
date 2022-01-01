@@ -35,6 +35,7 @@ void ud_print_expr(Emit *emit, Alloc *alloc, UdExpr expr)
         break;
 
     case UD_EXPR_FUNC_CALL:
+    {
         emit_fmt(emit, "Call(name={}, params=[", expr.func_call.name);
 
         int i = 0;
@@ -51,39 +52,31 @@ void ud_print_expr(Emit *emit, Alloc *alloc, UdExpr expr)
         emit_fmt(emit, "])");
 
         break;
+    }
 
     case UD_EXPR_BINOP:
         break;
 
-    default:
-        emit_fmt(emit, "unknown\n");
-    }
-}
-
-void ud_print_stmt(Emit *emit, Alloc *alloc, UdStmt stmt)
-{
-    switch (stmt.type)
+    case UD_EXPR_DECL:
     {
-    case UD_STMT_DECL:
-    {
-        if (stmt.decl_.type == UD_DECL_VAR)
+        if (expr.decl.type == UD_DECL_VAR)
         {
-            emit_fmt(emit, "VarDecl(name={}, type={}, value=", stmt.decl_.name, stmt.decl_.var.type.name);
-            ud_print_expr(emit, alloc, stmt.decl_.var.value);
+            emit_fmt(emit, "VarDecl(name={}, type={}, value=", expr.decl.name, expr.decl.var.type.name);
+            ud_print_expr(emit, alloc, *expr.decl.var.value);
             emit_fmt(emit, ")\n");
         }
 
-        if (stmt.decl_.type == UD_DECL_FUNC)
+        if (expr.decl.type == UD_DECL_FUNC)
         {
-            emit_fmt(emit, "FuncDecl(name={}, return_type={}, params=[", stmt.decl_.name, stmt.decl_.func.return_type.name);
+            emit_fmt(emit, "FuncDecl(name={}, return_type={}, params=[", expr.decl.name, expr.decl.func.return_type.name);
 
             int i = 0;
 
-            vec_foreach(param, &stmt.decl_.func.params)
+            vec_foreach(param, &expr.decl.func.params)
             {
                 emit_fmt(emit, "(name={}, type={})", param->name, param->type.name);
 
-                if (i + 1 != stmt.decl_.func.params.len)
+                if (i + 1 != expr.decl.func.params.len)
                     emit_fmt(emit, ",");
                 i++;
             }
@@ -94,19 +87,13 @@ void ud_print_stmt(Emit *emit, Alloc *alloc, UdStmt stmt)
 
             i = 0;
 
-            vec_foreach(node, &stmt.decl_.func.body)
+            vec_foreach(node, &expr.decl.func.body)
             {
-                if (i + 1 == stmt.decl_.func.body.len)
+                if (i + 1 == expr.decl.func.body.len)
                 {
                     emit_fmt(emit, "return=");
                 }
-
-                if (node->type == UD_NODE_STMT && !ud_get_error())
-                {
-                    ud_print_stmt(emit, alloc, node->stmt);
-                }
-
-                else if (node->type == UD_NODE_EXPR && !ud_get_error())
+                if (!ud_get_error())
                 {
                     ud_print_expr(emit, alloc, node->expr);
                 }
@@ -116,9 +103,12 @@ void ud_print_stmt(Emit *emit, Alloc *alloc, UdStmt stmt)
 
             emit_fmt(emit, "])\n");
         }
+
+        break;
     }
 
     default:
+        emit_fmt(emit, "unknown\n");
         break;
     }
 }
@@ -229,8 +219,6 @@ UdAstNode ud_parse_expr(Lex *lex, Alloc *alloc)
 {
     UdAstNode ret = {};
 
-    ret.type = UD_NODE_EXPR;
-
     if (lex_curr(lex).type == UDLEX_INTEGER || lex_curr(lex).type == UDLEX_STRING)
     {
         ret.expr.type = UD_EXPR_CONSTANT;
@@ -266,7 +254,7 @@ UdAst ud_parse(Lex *lex, Alloc *alloc)
 
     UdAstNode out = ud_parse_decl(lex, alloc);
 
-    if (out.stmt.decl_.type == UD_DECL_NONE)
+    if (out.expr.decl.type == UD_DECL_NONE)
     {
         out = ud_parse_expr(lex, alloc);
 

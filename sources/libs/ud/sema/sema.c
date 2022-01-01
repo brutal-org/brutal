@@ -43,6 +43,8 @@ UdDecl sema_find_reference(UdScope *self, Str name)
     return (UdDecl){};
 }
 
+void sema_add(UdSema *self, UdDecl decl);
+
 bool sema_analyze_expr(UdSema *self, UdExpr expr)
 {
     if (expr.type == UD_EXPR_REFERENCE)
@@ -52,6 +54,17 @@ bool sema_analyze_expr(UdSema *self, UdExpr expr)
             log$("Error: unbound value `{}`", expr.reference);
 
             return false;
+        }
+    }
+
+    if (expr.type == UD_EXPR_DECL)
+    {
+        if (expr.decl.type == UD_DECL_VAR)
+        {
+            if (sema_analyze_expr(self, *expr.decl.var.value))
+            {
+                sema_add(self, expr.decl);
+            }
         }
     }
 
@@ -65,22 +78,7 @@ void sema_add(UdSema *self, UdDecl decl)
 
 void sema_analyze_node(UdSema *self, UdAstNode node)
 {
-    if (node.type == UD_NODE_EXPR)
-    {
-        sema_analyze_expr(self, node.expr);
-    }
-
-    if (node.type == UD_NODE_STMT)
-    {
-        if (node.stmt.type == UD_STMT_DECL)
-        {
-            if (node.stmt.decl_.type == UD_DECL_VAR)
-            {
-                if (sema_analyze_expr(self, node.stmt.decl_.var.value))
-                    sema_add(self, node.stmt.decl_);
-            }
-        }
-    }
+    sema_analyze_expr(self, node.expr);
 }
 
 void ud_sema_analyze(UdSema *self, UdAst *ast)

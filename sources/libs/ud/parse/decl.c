@@ -2,6 +2,7 @@
 #include <ud/ast.h>
 #include <ud/parse/lexer.h>
 #include <ud/parse/parse.h>
+#include "brutal/alloc/base.h"
 
 UdDecl ud_parse_var_decl(Lex *lex, Alloc *alloc)
 {
@@ -41,7 +42,11 @@ UdDecl ud_parse_var_decl(Lex *lex, Alloc *alloc)
 
     ud_parse_whitespace(lex);
 
-    ret.var.value = ud_parse_expr(lex, alloc).expr;
+    ret.var.value = alloc_malloc(alloc, sizeof(UdExpr));
+
+    UdExpr out = ud_parse_expr(lex, alloc).expr;
+
+    mem_cpy(ret.var.value, &out, sizeof(UdExpr));
 
     lex_next(lex);
 
@@ -172,18 +177,17 @@ UdAstNode ud_parse_decl(Lex *lex, Alloc *alloc)
 {
     UdAstNode ret = {};
 
-    ret.type = UD_NODE_STMT;
-    ret.stmt.type = UD_STMT_DECL;
-    ret.stmt.decl_.type = UD_DECL_NONE;
+    ret.expr.type = UD_EXPR_DECL;
+    ret.expr.decl.type = UD_DECL_NONE;
 
     if (lex_expect(lex, UDLEX_LET))
     {
-        ret.stmt.decl_ = ud_parse_var_decl(lex, alloc);
+        ret.expr.decl = ud_parse_var_decl(lex, alloc);
     }
 
     else if (lex_expect(lex, UDLEX_FUNC))
     {
-        ret.stmt.decl_ = ud_parse_func_decl(lex, alloc);
+        ret.expr.decl = ud_parse_func_decl(lex, alloc);
     }
 
     return ret;
