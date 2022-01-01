@@ -23,7 +23,7 @@ Functions are defined with the `func` keyword, for example:
 ```go
 func my_function(param1: type) -> return_type 
 {
-  return 0;
+    return 0;
 }
 ```
 
@@ -32,15 +32,21 @@ Note that the return type can also be inferred:
 ```go
 func my_function()
 {
-  return 0;
+    return 0;
 }
+```
+
+And to simplify things even more, you can define functions with only one expression with `=`:
+
+```go
+func return_1() = 1;
 ```
 
 ### Generic functions
 
 Functions can be made generic by specifying an undefined type as type.
 
-`T` here is an undefined type, note that types can have any name such as `foo` or `bar`
+`T` here is an undefined type; also note that types can have any name such as `foo` or `bar`
 
 ```go
 func my_function(generic_parameter: T) -> T
@@ -84,8 +90,8 @@ Match statements allow for pattern matching, similar to OCaml and Haskell:
 ```rs
 match x 
 {
-  3 -> 4, // If x == 3
-  _ -> 3 // Else (similar to default: )
+    3 -> 4, // If x == 3
+    _ -> 3 // Else (similar to default: )
 }
 ```
 
@@ -97,8 +103,8 @@ List is a powerful data type, here are some operations you can do on it:
 
 To construct lists, there are a few operators you can use:
 
-- `::`-> cons operator, `1 :: [2,3,4]` is `[1,2,3,4]`
-- `++` -> concatenate two lists
+- `::`: cons operator, `1 :: [2,3,4]` is `[1,2,3,4]`
+- `++`: concatenate two lists, `[1,2] ++ [3,4]` is `[1,2,3,4]`
 
 ### Deconstructing
 
@@ -113,6 +119,6 @@ match list
 
 Here, in the `head :: tail` case, we're matching a non-empty list and deconstructing it.
 
-```
+```c++
 [1,2,3,4] // 1 :: [2,3,4]
 ```
