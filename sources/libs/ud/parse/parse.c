@@ -27,15 +27,15 @@ void ud_print_expr(Emit *emit, Alloc *alloc, UdExpr expr)
     switch (expr.type)
     {
     case UD_EXPR_CONSTANT:
-        emit_fmt(emit, "{}", str_from_constant(alloc, expr.const_));
+        emit_fmt(emit, "Constant(value={})", str_from_constant(alloc, expr.const_));
         break;
 
     case UD_EXPR_REFERENCE:
-        emit_fmt(emit, "{}", expr.reference);
+        emit_fmt(emit, "Reference(name={})", expr.reference);
         break;
 
     case UD_EXPR_FUNC_CALL:
-        emit_fmt(emit, "call(name={}, params=[", expr.func_call.name);
+        emit_fmt(emit, "Call(name={}, params=[", expr.func_call.name);
 
         int i = 0;
 
@@ -71,6 +71,50 @@ void ud_print_stmt(Emit *emit, Alloc *alloc, UdStmt stmt)
             emit_fmt(emit, "VarDecl(name={}, type={}, value=", stmt.decl_.name, stmt.decl_.var.type.name);
             ud_print_expr(emit, alloc, stmt.decl_.var.value);
             emit_fmt(emit, ")\n");
+        }
+
+        if (stmt.decl_.type == UD_DECL_FUNC)
+        {
+            emit_fmt(emit, "FuncDecl(name={}, return_type={}, params=[", stmt.decl_.name, stmt.decl_.func.return_type.name);
+
+            int i = 0;
+
+            vec_foreach(param, &stmt.decl_.func.params)
+            {
+                emit_fmt(emit, "(name={}, type={})", param->name, param->type.name);
+
+                if (i + 1 != stmt.decl_.func.params.len)
+                    emit_fmt(emit, ",");
+                i++;
+            }
+
+            emit_fmt(emit, "], ");
+
+            emit_fmt(emit, "body=[");
+
+            i = 0;
+
+            vec_foreach(node, &stmt.decl_.func.body)
+            {
+                if (i + 1 == stmt.decl_.func.body.len)
+                {
+                    emit_fmt(emit, "return=");
+                }
+
+                if (node->type == UD_NODE_STMT && !ud_get_error())
+                {
+                    ud_print_stmt(emit, alloc, node->stmt);
+                }
+
+                else if (node->type == UD_NODE_EXPR && !ud_get_error())
+                {
+                    ud_print_expr(emit, alloc, node->expr);
+                }
+
+                i++;
+            }
+
+            emit_fmt(emit, "])\n");
         }
     }
 
@@ -117,24 +161,66 @@ UdFuncCall ud_parse_func_call(Lex *lex, Alloc *alloc)
 
         vec_push(&ret.params, ud_parse_expr(lex, alloc).expr);
 
+        lex_next(lex);
+
         ud_parse_whitespace(lex);
 
-        if (lex_peek(lex, 1).type != UDLEX_RPAREN && lex_peek(lex, 1).type != UDLEX_WHITESPACE)
+        if (lex_peek(lex, 1).type != UDLEX_RPAREN)
         {
-            lex_next(lex);
-
             ud_parse_whitespace(lex);
 
-            ud_expect(lex, UDLEX_COMMA);
+            if (lex_curr(lex).type != UDLEX_RPAREN)
+            {
+                ud_parse_whitespace(lex);
+
+                ud_expect(lex, UDLEX_COMMA);
+            }
         }
 
         else
         {
+            ud_parse_whitespace(lex);
+
             lex_next(lex);
 
             ud_parse_whitespace(lex);
         }
     }
+
+    return ret;
+}
+
+// Pure crap
+// DON'T USE
+UdBinOp ud_parse_bin_op(Lex *lex, Alloc *alloc)
+{
+    UdBinOp ret = {};
+
+    lex->head -= 1;
+
+    while (lex_curr(lex).type == UDLEX_WHITESPACE)
+    {
+        lex->head -= 1;
+    }
+
+    UdExpr left = ud_parse_expr(lex, alloc).expr;
+
+    log$("{}", left.const_.int_);
+
+    lex_next(lex);
+    lex_next(lex);
+
+    ud_parse_whitespace(lex);
+
+    UdExpr right = ud_parse_expr(lex, alloc).expr;
+
+    log$("{}", right.const_.int_);
+
+    ret.left = alloc_malloc(alloc, sizeof(UdExpr));
+    ret.right = alloc_malloc(alloc, sizeof(UdExpr));
+
+    mem_cpy(ret.left, &left, sizeof(UdExpr));
+    mem_cpy(ret.right, &right, sizeof(UdExpr));
 
     return ret;
 }
@@ -185,6 +271,14 @@ UdAst ud_parse(Lex *lex, Alloc *alloc)
         out = ud_parse_expr(lex, alloc);
 
         lex_next(lex);
+
+        ud_parse_whitespace(lex);
+
+        if (lex_curr(lex).type == UDLEX_PLUS || lex_curr(lex).type == UDLEX_MINUS || lex_curr(lex).type == UDLEX_STAR || lex_curr(lex).type == UDLEX_SLASH)
+        {
+            out = ud_parse_expr(lex, alloc);
+        }
+
         ud_expect(lex, UDLEX_SEMICOLON);
     }
 

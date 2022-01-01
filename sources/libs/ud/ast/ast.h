@@ -8,7 +8,7 @@ typedef enum
     UD_NODE_EXPR,
 } UdAstNodeType;
 
-typedef struct
+typedef struct ast_node
 {
     UdAstNodeType type;
 

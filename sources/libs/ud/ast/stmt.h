@@ -9,6 +9,8 @@ typedef enum
     UD_STMT_WHILE
 } UdStmtType;
 
+typedef struct ast_node UdAstNode;
+
 typedef struct
 {
     UdExpr value;
@@ -25,6 +27,21 @@ typedef enum
 
 typedef struct
 {
+    Str name;
+    UdType type;
+} UdFuncParam;
+
+typedef struct
+{
+    Vec(UdAstNode) body;
+    Vec(UdFuncParam) params;
+
+    UdType return_type;
+
+} UdFuncDecl;
+
+typedef struct
+{
 
     UdDeclType type;
 
@@ -33,6 +50,7 @@ typedef struct
     union
     {
         UdVarDecl var;
+        UdFuncDecl func;
     };
 
 } UdDecl;

@@ -64,6 +64,11 @@ void eval(Str expr, Alloc *alloc, Emit *emit, UdSema *sema)
         ud_sema_analyze(sema, &ret);
     }
 
+    else
+    {
+        ud_set_error(false);
+    }
+
     //bvm_eval(nullptr, nullptr, nullptr);
 }
 

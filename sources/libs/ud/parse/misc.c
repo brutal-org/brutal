@@ -43,9 +43,9 @@ bool ud_get_error()
     return has_error;
 }
 
-void ud_set_error()
+void ud_set_error(bool val)
 {
-    has_error = true;
+    has_error = val;
 }
 
 bool ud_expect(Lex *lex, LexemeType type)
@@ -57,7 +57,7 @@ bool ud_expect(Lex *lex, LexemeType type)
 
     print(embed_log_writer(), "Error while parsing: expected '{}' at {}:{}\n", udlex_to_str(type), lex_curr(lex).line, lex_curr(lex).col);
 
-    ud_set_error();
+    ud_set_error(true);
 
     return false;
 }

@@ -51,6 +51,13 @@ typedef struct
     Vec(UdExpr) params;
 } UdFuncCall;
 
+typedef struct
+{
+    UdExpr *left;
+    UdExpr *right;
+    UdOp op;
+} UdBinOp;
+
 struct ud_expr
 {
     UdExprType type;
@@ -61,12 +68,7 @@ struct ud_expr
 
         Str reference;
 
-        struct
-        {
-            UdExpr *left;
-            UdExpr *right;
-            UdOp op;
-        } bin_op;
+        UdBinOp bin_op;
 
         UdFuncCall func_call;
     };
