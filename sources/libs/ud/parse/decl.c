@@ -132,15 +132,22 @@ UdDecl ud_parse_func_decl(Lex *lex, Alloc *alloc)
 
     ud_parse_whitespace(lex);
 
-    ud_expect(lex, UDLEX_THIN_ARROW);
+    if (lex_expect(lex, UDLEX_THIN_ARROW))
+    {
 
-    ud_expect(lex, UDLEX_WHITESPACE);
+        ud_expect(lex, UDLEX_WHITESPACE);
 
-    ud_parse_whitespace(lex);
+        ud_parse_whitespace(lex);
 
-    ret.func.return_type.name = lex_next(lex).str;
+        ret.func.return_type.name = lex_next(lex).str;
 
-    ud_expect(lex, UDLEX_WHITESPACE);
+        ud_expect(lex, UDLEX_WHITESPACE);
+    }
+
+    else
+    {
+        ret.func.return_type.name = str$("inferred");
+    }
 
     ud_parse_whitespace(lex);
 
