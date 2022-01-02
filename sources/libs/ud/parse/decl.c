@@ -47,7 +47,9 @@ UdDecl ud_parse_var_decl(Lex *lex, Alloc *alloc)
         ret.var.mutable = true;
 
         if (lex_curr(lex).type == UDLEX_COLON)
+        {
             lex_next(lex);
+        }
     }
 
     ud_expect(lex, UDLEX_EQUAL);

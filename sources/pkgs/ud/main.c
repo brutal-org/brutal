@@ -8,6 +8,8 @@
 #include <ud/parse/parse.h>
 #include <ud/repl.h>
 #include <ud/sema/sema.h>
+#include "brutal/io/buf.h"
+#include "brutal/parse/lex.h"
 
 Str shift(int *argc, char ***argv)
 {
@@ -31,8 +33,6 @@ void repl_eval_builtin(Str command)
 
 void eval(Str expr, Alloc *alloc, Emit *emit, UdSema *sema)
 {
-
-    (void)emit;
 
     Scan scan;
 
@@ -61,7 +61,6 @@ void eval(Str expr, Alloc *alloc, Emit *emit, UdSema *sema)
     {
         ud_set_error(false);
     }
-
     //bvm_eval(nullptr, nullptr, nullptr);
 }
 
@@ -93,8 +92,14 @@ void repl(Emit *emit, Alloc *alloc, UdSema *sema)
     }
 }
 
+void eval_file(Str str, Emit *emit, Alloc *alloc, UdSema *sema)
+{
+    eval(str, alloc, emit, sema);
+}
+
 int main(int argc, char **argv)
 {
+    shift(&argc, &argv);
 
     HeapAlloc heap;
     heap_alloc_init(&heap, NODE_DEFAULT);
@@ -108,6 +113,8 @@ int main(int argc, char **argv)
 
     bool do_repl = false;
 
+    Str file = nullstr;
+
     while (argc != 0)
     {
         Str arg = shift(&argc, &argv);
@@ -116,11 +123,33 @@ int main(int argc, char **argv)
         {
             do_repl = true;
         }
+
+        else
+        {
+            file = arg;
+        }
     }
 
     if (do_repl)
     {
         repl(&emit, base$(&heap), &sema);
+    }
+
+    else
+    {
+        IoFile source_file;
+        UNWRAP_OR_PANIC(io_file_open(&source_file, file), "File not found!");
+
+        IoReader source_file_reader = io_file_reader(&source_file);
+
+        Buf source_buf;
+        buf_init(&source_buf, 512, base$(&heap));
+
+        IoWriter source_buf_writer = buf_writer(&source_buf);
+
+        io_copy(&source_file_reader, &source_buf_writer);
+
+        eval_file(buf_str(&source_buf), &emit, base$(&heap), &sema);
     }
 
     return 0;

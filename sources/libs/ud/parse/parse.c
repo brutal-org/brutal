@@ -4,6 +4,8 @@
 #include <ud/ast.h>
 #include <ud/parse/lexer.h>
 #include <ud/parse/parse.h>
+#include "brutal/parse/lex.h"
+#include "ud/ast/expr.h"
 
 UdVal get_val_from_lexeme(Lexeme lexeme)
 {
@@ -144,27 +146,33 @@ UdAst ud_parse(Lex *lex, Alloc *alloc)
 
     vec_init(&ret, alloc);
 
-    UdAstNode out = ud_parse_decl(lex, alloc);
-
-    if (out.expr.decl.type == UD_DECL_NONE)
+    while (lex_curr(lex).type != LEXEME_EOF)
     {
-        out = ud_parse_expr(lex, alloc);
-
-        lex_next(lex);
-
-        ud_parse_whitespace(lex);
-
-        if (lex_curr(lex).type == UDLEX_PLUS || lex_curr(lex).type == UDLEX_MINUS || lex_curr(lex).type == UDLEX_STAR || lex_curr(lex).type == UDLEX_SLASH)
+        if (lex_curr(lex).type != UDLEX_WHITESPACE)
         {
-            out = ud_parse_expr(lex, alloc);
+            UdAstNode out = ud_parse_decl(lex, alloc);
+
+            if (out.expr.decl.type == UD_DECL_NONE)
+            {
+                out = ud_parse_expr(lex, alloc);
+
+                lex_next(lex);
+
+                ud_parse_whitespace(lex);
+
+                ud_expect(lex, UDLEX_SEMICOLON);
+            }
+
+            log$("{}", out.expr.decl.name);
+
+            vec_push(&ret, out);
         }
 
-        ud_parse_whitespace(lex);
-
-        ud_expect(lex, UDLEX_SEMICOLON);
+        else
+        {
+            lex_next(lex);
+        }
     }
-
-    vec_push(&ret, out);
 
     return ret;
 }
