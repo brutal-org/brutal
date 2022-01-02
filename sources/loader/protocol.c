@@ -126,14 +126,14 @@ static int eif_gop_find_mode(EFIGraphicsOutputProtocol *gop, size_t req_width, s
     return gop->mode->max_mode - 1;
 }
 
-static void efi_populate_framebuffer(EFIBootServices *bs, HandoverFramebuffer *fb)
+static void efi_populate_framebuffer(EFIBootServices *bs, HandoverFramebuffer *fb, LoaderFramebuffer const *req_fb)
 {
     EFIGraphicsOutputProtocol *gop;
     EfiGuid gop_guid = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
 
     bs->locate_protocol(&gop_guid, nullptr, (void **)&gop);
 
-    int mode = eif_gop_find_mode(gop, fb->width, fb->height);
+    int mode = eif_gop_find_mode(gop, req_fb->width, req_fb->height);
     EfiStatus status = gop->set_mode(gop, mode);
 
     if (status != EFI_SUCCESS)
@@ -197,7 +197,7 @@ void efi_populate_handover(LoaderEntry const *entry, Handover *ho)
 {
     ho->tag = HANDOVER_TAG;
 
-    efi_populate_framebuffer(efi_st()->boot_services, &ho->framebuffer);
+    efi_populate_framebuffer(efi_st()->boot_services, &ho->framebuffer, &entry->framebuffer);
     efi_load_modules(entry, &ho->modules);
     efi_populate_mmap(&ho->mmap);
     ho->rsdp = efi_find_rsdp();
