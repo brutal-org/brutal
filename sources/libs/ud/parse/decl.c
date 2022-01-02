@@ -125,6 +125,11 @@ UdDecl ud_parse_func_decl(Lex *lex, Alloc *alloc)
             ud_parse_whitespace(lex);
         }
 
+        if (ud_get_error())
+        {
+            break;
+        }
+
         vec_push(&ret.func.params, param);
     }
 
@@ -164,16 +169,25 @@ UdDecl ud_parse_func_decl(Lex *lex, Alloc *alloc)
 
     else if (lex_expect(lex, UDLEX_LCBRACE))
     {
-        lex_next(lex);
+        ud_parse_whitespace(lex);
 
         while (lex_curr(lex).type != UDLEX_RCBRACE)
         {
             UdAst ast = ud_parse(lex, alloc);
 
-            ret.func.body.data = ast.data;
-            ret.func.body.len = ast.len;
+            vec_push(&ret.func.body, ast.data[0]);
 
-            lex_next(lex);
+            if (lex_peek(lex, 1).type == UDLEX_WHITESPACE || lex_curr(lex).type == UDLEX_WHITESPACE)
+            {
+                lex_next(lex);
+
+                ud_parse_whitespace(lex);
+            }
+
+            if (ud_get_error())
+            {
+                break;
+            }
         }
     }
 

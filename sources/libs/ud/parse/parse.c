@@ -67,6 +67,11 @@ UdFuncCall ud_parse_func_call(Lex *lex, Alloc *alloc)
 
             ud_parse_whitespace(lex);
         }
+
+        if (ud_get_error())
+        {
+            break;
+        }
     }
 
     return ret;
@@ -128,11 +133,6 @@ UdAstNode ud_parse_expr(Lex *lex, Alloc *alloc)
     {
         ret.expr.type = UD_EXPR_FUNC_CALL;
         ret.expr.func_call = ud_parse_func_call(lex, alloc);
-    }
-
-    else
-    {
-        log$("Cannot parse '{}' yet", lex_curr(lex).str);
     }
 
     return ret;
