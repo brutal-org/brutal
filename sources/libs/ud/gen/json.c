@@ -1,6 +1,7 @@
 #include <brutal/debug.h>
 #include <json/parser.h>
 #include <ud/gen/json.h>
+#include "brutal/alloc/base.h"
 #include "brutal/ds/vec.h"
 #include "json/emit.h"
 #include "json/objects.h"
@@ -26,12 +27,14 @@ Str ud_str_from_constant(UdVal val, Alloc *alloc)
 
 void ud_emit_constant(UdVal val, Json *json, Alloc *alloc)
 {
-    json_put(json, str$("constant"), json_str(str_dup(ud_str_from_constant(val, alloc), alloc)));
+    json_put(json, str$("constant"), json_str(ud_str_from_constant(val, alloc)));
 }
 
 void ud_emit_reference(Str reference, Json *json, Alloc *alloc)
 {
-    json_put(json, str$("reference"), json_str(str_dup(reference, alloc)));
+    (void)alloc;
+
+    json_put(json, str$("reference"), json_str(reference));
 }
 
 void ud_emit_type(UdType type, Json *json, Alloc *alloc)
@@ -39,7 +42,7 @@ void ud_emit_type(UdType type, Json *json, Alloc *alloc)
     Json jtype = json_object(alloc);
 
     json_put(&jtype, str$("name"), json_str(str_dup(type.name, alloc)));
-    json_put(&jtype, str$("type"), json_str(str_dup(ud_type_to_str(type.type), alloc)));
+    json_put(&jtype, str$("type"), json_str(ud_type_to_str(type.type)));
 
     json_put(json, str$("type"), jtype);
 }
@@ -69,17 +72,17 @@ void ud_emit_func_decl(UdDecl decl, Json *json, Alloc *alloc)
 
     Json body = json_array(alloc);
 
-    json_put(&func, str$("name"), json_str(str_dup(decl.name, alloc)));
+    json_put(&func, str$("name"), json_str(decl.name));
 
-    json_put(&func, str$("return_type"), json_str(str_dup(decl.func.return_type.name, alloc)));
+    json_put(&func, str$("return_type"), json_str(decl.func.return_type.name));
 
     vec_foreach(param, &decl.func.params)
     {
         Json jparam = json_object(alloc);
 
-        json_put(&jparam, str$("name"), json_str(param->name));
+        json_put(&jparam, str$("name"), json_str(str_dup(param->name, alloc)));
 
-        ud_emit_type(decl.var.type, &jparam, alloc);
+        ud_emit_type(param->type, &jparam, alloc);
 
         json_append(&params, jparam);
     }
@@ -178,5 +181,7 @@ void ud_emit_json(UdAst ast, Emit *emit, Alloc *alloc)
 
         json_emit(json, emit);
         emit_fmt(emit, "\n");
+
+        map_deinit(&json.object);
     }
 }

@@ -97,10 +97,11 @@ UdDecl ud_parse_func_decl(Lex *lex, Alloc *alloc)
     // foo: bar
     while (lex_curr(lex).type != UDLEX_RPAREN)
     {
+
         UdFuncParam param = {};
 
         // foo
-        param.name = lex_curr(lex).str;
+        param.name = str_dup(lex_curr(lex).str, alloc);
 
         ud_expect(lex, UDLEX_IDENT);
 
@@ -112,7 +113,7 @@ UdDecl ud_parse_func_decl(Lex *lex, Alloc *alloc)
         ud_parse_whitespace(lex);
 
         // baz
-        param.type.name = lex_next(lex).str;
+        param.type.name = str_dup(lex_next(lex).str, alloc);
 
         param.type.type = ud_str_to_type(param.type.name);
 
@@ -156,7 +157,6 @@ UdDecl ud_parse_func_decl(Lex *lex, Alloc *alloc)
 
     if (lex_expect(lex, UDLEX_THIN_ARROW))
     {
-
         ud_expect(lex, UDLEX_WHITESPACE);
 
         ud_parse_whitespace(lex);

@@ -26,11 +26,9 @@ static inline Str ud_type_to_str(UdTypeType type)
     case UD_GENERIC:
         return str$("Generic");
     case UD_INT:
-        return str$("Int");
     case UD_BOOL:
-        return str$("Bool");
     case UD_STR:
-        return str$("String");
+        return str$("Builtin");
     case UD_USER_DEFINED:
         return str$("User defined");
     case UD_INFERRED:

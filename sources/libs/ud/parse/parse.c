@@ -148,7 +148,7 @@ UdAst ud_parse(Lex *lex, Alloc *alloc)
 
     while (lex_curr(lex).type != LEXEME_EOF)
     {
-        if (lex_curr(lex).type != UDLEX_WHITESPACE)
+        if (lex_curr(lex).type != UDLEX_WHITESPACE && lex_curr(lex).type != UDLEX_COMMENT)
         {
             UdAstNode out = ud_parse_decl(lex, alloc);
 
@@ -161,6 +161,8 @@ UdAst ud_parse(Lex *lex, Alloc *alloc)
                 ud_parse_whitespace(lex);
 
                 ud_expect(lex, UDLEX_SEMICOLON);
+
+                ud_parse_whitespace(lex);
             }
 
             vec_push(&ret, out);
