@@ -41,6 +41,7 @@ void ud_emit_var_decl(UdDecl decl, Json *json, Alloc *alloc)
 
     json_put(&var, str$("name"), json_str(decl.name));
     json_put(&var, str$("type"), json_str(decl.var.type.name));
+    json_put(&var, str$("mutable"), decl.var.mutable ? json_true() : json_false());
 
     ud_emit_expr(*decl.var.value, &var, alloc);
 

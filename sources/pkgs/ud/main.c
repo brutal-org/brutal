@@ -40,11 +40,6 @@ void eval(Str expr, Alloc *alloc, Emit *emit, UdSema *sema)
 
     Lex lex = ud_lex(&scan, alloc);
 
-    /*for (int i = 0; i < lex.lexemes.len; i++)
-    {
-        log$("{}", udlex_to_str(lex.lexemes.data[i].type));
-    }*/
-
     UdAst ret = ud_parse(&lex, alloc);
 
     vec_foreach(node, &ret)
@@ -80,7 +75,7 @@ void repl(Emit *emit, Alloc *alloc, UdSema *sema)
 
         if (expr.buf[0] == '#')
         {
-            if (str_eq(expr, str$("#quit")))
+            if (str_eq(expr, str$("#quit")) || str_eq(expr, str$("#q")))
             {
                 ud_do_repl_cleanup(expr);
                 break;
@@ -117,7 +112,7 @@ int main(int argc, char **argv)
     {
         Str arg = shift(&argc, &argv);
 
-        if (str_eq(arg, str$("--repl")))
+        if (str_eq(arg, str$("--repl")) || str_eq(arg, str$("-r")))
         {
             do_repl = true;
         }

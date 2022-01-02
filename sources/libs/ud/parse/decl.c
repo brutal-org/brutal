@@ -3,6 +3,7 @@
 #include <ud/parse/lexer.h>
 #include <ud/parse/parse.h>
 #include "brutal/alloc/base.h"
+#include "brutal/parse/lex.h"
 
 UdDecl ud_parse_var_decl(Lex *lex, Alloc *alloc)
 {
@@ -14,7 +15,6 @@ UdDecl ud_parse_var_decl(Lex *lex, Alloc *alloc)
 
     if (lex_curr(lex).type == UDLEX_IDENT)
     {
-
         ret.name = str_dup(lex_curr(lex).str, alloc);
 
         lex_next(lex);
@@ -41,6 +41,13 @@ UdDecl ud_parse_var_decl(Lex *lex, Alloc *alloc)
     ud_expect(lex, UDLEX_EQUAL);
 
     ud_parse_whitespace(lex);
+
+    if (lex_expect(lex, UDLEX_COLON))
+    {
+        ret.var.mutable = true;
+
+        lex_next(lex);
+    }
 
     ret.var.value = alloc_malloc(alloc, sizeof(UdExpr));
 

@@ -17,7 +17,7 @@ typedef struct
     union
     {
         Str string;
-        int int_;
+        uint64_t int_;
     };
 
 } UdVal;

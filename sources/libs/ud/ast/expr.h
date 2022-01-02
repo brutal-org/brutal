@@ -67,6 +67,7 @@ typedef struct
 {
     UdExpr *value;
     UdType type;
+    bool mutable;
 } UdVarDecl;
 
 typedef enum
