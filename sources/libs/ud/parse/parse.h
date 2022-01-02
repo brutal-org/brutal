@@ -4,7 +4,8 @@
 #include <ud/ast.h>
 #include <ud/ast/expr.h>
 
-UdAst ud_parse(Lex *lex, Alloc *alloc);
+UdAstNode ud_parse(Lex *lex, Alloc *alloc);
+UdAst ud_parse_file(Lex *lex, Alloc *alloc);
 
 void ud_parse_whitespace(Lex *lex);
 

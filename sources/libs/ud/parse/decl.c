@@ -191,9 +191,12 @@ UdDecl ud_parse_func_decl(Lex *lex, Alloc *alloc)
 
         while (lex_curr(lex).type != UDLEX_RCBRACE)
         {
-            UdAst ast = ud_parse(lex, alloc);
+            UdAstNode node = ud_parse(lex, alloc);
 
-            vec_push(&ret.func.body, ast.data[0]);
+            vec_push(&ret.func.body, node);
+
+            if (lex_curr_type(lex) == UDLEX_RCBRACE)
+                break;
 
             if (lex_peek(lex, 1).type == UDLEX_WHITESPACE || lex_curr(lex).type == UDLEX_WHITESPACE)
             {
@@ -207,6 +210,8 @@ UdDecl ud_parse_func_decl(Lex *lex, Alloc *alloc)
                 break;
             }
         }
+
+        ud_expect(lex, UDLEX_RCBRACE);
     }
 
     return ret;

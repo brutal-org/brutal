@@ -140,7 +140,47 @@ UdAstNode ud_parse_expr(Lex *lex, Alloc *alloc)
     return ret;
 }
 
-UdAst ud_parse(Lex *lex, Alloc *alloc)
+UdAstNode ud_parse(Lex *lex, Alloc *alloc)
+{
+
+    UdAstNode ret = {};
+
+    if (lex_curr_type(lex) == LEXEME_EOF)
+    {
+        return ret;
+    }
+
+    if (lex_curr(lex).type != UDLEX_WHITESPACE && lex_curr(lex).type != UDLEX_COMMENT && lex_curr(lex).type != LEXEME_EOF)
+    {
+        UdAstNode out = ud_parse_decl(lex, alloc);
+
+        if (out.expr.decl.type == UD_DECL_NONE)
+        {
+            out = ud_parse_expr(lex, alloc);
+
+            lex_next(lex);
+
+            ud_parse_whitespace(lex);
+
+            ud_expect(lex, UDLEX_SEMICOLON);
+
+            ud_parse_whitespace(lex);
+        }
+
+        ret = out;
+    }
+
+    else if (lex_curr(lex).type != LEXEME_EOF)
+    {
+        lex_next(lex);
+
+        ret = ud_parse(lex, alloc);
+    }
+
+    return ret;
+}
+
+UdAst ud_parse_file(Lex *lex, Alloc *alloc)
 {
     UdAst ret;
 
@@ -148,30 +188,10 @@ UdAst ud_parse(Lex *lex, Alloc *alloc)
 
     while (lex_curr(lex).type != LEXEME_EOF)
     {
-        if (lex_curr(lex).type != UDLEX_WHITESPACE && lex_curr(lex).type != UDLEX_COMMENT)
-        {
-            UdAstNode out = ud_parse_decl(lex, alloc);
+        UdAstNode node = ud_parse(lex, alloc);
 
-            if (out.expr.decl.type == UD_DECL_NONE)
-            {
-                out = ud_parse_expr(lex, alloc);
-
-                lex_next(lex);
-
-                ud_parse_whitespace(lex);
-
-                ud_expect(lex, UDLEX_SEMICOLON);
-
-                ud_parse_whitespace(lex);
-            }
-
-            vec_push(&ret, out);
-        }
-
-        else
-        {
-            lex_next(lex);
-        }
+        if (node.expr.type != UD_EXPR_NIL)
+            vec_push(&ret, node);
     }
 
     return ret;

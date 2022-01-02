@@ -40,7 +40,7 @@ void eval(Str expr, Alloc *alloc, Emit *emit, UdSema *sema)
 
     Lex lex = ud_lex(&scan, alloc);
 
-    UdAst ret = ud_parse(&lex, alloc);
+    UdAst ret = ud_parse_file(&lex, alloc);
 
     if (!ud_get_error())
     {
