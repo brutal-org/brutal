@@ -1,7 +1,9 @@
 #include <brutal/alloc.h>
 #include <brutal/debug.h>
 #include <brutal/io.h>
+#include <json/emit.h>
 #include <ud/ast.h>
+#include <ud/gen/json.h>
 #include <ud/parse/lexer.h>
 #include <ud/parse/parse.h>
 #include <ud/repl.h>
@@ -49,7 +51,9 @@ void eval(Str expr, Alloc *alloc, Emit *emit, UdSema *sema)
     {
         if (!ud_get_error())
         {
-            ud_print_expr(emit, alloc, node->expr);
+            ud_emit_json(ret, emit, alloc);
+
+            emit_fmt(emit, "\n");
         }
     }
 
