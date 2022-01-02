@@ -59,6 +59,7 @@ UdDecl ud_parse_var_decl(Lex *lex, Alloc *alloc)
 
     lex_next(lex);
 
+    ud_parse_whitespace(lex);
     ud_expect(lex, UDLEX_SEMICOLON);
 
     return ret;
@@ -175,6 +176,7 @@ UdDecl ud_parse_func_decl(Lex *lex, Alloc *alloc)
 
         lex_next(lex);
 
+        ud_parse_whitespace(lex);
         ud_expect(lex, UDLEX_SEMICOLON);
     }
 

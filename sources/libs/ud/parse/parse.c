@@ -159,6 +159,8 @@ UdAst ud_parse(Lex *lex, Alloc *alloc)
             out = ud_parse_expr(lex, alloc);
         }
 
+        ud_parse_whitespace(lex);
+
         ud_expect(lex, UDLEX_SEMICOLON);
     }
 
