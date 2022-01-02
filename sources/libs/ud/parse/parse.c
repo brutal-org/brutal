@@ -125,13 +125,13 @@ UdAstNode ud_parse_expr(Lex *lex, Alloc *alloc)
         ret.expr.const_ = get_val_from_lexeme(lex_curr(lex));
     }
 
-    else if (lex_curr(lex).type == UDLEX_IDENT && lex_peek(lex, 1).type != UDLEX_LPAREN)
+    else if (lex_curr(lex).type == UDLEX_IDENT && !lex_skip_type(lex, UDLEX_LPAREN))
     {
         ret.expr.type = UD_EXPR_REFERENCE;
         ret.expr.reference = lex_curr(lex).str;
     }
 
-    else if (lex_curr(lex).type == UDLEX_IDENT && lex_peek(lex, 1).type == UDLEX_LPAREN)
+    else if (lex_curr(lex).type == UDLEX_IDENT && lex_skip_type(lex, UDLEX_LPAREN))
     {
         ret.expr.type = UD_EXPR_FUNC_CALL;
         ret.expr.func_call = ud_parse_func_call(lex, alloc);
@@ -162,8 +162,6 @@ UdAst ud_parse(Lex *lex, Alloc *alloc)
 
                 ud_expect(lex, UDLEX_SEMICOLON);
             }
-
-            log$("{}", out.expr.decl.name);
 
             vec_push(&ret, out);
         }

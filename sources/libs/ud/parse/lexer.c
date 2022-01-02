@@ -5,9 +5,10 @@ struct
     LexemeType type;
     char const *literal;
 } keywords[] = {
-    {UDLEX_LET, "let "},
-    {UDLEX_FUNC, "func "},
+    {UDLEX_LET, "let"},
+    {UDLEX_FUNC, "func"},
     {UDLEX_COLON, ":"},
+    {UDLEX_THIN_ARROW, "->"},
     {UDLEX_MINUS, "-"},
     {UDLEX_PLUS, "+"},
     {UDLEX_STAR, "*"},
@@ -19,7 +20,6 @@ struct
     {UDLEX_COMMA, ","},
     {UDLEX_LCBRACE, "{"},
     {UDLEX_RCBRACE, "}"},
-    {UDLEX_THIN_ARROW, "->"},
     {UDLEX_DOUBLE_EQUAL, "=="},
     {UDLEX_EQUAL, "="},
     {UDLEX_SEMICOLON, ";"}};

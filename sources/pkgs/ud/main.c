@@ -42,18 +42,12 @@ void eval(Str expr, Alloc *alloc, Emit *emit, UdSema *sema)
 
     UdAst ret = ud_parse(&lex, alloc);
 
-    vec_foreach(node, &ret)
-    {
-        if (!ud_get_error())
-        {
-            ud_emit_json(ret, emit, alloc);
-
-            emit_fmt(emit, "\n");
-        }
-    }
-
     if (!ud_get_error())
     {
+        ud_emit_json(ret, emit, alloc);
+
+        emit_fmt(emit, "\n");
+
         ud_sema_analyze(sema, &ret);
     }
 
