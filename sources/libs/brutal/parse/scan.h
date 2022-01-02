@@ -32,7 +32,11 @@ bool scan_ended(Scan *self);
 
 char scan_peek(Scan *self, int offset);
 
+char scan_peek_is_any(Scan *self, int offset, Str chars);
+
 char scan_curr(Scan *self);
+
+char scan_curr_is_any(Scan *self, Str chars);
 
 char scan_next(Scan *self);
 
@@ -42,11 +46,15 @@ bool scan_skip(Scan *self, char c);
 
 bool scan_skip_word(Scan *self, Str word);
 
+bool scan_skip_any(Scan *self, Str chars);
+
 Str scan_skip_until(Scan *self, ScanMatch *match);
 
-#define scan_skip_space(scan) scan_skip_until(scan, isspace)
+bool scan_skip_space(Scan *self);
 
 bool scan_eat(Scan *self, ScanMatch *match);
+
+bool scan_eat_any(Scan *self, Str chars);
 
 void scan_begin(Scan *self);
 
@@ -61,5 +69,7 @@ void scan_breakpoint(Scan *self);
 bool scan_expect(Scan *self, char c);
 
 bool scan_expect_word(Scan *self, Str word);
+
+bool scan_expect_any(Scan *self, Str chars);
 
 bool scan_dump_error(Scan *self, IoWriter *writer);

@@ -33,17 +33,6 @@ void ui_view_deref(UiView *self)
     alloc_free(alloc_global(), self);
 }
 
-void ui_view_dump(UiView *self, Emit *emit)
-{
-    emit_fmt(emit, "View{{x={}, y={}, width={}, height={}}}\n", self->bound.x, self->bound.y, self->bound.width, self->bound.height);
-    emit_ident(emit);
-    vec_foreach_v(child, &self->children)
-    {
-        ui_view_dump(child, emit);
-    }
-    emit_deident(emit);
-}
-
 /* --- Childrens ------------------------------------------------------------ */
 
 void ui_view_mount(UiView *self, UiView *child)

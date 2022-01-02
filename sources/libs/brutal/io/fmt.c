@@ -176,7 +176,7 @@ static void fmt_parse_min_width(Fmt *fmt, Scan *scan)
         fmt->fill_with_zero = false;
     }
 
-    fmt->min_width = scan_next_number(scan);
+    scan_next_uint(scan, &fmt->min_width);
 }
 
 Fmt fmt_parse(Scan *scan)

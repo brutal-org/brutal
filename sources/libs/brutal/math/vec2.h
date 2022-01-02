@@ -23,7 +23,7 @@ typedef union
         float right;
     };
 
-    float elements[2];
+    float m[2];
 } MVec2;
 
 static inline MVec2 m_vec2(float x, float y)
@@ -63,6 +63,32 @@ static inline float m_vec2_dist(MVec2 a, MVec2 b)
     return m_vec2_len(m_vec2_sub(b, a));
 }
 
+static inline MVec2 m_vec2_norm(MVec2 a)
+{
+    float magn = m_vec2_len(a);
+
+    if (magn != 0)
+    {
+        return m_vec2_div_v(a, magn);
+    }
+    else
+    {
+        return m_vec2(0, 0);
+    }
+}
+
+static inline float m_vec2_dot(MVec2 a, MVec2 b)
+{
+    return a.x * b.x + a.y * b.y;
+}
+
+static inline float m_vec2_angle_with(MVec2 a, MVec2 b)
+{
+    float r = m_vec2_dot(m_vec2_norm(a), m_vec2_norm(b));
+    float sign = (a.x * b.y < a.y * b.x) ? -1.0f : 1.0f;
+
+    return sign * acosf(r);
+}
+
 #define m_vec2_angle(a) \
     deg2rad(atan2f((a).y, (a).x))
-

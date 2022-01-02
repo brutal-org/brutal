@@ -21,7 +21,8 @@ static CVal cparse_cval_string(Lex *lex)
 
 static CVal cparse_cval_integer(Lex *lex)
 {
-    long value = str_to_number(lex_curr(lex).str);
+    long value = 0;
+    str_to_int(lex_curr(lex).str, &value);
     lex_skip_type(lex, CLEX_INTEGER);
 
     return cval_signed(value);

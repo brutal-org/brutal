@@ -36,7 +36,7 @@ CType cparse_declarator_postfix(Lex *lex, CType type, Alloc *alloc)
 
         if (lex_curr_type(lex) == CLEX_INTEGER)
         {
-            size = str_to_number(lex_next(lex).str);
+            str_to_int(lex_next(lex).str, &size);
         }
 
         cparse_expect_separator(lex, CLEX_RBRACKET);

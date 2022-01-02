@@ -14,6 +14,8 @@ The following roadmap is always subject to change.
         - [x] Events
     - [ ] Brutal Backend
         - [ ] Compositor
+            - [ ] Event Dispatch
+            - [ ] Compositing
             - [ ] Tilling Mode
             - [ ] Floating Mode
         - [ ] Client
@@ -25,9 +27,9 @@ The following roadmap is always subject to change.
         - [x] Rect
         - [x] Poly
         - [x] Text
-    - [ ] Event
-        - [ ] Mouse Events
-        - [ ] Keyboard Events
+    - [x] Event
+        - [x] Mouse Events
+        - [x] Keyboard Events
     - [ ] Layout
         - [x] LTR/RTL Layout
         - [x] Dock Layout
@@ -38,10 +40,10 @@ The following roadmap is always subject to change.
         - [ ] Icon
         - [x] Button
         - [x] Text
-        - [ ] Frame
+        - [x] Frame
         - [ ] Image
         - [ ] Splitter
-        - [ ] Toggle
+        - [ ] Switch
         - [ ] Slider
 - [ ] Files System
     - [x] Ahci
