@@ -1,7 +1,7 @@
 #include <bal/abi.h>
 #include <bal/hw.h>
 #include <brutal/debug.h>
-#include <brutal/input.h>
+#include <brutal/ui/event.h>
 #include "ps2.h"
 
 typedef struct
@@ -19,9 +19,8 @@ void ps2_keyboard_handle_key(KbKey key, KbMotion motion)
     log$("ps2kb: key={} motion={}", kbkey_to_str(key), motion ? "up" : "down");
 }
 
-void ps2_mouse_handle_event(MouseEvent event)
+void ps2_mouse_handle_event(MAYBE_UNUSED UiMouseEvent event)
 {
-    log$("ps2mouse: offx={} offy={} vscroll={}, btns={03b}", event.offx, event.offy, event.vscroll, event.btns);
 }
 
 void ps2_keyboard_handle_code(Ps2 *ps2, uint8_t packet)
@@ -69,16 +68,15 @@ void ps2_mouse_handle_finished(Ps2 *ps2)
     }
 
     // decode the new mouse packet
-    MouseEvent event = {};
+    UiMouseEvent event = {};
 
-    event.offx = offx;
-    event.offy = -offy;
-    event.vscroll = scroll;
+    event.offset.x = offx;
+    event.offset.y = -offy;
+    event.scroll.y = scroll;
 
-    event.btns = 0;
-    event.btns |= ((buf[0] >> 0) & 1) ? MSBTN_LEFT : 0;
-    event.btns |= ((buf[0] >> 1) & 1) ? MSBTN_RIGHT : 0;
-    event.btns |= ((buf[0] >> 2) & 1) ? MSBTN_MIDDLE : 0;
+    event.buttons |= ((buf[0] >> 0) & 1) ? MSBTN_LEFT : 0;
+    event.buttons |= ((buf[0] >> 1) & 1) ? MSBTN_RIGHT : 0;
+    event.buttons |= ((buf[0] >> 2) & 1) ? MSBTN_MIDDLE : 0;
 
     ps2_mouse_handle_event(event);
 }
