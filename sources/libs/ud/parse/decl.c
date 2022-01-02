@@ -22,7 +22,7 @@ UdDecl ud_parse_var_decl(Lex *lex, Alloc *alloc)
 
     ud_parse_whitespace(lex);
 
-    if (lex_expect(lex, UDLEX_COLON))
+    if (lex_expect(lex, UDLEX_COLON) && lex_curr(lex).type != UDLEX_EQUAL)
     {
         ud_parse_whitespace(lex);
 
@@ -31,6 +31,8 @@ UdDecl ud_parse_var_decl(Lex *lex, Alloc *alloc)
         ret.var.type.type = ud_str_to_type(lex_peek(lex, -1).str);
 
         ret.var.type.name = str_dup(lex_peek(lex, -1).str, alloc);
+
+        ud_expect(lex, UDLEX_WHITESPACE);
     }
 
     else
@@ -40,16 +42,17 @@ UdDecl ud_parse_var_decl(Lex *lex, Alloc *alloc)
 
     ud_parse_whitespace(lex);
 
-    ud_expect(lex, UDLEX_EQUAL);
-
-    ud_parse_whitespace(lex);
-
-    if (lex_expect(lex, UDLEX_COLON))
+    if (lex_curr(lex).type == UDLEX_COLON || lex_peek(lex, -1).type == UDLEX_COLON)
     {
         ret.var.mutable = true;
 
-        lex_next(lex);
+        if (lex_curr(lex).type == UDLEX_COLON)
+            lex_next(lex);
     }
+
+    ud_expect(lex, UDLEX_EQUAL);
+
+    ud_parse_whitespace(lex);
 
     ret.var.value = alloc_malloc(alloc, sizeof(UdExpr));
 
