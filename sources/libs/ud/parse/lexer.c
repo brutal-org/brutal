@@ -26,7 +26,7 @@ struct
 
 static int isidentchar(char v)
 {
-    return isalpha(v) || v == '_' || v == '$' || isdigit(v);
+    return isalpha(v) || v == '_' || v == '$' || v == '@' || isdigit(v);
 }
 
 static LexemeType ud_lex_impl(Scan *scan)

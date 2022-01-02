@@ -28,6 +28,8 @@ UdDecl ud_parse_var_decl(Lex *lex, Alloc *alloc)
 
         ud_expect(lex, UDLEX_IDENT);
 
+        ret.var.type.type = ud_str_to_type(lex_peek(lex, -1).str);
+
         ret.var.type.name = str_dup(lex_peek(lex, -1).str, alloc);
     }
 
@@ -105,6 +107,8 @@ UdDecl ud_parse_func_decl(Lex *lex, Alloc *alloc)
 
         // baz
         param.type.name = lex_next(lex).str;
+
+        param.type.type = ud_str_to_type(param.type.name);
 
         ud_parse_whitespace(lex);
 

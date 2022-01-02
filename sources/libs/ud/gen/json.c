@@ -33,6 +33,16 @@ void ud_emit_reference(Str reference, Json *json)
     json_put(json, str$("reference"), json_str(reference));
 }
 
+void ud_emit_type(UdType type, Json *json, Alloc *alloc)
+{
+    Json jtype = json_object(alloc);
+
+    json_put(&jtype, str$("name"), json_str(type.name));
+    json_put(&jtype, str$("type"), json_str(ud_type_to_str(type.type)));
+
+    json_put(json, str$("type"), jtype);
+}
+
 void ud_emit_expr(UdExpr expr, Json *json, Alloc *alloc);
 
 void ud_emit_var_decl(UdDecl decl, Json *json, Alloc *alloc)
@@ -40,7 +50,9 @@ void ud_emit_var_decl(UdDecl decl, Json *json, Alloc *alloc)
     Json var = json_object(alloc);
 
     json_put(&var, str$("name"), json_str(decl.name));
-    json_put(&var, str$("type"), json_str(decl.var.type.name));
+
+    ud_emit_type(decl.var.type, &var, alloc);
+
     json_put(&var, str$("mutable"), decl.var.mutable ? json_true() : json_false());
 
     ud_emit_expr(*decl.var.value, &var, alloc);
@@ -65,7 +77,8 @@ void ud_emit_func_decl(UdDecl decl, Json *json, Alloc *alloc)
         Json jparam = json_object(alloc);
 
         json_put(&jparam, str$("name"), json_str(param->name));
-        json_put(&jparam, str$("type"), json_str(param->type.name));
+
+        ud_emit_type(decl.var.type, &jparam, alloc);
 
         json_append(&params, jparam);
     }
