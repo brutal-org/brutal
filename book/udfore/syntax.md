@@ -13,10 +13,10 @@ Note that variable types can be inferred, like this:
 let name = value;
 ```
 
-Mutable variables are defined with `:=` instead of `=`
+Mutable variables are defined with `=:` instead of `=`
 
 ```rs
-let name := value;
+let name =: value;
 ```
 
 ## Functions
