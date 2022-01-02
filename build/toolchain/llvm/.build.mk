@@ -18,13 +18,12 @@ HOST_CFLAGS= \
 	$(CFLAGS_OPT) \
 	$(CFLAGS_WARN) \
 	$(HOST_CFLAGS_INC) \
-	-fsanitize=address \
-	-fsanitize=undefined \
 	`pkg-config sdl2 --cflags`
 
 HOST_LD=ld.lld
 HOST_LDFLAGS= \
-	`pkg-config sdl2 --libs`
+	`pkg-config sdl2 --libs` \
+	-lm
 
 HOST_AR=llvm-ar$(LLVM_VERSION)
 ifeq (, $(shell which $(HOST_AR) 2> /dev/null))

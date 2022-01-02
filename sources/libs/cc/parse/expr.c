@@ -34,9 +34,7 @@ static CExpr cparse_primary_expr(Lex *lex, CUnit *context, Alloc *alloc)
 
     else if (cparse_is_separator(lex, CLEX_INTEGER))
     {
-        long val = str_to_number(lex_curr(lex).str);
-        cparse_skip_separator(lex, CLEX_INTEGER);
-        return cexpr_constant(cval$(val));
+        return cexpr_constant(cparse_val(lex));
     }
 
     else if (cparse_skip_separator(lex, CLEX_LPARENT))

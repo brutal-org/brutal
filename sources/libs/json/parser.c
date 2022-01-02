@@ -24,7 +24,7 @@ static bool json_skip_comment(Scan *scan)
 
 static void json_skip_space_and_comment(Scan *scan)
 {
-    while (scan_skip_space(scan).len != 0 || json_skip_comment(scan))
+    while (scan_skip_space(scan) || json_skip_comment(scan))
         ;
 }
 
@@ -114,7 +114,9 @@ Json json_parse(Scan *scan, Alloc *alloc)
     }
     else if (isdigit(scan_curr(scan)) || scan_curr(scan) == '-') // number
     {
-        return json_number(scan_next_number(scan));
+        long value = 0;
+        scan_next_int(scan, &value);
+        return json_number(value);
     }
     else if (scan_skip_word(scan, str$("true"))) // boolean (true)
     {

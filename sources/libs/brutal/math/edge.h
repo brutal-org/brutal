@@ -27,6 +27,11 @@ static inline MEdge m_edge(float sx, float sy, float ex, float ey)
     return (MEdge){{sx, sy, ex, ey}};
 }
 
+static inline MEdge m_edge_vec2(MVec2 start, MVec2 end)
+{
+    return (MEdge){.start = start, .end = end};
+}
+
 #define m_edge_min_x(EDGE) m_min((EDGE).sx, (EDGE).ex)
 #define m_edge_max_x(EDGE) m_max((EDGE).sx, (EDGE).ex)
 #define m_edge_min_y(EDGE) m_min((EDGE).sy, (EDGE).ey)

@@ -49,8 +49,6 @@ void ui_view_ref(UiView *self);
 
 void ui_view_deref(UiView *self);
 
-void ui_view_dump(UiView *self, Emit *emit);
-
 /* --- Childrens ------------------------------------------------------------ */
 
 void ui_view_mount(UiView *self, UiView *child);

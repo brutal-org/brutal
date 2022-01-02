@@ -4,6 +4,14 @@
 
 long scan_next_digit(Scan *self);
 
-long scan_next_number(Scan *self);
+bool scan_next_uint(Scan *self, unsigned long *value);
 
-long str_to_number(Str string);
+bool scan_next_int(Scan *self, long *value);
+
+bool scan_next_float(Scan *self, float *value);
+
+bool str_to_uint(Str string, unsigned long *value);
+
+bool str_to_int(Str string, long *value);
+
+bool str_to_float(Str string, float *value);
