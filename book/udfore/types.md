@@ -26,25 +26,33 @@ Where T is the type.
 
 Lists can be made dynamic by using `:=` when binding them
 
-## Tuple/struct
+## Func
+
+Used to represent higher-order functions, meaning that functions can be passed as parameters to other functions
 
 ```
-type XYTuple = (x: F64, y: F64);
-type XYTuple = (F64, F64);
+InputType -> OutputType
 
-struct MyXYStruct {
+// For example: 
+// Func(F32, F32) -> F64
+
+```
+## Tuples
+Tuples are unnamed records
+
+```ml
+type XYTuple = (F64, F64);
+```
+
+## Records
+
+Records are a data structure containing named fields. Similar to a C struct.
+
+```ml
+type some_record = {
     x : F64,
     y : F64,
 };
-
-XYTuple is MyXYStruct; // true
-
-```
-
-## Sum
-
-```
-F64 | I64
 ```
 
 ## Box
@@ -65,28 +73,13 @@ object MyCoolObject : MyCoolBaseObject
 }
 
 ```
-
-
-## Func
-
-Used to represent higher-order functions, meaning that functions can be passed as parameters to other functions
-
-```
-InputType -> OutputType
-
-// For example: 
-// Func(F32, F32) -> F64
-
-```
-
-
 ## Generic Types
 
 ```
 type Maybe(T) = T | Nil
 ```
 
-## User-defined types
+## Enumerations
 
 Note that types can also define their own values, for example, here is a simple Boolean implementation:
 
