@@ -44,7 +44,7 @@ typedef struct
     MVec2 start;
     MVec2 cp;
     MVec2 last;
-    void (*eval)(GfxPathCmd cmd, void *ctx);
+    void (*eval)(void *ctx, GfxPathCmd cmd);
     void *ctx;
 } GfxPathParser;
 
@@ -54,11 +54,13 @@ typedef struct
 {
     MVec2 start;
     MVec2 last;
-    void (*append)(MEdge edge, void *ctx);
+    void (*append)(void *ctx, MEdge edge);
     void *ctx;
 } GfxPathFlattener;
 
 #define GFX_FLATTEN_MAX_DEPTH (16)
 #define GFX_FLATTEN_TOLERANCE (0.25f)
 
-void gfx_path_flatten(GfxPathFlattener *self, GfxPathCmd cmd);
+void gfx_flattener_begin(GfxPathFlattener *self);
+
+void gfx_flattener_flatten(GfxPathFlattener *self, GfxPathCmd cmd);

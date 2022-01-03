@@ -1,5 +1,6 @@
 #include <brutal/font/font.h>
 #include <brutal/gfx/gfx.h>
+#include <brutal/gfx/path.h>
 #include <stdlib.h>
 
 /* --- Lifetime ------------------------------------------------------------- */
@@ -64,6 +65,11 @@ void gfx_end(Gfx *self)
     (void)vec_pop(&self->ctx);
 }
 
+void gfx_clear(Gfx *self, GfxColor color)
+{
+    gfx_buf_clear(self->buf, color);
+}
+
 /* --- Context -------------------------------------------------------------- */
 
 void gfx_push(Gfx *self)
@@ -108,95 +114,31 @@ void gfx_color(Gfx *self, GfxColor color)
     gfx_peek(self)->color = color;
 }
 
-/* --- Drawing -------------------------------------------------------------- */
+/* --- Path Building -------------------------------------------------------- */
 
-void gfx_clear(Gfx *self, GfxColor color)
+static void append_edge(void *ctx, MEdge edge)
 {
-    gfx_buf_clear(self->buf, color);
+    Gfx *gfx = ctx;
+    vec_push(&gfx->edges, edge);
 }
 
-void gfx_dot(Gfx *self, MVec2 dot, float size)
-{
-    MVec2 vert[4] = {
-        m_vec2(dot.x - size, dot.x - size),
-        m_vec2(dot.y - size, dot.y + size),
-        m_vec2(dot.x + size, dot.x + size),
-        m_vec2(dot.y + size, dot.y - size),
-    };
-
-    gfx_poly(self, vert, 4);
-}
-
-void gfx_line(Gfx *self, MEdge line, float weight)
-{
-    if (weight < 0)
-    {
-        weight = -weight;
-    }
-
-    float x = line.sx;
-    float y = line.sy;
-    float dx = line.ex - x;
-    float dy = line.ey - y;
-    float len = sqrtf(dx * dx + dy * dy);
-    float nx = dx / len;
-    float ny = dy / len;
-    float w = weight / 2;
-
-    MVec2 vert[4] = {
-        m_vec2(x - ny * w, y + nx * w),
-        m_vec2(x + ny * w, y - nx * w),
-        m_vec2(x + ny * w, y - nx * w),
-        m_vec2(x - ny * w, y + nx * w),
-    };
-
-    gfx_poly(self, vert, 4);
-}
-
-void gfx_rect(Gfx *self, MRect rect)
-{
-    MVec2 edges[4] = {
-        m_vec2(rect.x, rect.y),
-        m_vec2(rect.x + rect.width, rect.y),
-        m_vec2(rect.x + rect.width, rect.y + rect.height),
-        m_vec2(rect.x, rect.y + rect.height),
-    };
-
-    gfx_poly(self, edges, 4);
-}
-
-void gfx_ellipsis(Gfx *self, MRect rect)
-{
-    MVec2 edges[64];
-
-    for (size_t i = 0; i < 64; i++)
-    {
-        float angle = (2 * M_PI * i) / 64;
-
-        edges[i] = m_vec2(
-            rect.x + rect.width * cosf(angle),
-            rect.y + rect.height * sinf(angle));
-    }
-
-    gfx_poly(self, edges, 64);
-}
-
-void gfx_rast(Gfx *self, MVec2 const *edges, size_t len, GfxFillRule rule);
-
-void gfx_poly(Gfx *self, MVec2 const *points, size_t len)
+void gfx_begin_path(Gfx *self)
 {
     vec_clear(&self->edges);
 
-    for (size_t i = 0; i < len; i++)
-    {
-        MVec2 p = m_vec2_add(points[i], gfx_peek(self)->origin);
-        vec_push(&self->edges, p);
-    }
+    self->flattener.ctx = self;
+    self->flattener.append = append_edge;
 
-    MVec2 s = m_vec2_add(points[0], gfx_peek(self)->origin);
-    vec_push(&self->edges, s);
+    gfx_flattener_begin(&self->flattener);
+}
 
-    gfx_rast(self, self->edges.data, self->edges.len, GFX_RAST_EVENODD);
+void gfx_close_path(Gfx *self)
+{
+    GfxPathCmd cmd = {
+        .type = GFX_CMD_CLOSE_PATH,
+    };
+
+    gfx_eval_cmd(self, cmd);
 }
 
 #define RAST_AA 4
@@ -208,21 +150,9 @@ static int float_cmp(void const *lhs, void const *rhs)
     return *lhsf - *rhsf;
 }
 
-static inline MRect path_bound(MVec2 const *edges, size_t len)
+void gfx_fill_path(Gfx *self, GfxFillRule rule)
 {
-    MRect rect = m_rect_from_points(edges[0], edges[1]);
-
-    for (size_t i = 1; i + 1 < len; i++)
-    {
-        rect = m_rect_merge_rect(rect, m_rect_from_points(edges[i], edges[i + 1]));
-    }
-
-    return rect;
-}
-
-FLATTEN void gfx_rast(Gfx *self, MVec2 const *edges, size_t len, GfxFillRule rule)
-{
-    MRect pbound = path_bound(edges, len);
+    MRect pbound = m_edges_bound(vec_begin(&self->edges), vec_len(&self->edges));
     MRect rbound = gfx_buf_bound(self->buf);
     rbound = m_rect_clip_rect(rbound, pbound);
     rbound = m_rect_clip_rect(rbound, gfx_peek(self)->clip);
@@ -240,10 +170,8 @@ FLATTEN void gfx_rast(Gfx *self, MVec2 const *edges, size_t len, GfxFillRule rul
         {
             vec_clear(&self->active);
 
-            for (size_t i = 0; i + 1 < len; i++)
+            vec_foreach_v(edge, &self->edges)
             {
-                MEdge edge = m_edge(edges[i].x, edges[i].y, edges[i + 1].x, edges[i + 1].y);
-
                 if (m_edge_min_y(edge) <= yy && m_edge_max_y(edge) > yy)
                 {
                     float intersection = edge.sx + (yy - edge.sy) / (edge.ey - edge.sy) * (edge.ex - edge.sx);
@@ -259,7 +187,7 @@ FLATTEN void gfx_rast(Gfx *self, MVec2 const *edges, size_t len, GfxFillRule rul
                 float start = m_max(self->active.data[i], m_rect_start(rbound));
                 float end = m_min(self->active.data[i + 1], m_rect_end(rbound));
 
-                if (odd_even || rule == GFX_RAST_NONZERO)
+                if (odd_even || rule == GFX_FILL_NONZERO)
                 {
                     for (float x = start; x < end; x += 1.0f / RAST_AA)
                     {
@@ -289,8 +217,172 @@ FLATTEN void gfx_rast(Gfx *self, MVec2 const *edges, size_t len, GfxFillRule rul
     }
 }
 
+void gfx_eval_cmd(Gfx *self, GfxPathCmd cmd)
+{
+    cmd.cp1 = m_vec2_add(cmd.cp1, gfx_peek(self)->origin);
+    cmd.cp2 = m_vec2_add(cmd.cp2, gfx_peek(self)->origin);
+    cmd.point = m_vec2_add(cmd.point, gfx_peek(self)->origin);
+
+    gfx_flattener_flatten(&self->flattener, cmd);
+}
+
+void gfx_move_to(Gfx *self, MVec2 point)
+{
+    GfxPathCmd cmd = {
+        .type = GFX_CMD_MOVE_TO,
+        .point = point,
+    };
+
+    gfx_eval_cmd(self, cmd);
+}
+
+void gfx_line_to(Gfx *self, MVec2 point)
+{
+    GfxPathCmd cmd = {
+        .type = GFX_CMD_LINE_TO,
+        .point = point,
+    };
+
+    gfx_eval_cmd(self, cmd);
+}
+
+void gfx_bezier_to(Gfx *self, MVec2 cp1, MVec2 cp2, MVec2 point)
+{
+    GfxPathCmd cmd = {
+        .type = GFX_CMD_CUBIC_TO,
+        .cp1 = cp1,
+        .cp2 = cp2,
+        .point = point,
+    };
+
+    gfx_eval_cmd(self, cmd);
+}
+
+void gfx_quadratic_to(Gfx *self, MVec2 cp, MVec2 point)
+{
+    GfxPathCmd cmd = {
+        .type = GFX_CMD_QUADRATIC_TO,
+        .cp = cp,
+        .point = point,
+    };
+
+    gfx_eval_cmd(self, cmd);
+}
+
+void gfx_arc_to(Gfx *self, float rx, float ry, float angle, int flags, MVec2 point)
+{
+    GfxPathCmd cmd = {
+        .type = GFX_CMD_ARC_TO,
+        .rx = rx,
+        .ry = ry,
+        .angle = angle,
+        .flags = flags,
+        .point = point,
+    };
+
+    gfx_eval_cmd(self, cmd);
+}
+
+/* --- Drawing -------------------------------------------------------------- */
+
+void gfx_dot(Gfx *self, MVec2 dot, float size)
+{
+    gfx_begin_path(self);
+
+    gfx_move_to(self, m_vec2(dot.x - size, dot.x - size));
+    gfx_move_to(self, m_vec2(dot.y - size, dot.y + size));
+    gfx_move_to(self, m_vec2(dot.x + size, dot.x + size));
+    gfx_move_to(self, m_vec2(dot.y + size, dot.y - size));
+
+    gfx_close_path(self);
+
+    gfx_fill_path(self, GFX_FILL_EVENODD);
+}
+
+void gfx_line(Gfx *self, MEdge line, float weight)
+{
+    if (weight < 0)
+    {
+        weight = -weight;
+    }
+
+    float x = line.sx;
+    float y = line.sy;
+    float dx = line.ex - x;
+    float dy = line.ey - y;
+    float len = sqrtf(dx * dx + dy * dy);
+    float nx = dx / len;
+    float ny = dy / len;
+    float w = weight / 2;
+
+    gfx_begin_path(self);
+
+    gfx_move_to(self, m_vec2(x - ny * w, y + nx * w));
+    gfx_move_to(self, m_vec2(x + ny * w, y - nx * w));
+    gfx_move_to(self, m_vec2(x + ny * w, y - nx * w));
+    gfx_move_to(self, m_vec2(x - ny * w, y + nx * w));
+
+    gfx_close_path(self);
+
+    gfx_fill_path(self, GFX_FILL_EVENODD);
+}
+
+void gfx_rect(Gfx *self, MRect rect)
+{
+    gfx_begin_path(self);
+
+    gfx_move_to(self, m_vec2(rect.x, rect.y));
+    gfx_line_to(self, m_vec2(rect.x + rect.width, rect.y));
+    gfx_line_to(self, m_vec2(rect.x + rect.width, rect.y + rect.height));
+    gfx_line_to(self, m_vec2(rect.x, rect.y + rect.height));
+
+    gfx_close_path(self);
+
+    gfx_fill_path(self, GFX_FILL_EVENODD);
+}
+
+void gfx_ellipsis(Gfx *self, MRect rect)
+{
+    gfx_begin_path(self);
+
+    for (size_t i = 0; i < 64; i++)
+    {
+        float angle = (2 * M_PI * i) / 64;
+
+        gfx_line_to(
+            self,
+            m_vec2(
+                rect.x + rect.width * cosf(angle),
+                rect.y + rect.height * sinf(angle)));
+    }
+
+    gfx_close_path(self);
+
+    gfx_fill_path(self, GFX_FILL_EVENODD);
+}
+
 void gfx_text(Gfx *self, MVec2 origin, Str text)
 {
     origin = m_vec2_add(origin, gfx_peek(self)->origin);
     bfont_render_str(bfont_builtin(), text, origin, self->buf, gfx_peek(self)->clip, gfx_peek(self)->color);
+}
+
+void eval_cmd(void *ctx, GfxPathCmd cmd)
+{
+    Gfx *gfx = ctx;
+    gfx_eval_cmd(gfx, cmd);
+}
+
+void gfx_path(Gfx *self, Str path)
+{
+    GfxPathParser parser = {
+        .ctx = self,
+        .eval = eval_cmd,
+    };
+
+    Scan scan;
+    scan_init(&scan, path);
+    gfx_begin_path(self);
+    gfx_path_parse(&parser, &scan);
+    gfx_fill_path(self, GFX_FILL_EVENODD);
 }

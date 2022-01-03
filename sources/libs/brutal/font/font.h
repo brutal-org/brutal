@@ -1,8 +1,8 @@
 #pragma once
 
 #include <brutal/font/metrics.h>
-#include <brutal/gfx.h>
-#include <brutal/text.h>
+#include <brutal/gfx/buf.h>
+#include <brutal/text/rune.h>
 
 typedef enum
 {

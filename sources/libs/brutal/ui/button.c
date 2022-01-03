@@ -22,6 +22,8 @@ void ui_button_paint(UiView *self, Gfx *gfx)
     }
 
     gfx_rect(gfx, ui_view_container(self));
+
+    gfx_fill(gfx, gfx_paint_fill(GFX_BLACK));
 }
 
 void ui_button_event(UiView *self, UiEvent *event)
