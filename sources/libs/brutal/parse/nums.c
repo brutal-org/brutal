@@ -49,6 +49,7 @@ bool scan_next_int(Scan *self, long *value)
     while (!scan_ended(self))
     {
         char v = scan_peek(self, 0);
+
         if (v >= '0' && v <= '9')
         {
             *value *= 10;
@@ -84,11 +85,20 @@ bool scan_next_float(Scan *self, float *value)
     {
         double multiplier = (1.0 / 10);
 
-        char v = scan_peek(self, 0);
-        while (v >= '0' && v <= '9')
+        while (!scan_ended(self))
         {
-            fpart += multiplier * (v - '0');
-            multiplier *= (1.0 / 10);
+            char v = scan_peek(self, 0);
+
+            if (v >= '0' && v <= '9')
+            {
+                fpart += multiplier * (v - '0');
+                multiplier *= (1.0 / 10);
+                scan_next(self);
+            }
+            else
+            {
+                break;
+            }
         }
     }
 

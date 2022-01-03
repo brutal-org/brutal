@@ -1,3 +1,4 @@
+#include <brutal/debug.h>
 #include <brutal/gfx/path.h>
 #include <brutal/math/funcs.h>
 #include <brutal/math/trans2.h>
@@ -53,8 +54,6 @@ static int parse_arcflags(Scan *scan)
         flags |= GFX_PATH_SWEEP;
     }
 
-    parse_whitespace_or_comma(scan);
-
     return flags;
 }
 
@@ -84,8 +83,9 @@ static void eval_cmd(GfxPathParser *self, GfxPathCmd cmd)
 
     self->cp = eval_point(self, cmd.rel, cmd.cp);
     self->last = eval_point(self, cmd.rel, cmd.point);
+    cmd.rel = false;
 
-    self->eval(cmd, self->ctx);
+    self->eval(self->ctx, cmd);
 }
 
 static void parse_cmd(GfxPathParser *self, Scan *scan, char c)
@@ -118,7 +118,7 @@ static void parse_cmd(GfxPathParser *self, Scan *scan, char c)
     {
         cmd.type = GFX_CMD_LINE_TO;
         float value = parse_float(scan);
-        cmd.point = m_vec2(value, 0);
+        cmd.point = m_vec2(value, self->last.y);
         cmd.cp = cmd.point;
         break;
     }
@@ -127,7 +127,7 @@ static void parse_cmd(GfxPathParser *self, Scan *scan, char c)
     {
         cmd.type = GFX_CMD_LINE_TO;
         float value = parse_float(scan);
-        cmd.point = m_vec2(0, value);
+        cmd.point = m_vec2(self->last.x, value);
         cmd.cp = cmd.point;
         break;
     }
@@ -136,7 +136,9 @@ static void parse_cmd(GfxPathParser *self, Scan *scan, char c)
     {
         cmd.type = GFX_CMD_CUBIC_TO;
         cmd.cp1 = parse_coordinate(scan);
+        parse_whitespace_or_comma(scan);
         cmd.cp2 = parse_coordinate(scan);
+        parse_whitespace_or_comma(scan);
         cmd.point = parse_coordinate(scan);
         break;
     }
@@ -146,6 +148,7 @@ static void parse_cmd(GfxPathParser *self, Scan *scan, char c)
         cmd.type = GFX_CMD_CUBIC_TO;
         cmd.cp1 = eval_reflected_cp(self);
         cmd.cp2 = parse_coordinate(scan);
+        parse_whitespace_or_comma(scan);
         cmd.point = parse_coordinate(scan);
         break;
     }
@@ -154,6 +157,7 @@ static void parse_cmd(GfxPathParser *self, Scan *scan, char c)
     {
         cmd.type = GFX_CMD_QUADRATIC_TO;
         cmd.cp = parse_coordinate(scan);
+        parse_whitespace_or_comma(scan);
         cmd.point = parse_coordinate(scan);
         break;
     }
@@ -170,9 +174,13 @@ static void parse_cmd(GfxPathParser *self, Scan *scan, char c)
         cmd.type = GFX_CMD_ARC_TO;
 
         cmd.rx = parse_float(scan);
+        parse_whitespace_or_comma(scan);
         cmd.ry = parse_float(scan);
+        parse_whitespace_or_comma(scan);
         cmd.angle = parse_float(scan);
+        parse_whitespace_or_comma(scan);
         cmd.flags = parse_arcflags(scan);
+        parse_whitespace_or_comma(scan);
         cmd.point = parse_coordinate(scan);
         cmd.cp = cmd.point;
         break;
@@ -185,7 +193,7 @@ static void parse_cmd(GfxPathParser *self, Scan *scan, char c)
 
     parse_whitespace(scan);
 
-    if (c == 'c')
+    if (c == 'm')
     {
         // If a moveto is followed by multiple pairs of coordinates,
         // the subsequent pairs are treated as implicit lineto commands.
@@ -208,10 +216,10 @@ void gfx_path_parse(GfxPathParser *self, Scan *scan)
         return;
     }
 
-    while (!scan_ended(scan) &&
-           scan_skip_any(scan, str$(GFX_PATH_CMDS)))
+    while (!scan_ended(scan) && scan_curr_is_any(scan, str$(GFX_PATH_CMDS)))
     {
         char cmd = scan_next(scan);
+        assert_truth(isalpha(cmd));
 
         parse_whitespace(scan);
 
@@ -225,7 +233,7 @@ void gfx_path_parse(GfxPathParser *self, Scan *scan)
 
 static void flatten_line(GfxPathFlattener *self, MVec2 point)
 {
-    self->append(m_edge_vec2(self->last, point), self->ctx);
+    self->append(self->ctx, m_edge_vec2(self->last, point));
     self->last = point;
 }
 
@@ -259,7 +267,7 @@ static void flatten_cubic_recusive(GfxPathFlattener *self, MVec2 a, MVec2 b, MVe
 
 static void flatten_cubic(GfxPathFlattener *self, MVec2 cp1, MVec2 cp2, MVec2 point)
 {
-    flatten_cubic_recusive(self, self->start, cp1, cp2, point, 0);
+    flatten_cubic_recusive(self, self->last, cp1, cp2, point, 0);
 }
 
 static void flatten_quadratic(GfxPathFlattener *self, MVec2 cp, MVec2 point)
@@ -403,7 +411,13 @@ static void flatten_arc(GfxPathFlattener *self, float rx, float ry, float angle,
     flatten_line(self, point);
 }
 
-void gfx_path_flatten(GfxPathFlattener *self, GfxPathCmd cmd)
+void gfx_flattener_begin(GfxPathFlattener *self)
+{
+    self->start = (MVec2){};
+    self->last = (MVec2){};
+}
+
+void gfx_flattener_flatten(GfxPathFlattener *self, GfxPathCmd cmd)
 {
     switch (cmd.type)
     {

@@ -36,3 +36,25 @@ static inline MEdge m_edge_vec2(MVec2 start, MVec2 end)
 #define m_edge_max_x(EDGE) m_max((EDGE).sx, (EDGE).ex)
 #define m_edge_min_y(EDGE) m_min((EDGE).sy, (EDGE).ey)
 #define m_edge_max_y(EDGE) m_max((EDGE).sy, (EDGE).ey)
+
+static inline MRect m_edge_bound(MEdge edge)
+{
+    return m_rect_from_points(edge.start, edge.end);
+}
+
+static inline MRect m_edges_bound(MEdge const *edges, size_t len)
+{
+    if (!len)
+    {
+        return m_rect(0, 0, 0, 0);
+    }
+
+    MRect result = m_edge_bound(edges[0]);
+
+    for (size_t i = 1; i < len; i++)
+    {
+        result = m_rect_merge_rect(result, m_edge_bound(edges[i]));
+    }
+
+    return result;
+}
