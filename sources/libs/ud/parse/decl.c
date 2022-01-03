@@ -18,5 +18,10 @@ UdAstNode ud_parse_decl(Lex *lex, Alloc *alloc)
         ret.expr.decl = ud_parse_func_decl(lex, alloc);
     }
 
+    else if (lex_expect(lex, UDLEX_TYPE))
+    {
+        ret.expr.decl = ud_parse_type_decl(lex, alloc);
+    }
+
     return ret;
 }

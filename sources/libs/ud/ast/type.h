@@ -19,7 +19,7 @@ typedef struct
     Str name;
 } UdType;
 
-static inline Str ud_type_to_str(UdTypeType type)
+MAYBE_UNUSED static inline Str ud_type_to_str(UdTypeType type)
 {
     switch (type)
     {
@@ -40,7 +40,7 @@ static inline Str ud_type_to_str(UdTypeType type)
     return str$("unknown");
 }
 
-static inline UdTypeType ud_str_to_type(Str str)
+MAYBE_UNUSED static inline UdTypeType ud_str_to_type(Str str)
 {
 
     if (str.buf[0] == '@')

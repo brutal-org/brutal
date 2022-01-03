@@ -5,6 +5,7 @@
 #include "brutal/ds/vec.h"
 #include "json/emit.h"
 #include "json/objects.h"
+#include "ud/ast/decl.h"
 #include "ud/ast/expr.h"
 #include "ud/parse/parse.h"
 
@@ -102,16 +103,54 @@ void ud_emit_func_decl(UdDecl decl, Json *json, Alloc *alloc)
     json_put(json, str$("function"), func);
 }
 
-void ud_emit_decl(UdDecl decl, Json *json, Alloc *alloc)
+void ud_emit_tuple(UdDecl decl, Json *json, Alloc *alloc)
 {
-    if (decl.type == UD_DECL_VAR)
+    Json elements = json_array(alloc);
+
+    vec_foreach(field, &decl.type_decl.tuple.fields)
     {
-        ud_emit_var_decl(decl, json, alloc);
+        json_append(&elements, json_str(field->name));
     }
 
-    else if (decl.type == UD_DECL_FUNC)
+    json_put(json, str$("fields"), elements);
+}
+
+void ud_emit_type_decl(UdDecl decl, Json *json, Alloc *alloc)
+{
+    Json type_decl = json_object(alloc);
+
+    json_put(&type_decl, str$("name"), json_str(decl.name));
+
+    json_put(json, str$("type_decl"), type_decl);
+
+    if (decl.type_decl.type == UD_TYPE_TUPLE)
+    {
+        ud_emit_tuple(decl, &type_decl, alloc);
+    }
+}
+
+void ud_emit_decl(UdDecl decl, Json *json, Alloc *alloc)
+{
+    switch (decl.type)
+    {
+    case UD_DECL_VAR:
+    {
+        ud_emit_var_decl(decl, json, alloc);
+        break;
+    }
+    case UD_DECL_FUNC:
     {
         ud_emit_func_decl(decl, json, alloc);
+        break;
+    }
+    case UD_DECL_TYPE:
+    {
+
+        ud_emit_type_decl(decl, json, alloc);
+        break;
+    }
+    default:
+        break;
     }
 }
 

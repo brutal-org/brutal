@@ -18,3 +18,7 @@ func function_with_parameters(param: Int)
 {
     2; 
 }
+
+function_call(1,2,3);
+
+type my_tuple = (Int, Int);

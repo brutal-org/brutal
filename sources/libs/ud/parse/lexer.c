@@ -7,6 +7,7 @@ struct
 } keywords[] = {
     {UDLEX_LET, "let "},
     {UDLEX_FUNC, "func "},
+    {UDLEX_TYPE, "type "},
     {UDLEX_COLON, ":"},
     {UDLEX_THIN_ARROW, "->"},
     {UDLEX_MINUS, "-"},

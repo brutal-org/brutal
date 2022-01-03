@@ -54,7 +54,6 @@ typedef struct
 
 typedef struct
 {
-    Str name;
     UdTypeDeclType type;
 
     union

@@ -1,5 +1,7 @@
+#include <brutal/debug.h>
 #include <ud/parse/decl.h>
 #include <ud/parse/lexer.h>
+#include "brutal/parse/lex.h"
 
 UdFuncCall ud_parse_func_call(Lex *lex, Alloc *alloc)
 {
@@ -34,6 +36,11 @@ UdFuncCall ud_parse_func_call(Lex *lex, Alloc *alloc)
                 ud_parse_whitespace(lex);
 
                 ud_expect(lex, UDLEX_COMMA);
+            }
+
+            else
+            {
+                break;
             }
         }
 
