@@ -21,6 +21,8 @@ UdAstNode ud_parse_decl(Lex *lex, Alloc *alloc);
 
 UdAstNode ud_parse_expr(Lex *lex, Alloc *alloc);
 
+UdFuncCall ud_parse_func_call(Lex *lex, Alloc *alloc);
+
 void ud_print_expr(Emit *emit, Alloc *alloc, UdExpr expr);
 void ud_print_stmt(Emit *, Alloc *, UdExpr);
 

@@ -44,7 +44,7 @@ typedef enum
 
 // clang-format on
 
-static inline Str udlex_to_str(LexemeType type)
+MAYBE_UNUSED static inline Str udlex_to_str(LexemeType type)
 {
     if (type >= 0 && type < UDLEX_COUNT)
     {

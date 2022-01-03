@@ -25,60 +25,6 @@ UdVal get_val_from_lexeme(Lexeme lexeme)
     return ret;
 }
 
-UdFuncCall ud_parse_func_call(Lex *lex, Alloc *alloc)
-{
-    UdFuncCall ret = {};
-
-    vec_init(&ret.params, alloc);
-
-    ret.name = lex_curr(lex).str;
-
-    lex_next(lex);
-
-    ud_parse_whitespace(lex);
-
-    lex_next(lex);
-
-    while (lex_curr(lex).type != UDLEX_RPAREN)
-    {
-        ud_parse_whitespace(lex);
-
-        vec_push(&ret.params, ud_parse_expr(lex, alloc).expr);
-
-        lex_next(lex);
-
-        ud_parse_whitespace(lex);
-
-        if (lex_peek(lex, 1).type != UDLEX_RPAREN)
-        {
-            ud_parse_whitespace(lex);
-
-            if (lex_curr(lex).type != UDLEX_RPAREN)
-            {
-                ud_parse_whitespace(lex);
-
-                ud_expect(lex, UDLEX_COMMA);
-            }
-        }
-
-        else
-        {
-            ud_parse_whitespace(lex);
-
-            lex_next(lex);
-
-            ud_parse_whitespace(lex);
-        }
-
-        if (ud_get_error())
-        {
-            break;
-        }
-    }
-
-    return ret;
-}
-
 // Pure crap
 // DON'T USE
 UdBinOp ud_parse_bin_op(Lex *lex, Alloc *alloc)

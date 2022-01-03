@@ -1,11 +1,10 @@
 #pragma once
 
 #include <brutal/ds.h>
-#include <ud/ast/val.h>
+#include <ud/ast/decl.h>
+#include <ud/ast/expr.h>
 #include <ud/ast/type.h>
-
-typedef struct ast_node UdAstNode;
-typedef struct ud_expr UdExpr;
+#include <ud/ast/val.h>
 
 // ------------- Enums -----------
 typedef enum
@@ -62,53 +61,6 @@ typedef struct
     UdExpr *right;
     UdOp op;
 } UdBinOp;
-
-typedef struct
-{
-    UdExpr *value;
-    UdType type;
-    bool mutable;
-} UdVarDecl;
-
-typedef enum
-{
-    UD_DECL_NONE,
-    UD_DECL_FUNC,
-    UD_DECL_VAR,
-    UD_DECL_TYPE,
-} UdDeclType;
-
-typedef struct
-{
-    Str name;
-    UdType type;
-} UdFuncParam;
-
-typedef struct
-{
-    Vec(UdAstNode) body;
-    Vec(UdFuncParam) params;
-
-    UdType return_type;
-
-} UdFuncDecl;
-
-
-typedef struct
-{
-
-    UdDeclType type;
-
-    Str name;
-
-    union
-    {
-        UdVarDecl var;
-        UdFuncDecl func;
-    };
-
-} UdDecl;
-
 
 struct ud_expr
 {
