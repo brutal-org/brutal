@@ -9,7 +9,8 @@ ARCH_KCFLAGS = \
 	-mno-red-zone \
 	-mcmodel=kernel
 
-ARCH_CFLAGS =
+ARCH_CFLAGS = \
+	-fsanitize=undefined
 
 USER_AS=nasm
 USER_ASFLAGS=-f elf64
