@@ -8,6 +8,8 @@
 #    undef strcat
 #    undef strncpy
 #    undef strncat
+#    undef sprintf
+#    undef vsprintf
 
 #    define strcpy BANNED(strcpy)
 #    define strcat BANNED(strcat)
