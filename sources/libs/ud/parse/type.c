@@ -55,8 +55,6 @@ UdTupleDecl ud_parse_tuple_decl(Lex *lex, Alloc *alloc)
         }
     }
 
-    log$("{}", lex_curr(lex).str);
-
     return ret;
 }
 
@@ -68,10 +66,7 @@ UdDecl ud_parse_type_decl(Lex *lex, Alloc *alloc)
 
     ud_parse_whitespace(lex);
 
-    if (ud_expect(lex, UDLEX_IDENT))
-    {
-        ret.name = lex_peek(lex, -1).str;
-    }
+    ret.name = ud_expect(lex, UDLEX_IDENT).str;
 
     ud_parse_whitespace(lex);
 

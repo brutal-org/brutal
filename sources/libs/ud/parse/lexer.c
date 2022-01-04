@@ -27,7 +27,7 @@ struct
 
 static int isidentchar(char v)
 {
-    return isalpha(v) || v == '_' || v == '$' || v == '@' || isdigit(v);
+    return isalpha(v) || v == '_' || v == '@' || isdigit(v);
 }
 
 static LexemeType ud_lex_impl(Scan *scan)
@@ -60,11 +60,6 @@ static LexemeType ud_lex_impl(Scan *scan)
         }
 
         return (UDLEX_STRING);
-    }
-
-    else if (scan_skip_word(scan, str$("->")))
-    {
-        return (UDLEX_THIN_ARROW);
     }
 
     else if (scan_skip_word(scan, str$("'")))

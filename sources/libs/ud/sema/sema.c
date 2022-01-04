@@ -29,7 +29,7 @@ void sema_scope_leave(UdSema *self)
     vec_deinit(&scope.decls);
 }
 
-UdDecl sema_find_reference(UdScope *self, Str name)
+static UdDecl sema_find_reference(UdScope *self, Str name)
 {
 
     vec_foreach(decl, &self->decls)
@@ -43,7 +43,7 @@ UdDecl sema_find_reference(UdScope *self, Str name)
     return (UdDecl){};
 }
 
-void sema_add(UdSema *self, UdDecl decl);
+static void sema_add(UdSema *self, UdDecl decl);
 
 bool sema_analyze_expr(UdSema *self, UdExpr expr)
 {
@@ -71,12 +71,12 @@ bool sema_analyze_expr(UdSema *self, UdExpr expr)
     return true;
 }
 
-void sema_add(UdSema *self, UdDecl decl)
+static void sema_add(UdSema *self, UdDecl decl)
 {
     vec_push(&(vec_end(&self->scopes)->decls), decl);
 }
 
-void sema_analyze_node(UdSema *self, UdAstNode node)
+static void sema_analyze_node(UdSema *self, UdAstNode node)
 {
     sema_analyze_expr(self, node.expr);
 }

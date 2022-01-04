@@ -2,6 +2,7 @@
 #include <ud/parse/decl.h>
 #include <ud/parse/lexer.h>
 #include "brutal/parse/lex.h"
+#include "ud/parse/parse.h"
 
 UdFuncCall ud_parse_func_call(Lex *lex, Alloc *alloc)
 {
@@ -98,11 +99,7 @@ UdDecl ud_parse_func_decl(Lex *lex, Alloc *alloc)
         ud_expect(lex, UDLEX_IDENT);
 
         // :
-        ud_parse_whitespace(lex);
-
-        ud_expect(lex, UDLEX_COLON);
-
-        ud_parse_whitespace(lex);
+        ud_parse_expect_separator(lex, UDLEX_COLON);
 
         // baz
         param.type.name = str_dup(lex_next(lex).str, alloc);
@@ -118,21 +115,13 @@ UdDecl ud_parse_func_decl(Lex *lex, Alloc *alloc)
 
             if (lex_curr(lex).type != UDLEX_RPAREN)
             {
-                ud_parse_whitespace(lex);
-
-                ud_expect(lex, UDLEX_COMMA);
-
-                ud_parse_whitespace(lex);
+                ud_parse_expect_separator(lex, UDLEX_COMMA);
             }
         }
 
         else
         {
-            ud_parse_whitespace(lex);
-
-            lex_next(lex);
-
-            ud_parse_whitespace(lex);
+            ud_parse_skip_separator(lex, UDLEX_WHITESPACE);
         }
 
         if (ud_get_error())
@@ -174,6 +163,7 @@ UdDecl ud_parse_func_decl(Lex *lex, Alloc *alloc)
         lex_next(lex);
 
         ud_parse_whitespace(lex);
+
         ud_expect(lex, UDLEX_SEMICOLON);
     }
 

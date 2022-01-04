@@ -1,6 +1,7 @@
-#include <embed/log.h>
+#include <brutal/debug.h>
 #include <ud/ast.h>
 #include <ud/parse/lexer.h>
+#include <ud/parse/parse.h>
 
 void ud_parse_whitespace(Lex *lex)
 {
@@ -14,9 +15,12 @@ void ud_parse_whitespace(Lex *lex)
 bool ud_parse_expect_separator(Lex *lex, LexemeType type)
 {
     ud_parse_whitespace(lex);
-    bool result = lex_expect(lex, type);
+
+    ud_expect(lex, type);
+
     ud_parse_whitespace(lex);
-    return result;
+
+    return !ud_get_error();
 }
 
 bool ud_parse_skip_separator(Lex *lex, LexemeType type)
@@ -48,16 +52,16 @@ void ud_set_error(bool val)
     has_error = val;
 }
 
-bool ud_expect(Lex *lex, LexemeType type)
+Lexeme ud_expect(Lex *lex, LexemeType type)
 {
     if (lex_expect(lex, type))
     {
-        return true;
+        return lex_peek(lex, -1);
     }
 
-    print(embed_log_writer(), "Error while parsing: expected '{}' at {}:{}\n", udlex_to_str(type), lex_curr(lex).line, lex_curr(lex).col);
+    log$("Error while parsing: expected '{}' at {}:{}\n", udlex_to_str(type), lex_curr(lex).line, lex_curr(lex).col);
 
     ud_set_error(true);
 
-    return false;
+    return (Lexeme){};
 }

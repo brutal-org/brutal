@@ -14,12 +14,21 @@ UdVal get_val_from_lexeme(Lexeme lexeme)
     switch (lexeme.type)
     {
     case UDLEX_INTEGER:
+    {
         ret.type = UD_VAL_INT;
         ret.int_ = str_to_number(lexeme.str);
         break;
+    }
     case UDLEX_STRING:
+    {
         ret.type = UD_VAL_STR;
         ret.string = lexeme.str;
+        break;
+    }
+
+    default:
+        log$("Unknown lexeme '{}'", lexeme.str);
+        break;
     }
 
     return ret;

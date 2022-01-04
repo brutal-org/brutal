@@ -9,7 +9,8 @@ typedef struct
     Str message;
     Lexeme lexeme;
 
-    int line, col;
+    int line;
+    int col;
 
 } LexError;
 

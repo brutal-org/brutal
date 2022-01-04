@@ -2,6 +2,8 @@ let my_immutable_variable = 1; // This is an immutable variable
 
 let my_mutable_variable := 1; // This is mutable
 
+let a: Int = 1;
+
 // Functions with type
 func my_function() -> Int 
 {

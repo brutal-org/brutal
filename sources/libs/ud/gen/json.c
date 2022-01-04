@@ -202,6 +202,7 @@ void ud_emit_expr(UdExpr expr, Json *json, Alloc *alloc)
     case UD_EXPR_FUNC_CALL:
     {
         ud_emit_func_call(expr.func_call, json, alloc);
+        break;
     }
 
     default:

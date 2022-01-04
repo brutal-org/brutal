@@ -22,11 +22,11 @@ UdDecl ud_parse_var_decl(Lex *lex, Alloc *alloc)
     {
         ud_parse_whitespace(lex);
 
-        ud_expect(lex, UDLEX_IDENT);
+        Lexeme _type = ud_expect(lex, UDLEX_IDENT);
 
-        ret.var.type.type = ud_str_to_type(lex_peek(lex, -1).str);
+        ret.var.type.type = ud_str_to_type(_type.str);
 
-        ret.var.type.name = str_dup(lex_peek(lex, -1).str, alloc);
+        ret.var.type.name = str_dup(_type.str, alloc);
 
         ud_expect(lex, UDLEX_WHITESPACE);
     }
@@ -38,14 +38,11 @@ UdDecl ud_parse_var_decl(Lex *lex, Alloc *alloc)
 
     ud_parse_whitespace(lex);
 
-    if (lex_curr(lex).type == UDLEX_COLON || lex_peek(lex, -1).type == UDLEX_COLON)
+    if (lex_curr(lex).type == UDLEX_COLON)
     {
         ret.var.mutable = true;
 
-        if (lex_curr(lex).type == UDLEX_COLON)
-        {
-            lex_next(lex);
-        }
+        lex_next(lex);
     }
 
     ud_expect(lex, UDLEX_EQUAL);
