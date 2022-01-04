@@ -1,0 +1,26 @@
+let my_immutable_variable = 1; // This is an immutable variable
+
+let my_mutable_variable := 1; // This is mutable
+
+let a: Int = 1;
+
+// Functions with type
+func my_function() -> Int 
+{
+   1; 
+}
+
+// Inferred functions
+func my_inferred_function()
+{
+    2;
+}
+// Function with parameters
+func function_with_parameters(param: Int)
+{
+    2; 
+}
+
+function_call(1,2,3);
+
+type my_tuple = (Int, Int);
