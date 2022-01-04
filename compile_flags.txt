@@ -3,6 +3,10 @@
 -Wall
 -Wextra
 -Werror
+-Wnewline-eof
+-Wignored-attributes
+-Wunknown-attributes
+-Wimplicit-fallthrough
 -Isources/
 -Isources/pkgs
 -Isources/libs

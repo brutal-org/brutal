@@ -225,15 +225,19 @@ float __lgammaf_r(float x, int *signgamp)
         switch (i)
         {
         case 7:
-            z *= y + 6.0f; /* FALLTHRU */
+            z *= y + 6.0f;
+            [[fallthrough]];
         case 6:
-            z *= y + 5.0f; /* FALLTHRU */
+            z *= y + 5.0f;
+            [[fallthrough]];
         case 5:
-            z *= y + 4.0f; /* FALLTHRU */
+            z *= y + 4.0f;
+            [[fallthrough]];
         case 4:
-            z *= y + 3.0f; /* FALLTHRU */
+            z *= y + 3.0f;
+            [[fallthrough]];
         case 3:
-            z *= y + 2.0f; /* FALLTHRU */
+            z *= y + 2.0f;
             r += logf(z);
             break;
         }

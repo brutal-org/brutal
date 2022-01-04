@@ -216,6 +216,7 @@ MRect m_flow_set_end(MFlow flow, MRect rect, float value)
     {
     case M_FLOW_RIGHT_TO_LEFT:
         rect.x += d;
+        [[fallthrough]];
 
     default:
     case M_FLOW_LEFT_TO_RIGHT:
@@ -224,6 +225,7 @@ MRect m_flow_set_end(MFlow flow, MRect rect, float value)
 
     case M_FLOW_BOTTOM_TO_TOP:
         rect.y += d;
+        [[fallthrough]];
 
     case M_FLOW_TOP_TO_BOTTOM:
         rect.width += d;
