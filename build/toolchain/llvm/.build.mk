@@ -46,6 +46,7 @@ USER_CFLAGS= \
 	$(CFLAGS_STD) \
 	$(CFLAGS_OPT) \
 	$(CFLAGS_WARN) \
+	-Wimplicit-fallthrough \
 	$(ARCH_CFLAGS) \
 	$(USER_CFLAGS_INC) \
 	-D__brutal__=1 \
@@ -54,6 +55,7 @@ USER_CFLAGS= \
 USER_KCFLAGS= \
 	$(USER_CFLAGS) \
 	$(ARCH_KCFLAGS) \
+	-Wimplicit-fallthrough \
 	-D__kernel__=1 \
 	-D__freestanding__=1
 

@@ -290,15 +290,19 @@ double __lgamma_r(double x, int *signgamp)
         switch (i)
         {
         case 7:
-            z *= y + 6.0; /* FALLTHRU */
+            z *= y + 6.0;
+            [[fallthrough]];
         case 6:
-            z *= y + 5.0; /* FALLTHRU */
+            z *= y + 5.0;
+            [[fallthrough]];
         case 5:
-            z *= y + 4.0; /* FALLTHRU */
+            z *= y + 4.0;
+            [[fallthrough]];
         case 4:
-            z *= y + 3.0; /* FALLTHRU */
+            z *= y + 3.0;
+            [[fallthrough]];
         case 3:
-            z *= y + 2.0; /* FALLTHRU */
+            z *= y + 2.0;
             r += log(z);
             break;
         }
