@@ -11,6 +11,8 @@ typedef struct
 {
     LexemeType type;
     Str str;
+    int line;
+    int col;
 } Lexeme;
 
 #define lexeme$(TYPE, STR) \

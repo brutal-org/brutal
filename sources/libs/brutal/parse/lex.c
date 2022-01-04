@@ -6,11 +6,22 @@ Lex lex(Scan *scan, LexFn *fn, Alloc *alloc)
     Lex self = {};
     vec_init(&self.lexemes, alloc);
 
+    self.line = 1;
+    self.col = 1;
+
     while (!scan_ended(scan))
     {
         scan_begin(scan);
 
-        Lexeme l = {fn(scan), scan_end(scan)};
+        if (scan_curr(scan) == '\n')
+        {
+            self.col = 1;
+            self.line++;
+        }
+
+        Lexeme l = {fn(scan), scan_end(scan), self.line, self.col};
+
+        self.col = scan->head;
 
         if (l.type == LEXEME_INVALID)
         {
@@ -49,6 +60,8 @@ Lexeme lex_peek(Lex *self, int offset)
         return (Lexeme){
             LEXEME_EOF,
             str$(""),
+            self->line,
+            self->col,
         };
     }
 
@@ -63,7 +76,9 @@ Lexeme lex_curr(Lex *self)
 Lexeme lex_next(Lex *self)
 {
     Lexeme l = lex_curr(self);
+
     self->head++;
+
     return l;
 }
 
@@ -114,6 +129,8 @@ void lex_throw(Lex *self, Str message)
     self->error = (LexError){
         .message = message,
         .lexeme = lex_curr(self),
+        .col = self->col,
+        .line = self->line,
     };
 }
 

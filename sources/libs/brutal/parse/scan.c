@@ -37,29 +37,6 @@ char scan_peek(Scan *self, int offset)
     return self->buf[self->head + offset];
 }
 
-char scan_peek_is_any(Scan *self, int offset, Str chars)
-{
-    for (size_t i = 0; i < chars.len; i++)
-    {
-        if (scan_peek(self, offset) == chars.buf[i])
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-char scan_curr(Scan *self)
-{
-    return scan_peek(self, 0);
-}
-
-char scan_curr_is_any(Scan *self, Str chars)
-{
-    return scan_peek_is_any(self, 0, chars);
-}
-
 char scan_next(Scan *self)
 {
     if (self->has_error)
@@ -82,17 +59,12 @@ char scan_next(Scan *self)
     return c;
 }
 
-void scan_next_n(Scan *self, int n)
+void scan_scan_skip_space(Scan *self)
 {
-    for (int i = 0; i < n; i++)
+    while (isspace(scan_curr(self)) && !scan_ended(self))
     {
         scan_next(self);
     }
-}
-
-bool scan_skip_space(Scan *self)
-{
-    return scan_eat(self, isspace);
 }
 
 Str scan_skip_until(Scan *self, int (*callback)(int))
@@ -107,6 +79,19 @@ Str scan_skip_until(Scan *self, int (*callback)(int))
     }
 
     return str_n$(len, (char *)self->buf + start);
+}
+
+char scan_curr(Scan *self)
+{
+    return scan_peek(self, 0);
+}
+
+void scan_next_n(Scan *self, int n)
+{
+    for (int i = 0; i < n; i++)
+    {
+        scan_next(self);
+    }
 }
 
 bool scan_skip(Scan *self, char c)
@@ -137,20 +122,6 @@ bool scan_skip_word(Scan *self, Str word)
     return true;
 }
 
-bool scan_skip_any(Scan *self, Str chars)
-{
-    for (size_t i = 0; i < chars.len; i++)
-    {
-        if (scan_curr(self) == chars.buf[i])
-        {
-            scan_next(self);
-            return true;
-        }
-    }
-
-    return false;
-}
-
 bool scan_eat(Scan *self, ScanMatch *match)
 {
     bool result = false;
@@ -159,18 +130,6 @@ bool scan_eat(Scan *self, ScanMatch *match)
     {
         result = true;
         scan_next(self);
-    }
-
-    return result;
-}
-
-bool scan_eat_any(Scan *self, Str chars)
-{
-    bool result = false;
-
-    while (scan_skip_any(self, chars))
-    {
-        result = true;
     }
 
     return result;
@@ -226,17 +185,6 @@ bool scan_expect_word(Scan *self, Str word)
     if (!scan_skip_word(self, word))
     {
         scan_throw(self, str$("expected token"), word);
-        return false;
-    }
-
-    return true;
-}
-
-bool scan_expect_any(Scan *self, Str chars)
-{
-    if (!scan_skip_any(self, chars))
-    {
-        scan_throw(self, str$("expected any token"), chars);
         return false;
     }
 
