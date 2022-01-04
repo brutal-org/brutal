@@ -68,9 +68,7 @@ UiWin *demo_win_create(UiApp *app)
     ui_view_style(
         icon1,
         (UiStyle){
-            .margin.start = 4,
             .dock = UI_DOCK_FILL,
-            .size.max.width = 160,
         });
     ui_view_mount(container, icon1);
 

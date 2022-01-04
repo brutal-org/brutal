@@ -1,5 +1,6 @@
 #include <brutal/parse/nums.h>
 #include <math.h>
+#include <string.h>
 
 long scan_next_digit(Scan *self)
 {
@@ -70,7 +71,9 @@ bool scan_next_int(Scan *self, long *value)
     return true;
 }
 
-bool scan_next_float(Scan *self, float *value)
+#ifndef __kernel__
+
+bool scan_next_float(Scan *self, double *value)
 {
     long ipart = 0;
 
@@ -110,9 +113,19 @@ bool scan_next_float(Scan *self, float *value)
         scan_next_int(self, &exp);
     }
 
-    *value = (ipart + fpart) * pow(10, exp);
+    if (ipart < 0)
+    {
+        *value = (ipart - fpart) * pow(10, exp);
+    }
+    else
+    {
+        *value = (ipart + fpart) * pow(10, exp);
+    }
+
     return true;
 }
+
+#endif
 
 bool str_to_uint(Str string, unsigned long *value)
 {
@@ -128,9 +141,13 @@ bool str_to_int(Str string, long *value)
     return scan_next_int(&scan, value);
 }
 
-bool str_to_float(Str string, float *value)
+#ifndef __kernel__
+
+bool str_to_float(Str string, double *value)
 {
     Scan scan = {0};
     scan_init(&scan, string);
     return scan_next_float(&scan, value);
 }
+
+#endif

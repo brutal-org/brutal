@@ -182,6 +182,7 @@ static void fmt_parse_min_width(Fmt *fmt, Scan *scan)
 Fmt fmt_parse(Scan *scan)
 {
     Fmt fmt = {};
+    fmt.precison = 6;
 
     scan_skip(scan, '{');
 
@@ -290,6 +291,8 @@ IoResult fmt_unsigned(Fmt self, IoWriter *writer, FmtUInt value)
 
 IoResult fmt_float(Fmt self, IoWriter *writer, double value)
 {
+    io_print(writer, str$("<float>"));
+
     if (isnan(value))
     {
         return io_print(writer, str$("nan"));

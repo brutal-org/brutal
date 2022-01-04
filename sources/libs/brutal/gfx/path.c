@@ -1,4 +1,3 @@
-#include <brutal/debug.h>
 #include <brutal/gfx/path.h>
 #include <brutal/math/funcs.h>
 #include <brutal/math/trans2.h>
@@ -24,7 +23,7 @@ static bool parse_whitespace_or_comma(Scan *scan)
 
 static float parse_float(Scan *scan)
 {
-    float result = 0;
+    double result = 0;
     scan_next_float(scan, &result);
     return result;
 }
@@ -66,7 +65,7 @@ static MVec2 eval_point(GfxPathParser *self, bool rel, MVec2 point)
 {
     if (rel)
     {
-        return m_vec2_add(self->start, point);
+        return m_vec2_add(self->last, point);
     }
     else
     {
@@ -76,13 +75,17 @@ static MVec2 eval_point(GfxPathParser *self, bool rel, MVec2 point)
 
 static void eval_cmd(GfxPathParser *self, GfxPathCmd cmd)
 {
+    cmd.cp1 = eval_point(self, cmd.rel, cmd.cp1);
+    cmd.cp2 = eval_point(self, cmd.rel, cmd.cp2);
+    cmd.point = eval_point(self, cmd.rel, cmd.point);
+
     if (cmd.type == GFX_CMD_MOVE_TO)
     {
-        self->start = eval_point(self, cmd.rel, cmd.point);
+        self->start = cmd.point;
     }
 
-    self->cp = eval_point(self, cmd.rel, cmd.cp);
-    self->last = eval_point(self, cmd.rel, cmd.point);
+    self->cp = cmd.cp;
+    self->last = cmd.point;
     cmd.rel = false;
 
     self->eval(self->ctx, cmd);
@@ -107,33 +110,26 @@ static void parse_cmd(GfxPathParser *self, Scan *scan, char c)
         break;
 
     case 'l':
-    {
         cmd.type = GFX_CMD_LINE_TO;
         cmd.point = parse_coordinate(scan);
         cmd.cp = cmd.point;
         break;
-    }
 
     case 'h':
     {
         cmd.type = GFX_CMD_LINE_TO;
-        float value = parse_float(scan);
-        cmd.point = m_vec2(value, self->last.y);
+        cmd.point = m_vec2(parse_float(scan), cmd.rel ? 0 : self->last.y);
         cmd.cp = cmd.point;
         break;
     }
 
     case 'v':
-    {
         cmd.type = GFX_CMD_LINE_TO;
-        float value = parse_float(scan);
-        cmd.point = m_vec2(self->last.x, value);
+        cmd.point = m_vec2(cmd.rel ? 0 : self->last.x, parse_float(scan));
         cmd.cp = cmd.point;
         break;
-    }
 
     case 'c':
-    {
         cmd.type = GFX_CMD_CUBIC_TO;
         cmd.cp1 = parse_coordinate(scan);
         parse_whitespace_or_comma(scan);
@@ -141,34 +137,27 @@ static void parse_cmd(GfxPathParser *self, Scan *scan, char c)
         parse_whitespace_or_comma(scan);
         cmd.point = parse_coordinate(scan);
         break;
-    }
 
     case 's':
-    {
         cmd.type = GFX_CMD_CUBIC_TO;
         cmd.cp1 = eval_reflected_cp(self);
         cmd.cp2 = parse_coordinate(scan);
         parse_whitespace_or_comma(scan);
         cmd.point = parse_coordinate(scan);
         break;
-    }
 
     case 'q':
-    {
         cmd.type = GFX_CMD_QUADRATIC_TO;
         cmd.cp = parse_coordinate(scan);
         parse_whitespace_or_comma(scan);
         cmd.point = parse_coordinate(scan);
         break;
-    }
 
     case 't':
-    {
         cmd.type = GFX_CMD_QUADRATIC_TO;
         cmd.cp = eval_reflected_cp(self);
         cmd.point = parse_coordinate(scan);
         break;
-    }
 
     case 'a':
         cmd.type = GFX_CMD_ARC_TO;
@@ -190,23 +179,6 @@ static void parse_cmd(GfxPathParser *self, Scan *scan, char c)
     }
 
     eval_cmd(self, cmd);
-
-    parse_whitespace(scan);
-
-    if (c == 'm')
-    {
-        // If a moveto is followed by multiple pairs of coordinates,
-        // the subsequent pairs are treated as implicit lineto commands.
-        while (!scan_ended(scan) &&
-               !scan_curr_is_any(scan, str$(GFX_PATH_CMDS)))
-        {
-            GfxPathCmd line = {};
-            line.rel = cmd.rel;
-            line.type = GFX_CMD_LINE_TO;
-            line.point = parse_coordinate(scan);
-            eval_cmd(self, cmd);
-        }
-    }
 }
 
 void gfx_path_parse(GfxPathParser *self, Scan *scan)
@@ -219,7 +191,6 @@ void gfx_path_parse(GfxPathParser *self, Scan *scan)
     while (!scan_ended(scan) && scan_curr_is_any(scan, str$(GFX_PATH_CMDS)))
     {
         char cmd = scan_next(scan);
-        assert_truth(isalpha(cmd));
 
         parse_whitespace(scan);
 
@@ -227,6 +198,13 @@ void gfx_path_parse(GfxPathParser *self, Scan *scan)
         {
             parse_cmd(self, scan, cmd);
             parse_whitespace_or_comma(scan);
+
+            // If a moveto is followed by multiple pairs of coordinates,
+            // the subsequent pairs are treated as implicit lineto commands.
+            if (cmd == 'm')
+                cmd = 'l';
+            if (cmd == 'M')
+                cmd = 'L';
         } while (!scan_ended(scan) && !scan_curr_is_any(scan, str$(GFX_PATH_CMDS)));
     }
 }
