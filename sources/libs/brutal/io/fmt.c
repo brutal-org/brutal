@@ -176,7 +176,7 @@ static void fmt_parse_min_width(Fmt *fmt, Scan *scan)
         fmt->fill_with_zero = false;
     }
 
-    scan_next_uint(scan, &fmt->min_width);
+    scan_next_int(scan, &fmt->min_width);
 }
 
 Fmt fmt_parse(Scan *scan)
@@ -244,7 +244,7 @@ static void reverse(uint8_t *str, size_t len)
 IoResult fmt_unsigned(Fmt self, IoWriter *writer, FmtUInt value)
 {
     uint8_t buf[sizeof(FmtUInt) * 8] = {};
-    size_t i = 0;
+    int i = 0;
 
     if (value == 0)
     {
@@ -287,7 +287,7 @@ IoResult fmt_unsigned(Fmt self, IoWriter *writer, FmtUInt value)
     return io_write(writer, buf, i);
 }
 
-#if !defined(__kernel__) && !defined(__loader__)
+#ifndef __freestanding__
 
 IoResult fmt_float(Fmt self, IoWriter *writer, double value)
 {
