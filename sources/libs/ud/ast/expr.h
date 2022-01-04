@@ -1,23 +1,22 @@
 #pragma once
 
 #include <brutal/ds.h>
+#include <ud/ast/decl.h>
+#include <ud/ast/expr.h>
+#include <ud/ast/type.h>
 #include <ud/ast/val.h>
 
+// ------------- Enums -----------
 typedef enum
 {
     UD_EXPR_NIL,
+    UD_EXPR_CONSTANT,
+    UD_EXPR_BINOP,
+    UD_EXPR_FUNC_CALL,
+    UD_EXPR_CONDITION,
+    UD_EXPR_REFERENCE,
+    UD_EXPR_DECL,
 
-    UD_EXPR_VAL,
-    UD_EXPR_PREFIX,
-    UD_EXPR_INFIX,
-    UD_EXPR_POSTFIX,
-
-    UD_EXPR_IF,
-    UD_EXPR_DO,
-    UD_EXPR_WHILE,
-    UD_EXPR_BLOCK,
-
-    UD_EXPR_RET,
 } UdExprType;
 
 typedef enum
@@ -49,7 +48,19 @@ typedef enum
     UD_OP_BNOT,
 } UdOp;
 
-typedef struct ud_expr UdExpr;
+// ------------- Structs -----------
+typedef struct
+{
+    Str name;
+    Vec(UdExpr) params;
+} UdFuncCall;
+
+typedef struct
+{
+    UdExpr *left;
+    UdExpr *right;
+    UdOp op;
+} UdBinOp;
 
 struct ud_expr
 {
@@ -57,37 +68,14 @@ struct ud_expr
 
     union
     {
-        UdVal val_;
+        UdVal const_;
 
-        struct
-        {
-            UdOp op;
-            UdExpr *lhs;
-            UdExpr *rhs;
-        } infix_;
+        Str reference;
 
-        struct
-        {
-            UdOp op;
-            UdExpr *expr;
-        } prefix_, postfix_;
+        UdBinOp bin_op;
 
-        struct
-        {
-            UdExpr *cond;
-            UdExpr *then;
-            UdExpr *else_;
-        } if_;
+        UdFuncCall func_call;
 
-        struct
-        {
-            UdExpr *cond;
-            UdExpr *expr;
-        } while_, do_;
-
-        struct
-        {
-            Vec(UdExpr) exprs;
-        } block_;
+        UdDecl decl;
     };
 };

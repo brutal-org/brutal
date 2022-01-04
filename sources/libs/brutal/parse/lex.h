@@ -8,6 +8,10 @@ typedef struct
 {
     Str message;
     Lexeme lexeme;
+
+    int line;
+    int col;
+
 } LexError;
 
 typedef Vec(Lexeme) Lexemes;
@@ -19,6 +23,8 @@ typedef struct
 
     bool has_error;
     LexError error;
+
+    int line, col;
 } Lex;
 
 #define lex_assert_no_error(LEX)                                                                                 \
