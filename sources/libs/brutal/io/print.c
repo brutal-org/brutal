@@ -16,7 +16,7 @@ PrintValue print_val_unsigned(FmtUInt val)
 
 PrintValue print_val_float(MAYBE_UNUSED double val)
 {
-#if !defined(__kernel__) && !defined(__loader__)
+#ifndef __freestanding__
     return (PrintValue){nullstr, PRINT_FLOAT, {._float = val}};
 #else
     return (PrintValue){
@@ -71,7 +71,7 @@ IoResult print_dispatch(IoWriter *writer, Fmt fmt, PrintValue value)
         {
             return fmt_unsigned(fmt, writer, value._unsigned);
         }
-#if !defined(__kernel__) && !defined(__loader__)
+#ifndef __freestanding__
     case PRINT_FLOAT:
         return fmt_float(fmt, writer, value._float);
 #endif

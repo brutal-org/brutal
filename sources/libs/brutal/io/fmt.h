@@ -26,9 +26,9 @@ typedef struct
 {
     FmtType type;
     Case casing;
-    int precison;
 
-    size_t min_width;
+    long precison;
+    long min_width;
     bool fill_with_zero;
     bool prefix;
 } Fmt;

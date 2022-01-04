@@ -71,7 +71,7 @@ bool scan_next_int(Scan *self, long *value)
     return true;
 }
 
-#ifndef __kernel__
+#ifndef __freestanding__
 
 bool scan_next_float(Scan *self, double *value)
 {
@@ -141,7 +141,7 @@ bool str_to_int(Str string, long *value)
     return scan_next_int(&scan, value);
 }
 
-#ifndef __kernel__
+#ifndef __freestanding__
 
 bool str_to_float(Str string, double *value)
 {

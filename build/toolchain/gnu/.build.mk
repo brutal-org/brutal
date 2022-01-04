@@ -42,7 +42,8 @@ USER_KCFLAGS= \
 	$(USER_CFLAGS) \
 	$(ARCH_KCFLAGS) \
 	-fno-stack-protector \
-	-D__kernel__=1
+	-D__kernel__=1 \
+	-D__freestanding__=1
 
 USER_UCFLAGS= \
 	$(USER_CFLAGS) \
