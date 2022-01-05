@@ -1,5 +1,5 @@
 #include <bal/hw.h>
-#include <brutal/codec/tga.h>
+#include <brutal/codec/tga/tga.h>
 #include "init/boot.h"
 
 void boot_splashscreen(Handover const *handover)

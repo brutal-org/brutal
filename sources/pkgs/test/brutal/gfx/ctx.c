@@ -1,5 +1,5 @@
 #include <brutal/alloc.h>
-#include <brutal/codec/tga.h>
+#include <brutal/codec/tga/tga.h>
 #include <brutal/io.h>
 #include "test/test.h"
 

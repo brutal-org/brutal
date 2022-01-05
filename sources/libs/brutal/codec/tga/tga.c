@@ -1,4 +1,4 @@
-#include <brutal/codec/tga.h>
+#include <brutal/codec/tga/tga.h>
 
 IoResult tga_encode(IoWriter writer, GfxBuf surface)
 {
