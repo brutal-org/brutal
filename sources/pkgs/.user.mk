@@ -8,6 +8,7 @@ LIBS_SRC = \
 	$(wildcard sources/libs/bal/*/*.c) \
 	$(wildcard sources/libs/brutal/*.c) \
 	$(wildcard sources/libs/brutal/*/*.c) \
+	$(wildcard sources/libs/brutal/*/*/*.c) \
 	$(wildcard sources/libs/cc/*.c) \
 	$(wildcard sources/libs/cc/*/*.c) \
 	$(wildcard sources/libs/cc/*/*/*.c) \
