@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/base/attributes.h>
+#include <brutal/base.h>
 #include <stdint.h>
 
 #define EXT2_SIGNATURE 0xef53
@@ -129,7 +129,6 @@ typedef enum
     EXT2_INODE_UNIX_SOCKET = 0xC,
 } Ext2InodeType;
 
-#define EXT2_PERMISSION_BITS
 typedef struct PACKED
 {
     uint16_t mode;

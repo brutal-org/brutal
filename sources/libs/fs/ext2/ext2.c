@@ -1,4 +1,3 @@
-#include <brutal/base.h>
 #include <brutal/debug.h>
 #include <fs/ext2/ext2.h>
 #include <math.h>
@@ -231,7 +230,7 @@ FsResult ext2_inode(Ext2Fs *self, Ext2FsInode *inode, Ext2FsInodeId id)
     return FS_SUCCESS;
 }
 
-Iter ext2_fs_iter(Ext2Fs *self, Ext2FsInode *inode, IterFn fn, void *ctx)
+Iter ext2_fs_iter(Ext2Fs *self, Ext2FsInode *inode, Ext2IterFileFn fn, void *ctx)
 {
     if (!((inode->block.mode >> 12) == EXT2_INODE_DIRECTORY))
     {
@@ -246,11 +245,11 @@ Iter ext2_fs_iter(Ext2Fs *self, Ext2FsInode *inode, IterFn fn, void *ctx)
         Ext2Directory *dir = block_data;
         while (dir->type != EXT2_FT_UNKOWN && (uintptr_t)dir - (uintptr_t)block_data < self->block_size)
         {
-            Ext2FsInode sub_inode;
-            ext2_inode(self, &sub_inode, dir->inode);
-            sub_inode.name = str_n$(dir->name_len, (char *)dir->name_chars);
+            Ext2FsFile sub_file;
+            ext2_inode(self, &sub_file.inode, dir->inode);
+            sub_file.name = str_n$(dir->name_len, (char *)dir->name_chars);
 
-            if (fn(&sub_inode, ctx) == ITER_STOP)
+            if (fn(&sub_file, ctx) == ITER_STOP)
             {
                 alloc_free(self->alloc, block_data);
                 return ITER_STOP;

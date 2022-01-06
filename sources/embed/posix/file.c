@@ -4,6 +4,7 @@
 #include <embed/file.h>
 #include <embed/posix/err.h>
 #include <fcntl.h>
+#include <stdio.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -106,11 +107,5 @@ IoResult embed_file_write(IoFile *self, uint8_t const *data, size_t size)
         return ERR(IoResult, error);
     }
 
-    return OK(IoResult, result);
-}
-
-IoResult embed_file_seek(EmbedFile *self, int off, int type)
-{
-    ssize_t result = lseek(*self, off, type);
     return OK(IoResult, result);
 }

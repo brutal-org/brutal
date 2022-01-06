@@ -18,14 +18,21 @@ typedef struct
 {
     uint32_t id;
     Ext2InodeBlock block;
-    Str name; /* we can only have the name in the parent directory, so sometimes, this field may be empty */
 } Ext2FsInode;
+
+typedef struct
+{
+    Str name;
+    Ext2FsInode inode;
+} Ext2FsFile;
 
 typedef Range(long) BlockRange;
 
 FsResult ext2_init(Ext2Fs *self, FsBlockImpl *block, Alloc *alloc);
 
-Iter ext2_fs_iter(Ext2Fs *self, Ext2FsInode *inode, IterFn fn, void *ctx);
+typedef Iter Ext2IterFileFn(Ext2FsFile *val, void *ctx);
+
+Iter ext2_fs_iter(Ext2Fs *self, Ext2FsInode *inode, Ext2IterFileFn fn, void *ctx);
 
 FsResult ext2_inode(Ext2Fs *self, Ext2FsInode *inode, Ext2FsInodeId id);
 FsResult ext2_inode_read(Ext2Fs *self, Ext2FsInode *inode, void *data, BlockRange range);

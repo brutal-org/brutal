@@ -18,7 +18,7 @@ typedef struct
 
 FsBlockResult file_block_write(FileBlock *self, const void *buf, size_t count, size_t lba)
 {
-    if (!embed_file_seek(&self->file.embed, lba * 512, SEEK_SET).succ)
+    if (!embed_file_seek(&self->file.embed, lba * 512, EMBED_SEEK_SET).succ)
     {
         return FS_BLOCK_INVALID_LBA;
     }
@@ -32,7 +32,7 @@ FsBlockResult file_block_write(FileBlock *self, const void *buf, size_t count, s
 
 FsBlockResult file_block_read(FileBlock *self, void *buf, size_t count, size_t lba)
 {
-    if (!embed_file_seek(&self->file.embed, lba * 512, SEEK_SET).succ)
+    if (!embed_file_seek(&self->file.embed, lba * 512, EMBED_SEEK_SET).succ)
     {
         return FS_BLOCK_INVALID_LBA;
     }
@@ -45,14 +45,14 @@ FsBlockResult file_block_read(FileBlock *self, void *buf, size_t count, size_t l
 }
 
 Emit emit;
-Iter file_block_dump(Ext2FsInode *inode, void *ctx)
+Iter file_block_dump(Ext2FsFile *file, void *ctx)
 {
     emit_ident(&emit);
-    emit_fmt(&emit, "- founded inode: {}\n", inode->name);
-    if (!str_eq(inode->name, str$(".")) && !str_eq(inode->name, str$("..")))
+    emit_fmt(&emit, "- founded file: {}\n", file->name);
+    if (!str_eq(file->name, str$(".")) && !str_eq(file->name, str$("..")))
     {
         //   ext2_fs_dump_inode(ctx, inode);
-        ext2_fs_iter(ctx, inode, (IterFn *)file_block_dump, ctx);
+        ext2_fs_iter(ctx, &file->inode, (Ext2IterFileFn *)file_block_dump, ctx);
     }
     emit_deident(&emit);
     return ITER_CONTINUE;
@@ -90,6 +90,6 @@ int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char const *argv[])
 
     ext2_inode(&fs, &root_inode, 2);
 
-    ext2_fs_iter(&fs, &root_inode, (IterFn *)file_block_dump, &fs);
+    ext2_fs_iter(&fs, &root_inode, (Ext2IterFileFn *)file_block_dump, &fs);
     return 0;
 }
