@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/base/defs.h>
+#include <brutal/base.h>
 
 #if defined(SYSTEM_SDL)
 #    include <embed/sdl/win.h>
@@ -10,4 +10,4 @@
 #    error "Unsupported embedder!"
 #endif
 
-typedef struct embed_win EmbedWin;
+typedef struct _EmbedWin EmbedWin;

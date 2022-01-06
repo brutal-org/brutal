@@ -60,13 +60,15 @@ Str buf_str(Buf *self)
     return str_n$(self->used, (char *)self->data);
 }
 
-static IoResult buf_read_impl(Buf *self, char *data, size_t offset, size_t size)
+static IoResult buf_read_impl(void *ctx, uint8_t *data, size_t size)
 {
-    size_t read = m_min(size, self->used - offset);
+    Buf *self = (Buf *)ctx;
+
+    size_t read = m_min(size, self->used - self->read);
 
     for (size_t i = 0; i < read; i++)
     {
-        data[i] = self->data[offset + i];
+        data[i] = self->data[self->read++];
     }
 
     return OK(IoResult, read);
@@ -75,21 +77,22 @@ static IoResult buf_read_impl(Buf *self, char *data, size_t offset, size_t size)
 IoReader buf_reader(Buf *self)
 {
     return (IoReader){
-        .read = (IoRead *)buf_read_impl,
+        .read = buf_read_impl,
         .context = self,
     };
 }
 
-static IoResult buf_write_impl(Buf *self, char const *data, MAYBE_UNUSED size_t offset, size_t size)
+static IoResult buf_write_impl(void *ctx, uint8_t const *data, size_t size)
 {
-    buf_push_impl(self, (uint8_t const *)data, size);
+    Buf *self = (Buf *)ctx;
+    buf_push_impl(self, data, size);
     return OK(IoResult, size);
 }
 
 IoWriter buf_writer(Buf *self)
 {
     return (IoWriter){
-        .write = (IoWrite *)buf_write_impl,
+        .write = buf_write_impl,
         .context = self,
     };
 }

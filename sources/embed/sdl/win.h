@@ -2,8 +2,7 @@
 
 #include <SDL.h>
 
-struct embed_win
+struct _EmbedWin
 {
     SDL_Window *sdl_window;
 };
-

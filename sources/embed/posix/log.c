@@ -19,7 +19,7 @@ void embed_log_unlock(void)
     // FIXME: no-op
 }
 
-static IoResult embed_log_write(MAYBE_UNUSED void *context, uint8_t const *data, MAYBE_UNUSED size_t offset, size_t size)
+static IoResult embed_log_write(MAYBE_UNUSED void *context, uint8_t const *data, size_t size)
 {
     if (write(2, data, size) == -1)
     {

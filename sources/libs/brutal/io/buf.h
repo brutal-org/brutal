@@ -8,6 +8,7 @@ typedef struct
 {
     uint8_t *data;
     size_t used;
+    size_t read;
     size_t capacity;
     Alloc *alloc;
 } Buf;

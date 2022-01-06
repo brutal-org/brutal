@@ -2,7 +2,7 @@
 
 #include <efi/protos.h>
 
-typedef struct
+struct _EmbedFile
 {
     EfiFileProtocol *proto;
-} EmbedFile;
+};

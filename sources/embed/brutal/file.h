@@ -1,3 +1,6 @@
 #pragma once
 
-typedef int EmbedFile;
+struct _EmbedFile
+{
+    int fd;
+};

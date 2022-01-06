@@ -31,8 +31,9 @@ void emit_deident(Emit *self)
     self->indent--;
 }
 
-static IoResult emit_write_impl(Emit *self, uint8_t const *data, MAYBE_UNUSED size_t offset, size_t size)
+static IoResult emit_write_impl(void *ctx, uint8_t const *data, size_t size)
 {
+    Emit *self = (Emit *)ctx;
     size_t written = 0;
 
     for (size_t i = 0; i < size; i++)
@@ -61,7 +62,7 @@ static IoResult emit_write_impl(Emit *self, uint8_t const *data, MAYBE_UNUSED si
 IoWriter emit_writer(Emit *self)
 {
     return (IoWriter){
-        .write = (IoWrite *)emit_write_impl,
+        .write = emit_write_impl,
         .context = self,
     };
 }

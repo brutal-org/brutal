@@ -4,42 +4,55 @@
 
 MaybeError io_file_open(IoFile *self, Str path)
 {
-    return embed_file_open(&self->embed, path);
+    return embed_file_open(self, path);
 }
 
 MaybeError io_file_create(IoFile *self, Str path)
 {
-    return embed_file_create(&self->embed, path);
-}
-
-static IoResult io_file_read_impl(IoFile *self, uint8_t *data, MAYBE_UNUSED size_t offset, size_t size)
-{
-
-    return embed_file_read(&self->embed, data, size);
+    return embed_file_create(self, path);
 }
 
 IoReader io_file_reader(IoFile *self)
 {
     return (IoReader){
-        .read = (IoRead *)io_file_read_impl,
+        .read = (IoReadFn *)embed_file_read,
         .context = self,
     };
-}
-
-static IoResult io_file_write_impl(IoFile *self, uint8_t const *data, MAYBE_UNUSED size_t offset, size_t size)
-{
-    return embed_file_write(&self->embed, data, size);
 }
 
 IoWriter io_file_writer(IoFile *self)
 {
     return (IoWriter){
-        .write = (IoWrite *)io_file_write_impl,
+        .write = (IoWriteFn *)embed_file_write,
         .context = self,
+    };
+}
+
+IoSeeker io_file_seeker(IoFile *self)
+{
+    return (IoSeeker){
+        .seek = (IoSeekFn *)embed_file_seek,
+        .context = self,
+    };
+}
+
+IoDuplex io_file_duplex(IoFile *self)
+{
+    return (IoDuplex){
+        .reader = io_file_reader(self),
+        .writer = io_file_writer(self),
+    };
+}
+
+IoRwSeek io_file_rwseek(IoFile *self)
+{
+    return (IoRwSeek){
+        .duplex = io_file_duplex(self),
+        .seeker = io_file_seeker(self),
     };
 }
 
 MaybeError io_file_close(IoFile *self)
 {
-    return embed_file_close(&self->embed);
+    return embed_file_close(self);
 }

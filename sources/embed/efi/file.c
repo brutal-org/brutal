@@ -67,7 +67,7 @@ EfiFileProtocol *efi_rootdir(void)
     return _rootdir;
 }
 
-MaybeError embed_file_open(EmbedFile *self, Str path)
+MaybeError embed_file_open(IoFile *self, Str path)
 {
     uint16_t *cstr = utf16_str_to_cstr(path, alloc_global());
 
@@ -80,7 +80,7 @@ MaybeError embed_file_open(EmbedFile *self, Str path)
         }
     }
 
-    EfiStatus status = efi_rootdir()->open(efi_rootdir(), &self->proto, cstr, EFI_FILE_MODE_READ, EFI_FILE_READ_ONLY);
+    EfiStatus status = efi_rootdir()->open(efi_rootdir(), &self->embed.proto, cstr, EFI_FILE_MODE_READ, EFI_FILE_READ_ONLY);
 
     alloc_free(alloc_global(), cstr);
 
@@ -94,23 +94,23 @@ MaybeError embed_file_open(EmbedFile *self, Str path)
     }
 }
 
-MaybeError embed_file_create(EmbedFile *self, Str path)
+MaybeError embed_file_create(IoFile *self, Str path)
 {
     UNUSED(self);
     UNUSED(path);
     panic$("embed_file_create() not implemented");
 }
 
-MaybeError embed_file_close(EmbedFile *self)
+MaybeError embed_file_close(IoFile *self)
 {
-    _rootdir->close((EfiFileProtocol *)self->proto);
+    _rootdir->close((EfiFileProtocol *)self->embed.proto);
     return SUCCESS;
 }
 
-IoResult embed_file_read(EmbedFile *self, uint8_t *data, size_t size)
+IoResult embed_file_read(IoFile *self, uint8_t *data, size_t size)
 {
     uint64_t read_write_size = size;
-    EfiStatus status = self->proto->read(self->proto, &read_write_size, data);
+    EfiStatus status = self->embed.proto->read(self->embed.proto, &read_write_size, data);
 
     if (status != EFI_SUCCESS)
     {
@@ -122,10 +122,17 @@ IoResult embed_file_read(EmbedFile *self, uint8_t *data, size_t size)
     }
 }
 
-IoResult embed_file_write(EmbedFile *self, uint8_t const *data, size_t size)
+IoResult embed_file_write(IoFile *self, uint8_t const *data, size_t size)
 {
     UNUSED(self);
     UNUSED(data);
     UNUSED(size);
     panic$("embed_file_write() not implemented");
+}
+
+IoResult embed_file_seek(IoFile *self, IoSeek seek)
+{
+    UNUSED(self);
+    UNUSED(seek);
+    panic$("embed_file_seek() not implemented");
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-struct embed_app
+struct _EmbedApp
 {
     int _dummy;
 };

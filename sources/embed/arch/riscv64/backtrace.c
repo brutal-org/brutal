@@ -2,5 +2,6 @@
 
 size_t embed_debug_backtrace(MAYBE_UNUSED uintptr_t *buf, MAYBE_UNUSED size_t cap)
 {
-    return 0;
+    buf[0] = 0;
+    return 1;
 }

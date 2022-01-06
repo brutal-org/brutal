@@ -5,7 +5,7 @@
 
 static IoWriter _writer;
 
-static IoResult embed_log_write(MAYBE_UNUSED void *context, uint8_t const *data, MAYBE_UNUSED size_t offset, size_t size)
+static IoResult embed_log_write(MAYBE_UNUSED void *context, uint8_t const *data, size_t size)
 {
     uint16_t *cstr = utf16_str_to_cstr_dos(str_n$(size, (char *)data), alloc_global());
 
