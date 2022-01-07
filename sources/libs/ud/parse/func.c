@@ -1,8 +1,6 @@
 #include <brutal/debug.h>
 #include <ud/parse/decl.h>
 #include <ud/parse/lexer.h>
-#include "brutal/parse/lex.h"
-#include "ud/parse/parse.h"
 
 UdFuncCall ud_parse_func_call(Lex *lex, Alloc *alloc)
 {

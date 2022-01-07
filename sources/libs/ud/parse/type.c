@@ -1,9 +1,6 @@
 #include <brutal/debug.h>
 #include <ud/parse/decl.h>
 #include <ud/parse/lexer.h>
-#include "brutal/parse/lex.h"
-#include "ud/ast/decl.h"
-#include "ud/ast/type.h"
 
 UdTupleDecl ud_parse_tuple_decl(Lex *lex, Alloc *alloc)
 {
