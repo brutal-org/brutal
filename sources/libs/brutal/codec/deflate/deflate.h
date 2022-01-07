@@ -23,6 +23,15 @@ void deflate_free(DeflateCompressionContext *ctx);
 /**
  * Compress an entire stream
  * @param ctx The compression context used for this operation
+ * @param in The input data to compress
+ * @param in_len The size of the input data
+ * @param out The output buffer where we can store our data
+ * @param out_len The size of the output buffer
+ */
+IoResult deflate_compress_data(DeflateCompressionContext *ctx, const uint8_t *in, size_t in_len, const uint8_t *out, size_t out_len);
+/**
+ * Compress an entire stream
+ * @param ctx The compression context used for this operation
  * @param writer The destination where we write compressed data
  * @param reader The source where we read the uncompressed data from
  */

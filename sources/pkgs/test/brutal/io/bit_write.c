@@ -9,11 +9,18 @@ TEST(bitwriter_write_aligned)
     Buf buf;
     buf_init(&buf, 512, base$(&heap));
     IoWriter writer = buf_writer(&buf);
+    // Initialize our bitwriter
     BitWriter bit_writer;
     io_bw_init(&bit_writer, &writer);
     assert_equal(buf.used, 0);
+    // Write 8 bits
     unsigned data = 0b01010101;
-    io_bw_add_bits(&bit_writer, 8, data);
+    io_bw_add_bits(&bit_writer, data, 8);
     io_bw_flush_bits(&bit_writer);
     assert_equal(buf.used, 1);
+    // Write 16 bits
+    data = 0b0101010101010101;
+    io_bw_add_bits(&bit_writer, data, 16);
+    io_bw_flush_bits(&bit_writer);
+    assert_equal(buf.used, 3);
 }

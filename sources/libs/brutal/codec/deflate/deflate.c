@@ -2,6 +2,7 @@
 #include <brutal/alloc/global.h>
 #include <brutal/codec/deflate/constants.h>
 #include <brutal/codec/deflate/deflate.h>
+#include <brutal/io/mem_view.h>
 
 // Block compressions
 IoResult deflate_compress_block_uncompressed(DeflateCompressionContext *ctx, BitWriter *bit_writer, const uint8_t *in, size_t in_nbytes, bool last);
@@ -51,13 +52,42 @@ IoResult deflate_compress_block_uncompressed(DeflateCompressionContext *ctx, Bit
     io_write(bit_writer->writer, (uint8_t *)&block_len_inv, sizeof(uint16_t));
     io_write(bit_writer->writer, in, in_nbytes);
 
-    return OK(IoResult, in_nbytes);
+    // TODO: this calculation can be wrong
+    return OK(IoResult, in_nbytes + 5);
+}
+
+IoResult deflate_compress_data(DeflateCompressionContext *ctx, const uint8_t *in, size_t in_len, const uint8_t *out, size_t out_len)
+{
+    size_t total = 0;
+    bool last = false;
+
+    // Input
+    MemView in_view;
+    mem_view_init(&in_view, in_len, in);
+    IoReader reader = mem_view_reader(&in_view);
+
+    // Output
+    MemView out_view;
+    mem_view_init(&out_view, out_len, out);
+    IoWriter writer = mem_view_writer(&out_view);
+
+    BitWriter bit_writer;
+    io_bw_init(&bit_writer, &writer);
+
+    do
+    {
+        // Maximum blocksize is 65535
+        uint8_t buf[UINT16_MAX];
+        size_t read = TRY(IoResult, io_read(&reader, buf, sizeof(buf)));
+        last = read < sizeof(buf);
+        total += TRY(IoResult, (*ctx->compress_block_impl)(ctx, &bit_writer, buf, read, last));
+    } while (!last);
+
+    return OK(IoResult, total);
 }
 
 IoResult deflate_compress_stream(DeflateCompressionContext *ctx, IoWriter *writer, IoReader *reader)
 {
-    UNUSED(writer);
-
     size_t total = 0;
     bool last = false;
 
