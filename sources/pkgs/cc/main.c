@@ -2,8 +2,8 @@
 #include <brutal/debug.h>
 #include <brutal/io.h>
 #include <cc/dump.h>
+#include <cc/lex/pproc.h>
 #include <cc/parse.h>
-#include <cc/proc/proc.h>
 #include <cc/trans.h>
 
 int main(int argc, char const *argv[])

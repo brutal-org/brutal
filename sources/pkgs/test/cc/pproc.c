@@ -1,6 +1,6 @@
 #include <brutal/base.h>
+#include <cc/lex/pproc.h>
 #include <cc/parse.h>
-#include <cc/proc/proc.h>
 #include "test/cc/cc.h"
 #include "test/test.h"
 

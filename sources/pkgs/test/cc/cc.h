@@ -1,25 +1,9 @@
 #pragma once
 
-#include <brutal/io/std.h>
+#include <brutal/io.h>
 #include <cc/parse.h>
-#include <cc/proc/proc.h>
 
-#define lex_assert_no_error(LEX)                                                                                 \
-    ({                                                                                                           \
-        if ((LEX)->has_error)                                                                                    \
-        {                                                                                                        \
-            panic$("lex contains error: '{}' with lexeme: '{}'", (LEX)->error.message, (LEX)->error.lexeme.str); \
-        }                                                                                                        \
-    })
-
-#define scan_assert_no_error(SCAN)                    \
-    ({                                                \
-        if ((SCAN)->has_error)                        \
-        {                                             \
-            scan_dump_error(SCAN, io_chan_out());     \
-            panic$("scan: {} contains error", #SCAN); \
-        }                                             \
-    })
+// FIXME: get ride of thoses ugly macros.
 
 #define ctx_lex(lexer_name, str)                 \
     Scan _scan = {};                             \

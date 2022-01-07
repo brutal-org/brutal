@@ -1,9 +1,8 @@
 #include <brutal/debug.h>
-#include <cc/parse.h>
-#include <cc/proc/macro.h>
-#include <cc/proc/proc.h>
+#include <cc/lex/pproc.h>
+#include <cc/parse/parser.h>
 
-CProcMacro cproc_macro_init(CProcContext *ctx, Str name)
+CProcMacro cproc_macro_init(CProc *ctx, Str name)
 {
     CProcMacro macro = {};
     vec_init(&macro.args, ctx->alloc);
@@ -21,7 +20,7 @@ void cproc_macro_code(CProcMacro *target, Lex *source)
     }
 }
 
-CProcMacro *cproc_define(CProcContext *ctx, Str name, Str value)
+CProcMacro *cproc_define(CProc *ctx, Str name, Str value)
 {
     CProcMacro macro = cproc_macro_init(ctx, name);
 
@@ -42,7 +41,7 @@ void cproc_define_arg(CProcMacro *targ, Str name)
     vec_push(&targ->args, name);
 }
 
-void cproc_parse_define(Lex *source, CProcContext *ctx)
+void cproc_parse_define(Lex *source, CProc *ctx)
 {
     cparse_skip_separator(source, CLEX_IDENT); // # {define}
 
@@ -115,6 +114,7 @@ static MacroArgsCodes cproc_parse_macro_call_args(CProcMacro *macro, Lex *source
     MacroArgsCodes macro_args_values;
     vec_init(&macro_args_values, alloc);
     cparse_whitespace(source);
+
     if (lex_curr(source).type != CLEX_LPARENT || macro->args.len == 0)
     {
         return macro_args_values;
@@ -133,12 +133,10 @@ static MacroArgsCodes cproc_parse_macro_call_args(CProcMacro *macro, Lex *source
 
 static Lex cproc_gen_macro_code(CProcMacro *macro)
 {
-    Lex macro_lex = lex_from_lexeme(&macro->source); // take the macro source code
-
-    return macro_lex;
+    return lex_from_lexeme(&macro->source); // take the macro source code
 }
 
-static Lex cproc_gen_extended_macro_code(CProcMacro *macro, Lex *macro_code, CProcContext *ctx)
+static Lex cproc_gen_extended_macro_code(CProcMacro *macro, Lex *macro_code, CProc *ctx)
 {
     vec_push(&ctx->inside_macro, macro->name);
 
@@ -153,7 +151,7 @@ static Lex cproc_gen_extended_macro_code(CProcMacro *macro, Lex *macro_code, CPr
     return output;
 }
 
-static void cproc_gen_macro_args_replacement(CProcMacro *macro, MacroArgsCodes *macro_args_values, Lex *out, Lex *macro_source, CProcContext *ctx)
+static void cproc_gen_macro_args_replacement(CProcMacro *macro, MacroArgsCodes *macro_args_values, Lex *out, Lex *macro_source, CProc *ctx)
 {
     // we loop for each token and we want to find a token equal to an argument name
 
@@ -184,19 +182,20 @@ static void cproc_gen_macro_args_replacement(CProcMacro *macro, MacroArgsCodes *
 
 static void cproc_remove_last_non_space_keyword(Lex *lex)
 {
-
     while (vec_last(&lex->lexemes).type == CLEX_WHITESPACE)
     {
         (void)vec_pop(&lex->lexemes);
     }
+
     (void)vec_pop(&lex->lexemes); // we pop the last token to fusion it with the next one
 }
 
-static void cproc_gen_concatenation(Lex *out, Lex *macro_source, CProcContext *ctx)
+static void cproc_gen_concatenation(Lex *out, Lex *macro_source, CProc *ctx)
 {
-    Lexeme left_lexeme = {.type = CLEX_NONE};
-    Lexeme right_lexeme = {.type = CLEX_NONE};
+    Lexeme lhs = {.type = CLEX_NONE};
+    Lexeme rhs = {.type = CLEX_NONE};
     bool concatenating = false;
+
     while (!lex_ended(macro_source))
     {
         if (lex_curr_type(macro_source) != CLEX_WHITESPACE)
@@ -209,7 +208,7 @@ static void cproc_gen_concatenation(Lex *out, Lex *macro_source, CProcContext *c
             }
             else if (concatenating)
             {
-                if (left_lexeme.type == CLEX_NONE)
+                if (lhs.type == CLEX_NONE)
                 {
                     panic$("## concatenation is not supported");
                     return;
@@ -217,10 +216,10 @@ static void cproc_gen_concatenation(Lex *out, Lex *macro_source, CProcContext *c
 
                 cproc_remove_last_non_space_keyword(out); // we pop the last token to fusion it with the next one
 
-                right_lexeme = lex_curr(macro_source);
+                rhs = lex_curr(macro_source);
                 concatenating = false;
                 Lexeme final = {
-                    .str = str_concat(left_lexeme.str, right_lexeme.str, ctx->alloc),
+                    .str = str_concat(lhs.str, rhs.str, ctx->alloc),
                 };
 
                 Scan scanner;
@@ -239,7 +238,7 @@ static void cproc_gen_concatenation(Lex *out, Lex *macro_source, CProcContext *c
             }
             else
             {
-                left_lexeme = lex_curr(macro_source);
+                lhs = lex_curr(macro_source);
             }
         }
         vec_push(&out->lexemes, lex_curr(macro_source));
@@ -247,7 +246,7 @@ static void cproc_gen_concatenation(Lex *out, Lex *macro_source, CProcContext *c
     }
 }
 
-void cproc_gen_macro(Lex *out, Lex *source, CProcContext *ctx, CProcMacro *macro)
+void cproc_gen_macro(Lex *out, Lex *source, CProc *ctx, CProcMacro *macro)
 {
     // first we parse the argument
     MacroArgsCodes macro_args_values = cproc_parse_macro_call_args(macro, source, ctx->alloc);
@@ -261,4 +260,133 @@ void cproc_gen_macro(Lex *out, Lex *source, CProcContext *ctx, CProcMacro *macro
 
     // we apply the concatenation (after argument see 6.10.3)
     cproc_gen_concatenation(out, &extended_macro, ctx);
+}
+
+static CProcMacro *cproc_macro_by_name(Str name, CProc *ctx)
+{
+    vec_foreach(v, &ctx->macros)
+    {
+        if (str_eq(v->name, name))
+        {
+            return v;
+        }
+    }
+
+    return nullptr;
+}
+
+static bool cproc_is_already_in_macro(CProc *ctx, Str name)
+{
+    vec_foreach(macro_name, &ctx->inside_macro)
+    {
+        if (str_eq(*macro_name, name))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void cproc_parse_ident(Lex *out, Lex *source, CProc *ctx)
+{
+    CProcMacro *macro = cproc_macro_by_name(lex_curr(source).str, ctx);
+
+    // if the identifier is not a macro or we are already in this macro
+    if (macro == nullptr || cproc_is_already_in_macro(ctx, macro->name))
+    {
+        vec_push(&out->lexemes, lex_curr(source));
+        lex_next(source);
+        return;
+    }
+
+    lex_next(source);
+    if (cparse_peek_separator(source, 1).type != CLEX_LPARENT && macro->args.len != 0)
+    {
+        vec_push(&out->lexemes, lex_curr(source));
+        return;
+    }
+
+    cproc_gen_macro(out, source, ctx, macro);
+}
+
+void cproc_parse_directive(MAYBE_UNUSED Lex *result, Lex *source, CProc *context)
+{
+    lex_skip_type(source, CLEX_WHITESPACE);
+
+    if (lex_curr(source).type == CLEX_NEWLINE)
+    {
+        return;
+    }
+
+    if (lex_curr(source).type != CLEX_IDENT)
+    {
+        lex_throw(source, str$("expected identifier"));
+    }
+
+    if (str_eq(lex_curr(source).str, str$("define")))
+    {
+        cproc_parse_define(source, context);
+    }
+    else
+    {
+        lex_throw(source, str$("unknown directive"));
+    }
+}
+
+void cproc_lex(Lex *result, Lex *source, CProc *ctx)
+{
+    bool can_be_directive = true;
+
+    while (!lex_ended(source))
+    {
+        Lexeme curr = lex_curr(source);
+
+        switch (curr.type)
+        {
+        case CLEX_COMMENT:
+            lex_next(source);
+            break;
+
+        case CLEX_NEWLINE:
+            lex_next(source);
+            can_be_directive = true;
+            break;
+
+        case CLEX_POUND:
+            if (can_be_directive)
+            {
+                lex_next(source);
+                cproc_parse_directive(result, source, ctx);
+                can_be_directive = false;
+            }
+            else
+            {
+                lex_throw(source, str$("'#' can be placed only at the start of a line"));
+            }
+            break;
+
+        default:
+            cproc_parse_ident(result, source, ctx);
+            can_be_directive = false;
+            break;
+        }
+    }
+}
+
+Lex cproc_file(Lex *source, Str filename, Alloc *alloc)
+{
+    CProc ctx = {};
+    ctx.filename = filename;
+    ctx.alloc = alloc;
+    vec_init(&ctx.files_included, alloc);
+    vec_init(&ctx.macros, alloc);
+    vec_init(&ctx.include_path, alloc);
+    vec_init(&ctx.source, alloc);
+    vec_init(&ctx.inside_macro, alloc);
+
+    Lex result = {};
+    vec_init(&result.lexemes, alloc);
+
+    cproc_lex(&result, source, &ctx);
+    return result;
 }

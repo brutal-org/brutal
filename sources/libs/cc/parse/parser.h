@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cc/builder.h>
-#include <cc/parse/lexer.h>
+#include <cc/lex/lexer.h>
 
 CDecl cparse_decl(Lex *lex, CUnit *context, Alloc *alloc);
 

@@ -7,13 +7,13 @@ bool assert_lex_eq(Lex *first, Str left)
 
     vec_foreach(lexeme, &first->lexemes)
     {
-
         if ((size_t)idx > left.len)
         {
             panic$("expected len eq {} != {}", idx, left.len);
         }
 
         Str part = str_sub(left, idx, idx + lexeme->str.len);
+
         if (!str_eq(part, lexeme->str))
         {
             panic$("tok '{}' != '{}'", lexeme->str, part);
@@ -32,7 +32,6 @@ bool assert_lex_eq(Lex *first, Str left)
 
 TEST(lex_eq_test)
 {
-
     Str from = str$("int these_are_some_tokens >= + 10 \"efeifjieij\" \n");
 
     ctx_lex(lexer, from);
