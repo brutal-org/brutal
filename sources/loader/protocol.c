@@ -162,12 +162,12 @@ static void efi_load_module(HandoverModule *target, Str path)
     // TODO: make a kernel_module alloc instead of allocating 2 time (even if the first time is always freed)
     Buf buf = io_readall((&reader), alloc_global());
 
-    uintptr_t buf_page_size = ALIGN_UP(buf.used, PAGE_SIZE) / PAGE_SIZE;
+    uintptr_t buf_page_size = align_up$(buf.used, PAGE_SIZE) / PAGE_SIZE;
     uintptr_t module_addr = kernel_module_phys_alloc_page(buf_page_size);
 
     memcpy((void *)module_addr, buf.data, buf.used);
 
-    target->size = ALIGN_UP(buf.used, PAGE_SIZE);
+    target->size = align_up$(buf.used, PAGE_SIZE);
     target->addr = module_addr;
 
     buf_deinit(&buf);

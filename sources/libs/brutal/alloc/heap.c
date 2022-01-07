@@ -70,7 +70,7 @@ static bool check_minor_magic(HeapMinor *min, void *ptr)
 
 void *heap_alloc_acquire(HeapAlloc *alloc, size_t req_size)
 {
-    req_size = ALIGN_UP(req_size, ALLOC_HEAP_ALIGN);
+    req_size = align_up$(req_size, ALLOC_HEAP_ALIGN);
 
     size_t bestSize = 0;
     size_t size = req_size;
@@ -365,7 +365,7 @@ void heap_alloc_release(HeapAlloc *alloc, void *ptr)
 
 void *heap_alloc_resize(HeapAlloc *alloc, void *ptr, size_t size)
 {
-    size = ALIGN_UP(size, ALLOC_HEAP_ALIGN);
+    size = align_up$(size, ALLOC_HEAP_ALIGN);
 
     if (size == 0)
     {

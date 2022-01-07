@@ -104,7 +104,7 @@ void handover_mmap_append(HandoverMmap *self, HandoverMmapEntry entry)
         {
             if (entry.type < e->type)
             {
-                SWAP(*e, entry);
+                swap$(e, &entry);
             }
 
             HandoverMmapType type = e->type;

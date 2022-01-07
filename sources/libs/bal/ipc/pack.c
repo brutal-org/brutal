@@ -23,7 +23,7 @@ void bal_pack_ensure(BalPack *self, size_t cap)
     BrCreateArgs memory = {
         .type = BR_OBJECT_MEMORY,
         .memory = {
-            .size = ALIGN_UP(cap, MEM_PAGE_SIZE),
+            .size = align_up$(cap, MEM_PAGE_SIZE),
         },
     };
 
@@ -46,7 +46,7 @@ void bal_pack_ensure(BalPack *self, size_t cap)
 
     self->handle = memory.handle;
     self->buf = (void *)memmap.vaddr;
-    self->len = ALIGN_UP(cap, MEM_PAGE_SIZE);
+    self->len = align_up$(cap, MEM_PAGE_SIZE);
 }
 
 void bal_pack(BalPack *self, void const *buf, size_t len)

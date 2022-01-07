@@ -31,8 +31,8 @@ struct heap_minor
     HeapMajor *block;
 };
 
-#define MAJOR_BLOCK_HEADER_SIZE (ALIGN_UP(sizeof(HeapMajor), ALLOC_HEAP_ALIGN))
-#define MINOR_BLOCK_HEADER_SIZE (ALIGN_UP(sizeof(HeapMinor), ALLOC_HEAP_ALIGN))
+#define MAJOR_BLOCK_HEADER_SIZE (align_up$(sizeof(HeapMajor), ALLOC_HEAP_ALIGN))
+#define MINOR_BLOCK_HEADER_SIZE (align_up$(sizeof(HeapMinor), ALLOC_HEAP_ALIGN))
 
 typedef struct
 {

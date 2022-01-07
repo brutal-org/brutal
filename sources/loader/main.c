@@ -28,17 +28,17 @@ void loader_load(Elf64Header const *elf_header, void *base)
         {
             void *file_segment = (void *)((uint64_t)base + prog_header->file_offset);
 
-            void *mem_phys_segment = (void *)kernel_module_phys_alloc_page_addr(ALIGN_UP(prog_header->memory_size, PAGE_SIZE) / PAGE_SIZE, prog_header->virtual_address - MMAP_KERNEL_BASE);
+            void *mem_phys_segment = (void *)kernel_module_phys_alloc_page_addr(align_up$(prog_header->memory_size, PAGE_SIZE) / PAGE_SIZE, prog_header->virtual_address - MMAP_KERNEL_BASE);
 
             mem_cpy(mem_phys_segment, file_segment, prog_header->file_size);
             mem_set(mem_phys_segment + prog_header->file_size, 0, prog_header->memory_size - prog_header->file_size);
             memory_map_range((VmmRange){
                                  .base = prog_header->virtual_address,
-                                 .size = ALIGN_UP(prog_header->memory_size, PAGE_SIZE),
+                                 .size = align_up$(prog_header->memory_size, PAGE_SIZE),
                              },
                              (PmmRange){
                                  .base = (uintptr_t)mem_phys_segment,
-                                 .size = ALIGN_UP(prog_header->memory_size, PAGE_SIZE),
+                                 .size = align_up$(prog_header->memory_size, PAGE_SIZE),
                              });
         }
         else
@@ -87,11 +87,11 @@ Handover *allocate_handover(void)
 
     memory_map_range((VmmRange){
                          .base = handover_copy_phys + MMAP_KERNEL_BASE,
-                         .size = ALIGN_UP(sizeof(Handover), PAGE_SIZE),
+                         .size = align_up$(sizeof(Handover), PAGE_SIZE),
                      },
                      (PmmRange){
                          .base = handover_copy_phys,
-                         .size = ALIGN_UP(sizeof(Handover), PAGE_SIZE),
+                         .size = align_up$(sizeof(Handover), PAGE_SIZE),
                      });
 
     memory_flush_tlb();

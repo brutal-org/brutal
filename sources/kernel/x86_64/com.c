@@ -23,12 +23,12 @@ bool com_can_write(enum com_port port)
 
 void com_wait_write(enum com_port port)
 {
-    WAIT_FOR(com_can_write(port));
+    wait_for$(com_can_write(port));
 }
 
 void com_wait_read(enum com_port port)
 {
-    WAIT_FOR(com_can_read(port))
+    wait_for$(com_can_read(port))
 }
 
 void com_putc(enum com_port port, char c)

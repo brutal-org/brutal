@@ -8,12 +8,12 @@ static uint32_t map_hash(Str key)
 
 static MapNode *map_node_create(Alloc *alloc, Str key, void const *data, int data_size)
 {
-    int node_size = sizeof(MapNode) + ALIGN_UP(key.len, 16) + data_size;
+    int node_size = sizeof(MapNode) + align_up$(key.len, 16) + data_size;
     MapNode *node = (MapNode *)alloc_malloc(alloc, node_size);
 
     node->hash = map_hash(key);
 
-    node->data = (uint8_t *)node + sizeof(MapNode) + ALIGN_UP(key.len, 16);
+    node->data = (uint8_t *)node + sizeof(MapNode) + align_up$(key.len, 16);
 
     mem_cpy(&node->key.buf, key.buf, key.len);
     node->key.len = key.len;

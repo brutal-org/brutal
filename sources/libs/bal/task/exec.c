@@ -15,7 +15,7 @@ static void bal_exec_load(BrHandle space, Elf64Header const *elf_header, BrHandl
             continue;
         }
 
-        size_t size = ALIGN_UP(m_max(prog_header->memory_size, prog_header->file_size), MEM_PAGE_SIZE);
+        size_t size = align_up$(m_max(prog_header->memory_size, prog_header->file_size), MEM_PAGE_SIZE);
 
         if (!(prog_header->flags & ELF_PROGRAM_HEADER_WRITABLE) &&
             prog_header->file_size == prog_header->memory_size)
@@ -111,7 +111,7 @@ static uintptr_t bal_exec_stack(BrHandle space, BalArgs exec_args, BrTaskArgs *s
 
         for (int i = 0; i < cmain.argc; i++)
         {
-            head -= ALIGN_UP(cmain.argv[i].len + 1, 16);
+            head -= align_up$(cmain.argv[i].len + 1, 16);
             mem_cpy(head, cmain.argv[i].buf, cmain.argv[i].len);
             head[cmain.argv[i].len] = 0;
 
@@ -120,7 +120,7 @@ static uintptr_t bal_exec_stack(BrHandle space, BalArgs exec_args, BrTaskArgs *s
 
         argv[cmain.argc] = 0;
 
-        head -= ALIGN_UP(sizeof(argv), 16);
+        head -= align_up$(sizeof(argv), 16);
         mem_cpy(head, argv, sizeof(argv));
 
         start_args->arg1 = cmain.argc;
@@ -141,7 +141,7 @@ static uintptr_t bal_exec_stack(BrHandle space, BalArgs exec_args, BrTaskArgs *s
 
     case BR_START_HANDOVER:
     {
-        head -= ALIGN_UP(sizeof(Handover), 16);
+        head -= align_up$(sizeof(Handover), 16);
         mem_cpy(head, exec_args.handover, sizeof(Handover));
         start_args->arg1 = 0xC0000000 - ((uintptr_t)base - (uintptr_t)head);
     }

@@ -265,7 +265,7 @@ VmmResult vmm_unmap(VmmSpace space, VmmRange virtual_range)
 
     for (size_t i = 0; i < (virtual_range.size / MEM_PAGE_SIZE); i++)
     {
-        vmm_unmap_page((Pml *)space, i * MEM_PAGE_SIZE + ALIGN_DOWN(virtual_range.base, MEM_PAGE_SIZE));
+        vmm_unmap_page((Pml *)space, i * MEM_PAGE_SIZE + align_down$(virtual_range.base, MEM_PAGE_SIZE));
     }
 
     return OK(VmmResult, virtual_range);

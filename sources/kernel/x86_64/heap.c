@@ -8,7 +8,7 @@ static Lock _lock;
 
 HeapResult heap_alloc(size_t size)
 {
-    size = ALIGN_UP(size, 4096);
+    size = align_up$(size, 4096);
 
     LOCK_RETAINER(&_lock)
 

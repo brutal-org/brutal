@@ -35,7 +35,7 @@ static void pmm_bitmap_init(HandoverMmap const *memory_map)
     _usable_range = range_from_start_and_end(PmmRange, handover_mmap_base(memory_map), handover_mmap_end(memory_map));
     log$("Allocating memory bitmap...");
 
-    size_t bitmap_size = ALIGN_UP(_usable_range.size / MEM_PAGE_SIZE / 8, MEM_PAGE_SIZE);
+    size_t bitmap_size = align_up$(_usable_range.size / MEM_PAGE_SIZE / 8, MEM_PAGE_SIZE);
 
     log$("A bitmap {}kib long is needed", bitmap_size / 1024);
 

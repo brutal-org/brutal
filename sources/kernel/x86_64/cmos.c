@@ -21,7 +21,7 @@ DateTime cmos_read_rtc(void)
 {
     asm_cli();
 
-    WAIT_FOR(!cmos_is_update());
+    wait_for$(!cmos_is_update());
 
     DateTime datetime;
 

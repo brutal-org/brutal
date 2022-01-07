@@ -6,18 +6,16 @@
     {                                                                                  \
         0x09576e92, 0x6d3f, 0x11d2, { 0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b } \
     }
+
 #define EFI_FILE_SYSTEM_INFO_ID                                                        \
     {                                                                                  \
         0x09576e93, 0x6d3f, 0x11d2, { 0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b } \
     }
+
 #define EFI_FILE_SYSTEM_VOLUME_LABEL_ID                                                \
     {                                                                                  \
         0xdb47d7d3, 0xfe81, 0x11d3, { 0x9a, 0x35, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d } \
     }
-
-#define EFI_FILE_PROTOCOL_REVISION 0x00010000
-#define EFI_FILE_PROTOCOL_REVISION2 0x00020000
-#define EFI_FILE_PROTOCOL_LATEST_REVISION EFI_FILE_PROTOCOL_REVISION2
 
 #define EFI_FILE_MODE_READ (1 << 0)
 #define EFI_FILE_MODE_WRITE (1 << 1)
@@ -40,7 +38,7 @@ typedef struct EFI_FILE_INFO
     EFITime last_access_time;
     EFITime modification_time;
     uint64_t attribute;
-    char16 file_name[256];
+    uint16_t file_name[256];
 } EFIFileInfo;
 
 typedef struct EFI_FILE_SYSTEM_INFO
@@ -50,12 +48,12 @@ typedef struct EFI_FILE_SYSTEM_INFO
     uint64_t volume_size;
     uint64_t free_space;
     uint32_t block_size;
-    char16 volume_label;
+    uint16_t volume_label;
 } EFIFileSystemInfo;
 
 typedef struct
 {
-    char16 volume_label[256];
+    uint16_t volume_label[256];
 } EFIFileSystemVolumeLabel;
 
 typedef struct
@@ -70,7 +68,7 @@ struct _EFI_FILE_IO;
 
 #define DEF_FILE_EFI_FUNC(name, ...) typedef EfiStatus (*EFI_FILE_##name)(struct _EFI_FILE_IO * self IFN(__VA_ARGS__)(, ) __VA_ARGS__)
 
-DEF_FILE_EFI_FUNC(OPEN, struct _EFI_FILE_IO **, char16 *, uint64_t, uint64_t);
+DEF_FILE_EFI_FUNC(OPEN, struct _EFI_FILE_IO **, uint16_t *, uint64_t, uint64_t);
 DEF_FILE_EFI_FUNC(CLOSE);
 DEF_FILE_EFI_FUNC(DELETE);
 DEF_FILE_EFI_FUNC(READ, uint64_t *, void *);
@@ -80,7 +78,7 @@ DEF_FILE_EFI_FUNC(SET_POSITION, uint64_t);
 DEF_FILE_EFI_FUNC(GET_INFO, EfiGuid *, uint64_t *, void *);
 DEF_FILE_EFI_FUNC(SET_INFO, EfiGuid *, uint64_t, void *);
 DEF_FILE_EFI_FUNC(FLUSH);
-DEF_FILE_EFI_FUNC(OPEN_EX, struct _EFI_FILE_IO **, char16 *, uint64_t, uint64_t, EFIFileIOToken *);
+DEF_FILE_EFI_FUNC(OPEN_EX, struct _EFI_FILE_IO **, uint16_t *, uint64_t, uint64_t, EFIFileIOToken *);
 DEF_FILE_EFI_FUNC(READ_EX, EFIFileIOToken *);
 DEF_FILE_EFI_FUNC(WRITE_EX, EFIFileIOToken *);
 DEF_FILE_EFI_FUNC(FLUSH_EX, EFIFileIOToken *);

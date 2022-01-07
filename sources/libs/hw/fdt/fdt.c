@@ -68,12 +68,12 @@ FdtTok *fdt_tok_next(FdtTok *tok)
     if (cur_type == FDT_BEGIN_NODE)
     {
         FdtTokBegin *node = (FdtTokBegin *)tok;
-        tok += (ALIGN_UP(str$(node->name).len + 1, 4) / 4);
+        tok += (align_up$(str$(node->name).len + 1, 4) / 4);
     }
     else if (cur_type == FDT_PROP)
     {
         FdtTokProp *node = (FdtTokProp *)tok;
-        tok += (ALIGN_UP(load_be(node->len), 4) / 4);
+        tok += (align_up$(load_be(node->len), 4) / 4);
         tok += 2;
     }
     tok++;

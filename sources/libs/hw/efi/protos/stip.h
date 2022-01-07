@@ -41,7 +41,7 @@ struct _EFI_SIMPLE_TEXT_INPUT;
 typedef struct
 {
     uint16_t scan_code;
-    char16 unicode_char;
+    uint16_t unicode_char;
 } EFIInputKey;
 
 DEF_TEXTI_EFI_FUNC(RESET, bool);

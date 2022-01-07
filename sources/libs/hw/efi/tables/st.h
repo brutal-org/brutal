@@ -9,7 +9,7 @@
 typedef struct
 {
     EFITableHeader hdr;
-    char16 *firmware_vendor;
+    uint16_t *firmware_vendor;
     uint32_t firmware_revision;
     EFIHandle console_in_handle;
     EFISimpleTextInput *console_in;

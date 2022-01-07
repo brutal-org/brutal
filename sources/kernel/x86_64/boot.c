@@ -53,7 +53,7 @@ void arch_entry_main(Handover *handover)
 
     _ready++;
     smp_boot_other();
-    WAIT_FOR(_ready == cpu_count());
+    wait_for$(_ready == cpu_count());
 
     cpu_retain_enable();
     cpu_enable_interrupts();
@@ -75,7 +75,7 @@ void arch_entry_other(void)
     syscall_initialize();
 
     _ready++;
-    WAIT_FOR(_ready == cpu_count());
+    wait_for$(_ready == cpu_count());
 
     cpu_retain_enable();
     cpu_enable_interrupts();

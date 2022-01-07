@@ -87,7 +87,7 @@ static BidBuiltinType builtins[] = {
 
 BidBuiltinType *bid_lookup_builtin(Str name)
 {
-    for (size_t i = 0; i < ARRAY_LEN(builtins); i++)
+    for (size_t i = 0; i < array_len$(builtins); i++)
     {
         if (str_eq(name, builtins[i].name))
         {

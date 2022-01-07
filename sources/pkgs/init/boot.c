@@ -13,7 +13,7 @@ void boot_splashscreen(Handover const *handover)
 
     HandoverFramebuffer const *fb = &handover->framebuffer;
 
-    size_t fb_size = ALIGN_UP(fb->height * fb->pitch, MEM_PAGE_SIZE);
+    size_t fb_size = align_up$(fb->height * fb->pitch, MEM_PAGE_SIZE);
 
     BalMem fb_mem;
     bal_mem_init_pmm(&fb_mem, fb->addr, fb_size);

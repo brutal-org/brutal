@@ -150,7 +150,7 @@ static LexemeType clex_impl(Scan *scan)
         return CLEX_CHARACTER;
     }
 
-    for (size_t i = 0; i < ARRAY_LEN(keywords); i++)
+    for (size_t i = 0; i < array_len$(keywords); i++)
     {
         if (scan_skip_word(scan, str$(keywords[i].literal)))
         {

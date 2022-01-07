@@ -23,7 +23,7 @@ extern uint32_t trampoline_end;
 static size_t smp_trampoline_size(void)
 {
     uint64_t trampoline_len = (uintptr_t)&trampoline_end - (uintptr_t)&trampoline_start;
-    return ALIGN_UP(trampoline_len, MEM_PAGE_SIZE);
+    return align_up$(trampoline_len, MEM_PAGE_SIZE);
 }
 
 static void smp_trampoline_map(void)
@@ -109,7 +109,7 @@ void smp_boot_other(void)
         smp_initialize_cpu_context();
         smp_start_cpu(cpu_impl(cpu)->lapic);
 
-        WAIT_FOR(_ready);
+        wait_for$(_ready);
     }
 
     smp_trampoline_unmap();

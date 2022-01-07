@@ -45,7 +45,7 @@ static void elf_load_program(Task *task, Elf64Header const *elf_header, Memory *
             continue;
         }
 
-        size_t size = ALIGN_UP(m_max(prog_header->memory_size, prog_header->file_size), MEM_PAGE_SIZE);
+        size_t size = align_up$(m_max(prog_header->memory_size, prog_header->file_size), MEM_PAGE_SIZE);
 
         if (!(prog_header->flags & ELF_PROGRAM_HEADER_WRITABLE) &&
             prog_header->file_size == prog_header->memory_size)
@@ -79,7 +79,7 @@ void init_stack(Task *task)
 
 static uintptr_t init_pass(Task *task, Handover const *handover)
 {
-    HeapRange heap = UNWRAP(heap_alloc(ALIGN_UP(sizeof(Handover), MEM_PAGE_SIZE)));
+    HeapRange heap = UNWRAP(heap_alloc(align_up$(sizeof(Handover), MEM_PAGE_SIZE)));
     mem_cpy((void *)heap.base, handover, sizeof(Handover));
     Memory *obj = memory_heap(heap, MEMORY_OWNING);
     uintptr_t addr = UNWRAP(space_map(task->space, obj, 0, 0, 0)).base;

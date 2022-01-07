@@ -106,5 +106,5 @@ static char *_witty[] = {
 
 Str witty(int seed)
 {
-    return str$(_witty[seed % ARRAY_LEN(_witty)]);
+    return str$(_witty[seed % array_len$(_witty)]);
 }

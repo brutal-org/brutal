@@ -16,7 +16,6 @@ static inline bool efi_guid_eq(EfiGuid lhs, EfiGuid rhs)
     return memcmp(&lhs, &rhs, sizeof(EfiGuid)) == 0;
 }
 
-typedef unsigned short char16;
 typedef uint64_t EfiStatus;
 typedef void *EFIEvent;
 typedef void *EFIHandle;

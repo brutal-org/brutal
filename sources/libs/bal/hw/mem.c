@@ -94,7 +94,7 @@ MaybeError bal_mem_init_size(BalMem *self, size_t size)
     BrCreateArgs memory_args = {
         .type = BR_OBJECT_MEMORY,
         .memory = {
-            .size = ALIGN_UP(size, 4096),
+            .size = align_up$(size, 4096),
             .flags = 0,
         },
     };
