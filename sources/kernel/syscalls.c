@@ -259,7 +259,6 @@ BrResult sys_ipc(BrIpcArgs *args)
         }
         else
         {
-            // FIXME: We should use handle instead of id for IPCs.
             task = (Task *)global_lookup(args->to, BR_OBJECT_TASK);
         }
 

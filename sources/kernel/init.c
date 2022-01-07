@@ -30,7 +30,6 @@ static bool elf_supported(Elf64Header const *header, size_t data_size)
         return false;
     }
 
-    // don't start non executable files
     return true;
 }
 

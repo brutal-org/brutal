@@ -44,7 +44,7 @@ bool lex_ended(Lex *self)
 
 Lexeme lex_peek(Lex *self, int offset)
 {
-    if (self->head + offset >= self->lexemes.len)
+    if (self->has_error || self->head + offset >= self->lexemes.len)
     {
         return (Lexeme){
             LEXEME_EOF,

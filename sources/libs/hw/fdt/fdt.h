@@ -1,8 +1,6 @@
 #pragma once
 
-#include <brutal/base.h>
-#include <brutal/base/endian.h>
-#include <brutal/io/emit.h>
+#include <brutal/io.h>
 
 typedef struct PACKED
 {

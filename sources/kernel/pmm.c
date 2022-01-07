@@ -85,8 +85,7 @@ void pmm_initialize(Handover const *handover)
     pmm_bitmap_init(&handover->mmap);
     pmm_mmap_load(&handover->mmap);
 
-    // we set the first part of memory used
-    pmm_used((PmmRange){(uintptr_t)_usable_range.base, MEM_PAGE_SIZE * 32});
+    pmm_used((PmmRange){(uintptr_t)_usable_range.base, MEM_PAGE_SIZE});
     pmm_used((PmmRange){mmap_io_to_phys((uintptr_t)_bitmap.data), _bitmap.size});
 }
 

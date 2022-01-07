@@ -9,8 +9,6 @@ CDeclarator cparse_declarator(Lex *lex, Alloc *alloc);
 
 CExpr cparse_expr(Lex *lex, int pre, CUnit *context, Alloc *alloc);
 
-COp cparse_lexeme_to_cop(LexemeType type);
-
 CStmt cparse_stmt(Lex *lex, CUnit *context, Alloc *alloc);
 
 void cparse_func_params(Lex *lex, CType *type, Alloc *alloc);

@@ -30,8 +30,6 @@ DateTime cmos_read_rtc(void)
     datetime.hour = from_binary_coded_decimal(cmos_read(CMOS_RTC_HOUR));
     datetime.day = from_binary_coded_decimal(cmos_read(CMOS_RTC_DAY));
     datetime.month = from_binary_coded_decimal(cmos_read(CMOS_RTC_MONTH));
-
-    // FIXME: Add support for century register
     datetime.year = from_binary_coded_decimal(cmos_read(CMOS_RTC_YEAR)) + 2000;
 
     asm_sti();

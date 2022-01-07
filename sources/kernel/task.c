@@ -27,7 +27,6 @@ void task_destroy(Task *task)
 
 TaskCreateResult task_create(Space *space, BrRight rights, BrTaskFlags flags)
 {
-
     Task *task = alloc_make(alloc_global(), Task);
 
     task->flags = flags;
@@ -39,7 +38,6 @@ TaskCreateResult task_create(Space *space, BrRight rights, BrTaskFlags flags)
     task->domain = domain_create();
     task->channel = channel_create();
 
-    // Create the kernel stack
     task->stack = UNWRAP(heap_alloc(KERNEL_STACK_SIZE));
     task->sp = range_end(task->stack);
 
