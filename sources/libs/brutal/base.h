@@ -14,5 +14,5 @@
 #include <brutal/base/result.h>
 #include <brutal/base/slice.h>
 #include <brutal/base/std.h>
-#include <brutal/base/vaopt.h>
 #include <brutal/base/types.h>
+#include <brutal/base/vaopt.h>

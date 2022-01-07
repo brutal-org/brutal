@@ -8,7 +8,7 @@ typedef struct
     uint64_t inc;
 } MRand;
 
-void m_rand_init(MRand* self, uint32_t seed);
+void m_rand_init(MRand *self, uint32_t seed);
 
 uint64_t m_rand_next_u64(MRand *self);
 

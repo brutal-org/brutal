@@ -147,4 +147,3 @@ typedef enum
 #define KBMOD_SUPER (1 << 4)
 
 typedef uint8_t KbMod;
-

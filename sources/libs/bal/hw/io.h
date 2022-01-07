@@ -1,7 +1,7 @@
 #pragma once
 
-#include <brutal/base.h>
 #include <bal/hw/mem.h>
+#include <brutal/base.h>
 
 typedef enum
 {

@@ -26,13 +26,13 @@ typedef struct
     ScanError error;
 } Scan;
 
-#define scan_assert_no_error(SCAN)                    \
-    ({                                                \
-        if ((SCAN)->has_error)                        \
-        {                                             \
-            scan_dump_error(SCAN, io_chan_out());     \
+#define scan_assert_no_error(SCAN)                              \
+    ({                                                          \
+        if ((SCAN)->has_error)                                  \
+        {                                                       \
+            scan_dump_error(SCAN, io_chan_out());               \
             panic$("scan: terminating due to previous errors"); \
-        }                                             \
+        }                                                       \
     })
 
 void scan_init(Scan *self, Str str);

@@ -23,6 +23,7 @@ usage()
   echo "    -d, --debug    Run the tool inside a debuger"
   echo "    -n, --nuke     Nuke the build dir"
   echo "    -f, --fast     Do it fast"
+  echo "        --format   Format all C and header files in sources/"
   echo "    -h, --help     Show usage"
   echo "    -o, --coverage Generate code coverage"
   echo "    -r, --run      Start the virtual machine"
@@ -71,6 +72,10 @@ eval_arg()
 
     "-v" | "--verbose")
       SILENT=""
+      ;;
+
+    "--format")
+      find sources/ -name '*.c' -o -name '*.h' -exec clang-format -i '{}' \;
       ;;
 
     *)

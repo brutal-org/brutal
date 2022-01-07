@@ -7,5 +7,3 @@
 #define MSBTN_RIGHT (1 << 2)
 
 typedef uint8_t MsBtns;
-
-
