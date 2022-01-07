@@ -1,13 +1,7 @@
 #include <brutal/debug.h>
+#include <json/emit.h>
 #include <json/parser.h>
 #include <ud/gen/json.h>
-#include "brutal/alloc/base.h"
-#include "brutal/ds/vec.h"
-#include "json/emit.h"
-#include "json/objects.h"
-#include "ud/ast/decl.h"
-#include "ud/ast/expr.h"
-#include "ud/parse/parse.h"
 
 Str ud_str_from_constant(UdVal val, Alloc *alloc)
 {
