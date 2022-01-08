@@ -1,6 +1,6 @@
 # Naming
 
-## BID
+## IDL
 
 - snake_case for all methods
 - CONST_CASE for all constants

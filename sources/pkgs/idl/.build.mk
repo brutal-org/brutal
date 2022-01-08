@@ -1,0 +1,3 @@
+IDL_NAME = idl
+
+HOST_PKGS += IDL
