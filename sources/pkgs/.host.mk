@@ -18,8 +18,8 @@ LIBS_HOST_SRC = \
 	$(wildcard sources/libs/json/*.c)     \
 	$(wildcard sources/libs/elf/*.c)      \
 	$(wildcard sources/libs/boot/abi/handover.c) \
-	$(wildcard sources/libs/bid/*.c) \
-	$(wildcard sources/libs/bid/*/*.c)
+	$(wildcard sources/libs/idl/*.c) \
+	$(wildcard sources/libs/idl/*/*.c)
 
 LIBS_HOST_OBJ = \
 	$(patsubst sources/%, $(BINDIR_HOST)/%.o, $(LIBS_HOST_SRC))

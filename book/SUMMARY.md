@@ -9,5 +9,5 @@
   - [Syscalls](./kernel/syscalls.md)
   - [Scheduling](./kernel/scheduling.md)
 - [Tools]()
-  - [Interface Definition language (BID)](./tools/bid.md)
+  - [Interface Definition language (IDL)](./tools/idl.md)
 - [Credits](./credits.md)

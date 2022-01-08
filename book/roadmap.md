@@ -116,7 +116,7 @@ The following roadmap is always subject to change.
 - [x] IPC
 - [x] IDL
 
-### Milestone 3 - ACPI, PCIe, Bootloader And BID
+### Milestone 3 - ACPI, PCIe, Bootloader And IDL
 
 - [x] Fibers
 - [x] Event loop
@@ -125,7 +125,7 @@ The following roadmap is always subject to change.
   - [x] MCFG
 - [x] PCIe Server
   - [x] Device enumeration
-- [x] BID (Interface definition language)
+- [x] IDL (Interface definition language)
   - [x] Parser
   - [x] Sema
   - [x] C code gen
