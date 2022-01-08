@@ -123,6 +123,12 @@ void bal_pack_str(BalPack *self, Str const *v)
     bal_pack(self, v->buf, v->len);
 }
 
+void bal_pack_addr(BalPack *self, BrAddr const *addr)
+{
+    bal_pack_u64(self, &addr->port);
+    bal_pack_u64(self, &addr->id);
+}
+
 void bal_pack_slice_impl(BalPack *self, SliceImpl const *v, BalPackFn *el)
 {
     bal_pack_size(self, &v->len);

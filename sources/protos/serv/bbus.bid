@@ -4,5 +4,5 @@ interface Bbus
         NOT_FOUND,
     };
 
-    method locate Str -> U64;
+    method locate Str -> Capability;
 }

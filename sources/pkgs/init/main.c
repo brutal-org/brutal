@@ -1,4 +1,5 @@
 #include <bal/ipc.h>
+#include <brutal/alloc.h>
 #include <brutal/debug.h>
 #include <protos/serv/bbus.h>
 #include "init/boot.h"
@@ -6,15 +7,15 @@
 
 BbusError handle_bbus_locate(
     IpcEv *ev,
-    MAYBE_UNUSED BrId task,
+    MAYBE_UNUSED BrAddr from,
     Str const *req,
-    uint64_t *resp,
+    BrAddr *resp,
     MAYBE_UNUSED Alloc *alloc)
 {
     Bus *bus = ev->ctx;
-    BrId id = bus_lookup(bus, *req);
+    BrAddr id = bus_lookup(bus, *req);
 
-    if (id == BR_ID_NIL)
+    if (id.id == BR_ID_NIL)
     {
         return BBUS_NOT_FOUND;
     }
@@ -45,7 +46,7 @@ int br_entry_handover(Handover *handover)
     bus_start(&bus, str$("ps2"), bal_args1(0));
     bus_start(&bus, str$("ahci"), bal_args1(0));
 
-    bbus_impl(&ev, &_bbus_vtable);
+    bbus_provide(&ev, &_bbus_vtable);
 
     return br_ev_run(&ev);
 }

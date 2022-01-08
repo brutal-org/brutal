@@ -7,55 +7,55 @@ The following roadmap is always subject to change.
 ## Milestone 4 - FileSystem, Capabilities and Graphics
 
 - [ ] BBus
-    - [ ] Capabilities
+  - [ ] Capabilities
 - [ ] Graphic Library
-    - [x] SDL Backend
-        - [x] Render
-        - [x] Events
-    - [ ] Brutal Backend
-        - [ ] Compositor
-            - [ ] Event Dispatch
-            - [ ] Compositing
-            - [ ] Tilling Mode
-            - [ ] Floating Mode
-        - [ ] Client
-            - [x] Render
-            - [ ] Events
-    - [x] Paint
-        - [x] Dots
-        - [x] Lines
-        - [x] Rect
-        - [x] Poly
-        - [x] Text
-    - [x] Event
-        - [x] Mouse Events
-        - [x] Keyboard Events
-    - [ ] Layout
-        - [x] LTR/RTL Layout
-        - [x] Dock Layout
-        - [ ] Flex Layout
-        - [ ] Grid Layout
-    - [ ] Views
-        - [x] Panel
-        - [ ] Icon
-        - [x] Button
-        - [x] Text
-        - [x] Frame
-        - [ ] Image
-        - [ ] Splitter
-        - [ ] Switch
-        - [ ] Slider
+  - [x] SDL Backend
+    - [x] Render
+    - [x] Events
+  - [ ] Brutal Backend
+    - [ ] Compositor
+      - [ ] Event Dispatch
+      - [ ] Compositing
+      - [ ] Tilling Mode
+      - [ ] Floating Mode
+    - [ ] Client
+      - [x] Render
+      - [ ] Events
+  - [x] Paint
+    - [x] Dots
+    - [x] Lines
+    - [x] Rect
+    - [x] Poly
+    - [x] Text
+  - [x] Event
+    - [x] Mouse Events
+    - [x] Keyboard Events
+  - [ ] Layout
+    - [x] LTR/RTL Layout
+    - [x] Dock Layout
+    - [ ] Flex Layout
+    - [ ] Grid Layout
+  - [ ] Views
+    - [x] Panel
+    - [ ] Icon
+    - [x] Button
+    - [x] Text
+    - [x] Frame
+    - [ ] Image
+    - [ ] Splitter
+    - [ ] Switch
+    - [ ] Slider
 - [ ] Files System
-    - [x] Ahci
-        - [x] Read
-        - [x] Write
-    - [ ] Ext2Fs
-        - [x] Read
-        - [ ] Write
+  - [x] Ahci
+    - [x] Read
+    - [x] Write
+  - [ ] Ext2Fs
+    - [x] Read
+    - [ ] Write
 
 ### Milestone 5 - Networking and Shell
 
-- [ ] TTy
+- [ ] TTY
 - [ ] Shell
 - [ ] Optimise IPCs
 - [ ] Networking

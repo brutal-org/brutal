@@ -1,9 +1,11 @@
 #include <ahci/ahci.h>
 #include <ahci/device.h>
 #include <bal/ipc.h>
+#include <brutal/alloc.h>
 #include <brutal/debug.h>
 #include <protos/hw/pci.h>
 #include <protos/serv/bbus.h>
+
 int br_entry_args(
     MAYBE_UNUSED long arg1,
     MAYBE_UNUSED long arg2,
@@ -15,8 +17,8 @@ int br_entry_args(
     br_ev_init(&ev, nullptr, alloc_global());
 
     Str req = str$("pci");
-    uint64_t resp = 0;
-    while (bbus_locate(&ev, BR_ID_SUPER, &req, &resp, alloc_global()) == BBUS_NOT_FOUND)
+    BrAddr resp;
+    while (bbus_locate(&ev, BR_ADDR_SUPER, &req, &resp, alloc_global()) == BBUS_NOT_FOUND)
         ;
 
     PciFindDeviceRequest r = {

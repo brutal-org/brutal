@@ -5,14 +5,20 @@
 
 typedef struct
 {
+    Str name;
+    BrAddr addr;
+} BbusComponent;
+
+typedef struct
+{
     Handover *handover;
-    Vec(BalTask) serv;
+    Vec(BbusComponent) serv;
 } Bus;
 
 void bus_init(Bus *bus, Handover *handover, Alloc *alloc);
 
 void bus_deinit(Bus *bus);
 
-BrId bus_lookup(Bus *bus, Str name);
+BrAddr bus_lookup(Bus *bus, Str name);
 
-BrId bus_start(Bus *bus, Str name, BalArgs args);
+void bus_start(Bus *bus, Str name, BalArgs args);

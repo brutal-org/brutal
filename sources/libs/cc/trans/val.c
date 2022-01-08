@@ -1,7 +1,7 @@
 #include <brutal/debug.h>
 #include <cc/trans.h>
 
-void cgen_c_value(Emit *emit, CVal value)
+void cc_trans_value(Emit *emit, CVal value)
 {
     switch (value.type)
     {

@@ -168,13 +168,38 @@ typedef struct
 
 typedef struct
 {
-    BrId from;
+    BrId id;
+#define BR_PORT_NIL ((uint64_t)0)
+#define BR_PORT_ANY ((uint64_t)-1)
+    uint64_t port;
+} BrAddr;
+
+#define BR_ADDR_NIL \
+    (BrAddr) { BR_ID_NIL, BR_PORT_ANY }
+
+#define BR_ADDR_ERR \
+    (BrAddr) { BR_ID_ERR, BR_PORT_ANY }
+
+#define BR_ADDR_EVENT \
+    (BrAddr) { BR_ID_EVENT, BR_PORT_ANY }
+
+#define BR_ADDR_SELF \
+    (BrAddr) { BR_ID_SELF, BR_PORT_ANY }
+
+#define BR_ADDR_SUPER \
+    (BrAddr) { BR_ID_SUPER, BR_PORT_ANY }
+
+typedef struct
+{
     BrMsgFlags flags;
-    uint32_t seq;
-    uint32_t prot;
+
+    BrAddr from;
+    BrAddr to;
 
 #define BR_MSG_ERROR (uint32_t)(-1)
-    uint32_t type;
+    uint64_t prot;
+    uint64_t type;
+    uint64_t seq;
 
     union
     {
@@ -183,8 +208,6 @@ typedef struct
         BrEvent event;
     };
 } BrMsg;
-
-_Static_assert(sizeof(BrMsg) == 64, "");
 
 // Rights
 

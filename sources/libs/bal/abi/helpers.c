@@ -75,3 +75,8 @@ bool br_event_eq(BrEvent a, BrEvent b)
 {
     return a.type == b.type && a.irq == b.irq;
 }
+
+bool br_addr_eq(BrAddr a, BrAddr b)
+{
+    return a.id == b.id && (a.port == b.port || a.port == BR_PORT_ANY || b.port == BR_PORT_ANY);
+}

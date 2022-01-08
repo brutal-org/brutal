@@ -103,7 +103,7 @@ typedef uint32_t BrIpcFlags;
 
 typedef struct
 {
-    BrId to;
+    BrAddr to;
     BrMsg msg;
     BrDeadline deadline;
     BrIpcFlags flags;

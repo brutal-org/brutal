@@ -47,6 +47,8 @@ void bal_pack_f64(BalPack *self, double const *f);
 
 void bal_pack_str(BalPack *self, Str const *str);
 
+void bal_pack_addr(BalPack *self, BrAddr const *addr);
+
 void bal_pack_slice_impl(BalPack *self, SliceImpl const *v, BalPackFn *el);
 
 #define bal_pack_slice(SELF, SLICE, EL) bal_pack_slice_impl(SELF, &slice_impl$(*(SLICE)), (BalPackFn *)EL)

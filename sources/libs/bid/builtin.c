@@ -83,6 +83,13 @@ static BidBuiltinType builtins[] = {
         .pack_fn = str_const$("bal_pack_str"),
         .unpack_fn = str_const$("bal_unpack_str"),
     },
+
+    {
+        .name = str_const$("Capability"),
+        .cname = str_const$("BrAddr"),
+        .pack_fn = str_const$("bal_pack_addr"),
+        .unpack_fn = str_const$("bal_unpack_addr"),
+    },
 };
 
 BidBuiltinType *bid_lookup_builtin(Str name)

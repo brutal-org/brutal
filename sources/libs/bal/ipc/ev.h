@@ -6,13 +6,13 @@
 #include <brutal/ds.h>
 #include <brutal/fibers.h>
 
-typedef struct ipc_job IpcJob;
-typedef struct ipc_ev IpcEv;
-typedef struct ipc_proto IpcProto;
+typedef struct _IpcJob IpcJob;
+typedef struct _IpcEv IpcEv;
+typedef struct _IpcProto IpcProto;
 
-struct ipc_job
+struct _IpcJob
 {
-    uint32_t seq;
+    uint64_t seq;
     bool ok;
     BrMsg *resp;
 
@@ -20,16 +20,17 @@ struct ipc_job
     IpcJob *prev;
 };
 
-typedef void IpcFn(struct ipc_ev *ev, BrMsg *req, void *ctx);
+typedef void IpcFn(struct _IpcEv *ev, BrMsg *req, void *ctx);
 
-struct ipc_proto
+struct _IpcProto
 {
-    uint32_t id;
+    uint64_t port;
+    uint64_t id;
     IpcFn *fn;
     void *ctx;
 };
 
-struct ipc_ev
+struct _IpcEv
 {
     Fiber *dispatcher;
     void *ctx;
@@ -44,9 +45,9 @@ void br_ev_init(IpcEv *self, void *ctx, Alloc *alloc);
 
 void br_ev_deinit(IpcEv *self);
 
-void br_ev_impl(IpcEv *self, uint32_t id, IpcFn *fn, void *ctx);
+BrAddr br_ev_provide(IpcEv *self, uint32_t id, IpcFn *fn, void *ctx);
 
-BrResult br_ev_req_raw(IpcEv *self, BrId to, BrMsg *req, BrMsg *resp);
+BrResult br_ev_req_raw(IpcEv *self, BrAddr to, BrMsg *req, BrMsg *resp);
 
 BrResult br_ev_resp_raw(IpcEv *self, BrMsg const *req, BrMsg *resp);
 

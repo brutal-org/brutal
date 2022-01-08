@@ -17,3 +17,16 @@ BrResult bal_unmap(BrHandle space, void *base, size_t len)
         len,
     });
 }
+
+BrId bal_self_id(void)
+{
+    static BrId cache = BR_ID_NIL;
+    if (cache == BR_ID_NIL)
+    {
+        BrInspectArgs inspect = {};
+        inspect.handle = BR_HANDLE_SELF;
+        br_inspect(&inspect);
+        cache = inspect.id;
+    }
+    return cache;
+}

@@ -1,4 +1,5 @@
 #include <bal/ipc.h>
+#include <brutal/alloc.h>
 #include <brutal/debug.h>
 #include <protos/serv/bbus.h>
 
@@ -8,10 +9,10 @@ int br_entry_args()
     br_ev_init(&ev, nullptr, alloc_global());
 
     Str req = str$("pci");
-    uint64_t resp = 0;
-    bbus_locate(&ev, BR_ID_SUPER, &req, &resp, alloc_global());
+    BrAddr resp;
+    bbus_locate(&ev, BR_ADDR_SUPER, &req, &resp, alloc_global());
 
-    log$("PCI id is {}", resp);
+    log$("PCI id is {}", resp.id);
 
     return br_ev_run(&ev);
 }
