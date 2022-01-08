@@ -1,8 +1,9 @@
 #include <brutal/alloc.h>
 #include <brutal/debug.h>
+#include <brutal/ds.h>
+#include <embed/file.h>
 #include <fs/block.h>
 #include <fs/ext2/ext2.h>
-
 /*
     this file is only for testing, it will be deleted later on, don't expect good code here
     if you want to make a test image: (named here ext2disk)
@@ -12,34 +13,70 @@
 
 typedef struct
 {
+    void *buf;
+    size_t count;
+    size_t lba;
+    FsBlockFlags flags;
+} FileBlockData;
+
+typedef struct
+{
     FsBlockImpl _impl;
     IoFile file;
+    Alloc *alloc;
+    Vec(FileBlockData) blocks;
 } FileBlock;
 
-FsBlockResult file_block_write(FileBlock *self, const void *buf, size_t count, size_t lba)
+FsBlockResult file_block_acquire(FileBlock *self, void **buf, size_t count, size_t lba, FsBlockFlags flags)
 {
-    if (!embed_file_seek(&self->file.embed, lba * 512, EMBED_SEEK_SET).succ)
+    FileBlockData block = {
+        .flags = flags,
+        .lba = lba,
+        .count = count};
+
+    block.buf = alloc_malloc(self->alloc, count * 512);
+    if (flags & FS_BLOCK_READ)
     {
-        return FS_BLOCK_INVALID_LBA;
+        IoSeek pos = {.position = lba * 512, .whence = IO_WHENCE_START};
+        embed_file_seek(&self->file, pos);
+        embed_file_read(&self->file, block.buf, count * 512);
     }
-    if (!embed_file_write(&self->file.embed, buf, count * 512).succ)
-    {
-        return FS_BLOCK_ERROR;
-    }
+
+    *buf = block.buf;
+
+    vec_push(&self->blocks, block);
 
     return FS_BLOCK_SUCCESS;
 }
 
-FsBlockResult file_block_read(FileBlock *self, void *buf, size_t count, size_t lba)
+FsBlockResult file_block_release(FileBlock *self, void const **buf)
 {
-    if (!embed_file_seek(&self->file.embed, lba * 512, EMBED_SEEK_SET).succ)
+    FileBlockData *block = nullptr;
+    long block_idx = 0;
+    vec_foreach_idx(i, v, &self->blocks)
     {
-        return FS_BLOCK_INVALID_LBA;
+        if (v->buf == buf)
+        {
+            block = v;
+            block_idx = i;
+        }
     }
-    if (!embed_file_read(&self->file.embed, buf, count * 512).succ)
+
+    if (block == nullptr)
     {
         return FS_BLOCK_ERROR;
     }
+
+    if (block->flags & FS_BLOCK_WRITE)
+    {
+        IoSeek pos = {.position = block->lba * 512, .whence = IO_WHENCE_START};
+        embed_file_seek(&self->file, pos);
+        embed_file_write(&self->file, block->buf, block->count * 512);
+    }
+
+    vec_splice(&self->blocks, block_idx, 1);
+
+    alloc_free(self->alloc, block->buf);
 
     return FS_BLOCK_SUCCESS;
 }
@@ -51,7 +88,7 @@ Iter file_block_dump(Ext2FsFile *file, void *ctx)
     emit_fmt(&emit, "- founded file: {}\n", file->name);
     if (!str_eq(file->name, str$(".")) && !str_eq(file->name, str$("..")))
     {
-        //   ext2_fs_dump_inode(ctx, inode);
+        //    ext2_fs_dump_inode(ctx, &file->inode);
         ext2_fs_iter(ctx, &file->inode, (Ext2IterFileFn *)file_block_dump, ctx);
     }
     emit_deident(&emit);
@@ -75,12 +112,13 @@ int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char const *argv[])
 
     FileBlock block = {
         ._impl = {
-            .read = (FsReadBlock *)file_block_read,
-            .write = (FsWriteBlock *)file_block_write,
+            .acquire = (FsAcquireBlock *)file_block_acquire,
+            .release = (FsReleaseBlock *)file_block_release,
             .block_size = 512,
         },
         .file = source_file,
-    };
+        .alloc = alloc_global()};
+    vec_init(&block.blocks, alloc_global());
 
     emit_init(&emit, io_chan_out());
     Ext2Fs fs = {};

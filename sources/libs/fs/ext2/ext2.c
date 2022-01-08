@@ -1,25 +1,19 @@
 #include <brutal/debug.h>
+#include <brutal/math.h>
 #include <fs/ext2/ext2.h>
-#include <math.h>
 
-FsResult ext2_read_blocks(Ext2Fs *self, void *data, size_t off, size_t count)
+static void *ext2_acquire_blocks(Ext2Fs *self, size_t off, size_t count, bool write)
 {
     size_t block_diff = self->block_size / self->block_device->block_size;
-    if (fs_block_read(self->block_device, data, count * block_diff, off * block_diff) != FS_BLOCK_SUCCESS)
-    {
-        return FS_ERROR_FROM_BLOCK;
-    }
-    return FS_SUCCESS;
+
+    void *block = nullptr;
+    fs_block_acquire(self->block_device, &block, count * block_diff, off * block_diff, write ? FS_BLOCK_WRITE : FS_BLOCK_READ);
+    return block;
 }
 
-FsResult ext2_write_blocks(Ext2Fs *self, void *data, size_t off, size_t count)
+static void ext2_release_blocks(Ext2Fs *self, void *block)
 {
-    size_t block_diff = self->block_size / self->block_device->block_size;
-    if (fs_block_read(self->block_device, data, count * block_diff, off * block_diff) != FS_BLOCK_SUCCESS)
-    {
-        return FS_ERROR_FROM_BLOCK;
-    }
-    return FS_SUCCESS;
+    fs_block_release(self->block_device, block);
 }
 
 static FsResult ext2_get_group(Ext2Fs *self, Ext2GroupBlockDescTable *group, uint64_t group_id)
@@ -27,15 +21,15 @@ static FsResult ext2_get_group(Ext2Fs *self, Ext2GroupBlockDescTable *group, uin
     size_t block_off = group_id % self->block_size;
     size_t block_id = group_id / self->block_size + self->group_desc_table_block;
 
-    Ext2GroupBlockDescTable *desc = alloc_malloc(self->alloc, self->block_size);
-    FsResult res = ext2_read_blocks(self, desc, block_id, 1);
-    if (res != FS_SUCCESS)
+    Ext2GroupBlockDescTable *desc = ext2_acquire_blocks(self, block_id, 1, false);
+    if (desc == nullptr)
     {
-        return res;
+        return FS_ERROR_FROM_BLOCK;
     }
 
     *group = desc[block_off];
 
+    ext2_release_blocks(self, desc);
     return FS_SUCCESS;
 }
 
@@ -74,35 +68,38 @@ static FsResult ext2_inode_read_indirect_block_rec(Ext2Fs *self, void **data_cur
     if (depth == 0)
     {
         *data_cur += self->block_size;
-        return ext2_read_blocks(self, *data_cur, range.base, 1);
+        void *buf = ext2_acquire_blocks(self, range.base, 1, false);
+        mem_cpy(data_cur, buf, self->block_size);
+        ext2_release_blocks(self, buf);
+        return FS_SUCCESS;
     }
 
     size_t entry_per_block = self->block_size / sizeof(uint32_t);
     size_t entry_in_indirect_rec = get_entry_in_indirect_block(entry_per_block, depth);
     size_t block_per_entry_rec = entry_in_indirect_rec / entry_per_block;
 
-    uint32_t *indirect_table = alloc_malloc(self->alloc, self->block_size);
+    uint32_t *indirect_table = ext2_acquire_blocks(self, indirect_ptr, 1, false);
 
-    FsResult res = ext2_read_blocks(self, indirect_table, indirect_ptr, 1);
-    if (res != FS_SUCCESS)
+    if (indirect_table == nullptr)
     {
-        return res;
+        return FS_ERROR_FROM_BLOCK;
     }
 
-    for (size_t block = range.base; block < MIN((size_t)range_end(range), entry_in_indirect_rec); block += block_per_entry_rec)
+    for (size_t block = range.base; block < m_min((size_t)range_end(range), entry_in_indirect_rec); block += block_per_entry_rec)
     {
         size_t table_id = block / block_per_entry_rec;
         size_t entry_in_table = block % block_per_entry_rec;
         BlockRange sub_range = range_from_start_and_end(BlockRange, entry_in_table, range_end(range));
 
-        res = ext2_inode_read_indirect_block_rec(self, data_cur, sub_range, depth - 1, indirect_table[table_id]);
+        FsResult res = ext2_inode_read_indirect_block_rec(self, data_cur, sub_range, depth - 1, indirect_table[table_id]);
         if (res != FS_SUCCESS)
         {
+            ext2_release_blocks(self, indirect_table);
             return res;
         }
     }
 
-    alloc_free(self->alloc, indirect_table);
+    ext2_release_blocks(self, indirect_table);
 
     return FS_SUCCESS;
 }
@@ -112,16 +109,18 @@ FsResult ext2_inode_read(Ext2Fs *self, Ext2FsInode *inode, void *data, BlockRang
     // single block
     long block;
     FsResult res;
-    for (block = range.base; block < MIN(range_end(range), 12); block++)
+    for (block = range.base; block < m_min(range_end(range), 12); block++)
     {
-        res = ext2_read_blocks(self, data, inode->block.blocks_ptr[block], 1);
-        if (res != FS_SUCCESS)
+        void *d = ext2_acquire_blocks(self, inode->block.blocks_ptr[block], 1, false);
+        if (d == nullptr)
         {
-            return res;
+            return FS_ERROR_FROM_BLOCK;
         }
-
+        mem_cpy(data, d, self->block_size);
+        ext2_release_blocks(self, d);
         data += self->block_size;
     }
+
     range = range_from_start_and_end(BlockRange, block - 12, range_end(range) - 12);
     if (range_end(range) < 0)
     {
@@ -165,13 +164,7 @@ FsResult ext2_init(Ext2Fs *self, FsBlockImpl *block, Alloc *alloc)
     self->block_device = block;
     self->alloc = alloc;
 
-    self->super_block = alloc_malloc(alloc, EXT2_SUPER_BLOCK_SIZE);
-
-    if (fs_block_read(block, self->super_block, EXT2_SUPER_BLOCK_BASE / block->block_size, EXT2_SUPER_BLOCK_SIZE / block->block_size) != FS_BLOCK_SUCCESS)
-    {
-        return FS_ERROR_FROM_BLOCK;
-    }
-
+    fs_block_acquire(block, (void **)&self->super_block, EXT2_SUPER_BLOCK_BASE / block->block_size, EXT2_SUPER_BLOCK_SIZE / block->block_size, FS_BLOCK_READ);
     if (self->super_block->signature != EXT2_SIGNATURE)
     {
         log$("invalid ext2 fs signature");
@@ -213,20 +206,18 @@ FsResult ext2_inode(Ext2Fs *self, Ext2FsInode *inode, Ext2FsInodeId id)
         return res;
     }
 
-    uint8_t *inode_block_data = alloc_malloc(self->alloc, self->block_size);
+    uint8_t *inode_block_data = ext2_acquire_blocks(self, group_desc.inode_table_addr + inode_block, 1, false);
 
-    res = ext2_read_blocks(self, inode_block_data,
-                           group_desc.inode_table_addr + inode_block,
-                           1);
-    if (res != FS_SUCCESS)
+    if (inode_block_data == nullptr)
     {
-        return res;
+        return FS_ERROR_FROM_BLOCK;
     }
 
     // we can't use Ext2InodeBlock as an array as inode_size can be != sizeof(Ext2InodeBlock)
     inode->block = *(Ext2InodeBlock *)(inode_block_data + inode_off_in_block);
     inode->id = id;
 
+    ext2_release_blocks(self, inode_block_data);
     return FS_SUCCESS;
 }
 
