@@ -66,7 +66,7 @@ jobs:
 
       - name: Run Tests
         run: |
-          CONFIG_TOOLCHAIN=${{matrix.toolchain}} ./brutal --coverage test
+          CONFIG_TOOLCHAIN=${{matrix.toolchain}} ./brutal.sh --coverage test
           llvm-profdata-12 merge -sparse `find . -name "*.profraw"` -o coverage.profdata
           llvm-cov-12 show ./bin/x86_64-${{matrix.toolchain}}/host/test -instr-profile=coverage.profdata -format=text> coverage.txt
 

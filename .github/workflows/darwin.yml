@@ -24,4 +24,4 @@ jobs:
 
       - name: Run Tests
         run: |
-          .github/workflows/env-darwin.sh ./brutal test
+          .github/workflows/env-darwin.sh ./brutal.sh test
