@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/alloc.h>
+#include <bal/abi.h>
 #include <brutal/ds.h>
 
 typedef struct
@@ -42,6 +42,8 @@ void bal_unpack_f32(BalUnpack *self, float *f);
 void bal_unpack_f64(BalUnpack *self, double *f);
 
 void bal_unpack_str(BalUnpack *self, Str *str);
+
+void bal_unpack_addr(BalUnpack *self, BrAddr *str);
 
 void bal_unpack_slice_impl(BalUnpack *self, VoidSlice *slice, BalUnpackFn *el, size_t el_size);
 

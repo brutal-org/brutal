@@ -36,8 +36,8 @@ void gfx_fmt_store(GfxFmt self, GfxColor color, void *dst)
     {
         GfxFmtGS8 *p = (GfxFmtGS8 *)dst;
         p->v = 0.299 * color.r + 0.587 * color.g + 0.114 * color.b;
+        break;
     }
-    break;
 
     case GFX_FMT_RGB888:
     {
@@ -45,8 +45,8 @@ void gfx_fmt_store(GfxFmt self, GfxColor color, void *dst)
         p->r = color.r;
         p->g = color.g;
         p->b = color.b;
+        break;
     }
-    break;
 
     case GFX_FMT_RGBA8888:
     {
@@ -55,8 +55,8 @@ void gfx_fmt_store(GfxFmt self, GfxColor color, void *dst)
         p->g = color.g;
         p->b = color.b;
         p->a = color.a;
+        break;
     }
-    break;
 
     case GFX_FMT_BGRA8888:
     {
@@ -65,8 +65,8 @@ void gfx_fmt_store(GfxFmt self, GfxColor color, void *dst)
         p->g = color.g;
         p->b = color.b;
         p->a = color.a;
+        break;
     }
-    break;
 
     default:
         panic$("Unknown pixel format {}", self);

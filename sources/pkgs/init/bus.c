@@ -14,20 +14,20 @@ void bus_deinit(Bus *bus)
     vec_deinit(&bus->serv);
 }
 
-BrId bus_lookup(Bus *bus, Str name)
+BrAddr bus_lookup(Bus *bus, Str name)
 {
     vec_foreach_v(serv, &bus->serv)
     {
         if (str_eq(serv.name, name))
         {
-            return serv.id;
+            return serv.addr;
         }
     }
 
-    return BR_ID_NIL;
+    return BR_ADDR_NIL;
 }
 
-BrId bus_start(Bus *bus, Str name, BalArgs args)
+void bus_start(Bus *bus, Str name, BalArgs args)
 {
     log$("Starting service '{case:pascal}'...", name);
 
@@ -44,7 +44,9 @@ BrId bus_start(Bus *bus, Str name, BalArgs args)
 
     bal_mem_deinit(&elf_mem);
 
-    vec_push(&bus->serv, elf_task);
-
-    return elf_task.id;
+    BbusComponent comp = {
+        .addr.id = elf_task.id,
+        .name = name,
+    };
+    vec_push(&bus->serv, comp);
 }

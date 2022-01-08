@@ -83,6 +83,12 @@ void bal_unpack_str(BalUnpack *self, Str *str)
     *str = str_n$(len, buf);
 }
 
+void bal_unpack_addr(BalUnpack *self, BrAddr *addr)
+{
+    bal_unpack_u64(self, &addr->id);
+    bal_unpack_u64(self, &addr->port);
+}
+
 void bal_unpack_slice_impl(BalUnpack *self, VoidSlice *slice, BalUnpackFn *el, size_t el_size)
 {
     uint64_t len;

@@ -5,16 +5,14 @@
 typedef struct
 {
     IpcEv *self;
-    BrId from;
-    BrMsg *msg;
-    void *ctx;
-
+    BrMsg msg;
     IpcFn *fn;
+    void *ctx;
 } BrEvCtx;
 
 void *br_ev_handle(BrEvCtx *ctx)
 {
-    BrMsg msg = *ctx->msg;
+    BrMsg msg = ctx->msg;
     ctx->fn(ctx->self, &msg, ctx->ctx);
     return nullptr;
 }
@@ -32,55 +30,50 @@ static void *req_dispatch(IpcEv *self)
 
         if (result == BR_SUCCESS)
         {
-            bool message_handeled = false;
+            bool handeled = false;
 
             for (IpcJob *j = self->jobs; j; j = j->next)
             {
                 if (j->seq == ipc.msg.seq)
                 {
-
                     *j->resp = ipc.msg;
                     j->ok = true;
 
-                    message_handeled = true;
+                    handeled = true;
                     break;
                 }
             }
 
-            if (!message_handeled)
+            if (!handeled)
             {
-
                 vec_foreach_v(proto, &self->protos)
                 {
-                    if (proto.id == ipc.msg.prot)
+                    if (proto.port == ipc.msg.to.port &&
+                        proto.id == ipc.msg.prot)
                     {
-
                         fiber_start(
                             (FiberFn *)br_ev_handle,
                             &(BrEvCtx){
-                                self,
-                                ipc.msg.from,
-                                &ipc.msg,
-                                proto.ctx,
-                                proto.fn,
+                                .self = self,
+                                .msg = ipc.msg,
+                                .ctx = proto.ctx,
+                                .fn = proto.fn,
                             });
 
-                        message_handeled = true;
+                        handeled = true;
                     }
                 }
             }
 
-            if (!message_handeled && self->sink)
+            if (!handeled && self->sink)
             {
-
                 fiber_start(
                     (FiberFn *)br_ev_handle,
                     &(BrEvCtx){
-                        self,
-                        ipc.msg.from,
-                        &ipc.msg,
-                        nullptr,
-                        self->sink,
+                        .self = self,
+                        .msg = ipc.msg,
+                        .ctx = nullptr,
+                        .fn = self->sink,
                     });
             }
         }
@@ -136,10 +129,12 @@ void br_ev_deinit(IpcEv *self)
     vec_deinit(&self->protos);
 }
 
-void br_ev_impl(IpcEv *self, uint32_t id, IpcFn *fn, void *ctx)
+BrAddr br_ev_provide(IpcEv *self, uint32_t id, IpcFn *fn, void *ctx)
 {
-    IpcProto proto = {id, fn, ctx};
+    static uint64_t port_id = 0;
+    IpcProto proto = {id, port_id++, fn, ctx};
     vec_push(&self->protos, proto);
+    return (BrAddr){bal_self_id(), port_id};
 }
 
 typedef struct
@@ -160,7 +155,7 @@ static bool req_wait(ReqWaitCtx *ctx)
     return true;
 }
 
-BrResult br_ev_req_raw(IpcEv *self, BrId to, BrMsg *req, BrMsg *resp)
+BrResult br_ev_req_raw(IpcEv *self, BrAddr to, BrMsg *req, BrMsg *resp)
 {
     static uint32_t seq = 0;
     req->seq = seq++;

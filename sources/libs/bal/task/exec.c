@@ -125,8 +125,8 @@ static uintptr_t bal_exec_stack(BrHandle space, BalArgs exec_args, BrTaskArgs *s
 
         start_args->arg1 = cmain.argc;
         start_args->arg2 = 0xC0000000 - ((uintptr_t)base - (uintptr_t)head);
-    }
     break;
+    }
 
     case BR_START_ARGS:
     {
@@ -136,16 +136,16 @@ static uintptr_t bal_exec_stack(BrHandle space, BalArgs exec_args, BrTaskArgs *s
         start_args->arg3 = exec_args.args.arg3;
         start_args->arg4 = exec_args.args.arg4;
         start_args->arg5 = exec_args.args.arg5;
-    }
     break;
+    }
 
     case BR_START_HANDOVER:
     {
         head -= align_up$(sizeof(Handover), 16);
         mem_cpy(head, exec_args.handover, sizeof(Handover));
         start_args->arg1 = 0xC0000000 - ((uintptr_t)base - (uintptr_t)head);
-    }
     break;
+    }
 
     default:
         break;

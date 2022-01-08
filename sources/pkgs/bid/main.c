@@ -1,4 +1,5 @@
-#include <bid/gen.h>
+#include <bid/cgen.h>
+#include <bid/json.h>
 #include <bid/parse.h>
 #include <bid/pass.h>
 #include <brutal/alloc.h>
@@ -12,7 +13,7 @@ void bid_emit_json(BidIface const iface, IoWriter writer)
     HeapAlloc heap;
     heap_alloc_init(&heap, NODE_DEFAULT);
 
-    Json json = bidgen_json_iface(iface, alloc_global());
+    Json json = bid_jgen_iface(iface, alloc_global());
     heap_alloc_deinit(&heap);
 
     Emit emit;
@@ -28,12 +29,12 @@ void bid_emit_source(BidIface const iface, IoWriter writer)
     HeapAlloc heap;
     heap_alloc_init(&heap, NODE_DEFAULT);
 
-    CUnit unit = bidgen_c_source(iface, alloc_global());
+    CUnit unit = bid_cgen_source(iface, alloc_global());
     heap_alloc_deinit(&heap);
 
     Emit emit;
     emit_init(&emit, writer);
-    cgen_c_unit(&emit, unit);
+    cc_trans_unit(&emit, unit);
     emit_deinit(&emit);
 
     heap_alloc_deinit(&heap);
@@ -44,12 +45,12 @@ void bid_emit_header(BidIface const iface, IoWriter writer)
     HeapAlloc heap;
     heap_alloc_init(&heap, NODE_DEFAULT);
 
-    CUnit unit = bidgen_c_header(iface, alloc_global());
+    CUnit unit = bid_cgen_header(iface, alloc_global());
     heap_alloc_deinit(&heap);
 
     Emit emit;
     emit_init(&emit, writer);
-    cgen_c_unit(&emit, unit);
+    cc_trans_unit(&emit, unit);
     emit_deinit(&emit);
 
     heap_alloc_deinit(&heap);
