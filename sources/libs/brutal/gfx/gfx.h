@@ -94,6 +94,6 @@ void gfx_rect(Gfx *self, MRect rect, float radius);
 
 void gfx_ellipse(Gfx *self, MRect rect);
 
-void gfx_text(Gfx *self, MVec2 origin, Str text);
+void gfx_text(Gfx *self, MVec2 origin, Str text, float scale);
 
 void gfx_path(Gfx *self, Str path);

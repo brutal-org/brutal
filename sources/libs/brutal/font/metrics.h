@@ -15,6 +15,7 @@ typedef struct
 
 typedef struct
 {
-    MRect bound;
+    MRect capbound;
+    MRect linebound;
     MVec2 baseline;
 } BFontMesure;

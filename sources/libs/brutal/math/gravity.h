@@ -3,6 +3,8 @@
 #include <brutal/math/flow.h>
 #include <brutal/math/rect.h>
 
+#define M_GRAVITY_NONE (0)
+
 #define M_GRAVITY_START (1 << 0)
 #define M_GRAVITY_TOP (1 << 1)
 

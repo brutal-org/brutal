@@ -14,14 +14,14 @@ typedef struct
     BFontType type;
 } BFont;
 
-float bfont_advance(BFont *font, Rune rune);
+float bfont_advance(BFont *font, Rune rune, float scale);
 
-BFontMetrics bfont_metrics(BFont *font);
+BFontMetrics bfont_metrics(BFont *font, float scale);
 
-BFontMesure bfont_mesure(BFont *font, Str str);
+BFontMesure bfont_mesure(BFont *font, Str str, float scale);
 
-void bfont_render_rune(BFont *font, Rune rune, MVec2 baseline, GfxBuf buf, MRect clip, GfxColor color);
+void bfont_render_rune(BFont *font, Rune rune, MVec2 baseline, GfxBuf buf, MRect clip, float scale, GfxColor color);
 
-void bfont_render_str(BFont *font, Str str, MVec2 baseline, GfxBuf buf, MRect clip, GfxColor color);
+void bfont_render_str(BFont *font, Str str, MVec2 baseline, GfxBuf buf, MRect clip, float scale, GfxColor color);
 
 BFont *bfont_builtin(void);

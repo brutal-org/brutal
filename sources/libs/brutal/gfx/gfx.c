@@ -383,10 +383,10 @@ void gfx_ellipsis(Gfx *self, MRect rect)
     gfx_fill_path(self, GFX_FILL_EVENODD);
 }
 
-void gfx_text(Gfx *self, MVec2 origin, Str text)
+void gfx_text(Gfx *self, MVec2 origin, Str text, float scale)
 {
     origin = m_vec2_add(origin, gfx_peek(self)->origin);
-    bfont_render_str(bfont_builtin(), text, origin, self->buf, gfx_peek(self)->clip, gfx_peek(self)->color);
+    bfont_render_str(bfont_builtin(), text, origin, self->buf, gfx_peek(self)->clip, scale, gfx_peek(self)->color);
 }
 
 void eval_cmd(void *ctx, GfxPathCmd cmd)
