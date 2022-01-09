@@ -17,6 +17,21 @@ bool scan_ended(Scan *self)
     return self->head >= self->size || self->has_error;
 }
 
+int scan_tell(Scan *self)
+{
+    return self->head;
+}
+
+void scan_seek(Scan *self, int offset)
+{
+    self->head = offset;
+}
+
+int scan_size(Scan *self)
+{
+    return self->size;
+}
+
 char scan_peek(Scan *self, int offset)
 {
     if (self->has_error)
@@ -37,7 +52,7 @@ char scan_peek(Scan *self, int offset)
     return self->buf[self->head + offset];
 }
 
-char scan_peek_is_any(Scan *self, int offset, Str chars)
+bool scan_peek_is_any(Scan *self, int offset, Str chars)
 {
     for (size_t i = 0; i < chars.len; i++)
     {
