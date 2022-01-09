@@ -118,7 +118,7 @@ void scan_begin(Scan *self);
 
 Str scan_end(Scan *self);
 
-/* --- Error Handeling ------------------------------------------------------ */
+/* --- Error Handling ------------------------------------------------------ */
 
 void scan_throw(Scan *self, Str message, Str token);
 

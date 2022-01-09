@@ -1,5 +1,4 @@
 #include <brutal/alloc.h>
-#include <brutal/alloc/global.h>
 #include <brutal/codec/deflate/constants.h>
 #include <brutal/codec/deflate/deflate.h>
 #include <brutal/io/mem_view.h>
@@ -7,9 +6,9 @@
 // Block compressions
 IoResult deflate_compress_block_uncompressed(DeflateCompressionContext *ctx, BitWriter *bit_writer, const uint8_t *in, size_t in_nbytes, bool last);
 
-DeflateCompressionContext *deflate_alloc(int level)
+void deflate_init(DeflateCompressionContext *ctx, int level, Alloc *alloc)
 {
-    DeflateCompressionContext *ctx = alloc_make(alloc_global(), DeflateCompressionContext);
+    ctx->alloc = alloc;
     ctx->compression_level = level;
     ctx->min_size_to_compress = 56 - (ctx->compression_level * 4);
 
@@ -20,14 +19,13 @@ DeflateCompressionContext *deflate_alloc(int level)
     else
     {
         //TODO: IMPLEMENT OTHER MODES
-        return NULL;
     }
-    return ctx;
 }
 
-void deflate_free(DeflateCompressionContext *ctx)
+void deflate_deinit(DeflateCompressionContext *ctx)
 {
-    alloc_free(alloc_global(), ctx);
+    // TODO: free arrays later
+    UNUSED(ctx);
 }
 
 /* Write the header fields common to all DEFLATE block types. */
@@ -58,9 +56,6 @@ IoResult deflate_compress_block_uncompressed(DeflateCompressionContext *ctx, Bit
 
 IoResult deflate_compress_data(DeflateCompressionContext *ctx, const uint8_t *in, size_t in_len, const uint8_t *out, size_t out_len)
 {
-    size_t total = 0;
-    bool last = false;
-
     // Input
     MemView in_view;
     mem_view_init(&in_view, in_len, in);
@@ -71,19 +66,7 @@ IoResult deflate_compress_data(DeflateCompressionContext *ctx, const uint8_t *in
     mem_view_init(&out_view, out_len, out);
     IoWriter writer = mem_view_writer(&out_view);
 
-    BitWriter bit_writer;
-    io_bw_init(&bit_writer, &writer);
-
-    do
-    {
-        // Maximum blocksize is 65535
-        uint8_t buf[UINT16_MAX];
-        size_t read = TRY(IoResult, io_read(&reader, buf, sizeof(buf)));
-        last = read < sizeof(buf);
-        total += TRY(IoResult, (*ctx->compress_block_impl)(ctx, &bit_writer, buf, read, last));
-    } while (!last);
-
-    return OK(IoResult, total);
+    return deflate_compress_stream(ctx, &writer, &reader);
 }
 
 IoResult deflate_compress_stream(DeflateCompressionContext *ctx, IoWriter *writer, IoReader *reader)

@@ -29,7 +29,7 @@ static IoResult mem_view_read_impl(MemView *self, char *data, size_t offset, siz
 IoReader mem_view_reader(MemView *self)
 {
     return (IoReader){
-        .read = (IoRead *)mem_view_read_impl,
+        .read = (IoReadFn *)mem_view_read_impl,
         .context = self,
     };
 }
@@ -45,7 +45,7 @@ static IoResult mem_view_write_impl(MemView *self, char const *data, MAYBE_UNUSE
 IoWriter mem_view_writer(MemView *self)
 {
     return (IoWriter){
-        .write = (IoWrite *)mem_view_write_impl,
+        .write = (IoWriteFn *)mem_view_write_impl,
         .context = self,
     };
 }
