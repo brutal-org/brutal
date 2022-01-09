@@ -327,16 +327,38 @@ void gfx_line(Gfx *self, MEdge line, float weight)
     gfx_fill_path(self, GFX_FILL_EVENODD);
 }
 
-void gfx_rect(Gfx *self, MRect rect)
+void gfx_rect(Gfx *self, MRect rect, float radius)
 {
     gfx_begin_path(self);
 
-    gfx_move_to(self, m_vec2(rect.x, rect.y));
-    gfx_line_to(self, m_vec2(rect.x + rect.width, rect.y));
-    gfx_line_to(self, m_vec2(rect.x + rect.width, rect.y + rect.height));
-    gfx_line_to(self, m_vec2(rect.x, rect.y + rect.height));
+    if (radius == 0)
+    {
+        gfx_move_to(self, m_vec2(rect.x, rect.y));
+        gfx_line_to(self, m_vec2(rect.x + rect.width, rect.y));
+        gfx_line_to(self, m_vec2(rect.x + rect.width, rect.y + rect.height));
+        gfx_line_to(self, m_vec2(rect.x, rect.y + rect.height));
+        gfx_close_path(self);
+    }
+    else
+    {
+        gfx_move_to(self, m_vec2(rect.x + radius, rect.y));
 
-    gfx_close_path(self);
+        // Top edge
+        gfx_line_to(self, m_vec2(rect.x + rect.width - radius, rect.y));
+        gfx_quadratic_to(self, m_vec2(rect.x + rect.width, rect.y), m_vec2(rect.x + rect.width, rect.y + radius));
+
+        // Right edge
+        gfx_line_to(self, m_vec2(rect.x + rect.width, rect.y + rect.height - radius));
+        gfx_quadratic_to(self, m_vec2(rect.x + rect.width, rect.y + rect.height), m_vec2(rect.x + rect.width - radius, rect.y + rect.height));
+
+        // Bottom edge
+        gfx_line_to(self, m_vec2(rect.x + radius, rect.y + rect.height));
+        gfx_quadratic_to(self, m_vec2(rect.x, rect.y + rect.height), m_vec2(rect.x, rect.y + rect.height - radius));
+
+        // Left edge
+        gfx_line_to(self, m_vec2(rect.x, rect.y + radius));
+        gfx_quadratic_to(self, m_vec2(rect.x, rect.y), m_vec2(rect.x + radius, rect.y));
+    }
 
     gfx_fill_path(self, GFX_FILL_EVENODD);
 }

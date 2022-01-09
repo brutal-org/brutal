@@ -8,6 +8,7 @@ void ui_view_init(UiView *self)
 {
     vec_init(&self->children, alloc_global());
     self->bound = m_rect(0, 0, 100, 100);
+    self->flags = UI_VIEW_ENABLED | UI_VIEW_VISIBLE;
 }
 
 void ui_view_ref(UiView *self)
@@ -134,6 +135,7 @@ void ui_view_should_repaint_rect(UiView *self, MRect dirty)
 
     if (self->parent)
     {
+        dirty.pos = m_vec2_add(dirty.pos, ui_view_orgin(self->parent));
         ui_view_should_repaint_rect(self->parent, dirty);
     }
 

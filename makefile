@@ -13,6 +13,7 @@ CFLAGS_STD ?= \
 CFLAGS_OPT ?= \
 	-g -O2
 
+
 CFLAGS_WARN ?= \
 	-Wall \
 	-Wextra \
@@ -29,6 +30,10 @@ INC_LIBS= \
 
 INC_LIBBRUTAL= \
 	-Isources/libs/
+
+HOST_CFLAGS_SAN ?= \
+	-fsanitize=address \
+	-fsanitize=undefined
 
 HOST_CFLAGS_INC ?= \
 	$(INC_LIBBRUTAL) \

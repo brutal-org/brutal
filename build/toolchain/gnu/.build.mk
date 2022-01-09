@@ -11,8 +11,7 @@ HOST_CFLAGS= \
 	$(CFLAGS_OPT) \
 	$(CFLAGS_WARN) \
 	$(HOST_CFLAGS_INC) \
-	-fsanitize=address \
-	-fsanitize=undefined \
+	$(HOST_CFLAGS_SAN) \
 	`pkg-config  sdl2 --cflags`
 
 HOST_LD=ld

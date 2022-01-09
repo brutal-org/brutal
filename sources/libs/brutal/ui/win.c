@@ -111,7 +111,7 @@ void ui_win_should_repaint(MAYBE_UNUSED UiWin *self)
 void ui_win_should_repaint_rect(UiWin *self, MAYBE_UNUSED MRect rect)
 {
     ui_win_repaint_rect(self, rect);
-    ui_win_flip_full(self);
+    ui_win_flip(self, rect);
 }
 
 void ui_win_repaint(UiWin *self)
@@ -138,6 +138,9 @@ void ui_win_repaint_rect(UiWin *self, MRect rect)
         ui_view_paint(self->root, &self->gfx);
         gfx_pop(&self->gfx);
     }
+
+    // gfx_fill(&self->gfx, gfx_paint_fill(gfx_color_rand(100)));
+    // gfx_rect(&self->gfx, rect, 0);
 
     gfx_end(&self->gfx);
 }

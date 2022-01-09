@@ -129,3 +129,21 @@ static inline GfxColor gfx_paint_sample(GfxPaint paint, float x, float y)
         panic$("Unkown paint type {}.", paint.type);
     }
 }
+
+static inline bool paint_is_visible(GfxPaint paint)
+{
+    switch (paint.type)
+    {
+    case GFX_PAINT_NONE:
+        return false;
+
+    case GFX_PAINT_FILL:
+        return paint.fill_.a != 255;
+
+    case GFX_PAINT_GRADIENT:
+        return true;
+
+    default:
+        panic$("Unkown paint type {}.", paint.type);
+    }
+}

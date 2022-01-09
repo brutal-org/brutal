@@ -1,0 +1,3 @@
+ABOUT_NAME = about
+
+HOST_PKGS += ABOUT

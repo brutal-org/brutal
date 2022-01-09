@@ -161,10 +161,10 @@ typedef struct
     COLOR(YELLOW, 0xFFFF00)                  \
     COLOR(YELLOW_GREEN, 0x9ACD32)
 
-#define ITER(NAME, VALUE) \
+#define COLOR_DECL(NAME, VALUE) \
     static const GfxColor GFX_##NAME = (gfx_hex(VALUE));
-GFX_FOREACH_COLOR(ITER)
-#undef ITER
+
+GFX_FOREACH_COLOR(COLOR_DECL)
 
 static inline GfxColor gfx_blend(GfxColor fg, GfxColor bg)
 {
@@ -199,3 +199,9 @@ static inline GfxColor gfx_lerp(GfxColor a, GfxColor b, float t)
 }
 
 GfxColor gfx_color_rand(uint8_t alpha);
+
+static inline GfxColor gfx_color_with_alpha(GfxColor color, uint8_t alpha)
+{
+    color.a = alpha;
+    return color;
+}

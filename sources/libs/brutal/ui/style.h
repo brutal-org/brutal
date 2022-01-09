@@ -15,6 +15,11 @@ typedef struct
     float bottom;
 } UiSpacing;
 
+static inline UiSpacing ui_spacing_all(float value)
+{
+    return (UiSpacing){value, value, value, value};
+}
+
 static inline MRect ui_spacing_shrink(UiSpacing spacing, MFlow flow, MRect rect)
 {
     rect = m_flow_set_start(flow, rect, m_flow_get_start(flow, rect) + spacing.start);
