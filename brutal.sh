@@ -21,6 +21,7 @@ usage()
   echo "    -a, --all      Make all before"
   echo "    -c, --clean    Do a clean build"
   echo "    -d, --debug    Run the tool inside a debuger"
+  echo "        --doc      open the doc in your prefered browser"
   echo "    -n, --nuke     Nuke the build dir"
   echo "    -f, --fast     Do it fast"
   echo "        --format   Format all C and header files in sources/"
@@ -48,6 +49,11 @@ eval_arg()
 
     "-d" | "--debug")
       DEBUG="lldb --"
+      ;;
+
+    "--doc")
+      doxygen doxyfile
+      xdg-open bin/docs/html/index.html
       ;;
 
     "-n" | "--nuke")
