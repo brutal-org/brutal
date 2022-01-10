@@ -17,6 +17,6 @@ typedef struct
     IoSeeker seeker;
 } IoRwSeek;
 
-IoResult io_pread(IoRwSeek *self, uint8_t *data, size_t size, size_t offset);
+IoResult io_pread(IoRwSeek self, uint8_t *data, size_t size, size_t offset);
 
-IoResult io_pwrite(IoRwSeek *self, uint8_t const *data, size_t size, size_t offset);
+IoResult io_pwrite(IoRwSeek self, uint8_t const *data, size_t size, size_t offset);

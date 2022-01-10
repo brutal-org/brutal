@@ -1,14 +1,12 @@
 #include <brutal/alloc.h>
 #include <brutal/debug.h>
 #include <brutal/ds.h>
-#include <embed/file.h>
 #include <fs/block.h>
 #include <fs/ext2/ext2.h>
 /*
-    this file is only for testing, it will be deleted later on, don't expect good code here
-    if you want to make a test image: (named here ext2disk)
-        - dd if=/dev/zero of=ext2disk.hdd bs=512 count=65556
-        - mkfs.ext2 -O ^sparse_super,^resize_inode ./ext2disk.hdd
+    if you want to make a test image: (named here image.hdd)
+        - dd if=/dev/zero of=image.hdd bs=512 count=65556
+        - mkfs.ext2 -O ^sparse_super,^resize_inode ./image.hdd
 */
 
 typedef struct
@@ -32,14 +30,14 @@ FsBlockResult file_block_acquire(FileBlock *self, void **buf, size_t count, size
     FileBlockData block = {
         .flags = flags,
         .lba = lba,
-        .count = count};
+        .count = count,
+    };
 
     block.buf = alloc_malloc(self->alloc, count * 512);
+
     if (flags & FS_BLOCK_READ)
     {
-        IoSeek pos = {.position = lba * 512, .whence = IO_WHENCE_START};
-        embed_file_seek(&self->file, pos);
-        embed_file_read(&self->file, block.buf, count * 512);
+        io_pread(io_file_rwseek(&self->file), block.buf, count * 512, lba * 512);
     }
 
     *buf = block.buf;
@@ -53,6 +51,7 @@ FsBlockResult file_block_release(FileBlock *self, void const **buf)
 {
     FileBlockData *block = nullptr;
     long block_idx = 0;
+
     vec_foreach_idx(i, v, &self->blocks)
     {
         if (v->buf == buf)
@@ -69,9 +68,7 @@ FsBlockResult file_block_release(FileBlock *self, void const **buf)
 
     if (block->flags & FS_BLOCK_WRITE)
     {
-        IoSeek pos = {.position = block->lba * 512, .whence = IO_WHENCE_START};
-        embed_file_seek(&self->file, pos);
-        embed_file_write(&self->file, block->buf, block->count * 512);
+        io_pwrite(io_file_rwseek(&self->file), block->buf, block->count * 512, block->lba * 512);
     }
 
     vec_splice(&self->blocks, block_idx, 1);
@@ -88,7 +85,6 @@ Iter file_block_dump(Ext2FsFile *file, void *ctx)
     emit_fmt(&emit, "- founded file: {}\n", file->name);
     if (!str_eq(file->name, str$(".")) && !str_eq(file->name, str$("..")))
     {
-        //    ext2_fs_dump_inode(ctx, &file->inode);
         ext2_fs_iter(ctx, &file->inode, (Ext2IterFileFn *)file_block_dump, ctx);
     }
     emit_deident(&emit);
@@ -97,18 +93,14 @@ Iter file_block_dump(Ext2FsFile *file, void *ctx)
 
 int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char const *argv[])
 {
-
-    log$("started fs_test app");
     if (argc == 1)
     {
-        log$("usage: fs_test [disk]");
+        log$("usage: {} [disk]", argv[0]);
         return 0;
     }
 
-    Str path = str$(argv[1]);
-
     IoFile source_file;
-    UNWRAP_OR_PANIC(io_file_open(&source_file, path), "File not found!");
+    UNWRAP_OR_PANIC(io_file_open(&source_file, str$(argv[1])), "File not found!");
 
     FileBlock block = {
         ._impl = {
@@ -117,7 +109,9 @@ int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char const *argv[])
             .block_size = 512,
         },
         .file = source_file,
-        .alloc = alloc_global()};
+        .alloc = alloc_global(),
+    };
+
     vec_init(&block.blocks, alloc_global());
 
     emit_init(&emit, io_chan_out());
