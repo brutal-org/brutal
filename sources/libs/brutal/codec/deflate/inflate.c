@@ -1,4 +1,5 @@
 #include <brutal/codec/deflate/constants.h>
+#include <brutal/codec/deflate/huff.h>
 #include <brutal/codec/deflate/inflate.h>
 #include <brutal/debug/assert.h>
 #include <brutal/io/bit_read.h>
@@ -31,6 +32,10 @@ IoResult deflate_decompress_block(IoWriter writer, BitReader *bit_reader, bool *
 
     uint16_t len, nlen;
 
+    /* The order in which precode lengths are stored.  */
+    static const uint8_t deflate_precode_lens_permutation[DEFLATE_NUM_PRECODE_SYMS] = {
+        16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15};
+
     switch (block_type)
     {
     case DEFLATE_BLOCKTYPE_UNCOMPRESSED:
@@ -43,7 +48,11 @@ IoResult deflate_decompress_block(IoWriter writer, BitReader *bit_reader, bool *
 
         decompressed_size = TRY(IoResult, io_copy_range(bit_reader->reader, writer, len));
         break;
+    case DEFLATE_BLOCKTYPE_STATIC_HUFFMAN:
+        break;
+    case DEFLATE_BLOCKTYPE_DYNAMIC_HUFFMAN:
 
+        break;
     default:
         return ERR(IoResult, ERR_UNKNOWN_BLOCK);
     }
