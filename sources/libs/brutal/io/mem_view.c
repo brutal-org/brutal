@@ -12,13 +12,13 @@ void mem_view_init(MemView *self, size_t capacity, const void *data)
     };
 }
 
-static IoResult mem_view_read_impl(MemView *self, char *data, size_t offset, size_t size)
+static IoResult mem_view_read_impl(MemView *self, char *data, size_t size)
 {
     size_t read = m_min(size, self->capacity - self->used);
 
     for (size_t i = 0; i < read; i++)
     {
-        data[i] = self->data[offset + i];
+        data[i] = self->data[i];
     }
 
     self->used += read;
@@ -34,7 +34,7 @@ IoReader mem_view_reader(MemView *self)
     };
 }
 
-static IoResult mem_view_write_impl(MemView *self, char const *data, MAYBE_UNUSED size_t offset, size_t size)
+static IoResult mem_view_write_impl(MemView *self, char const *data, size_t size)
 {
     size_t to_write = m_min(self->capacity - self->used, size);
     mem_cpy(self->data + self->used, data, to_write);
