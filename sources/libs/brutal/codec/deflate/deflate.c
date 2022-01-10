@@ -88,11 +88,3 @@ IoResult deflate_compress_stream(DeflateCompressionContext *ctx, IoWriter *write
 
     return OK(IoResult, total);
 }
-
-IoResult deflate_decompress_stream(IoWriter *writer, IoReader *reader)
-{
-    UNUSED(writer);
-    UNUSED(reader);
-
-    return OK(IoResult, 0);
-}
