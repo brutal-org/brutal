@@ -18,7 +18,7 @@ static IoResult mem_view_read_impl(MemView *self, char *data, size_t size)
 
     for (size_t i = 0; i < read; i++)
     {
-        data[i] = self->data[i];
+        data[i] = self->data[self->used + i];
     }
 
     self->used += read;

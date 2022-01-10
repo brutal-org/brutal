@@ -19,14 +19,14 @@ typedef size_t BitBuf;
 typedef struct
 {
     /* The output stream where we flush our bits into */
-    IoReader *reader;
+    IoReader reader;
     /* Bits that haven't yet been written to the output buffer */
     BitBuf bitbuf;
     /* Number of bits currently held in @bitbuf */
     unsigned bitcount;
 } BitReader;
 
-static inline void io_br_init(BitReader *self, IoReader *reader)
+static inline void io_br_init(BitReader *self, IoReader reader)
 {
     self->reader = reader;
     self->bitbuf = 0;

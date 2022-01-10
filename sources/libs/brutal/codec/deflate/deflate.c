@@ -66,10 +66,10 @@ IoResult deflate_compress_data(DeflateCompressionContext *ctx, const uint8_t *in
     mem_view_init(&out_view, out_len, out);
     IoWriter writer = mem_view_writer(&out_view);
 
-    return deflate_compress_stream(ctx, &writer, &reader);
+    return deflate_compress_stream(ctx, writer, reader);
 }
 
-IoResult deflate_compress_stream(DeflateCompressionContext *ctx, IoWriter *writer, IoReader *reader)
+IoResult deflate_compress_stream(DeflateCompressionContext *ctx, IoWriter writer, IoReader reader)
 {
     size_t total = 0;
     bool last = false;

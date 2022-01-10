@@ -40,4 +40,4 @@ IoResult deflate_compress_data(DeflateCompressionContext *ctx, const uint8_t *in
   @param reader The source where we read the uncompressed data from
   @return The number of bytes written to the \p writer stream (compressed size)
 */
-IoResult deflate_compress_stream(DeflateCompressionContext *ctx, IoWriter *writer, IoReader *reader);
+IoResult deflate_compress_stream(DeflateCompressionContext *ctx, IoWriter writer, IoReader reader);

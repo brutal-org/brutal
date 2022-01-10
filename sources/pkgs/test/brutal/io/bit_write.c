@@ -11,7 +11,7 @@ TEST(bitwriter_write_aligned)
     IoWriter writer = buf_writer(&buf);
     // Initialize our bitwriter
     BitWriter bit_writer;
-    io_bw_init(&bit_writer, &writer);
+    io_bw_init(&bit_writer, writer);
     assert_equal(buf.used, 0);
     // Write 8 bits
     unsigned data = 0b01010101;

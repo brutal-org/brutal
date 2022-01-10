@@ -18,38 +18,52 @@ IoResult deflate_decompress_data(const uint8_t *in, size_t in_len, const uint8_t
     mem_view_init(&out_view, out_len, out);
     IoWriter writer = mem_view_writer(&out_view);
 
-    return deflate_decompress_stream(&writer, &reader);
+    return deflate_decompress_stream(writer, reader);
 }
 
-IoResult deflate_decompress_stream(IoWriter *writer, IoReader *reader)
+IoResult deflate_decompress_block(IoWriter writer, BitReader *bit_reader, bool *final_block)
 {
-    UNUSED(writer);
-    static_assert(1 + 2 + 5 + 5 + 4 < BITBUF_NBITS, "BitReader can't hold enough bits");
+    size_t decompressed_size = 0;
+    io_br_ensure_bits(bit_reader, 1 + 2);
 
-    BitReader bit_reader;
-    io_br_init(&bit_reader, reader);
-    io_br_ensure_bits(&bit_reader, 1 + 2 + 5 + 5 + 4);
-
-    bool is_final = io_br_pop_bits(&bit_reader, 1);
-    UNUSED(is_final);
-    unsigned block_type = io_br_pop_bits(&bit_reader, 2);
+    *final_block = io_br_pop_bits(bit_reader, 1);
+    unsigned block_type = io_br_pop_bits(bit_reader, 2);
 
     uint16_t len, nlen;
 
     switch (block_type)
     {
     case DEFLATE_BLOCKTYPE_UNCOMPRESSED:
-        io_br_align(&bit_reader);
+        io_br_align(bit_reader);
 
-        io_read(bit_reader.reader, (uint8_t *)&len, sizeof(uint16_t));
-        io_read(bit_reader.reader, (uint8_t *)&nlen, sizeof(uint16_t));
+        TRY(IoResult, io_read(bit_reader->reader, (uint8_t *)&len, sizeof(uint16_t)));
+        TRY(IoResult, io_read(bit_reader->reader, (uint8_t *)&nlen, sizeof(uint16_t)));
 
-        assert_equal(len, ~nlen);
+        assert_equal(len, (uint16_t)~nlen);
+
+        decompressed_size = TRY(IoResult, io_copy_range(bit_reader->reader, writer, len));
         break;
 
     default:
         return ERR(IoResult, ERR_UNKNOWN_BLOCK);
     }
 
-    return OK(IoResult, 0);
+    return OK(IoResult, decompressed_size);
+}
+
+IoResult deflate_decompress_stream(IoWriter writer, IoReader reader)
+{
+    size_t total = 0;
+    static_assert(1 + 2 + 5 + 5 + 4 < BITBUF_NBITS, "BitReader can't hold enough bits");
+
+    BitReader bit_reader;
+    io_br_init(&bit_reader, reader);
+    bool final_block;
+
+    do
+    {
+        total += TRY(IoResult, deflate_decompress_block(writer, &bit_reader, &final_block));
+    } while (!final_block);
+
+    return OK(IoResult, total);
 }

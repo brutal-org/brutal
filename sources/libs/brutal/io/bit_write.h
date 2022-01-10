@@ -11,14 +11,14 @@ typedef size_t BitBuf;
 typedef struct
 {
     /* The output stream where we flush our bits into */
-    IoWriter *writer;
+    IoWriter writer;
     /* Bits that haven't yet been written to the output buffer */
     BitBuf bitbuf;
     /* Number of bits currently held in @bitbuf */
     unsigned bitcount;
 } BitWriter;
 
-static inline void io_bw_init(BitWriter *self, IoWriter *writer)
+static inline void io_bw_init(BitWriter *self, IoWriter writer)
 {
     self->writer = writer;
     self->bitbuf = 0;
@@ -37,7 +37,7 @@ io_bw_add_bits(BitWriter *self,
     self->bitcount += num_bits;
 }
 
-/** 
+/**
   @brief Flush bits that fit into bytes
 */
 static inline void io_bw_flush_bits(BitWriter *self)
@@ -51,7 +51,7 @@ static inline void io_bw_flush_bits(BitWriter *self)
     }
 }
 
-/** 
+/**
   @brief Flush all remaining bits even if does not align to a byte boundary
 */
 static inline void io_bw_flush_bits_remaining(BitWriter *self)
@@ -64,8 +64,8 @@ static inline void io_bw_flush_bits_remaining(BitWriter *self)
     }
 }
 
-/** 
-  @brief Align the bitstream on a byte boundary. 
+/**
+  @brief Align the bitstream on a byte boundary.
 */
 static inline void
 io_bw_align_bitstream(BitWriter *self)
