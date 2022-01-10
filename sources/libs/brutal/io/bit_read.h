@@ -59,7 +59,7 @@ io_br_ensure_bits(BitReader *self, const unsigned num_bits)
 /**
   @brief Return the next \p num_bits from the bitbuffer variable without removing them.
 */
-inline unsigned io_br_get_bits(BitReader *self, const unsigned num_bits)
+static inline unsigned io_br_get_bits(BitReader *self, const unsigned num_bits)
 {
     return self->bitbuf & ((1 << num_bits) - 1);
 }
@@ -67,7 +67,7 @@ inline unsigned io_br_get_bits(BitReader *self, const unsigned num_bits)
 /**
   @brief Remove the next \p num_bits from the bitbuffer variable.
 */
-inline void io_br_remove_bits(BitReader *self, const unsigned num_bits)
+static inline void io_br_remove_bits(BitReader *self, const unsigned num_bits)
 {
     self->bitbuf >>= num_bits;
     self->bitcount -= num_bits;
@@ -76,7 +76,7 @@ inline void io_br_remove_bits(BitReader *self, const unsigned num_bits)
 /**
   @brief Return the next \p num_bits from the bitbuffer variable with removing them.
 */
-inline unsigned io_br_pop_bits(BitReader *self, const unsigned num_bits)
+static inline unsigned io_br_pop_bits(BitReader *self, const unsigned num_bits)
 {
     unsigned result = io_br_get_bits(self, num_bits);
     io_br_remove_bits(self, num_bits);
@@ -86,7 +86,7 @@ inline unsigned io_br_pop_bits(BitReader *self, const unsigned num_bits)
 /**
   @brief Flush to byte boundary
 */
-inline void io_br_align(BitReader *self)
+static inline void io_br_align(BitReader *self)
 {
     unsigned to_flush = self->bitcount % 8;
     io_br_remove_bits(self, to_flush);
