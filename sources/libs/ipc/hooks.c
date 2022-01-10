@@ -1,10 +1,10 @@
 #include <bal/hw.h>
-#include <bal/ipc/idl.h>
 #include <brutal/alloc.h>
 #include <brutal/debug.h>
+#include <ipc/hooks.h>
 
-int idl_hook_call(
-    IpcEv *self,
+int ipc_hook_call(
+    IpcComponent *self,
     BrAddr to,
     IdlBinding binding,
     void const *req,
@@ -19,8 +19,8 @@ int idl_hook_call(
     req_msg.prot = binding.proto;
     req_msg.type = binding.req_id;
 
-    BalPack pack;
-    bal_pack_init(&pack);
+    IpcPack pack;
+    ipc_pack_init(&pack);
 
     if (req != nullptr)
     {
@@ -29,7 +29,7 @@ int idl_hook_call(
         req_msg.flags = BR_MSG_HND(0);
     }
 
-    br_ev_req_raw(self, to, &req_msg, &resp_msg);
+    ipc_component_request(self, to, &req_msg, &resp_msg);
 
     // Error handeling
 
@@ -47,18 +47,18 @@ int idl_hook_call(
         BalMem shm;
         bal_mem_init_mobj(&shm, resp_msg.args[0]);
 
-        BalUnpack unpack;
-        bal_unpack_init(&unpack, shm.buf, shm.len, alloc);
+        IpcUnpack unpack;
+        ipc_unpack_init(&unpack, shm.buf, shm.len, alloc);
         binding.req_unpack(&unpack, resp);
         bal_mem_deinit(&shm);
     }
 
-    bal_pack_deinit(&pack);
+    ipc_pack_deinit(&pack);
 
     return 0;
 }
 
-static int idl_handle_invoke(IdlHandler handler, IpcEv *ev, BrAddr addr, void *req, void *resp, Alloc *alloc)
+static int idl_handle_invoke(IdlHandler handler, IpcComponent *ev, BrAddr addr, void *req, void *resp, Alloc *alloc)
 {
     switch (handler.type)
     {
@@ -79,9 +79,9 @@ static int idl_handle_invoke(IdlHandler handler, IpcEv *ev, BrAddr addr, void *r
     }
 }
 
-void idl_hook_handle(
+void ipc_hook_handle(
     IdlHandler handler,
-    IpcEv *ev,
+    IpcComponent *ev,
     BrMsg *msg,
     IdlBinding binding,
     void *req,
@@ -95,8 +95,8 @@ void idl_hook_handle(
         BalMem shm;
         bal_mem_init_mobj(&shm, msg->args[0]);
 
-        BalUnpack unpack;
-        bal_unpack_init(&unpack, shm.buf, shm.len, base$(&heap));
+        IpcUnpack unpack;
+        ipc_unpack_init(&unpack, shm.buf, shm.len, base$(&heap));
         binding.req_unpack(&unpack, req);
 
         bal_mem_deinit(&shm);
@@ -110,12 +110,12 @@ void idl_hook_handle(
         BrMsg resp_msg;
         resp_msg.type = BR_MSG_ERROR;
         resp_msg.args[0] = result;
-        br_ev_resp_raw(ev, msg, &resp_msg);
+        ipc_component_respond(ev, msg, &resp_msg);
     }
     else if (resp != nullptr)
     {
-        BalPack pack;
-        bal_pack_init(&pack);
+        IpcPack pack;
+        ipc_pack_init(&pack);
 
         binding.resp_pack(&pack, resp);
 
@@ -125,9 +125,9 @@ void idl_hook_handle(
         resp_msg.flags = BR_MSG_HND(0);
         resp_msg.args[0] = pack.handle;
 
-        br_ev_resp_raw(ev, msg, &resp_msg);
+        ipc_component_respond(ev, msg, &resp_msg);
 
-        bal_pack_deinit(&pack);
+        ipc_pack_deinit(&pack);
     }
 
     heap_alloc_deinit(&heap);

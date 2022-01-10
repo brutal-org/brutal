@@ -6,7 +6,7 @@ CType idl_cgen_dispatch_type(Alloc *alloc)
 {
     CType ctype = ctype_func(ctype_void(), alloc);
 
-    ctype_member(&ctype, str$("ev"), ctype_ident_ptr(str$("IpcEv"), alloc));
+    ctype_member(&ctype, str$("ev"), ctype_ident_ptr(str$("IpcComponent"), alloc));
     ctype_member(&ctype, str$("req"), ctype_ident_ptr(str$("BrMsg"), alloc));
     ctype_member(&ctype, str$("ctx"), ctype_ptr(ctype_void(), alloc));
 
@@ -46,7 +46,7 @@ CExpr idl_cgen_dispatch_handler(IdlMethod method, Alloc *alloc)
 
 void idl_cgen_dispatch_case(CStmt *block, IdlMethod method, IdlIface const iface, Alloc *alloc)
 {
-    CExpr call_handler = cexpr_call(alloc, cexpr_ident(str$("idl_hook_handle")));
+    CExpr call_handler = cexpr_call(alloc, cexpr_ident(str$("ipc_hook_handle")));
 
     cexpr_member(&call_handler, idl_cgen_dispatch_handler(method, alloc));
     cexpr_member(&call_handler, cexpr_ident(str$("ev")));

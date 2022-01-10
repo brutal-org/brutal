@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bal/ipc/ev.h>
+#include <ipc/component.h>
 
 typedef enum
 {
@@ -23,25 +23,25 @@ typedef struct
     int proto;
 
     int req_id;
-    BalPackFn *req_pack;
-    BalUnpackFn *req_unpack;
+    IpcPackFn *req_pack;
+    IpcUnpackFn *req_unpack;
 
     int resp_id;
-    BalPackFn *resp_pack;
-    BalUnpackFn *resp_unpack;
+    IpcPackFn *resp_pack;
+    IpcUnpackFn *resp_unpack;
 } IdlBinding;
 
-int idl_hook_call(
-    IpcEv *self,
+int ipc_hook_call(
+    IpcComponent *self,
     BrAddr to,
     IdlBinding binding,
     void const *req,
     void *resp,
     Alloc *alloc);
 
-void idl_hook_handle(
+void ipc_hook_handle(
     IdlHandler handler,
-    IpcEv *ev,
+    IpcComponent *ev,
     BrMsg *msg,
     IdlBinding binding,
     void *req,
