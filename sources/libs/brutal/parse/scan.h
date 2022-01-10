@@ -130,4 +130,4 @@ bool scan_expect_word(Scan *self, Str word);
 
 bool scan_expect_any(Scan *self, Str chars);
 
-bool scan_dump_error(Scan *self, IoWriter *writer);
+bool scan_dump_error(Scan *self, IoWriter writer);

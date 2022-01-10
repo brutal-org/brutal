@@ -6,7 +6,7 @@
 
 typedef Result(Error, size_t) IoCopyResult;
 
-static inline IoCopyResult io_copy(IoReader *from, IoWriter *to)
+static inline IoCopyResult io_copy(IoReader from, IoWriter to)
 {
     size_t total = 0;
 
@@ -31,11 +31,10 @@ static inline IoCopyResult io_copy(IoReader *from, IoWriter *to)
     } while (1);
 }
 
-static inline Buf io_readall(IoReader *from, Alloc *alloc)
+static inline Buf io_readall(IoReader from, Alloc *alloc)
 {
     Buf buf;
     buf_init(&buf, 512, alloc);
-    IoWriter to = buf_writer(&buf);
-    io_copy(from, &to);
+    io_copy(from, buf_writer(&buf));
     return buf;
 }

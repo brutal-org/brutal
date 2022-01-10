@@ -7,7 +7,6 @@
 static bool _initialized = false;
 static Lock _lock;
 static Buf _buf = {};
-static IoWriter _log = {};
 
 void embed_log_lock(void)
 {
@@ -39,16 +38,15 @@ static IoResult embed_log_write(MAYBE_UNUSED void *context, uint8_t const *data,
     return OK(IoResult, size);
 }
 
-IoWriter *embed_log_writer(void)
+IoWriter embed_log_writer(void)
 {
     if (!_initialized)
     {
-        _log.write = embed_log_write;
         buf_init(&_buf, 128, alloc_global());
         _initialized = true;
     }
 
-    return &_log;
+    return (IoWriter){.write = embed_log_write};
 }
 
 void embed_log_panic(void)

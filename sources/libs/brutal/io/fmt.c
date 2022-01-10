@@ -216,13 +216,13 @@ Fmt fmt_parse(Scan *scan)
     return fmt;
 }
 
-IoResult fmt_signed(Fmt self, IoWriter *writer, FmtInt value)
+IoResult fmt_signed(Fmt self, IoWriter writer, FmtInt value)
 {
     size_t written = 0;
 
     if (value < 0)
     {
-        written += TRY(IoResult, io_put(writer, '-'));
+        written += TRY(IoResult, io_putc(writer, '-'));
         value *= -1;
     }
 
@@ -241,7 +241,7 @@ static void reverse(uint8_t *str, size_t len)
     }
 }
 
-IoResult fmt_unsigned(Fmt self, IoWriter *writer, FmtUInt value)
+IoResult fmt_unsigned(Fmt self, IoWriter writer, FmtUInt value)
 {
     uint8_t buf[sizeof(FmtUInt) * 8] = {};
     int i = 0;
@@ -289,10 +289,8 @@ IoResult fmt_unsigned(Fmt self, IoWriter *writer, FmtUInt value)
 
 #ifndef __freestanding__
 
-IoResult fmt_float(Fmt self, IoWriter *writer, double value)
+IoResult fmt_float(Fmt self, IoWriter writer, double value)
 {
-    io_print(writer, str$("<float>"));
-
     if (isnan(value))
     {
         return io_print(writer, str$("nan"));
@@ -302,7 +300,7 @@ IoResult fmt_float(Fmt self, IoWriter *writer, double value)
 
     if (value < 0)
     {
-        written += TRY(IoResult, io_put(writer, '-'));
+        written += TRY(IoResult, io_putc(writer, '-'));
         value *= -1;
     }
 
@@ -319,14 +317,14 @@ IoResult fmt_float(Fmt self, IoWriter *writer, double value)
         return OK(IoResult, written);
     }
 
-    written += TRY(IoResult, io_put(writer, '.'));
+    written += TRY(IoResult, io_putc(writer, '.'));
 
     value -= (FmtUInt)value;
 
     for (int i = 0; i < self.precison; i++)
     {
         value *= fmt_base(self);
-        written += TRY(IoResult, io_put(writer, fmt_digit(self, (FmtUInt)value)));
+        written += TRY(IoResult, io_putc(writer, fmt_digit(self, (FmtUInt)value)));
         value -= (FmtUInt)value;
     }
 
@@ -335,7 +333,7 @@ IoResult fmt_float(Fmt self, IoWriter *writer, double value)
 
 #endif
 
-IoResult fmt_char(Fmt self, IoWriter *writer, unsigned int character)
+IoResult fmt_char(Fmt self, IoWriter writer, unsigned int character)
 {
     size_t written = 0;
 
@@ -377,7 +375,7 @@ IoResult fmt_char(Fmt self, IoWriter *writer, unsigned int character)
     return OK(IoResult, written);
 }
 
-IoResult fmt_string(Fmt self, IoWriter *writer, Str value)
+IoResult fmt_string(Fmt self, IoWriter writer, Str value)
 {
     if (self.casing == CASE_DEFAULT)
     {

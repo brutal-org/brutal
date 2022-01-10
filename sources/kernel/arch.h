@@ -5,7 +5,7 @@
 #include <brutal/io.h>
 #include "kernel/tasking.h"
 
-IoWriter *arch_debug(void);
+IoWriter arch_debug(void);
 
 void arch_entry_main();
 

@@ -5,24 +5,15 @@
 #include "kernel/x86_64/com.h"
 #include "kernel/x86_64/smp.h"
 
-static bool log_initialized = false;
-static IoWriter log;
-
 static IoResult arch_debug_write(MAYBE_UNUSED void *context, uint8_t const *data, size_t size)
 {
     com_write(COM1, data, size);
     return OK(IoResult, size);
 }
 
-IoWriter *arch_debug(void)
+IoWriter arch_debug(void)
 {
-    if (!log_initialized)
-    {
-        log.write = arch_debug_write;
-        log_initialized = true;
-    }
-
-    return &log;
+    return (IoWriter){.write = arch_debug_write};
 }
 
 void arch_idle(void)

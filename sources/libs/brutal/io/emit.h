@@ -6,11 +6,11 @@ typedef struct
 {
     int indent;
     int indent_size;
-    IoWriter *writer;
+    IoWriter writer;
     bool line_begin;
 } Emit;
 
-void emit_init(Emit *self, IoWriter *writer);
+void emit_init(Emit *self, IoWriter writer);
 
 void emit_deinit(Emit *self);
 
@@ -22,8 +22,4 @@ void emit_deident(Emit *self);
 
 IoWriter emit_writer(Emit *self);
 
-#define emit_fmt(EMIT, FMT, ...) (                                 \
-    {                                                              \
-        IoWriter __writer = emit_writer((EMIT));                   \
-        print_impl(&__writer, str$(FMT), PRINT_ARGS(__VA_ARGS__)); \
-    })
+#define emit_fmt(SELF, FMT, ...) print_impl(emit_writer(SELF), str$(FMT), PRINT_ARGS(__VA_ARGS__));

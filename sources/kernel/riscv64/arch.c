@@ -2,23 +2,17 @@
 #include "kernel/riscv64/arch.h"
 
 static bool _init = false;
-static IoWriter _lock;
+static IoWriter _writer;
 
 void arch_use_uart(Uart *device)
 {
     _init = true;
-    _lock = uart_writer(device);
+    _writer = uart_writer(device);
 }
 
-IoWriter *arch_debug(void)
+IoWriter arch_debug(void)
 {
-    if (!_init)
-    {
-        _lock.write = NULL;
-        _init = true;
-    }
-
-    return &_lock;
+    return _writer;
 }
 
 void arch_idle(void)

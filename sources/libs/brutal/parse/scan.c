@@ -258,7 +258,7 @@ bool scan_expect_any(Scan *self, Str chars)
     return true;
 }
 
-bool scan_dump_error(Scan *self, IoWriter *writer)
+bool scan_dump_error(Scan *self, IoWriter writer)
 {
     if (!self->has_error)
     {

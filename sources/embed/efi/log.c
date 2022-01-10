@@ -3,8 +3,6 @@
 #include <efi/lib.h>
 #include <embed/log.h>
 
-static IoWriter _writer;
-
 static IoResult embed_log_write(MAYBE_UNUSED void *context, uint8_t const *data, size_t size)
 {
     uint16_t *cstr = utf16_str_to_cstr_dos(str_n$(size, (char *)data), alloc_global());
@@ -16,10 +14,9 @@ static IoResult embed_log_write(MAYBE_UNUSED void *context, uint8_t const *data,
     return OK(IoResult, size);
 }
 
-IoWriter *embed_log_writer(void)
+IoWriter embed_log_writer(void)
 {
-    _writer.write = embed_log_write;
-    return &_writer;
+    return (IoWriter){.write = embed_log_write};
 }
 
 void embed_log_lock(void)

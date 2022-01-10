@@ -10,8 +10,8 @@ typedef struct
     void *context;
 } IoWriter;
 
-IoResult io_write(IoWriter *self, uint8_t const *data, size_t size);
+IoResult io_write(IoWriter self, uint8_t const *data, size_t size);
 
-IoResult io_put(IoWriter *writer, uint8_t c);
+IoResult io_putc(IoWriter self, uint8_t c);
 
-IoResult io_print(IoWriter *writer, Str str);
+IoResult io_print(IoWriter self, Str str);

@@ -1,6 +1,6 @@
 #include <brutal/codec/tga.h>
 
-IoResult tga_encode(IoWriter *writer, GfxBuf surface)
+IoResult tga_encode(IoWriter writer, GfxBuf surface)
 {
     TgaHeader header = (TgaHeader){
         .data_type_code = le$(le_int8_t, TGA_DATATYPE_UNCOMPRESSED_RGB),

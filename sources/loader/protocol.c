@@ -157,10 +157,9 @@ static void efi_load_module(HandoverModule *target, Str path)
 {
     IoFile file;
     io_file_open(&file, path);
-    IoReader reader = io_file_reader(&file);
 
     // TODO: make a kernel_module alloc instead of allocating 2 time (even if the first time is always freed)
-    Buf buf = io_readall((&reader), alloc_global());
+    Buf buf = io_readall(io_file_reader(&file), alloc_global());
 
     uintptr_t buf_page_size = align_up$(buf.used, PAGE_SIZE) / PAGE_SIZE;
     uintptr_t module_addr = kernel_module_phys_alloc_page(buf_page_size);

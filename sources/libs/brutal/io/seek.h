@@ -30,4 +30,4 @@ typedef struct
     void *context;
 } IoSeeker;
 
-IoResult io_seek(IoSeeker *self, IoSeek off);
+IoResult io_seek(IoSeeker self, IoSeek off);

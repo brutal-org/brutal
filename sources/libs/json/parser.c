@@ -155,22 +155,16 @@ Json json_parse_str(Str str, Alloc *alloc)
 
 Json json_parse_file(Str path, Alloc *alloc)
 {
-    HeapAlloc heap;
-    heap_alloc_init(&heap, NODE_DEFAULT);
-
     IoFile file;
     io_file_open(&file, path);
 
-    IoReader reader = io_file_reader(&file);
-    Buf buf = io_readall((&reader), alloc_global());
+    Buf buf = io_readall(io_file_reader(&file), alloc);
 
     Scan scan = {};
     scan_init(&scan, buf_str(&buf));
     Json json = json_parse(&scan, alloc);
 
     io_file_close(&file);
-
-    heap_alloc_deinit(&heap);
 
     return json;
 }

@@ -98,7 +98,7 @@ PrintValue print_val_pointer(void *);
     IFNE(__VA_ARGS__)   \
     (PRINT_ARGS_N, PRINT_ARGS_)(__VA_ARGS__)
 
-IoResult print_impl(IoWriter *writer, Str format, PrintArgs args);
+IoResult print_impl(IoWriter writer, Str format, PrintArgs args);
 
 #define print(writer, fmt, ...) \
     print_impl(writer, str$(fmt), PRINT_ARGS(__VA_ARGS__))

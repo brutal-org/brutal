@@ -10,8 +10,8 @@ typedef enum
     IO_CHAN_ERR,
 } IoChan;
 
-IoReader *io_chan_in(void);
+IoReader io_chan_in(void);
 
-IoWriter *io_chan_out(void);
+IoWriter io_chan_out(void);
 
-IoWriter *io_chan_err(void);
+IoWriter io_chan_err(void);

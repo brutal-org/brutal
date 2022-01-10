@@ -9,7 +9,7 @@ void embed_log_lock(void)
     lock_acquire(&_lock);
 }
 
-IoWriter *embed_log_writer(void)
+IoWriter embed_log_writer(void)
 {
     return arch_debug();
 }

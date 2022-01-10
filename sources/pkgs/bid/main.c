@@ -7,7 +7,7 @@
 #include <cc/trans.h>
 #include <json/emit.h>
 
-void bid_emit_json(BidIface const iface, IoWriter *writer)
+void bid_emit_json(BidIface const iface, IoWriter writer)
 {
     HeapAlloc heap;
     heap_alloc_init(&heap, NODE_DEFAULT);
@@ -23,7 +23,7 @@ void bid_emit_json(BidIface const iface, IoWriter *writer)
     heap_alloc_deinit(&heap);
 }
 
-void bid_emit_source(BidIface const iface, IoWriter *writer)
+void bid_emit_source(BidIface const iface, IoWriter writer)
 {
     HeapAlloc heap;
     heap_alloc_init(&heap, NODE_DEFAULT);
@@ -39,7 +39,7 @@ void bid_emit_source(BidIface const iface, IoWriter *writer)
     heap_alloc_deinit(&heap);
 }
 
-void bid_emit_header(BidIface const iface, IoWriter *writer)
+void bid_emit_header(BidIface const iface, IoWriter writer)
 {
     HeapAlloc heap;
     heap_alloc_init(&heap, NODE_DEFAULT);
@@ -75,14 +75,10 @@ int main(int argc, char const *argv[])
     IoFile source_file;
     UNWRAP_OR_PANIC(io_file_open(&source_file, str$(argv[1])), "File not found!");
 
-    IoReader source_file_reader = io_file_reader(&source_file);
-
     Buf source_buf;
     buf_init(&source_buf, 512, base$(&heap));
 
-    IoWriter source_buf_writer = buf_writer(&source_buf);
-
-    io_copy(&source_file_reader, &source_buf_writer);
+    io_copy(io_file_reader(&source_file), buf_writer(&source_buf));
 
     Scan scan;
     scan_init(&scan, buf_str(&source_buf));

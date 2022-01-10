@@ -56,8 +56,7 @@ EntryPointFn loader_load_kernel(Str path)
 
     IoFile file;
     io_file_open(&file, path);
-    IoReader reader = io_file_reader(&file);
-    Buf buf = io_readall((&reader), alloc_global());
+    Buf buf = io_readall(io_file_reader(&file), alloc_global());
 
     log$("Loaded elf file...");
     Elf64Header *header = (Elf64Header *)buf.data;
