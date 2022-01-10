@@ -18,13 +18,13 @@ Str idl_cgen_unpack_name(Str name, Alloc *alloc)
 
 CExpr idl_cgen_unpack_ref(Str name, Alloc *alloc)
 {
-    return cexpr_cast(cexpr_ident(idl_cgen_unpack_name(name, alloc)), ctype_ident_ptr(str$("BalUnpackFn"), alloc), alloc);
+    return cexpr_cast(cexpr_ident(idl_cgen_unpack_name(name, alloc)), ctype_ident_ptr(str$("IpcUnpackFn"), alloc), alloc);
 }
 
 CType idl_cgen_unpack_type(IdlAlias alias, Alloc *alloc)
 {
     CType ctype = ctype_func(ctype_void(), alloc);
-    ctype_member(&ctype, str$("self"), ctype_ident_ptr(str$("BalUnpack"), alloc));
+    ctype_member(&ctype, str$("self"), ctype_ident_ptr(str$("IpcUnpack"), alloc));
     ctype_member(&ctype, str$("data"), ctype_ident_ptr(alias.mangled, alloc));
     return ctype;
 }
@@ -70,7 +70,7 @@ void idl_cgen_unpack_body(CStmt *block, IdlType type, CExpr path, Alloc *alloc)
         IdlType subtype = *type.vec_.subtype;
         assert_truth(subtype.type == IDL_TYPE_PRIMITIVE);
 
-        CExpr expr = cexpr_call(alloc, cexpr_ident(str$("bal_unpack_slice")));
+        CExpr expr = cexpr_call(alloc, cexpr_ident(str$("ipc_unpack_slice")));
         cexpr_member(&expr, cexpr_ident(str$("self")));
         cexpr_member(&expr, path);
         cexpr_member(&expr, cexpr_ident(idl_cgen_unpack_name(subtype.primitive_.mangled, alloc)));

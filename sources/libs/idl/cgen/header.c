@@ -7,7 +7,7 @@ CUnit idl_cgen_header(MAYBE_UNUSED IdlIface const iface, Alloc *alloc)
     CUnit unit = cunit(alloc);
     cunit_pragma_once(&unit);
 
-    cunit_include(&unit, true, str$("bal/ipc.h"));
+    cunit_include(&unit, true, str$("ipc/ipc.h"));
 
     vec_foreach_v(alias, &iface.aliases)
     {

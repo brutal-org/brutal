@@ -36,7 +36,7 @@ static Iter iter_pci_find(void *data, PciGetDevIterCtx *ctx)
     return ITER_CONTINUE;
 }
 
-PciError pci_impl_find_device(IpcEv *ev, MAYBE_UNUSED BrAddr from, PciFindDeviceRequest const *req, PciAddr *resp, MAYBE_UNUSED Alloc *alloc)
+PciError pci_impl_find_device(IpcComponent *ev, MAYBE_UNUSED BrAddr from, PciFindDeviceRequest const *req, PciAddr *resp, MAYBE_UNUSED Alloc *alloc)
 {
     PciGetDevIterCtx ctx = {.result = resp, .identifier = req->identifier, .pci = ev->ctx};
 
@@ -48,7 +48,7 @@ PciError pci_impl_find_device(IpcEv *ev, MAYBE_UNUSED BrAddr from, PciFindDevice
     return PCI_SUCCESS;
 }
 
-static PciError pci_impl_bar(IpcEv *ev, MAYBE_UNUSED BrAddr from, PciBarRequest const *req, PciBarInfo *resp, MAYBE_UNUSED Alloc *alloc)
+static PciError pci_impl_bar(IpcComponent *ev, MAYBE_UNUSED BrAddr from, PciBarRequest const *req, PciBarInfo *resp, MAYBE_UNUSED Alloc *alloc)
 {
     PciConfig *config = pci_config(ev->ctx, (PciAddr){.bus = req->addr.bus, .func = req->addr.func, .seg = req->addr.seg, .slot = req->addr.slot});
 
@@ -62,7 +62,7 @@ static PciError pci_impl_bar(IpcEv *ev, MAYBE_UNUSED BrAddr from, PciBarRequest 
     return PCI_SUCCESS;
 }
 
-static PciError pci_impl_enable_irq(IpcEv *ev, MAYBE_UNUSED BrAddr from, PciEnableIrqRequest const *req, uint8_t *resp, MAYBE_UNUSED Alloc *alloc)
+static PciError pci_impl_enable_irq(IpcComponent *ev, MAYBE_UNUSED BrAddr from, PciEnableIrqRequest const *req, uint8_t *resp, MAYBE_UNUSED Alloc *alloc)
 {
 
     PciConfig *config = pci_config(ev->ctx, (PciAddr){.bus = req->addr.bus, .func = req->addr.func, .seg = req->addr.seg, .slot = req->addr.slot});
@@ -159,11 +159,11 @@ int br_entry_handover(Handover *handover)
 
     pci_iter(&pci, iter_pci, &pci);
 
-    IpcEv ev = {};
-    br_ev_init(&ev, &pci, alloc_global());
+    IpcComponent ev = {};
+    ipc_component_init(&ev, &pci, alloc_global());
     pci_provide(&ev, &pci_vtable);
 
-    int res = br_ev_run(&ev);
+    int res = ipc_component_run(&ev);
     pci_deinit(&pci);
     acpi_deinit(&acpi);
 

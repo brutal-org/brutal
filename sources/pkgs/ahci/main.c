@@ -1,8 +1,8 @@
 #include <ahci/ahci.h>
 #include <ahci/device.h>
-#include <bal/ipc.h>
 #include <brutal/alloc.h>
 #include <brutal/debug.h>
+#include <ipc/ipc.h>
 #include <protos/hw/pci.h>
 #include <protos/serv/bbus.h>
 
@@ -13,8 +13,8 @@ int br_entry_args(
     MAYBE_UNUSED long arg4,
     MAYBE_UNUSED long arg5)
 {
-    IpcEv ev = {};
-    br_ev_init(&ev, nullptr, alloc_global());
+    IpcComponent ev = {};
+    ipc_component_init(&ev, nullptr, alloc_global());
 
     Str req = str$("pci");
     BrAddr resp;

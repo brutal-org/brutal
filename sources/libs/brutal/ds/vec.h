@@ -153,7 +153,3 @@ void vec_swap_impl(VecImpl *impl, int idx1, int idx2);
                  });                                                              \
              __it##VAR++)                                                         \
             for (typeof(*(SELF)->data) VAR = *__it##VAR; __once##VAR == nullptr; __once##VAR = (typeof((SELF)->data))1)
-
-typedef Vec(void *) VecPtr;
-typedef Vec(int) VecInt;
-typedef Vec(char) VecChar;

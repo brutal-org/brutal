@@ -6,7 +6,7 @@ CType idl_cgen_method_type(IdlMethod method, IdlIface const iface, Alloc *alloc)
 {
     CType ctype = ctype_func(idl_cgen_decl_primitive(iface.errors), alloc);
 
-    ctype_member(&ctype, str$("ev"), ctype_ident_ptr(str$("IpcEv"), alloc));
+    ctype_member(&ctype, str$("ev"), ctype_ident_ptr(str$("IpcComponent"), alloc));
 
     ctype_member(&ctype, str$("from"), ctype_ident(str$("BrAddr")));
 
@@ -34,7 +34,7 @@ CStmt idl_cgen_method_body(IdlMethod method, IdlIface const iface, Alloc *alloc)
 {
     CStmt block = cstmt_block(alloc);
 
-    CExpr pack_request = cexpr_call(alloc, cexpr_ident(str$("idl_hook_call")));
+    CExpr pack_request = cexpr_call(alloc, cexpr_ident(str$("ipc_hook_call")));
     cexpr_member(&pack_request, cexpr_ident(str$("ev")));
     cexpr_member(&pack_request, cexpr_ident(str$("from")));
     cexpr_member(&pack_request, idl_cgen_binding(method, iface, alloc));

@@ -1,12 +1,12 @@
-#include <bal/ipc.h>
 #include <brutal/alloc.h>
 #include <brutal/debug.h>
+#include <ipc/ipc.h>
 #include <protos/serv/bbus.h>
 #include "init/boot.h"
 #include "init/bus.h"
 
 BbusError handle_bbus_locate(
-    IpcEv *ev,
+    IpcComponent *ev,
     MAYBE_UNUSED BrAddr from,
     Str const *req,
     BrAddr *resp,
@@ -37,8 +37,8 @@ int br_entry_handover(Handover *handover)
     Bus bus;
     bus_init(&bus, handover, alloc_global());
 
-    IpcEv ev = {};
-    br_ev_init(&ev, &bus, alloc_global());
+    IpcComponent ev = {};
+    ipc_component_init(&ev, &bus, alloc_global());
 
     bus_start(&bus, str$("posix"), bal_args1(0));
     bus_start(&bus, str$("acpi"), bal_args_handover(handover));
@@ -48,5 +48,5 @@ int br_entry_handover(Handover *handover)
 
     bbus_provide(&ev, &_bbus_vtable);
 
-    return br_ev_run(&ev);
+    return ipc_component_run(&ev);
 }
