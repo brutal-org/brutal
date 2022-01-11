@@ -44,16 +44,27 @@ static inline bool io_br_can_ensure(const unsigned num_bits)
 /**
  @brief Make sure we have atleast \p num_bits
 */
-static inline void
+static inline IoResult
 io_br_ensure_bits(BitReader *self, const unsigned num_bits)
 {
     uint8_t b;
     while (self->bitcount < num_bits)
     {
-        io_read(self->reader, &b, 1);
+        TRY(IoResult, io_read(self->reader, &b, 1));
         self->bitbuf |= b << self->bitcount;
         self->bitcount += 8;
     }
+    return OK(IoResult, num_bits);
+}
+
+static inline IoResult
+io_br_get_byte(BitReader *self)
+{
+    uint8_t b;
+    TRY(IoResult, io_read(self->reader, &b, 1));
+    self->bitbuf |= b << self->bitcount;
+    self->bitcount += 8;
+    return OK(IoResult, 8);
 }
 
 /**
