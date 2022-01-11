@@ -18,15 +18,13 @@
 
 typedef struct
 {
-    unsigned char op;   /* operation, extra bits, table bits */
-    unsigned char bits; /* bits in this part of the code */
-    unsigned short val; /* offset in table or code value */
-} Code;
-
-typedef struct
-{
-    unsigned lenbits;
-    // DYNAMIC Huffman
+    unsigned have;
+    // Static & Dynamic Huffman
+    Code const *lencode;  /* starting table for length/literal codes */
+    Code const *distcode; /* starting table for distance codes */
+    unsigned lenbits;     /* index bits for lencode */
+    unsigned distbits;    /* index bits for distcode */
+    // Dynamic Huffman
     unsigned hlit;                       /* number of code length code lengths */
     unsigned hdist;                      /* number of length code lengths */
     unsigned hclen;                      /* number of distance code lengths */
@@ -254,10 +252,10 @@ MaybeError build_dynamic_huffman_alphabet(DeflateDecompressionContext *ctx, BitR
     }
 
     // 3 bits per code
-    io_br_ensure_bits(bit_reader, ctx->hclen * 3);
     unsigned i;
     for (i = 0; i < ctx->hclen; i++)
     {
+        io_br_ensure_bits(bit_reader, 3);
         ctx->lens[order[i]] = io_br_pop_bits(bit_reader, 3);
     }
 
@@ -267,8 +265,53 @@ MaybeError build_dynamic_huffman_alphabet(DeflateDecompressionContext *ctx, BitR
     }
 
     ctx->next = ctx->codes;
+    ctx->lencode = ctx->next;
     ctx->lenbits = 7;
     TRY(MaybeError, inflate_table_precode(ctx->lens, DEFLATE_NUM_PRECODE_SYMS, &ctx->next, &ctx->lenbits, ctx->work));
+
+    ctx->have = 0;
+    HuffDecoder dec;
+    huff_dec_init(&dec, bit_reader, ctx->lencode, ctx->lenbits);
+    while (ctx->have < ctx->hdist + ctx->hlit)
+    {
+        Code here = TRY(MaybeError, huff_dec_get_code(&dec));
+
+        // Everything below 16 corresponds directly to a codelength. See https://tools.ietf.org/html/rfc1951#section-3.2.7
+        if (here.val < 16)
+        {
+            ctx->lens[ctx->have++] = here.val;
+            continue;
+        }
+
+        unsigned int repeat_count = 0;
+        unsigned int len_to_repeat = 0;
+
+        switch (here.val)
+        {
+        // 3-6
+        case 16:
+            io_br_ensure_bits(bit_reader, 2);
+            repeat_count = io_br_pop_bits(bit_reader, 2) + 3;
+            // Last element will get repeated
+            len_to_repeat = ctx->lens[ctx->have - 1];
+            break;
+        // 3-10
+        case 17:
+            io_br_ensure_bits(bit_reader, 3);
+            repeat_count = io_br_pop_bits(bit_reader, 3) + 3;
+            break;
+        // 11 - 138
+        case 18:
+            io_br_ensure_bits(bit_reader, 7);
+            repeat_count = io_br_pop_bits(bit_reader, 8) + 11;
+            break;
+        }
+
+        for (i = 0; i != repeat_count; i++)
+        {
+            ctx->lens[ctx->have++] = (uint16_t)len_to_repeat;
+        }
+    }
     return SUCCESS;
 }
 
