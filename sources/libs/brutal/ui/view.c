@@ -171,7 +171,6 @@ MRect ui_view_size(MAYBE_UNUSED UiView *self, MAYBE_UNUSED MRect parent)
     MRect result = parent;
 
     UiStyle style = self->style;
-    UiSize size = style.size;
 
     if (self->size)
     {
@@ -179,33 +178,7 @@ MRect ui_view_size(MAYBE_UNUSED UiView *self, MAYBE_UNUSED MRect parent)
         result = ui_spacing_grow(style.padding, style.flow, result);
     }
 
-    if (size.min.width)
-    {
-        result.width = m_max(result.width, size.min.width);
-    }
-
-    if (size.min.height)
-    {
-        result.height = m_max(result.height, size.min.height);
-    }
-
-    if (size.max.width)
-    {
-        result.width = m_min(result.width, size.max.width);
-    }
-
-    if (size.max.height)
-    {
-        result.height = m_min(result.height, size.max.height);
-    }
-
-    if (size.square)
-    {
-        float v = m_min(result.width, result.height);
-        result.width = v;
-        result.height = v;
-    }
-
+    result.size = ui_size_apply(style.size, result.size);
     result = ui_spacing_grow(style.margin, self->style.flow, result);
 
     return result;
@@ -214,7 +187,15 @@ MRect ui_view_size(MAYBE_UNUSED UiView *self, MAYBE_UNUSED MRect parent)
 void ui_view_place(UiView *self, MRect container)
 {
     UiStyle style = self->style;
-    ui_view_resize(self, ui_spacing_shrink(style.margin, self->style.flow, container));
+
+    if (style.placement != M_GRAVITY_NONE)
+    {
+        MRect bound = ui_view_size(self, container);
+        container = m_gravity_apply(style.placement, M_FLOW_LEFT_TO_RIGHT, bound, container);
+    }
+
+    container = ui_spacing_shrink(style.margin, self->style.flow, container);
+    ui_view_resize(self, container);
 }
 
 void ui_layout_dock(UiStyle style, MRect container, UiView *views[], size_t len)
@@ -225,6 +206,58 @@ void ui_layout_dock(UiStyle style, MRect container, UiView *views[], size_t len)
         MRect content = ui_view_size(child, container);
         content = ui_dock_apply(child->style.dock, style.flow, content, &container);
         ui_view_place(child, content);
+    }
+}
+
+void ui_layout_flex(UiStyle style, MRect container, UiView *views[], size_t len)
+{
+    MFlow flow = style.flow;
+
+    float grows = 0;
+    float total = 0;
+
+    for (size_t i = 0; i < len; i++)
+    {
+        UiView *child = views[i];
+        UiStyle child_style = child->style;
+
+        if (child_style.grow > 0.01)
+        {
+            grows += child_style.grow;
+        }
+        else
+        {
+            total += m_flow_get_width(flow, ui_view_size(child, container));
+        }
+    }
+
+    float all = m_flow_get_width(flow, container) - style.gaps.x * len;
+    float grow_total = m_max(0, all - total);
+    float grow_unit = (grow_total) / m_max(1, grows);
+    float start = m_flow_get_start(flow, container);
+
+    for (size_t i = 0; i < len; i++)
+    {
+        UiView *child = views[i];
+        UiStyle child_style = child->style;
+        MRect child_bound = {};
+
+        if (child_style.grow > 0.01)
+        {
+            child_bound = m_flow_set_start(flow, child_bound, start);
+            child_bound = m_flow_set_width(flow, child_bound, grow_unit * child_style.grow);
+        }
+        else
+        {
+            child_bound = ui_view_size(child, container);
+            child_bound = m_flow_set_x(flow, child_bound, start);
+        }
+
+        child_bound = m_flow_set_y(flow, child_bound, m_flow_get_top(flow, container));
+        child_bound = m_flow_set_height(flow, child_bound, m_flow_get_height(flow, container));
+
+        ui_view_place(child, child_bound);
+        start += m_flow_get_width(flow, child_bound) + style.gaps.x;
     }
 }
 
@@ -246,6 +279,7 @@ void ui_view_layout(UiView *self)
         break;
 
     case UI_LAYOUT_FLEX:
+        ui_layout_flex(style, ui_view_content(self), self->children.data, self->children.len);
         break;
 
     case UI_LAYOUT_GRID:

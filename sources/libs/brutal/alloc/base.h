@@ -42,7 +42,7 @@ struct alloc
 #define alloc_make(SELF, T) (                         \
     {                                                 \
         T *ptr = (T *)alloc_acquire(SELF, sizeof(T)); \
-        mem_set(ptr, 0, sizeof(T));                   \
+        *ptr = (T){};                                 \
         ptr;                                          \
     })
 
