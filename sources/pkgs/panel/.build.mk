@@ -1,0 +1,3 @@
+PANEL_NAME = panel
+
+HOST_PKGS += PANEL
