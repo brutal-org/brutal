@@ -8,26 +8,35 @@
 
 #define MAXBITS 15
 
-// static const uint16_t BASE_LENS[31] = {/* Length codes 257..285 base */
-//                                        3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31,
-//                                        35, 43, 51, 59, 67, 83, 99, 115, 131, 163, 195, 227, 258, 0, 0};
-// static const uint16_t BASE_DISTANCE[32] = {/* Distance codes 0..29 base */
-//                                            1, 2, 3, 4, 5, 7, 9, 13, 17, 25, 33, 49, 65, 97, 129, 193,
-//                                            257, 385, 513, 769, 1025, 1537, 2049, 3073, 4097, 6145,
-//                                            8193, 12289, 16385, 24577, 0, 0};
+static const uint16_t LENS_BASE[31] = {/* Length codes 257..285 base */
+                                       3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31,
+                                       35, 43, 51, 59, 67, 83, 99, 115, 131, 163, 195, 227, 258, 0, 0};
+static const uint16_t LENS_EXTRA[31] = {/* Length codes 257..285 extra */
+                                        16, 16, 16, 16, 16, 16, 16, 16, 17, 17, 17, 17, 18, 18, 18, 18,
+                                        19, 19, 19, 19, 20, 20, 20, 20, 21, 21, 21, 21, 16, 77, 202};
+static const uint16_t DIST_BASE[32] = {/* Distance codes 0..29 base */
+                                       1, 2, 3, 4, 5, 7, 9, 13, 17, 25, 33, 49, 65, 97, 129, 193,
+                                       257, 385, 513, 769, 1025, 1537, 2049, 3073, 4097, 6145,
+                                       8193, 12289, 16385, 24577, 0, 0};
+static const uint16_t DIST_EXTRA[32] = {/* Distance codes 0..29 extra */
+                                        16, 16, 16, 16, 17, 17, 18, 18, 19, 19, 20, 20, 21, 21, 22, 22,
+                                        23, 23, 24, 24, 25, 25, 26, 26, 27, 27,
+                                        28, 28, 29, 29, 64, 64};
 
 typedef struct
 {
-    unsigned have;
+    uint32_t have;
+    int32_t back;
+    uint32_t length;
     // Static & Dynamic Huffman
-    Code const *lencode;  /* starting table for length/literal codes */
-    Code const *distcode; /* starting table for distance codes */
-    unsigned lenbits;     /* index bits for lencode */
-    unsigned distbits;    /* index bits for distcode */
+    Code const *len_code;  /* starting table for length/literal codes */
+    Code const *dist_code; /* starting table for distance codes */
+    uint32_t len_bits;     /* index bits for lencode */
+    uint32_t dist_bits;    /* index bits for distcode */
     // Dynamic Huffman
-    unsigned hlit;                       /* number of code length code lengths */
-    unsigned hdist;                      /* number of length code lengths */
-    unsigned hclen;                      /* number of distance code lengths */
+    uint32_t hlit;                       /* number of code length code lengths */
+    uint32_t hdist;                      /* number of length code lengths */
+    uint32_t hclen;                      /* number of distance code lengths */
     uint16_t lens[320];                  /* temporary storage for code lengths */
     uint16_t work[DEFLATE_MAX_NUM_SYMS]; /* work area for code table building */
     Code codes[ENOUGH];                  /* space for code tables */
@@ -49,33 +58,34 @@ IoResult deflate_decompress_data(const uint8_t *in, size_t in_len, const uint8_t
     return deflate_decompress_stream(writer, reader);
 }
 
-MaybeError inflate_table(uint16_t *lens, unsigned codes, Code **table, unsigned *bits, uint16_t *work,
-                         const uint16_t *base, const uint16_t *extra, const unsigned match, const unsigned enough)
+// Should we maybe inline this?
+MaybeError inflate_table(uint16_t *lens, uint32_t codes, Code **table, uint32_t *bits, uint16_t *work,
+                         const uint16_t *base, const uint16_t *extra, const uint32_t match, const uint32_t enough)
 {
-    unsigned short count[MAXBITS + 1]; /* number of codes of each length */
-    unsigned short offs[MAXBITS + 1];  /* offsets in table for each length */
+    uint16_t count[MAXBITS + 1]; /* number of codes of each length */
+    uint16_t offs[MAXBITS + 1];  /* offsets in table for each length */
     Code here;
 
     // Create a canonical huffman code: https://en.wikipedia.org/wiki/Canonical_Huffman_code
     /* accumulate lengths for codes (assumes lens[] all in 0..MAXBITS) */
-    for (unsigned len = 0; len <= MAXBITS; len++)
+    for (uint8_t len = 0; len <= MAXBITS; len++)
         count[len] = 0;
-    for (unsigned sym = 0; sym < codes; sym++)
+    for (uint32_t sym = 0; sym < codes; sym++)
         count[lens[sym]]++;
 
     /* bound code lengths, force root to be within code lengths */
-    unsigned root = *bits;
-    unsigned min, max;
+    uint32_t root = *bits;
+    uint32_t min, max;
     for (max = MAXBITS; max >= 1; max--)
         if (count[max] != 0)
             break;
     if (root > max)
         root = max;
     if (max == 0)
-    {                                /* no symbols to code at all */
-        here.op = (unsigned char)64; /* invalid code marker */
-        here.bits = (unsigned char)1;
-        here.val = (unsigned short)0;
+    {                          /* no symbols to code at all */
+        here.op = (uint8_t)64; /* invalid code marker */
+        here.bits = (uint8_t)1;
+        here.val = (uint16_t)0;
         *(*table)++ = here; /* make a table to force an error */
         *(*table)++ = here;
         *bits = 1;
@@ -88,8 +98,8 @@ MaybeError inflate_table(uint16_t *lens, unsigned codes, Code **table, unsigned 
         root = min;
 
     /* check for an over-subscribed or incomplete set of lengths */
-    unsigned left = 1;
-    for (unsigned len = 1; len <= MAXBITS; len++)
+    int32_t left = 1;
+    for (uint32_t len = 1; len <= MAXBITS; len++)
     {
         left <<= 1;
         left -= count[len];
@@ -101,24 +111,24 @@ MaybeError inflate_table(uint16_t *lens, unsigned codes, Code **table, unsigned 
 
     /* generate offsets into symbol table for each length for sorting */
     offs[1] = 0;
-    for (unsigned len = 1; len < MAXBITS; len++)
+    for (uint32_t len = 1; len < MAXBITS; len++)
         offs[len + 1] = offs[len] + count[len];
 
     /* sort symbols by length, by symbol order within each length */
-    for (unsigned sym = 0; sym < codes; sym++)
+    for (uint32_t sym = 0; sym < codes; sym++)
         if (lens[sym] != 0)
-            work[offs[lens[sym]]++] = (unsigned short)sym;
+            work[offs[lens[sym]]++] = (uint16_t)sym;
 
     /* initialize state for loop */
-    unsigned huff = 0;             /* starting code */
-    unsigned sym = 0;              /* starting code symbol */
-    unsigned len = min;            /* starting code length */
-    Code *next = *table;           /* current table to fill in */
-    unsigned curr = root;          /* current table index bits */
-    unsigned drop = 0;             /* current bits to drop from code for index */
-    unsigned low = (unsigned)(-1); /* trigger new sub-table when len > root */
-    unsigned used = 1U << root;    /* use root table entries */
-    unsigned mask = used - 1;      /* mask for comparing low */
+    uint32_t huff = 0;          /* starting code */
+    uint32_t sym = 0;           /* starting code symbol */
+    uint32_t len = min;         /* starting code length */
+    Code *next = *table;        /* current table to fill in */
+    uint32_t curr = root;       /* current table index bits */
+    uint32_t drop = 0;          /* current bits to drop from code for index */
+    uint32_t low = UINT32_MAX;  /* trigger new sub-table when len > root */
+    uint32_t used = 1U << root; /* use root table entries */
+    uint32_t mask = used - 1;   /* mask for comparing low */
 
     /* check available table space */
     if (used > enough)
@@ -128,26 +138,26 @@ MaybeError inflate_table(uint16_t *lens, unsigned codes, Code **table, unsigned 
     for (;;)
     {
         /* create table entry */
-        here.bits = (unsigned char)(len - drop);
+        here.bits = (uint8_t)(len - drop);
         if (work[sym] + 1U < match)
         {
-            here.op = (unsigned char)0;
+            here.op = (uint8_t)0;
             here.val = work[sym];
         }
         else if (work[sym] >= match)
         {
-            here.op = (unsigned char)(extra[work[sym] - match]);
+            here.op = (uint8_t)(extra[work[sym] - match]);
             here.val = base[work[sym] - match];
         }
         else
         {
-            here.op = (unsigned char)(32 + 64); /* end of block */
+            here.op = (uint8_t)(32 + 64); /* end of block */
             here.val = 0;
         }
 
         /* replicate for those indices with low len bits equal to huff */
-        unsigned incr = 1U << (len - drop);
-        unsigned fill = 1U << curr;
+        uint32_t incr = 1U << (len - drop);
+        uint32_t fill = 1U << curr;
         min = fill; /* save offset to next table */
         do
         {
@@ -206,9 +216,9 @@ MaybeError inflate_table(uint16_t *lens, unsigned codes, Code **table, unsigned 
 
             /* point entry in root table to sub-table */
             low = huff & mask;
-            (*table)[low].op = (unsigned char)curr;
-            (*table)[low].bits = (unsigned char)root;
-            (*table)[low].val = (unsigned short)(next - *table);
+            (*table)[low].op = (uint8_t)curr;
+            (*table)[low].bits = (uint8_t)root;
+            (*table)[low].val = (uint16_t)(next - *table);
         }
     }
 
@@ -217,9 +227,9 @@ MaybeError inflate_table(uint16_t *lens, unsigned codes, Code **table, unsigned 
        maximum code length that was allowed to get this far is one bit) */
     if (huff != 0)
     {
-        here.op = (unsigned char)64; /* invalid code marker */
-        here.bits = (unsigned char)(len - drop);
-        here.val = (unsigned short)0;
+        here.op = (uint8_t)64; /* invalid code marker */
+        here.bits = (uint8_t)(len - drop);
+        here.val = (uint16_t)0;
         next[huff] = here;
     }
 
@@ -230,9 +240,19 @@ MaybeError inflate_table(uint16_t *lens, unsigned codes, Code **table, unsigned 
     return SUCCESS;
 }
 
-MaybeError inflate_table_precode(uint16_t *lens, unsigned codes, Code **table, unsigned *bits, uint16_t *work)
+MaybeError inflate_table_precode(uint16_t *lens, uint32_t codes, Code **table, uint32_t *bits, uint16_t *work)
 {
     return inflate_table(lens, codes, table, bits, work, work, work, 20, UINT32_MAX);
+}
+
+MaybeError inflate_table_length(uint16_t *lens, uint32_t codes, Code **table, uint32_t *bits, uint16_t *work)
+{
+    return inflate_table(lens, codes, table, bits, work, LENS_BASE, LENS_EXTRA, 257, ENOUGH_LENS);
+}
+
+MaybeError inflate_table_distance(uint16_t *lens, uint32_t codes, Code **table, uint32_t *bits, uint16_t *work)
+{
+    return inflate_table(lens, codes, table, bits, work, DIST_BASE, DIST_EXTRA, 0, ENOUGH_DISTS);
 }
 
 MaybeError build_dynamic_huffman_alphabet(DeflateDecompressionContext *ctx, BitReader *bit_reader)
@@ -252,7 +272,7 @@ MaybeError build_dynamic_huffman_alphabet(DeflateDecompressionContext *ctx, BitR
     }
 
     // 3 bits per code
-    unsigned i;
+    uint32_t i;
     for (i = 0; i < ctx->hclen; i++)
     {
         io_br_ensure_bits(bit_reader, 3);
@@ -265,13 +285,13 @@ MaybeError build_dynamic_huffman_alphabet(DeflateDecompressionContext *ctx, BitR
     }
 
     ctx->next = ctx->codes;
-    ctx->lencode = ctx->next;
-    ctx->lenbits = 7;
-    TRY(MaybeError, inflate_table_precode(ctx->lens, DEFLATE_NUM_PRECODE_SYMS, &ctx->next, &ctx->lenbits, ctx->work));
+    ctx->len_code = ctx->next;
+    ctx->len_bits = 7;
+    TRY(MaybeError, inflate_table_precode(ctx->lens, DEFLATE_NUM_PRECODE_SYMS, &ctx->next, &ctx->len_bits, ctx->work));
 
     ctx->have = 0;
     HuffDecoder dec;
-    huff_dec_init(&dec, bit_reader, ctx->lencode, ctx->lenbits);
+    huff_dec_init(&dec, bit_reader, ctx->len_code, ctx->len_bits);
     while (ctx->have < ctx->hdist + ctx->hlit)
     {
         Code here = TRY(MaybeError, huff_dec_get_code(&dec));
@@ -283,8 +303,8 @@ MaybeError build_dynamic_huffman_alphabet(DeflateDecompressionContext *ctx, BitR
             continue;
         }
 
-        unsigned int repeat_count = 0;
-        unsigned int len_to_repeat = 0;
+        uint32_t repeat_count = 0;
+        uint32_t len_to_repeat = 0;
 
         switch (here.val)
         {
@@ -303,7 +323,7 @@ MaybeError build_dynamic_huffman_alphabet(DeflateDecompressionContext *ctx, BitR
         // 11 - 138
         case 18:
             io_br_ensure_bits(bit_reader, 7);
-            repeat_count = io_br_pop_bits(bit_reader, 8) + 11;
+            repeat_count = io_br_pop_bits(bit_reader, 7) + 11;
             break;
         }
 
@@ -312,6 +332,19 @@ MaybeError build_dynamic_huffman_alphabet(DeflateDecompressionContext *ctx, BitR
             ctx->lens[ctx->have++] = (uint16_t)len_to_repeat;
         }
     }
+
+    if (ctx->lens[256] == 0)
+    {
+        return ERR(MaybeError, ERR_INVALID_CODE);
+    }
+
+    ctx->next = ctx->codes;
+    ctx->len_code = ctx->next;
+    ctx->len_bits = 9;
+    TRY(MaybeError, inflate_table_length(ctx->lens, ctx->hlit, &ctx->next, &ctx->len_bits, ctx->work));
+    ctx->dist_code = ctx->next;
+    ctx->dist_bits = 6;
+    TRY(MaybeError, inflate_table_distance(ctx->lens + ctx->hlit, ctx->hdist, &ctx->next, &ctx->dist_bits, ctx->work));
     return SUCCESS;
 }
 
@@ -321,7 +354,7 @@ IoResult deflate_decompress_block(DeflateDecompressionContext *ctx, IoWriter wri
     io_br_ensure_bits(bit_reader, 1 + 2);
 
     *final_block = io_br_pop_bits(bit_reader, 1);
-    unsigned block_type = io_br_pop_bits(bit_reader, 2);
+    uint32_t block_type = io_br_pop_bits(bit_reader, 2);
 
     uint16_t len, nlen;
 
@@ -339,7 +372,44 @@ IoResult deflate_decompress_block(DeflateDecompressionContext *ctx, IoWriter wri
     else if (block_type == DEFLATE_BLOCKTYPE_STATIC_HUFFMAN || block_type == DEFLATE_BLOCKTYPE_DYNAMIC_HUFFMAN)
     {
         if (block_type == DEFLATE_BLOCKTYPE_DYNAMIC_HUFFMAN)
-            build_dynamic_huffman_alphabet(ctx, bit_reader);
+            TRY(IoResult, build_dynamic_huffman_alphabet(ctx, bit_reader));
+
+        HuffDecoder len_decoder, dist_decoder;
+        huff_dec_init(&len_decoder, bit_reader, ctx->len_code, ctx->len_bits);
+        huff_dec_init(&dist_decoder, bit_reader, ctx->dist_code, ctx->dist_bits);
+
+        while (true)
+        {
+            ctx->back = 0;
+            Code decoded = TRY(IoResult, huff_dec_get_code(&len_decoder));
+
+            if (decoded.op && (decoded.op & 0xf0) == 0) {
+                Code last = decoded;
+                decoded = TRY(IoResult, huff_dec_get_code_offset(&len_decoder, last));
+                ctx->back += last.bits;
+            }
+            ctx->back += decoded.bits;
+            ctx->length = decoded.val;
+
+            // Literals
+            if (decoded.op == 0)
+            {
+                uint8_t val = ctx->length;
+                TRY(IoResult, io_write(writer, &val, 1));
+                continue;
+            }
+            // End of block
+            if (decoded.op & 32)
+            {
+                ctx->back = -1;
+                break;
+            }
+            if (decoded.op & 64)
+            {
+                return ERR(IoResult, ERR_INVALID_CODE);
+            }
+            //TODO:
+        }
     }
     else
     {
