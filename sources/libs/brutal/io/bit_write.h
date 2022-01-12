@@ -56,12 +56,10 @@ static inline void io_bw_flush_bits(BitWriter *self)
 */
 static inline void io_bw_flush_bits_remaining(BitWriter *self)
 {
-    while (self->bitcount >= 0)
-    {
-        io_write(self->writer, (uint8_t *)&self->bitbuf, 1);
-        self->bitcount -= 8;
-        self->bitbuf >>= 8;
-    }
+    io_bw_flush_bits(self);
+    io_write(self->writer, (uint8_t *)&self->bitbuf, 1);
+    self->bitcount = 0;
+    self->bitbuf = 0;
 }
 
 /**
