@@ -5,8 +5,8 @@
 #include <brutal/base/std.h>
 #include <brutal/io/write.h>
 
-typedef size_t BitBuf;
-#define BITBUF_NBITS (8 * sizeof(bitbuf_t))
+typedef uint_fast64_t BitBuf;
+#define BITBUF_NBITS (8 * sizeof(BitBuf))
 
 typedef struct
 {
