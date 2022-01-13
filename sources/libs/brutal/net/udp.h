@@ -13,6 +13,6 @@ typedef struct PACKED
 
 typedef struct PACKED
 {
-    UdpHeader header,
+    UdpHeader header;
     uint8_t data[];
 } Udp;
