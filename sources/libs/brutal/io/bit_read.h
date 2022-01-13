@@ -6,7 +6,7 @@
 #include <brutal/debug/assert.h>
 #include <brutal/io/read.h>
 
-typedef size_t BitBuf;
+typedef uint_fast64_t BitBuf;
 /**
   @brief Number of bits the bitbuffer variable can hold.
 */
@@ -48,6 +48,7 @@ static inline bool io_br_can_ensure(const unsigned num_bits)
 static inline IoResult
 io_br_ensure_bits(BitReader *self, const unsigned num_bits)
 {
+    assert_truth(io_br_can_ensure(num_bits));
     uint8_t b;
     while (self->bitcount < num_bits)
     {

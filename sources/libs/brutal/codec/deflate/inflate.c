@@ -82,8 +82,8 @@ MaybeError inflate_table(uint16_t *lens, uint32_t codes, Code **table, uint32_t 
     if (root > max)
         root = max;
     if (max == 0)
-    {                          /* no symbols to code at all */
-        here.op = (uint8_t)64; /* invalid code marker */
+    {                                         /* no symbols to code at all */
+        here.op = (uint8_t)OP_INVALID_MARKER; /* invalid code marker */
         here.bits = (uint8_t)1;
         here.val = (uint16_t)0;
         *(*table)++ = here; /* make a table to force an error */
@@ -137,21 +137,20 @@ MaybeError inflate_table(uint16_t *lens, uint32_t codes, Code **table, uint32_t 
     /* process all codes and make table entries */
     for (;;)
     {
-        /* create table entry */
         here.bits = (uint8_t)(len - drop);
-        if (work[sym] + 1U < match)
+        if (work[sym] + 1U < match) // Literal
         {
-            here.op = (uint8_t)0;
+            here.op = (uint8_t)OP_LITERAL_MARKER;
             here.val = work[sym];
         }
-        else if (work[sym] >= match)
+        else if (work[sym] >= match) // Distance code
         {
             here.op = (uint8_t)(extra[work[sym] - match]);
             here.val = base[work[sym] - match];
         }
-        else
+        else // End of block
         {
-            here.op = (uint8_t)(32 + 64); /* end of block */
+            here.op = (uint8_t)(OP_INVALID_MARKER + OP_END_MARKER);
             here.val = 0;
         }
 
@@ -227,7 +226,7 @@ MaybeError inflate_table(uint16_t *lens, uint32_t codes, Code **table, uint32_t 
        maximum code length that was allowed to get this far is one bit) */
     if (huff != 0)
     {
-        here.op = (uint8_t)64; /* invalid code marker */
+        here.op = (uint8_t)OP_INVALID_MARKER; /* invalid code marker */
         here.bits = (uint8_t)(len - drop);
         here.val = (uint16_t)0;
         next[huff] = here;
@@ -300,36 +299,39 @@ MaybeError build_dynamic_huffman_alphabet(DeflateDecompressionContext *ctx, BitR
         if (here.val < 16)
         {
             ctx->lens[ctx->have++] = here.val;
-            continue;
         }
-
-        uint32_t repeat_count = 0;
-        uint32_t len_to_repeat = 0;
-
-        switch (here.val)
+        else
         {
-        // 3-6
-        case 16:
-            io_br_ensure_bits(bit_reader, 2);
-            repeat_count = io_br_pop_bits(bit_reader, 2) + 3;
-            // Last element will get repeated
-            len_to_repeat = ctx->lens[ctx->have - 1];
-            break;
-        // 3-10
-        case 17:
-            io_br_ensure_bits(bit_reader, 3);
-            repeat_count = io_br_pop_bits(bit_reader, 3) + 3;
-            break;
-        // 11 - 138
-        case 18:
-            io_br_ensure_bits(bit_reader, 7);
-            repeat_count = io_br_pop_bits(bit_reader, 7) + 11;
-            break;
-        }
+            uint32_t repeat_count = 0;
+            uint32_t len_to_repeat = 0;
 
-        for (i = 0; i != repeat_count; i++)
-        {
-            ctx->lens[ctx->have++] = (uint16_t)len_to_repeat;
+            switch (here.val)
+            {
+            // 3-6
+            case 16:
+                io_br_ensure_bits(bit_reader, 2);
+                repeat_count = io_br_pop_bits(bit_reader, 2) + 3;
+                // Last element will get repeated
+                len_to_repeat = ctx->lens[ctx->have - 1];
+                break;
+            // 3-10
+            case 17:
+                io_br_ensure_bits(bit_reader, 3);
+                repeat_count = io_br_pop_bits(bit_reader, 3) + 3;
+                break;
+            // 11 - 138
+            case 18:
+                io_br_ensure_bits(bit_reader, 7);
+                repeat_count = io_br_pop_bits(bit_reader, 7) + 11;
+                break;
+            }
+
+            assert_lower_equal(ctx->have, ctx->hdist + ctx->hlit);
+
+            for (i = 0; i != repeat_count; i++)
+            {
+                ctx->lens[ctx->have++] = (uint16_t)len_to_repeat;
+            }
         }
     }
 
@@ -346,6 +348,48 @@ MaybeError build_dynamic_huffman_alphabet(DeflateDecompressionContext *ctx, BitR
     ctx->dist_bits = 6;
     TRY(MaybeError, inflate_table_distance(ctx->lens + ctx->hlit, ctx->hdist, &ctx->next, &ctx->dist_bits, ctx->work));
     return SUCCESS;
+}
+
+void build_static_huffman_alphabet(DeflateDecompressionContext *ctx)
+{
+    static bool initialized = false;
+    static Code *len_fix, *dist_fix;
+    static Code fixed[544];
+
+    if (!initialized)
+    {
+        uint32_t sym, bits;
+        static Code *next;
+
+        /* literal/length table */
+        sym = 0;
+        while (sym < 144)
+            ctx->lens[sym++] = 8;
+        while (sym < 256)
+            ctx->lens[sym++] = 9;
+        while (sym < 280)
+            ctx->lens[sym++] = 7;
+        while (sym < 288)
+            ctx->lens[sym++] = 8;
+        next = fixed;
+        len_fix = next;
+        bits = 9;
+        inflate_table_length(ctx->lens, 288, &(next), &(bits), ctx->work);
+
+        /* distance table */
+        sym = 0;
+        while (sym < 32)
+            ctx->lens[sym++] = 5;
+        dist_fix = next;
+        bits = 5;
+        inflate_table_distance(ctx->lens, 32, &(next), &(bits), ctx->work);
+        initialized = true;
+    }
+
+    ctx->len_code = len_fix;
+    ctx->len_bits = 9;
+    ctx->dist_code = dist_fix;
+    ctx->dist_bits = 5;
 }
 
 IoResult deflate_decompress_block(DeflateDecompressionContext *ctx, IoWriter writer, BitReader *bit_reader, bool *final_block)
@@ -373,6 +417,8 @@ IoResult deflate_decompress_block(DeflateDecompressionContext *ctx, IoWriter wri
     {
         if (block_type == DEFLATE_BLOCKTYPE_DYNAMIC_HUFFMAN)
             TRY(IoResult, build_dynamic_huffman_alphabet(ctx, bit_reader));
+        else
+            build_static_huffman_alphabet(ctx);
 
         HuffDecoder len_decoder, dist_decoder;
         huff_dec_init(&len_decoder, bit_reader, ctx->len_code, ctx->len_bits);
@@ -381,34 +427,43 @@ IoResult deflate_decompress_block(DeflateDecompressionContext *ctx, IoWriter wri
         while (true)
         {
             ctx->back = 0;
-            Code decoded = TRY(IoResult, huff_dec_get_code(&len_decoder));
+            Code symbol = TRY(IoResult, huff_dec_get_code(&len_decoder));
 
-            if (decoded.op && (decoded.op & 0xf0) == 0) {
-                Code last = decoded;
-                decoded = TRY(IoResult, huff_dec_get_code_offset(&len_decoder, last));
+            if (symbol.op && (symbol.op & 0xf0) == 0)
+            {
+                Code last = symbol;
+                symbol = TRY(IoResult, huff_dec_get_code_offset(&len_decoder, last));
                 ctx->back += last.bits;
             }
-            ctx->back += decoded.bits;
-            ctx->length = decoded.val;
+            ctx->back += symbol.bits;
+            ctx->length = symbol.val;
 
             // Literals
-            if (decoded.op == 0)
+            if (symbol.op == OP_LITERAL_MARKER)
             {
                 uint8_t val = ctx->length;
                 TRY(IoResult, io_write(writer, &val, 1));
+                decompressed_size++;
                 continue;
             }
-            // End of block
-            if (decoded.op & 32)
+            // First check for end marker
+            if (symbol.op & OP_END_MARKER)
             {
                 ctx->back = -1;
                 break;
             }
-            if (decoded.op & 64)
+            if (symbol.op & OP_INVALID_MARKER)
             {
                 return ERR(IoResult, ERR_INVALID_CODE);
             }
-            //TODO:
+            // Distance codes
+            Code dist = TRY(IoResult, huff_dec_get_code(&dist_decoder));
+            if (dist.op && (dist.op & 0xf0) == 0)
+            {
+                Code last = dist;
+                dist = TRY(IoResult, huff_dec_get_code_offset(&dist_decoder, last));
+                ctx->back += last.bits;
+            }
         }
     }
     else
