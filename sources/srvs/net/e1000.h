@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/base.h>
+#include <brutal-base>
 #include <bal/abi.h>
 #include "pci.h"
 

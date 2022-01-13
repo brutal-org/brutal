@@ -1,7 +1,7 @@
 #pragma once
 
 #include <bal/boot/handover.h>
-#include <brutal/ds.h>
+#include <brutal-ds>
 #include "driver.h"
 
 typedef struct {

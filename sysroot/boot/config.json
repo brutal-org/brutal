@@ -25,6 +25,10 @@
                     "path": "/pkgs/pci"
                 },
                 {
+                    "name": "net",
+                    "path": "/pkgs/net"
+                },
+                {
                     "name": "ps2",
                     "path": "/pkgs/ps2"
                 },

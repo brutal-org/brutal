@@ -1,9 +1,10 @@
-#include <brutal/io.h>
-#include <brutal/debug.h>
+#include <brutal-io>
+#include <brutal-debug>
 #include <bal/hw.h>
 #include <bal/abi.h>
-#include <brutal/alloc.h>
+#include <brutal-alloc>
 #include "bal/abi/types.h"
+#include <brutal-net>
 #include "driver.h"
 #include "rtl8139.h"
 
@@ -39,7 +40,7 @@ static void rtl8139_init_rx(RTL8139Device *dev)
     BrCreateArgs mem_obj_rx = {
         .type = BR_OBJECT_MEMORY,
         .memory = {
-            .size = ALIGN_UP(8192 + 16, MEM_PAGE_SIZE),
+            .size = align_up$(8192 + 16 + 1500, MEM_PAGE_SIZE),
             .flags = BR_MEM_LOWER /* force lower memory */
         },
     };
@@ -64,29 +65,20 @@ static void rtl8139_init_interrupt(RTL8139Device *dev)
     bal_io_out32(dev->io, RTL8139_RCR_REG,
              RTL8139_RCR_ACCEPT_ALL | RTL8139_RCR_WRAP);
     bal_io_out8(dev->io, RTL8139_CR_REG, RTL8139_CR_TE | RTL8139_CR_RE);
-
-    BrEvent rtl8139_irq = {
-        .type = BR_EVENT_IRQ,
-        .irq =  dev->int_line,
-    };
-
+    log$("ligne 68");
     BrBindArgs rtl8139_bind = {
-        .event = rtl8139_irq,
+        .event = {
+            .type = BR_EVENT_IRQ,
+            .irq =  dev->int_line,
+        }
     };
-
     br_bind(&rtl8139_bind);
-
     log$("interrupt initialized");
 }
 
-static void rtl8139_handle_irq(void *ctx, uint16_t int_line)
+static void rtl8139_handle_irq(void *ctx)
 {
     RTL8139Device *dev = (RTL8139Device *)ctx;
-
-    if (int_line != dev->int_line)
-    {
-        return;
-    }
 
     uint16_t status = bal_io_in16(dev->io, RTL8139_ISR_REG);
     log$("status: {b}", status);
@@ -104,6 +96,10 @@ static void rtl8139_handle_irq(void *ctx, uint16_t int_line)
         log$("Packet not sent - error");
     }
 
+    EthernetFrameHeader *hdr = (EthernetFrameHeader*)dev->rx_buffer;
+
+    log$("packet from: {02x}:{02x}:{02x}:{02x}:{02x}:{02x}", hdr->mac_dst[0], hdr->mac_dst[1],
+         hdr->mac_dst[2], hdr->mac_dst[3], hdr->mac_dst[4], hdr->mac_dst[5]);
     bal_io_out16(dev->io, RTL8139_ISR_REG, RTL8139_ISR_ROK | RTL8139_ISR_TOK);
 }
 
@@ -111,10 +107,12 @@ static void rtl8139_send(void *ctx, void *data, size_t len)
 {
     RTL8139Device *dev = (RTL8139Device *)ctx;
 
+    mem_cpy(((EthernetFrameHeader *)data)->mac_src, dev->mac, 6); /* copy source addr */
+
     BrCreateArgs mem_obj_tx = {
         .type = BR_OBJECT_MEMORY,
         .memory = {
-            .size = ALIGN_UP(8192 + 16 + 1500, MEM_PAGE_SIZE),
+            .size = align_up$(8192 + 16 + 1500, MEM_PAGE_SIZE),
             .flags = BR_MEM_LOWER
         },
     };
@@ -162,7 +160,7 @@ static void *rtl8139_init(PciConfigType0 *pci_conf, uint16_t int_line)
 
     log$("SoftReset the RTL8139");
     bal_io_out8(dev->io, RTL8139_CR_REG, RTL8139_CONFIG1_LWACT);
-    WAIT_FOR((bal_io_in8(dev->io, RTL8139_CR_REG) & RTL8139_CONFIG1_LWACT) == 0);
+    wait_for$((bal_io_in8(dev->io, RTL8139_CR_REG) & RTL8139_CONFIG1_LWACT) == 0);
 
     log$("trying to read mac");
     rtl8139_read_mac(dev);
@@ -173,6 +171,7 @@ static void *rtl8139_init(PciConfigType0 *pci_conf, uint16_t int_line)
     rtl8139_init_rx(dev);
     rtl8139_init_interrupt(dev);
 
+    log$("RTL initialized");
     return dev;
 }
 

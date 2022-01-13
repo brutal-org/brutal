@@ -1,6 +1,6 @@
-#include <brutal/alloc.h>
-#include <brutal/ds.h>
-#include <brutal/debug.h>
+#include <brutal-alloc>
+#include <brutal-ds>
+#include <brutal-debug>
 #include "interface.h"
 #include "net/pci.h"
 

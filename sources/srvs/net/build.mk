@@ -1,0 +1,3 @@
+PKG_NET_PATH=srvs/net
+
+SRVS+=NET

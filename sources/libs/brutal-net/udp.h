@@ -1,7 +1,6 @@
 #pragma once
 
-#include <brutal/base.h>
-#include "brutal/base/attributes.h"
+#include <brutal-base>
 
 typedef struct PACKED
 {
@@ -13,6 +12,6 @@ typedef struct PACKED
 
 typedef struct PACKED
 {
-    UdpHeader header,
+    UdpHeader header;
     uint8_t data[];
 } Udp;

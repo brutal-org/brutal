@@ -1,11 +1,11 @@
 #pragma once
 
-#include <brutal/base.h>
+#include <brutal-base>
 #include <bal/abi.h>
 #include "pci.h"
 
 /*
- * from: RTL8139D DataSheet p10-11 
+ * from: RTL8139D DataSheet p10-11
  * http://realtek.info/pdf/rtl8139d.pdf
 */
 #define RTL8139_IDR0_REG 0x0

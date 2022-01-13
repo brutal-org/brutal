@@ -1,6 +1,6 @@
 #include <acpi/base.h>
-#include <brutal/alloc.h>
-#include <brutal/debug.h>
+#include <brutal-alloc>
+#include <brutal-debug>
 #include <pci/pci.h>
 #include "pci.h"
 #include "driver.h"

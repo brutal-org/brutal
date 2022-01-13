@@ -1,11 +1,11 @@
-#include <brutal/io.h>
-#include <brutal/debug.h>
+#include <brutal-io>
+#include <brutal-debug>
 #include <bal/hw.h>
 #include <bal/abi.h>
-#include <brutal/alloc.h>
+#include <brutal-alloc>
 #include "bal/hw/io.h"
-#include "brutal/base/macros.h"
-#include "brutal/mem/units.h"
+#include <brutal-base>
+#include <brutal-mem>
 #include "driver.h"
 #include "e1000.h"
 #include "net/pci.h"
@@ -60,7 +60,7 @@ static uint16_t e1000_eeprom_read(E1000Device *dev, uint8_t addr)
     uint32_t tmp = ((uint32_t)addr & 0xff) << 8;
     tmp |= 0x1;
     e1000_io_write(dev, E1000_EEPROM_REG, tmp);
-    WAIT_FOR(e1000_io_read(dev, E1000_EEPROM_REG) & 0x10);
+    wait_for$(e1000_io_read(dev, E1000_EEPROM_REG) & 0x10);
 
     uint16_t data = e1000_io_read(dev, E1000_EEPROM_REG) >> 16;
 
@@ -103,10 +103,11 @@ static uint8_t *e1000_get_mac(void *ctx)
     return ((E1000Device *)ctx)->mac;
 }
 
-static void e1000_handle_irq(void *ctx, uint16_t int_line)
+static void e1000_handle_irq(void *ctx)
 {
-    (void)ctx;
-    (void)int_line;
+    E1000Device *dev = (E1000Device *)ctx;
+
+    (void)dev;
 }
 
 static void e1000_send(void *ctx, void *data, size_t len)
@@ -128,7 +129,7 @@ static void *e1000_init(PciConfigType0 *pci_conf, uint16_t int_line)
     */
     if (!(pci_conf->bars[0] & 0x1))
     {
-        bal_mem_init_pmm(&dev->mmio, pci_conf->bars[0], ALIGN_UP(E1000_END_REG, MEM_PAGE_SIZE));
+        bal_mem_init_pmm(&dev->mmio, pci_conf->bars[0], align_up$(E1000_END_REG, MEM_PAGE_SIZE));
         dev->io = bal_io_mem(&dev->mmio);
     }
     else

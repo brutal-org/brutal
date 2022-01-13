@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/base.h>
+#include <brutal-base>
 #include <stdint.h>
 #include <pci/pci.h>
 
@@ -22,7 +22,7 @@
 typedef struct {
     void *(*init)(PciConfigType0 *, uint16_t);
     void (*deinit)(void *);
-    void (*handle)(void *, uint16_t);
+    void (*handle)(void *);
     void (*send)(void *, void *, size_t);
     uint8_t *(*get_mac)(void *);
 } NicDriver;

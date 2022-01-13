@@ -1,8 +1,8 @@
 #pragma once
 
-#include <brutal/base.h>
+#include <brutal-base>
 
-/* from https://datatracker.ietf.org/doc/html/rfc791 */ 
+/* from https://datatracker.ietf.org/doc/html/rfc791 */
 typedef struct PACKED
 {
     uint8_t version : 4;

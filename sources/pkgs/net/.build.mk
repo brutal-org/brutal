@@ -1,3 +1,0 @@
-NET_NAME = net
-
-USER_PKGS += NET

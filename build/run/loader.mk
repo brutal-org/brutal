@@ -32,5 +32,6 @@ run: $(LOADER) $(PKGS) $(KERNEL) $(CACHEDIR)/OVMF.fd
 		-no-shutdown \
 		-no-reboot -no-shutdown \
 		-bios $(CACHEDIR)/OVMF.fd \
-		-drive file=fat:rw:$(IMAGE_ROOT),media=disk,format=raw
+		-drive file=fat:rw:$(IMAGE_ROOT),media=disk,format=raw \
+		-M q35 -net nic,model=rtl8139 -net nic,model=e1000
 
