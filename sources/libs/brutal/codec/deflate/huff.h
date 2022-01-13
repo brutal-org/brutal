@@ -1,6 +1,10 @@
 #pragma once
 #include <brutal/io/bit_read.h>
 
+#define OP_LITERAL_MARKER 0
+#define OP_END_MARKER 32
+#define OP_INVALID_MARKER 64
+
 typedef struct
 {
     uint8_t op;   /* operation, extra bits, table bits */
@@ -24,31 +28,20 @@ void huff_dec_init(HuffDecoder *dec, BitReader *bit_reader, const Code *code, ui
     dec->bits = bits;
 }
 
-DecodeResult huff_dec_get_code(HuffDecoder *dec)
+static inline DecodeResult huff_dec_get_code(HuffDecoder *dec)
 {
     Code result;
-    for (;;)
-    {
-        io_br_ensure_bits(dec->bit_reader, dec->bits);
-        result = dec->code[io_br_pop_bits(dec->bit_reader, dec->bits)];
-        if ((uint32_t)(result.bits) <= dec->bit_reader->bitcount)
-            break;
-        TRY(DecodeResult, io_br_get_byte(dec->bit_reader));
-    }
-
+    io_br_ensure_bits(dec->bit_reader, dec->bits);
+    result = dec->code[io_br_pop_bits(dec->bit_reader, dec->bits)];
+    io_br_ensure_bits(dec->bit_reader, result.bits);
     return OK(DecodeResult, result);
 }
 
-DecodeResult huff_dec_get_code_offset(HuffDecoder *dec, Code prev)
+static inline DecodeResult huff_dec_get_code_offset(HuffDecoder *dec, Code prev)
 {
     Code result;
-    for (;;)
-    {
-        result = dec->code[prev.val + io_br_pop_bits(dec->bit_reader, dec->bits)];
-        if ((uint32_t)(result.bits) <= dec->bit_reader->bitcount)
-            break;
-        TRY(DecodeResult, io_br_get_byte(dec->bit_reader));
-    }
-
+    io_br_ensure_bits(dec->bit_reader, dec->bits);
+    result = dec->code[prev.val + io_br_pop_bits(dec->bit_reader, dec->bits)];
+    io_br_ensure_bits(dec->bit_reader, result.bits);
     return OK(DecodeResult, result);
 }
