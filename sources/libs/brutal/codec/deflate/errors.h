@@ -6,3 +6,4 @@
 #define ERR_INCOMPLETE_SET make_error(ERR_KIND_INVALID_DATA, "incomplete-set")
 #define ERR_NOT_ENOUGH_TABLE_SPACE make_error(ERR_KIND_INVALID_DATA, "not-enough-table-space")
 #define ERR_INVALID_CODE make_error(ERR_KIND_INVALID_DATA, "invalid-code")
+#define ERR_BAD_DATA make_error(ERR_KIND_INVALID_DATA, "bad-data")
