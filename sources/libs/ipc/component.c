@@ -93,12 +93,36 @@ void ipc_component_init(IpcComponent *self, void *ctx, Alloc *alloc)
 
     vec_init(&self->pendings, alloc);
     vec_init(&self->providers, alloc);
+    vec_init(&self->capabilities, alloc);
 }
 
 void ipc_component_deinit(IpcComponent *self)
 {
+    vec_deinit(&self->capabilities);
     vec_deinit(&self->providers);
     vec_deinit(&self->pendings);
+}
+
+void ipc_component_inject(IpcComponent *self, IpcCapability const *caps, int count)
+{
+    for (int i = 0; i < count; i++)
+    {
+        vec_push(&self->capabilities, caps[i]);
+    }
+}
+
+Iter ipc_component_query(IpcComponent *self, uint32_t proto, IterFn *iter, void *ctx)
+{
+    vec_foreach(cap, &self->capabilities)
+    {
+        if (cap->type == IPC_CAPABILITY_ADDR && cap->addr.proto == proto &&
+            iter(cap, ctx) == ITER_STOP)
+        {
+            return ITER_STOP;
+        }
+    }
+
+    return ITER_CONTINUE;
 }
 
 IpcCapability ipc_component_provide(IpcComponent *self, uint32_t id, IpcHandler *fn, void *ctx)
@@ -114,17 +138,19 @@ IpcCapability ipc_component_provide(IpcComponent *self, uint32_t id, IpcHandler 
     vec_push(&self->providers, provider);
 
     return (IpcCapability){
-        .address = (BrAddr){
-            bal_self_id(),
-            port_id - 1,
+        .addr = {
+            .address = (BrAddr){
+                bal_self_id(),
+                provider->port,
+            },
+            .proto = provider->port,
         },
-        .proto = provider->port,
     };
 }
 
-static bool wait_pending(void  *ctx)
+static bool wait_pending(void *ctx)
 {
-    IpcPending* pending = ctx;
+    IpcPending *pending = ctx;
     return pending->ok;
 }
 

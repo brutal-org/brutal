@@ -112,18 +112,8 @@ typedef uint64_t BrSpaceFlags;
 
 typedef uint64_t BrTaskFlags;
 
-typedef enum
-{
-    BR_START_NONE,
-    BR_START_CMAIN,
-    BR_START_ARGS,
-    BR_START_HANDOVER,
-} BrStartType;
-
 typedef struct
 {
-    BrStartType type;
-
     BrArg arg1;
     BrArg arg2;
     BrArg arg3;
