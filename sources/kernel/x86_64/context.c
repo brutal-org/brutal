@@ -25,12 +25,11 @@ void context_start(Context *self, uintptr_t ip, uintptr_t sp, uintptr_t ksp, BrT
     regs.rip = ip;
     regs.rflags = RFLAGS_INTERRUPT_ENABLE | RFLAGS_RESERVED1_ONE;
 
-    regs.rdi = args.type;
-    regs.rsi = args.arg1;
-    regs.rdx = args.arg2;
-    regs.rcx = args.arg3;
-    regs.r8 = args.arg4;
-    regs.r9 = args.arg5;
+    regs.rdi = args.arg1;
+    regs.rsi = args.arg2;
+    regs.rdx = args.arg3;
+    regs.rcx = args.arg4;
+    regs.r8 = args.arg5;
 
     if (flags & BR_TASK_USER)
     {

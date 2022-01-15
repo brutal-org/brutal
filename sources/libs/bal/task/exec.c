@@ -78,7 +78,7 @@ static void bal_exec_load(BrHandle space, Elf64Header const *elf_header, BrHandl
     }
 }
 
-static uintptr_t bal_exec_stack(BrHandle space, BalArgs exec_args, BrTaskArgs *start_args)
+static uintptr_t bal_exec_stack(BrHandle space, IpcCapability *caps, size_t count, BrTaskArgs *start_args)
 {
     BrCreateArgs stack_obj = {
         .type = BR_OBJECT_MEMORY,
@@ -100,56 +100,11 @@ static uintptr_t bal_exec_stack(BrHandle space, BalArgs exec_args, BrTaskArgs *s
     uint8_t *base = (uint8_t *)local_stack_map.vaddr + 0x4000;
     uint8_t *head = base;
 
-    start_args->type = exec_args.type;
+    head -= align_up$(sizeof(IpcCapability) * count, 16);
+    mem_cpy(head, caps, align_up$(sizeof(IpcCapability) * count, 16));
 
-    switch (exec_args.type)
-    {
-    case BR_START_CMAIN:
-    {
-        BrCMainArgs cmain = exec_args.cmain;
-        uintptr_t argv[BR_MAX_ARGC + 1];
-
-        for (int i = 0; i < cmain.argc; i++)
-        {
-            head -= align_up$(cmain.argv[i].len + 1, 16);
-            mem_cpy(head, cmain.argv[i].buf, cmain.argv[i].len);
-            head[cmain.argv[i].len] = 0;
-
-            argv[i] = 0xC0000000 - ((uintptr_t)base - (uintptr_t)head);
-        }
-
-        argv[cmain.argc] = 0;
-
-        head -= align_up$(sizeof(argv), 16);
-        mem_cpy(head, argv, sizeof(argv));
-
-        start_args->arg1 = cmain.argc;
-        start_args->arg2 = 0xC0000000 - ((uintptr_t)base - (uintptr_t)head);
-    break;
-    }
-
-    case BR_START_ARGS:
-    {
-        // Nothing to copy
-        start_args->arg1 = exec_args.args.arg1;
-        start_args->arg2 = exec_args.args.arg2;
-        start_args->arg3 = exec_args.args.arg3;
-        start_args->arg4 = exec_args.args.arg4;
-        start_args->arg5 = exec_args.args.arg5;
-    break;
-    }
-
-    case BR_START_HANDOVER:
-    {
-        head -= align_up$(sizeof(Handover), 16);
-        mem_cpy(head, exec_args.handover, sizeof(Handover));
-        start_args->arg1 = 0xC0000000 - ((uintptr_t)base - (uintptr_t)head);
-    break;
-    }
-
-    default:
-        break;
-    }
+    start_args->arg1 = 0xC0000000 - ((uintptr_t)base - (uintptr_t)head);
+    start_args->arg2 = count;
 
     uintptr_t sp = 0xC0000000 - ((uintptr_t)base - (uintptr_t)head);
 
@@ -175,7 +130,7 @@ static uintptr_t bal_exec_stack(BrHandle space, BalArgs exec_args, BrTaskArgs *s
     return sp;
 }
 
-BrResult bal_task_exec(BalTask *task, BalMem *elf, BrRight rights, BalArgs args)
+BrResult bal_task_exec(BalTask *task, BalMem *elf, BrRight rights, IpcCapability *caps, size_t count)
 {
     BrCreateArgs space = {
         .type = BR_OBJECT_SPACE,
@@ -198,7 +153,7 @@ BrResult bal_task_exec(BalTask *task, BalMem *elf, BrRight rights, BalArgs args)
     bal_exec_load(space.handle, header, elf->handle);
 
     BrTaskArgs task_args;
-    uintptr_t sp = bal_exec_stack(space.handle, args, &task_args);
+    uintptr_t sp = bal_exec_stack(space.handle, caps, count, &task_args);
 
     BrStartArgs elf_start = {
         .handle = elf_task.handle,
