@@ -140,7 +140,7 @@ void ui_win_repaint_rect(UiWin *self, MRect rect)
     }
 
     // gfx_fill(&self->gfx, gfx_paint_fill(gfx_color_rand(100)));
-    // gfx_rect(&self->gfx, rect, 0);
+    // gfx_fill_rect(&self->gfx, rect, 0);
 
     gfx_end(&self->gfx);
 }

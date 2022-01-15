@@ -26,10 +26,10 @@
     };
 
 // Swap two the content of two variables
-#define swap$(X, Y)                   \
-    do                                \
-    {                                 \
-        typeof(*X) __swap_tmp = (*X); \
-        (*X) = (*Y);                  \
-        (*Y) = __swap_tmp;            \
+#define swap$(X, Y)                     \
+    do                                  \
+    {                                   \
+        typeof(*(X)) __swap_tmp = *(X); \
+        *(X) = *(Y);                    \
+        *(Y) = __swap_tmp;              \
     } while (0)

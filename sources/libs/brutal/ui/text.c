@@ -23,7 +23,7 @@ void ui_text_paint(UiView *self, Gfx *gfx)
     MVec2 orgin = m_vec2_add(centered.pos, mesures.baseline);
 
     gfx_color(gfx, ui_text$(self)->color);
-    gfx_text(gfx, orgin, ui_text$(self)->text, scale);
+    gfx_fill_text(gfx, orgin, ui_text$(self)->text, scale);
 }
 
 MRect ui_text_size(UiView *self)

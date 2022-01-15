@@ -1,5 +1,6 @@
 #pragma once
 
+#include <brutal/ds/vec.h>
 #include <brutal/io/buf.h>
 #include <brutal/math/clamp.h>
 #include <brutal/math/rect.h>
@@ -21,6 +22,8 @@ typedef union
         MVec2 end;
     };
 } MEdge;
+
+typedef Vec(MEdge) MEdges;
 
 static inline MEdge m_edge(float sx, float sy, float ex, float ey)
 {
@@ -57,4 +60,30 @@ static inline MRect m_edges_bound(MEdge const *edges, size_t len)
     }
 
     return result;
+}
+
+static inline float m_edge_vec_dist(MEdge edge, MVec2 vec)
+{
+    float d = m_vec2_dist(edge.start, edge.end);
+
+    if (d < 0.01)
+    {
+        return m_vec2_dist(edge.start, vec);
+    }
+
+    float t = m_vec2_dot(m_vec2_sub(vec, edge.start), m_vec2_sub(edge.end, edge.start));
+    t = m_max(0, m_min(1, t / (d * d)));
+    MVec2 projection = m_vec2_add(edge.start, m_vec2_mul_v(m_vec2_sub(edge.end, edge.start), t));
+    return m_vec2_dist(vec, projection);
+}
+
+static inline MEdge m_edge_parallel(MEdge edge, float offset)
+{
+    MVec2 d = m_vec2_sub(edge.end, edge.start);
+    float scale = offset / m_vec2_len(d);
+    MVec2 o = m_vec2(-d.y * scale, d.x * scale);
+    MVec2 s = m_vec2_add(edge.start, o);
+    MVec2 e = m_vec2_add(edge.end, o);
+
+    return m_edge_vec2(s, e);
 }

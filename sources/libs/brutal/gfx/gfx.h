@@ -26,7 +26,10 @@ typedef struct
     Alloc *alloc;
     GfxBuf buf;
     Vec(GfxCtx) ctx;
-    Vec(MEdge) edges;
+
+    MEdges path;
+    MEdges stroke;
+
     Vec(float) active;
     GfxPathFlattener flattener;
 
@@ -72,7 +75,11 @@ void gfx_close_path(Gfx *self);
 
 void gfx_fill_path(Gfx *self, GfxFillRule rule);
 
+void gfx_stroke_path(Gfx *self, float width);
+
 void gfx_eval_cmd(Gfx *self, GfxPathCmd cmd);
+
+void gfx_eval_svg(Gfx *self, Str path);
 
 void gfx_move_to(Gfx *self, MVec2 point);
 
@@ -84,16 +91,16 @@ void gfx_quadratic_to(Gfx *self, MVec2 cp2, MVec2 point);
 
 void gfx_arc_to(Gfx *self, float rx, float ry, float angle, int flags, MVec2 point);
 
-/* ---  Drawing ------------------------------------------------------------- */
+/* --- Drawing -------------------------------------------------------------- */
 
 void gfx_dot(Gfx *self, MVec2 dot, float size);
 
-void gfx_line(Gfx *self, MEdge line, float weight);
+void gfx_fill_line(Gfx *self, MEdge line, float weight);
 
-void gfx_rect(Gfx *self, MRect rect, float radius);
+void gfx_fill_rect(Gfx *self, MRect rect, float radius);
 
-void gfx_ellipse(Gfx *self, MRect rect);
+void gfx_fill_ellipse(Gfx *self, MRect rect);
 
-void gfx_text(Gfx *self, MVec2 origin, Str text, float scale);
+void gfx_fill_text(Gfx *self, MVec2 origin, Str text, float scale);
 
-void gfx_path(Gfx *self, Str path);
+void gfx_fill_svg(Gfx *self, Str path);

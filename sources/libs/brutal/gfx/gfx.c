@@ -1,3 +1,4 @@
+#include <brutal/base/macros.h>
 #include <brutal/font/font.h>
 #include <brutal/gfx/gfx.h>
 #include <brutal/gfx/path.h>
@@ -12,12 +13,14 @@ void gfx_init(Gfx *self, Alloc *alloc)
     self->alloc = alloc;
     vec_init(&self->ctx, alloc);
     vec_init(&self->active, alloc);
-    vec_init(&self->edges, alloc);
+    vec_init(&self->path, alloc);
+    vec_init(&self->stroke, alloc);
 }
 
 void gfx_deinit(Gfx *self)
 {
-    vec_deinit(&self->edges);
+    vec_deinit(&self->path);
+    vec_deinit(&self->stroke);
     vec_deinit(&self->active);
     vec_deinit(&self->ctx);
 
@@ -119,12 +122,12 @@ void gfx_color(Gfx *self, GfxColor color)
 static void append_edge(void *ctx, MEdge edge)
 {
     Gfx *gfx = ctx;
-    vec_push(&gfx->edges, edge);
+    vec_push(&gfx->path, edge);
 }
 
 void gfx_begin_path(Gfx *self)
 {
-    vec_clear(&self->edges);
+    vec_clear(&self->path);
 
     self->flattener.ctx = self;
     self->flattener.append = append_edge;
@@ -152,7 +155,7 @@ static int float_cmp(void const *lhs, void const *rhs)
 
 void gfx_fill_path(Gfx *self, GfxFillRule rule)
 {
-    MRect pbound = m_edges_bound(vec_begin(&self->edges), vec_len(&self->edges));
+    MRect pbound = m_edges_bound(vec_begin(&self->path), vec_len(&self->path));
     MRect rbound = gfx_buf_bound(self->buf);
     rbound = m_rect_clip_rect(rbound, pbound);
     rbound = m_rect_clip_rect(rbound, gfx_peek(self)->clip);
@@ -170,7 +173,7 @@ void gfx_fill_path(Gfx *self, GfxFillRule rule)
         {
             vec_clear(&self->active);
 
-            vec_foreach_v(edge, &self->edges)
+            vec_foreach_v(edge, &self->path)
             {
                 if (m_edge_min_y(edge) <= yy && m_edge_max_y(edge) > yy)
                 {
@@ -217,6 +220,33 @@ void gfx_fill_path(Gfx *self, GfxFillRule rule)
     }
 }
 
+void gfx_stroke_path(Gfx *self, float width)
+{
+    vec_clear(&self->stroke);
+
+    for (int i = 0; i < vec_len(&self->path); i++)
+    {
+        MEdge a = vec_at(&self->path, i);
+        MEdge b = vec_at(&self->path, (i + 1) % vec_len(&self->path));
+
+        MEdge aa = m_edge_parallel(a, width / 2);
+        MEdge ab = m_edge_parallel(a, -width / 2);
+
+        MEdge ba = m_edge_parallel(b, width / 2);
+        MEdge bb = m_edge_parallel(b, -width / 2);
+
+        vec_push(&self->stroke, aa);
+        vec_push(&self->stroke, ab);
+
+        vec_push(&self->stroke, m_edge_vec2(aa.end, ba.start));
+        vec_push(&self->stroke, m_edge_vec2(ab.end, bb.start));
+    }
+
+    swap$(&self->path, &self->stroke);
+    gfx_fill_path(self, GFX_FILL_EVENODD);
+    swap$(&self->path, &self->stroke);
+}
+
 void gfx_eval_cmd(Gfx *self, GfxPathCmd cmd)
 {
     cmd.cp1 = m_vec2_add(cmd.cp1, gfx_peek(self)->origin);
@@ -224,6 +254,24 @@ void gfx_eval_cmd(Gfx *self, GfxPathCmd cmd)
     cmd.point = m_vec2_add(cmd.point, gfx_peek(self)->origin);
 
     gfx_flattener_flatten(&self->flattener, cmd);
+}
+
+static void eval_cmd(void *ctx, GfxPathCmd cmd)
+{
+    Gfx *gfx = ctx;
+    gfx_eval_cmd(gfx, cmd);
+}
+
+void gfx_eval_svg(Gfx *self, Str path)
+{
+    GfxPathParser parser = {
+        .ctx = self,
+        .eval = eval_cmd,
+    };
+
+    Scan scan;
+    scan_init(&scan, path);
+    gfx_path_parse(&parser, &scan);
 }
 
 void gfx_move_to(Gfx *self, MVec2 point)
@@ -289,27 +337,25 @@ void gfx_dot(Gfx *self, MVec2 dot, float size)
 {
     gfx_begin_path(self);
 
-    gfx_move_to(self, m_vec2(dot.x - size, dot.x - size));
-    gfx_move_to(self, m_vec2(dot.y - size, dot.y + size));
-    gfx_move_to(self, m_vec2(dot.x + size, dot.x + size));
-    gfx_move_to(self, m_vec2(dot.y + size, dot.y - size));
+    gfx_move_to(self, m_vec2(dot.x - size, dot.y - size));
+    gfx_line_to(self, m_vec2(dot.x + size, dot.y - size));
+    gfx_line_to(self, m_vec2(dot.x + size, dot.y + size));
+    gfx_line_to(self, m_vec2(dot.x - size, dot.y + size));
 
     gfx_close_path(self);
 
     gfx_fill_path(self, GFX_FILL_EVENODD);
 }
 
-void gfx_line(Gfx *self, MEdge line, float weight)
+void gfx_fill_line(Gfx *self, MEdge line, float weight)
 {
-    if (weight < 0)
-    {
-        weight = -weight;
-    }
+    float sx = line.sx;
+    float sy = line.sy;
+    float ex = line.ex;
+    float ey = line.ey;
 
-    float x = line.sx;
-    float y = line.sy;
-    float dx = line.ex - x;
-    float dy = line.ey - y;
+    float dx = line.ex - sx;
+    float dy = line.ey - sy;
     float len = sqrtf(dx * dx + dy * dy);
     float nx = dx / len;
     float ny = dy / len;
@@ -317,17 +363,18 @@ void gfx_line(Gfx *self, MEdge line, float weight)
 
     gfx_begin_path(self);
 
-    gfx_move_to(self, m_vec2(x - ny * w, y + nx * w));
-    gfx_move_to(self, m_vec2(x + ny * w, y - nx * w));
-    gfx_move_to(self, m_vec2(x + ny * w, y - nx * w));
-    gfx_move_to(self, m_vec2(x - ny * w, y + nx * w));
+    gfx_move_to(self, m_vec2(sx - ny * w, sy + nx * w));
+    gfx_line_to(self, m_vec2(sx + ny * w, sy - nx * w));
+
+    gfx_line_to(self, m_vec2(ex + ny * w, ey - nx * w));
+    gfx_line_to(self, m_vec2(ex - ny * w, ey + nx * w));
 
     gfx_close_path(self);
 
     gfx_fill_path(self, GFX_FILL_EVENODD);
 }
 
-void gfx_rect(Gfx *self, MRect rect, float radius)
+void gfx_fill_rect(Gfx *self, MRect rect, float radius)
 {
     gfx_begin_path(self);
 
@@ -337,7 +384,6 @@ void gfx_rect(Gfx *self, MRect rect, float radius)
         gfx_line_to(self, m_vec2(rect.x + rect.width, rect.y));
         gfx_line_to(self, m_vec2(rect.x + rect.width, rect.y + rect.height));
         gfx_line_to(self, m_vec2(rect.x, rect.y + rect.height));
-        gfx_close_path(self);
     }
     else
     {
@@ -359,6 +405,8 @@ void gfx_rect(Gfx *self, MRect rect, float radius)
         gfx_line_to(self, m_vec2(rect.x, rect.y + radius));
         gfx_quadratic_to(self, m_vec2(rect.x, rect.y), m_vec2(rect.x + radius, rect.y));
     }
+
+    gfx_close_path(self);
 
     gfx_fill_path(self, GFX_FILL_EVENODD);
 }
@@ -383,28 +431,15 @@ void gfx_ellipsis(Gfx *self, MRect rect)
     gfx_fill_path(self, GFX_FILL_EVENODD);
 }
 
-void gfx_text(Gfx *self, MVec2 origin, Str text, float scale)
+void gfx_fill_text(Gfx *self, MVec2 origin, Str text, float scale)
 {
     origin = m_vec2_add(origin, gfx_peek(self)->origin);
     bfont_render_str(bfont_builtin(), text, origin, self->buf, gfx_peek(self)->clip, scale, gfx_peek(self)->color);
 }
 
-void eval_cmd(void *ctx, GfxPathCmd cmd)
+void gfx_fill_svg(Gfx *self, Str path)
 {
-    Gfx *gfx = ctx;
-    gfx_eval_cmd(gfx, cmd);
-}
-
-void gfx_path(Gfx *self, Str path)
-{
-    GfxPathParser parser = {
-        .ctx = self,
-        .eval = eval_cmd,
-    };
-
-    Scan scan;
-    scan_init(&scan, path);
     gfx_begin_path(self);
-    gfx_path_parse(&parser, &scan);
+    gfx_eval_svg(self, path);
     gfx_fill_path(self, GFX_FILL_EVENODD);
 }
