@@ -1,3 +1,0 @@
-POSIX_NAME = posix
-
-USER_PKGS += POSIX
