@@ -89,7 +89,7 @@ int test_run_all(void)
     return fail_count != 0 ? TASK_EXIT_FAILURE : TASK_EXIT_SUCCESS;
 }
 
-int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char const *argv[])
+int main(int argc, char const *argv[])
 {
     if (argc == 3 && str_eq(str$(argv[1]), str$("-t")))
     {
