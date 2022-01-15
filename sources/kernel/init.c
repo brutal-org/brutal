@@ -6,8 +6,6 @@
 #include "kernel/mmap.h"
 #include "kernel/sched.h"
 
-static Task *_task = nullptr;
-
 static bool elf_supported(Elf64Header const *header, size_t data_size)
 {
     if (data_size < sizeof(Elf64Header))
@@ -114,24 +112,15 @@ void init_start(Handover const *handover)
     uintptr_t hoaddr = init_pass(task, handover);
 
     task_ref(task);
-    _task = task;
 
     sched_start(
         task,
         elf_header->entry,
         USER_STACK_BASE,
         (BrTaskArgs){
-            .type = BR_START_HANDOVER,
             .arg1 = hoaddr,
         });
 
     task_deref(task);
     memory_deref(elf_obj);
-}
-
-Task *init_task(void)
-{
-    assert_not_null(_task);
-    task_ref(_task);
-    return _task;
 }
