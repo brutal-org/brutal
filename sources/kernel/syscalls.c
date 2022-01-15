@@ -253,16 +253,7 @@ BrResult sys_ipc(BrIpcArgs *args)
         args->msg.from.id = task_self()->id;
         args->msg.to = args->to;
 
-        Task *task CLEANUP(object_cleanup) = nullptr;
-
-        if (br_addr_eq(args->to, BR_ADDR_SUPER))
-        {
-            task = init_task();
-        }
-        else
-        {
-            task = (Task *)global_lookup(args->to.id, BR_OBJECT_TASK);
-        }
+        Task *task CLEANUP(object_cleanup) = (Task *)global_lookup(args->to.id, BR_OBJECT_TASK);
 
         if (!task)
         {

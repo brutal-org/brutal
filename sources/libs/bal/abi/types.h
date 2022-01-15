@@ -186,9 +186,6 @@ typedef struct
 #define BR_ADDR_SELF \
     (BrAddr) { BR_ID_SELF, BR_PORT_ANY }
 
-#define BR_ADDR_SUPER \
-    (BrAddr) { BR_ID_SUPER, BR_PORT_ANY }
-
 typedef struct
 {
     BrMsgFlags flags;
