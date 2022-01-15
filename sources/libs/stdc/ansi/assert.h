@@ -2,7 +2,7 @@
 
 /* --- 7.2 Diagnostics ------------------------------------------------------ */
 
-void assert_failled_impl();
+void assert_failled_impl(void);
 
 #ifdef NDEBUG
 #    define assert(expr) (void)(expr)
