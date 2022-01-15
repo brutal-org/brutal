@@ -6,8 +6,11 @@ The following roadmap is always subject to change.
 
 ## Milestone 4 - FileSystem, Capabilities and Graphics
 
-- [ ] BBus
-  - [ ] Capabilities
+- [ ] IPC/IDL
+  - [x] Capabilities
+  - [ ] Import
+  - [ ] Attributes
+  - [ ] Modules
 - [ ] Graphic Library
   - [x] SDL Backend
     - [x] Render
@@ -33,7 +36,7 @@ The following roadmap is always subject to change.
   - [ ] Layout
     - [x] LTR/RTL Layout
     - [x] Dock Layout
-    - [ ] Flex Layout
+    - [x] Flex Layout
     - [ ] Grid Layout
   - [ ] Views
     - [x] Panel
