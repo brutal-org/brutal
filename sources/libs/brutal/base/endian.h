@@ -10,13 +10,13 @@
     {                                        \
         typeof(VALUE + 0) _v = (VALUE);      \
         typeof(VALUE + 0) _result = 0;       \
-        if (sizeof(_v) == 8)                 \
+        if (sizeof(VALUE) == 8)              \
             _result = __builtin_bswap64(_v); \
-        if (sizeof(_v) == 4)                 \
+        if (sizeof(VALUE) == 4)              \
             _result = __builtin_bswap32(_v); \
-        if (sizeof(_v) == 2)                 \
+        if (sizeof(VALUE) == 2)              \
             _result = __builtin_bswap16(_v); \
-        if (sizeof(_v) == 1)                 \
+        if (sizeof(VALUE) == 1)              \
             _result = _v;                    \
         _result;                             \
     })
@@ -80,12 +80,12 @@ static_assert(sizeof(le_int16_t) == sizeof(int16_t), "le and native are expected
 static_assert(sizeof(le_int32_t) == sizeof(int32_t), "le and native are expected to be of the same size");
 static_assert(sizeof(le_int64_t) == sizeof(int64_t), "le and native are expected to be of the same size");
 
-#define store_be(VALUE, DEST) ({ (DEST)->_be_data = swap_big_endian(VALUE); })
+#define store_be(VALUE, DEST) ({ (DEST)->_be_data = swap_big_endian((typeof((DEST)->_be_data))VALUE); })
 #define load_be(VALUE) swap_big_endian((VALUE)._be_data)
 #define be$(T, VALUE) \
     ((T){swap_big_endian(VALUE)})
 
-#define store_le(VALUE, DEST) ({ (DEST)->_le_data = swap_little_endian(VALUE); })
+#define store_le(VALUE, DEST) ({ (DEST)->_le_data = swap_little_endian((typeof((DEST)->_le_data))VALUE); })
 #define load_le(VALUE) swap_little_endian((VALUE)._le_data)
 #define le$(T, VALUE) \
     ((T){swap_little_endian(VALUE)})
