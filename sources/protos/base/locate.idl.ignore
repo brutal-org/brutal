@@ -1,1 +1,0 @@
-interface method locate { name : Str, protos : Proto[] } -> Srv[];
