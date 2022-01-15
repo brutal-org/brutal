@@ -1,0 +1,13 @@
+module math;
+
+include "brutal/math.h";
+
+[no-prefix]
+[packfn("ipc_pack_rect", "ipc_unpack_rect")]
+type MRect = __ctype;
+
+[no-prefix]
+[packfn("ipc_pack_vec2", "ipc_unpack_vec2")]
+type MVec2 = __ctype;
+
+

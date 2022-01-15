@@ -1,0 +1,10 @@
+module bbus;
+
+errors {
+    NOT_FOUND,
+};
+
+interface Locator
+{
+    method locate Str -> Cap;
+}

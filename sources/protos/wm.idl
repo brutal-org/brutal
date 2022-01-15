@@ -1,0 +1,20 @@
+module wm;
+
+import base, math;
+
+interface Client
+{
+
+};
+
+interface Server
+{
+    method create_window {MRect bound } -> Cap;
+};
+
+interface Window
+{
+    method resize MRect -> Nil;
+    method flip MRect -> Bool;
+    method destroy -> Bool;
+};
