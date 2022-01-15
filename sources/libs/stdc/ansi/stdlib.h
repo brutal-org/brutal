@@ -65,7 +65,7 @@ int strfroml(char *restricts, size_t n, char const *restrict format, long double
 
 /* --- 7.22.2 - Pseudo-random sequence generation functions ----------------- */
 
-int rand();
+int rand(void);
 
 void srand(unsigned int seed);
 
