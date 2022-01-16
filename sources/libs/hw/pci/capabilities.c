@@ -11,7 +11,7 @@ const char *caps[] = {
 
 Str cap2str(uint8_t id)
 {
-    if (array_len$(caps) < id)
+    if (id < array_len$(caps))
     {
         if (caps[id] == nullptr)
         {
