@@ -15,7 +15,7 @@ IoResult zlib_decompress_data(const uint8_t *in, size_t in_len, const uint8_t *o
     mem_view_init(&out_view, out_len, out);
     IoWriter writer = mem_view_writer(&out_view);
 
-    return deflate_decompress_stream(writer, reader);
+    return zlib_decompress_stream(writer, reader);
 }
 
 IoResult zlib_decompress_stream(IoWriter writer, IoReader reader)
@@ -53,13 +53,13 @@ IoResult zlib_decompress_stream(IoWriter writer, IoReader reader)
         return ERR(IoResult, ERR_NOT_IMPLEMENTED);
     }
 
+    size_t decompressed = TRY(IoResult, deflate_decompress_stream(writer, reader));
+
     // Get Adler-32 checksum of original data
     be_uint32_t value;
     io_read(reader, (uint8_t*)&value, 4);
     uint32_t adler32 = load_be(value);
     UNUSED(adler32);
-
-    size_t decompressed = TRY(IoResult, deflate_decompress_stream(writer, reader));
 
     return OK(IoResult, decompressed);
 }
