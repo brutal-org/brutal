@@ -217,7 +217,7 @@ IoResult deflate_decompress_block(DeflateDecompressor *ctx, bool *final_block)
 
         assert_equal(len, (uint16_t)~nlen);
 
-        decompressed_size = TRY(IoResult, io_copy_range(ctx->bit_reader.reader, ctx->writer, len));
+        decompressed_size = TRY(IoResult, io_copy_n(ctx->bit_reader.reader, ctx->writer, len));
     }
     else if (block_type == DEFLATE_BLOCKTYPE_STATIC_HUFFMAN || block_type == DEFLATE_BLOCKTYPE_DYNAMIC_HUFFMAN)
     {
