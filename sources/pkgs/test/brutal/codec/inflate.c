@@ -24,7 +24,7 @@ TEST(inflate_empty)
 
     size_t size = UNWRAP(deflate_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
-    assert_equal(size, 0);
+    assert_equal(size, 0u);
 }
 
 TEST(inflate_empty_no_literals)
@@ -45,7 +45,7 @@ TEST(inflate_empty_no_literals)
 
     size_t size = UNWRAP(deflate_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
-    assert_equal(size, 0);
+    assert_equal(size, 0u);
 }
 
 TEST(inflate_rle)
@@ -59,7 +59,7 @@ TEST(inflate_rle)
     size_t size = UNWRAP(deflate_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
     // Should be 256
-    assert_equal(size, 256);
+    assert_equal(size, 256u);
 }
 
 TEST(inflate_huffman)
@@ -76,7 +76,7 @@ TEST(inflate_huffman)
     size_t size = UNWRAP(deflate_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
     // Should be 256
-    assert_equal(size, 256);
+    assert_equal(size, 256u);
 }
 
 TEST(inflate_max_matchlen)
@@ -91,5 +91,5 @@ TEST(inflate_max_matchlen)
     size_t size = UNWRAP(deflate_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
 	// Should be 259
-    assert_equal(size, 259);
+    assert_equal(size, 259u);
 }

@@ -14,7 +14,7 @@ MaybeError build_huff_tree(HuffTree *t, const uint8_t *lengths,
     uint16_t offs[16];
     uint32_t i, num_codes, available;
 
-    assert_lower_equal(num, 288);
+    assert_lower_equal(num, 288u);
 
     for (i = 0; i < 16; ++i)
     {
@@ -26,7 +26,7 @@ MaybeError build_huff_tree(HuffTree *t, const uint8_t *lengths,
     // Count number of codes for each non-zero length
     for (i = 0; i < num; ++i)
     {
-        assert_lower_than(lengths[i], 16);
+        assert_lower_than(lengths[i], 16u);
 
         if (lengths[i])
         {
