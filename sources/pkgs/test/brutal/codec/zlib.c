@@ -14,7 +14,7 @@ TEST(zlib_empty_raw)
 
     size_t size = UNWRAP(zlib_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
-    assert_equal(size, 0);
+    assert_equal(size, 0u);
 }
 
 TEST(zlib_empty_fixed)
@@ -26,7 +26,7 @@ TEST(zlib_empty_fixed)
 
     size_t size = UNWRAP(zlib_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
-    assert_equal(size, 0);
+    assert_equal(size, 0u);
 }
 
 TEST(zlib_empty_dynamic)
@@ -39,7 +39,7 @@ TEST(zlib_empty_dynamic)
 
     size_t size = UNWRAP(zlib_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
-    assert_equal(size, 0);
+    assert_equal(size, 0u);
 }
 
 TEST(zlib_onebyte_raw)
@@ -52,7 +52,7 @@ TEST(zlib_onebyte_raw)
 
     size_t size = UNWRAP(zlib_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
-    assert_equal(size, 1);
+    assert_equal(size, 1u);
 }
 
 TEST(zlib_onebyte_fixed)
@@ -64,7 +64,7 @@ TEST(zlib_onebyte_fixed)
 
     size_t size = UNWRAP(zlib_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
-    assert_equal(size, 1);
+    assert_equal(size, 1u);
 }
 
 TEST(zlib_onebyte_dynamic)
@@ -77,7 +77,7 @@ TEST(zlib_onebyte_dynamic)
 
     size_t size = UNWRAP(zlib_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
-    assert_equal(size, 1);
+    assert_equal(size, 1u);
 }
 
 TEST(zlib_zeroes)
@@ -90,5 +90,5 @@ TEST(zlib_zeroes)
 
     size_t size = UNWRAP(zlib_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
-    assert_equal(size, 256);
+    assert_equal(size, 256u);
 }
