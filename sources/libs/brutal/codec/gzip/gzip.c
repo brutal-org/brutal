@@ -60,16 +60,15 @@ IoResult gzip_decompress_stream(IoWriter writer, IoReader reader)
         return ERR(IoResult, ERR_INVALID_DATA);
     }
 
-    uint8_t unused[6];
-    TRY(IoResult, io_read(reader, unused, 6));
+    // Skip unused bytes
+    TRY(IoResult, io_skip(reader, 6));
 
-    /* Skip extra data if present */
+    // Skip extra data if present
 	if (flags & FLAG_EXTRA) {
 		le_uint16_t value;
         TRY(IoResult, io_read(reader, (uint8_t*)&value, 2));
         uint16_t xlen = load_le(value);
-
-        // Skip XLEN bytes
+        TRY(IoResult, io_skip(reader, xlen));
 	}
 
     // Skip file name if present
@@ -94,19 +93,15 @@ IoResult gzip_decompress_stream(IoWriter writer, IoReader reader)
 
 	// Check header crc if present
 	if (flags & FLAG_HCRC) {
-		uint32_t hcrc;
-
 		le_uint16_t value;
         TRY(IoResult, io_read(reader, (uint8_t*)&value, 2));
-        uint16_t xlen = load_le(value);
-        
+        uint16_t hcrc = load_le(value);
+        UNUSED(hcrc);
         // TODO: Header CRC32C
 	}
 
-    // TODO: CRC32C
-
+    // TODO: Data CRC32C
     size_t decompressed = TRY(IoResult, deflate_decompress_stream(writer, reader));
-
 
     return OK(IoResult, decompressed);
 }
