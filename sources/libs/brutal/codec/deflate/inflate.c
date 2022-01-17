@@ -239,6 +239,7 @@ IoResult deflate_decompress_block(DeflateDecompressionContext *ctx, Window *wind
             {
                 uint8_t val = symbol;
                 TRY(IoResult, io_write(writer, &val, 1));
+                decompressed_size++;
             }
             // End of block
             else if (symbol == 256)
@@ -260,8 +261,8 @@ IoResult deflate_decompress_block(DeflateDecompressionContext *ctx, Window *wind
                 uint16_t dist = huff_decode_symbol(&dist_dec);
                 io_br_ensure_bits(bit_reader, DIST_BITS[dist]);
                 uint32_t offset = DIST_BASE[dist] + io_br_pop_bits(bit_reader, DIST_BITS[dist]);
-                //TODO: safety check if offset in bounds
                 /* Copy match */
+                decompressed_size += length;
                 for (size_t i = 0; i < length; ++i)
                 {
                     uint8_t val = window_peek_from_back(window, offset);

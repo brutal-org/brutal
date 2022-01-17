@@ -12,7 +12,7 @@ MaybeError build_huff_tree(HuffTree *t, const uint8_t *lengths,
                            uint32_t num)
 {
     uint16_t offs[16];
-    unsigned int i, num_codes, available;
+    uint32_t i, num_codes, available;
 
     assert_lower_equal(num, 288);
 
@@ -96,8 +96,8 @@ void huff_dec_init(HuffDecoder *dec, BitReader *bit_reader, HuffTree *tree)
 
 static inline uint16_t huff_decode_symbol(HuffDecoder *dec)
 {
-    int base = 0, offs = 0;
-    int len;
+    int32_t base = 0, offs = 0;
+    int32_t len;
 
     /*
      * Get more bits while code index is above number of codes
