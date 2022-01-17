@@ -22,11 +22,11 @@ void window_deinit(Window *self)
 void window_flush(Window *self)
 {
     size_t src_size = m_min(self->used, self->capacity);
-    size_t src_offset = m_max(0, ((intptr_t)self->used) - self->capacity);
-    uint8_t *src = self->data + src_offset;
-    io_write(self->underlying, src, self->capacity);
+    size_t src_start = src_size > self->capacity ? src_size - self->capacity : 0;
+    uint8_t *src = self->data + src_start;
+    io_write(self->underlying, src, src_size);
     mem_move(self->data, src, src_size);
-    self->used = self->capacity;
+    self->used -= src_size;
 }
 
 static IoResult window_write_impl(Window *self, char const *data, size_t size)

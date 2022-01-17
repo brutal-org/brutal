@@ -39,14 +39,13 @@ TEST(inflate_empty_no_literals)
 	 *
 	 * See also: https://github.com/madler/zlib/issues/75
 	 */
-    static const unsigned char in_storage[] = {
+    static const uint8_t in_storage[] = {
         0x05, 0xCA, 0x81, 0x00, 0x00, 0x00, 0x00, 0x00, 0x90, 0xFF,
         0x6B, 0x01, 0x00};
 
     size_t size = UNWRAP(deflate_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
-    // A single uncompressed block has 5 extra bytes
-    assert_equal(size, 256);
+    assert_equal(size, 0);
 }
 
 TEST(inflate_rle)
@@ -59,7 +58,7 @@ TEST(inflate_rle)
 
     size_t size = UNWRAP(deflate_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
-    // A single uncompressed block has 5 extra bytes
+    // Should be 256
     assert_equal(size, 256);
 }
 
@@ -76,6 +75,21 @@ TEST(inflate_huffman)
 
     size_t size = UNWRAP(deflate_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
-    // A single uncompressed block has 5 extra bytes
+    // Should be 256
     assert_equal(size, 256);
+}
+
+TEST(inflate_max_matchlen)
+{
+    uint8_t out_storage[512];
+	/* 259 zero bytes compressed using literal/length code 285 (len 258) */
+	static const uint8_t in_storage[] = {
+		0xED, 0xCC, 0x81, 0x00, 0x00, 0x00, 0x00, 0x80, 0xA0, 0xFC,
+		0xA9, 0x17, 0xB9, 0x00, 0x2C
+	};
+	
+    size_t size = UNWRAP(deflate_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
+
+	// Should be 259
+    assert_equal(size, 259);
 }
