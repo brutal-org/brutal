@@ -3,6 +3,12 @@
 #include <brutal/alloc/base.h>
 #include <brutal/io/write.h>
 
+/**
+    @brief A sliding window implementation, used to lookup already written data
+
+    This struct allocates memory depending on the capacity specified.
+    Sample applications are compression algorithms (e.g. DEFLATE)
+*/
 typedef struct
 {
     uint8_t *data;
@@ -10,11 +16,11 @@ typedef struct
     size_t capacity;
     IoWriter underlying;
     Alloc *alloc;
-} Window;
+} IoWindow;
 
-void window_init(Window *self, IoWriter underlying, size_t windowsize, Alloc *alloc);
-void window_deinit(Window *self);
-void window_flush(Window *self);
+void io_window_init(IoWindow *self, IoWriter underlying, size_t windowsize, Alloc *alloc);
+void io_window_deinit(IoWindow *self);
+void io_window_flush(IoWindow *self);
 
-uint8_t window_peek_from_back(Window *self, size_t offset);
-IoWriter window_writer(Window *self);
+uint8_t io_window_peek_from_back(IoWindow *self, size_t offset);
+IoWriter io_window_writer(IoWindow *self);

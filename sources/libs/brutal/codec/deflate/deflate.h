@@ -3,14 +3,15 @@
 #include <brutal/io.h>
 #include <brutal/io/bit_write.h>
 
-typedef struct _DeflateCompressionContext
+typedef struct _DeflateCompressor
 {
     int compression_level;
     int min_size_to_compress;
     Alloc *alloc;
-    IoResult (*compress_block_impl)(struct _DeflateCompressionContext *c, BitWriter *bit_writer, const uint8_t *in,
+    IoResult (*compress_block_impl)(struct _DeflateCompressor *c, const uint8_t *in,
                                     size_t in_nbytes, bool last);
-} DeflateCompressionContext;
+    IoBitWriter bit_writer;
+} DeflateCompressor;
 
 /**
   @brief Allocate our compression context
@@ -18,11 +19,11 @@ typedef struct _DeflateCompressionContext
   @param compression_level The rate at which we want to compress (0 none, 9 best compression)
   @param alloc The heap object which is used for internal allocations
 */
-void deflate_init(DeflateCompressionContext *ctx, int compression_level, Alloc *alloc);
+void deflate_init(DeflateCompressor *ctx, int compression_level, Alloc *alloc);
 /**
   @brief Free the compression context
 */
-void deflate_deinit(DeflateCompressionContext *ctx);
+void deflate_deinit(DeflateCompressor *ctx);
 /**
   @brief Compress an entire stream
   @param ctx The compression context used for this operation
@@ -32,7 +33,7 @@ void deflate_deinit(DeflateCompressionContext *ctx);
   @param out_len The size of the output buffer
   @return The number of bytes written to the \p out buffer (compressed size)
 */
-IoResult deflate_compress_data(DeflateCompressionContext *ctx, const uint8_t *in, size_t in_len, const uint8_t *out, size_t out_len);
+IoResult deflate_compress_data(DeflateCompressor *ctx, const uint8_t *in, size_t in_len, const uint8_t *out, size_t out_len);
 /**
   @brief Compress an entire stream
   @param ctx The compression context used for this operation
@@ -40,4 +41,4 @@ IoResult deflate_compress_data(DeflateCompressionContext *ctx, const uint8_t *in
   @param reader The source where we read the uncompressed data from
   @return The number of bytes written to the \p writer stream (compressed size)
 */
-IoResult deflate_compress_stream(DeflateCompressionContext *ctx, IoWriter writer, IoReader reader);
+IoResult deflate_compress_stream(DeflateCompressor *ctx, IoWriter writer, IoReader reader);
