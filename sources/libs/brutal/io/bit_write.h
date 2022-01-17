@@ -15,7 +15,7 @@ typedef struct
     /* Bits that haven't yet been written to the output buffer */
     BitBuf bitbuf;
     /* Number of bits currently held in @bitbuf */
-    unsigned bitcount;
+    size_t bitcount;
 } IoBitWriter;
 
 static inline void io_bw_init(IoBitWriter *self, IoWriter writer)

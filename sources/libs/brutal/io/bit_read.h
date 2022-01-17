@@ -24,7 +24,7 @@ typedef struct
     /* Bits that haven't yet been written to the output buffer */
     BitBuf bitbuf;
     /* Number of bits currently held in @bitbuf */
-    unsigned bitcount;
+    size_t bitcount;
 } IoBitReader;
 
 static inline void io_br_init(IoBitReader *self, IoReader reader)
@@ -105,6 +105,6 @@ static inline uint32_t io_br_pop_bits(IoBitReader *self, const size_t num_bits)
 */
 static inline void io_br_align(IoBitReader *self)
 {
-    unsigned to_flush = self->bitcount % 8;
+    size_t to_flush = self->bitcount % 8;
     io_br_remove_bits(self, to_flush);
 }
