@@ -1,6 +1,7 @@
 #include <brutal/codec/deflate/inflate.h>
 #include <brutal/codec/errors.h>
 #include <brutal/codec/zlib/zlib.h>
+#include <brutal/hash/adler32.h>
 #include <brutal/io/mem_view.h>
 
 IoResult zlib_decompress_data(const uint8_t *in, size_t in_len, const uint8_t *out, size_t out_len)
@@ -53,13 +54,22 @@ IoResult zlib_decompress_stream(IoWriter writer, IoReader reader)
         return ERR(IoResult, ERR_NOT_IMPLEMENTED);
     }
 
-    size_t decompressed = TRY(IoResult, deflate_decompress_stream(writer, reader));
+    // Calculate the Adler32 checksum of the uncompressed data on the fly
+    Adler32 adler;
+    adler32_init(&adler, writer);
+    IoWriter checksum_writer = adler32_writer(&adler);
+
+    size_t decompressed = TRY(IoResult, deflate_decompress_stream(checksum_writer, reader));
 
     // Get Adler-32 checksum of original data
     be_uint32_t value;
-    io_read(reader, (uint8_t*)&value, 4);
+    io_read(reader, (uint8_t *)&value, 4);
     uint32_t adler32 = load_be(value);
-    UNUSED(adler32);
+    
+    if(adler32 != adler32_get(&adler))
+    {
+        return ERR(IoResult, ERR_CHECKSUM_MISMATCH);
+    }
 
     return OK(IoResult, decompressed);
 }
