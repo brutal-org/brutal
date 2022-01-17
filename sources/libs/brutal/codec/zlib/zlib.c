@@ -23,9 +23,9 @@ IoResult zlib_decompress_stream(IoWriter writer, IoReader reader)
 {
     uint8_t cmf, flg;
     // Read CMF (compression method & flags)
-    io_read(reader, &cmf, 1);
+    TRY(IoResult, io_read(reader, &cmf, 1));
     // Flags
-    io_read(reader, &flg, 1);
+    TRY(IoResult, io_read(reader, &flg, 1));
 
     // The FCHECK value must be such that CMF and FLG, when viewed as
     // a 16-bit unsigned integer stored in MSB order (CMF*256 + FLG),
@@ -63,7 +63,7 @@ IoResult zlib_decompress_stream(IoWriter writer, IoReader reader)
 
     // Get Adler-32 checksum of original data
     be_uint32_t value;
-    io_read(reader, (uint8_t *)&value, 4);
+    TRY(IoResult, io_read(reader, (uint8_t *)&value, 4));
     uint32_t adler32 = load_be(value);
     
     if(adler32 != adler32_get(&adler))
