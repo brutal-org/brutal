@@ -8,8 +8,6 @@
 #include <brutal/io/mem_view.h>
 #include <brutal/io/window.h>
 
-#define MAXBITS 15
-
 static const uint16_t LENS_BASE[30] = {/* Length codes 257..285 base */
                                        3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31,
                                        35, 43, 51, 59, 67, 83, 99, 115, 131, 163, 195, 227, 258, 0};
@@ -30,7 +28,10 @@ typedef struct
 {
     HuffTree length_tree;
     HuffTree dist_tree;
-} DeflateDecompressionContext;
+    IoWindow window;
+    IoBitReader bit_reader;
+    IoWriter writer;
+} DeflateDecompressor;
 
 IoResult deflate_decompress_data(const uint8_t *in, size_t in_len, const uint8_t *out, size_t out_len)
 {
@@ -47,31 +48,30 @@ IoResult deflate_decompress_data(const uint8_t *in, size_t in_len, const uint8_t
     return deflate_decompress_stream(writer, reader);
 }
 
-MaybeError build_dynamic_huff_trees(DeflateDecompressionContext *ctx, BitReader *bit_reader)
+MaybeError build_dynamic_huff_trees(DeflateDecompressor *ctx)
 {
+    // 288 symbols for lengths, 32 symbols for distance
     uint8_t lengths[288 + 32];
 
-    /* Special ordering of code length codes */
+    // Special ordering of code length codes
     static const uint16_t order[DEFLATE_NUM_PRECODE_SYMS] =
         {16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15};
 
+    IoBitReader *bit_reader = &ctx->bit_reader;
     io_br_ensure_bits(bit_reader, 14);
-    /* Get 5 bits HLIT (257-286) */
+    // Get 5 bits HLIT (257-286)
     uint32_t hlit = io_br_pop_bits(bit_reader, 5) + 257;
-    /* Get 5 bits HDIST (1-32) */
+    // Get 5 bits HDIST (1-32)
     uint32_t hdist = io_br_pop_bits(bit_reader, 5) + 1;
-    /* Get 4 bits HCLEN (4-19) */
+    // Get 4 bits HCLEN (4-19)
     uint32_t hclen = io_br_pop_bits(bit_reader, 4) + 4;
 
-    /*
-	   * The RFC limits the range of HLIT to 286, but lists HDIST as range
-	   * 1-32, even though distance codes 30 and 31 have no meaning. While
-	   * we could allow the full range of HLIT and HDIST to make it possible
-	   * to decode the fixed trees with this function, we consider it an
-	   * error here.
-	   *
-	   * See also: https://github.com/madler/zlib/issues/82
-	   */
+    //  The RFC 1951 limits the range of HLIT to 286, but lists HDIST as range
+    //  1-32, even though distance codes 30 and 31 have no meaning. While
+    //  we could allow the full range of HLIT and HDIST to make it possible
+    //  to decode the fixed trees with this function, we consider it an
+    //  error here.
+    //  See also: https://github.com/madler/zlib/issues/82
     if (hlit > DEFLATE_MAX_NUM_LITLEN_SYMS || hdist > DEFLATE_MAX_NUM_OFFSET_SYMS)
     {
         return ERR(MaybeError, ERR_TOO_MANY_SYMBOLS);
@@ -148,7 +148,7 @@ MaybeError build_dynamic_huff_trees(DeflateDecompressionContext *ctx, BitReader 
     return SUCCESS;
 }
 
-void build_static_huff_trees(DeflateDecompressionContext *ctx)
+void build_static_huff_trees(DeflateDecompressor *ctx)
 {
     HuffTree *lt = &ctx->length_tree;
     HuffTree *dt = &ctx->dist_tree;
@@ -182,7 +182,7 @@ void build_static_huff_trees(DeflateDecompressionContext *ctx)
 
     lt->max_sym = 285;
 
-    /* Build fixed distance tree */
+    // Build fixed distance tree
     for (size_t i = 0; i < 16; ++i)
     {
         dt->counts[i] = 0;
@@ -198,37 +198,37 @@ void build_static_huff_trees(DeflateDecompressionContext *ctx)
     dt->max_sym = 29;
 }
 
-IoResult deflate_decompress_block(DeflateDecompressionContext *ctx, Window *window, IoWriter writer, BitReader *bit_reader, bool *final_block)
+IoResult deflate_decompress_block(DeflateDecompressor *ctx, bool *final_block)
 {
     size_t decompressed_size = 0;
-    io_br_ensure_bits(bit_reader, 1 + 2);
+    io_br_ensure_bits(&ctx->bit_reader, 1 + 2);
 
-    *final_block = io_br_pop_bits(bit_reader, 1);
-    uint32_t block_type = io_br_pop_bits(bit_reader, 2);
+    *final_block = io_br_pop_bits(&ctx->bit_reader, 1);
+    uint32_t block_type = io_br_pop_bits(&ctx->bit_reader, 2);
 
     uint16_t len, nlen;
 
     if (block_type == DEFLATE_BLOCKTYPE_UNCOMPRESSED)
     {
-        io_br_align(bit_reader);
+        io_br_align(&ctx->bit_reader);
 
-        TRY(IoResult, io_read(bit_reader->reader, (uint8_t *)&len, sizeof(uint16_t)));
-        TRY(IoResult, io_read(bit_reader->reader, (uint8_t *)&nlen, sizeof(uint16_t)));
+        TRY(IoResult, io_read(ctx->bit_reader.reader, (uint8_t *)&len, sizeof(uint16_t)));
+        TRY(IoResult, io_read(ctx->bit_reader.reader, (uint8_t *)&nlen, sizeof(uint16_t)));
 
         assert_equal(len, (uint16_t)~nlen);
 
-        decompressed_size = TRY(IoResult, io_copy_range(bit_reader->reader, writer, len));
+        decompressed_size = TRY(IoResult, io_copy_range(ctx->bit_reader.reader, ctx->writer, len));
     }
     else if (block_type == DEFLATE_BLOCKTYPE_STATIC_HUFFMAN || block_type == DEFLATE_BLOCKTYPE_DYNAMIC_HUFFMAN)
     {
         if (block_type == DEFLATE_BLOCKTYPE_DYNAMIC_HUFFMAN)
-            TRY(IoResult, build_dynamic_huff_trees(ctx, bit_reader));
+            TRY(IoResult, build_dynamic_huff_trees(ctx));
         else
             build_static_huff_trees(ctx);
 
         HuffDecoder len_dec, dist_dec;
-        huff_dec_init(&len_dec, bit_reader, &ctx->length_tree);
-        huff_dec_init(&dist_dec, bit_reader, &ctx->dist_tree);
+        huff_dec_init(&len_dec, &ctx->bit_reader, &ctx->length_tree);
+        huff_dec_init(&dist_dec, &ctx->bit_reader, &ctx->dist_tree);
 
         while (true)
         {
@@ -238,7 +238,7 @@ IoResult deflate_decompress_block(DeflateDecompressionContext *ctx, Window *wind
             if (symbol < 256)
             {
                 uint8_t val = symbol;
-                TRY(IoResult, io_write(writer, &val, 1));
+                TRY(IoResult, io_write(ctx->writer, &val, 1));
                 decompressed_size++;
             }
             // End of block
@@ -248,25 +248,25 @@ IoResult deflate_decompress_block(DeflateDecompressionContext *ctx, Window *wind
             }
             else
             {
-                /* Check sym is within range and distance tree is not empty */
+                // Check sym is within range and distance tree is not empty
                 if (symbol > ctx->length_tree.max_sym || symbol - 257 > 28 || ctx->dist_tree.max_sym == -1)
                 {
                     return ERR(IoResult, ERR_BAD_DATA);
                 }
 
                 symbol -= 257;
-                io_br_ensure_bits(bit_reader, LENS_BITS[symbol]);
-                uint32_t length = LENS_BASE[symbol] + io_br_pop_bits(bit_reader, LENS_BITS[symbol]);
+                io_br_ensure_bits(&ctx->bit_reader, LENS_BITS[symbol]);
+                uint32_t length = LENS_BASE[symbol] + io_br_pop_bits(&ctx->bit_reader, LENS_BITS[symbol]);
 
                 uint16_t dist = huff_decode_symbol(&dist_dec);
-                io_br_ensure_bits(bit_reader, DIST_BITS[dist]);
-                uint32_t offset = DIST_BASE[dist] + io_br_pop_bits(bit_reader, DIST_BITS[dist]);
-                /* Copy match */
+                io_br_ensure_bits(&ctx->bit_reader, DIST_BITS[dist]);
+                uint32_t offset = DIST_BASE[dist] + io_br_pop_bits(&ctx->bit_reader, DIST_BITS[dist]);
+                // Copy match
                 decompressed_size += length;
                 for (size_t i = 0; i < length; ++i)
                 {
-                    uint8_t val = window_peek_from_back(window, offset);
-                    TRY(IoResult, io_write(writer, &val, 1));
+                    uint8_t val = io_window_peek_from_back(&ctx->window, offset);
+                    TRY(IoResult, io_write(ctx->writer, &val, 1));
                 }
             }
         }
@@ -284,23 +284,21 @@ IoResult deflate_decompress_stream(IoWriter writer, IoReader reader)
     size_t total = 0;
     static_assert(1 + 2 + 5 + 5 + 4 < BITBUF_NBITS, "BitReader can't hold enough bits");
 
-    BitReader bit_reader;
-    io_br_init(&bit_reader, reader);
     bool final_block;
 
-    Window window;
-    window_init(&window, writer, 0x8000, alloc_global());
-    IoWriter buffered_writer = window_writer(&window);
-
-    DeflateDecompressionContext ctx;
+    DeflateDecompressor ctx;
+    io_br_init(&ctx.bit_reader, reader);
+    // TODO: windowsize can be smaller (see RFC 1950)
+    io_window_init(&ctx.window, writer, 0x8000, alloc_global());
+    ctx.writer = io_window_writer(&ctx.window);
 
     do
     {
-        total += TRY(IoResult, deflate_decompress_block(&ctx, &window, buffered_writer, &bit_reader, &final_block));
+        total += TRY(IoResult, deflate_decompress_block(&ctx, &final_block));
     } while (!final_block);
 
-    window_flush(&window);
-    window_deinit(&window);
+    io_window_flush(&ctx.window);
+    io_window_deinit(&ctx.window);
 
     return OK(IoResult, total);
 }

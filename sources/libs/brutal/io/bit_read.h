@@ -25,9 +25,9 @@ typedef struct
     BitBuf bitbuf;
     /* Number of bits currently held in @bitbuf */
     unsigned bitcount;
-} BitReader;
+} IoBitReader;
 
-static inline void io_br_init(BitReader *self, IoReader reader)
+static inline void io_br_init(IoBitReader *self, IoReader reader)
 {
     self->reader = reader;
     self->bitbuf = 0;
@@ -37,7 +37,7 @@ static inline void io_br_init(BitReader *self, IoReader reader)
 /**
  @brief Check that our bitbuffer can hold atleast \p num_bits
 */
-static inline bool io_br_can_ensure(const unsigned num_bits)
+static inline bool io_br_can_ensure(const size_t num_bits)
 {
     return num_bits <= MAX_ENSURE;
 }
@@ -46,7 +46,7 @@ static inline bool io_br_can_ensure(const unsigned num_bits)
  @brief Make sure we have atleast \p num_bits
 */
 static inline IoResult
-io_br_ensure_bits(BitReader *self, const unsigned num_bits)
+io_br_ensure_bits(IoBitReader *self, const size_t num_bits)
 {
     assert_truth(io_br_can_ensure(num_bits));
     uint8_t b;
@@ -60,7 +60,7 @@ io_br_ensure_bits(BitReader *self, const unsigned num_bits)
 }
 
 static inline IoResult
-io_br_get_byte(BitReader *self)
+io_br_get_byte(IoBitReader *self)
 {
     assert_lower_equal(self->bitcount, BITBUF_NBITS - 8);
     uint8_t b;
@@ -73,7 +73,7 @@ io_br_get_byte(BitReader *self)
 /**
   @brief Return the next \p num_bits from the bitbuffer variable without removing them.
 */
-static inline uint32_t io_br_get_bits(BitReader *self, const size_t num_bits)
+static inline uint32_t io_br_get_bits(IoBitReader *self, const size_t num_bits)
 {
     assert_lower_equal(num_bits, self->bitcount);
     return self->bitbuf & ((1 << num_bits) - 1);
@@ -82,7 +82,7 @@ static inline uint32_t io_br_get_bits(BitReader *self, const size_t num_bits)
 /**
   @brief Remove the next \p num_bits from the bitbuffer variable.
 */
-static inline void io_br_remove_bits(BitReader *self, const unsigned num_bits)
+static inline void io_br_remove_bits(IoBitReader *self, const size_t num_bits)
 {
     assert_lower_equal(num_bits, self->bitcount);
     self->bitbuf >>= num_bits;
@@ -92,7 +92,7 @@ static inline void io_br_remove_bits(BitReader *self, const unsigned num_bits)
 /**
   @brief Return the next \p num_bits from the bitbuffer variable with removing them.
 */
-static inline uint32_t io_br_pop_bits(BitReader *self, const size_t num_bits)
+static inline uint32_t io_br_pop_bits(IoBitReader *self, const size_t num_bits)
 {
     assert_lower_equal(num_bits, self->bitcount);
     uint32_t result = io_br_get_bits(self, num_bits);
@@ -103,7 +103,7 @@ static inline uint32_t io_br_pop_bits(BitReader *self, const size_t num_bits)
 /**
   @brief Flush to byte boundary
 */
-static inline void io_br_align(BitReader *self)
+static inline void io_br_align(IoBitReader *self)
 {
     unsigned to_flush = self->bitcount % 8;
     io_br_remove_bits(self, to_flush);
