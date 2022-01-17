@@ -38,7 +38,7 @@ MaybeError build_huff_tree(HuffTree *t, const uint8_t *lengths,
     /* Compute offset table for distribution sort */
     for (available = 1, num_codes = 0, i = 0; i < 16; ++i)
     {
-        unsigned int used = t->counts[i];
+        uint32_t used = t->counts[i];
 
         /* Check length contains no more codes than available */
         if (used > available)
@@ -114,7 +114,8 @@ static inline uint16_t huff_decode_symbol(HuffDecoder *dec)
      */
     for (len = 1;; ++len)
     {
-        offs = 2 * offs + io_br_get_bits(dec->bit_reader, 1);
+        io_br_ensure_bits(dec->bit_reader, 1);
+        offs = 2 * offs + io_br_pop_bits(dec->bit_reader, 1);
 
         assert_lower_equal(len, 15);
 

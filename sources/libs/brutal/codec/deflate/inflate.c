@@ -1,3 +1,4 @@
+#include <brutal/alloc/global.h>
 #include <brutal/codec/deflate/constants.h>
 #include <brutal/codec/deflate/errors.h>
 #include <brutal/codec/deflate/huff.h>
@@ -5,7 +6,7 @@
 #include <brutal/debug/assert.h>
 #include <brutal/io/bit_read.h>
 #include <brutal/io/mem_view.h>
-#include <brutal/ds/ring.h>
+#include <brutal/io/window.h>
 
 #define MAXBITS 15
 
@@ -197,7 +198,7 @@ void build_static_huff_trees(DeflateDecompressionContext *ctx)
     dt->max_sym = 29;
 }
 
-IoResult deflate_decompress_block(DeflateDecompressionContext *ctx, IoWriter writer, BitReader *bit_reader, bool *final_block)
+IoResult deflate_decompress_block(DeflateDecompressionContext *ctx, Window *window, IoWriter writer, BitReader *bit_reader, bool *final_block)
 {
     size_t decompressed_size = 0;
     io_br_ensure_bits(bit_reader, 1 + 2);
@@ -253,18 +254,19 @@ IoResult deflate_decompress_block(DeflateDecompressionContext *ctx, IoWriter wri
                 }
 
                 symbol -= 257;
-                uint32_t length = LENS_BASE[symbol] + io_br_get_bits(bit_reader, LENS_BITS[symbol]);
+                io_br_ensure_bits(bit_reader, LENS_BITS[symbol]);
+                uint32_t length = LENS_BASE[symbol] + io_br_pop_bits(bit_reader, LENS_BITS[symbol]);
 
                 uint16_t dist = huff_decode_symbol(&dist_dec);
-                uint32_t offset = DIST_BASE[dist] + io_br_get_bits(bit_reader, DIST_BITS[dist]);
-                UNUSED(offset);
+                io_br_ensure_bits(bit_reader, DIST_BITS[dist]);
+                uint32_t offset = DIST_BASE[dist] + io_br_pop_bits(bit_reader, DIST_BITS[dist]);
                 //TODO: safety check if offset in bounds
                 /* Copy match */
                 for (size_t i = 0; i < length; ++i)
                 {
-                    // deflate_put(ctx, deflate_back(-offset));
-
-                }            
+                    uint8_t val = window_peek_from_back(window, offset);
+                    TRY(IoResult, io_write(writer, &val, 1));
+                }
             }
         }
     }
@@ -285,12 +287,19 @@ IoResult deflate_decompress_stream(IoWriter writer, IoReader reader)
     io_br_init(&bit_reader, reader);
     bool final_block;
 
+    Window window;
+    window_init(&window, writer, 0x8000, alloc_global());
+    IoWriter buffered_writer = window_writer(&window);
+
     DeflateDecompressionContext ctx;
 
     do
     {
-        total += TRY(IoResult, deflate_decompress_block(&ctx, writer, &bit_reader, &final_block));
+        total += TRY(IoResult, deflate_decompress_block(&ctx, &window, buffered_writer, &bit_reader, &final_block));
     } while (!final_block);
+
+    window_flush(&window);
+    window_deinit(&window);
 
     return OK(IoResult, total);
 }

@@ -4,10 +4,11 @@
 #include <brutal/io/window.h>
 #include <brutal/math/clamp.h>
 
-void window_init(Window *self, size_t capacity, Alloc *alloc)
+void window_init(Window *self, IoWriter underlying, size_t capacity, Alloc *alloc)
 {
     *self = (Window){
         .data = (uint8_t *)alloc_malloc(alloc, capacity * 3),
+        .underlying = underlying,
         .used = 0,
         .capacity = capacity,
         .alloc = alloc};
@@ -16,6 +17,16 @@ void window_init(Window *self, size_t capacity, Alloc *alloc)
 void window_deinit(Window *self)
 {
     alloc_free(self->alloc, self->data);
+}
+
+void window_flush(Window *self)
+{
+    size_t src_size = m_min(self->used, self->capacity);
+    size_t src_offset = m_max(0, ((intptr_t)self->used) - self->capacity);
+    uint8_t *src = self->data + src_offset;
+    io_write(self->underlying, src, self->capacity);
+    mem_move(self->data, src, src_size);
+    self->used = self->capacity;
 }
 
 static IoResult window_write_impl(Window *self, char const *data, size_t size)
@@ -27,8 +38,7 @@ static IoResult window_write_impl(Window *self, char const *data, size_t size)
     // Put the latest data back to the front
     if (self->used > self->capacity * 2)
     {
-        mem_move(self->data, self->data + (self->used - self->capacity), self->capacity);
-        self->used = self->capacity;
+        window_flush(self);
     }
     return OK(IoResult, to_write);
 }
