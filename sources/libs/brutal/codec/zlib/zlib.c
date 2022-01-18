@@ -2,19 +2,19 @@
 #include <brutal/codec/errors.h>
 #include <brutal/codec/zlib/zlib.h>
 #include <brutal/hash/adler32.h>
-#include <brutal/io/mem_view.h>
+#include <brutal/io/mem.h>
 
 IoResult zlib_decompress_data(const uint8_t *in, size_t in_len, const uint8_t *out, size_t out_len)
 {
     // Input
-    MemView in_view;
-    mem_view_init(&in_view, in_len, in);
-    IoReader reader = mem_view_reader(&in_view);
+    IoMem in_view;
+    io_mem_init(&in_view, in_len, in);
+    IoReader reader = io_mem_reader(&in_view);
 
     // Output
-    MemView out_view;
-    mem_view_init(&out_view, out_len, out);
-    IoWriter writer = mem_view_writer(&out_view);
+    IoMem out_view;
+    io_mem_init(&out_view, out_len, out);
+    IoWriter writer = io_mem_writer(&out_view);
 
     return zlib_decompress_stream(writer, reader);
 }
@@ -65,8 +65,8 @@ IoResult zlib_decompress_stream(IoWriter writer, IoReader reader)
     be_uint32_t value;
     TRY(IoResult, io_read(reader, (uint8_t *)&value, 4));
     uint32_t adler32 = load_be(value);
-    
-    if(adler32 != adler32_get(&adler))
+
+    if (adler32 != adler32_get(&adler))
     {
         return ERR(IoResult, ERR_CHECKSUM_MISMATCH);
     }

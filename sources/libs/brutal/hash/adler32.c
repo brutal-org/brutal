@@ -1,4 +1,6 @@
 #include <brutal/hash/adler32.h>
+#include <brutal/io/funcs.h>
+
 #define A32_BASE 65521
 
 void adler32_init(Adler32 *self, IoWriter underlying)

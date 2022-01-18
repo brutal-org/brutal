@@ -1,5 +1,6 @@
 #pragma once
-#include <brutal/io/bit_read.h>
+
+#include <brutal/io/bit-read.h>
 
 typedef struct
 {
@@ -8,11 +9,10 @@ typedef struct
     int32_t max_sym;
 } HuffTree;
 
-MaybeError build_huff_tree(HuffTree *t, const uint8_t *lengths,
-                           uint32_t num)
+MaybeError build_huff_tree(HuffTree *t, const uint8_t *lengths, uint32_t num)
 {
     uint16_t offs[16];
-    uint32_t i, num_codes, available;
+    size_t i, num_codes, available;
 
     assert_lower_equal(num, 288u);
 
@@ -53,7 +53,8 @@ MaybeError build_huff_tree(HuffTree *t, const uint8_t *lengths,
 
     // Check all codes were used, or for the special case of only one
     // code that it has length 1
-    if ((num_codes > 1 && available > 0) || (num_codes == 1 && t->counts[1] != 1))
+    if ((num_codes > 1 && available > 0) ||
+        (num_codes == 1 && t->counts[1] != 1))
     {
         return ERROR(ERR_INVALID_CODE);
     }
@@ -84,16 +85,15 @@ typedef struct
     HuffTree *tree;
 } HuffDecoder;
 
-void huff_dec_init(HuffDecoder *dec, IoBitReader *bit_reader, HuffTree *tree)
+void huff_decoder_init(HuffDecoder *dec, IoBitReader *bit_reader, HuffTree *tree)
 {
     dec->bit_reader = bit_reader;
     dec->tree = tree;
 }
 
-static inline uint16_t huff_decode_symbol(HuffDecoder *dec)
+static inline uint16_t huff_decoder_next(HuffDecoder *dec)
 {
     int32_t base = 0, offs = 0;
-    int32_t len;
 
     // Get more bits while code index is above number of codes
     //
@@ -106,7 +106,7 @@ static inline uint16_t huff_decode_symbol(HuffDecoder *dec)
     // The index we have decoded so far is base + offs, and if that
     // falls within the leaves we are done. Otherwise we adjust the range
     // of offs and add one more bit to it.
-    for (len = 1;; ++len)
+    for (int32_t len = 1;; ++len)
     {
         io_br_ensure_bits(dec->bit_reader, 1);
         offs = 2 * offs + io_br_pop_bits(dec->bit_reader, 1);

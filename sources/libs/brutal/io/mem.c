@@ -1,19 +1,20 @@
 #include <brutal/base/attributes.h>
 #include <brutal/base/macros.h>
-#include <brutal/io/mem_view.h>
+#include <brutal/io/mem.h>
 #include <brutal/math/clamp.h>
 
-void mem_view_init(MemView *self, size_t capacity, const void *data)
+void io_mem_init(IoMem *self, size_t capacity, const void *data)
 {
-    *self = (MemView){
-        .data = (uint8_t*)data,
+    *self = (IoMem){
+        .data = (uint8_t *)data,
         .used = 0,
         .capacity = capacity,
     };
 }
 
-static IoResult mem_view_read_impl(MemView *self, uint8_t *data, size_t size)
+static IoResult io_mem_read(void *ctx, uint8_t *data, size_t size)
 {
+    IoMem* self = ctx;
     size_t read = m_min(size, self->capacity - self->used);
 
     for (size_t i = 0; i < read; i++)
@@ -26,15 +27,15 @@ static IoResult mem_view_read_impl(MemView *self, uint8_t *data, size_t size)
     return OK(IoResult, read);
 }
 
-IoReader mem_view_reader(MemView *self)
+IoReader io_mem_reader(IoMem *self)
 {
     return (IoReader){
-        .read = (IoReadFn *)mem_view_read_impl,
+        .read = io_mem_read,
         .context = self,
     };
 }
 
-static IoResult mem_view_write_impl(MemView *self, uint8_t const *data, size_t size)
+static IoResult io_mem_write_impl(IoMem *self, uint8_t const *data, size_t size)
 {
     size_t to_write = m_min(self->capacity - self->used, size);
     mem_cpy(self->data + self->used, data, to_write);
@@ -42,10 +43,10 @@ static IoResult mem_view_write_impl(MemView *self, uint8_t const *data, size_t s
     return OK(IoResult, to_write);
 }
 
-IoWriter mem_view_writer(MemView *self)
+IoWriter io_mem_writer(IoMem *self)
 {
     return (IoWriter){
-        .write = (IoWriteFn *)mem_view_write_impl,
+        .write = (IoWriteFn *)io_mem_write_impl,
         .context = self,
     };
 }

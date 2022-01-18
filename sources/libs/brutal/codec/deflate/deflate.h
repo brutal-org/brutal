@@ -1,7 +1,6 @@
 #pragma once
 
-#include <brutal/io.h>
-#include <brutal/io/bit_write.h>
+#include <brutal/io/bit-write.h>
 
 typedef struct _DeflateCompressor
 {
@@ -20,10 +19,12 @@ typedef struct _DeflateCompressor
   @param alloc The heap object which is used for internal allocations
 */
 void deflate_init(DeflateCompressor *ctx, int compression_level, Alloc *alloc);
+
 /**
   @brief Free the compression context
 */
 void deflate_deinit(DeflateCompressor *ctx);
+
 /**
   @brief Compress an entire stream
   @param ctx The compression context used for this operation
@@ -34,6 +35,7 @@ void deflate_deinit(DeflateCompressor *ctx);
   @return The number of bytes written to the \p out buffer (compressed size)
 */
 IoResult deflate_compress_data(DeflateCompressor *ctx, const uint8_t *in, size_t in_len, const uint8_t *out, size_t out_len);
+
 /**
   @brief Compress an entire stream
   @param ctx The compression context used for this operation

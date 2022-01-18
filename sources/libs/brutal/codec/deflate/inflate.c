@@ -4,9 +4,9 @@
 #include <brutal/codec/deflate/huff.h>
 #include <brutal/codec/deflate/inflate.h>
 #include <brutal/debug/assert.h>
-#include <brutal/io/bit_read.h>
-#include <brutal/io/mem_view.h>
+#include <brutal/io/mem.h>
 #include <brutal/io/window.h>
+#include <brutal/io/bit-read.h>
 
 static const uint16_t LENS_BASE[30] = {/* Length codes 257..285 base */
                                        3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31,
@@ -36,14 +36,14 @@ typedef struct
 IoResult deflate_decompress_data(const uint8_t *in, size_t in_len, const uint8_t *out, size_t out_len)
 {
     // Input
-    MemView in_view;
-    mem_view_init(&in_view, in_len, in);
-    IoReader reader = mem_view_reader(&in_view);
+    IoMem in_view;
+    io_mem_init(&in_view, in_len, in);
+    IoReader reader = io_mem_reader(&in_view);
 
     // Output
-    MemView out_view;
-    mem_view_init(&out_view, out_len, out);
-    IoWriter writer = mem_view_writer(&out_view);
+    IoMem out_view;
+    io_mem_init(&out_view, out_len, out);
+    IoWriter writer = io_mem_writer(&out_view);
 
     return deflate_decompress_stream(writer, reader);
 }
@@ -93,10 +93,10 @@ MaybeError build_dynamic_huff_trees(DeflateDecompressor *ctx)
     TRY(MaybeError, build_huff_tree(&ctx->length_tree, lengths, DEFLATE_NUM_PRECODE_SYMS));
 
     HuffDecoder dec;
-    huff_dec_init(&dec, bit_reader, &ctx->length_tree);
+    huff_decoder_init(&dec, bit_reader, &ctx->length_tree);
     for (size_t num = 0; num < hdist + hlit;)
     {
-        uint16_t symbol = huff_decode_symbol(&dec);
+        uint16_t symbol = huff_decoder_next(&dec);
         uint32_t repeat_count = 0;
 
         switch (symbol)
@@ -227,12 +227,12 @@ IoResult deflate_decompress_block(DeflateDecompressor *ctx, bool *final_block)
             build_static_huff_trees(ctx);
 
         HuffDecoder len_dec, dist_dec;
-        huff_dec_init(&len_dec, &ctx->bit_reader, &ctx->length_tree);
-        huff_dec_init(&dist_dec, &ctx->bit_reader, &ctx->dist_tree);
+        huff_decoder_init(&len_dec, &ctx->bit_reader, &ctx->length_tree);
+        huff_decoder_init(&dist_dec, &ctx->bit_reader, &ctx->dist_tree);
 
         while (true)
         {
-            uint16_t symbol = huff_decode_symbol(&len_dec);
+            uint16_t symbol = huff_decoder_next(&len_dec);
 
             // Literal
             if (symbol < 256)
@@ -258,7 +258,7 @@ IoResult deflate_decompress_block(DeflateDecompressor *ctx, bool *final_block)
                 io_br_ensure_bits(&ctx->bit_reader, LENS_BITS[symbol]);
                 uint32_t length = LENS_BASE[symbol] + io_br_pop_bits(&ctx->bit_reader, LENS_BITS[symbol]);
 
-                uint16_t dist = huff_decode_symbol(&dist_dec);
+                uint16_t dist = huff_decoder_next(&dist_dec);
                 io_br_ensure_bits(&ctx->bit_reader, DIST_BITS[dist]);
                 uint32_t offset = DIST_BASE[dist] + io_br_pop_bits(&ctx->bit_reader, DIST_BITS[dist]);
                 // Copy match

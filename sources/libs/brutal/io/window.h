@@ -1,7 +1,7 @@
 #pragma once
 
 #include <brutal/alloc/base.h>
-#include <brutal/io/write.h>
+#include <brutal/io/traits.h>
 
 /**
     @brief A sliding window implementation, used to lookup already written data

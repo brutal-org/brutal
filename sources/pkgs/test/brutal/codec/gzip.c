@@ -1,7 +1,5 @@
 #include <brutal/alloc/global.h>
 #include <brutal/codec/gzip/gzip.h>
-#include <brutal/io/bit_write.h>
-#include <brutal/io/mem_view.h>
 #include "test/test.h"
 
 TEST(gzip_empty_raw)

@@ -1,7 +1,7 @@
-#include <brutal/alloc.h>
+#include <brutal/base/attributes.h>
 #include <brutal/codec/deflate/constants.h>
 #include <brutal/codec/deflate/deflate.h>
-#include <brutal/io/mem_view.h>
+#include <brutal/io/mem.h>
 
 // Block compressions
 IoResult deflate_compress_block_uncompressed(DeflateCompressor *ctx, const uint8_t *in, size_t in_nbytes, bool last);
@@ -18,19 +18,20 @@ void deflate_init(DeflateCompressor *ctx, int level, Alloc *alloc)
     }
     else
     {
-        //TODO: IMPLEMENT OTHER MODES
+        // TODO: IMPLEMENT OTHER MODES
     }
 }
 
-void deflate_deinit(DeflateCompressor *ctx)
+void deflate_deinit(MAYBE_UNUSED DeflateCompressor *ctx)
 {
     // TODO: free arrays later
-    UNUSED(ctx);
 }
 
 /* Write the header fields common to all DEFLATE block types. */
-void deflate_write_block_header(IoBitWriter *bit_writer,
-                                bool is_final_block, unsigned block_type)
+void deflate_write_block_header(
+    IoBitWriter *bit_writer,
+    bool is_final_block,
+    unsigned block_type)
 {
     io_bw_add_bits(bit_writer, is_final_block, 1);
     io_bw_add_bits(bit_writer, block_type, 2);
@@ -39,7 +40,6 @@ void deflate_write_block_header(IoBitWriter *bit_writer,
 
 IoResult deflate_compress_block_uncompressed(DeflateCompressor *ctx, const uint8_t *in, size_t in_nbytes, bool is_last)
 {
-    UNUSED(ctx);
     deflate_write_block_header(&ctx->bit_writer, is_last,
                                DEFLATE_BLOCKTYPE_UNCOMPRESSED);
     io_bw_align_bitstream(&ctx->bit_writer);
@@ -57,14 +57,14 @@ IoResult deflate_compress_block_uncompressed(DeflateCompressor *ctx, const uint8
 IoResult deflate_compress_data(DeflateCompressor *ctx, const uint8_t *in, size_t in_len, const uint8_t *out, size_t out_len)
 {
     // Input
-    MemView in_view;
-    mem_view_init(&in_view, in_len, in);
-    IoReader reader = mem_view_reader(&in_view);
+    IoMem in_view;
+    io_mem_init(&in_view, in_len, in);
+    IoReader reader = io_mem_reader(&in_view);
 
     // Output
-    MemView out_view;
-    mem_view_init(&out_view, out_len, out);
-    IoWriter writer = mem_view_writer(&out_view);
+    IoMem out_view;
+    io_mem_init(&out_view, out_len, out);
+    IoWriter writer = io_mem_writer(&out_view);
 
     return deflate_compress_stream(ctx, writer, reader);
 }

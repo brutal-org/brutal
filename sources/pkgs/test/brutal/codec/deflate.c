@@ -1,7 +1,5 @@
 #include <brutal/alloc/global.h>
 #include <brutal/codec/deflate/deflate.h>
-#include <brutal/io/bit_write.h>
-#include <brutal/io/mem_view.h>
 #include "test/test.h"
 
 TEST(deflate_uncompressed)

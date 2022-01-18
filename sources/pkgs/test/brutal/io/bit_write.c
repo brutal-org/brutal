@@ -1,5 +1,5 @@
 #include <brutal/alloc.h>
-#include <brutal/io/bit_write.h>
+#include <brutal/io/bit-write.h>
 #include "test/test.h"
 
 TEST(bitwriter_write_aligned)

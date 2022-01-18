@@ -1,12 +1,11 @@
 #pragma once
 
-#include <brutal/base/error.h>
 #include <brutal/base/result.h>
-#include <brutal/base/std.h>
 #include <brutal/debug/assert.h>
-#include <brutal/io/read.h>
+#include <brutal/io/funcs.h>
 
 typedef uint_fast64_t BitBuf;
+
 /**
   @brief Number of bits the bitbuffer variable can hold.
 */
@@ -45,8 +44,7 @@ static inline bool io_br_can_ensure(const size_t num_bits)
 /**
  @brief Make sure we have atleast \p num_bits
 */
-static inline IoResult
-io_br_ensure_bits(IoBitReader *self, const size_t num_bits)
+static inline IoResult io_br_ensure_bits(IoBitReader *self, const size_t num_bits)
 {
     assert_truth(io_br_can_ensure(num_bits));
     uint8_t b;
@@ -59,8 +57,7 @@ io_br_ensure_bits(IoBitReader *self, const size_t num_bits)
     return OK(IoResult, num_bits);
 }
 
-static inline IoResult
-io_br_get_byte(IoBitReader *self)
+static inline IoResult io_br_get_byte(IoBitReader *self)
 {
     assert_lower_equal(self->bitcount, BITBUF_NBITS - 8);
     uint8_t b;

@@ -2,7 +2,7 @@
 #include <brutal/codec/errors.h>
 #include <brutal/codec/gzip/gzip.h>
 #include <brutal/hash/adler32.h>
-#include <brutal/io/mem_view.h>
+#include <brutal/io/mem.h>
 
 typedef enum
 {
@@ -16,14 +16,14 @@ typedef enum
 IoResult gzip_decompress_data(const uint8_t *in, size_t in_len, const uint8_t *out, size_t out_len)
 {
     // Input
-    MemView in_view;
-    mem_view_init(&in_view, in_len, in);
-    IoReader reader = mem_view_reader(&in_view);
+    IoMem in_view;
+    io_mem_init(&in_view, in_len, in);
+    IoReader reader = io_mem_reader(&in_view);
 
     // Output
-    MemView out_view;
-    mem_view_init(&out_view, out_len, out);
-    IoWriter writer = mem_view_writer(&out_view);
+    IoMem out_view;
+    io_mem_init(&out_view, out_len, out);
+    IoWriter writer = io_mem_writer(&out_view);
 
     return gzip_decompress_stream(writer, reader);
 }
@@ -64,12 +64,13 @@ IoResult gzip_decompress_stream(IoWriter writer, IoReader reader)
     TRY(IoResult, io_skip(reader, 6));
 
     // Skip extra data if present
-	if (flags & FLAG_EXTRA) {
-		le_uint16_t value;
-        TRY(IoResult, io_read(reader, (uint8_t*)&value, 2));
+    if (flags & FLAG_EXTRA)
+    {
+        le_uint16_t value;
+        TRY(IoResult, io_read(reader, (uint8_t *)&value, 2));
         uint16_t xlen = load_le(value);
         TRY(IoResult, io_skip(reader, xlen));
-	}
+    }
 
     // Skip file name if present
     if (flags & FLAG_NAME)
@@ -91,14 +92,15 @@ IoResult gzip_decompress_stream(IoWriter writer, IoReader reader)
         } while (val != 0);
     }
 
-	// Check header crc if present
-	if (flags & FLAG_HCRC) {
-		le_uint16_t value;
-        TRY(IoResult, io_read(reader, (uint8_t*)&value, 2));
+    // Check header crc if present
+    if (flags & FLAG_HCRC)
+    {
+        le_uint16_t value;
+        TRY(IoResult, io_read(reader, (uint8_t *)&value, 2));
         uint16_t hcrc = load_le(value);
         UNUSED(hcrc);
         // TODO: Header CRC32C
-	}
+    }
 
     // TODO: Data CRC32C
     size_t decompressed = TRY(IoResult, deflate_decompress_stream(writer, reader));

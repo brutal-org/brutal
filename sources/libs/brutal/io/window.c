@@ -1,8 +1,7 @@
-#include <brutal/base/attributes.h>
-#include <brutal/base/macros.h>
 #include <brutal/debug/assert.h>
 #include <brutal/io/window.h>
 #include <brutal/math/clamp.h>
+#include <brutal/io/funcs.h>
 
 void io_window_init(IoWindow *self, IoWriter underlying, size_t capacity, Alloc *alloc)
 {
@@ -11,7 +10,8 @@ void io_window_init(IoWindow *self, IoWriter underlying, size_t capacity, Alloc 
         .underlying = underlying,
         .used = 0,
         .capacity = capacity,
-        .alloc = alloc};
+        .alloc = alloc,
+    };
 }
 
 void io_window_deinit(IoWindow *self)

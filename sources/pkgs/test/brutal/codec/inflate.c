@@ -1,7 +1,5 @@
 #include <brutal/alloc/global.h>
 #include <brutal/codec/deflate/inflate.h>
-#include <brutal/io/bit_write.h>
-#include <brutal/io/mem_view.h>
 #include "test/test.h"
 
 TEST(inflate_uncompressed)
@@ -32,13 +30,13 @@ TEST(inflate_empty_no_literals)
     uint8_t out_storage[512];
 
     /* Empty buffer, dynamic with 256 as only literal/length code
-	 *
-	 * You could argue that since the RFC only has an exception allowing
-	 * one symbol for the distance tree, the literal/length tree should
-	 * be complete. However gzip allows this.
-	 *
-	 * See also: https://github.com/madler/zlib/issues/75
-	 */
+     *
+     * You could argue that since the RFC only has an exception allowing
+     * one symbol for the distance tree, the literal/length tree should
+     * be complete. However gzip allows this.
+     *
+     * See also: https://github.com/madler/zlib/issues/75
+     */
     static const uint8_t in_storage[] = {
         0x05, 0xCA, 0x81, 0x00, 0x00, 0x00, 0x00, 0x00, 0x90, 0xFF,
         0x6B, 0x01, 0x00};
@@ -82,14 +80,13 @@ TEST(inflate_huffman)
 TEST(inflate_max_matchlen)
 {
     uint8_t out_storage[512];
-	/* 259 zero bytes compressed using literal/length code 285 (len 258) */
-	static const uint8_t in_storage[] = {
-		0xED, 0xCC, 0x81, 0x00, 0x00, 0x00, 0x00, 0x80, 0xA0, 0xFC,
-		0xA9, 0x17, 0xB9, 0x00, 0x2C
-	};
-	
+    /* 259 zero bytes compressed using literal/length code 285 (len 258) */
+    static const uint8_t in_storage[] = {
+        0xED, 0xCC, 0x81, 0x00, 0x00, 0x00, 0x00, 0x80, 0xA0, 0xFC,
+        0xA9, 0x17, 0xB9, 0x00, 0x2C};
+
     size_t size = UNWRAP(deflate_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
-	// Should be 259
+    // Should be 259
     assert_equal(size, 259u);
 }
