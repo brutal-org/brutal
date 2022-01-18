@@ -1,5 +1,6 @@
 #include <brutal/debug.h>
 #include <brutal/task.h>
+#include <brutal/text.h>
 #include "test/test.h"
 
 static size_t _len = 0;
@@ -48,11 +49,11 @@ bool test_run(Test test)
     }
 }
 
-void test_run_by_name(Str name)
+void test_run_by_pattern(Str pattern)
 {
     for (size_t i = 0; i < _len; i++)
     {
-        if (str_eq(_tests[i].name, name))
+        if (glob_match_str(pattern, str$(_tests[i].name)))
         {
             test_run(_tests[i]);
         }
@@ -92,7 +93,7 @@ int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char const *argv[])
 {
     if (argc == 3 && str_eq(str$(argv[1]), str$("-t")))
     {
-        test_run_by_name(str$(argv[2]));
+        test_run_by_pattern(str$(argv[2]));
     }
     else
     {
