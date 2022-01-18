@@ -1,7 +1,6 @@
 #pragma once
 
-#include <brutal/base/defs.h>
-#include <brutal/io/write.h>
+#include <brutal/io/traits.h>
 #include <brutal/parse/scan.h>
 #include <brutal/text/case.h>
 #include <brutal/text/str.h>

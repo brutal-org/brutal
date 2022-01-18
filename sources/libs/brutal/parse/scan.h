@@ -1,7 +1,7 @@
 #pragma once
 
 #include <brutal/base/std.h>
-#include <brutal/io/write.h>
+#include <brutal/io/traits.h>
 #include <brutal/text/str.h>
 #include <ctype.h>
 

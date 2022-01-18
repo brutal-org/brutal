@@ -4,6 +4,7 @@
 #include <brutal/base/attributes.h>
 #include <brutal/base/keywords.h>
 #include <brutal/io/fmt.h>
+#include <brutal/io/funcs.h>
 #include <brutal/parse/nums.h>
 #include <brutal/text/case.h>
 #include <brutal/text/utf8.h>
@@ -222,7 +223,7 @@ IoResult fmt_signed(Fmt self, IoWriter writer, FmtInt value)
 
     if (value < 0)
     {
-        written += TRY(IoResult, io_putc(writer, '-'));
+        written += TRY(IoResult, io_write_byte(writer, '-'));
         value *= -1;
     }
 
@@ -293,20 +294,20 @@ IoResult fmt_float(Fmt self, IoWriter writer, double value)
 {
     if (isnan(value))
     {
-        return io_print(writer, str$("nan"));
+        return io_write_str(writer, str$("nan"));
     }
 
     int written = 0;
 
     if (value < 0)
     {
-        written += TRY(IoResult, io_putc(writer, '-'));
+        written += TRY(IoResult, io_write_byte(writer, '-'));
         value *= -1;
     }
 
     if (isinf(value))
     {
-        written += TRY(IoResult, io_print(writer, str$("inf")));
+        written += TRY(IoResult, io_write_str(writer, str$("inf")));
         return OK(IoResult, written);
     }
 
@@ -317,14 +318,14 @@ IoResult fmt_float(Fmt self, IoWriter writer, double value)
         return OK(IoResult, written);
     }
 
-    written += TRY(IoResult, io_putc(writer, '.'));
+    written += TRY(IoResult, io_write_byte(writer, '.'));
 
     value -= (FmtUInt)value;
 
     for (int i = 0; i < self.precison; i++)
     {
         value *= fmt_base(self);
-        written += TRY(IoResult, io_putc(writer, fmt_digit(self, (FmtUInt)value)));
+        written += TRY(IoResult, io_write_byte(writer, fmt_digit(self, (FmtUInt)value)));
         value -= (FmtUInt)value;
     }
 
@@ -370,7 +371,7 @@ IoResult fmt_char(Fmt self, IoWriter writer, unsigned int character)
 
     StrFix8 utf8 = utf8_from_rune((Rune)character);
 
-    written += TRY(IoResult, io_print(writer, str$(&utf8)));
+    written += TRY(IoResult, io_write_str(writer, str$(&utf8)));
 
     return OK(IoResult, written);
 }
@@ -379,12 +380,12 @@ IoResult fmt_string(Fmt self, IoWriter writer, Str value)
 {
     if (self.casing == CASE_DEFAULT)
     {
-        return io_print(writer, value);
+        return io_write_str(writer, value);
     }
     else
     {
         Buf buf = case_change(self.casing, value, alloc_global());
-        IoResult result = io_print(writer, buf_str(&buf));
+        IoResult result = io_write_str(writer, buf_str(&buf));
         buf_deinit(&buf);
         return result;
     }

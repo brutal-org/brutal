@@ -37,7 +37,7 @@ FsBlockResult file_block_acquire(FileBlock *self, void **buf, size_t count, size
 
     if (flags & FS_BLOCK_READ)
     {
-        io_pread(io_file_rwseek(&self->file), block.buf, count * 512, lba * 512);
+        io_pread(io_file_rseek(&self->file), block.buf, count * 512, lba * 512);
     }
 
     *buf = block.buf;
@@ -68,7 +68,7 @@ FsBlockResult file_block_release(FileBlock *self, void const **buf)
 
     if (block->flags & FS_BLOCK_WRITE)
     {
-        io_pwrite(io_file_rwseek(&self->file), block->buf, block->count * 512, block->lba * 512);
+        io_pwrite(io_file_wseek(&self->file), block->buf, block->count * 512, block->lba * 512);
     }
 
     vec_splice(&self->blocks, block_idx, 1);

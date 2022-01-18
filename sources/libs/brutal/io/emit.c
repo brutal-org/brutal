@@ -1,6 +1,7 @@
 #include <brutal/base/attributes.h>
 #include <brutal/debug/assert.h>
 #include <brutal/io/emit.h>
+#include <brutal/io/funcs.h>
 
 void emit_init(Emit *self, IoWriter writer)
 {
@@ -42,7 +43,7 @@ static IoResult emit_write_impl(void *ctx, uint8_t const *data, size_t size)
         {
             for (int j = 0; j < self->indent_size * self->indent; j++)
             {
-                written += TRY(IoResult, io_putc(self->writer, ' '));
+                written += TRY(IoResult, io_write_byte(self->writer, ' '));
             }
 
             self->line_begin = false;
@@ -53,7 +54,7 @@ static IoResult emit_write_impl(void *ctx, uint8_t const *data, size_t size)
             self->line_begin = true;
         }
 
-        written += TRY(IoResult, io_putc(self->writer, data[i]));
+        written += TRY(IoResult, io_write_byte(self->writer, data[i]));
     }
 
     return OK(IoResult, written);

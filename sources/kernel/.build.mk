@@ -13,7 +13,8 @@ KERNEL_SRC += \
 	sources/libs/brutal/io/fmt.c                   \
 	sources/libs/brutal/io/print.c                 \
 	sources/libs/brutal/io/emit.c                  \
-	sources/libs/brutal/io/write.c                 \
+	sources/libs/brutal/io/funcs.c                 \
+	sources/libs/brutal/io/base.c                 \
 	sources/libs/brutal/time/convert.c             \
 	sources/libs/elf/elf.c                         \
 	sources/libs/bal/boot/handover.c               \

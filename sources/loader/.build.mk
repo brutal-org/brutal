@@ -36,21 +36,21 @@ LOADER_LDFLAGS= \
 	-fuse-ld=lld-link
 
 LOADER_SRC = \
-	sources/libs/brutal/io/buf.c                    \
-	sources/libs/brutal/io/fmt.c                    \
-	sources/libs/brutal/io/file.c                   \
-	sources/libs/brutal/io/std.c                    \
-	sources/libs/brutal/io/print.c                  \
-	sources/libs/brutal/io/read.c                   \
-	sources/libs/brutal/parse/scan.c                \
-	sources/libs/brutal/parse/nums.c                \
-	sources/libs/brutal/parse/lex.c                 \
-	sources/libs/brutal/io/write.c                  \
-	sources/libs/brutal/io/emit.c                   \
-	sources/libs/hw/fdt/fdt.c                       \
 	sources/libs/bal/boot/handover.c                \
-	sources/libs/stdc/ansi/string.c			        \
+	sources/libs/brutal/io/buf.c                    \
+	sources/libs/brutal/io/emit.c                   \
+	sources/libs/brutal/io/file.c                   \
+	sources/libs/brutal/io/fmt.c                    \
+	sources/libs/brutal/io/funcs.c                  \
+	sources/libs/brutal/io/base.c                   \
+	sources/libs/brutal/io/print.c                  \
+	sources/libs/brutal/io/std.c                    \
+	sources/libs/brutal/parse/lex.c                 \
+	sources/libs/brutal/parse/nums.c                \
+	sources/libs/brutal/parse/scan.c                \
+	sources/libs/hw/fdt/fdt.c                       \
 	sources/libs/stdc/ansi/ctype.c			        \
+	sources/libs/stdc/ansi/string.c			        \
 	$(wildcard sources/loader/*.c) 					\
 	$(wildcard sources/libs/json/parser.c)		    \
 	$(wildcard sources/libs/json/objects.c)		    \

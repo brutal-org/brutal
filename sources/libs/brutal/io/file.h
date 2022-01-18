@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/io/rwseek.h>
+#include <brutal/io/traits.h>
 #include <embed/file-decl.h>
 
 typedef struct
@@ -20,6 +20,8 @@ IoDuplex io_file_duplex(IoFile *self);
 
 IoSeeker io_file_seeker(IoFile *self);
 
-IoRwSeek io_file_rwseek(IoFile *self);
+IoRSeek io_file_rseek(IoFile *self);
+
+IoWSeek io_file_wseek(IoFile *self);
 
 MaybeError io_file_close(IoFile *self);

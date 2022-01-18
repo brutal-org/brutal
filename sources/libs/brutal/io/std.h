@@ -1,7 +1,6 @@
 #pragma once
 
-#include <brutal/io/read.h>
-#include <brutal/io/write.h>
+#include <brutal/io/traits.h>
 
 typedef enum
 {
@@ -15,3 +14,9 @@ IoReader io_chan_in(void);
 IoWriter io_chan_out(void);
 
 IoWriter io_chan_err(void);
+
+IoReader io_chan_in_locked(void);
+
+IoWriter io_chan_out_locked(void);
+
+IoWriter io_chan_err_locked(void);

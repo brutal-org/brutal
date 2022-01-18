@@ -158,7 +158,8 @@ Json json_parse_file(Str path, Alloc *alloc)
     IoFile file;
     io_file_open(&file, path);
 
-    Buf buf = io_readall(io_file_reader(&file), alloc);
+    Buf buf;
+    io_read_all(io_file_reader(&file), &buf, alloc);
 
     Scan scan = {};
     scan_init(&scan, buf_str(&buf));

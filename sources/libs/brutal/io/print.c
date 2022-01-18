@@ -1,6 +1,7 @@
 #include <brutal/base/attributes.h>
 #include <brutal/debug/locked.h>
 #include <brutal/io/fmt.h>
+#include <brutal/io/funcs.h>
 #include <brutal/io/print.h>
 #include <brutal/parse/scan.h>
 
@@ -103,12 +104,12 @@ IoResult print_impl(IoWriter writer, Str format, PrintArgs args)
         if (scan_skip_word(&scan, str$("{{")))
         {
             skip_fmt = false;
-            written += TRY(IoResult, io_putc(writer, '{'));
+            written += TRY(IoResult, io_write_byte(writer, '{'));
         }
         else if (scan_skip_word(&scan, str$("}}")))
         {
             skip_fmt = false;
-            written += TRY(IoResult, io_putc(writer, '}'));
+            written += TRY(IoResult, io_write_byte(writer, '}'));
         }
         else if (scan_curr(&scan) == '{' && !skip_fmt)
         {
@@ -120,7 +121,7 @@ IoResult print_impl(IoWriter writer, Str format, PrintArgs args)
             }
             else
             {
-                written += TRY(IoResult, io_print(writer, str$("{}")));
+                written += TRY(IoResult, io_write_str(writer, str$("{}")));
             }
 
             current++;
@@ -133,7 +134,7 @@ IoResult print_impl(IoWriter writer, Str format, PrintArgs args)
         else
         {
             skip_fmt = false;
-            written += TRY(IoResult, io_putc(writer, scan_next(&scan)));
+            written += TRY(IoResult, io_write_byte(writer, scan_next(&scan)));
         }
     }
 

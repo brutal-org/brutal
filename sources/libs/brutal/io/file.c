@@ -44,10 +44,18 @@ IoDuplex io_file_duplex(IoFile *self)
     };
 }
 
-IoRwSeek io_file_rwseek(IoFile *self)
+IoRSeek io_file_rseek(IoFile *self)
 {
-    return (IoRwSeek){
-        .duplex = io_file_duplex(self),
+    return (IoRSeek){
+        .reader = io_file_reader(self),
+        .seeker = io_file_seeker(self),
+    };
+}
+
+IoWSeek io_file_wseek(IoFile *self)
+{
+    return (IoWSeek){
+        .writer = io_file_writer(self),
         .seeker = io_file_seeker(self),
     };
 }
