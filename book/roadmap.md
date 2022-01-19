@@ -8,7 +8,7 @@ The following roadmap is always subject to change.
 
 - [ ] BBus
     - [ ] Capabilities
-- [] Graphic Library
+- [ ] Graphic Library
     - [x] SDL Backend
         - [x] Render
         - [x] Events
@@ -50,7 +50,7 @@ The following roadmap is always subject to change.
         - [x] Read
         - [x] Write
     - [ ] Ext2Fs
-        - [ ] Read
+        - [x] Read
         - [ ] Write
 
 ### Milestone 5 - Networking and Shell
