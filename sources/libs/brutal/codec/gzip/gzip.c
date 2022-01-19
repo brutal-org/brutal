@@ -1,7 +1,7 @@
 #include <brutal/codec/deflate/inflate.h>
 #include <brutal/codec/errors.h>
 #include <brutal/codec/gzip/gzip.h>
-#include <brutal/hash/adler32.h>
+#include <brutal/hash/crc32.h>
 #include <brutal/io/mem.h>
 
 typedef enum
@@ -36,7 +36,7 @@ IoResult gzip_decompress_stream(IoWriter writer, IoReader reader)
     // Flags
     TRY(IoResult, io_read(reader, &id2, 1));
 
-    //
+    // Check this a valid gzip stream
     if (id1 != 0x1f || id2 != 0x8b)
     {
         return ERR(IoResult, ERR_INVALID_DATA);
@@ -102,8 +102,31 @@ IoResult gzip_decompress_stream(IoWriter writer, IoReader reader)
         // TODO: Header CRC32C
     }
 
-    // TODO: Data CRC32C
-    size_t decompressed = TRY(IoResult, deflate_decompress_stream(writer, reader));
+    // Calculate the Crc32 checksum of the uncompressed data on the fly
+    Crc32 crc;
+    crc32_init(&crc, writer);
+    IoWriter checksum_writer = crc32_writer(&crc);
+
+    size_t decompressed = TRY(IoResult, deflate_decompress_stream(checksum_writer, reader));
+
+    // Get CRC-32 checksum of original data
+    le_uint32_t value;
+    TRY(IoResult, io_read(reader, (uint8_t *)&value, 4));
+    uint32_t crc32 = load_le(value);
+
+    if (crc32 != crc32_get(&crc))
+    {
+        return ERR(IoResult, ERR_CHECKSUM_MISMATCH);
+    }
+
+    // Get the stored size of the uncompressed data
+    TRY(IoResult, io_read(reader, (uint8_t *)&value, 4));
+    uint32_t data_length = load_le(value);
+
+    if (data_length != decompressed)
+    {
+        return ERR(IoResult, ERR_INVALID_DATA);
+    }
 
     return OK(IoResult, decompressed);
 }
