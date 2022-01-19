@@ -85,7 +85,7 @@ $(BINDIR_LOADER)/libs/%.c.o: sources/libs/%.c
 	@$(MKCWD)
 	$(LOADER_CC) -c -o $@ $< $(LOADER_CFLAGS)
 
-$(BINDIR_LOADER)/tools/OVMF.fd:
+$(CACHEDIR)/OVMF.fd:
 	$(MKCWD)
 	wget https://retrage.github.io/edk2-nightly/bin/DEBUGX64_OVMF.fd
 	mv DEBUGX64_OVMF.fd $@

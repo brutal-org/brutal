@@ -51,13 +51,20 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
+
+# VScode
 .vscode/
 
+
+# Build Output
 bin/
+.cache/
 
 build/toolchain/gnu/build
 build/toolchain/gnu/local
 build/toolchain/gnu/tarballs
 
 book/brutal.pdf
+
+# MacOS
 .DS_STORE

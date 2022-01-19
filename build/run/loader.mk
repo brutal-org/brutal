@@ -1,7 +1,7 @@
 
 # x86 use the loader
 
-run: $(LOADER) $(PKGS) $(KERNEL) $(BINDIR_LOADER)/tools/OVMF.fd
+run: $(LOADER) $(PKGS) $(KERNEL) $(CACHEDIR)/OVMF.fd
 	$(MKCWD)
 
 	mkdir -p $(BINDIR_LOADER)/image
@@ -18,6 +18,6 @@ run: $(LOADER) $(PKGS) $(KERNEL) $(BINDIR_LOADER)/tools/OVMF.fd
 		-no-reboot \
 		-no-shutdown \
 		-no-reboot -no-shutdown\
-		-bios $(BINDIR_LOADER)/tools/OVMF.fd \
+		-bios $(CACHEDIR)/OVMF.fd \
 		-drive file=fat:rw:$(BINDIR_LOADER)/image,media=disk,format=raw
 
