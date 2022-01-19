@@ -1,8 +1,11 @@
+#include <brutal/alloc/global.h>
+#include <brutal/codec/deflate/deflate.h>
 #include <brutal/codec/deflate/inflate.h>
 #include <brutal/codec/errors.h>
 #include <brutal/codec/gzip/gzip.h>
 #include <brutal/hash/crc32.h>
 #include <brutal/io/mem.h>
+#include <brutal/debug.h>
 
 typedef enum
 {
@@ -104,7 +107,7 @@ IoResult gzip_decompress_stream(IoWriter writer, IoReader reader)
 
     // Calculate the Crc32 checksum of the uncompressed data on the fly
     Crc32 crc;
-    crc32_init(&crc, writer);
+    crc32_init_writer(&crc, writer);
     IoWriter checksum_writer = crc32_writer(&crc);
 
     size_t decompressed = TRY(IoResult, deflate_decompress_stream(checksum_writer, reader));
@@ -129,4 +132,60 @@ IoResult gzip_decompress_stream(IoWriter writer, IoReader reader)
     }
 
     return OK(IoResult, decompressed);
+}
+
+IoResult gzip_compress_data(const uint8_t *in, size_t in_len, const uint8_t *out, size_t out_len)
+{
+    // Input
+    IoMem in_view;
+    io_mem_init(&in_view, in_len, in);
+    IoReader reader = io_mem_reader(&in_view);
+
+    // Output
+    IoMem out_view;
+    io_mem_init(&out_view, out_len, out);
+    IoWriter writer = io_mem_writer(&out_view);
+
+    return gzip_compress_stream(writer, reader);
+}
+
+IoResult gzip_compress_stream(IoWriter writer, IoReader reader)
+{
+    uint8_t id1 = 0x1f, id2 = 0x8b;
+    // Write CMF (compression method & flags)
+    TRY(IoResult, io_write(writer, &id1, 1));
+    // Flags
+    TRY(IoResult, io_write(writer, &id2, 1));
+    // Compression method
+    uint8_t cm = 8;
+    TRY(IoResult, io_write(writer, &cm, 1));
+    // Flags
+    uint8_t flags = 0;
+    TRY(IoResult, io_write(writer, &flags, 1));
+    // Write unused bytes
+    uint8_t null_byte = 0;
+    for (size_t i = 0; i < 6; i++)
+        TRY(IoResult, io_write(writer, &null_byte, 1));
+
+    // Calculate the Crc32 checksum of the uncompressed data on the fly
+    Crc32 crc;
+    crc32_init_reader(&crc, reader);
+    IoReader checksum_reader = crc32_reader(&crc);
+
+    DeflateCompressor ctx;
+    deflate_init(&ctx, 0, alloc_global());
+    size_t compressed = TRY(IoResult, deflate_compress_stream(&ctx, writer, checksum_reader));
+    deflate_deinit(&ctx);
+
+    // Write CRC-32 checksum of original data
+    le_uint32_t value;
+    store_le(crc32_get(&crc), &value);
+    TRY(IoResult, io_write(writer, (uint8_t *)&value, 4));
+
+    // Write size of original data
+    size_t count = crc32_count(&crc);
+    store_le(count, &value);
+    TRY(IoResult, io_write(writer, (uint8_t *)&value, 4));
+
+    return OK(IoResult, compressed);
 }
