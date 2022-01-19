@@ -7,22 +7,37 @@ static const uint32_t crc32tab[16] = {
     0xD6D6A3E8, 0xCB61B38C, 0x9B64C2B0, 0x86D3D2D4, 0xA00AE278,
     0xBDBDF21C};
 
-void crc32_init(Crc32 *self, IoWriter underlying)
+void crc32_init_writer(Crc32 *self, IoWriter base)
 {
     self->crc = 0xFFFFFFFF;
-    self->underlying = underlying;
+    self->count = 0;
+    self->base_writer = base;
+}
+
+void crc32_init_reader(Crc32 *self, IoReader base)
+{
+    self->crc = 0xFFFFFFFF;
+    self->count = 0;
+    self->base_reader = base;
+}
+
+static uint32_t crc32_impl(uint32_t crc, uint8_t const *data, size_t size)
+{
+    for (size_t n = 0; n < size; ++n)
+    {
+        crc ^= data[n];
+        crc = crc32tab[crc & 0x0F] ^ (crc >> 4);
+        crc = crc32tab[crc & 0x0F] ^ (crc >> 4);
+    }
+    return crc;
 }
 
 static IoResult crc32_write_impl(Crc32 *self, uint8_t const *data, size_t size)
 {
-    for (size_t n = 0; n < size; ++n)
-    {
-        self->crc ^= data[n];
-        self->crc = crc32tab[self->crc & 0x0F] ^ (self->crc >> 4);
-        self->crc = crc32tab[self->crc & 0x0F] ^ (self->crc >> 4);
-    }
+    self->crc = crc32_impl(self->crc, data, size);
+    self->count += size;
 
-    return io_write(self->underlying, data, size);
+    return io_write(self->base_writer, data, size);
 }
 
 IoWriter crc32_writer(Crc32 *self)
@@ -33,22 +48,37 @@ IoWriter crc32_writer(Crc32 *self)
     };
 }
 
+static IoResult crc32_read_impl(Crc32 *self, uint8_t *data, size_t size)
+{
+    size_t read = TRY(IoResult, io_read(self->base_reader, data, size));
+    self->crc = crc32_impl(self->crc, data, read);
+    self->count += read;
+
+    return OK(IoResult, read);
+}
+
+IoReader crc32_reader(Crc32 *self)
+{
+    return (IoReader){
+        .read = (IoReadFn *)crc32_read_impl,
+        .context = self,
+    };
+}
+
 uint32_t crc32_get(Crc32 *self)
 {
     return self->crc ^ 0xFFFFFFFF;
 }
 
-uint32_t crc32(void const *buf, size_t len)
+size_t crc32_count(Crc32 *self)
 {
-    uint8_t *bp = (uint8_t *)buf;
-    uint32_t crc = 0xFFFFFFFF;
+    return self->count;
+}
 
-    for (size_t n = 0; n < len; ++n)
-    {
-        crc ^= bp[n];
-        crc = crc32tab[crc & 0x0F] ^ (crc >> 4);
-        crc = crc32tab[crc & 0x0F] ^ (crc >> 4);
-    }
+uint32_t crc32(void const *buf, size_t size)
+{
+    uint8_t *data = (uint8_t *)buf;
+    uint32_t crc = crc32_impl(0xFFFFFFFF, data, size);
 
     return crc ^ 0xFFFFFFFF;
 }

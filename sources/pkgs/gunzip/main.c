@@ -7,7 +7,7 @@ int main(int argc, char const *argv[])
 {
     if (argc < 2)
     {
-        log$("Usage: gzip [OPTION]... [INPUT] [OUTPUT]", argv[0]);
+        log$("Usage: gunzip [OPTION]... [INPUT] [OUTPUT]", argv[0]);
         return -1;
     }
 
@@ -16,7 +16,7 @@ int main(int argc, char const *argv[])
 
     IoFile dest_file;
     io_file_create(&dest_file, str$(argv[2]));
-    IoResult result = gzip_compress_stream(io_file_writer(&dest_file), io_file_reader(&source_file));
+    IoResult result = gzip_decompress_stream(io_file_writer(&dest_file), io_file_reader(&source_file));
     if (!result.succ)
     {
         return -1;
