@@ -4,7 +4,7 @@
 #include <brutal/alloc.h>
 #include <brutal/debug.h>
 #include <pci/pci.h>
-#include <protos/hw/pci.h>
+#include <protos/pci.h>
 
 typedef struct
 {

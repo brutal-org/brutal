@@ -115,8 +115,7 @@ Iter ipc_component_query(IpcComponent *self, uint32_t proto, IterFn *iter, void 
 {
     vec_foreach(cap, &self->capabilities)
     {
-        if (cap->type == IPC_CAPABILITY_ADDR && cap->addr.proto == proto &&
-            iter(cap, ctx) == ITER_STOP)
+        if (cap->proto == proto && iter(cap, ctx) == ITER_STOP)
         {
             return ITER_STOP;
         }
@@ -138,13 +137,11 @@ IpcCapability ipc_component_provide(IpcComponent *self, uint32_t id, IpcHandler 
     vec_push(&self->providers, provider);
 
     return (IpcCapability){
-        .addr = {
-            .address = (BrAddr){
-                bal_self_id(),
-                provider->port,
-            },
-            .proto = provider->port,
+        .address = (BrAddr){
+            bal_self_id(),
+            provider->port,
         },
+        .proto = provider->port,
     };
 }
 

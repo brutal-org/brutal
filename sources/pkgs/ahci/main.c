@@ -3,8 +3,8 @@
 #include <brutal/alloc.h>
 #include <brutal/debug.h>
 #include <ipc/ipc.h>
-#include <protos/hw/pci.h>
-#include <protos/serv/bbus.h>
+#include <protos/pci.h>
+#include <protos/bbus.h>
 
 int br_entry_args(
     MAYBE_UNUSED long arg1,
