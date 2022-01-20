@@ -168,7 +168,6 @@ int br_entry_handover(Handover *handover)
     pci_iter(&pci, iter_pci, &pci);
 
     IpcEv ev = {};
-    ev.ctx = &pci;
     br_ev_init(&ev, &pci, alloc_global());
     pci_impl(&ev, &pci_vtable);
 
