@@ -6,7 +6,7 @@
 #include <pci/capabilities.h>
 #include <pci/config.h>
 #include <pci/group.h>
-#include <protos/hw/pci.h>
+#include <protos/pci.h>
 
 typedef struct
 {
