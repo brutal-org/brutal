@@ -38,7 +38,9 @@ IoResult fmt_signed(Fmt self, IoWriter writer, FmtInt value);
 
 IoResult fmt_unsigned(Fmt self, IoWriter writer, FmtUInt value);
 
+#ifndef __freestanding__
 IoResult fmt_float(Fmt self, IoWriter writer, double value);
+#endif
 
 IoResult fmt_string(Fmt self, IoWriter writer, Str string);
 

@@ -34,7 +34,9 @@ struct print_value
     {
         FmtInt _signed;
         FmtUInt _unsigned;
+#ifndef __freestanding__
         double _float;
+#endif
         Str _string;
         void *_pointer;
         char _char;
@@ -45,7 +47,9 @@ PrintValue print_val_signed(FmtInt);
 
 PrintValue print_val_unsigned(FmtUInt);
 
+#ifndef __freestanding__
 PrintValue print_val_float(double);
+#endif
 
 PrintValue print_val_string(Str);
 
@@ -56,6 +60,8 @@ PrintValue print_val_char(char);
 PrintValue print_val_pointer(void *);
 
 // clang-format off
+
+#ifndef __freestanding__
 
 #define PRINT_MATCH(VALUE)                      \
     _Generic((VALUE),                           \
@@ -78,6 +84,30 @@ PrintValue print_val_pointer(void *);
         Str: print_val_string,                  \
         void*: print_val_pointer                \
     )(VALUE),
+
+#else
+
+#define PRINT_MATCH(VALUE)                      \
+    _Generic((VALUE),                           \
+        signed char: print_val_signed,          \
+        signed short: print_val_signed,         \
+        signed int: print_val_signed,           \
+        signed long: print_val_signed,          \
+	    signed long long: print_val_signed,     \
+                                                \
+        unsigned char: print_val_unsigned,      \
+        unsigned short: print_val_unsigned,     \
+        unsigned int: print_val_unsigned,       \
+        unsigned long: print_val_unsigned,      \
+	    unsigned long long: print_val_unsigned, \
+        char*: print_val_cstring,               \
+        char const*: print_val_cstring,         \
+        char: print_val_char,                   \
+        Str: print_val_string,                  \
+        void*: print_val_pointer                \
+    )(VALUE),
+
+#endif
 
 #define named$(NAME, VALUE) ({                  \
        PrintValue pv = PRINT_MATCH(VALUE);      \

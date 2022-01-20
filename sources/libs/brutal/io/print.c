@@ -15,18 +15,17 @@ PrintValue print_val_unsigned(FmtUInt val)
     return (PrintValue){nullstr, PRINT_UNSIGNED, {._unsigned = val}};
 }
 
+#ifndef __freestanding__
 PrintValue print_val_float(MAYBE_UNUSED double val)
 {
-#ifndef __freestanding__
     return (PrintValue){nullstr, PRINT_FLOAT, {._float = val}};
-#else
     return (PrintValue){
         nullstr,
         PRINT_STRING,
         {._string = str$("<float>")},
     };
-#endif
 }
+#endif
 
 PrintValue print_val_cstring(char const *val)
 {
