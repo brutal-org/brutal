@@ -6,9 +6,18 @@
 typedef struct
 {
     Str name;
+    Vec(Str) args;
+} IdlAttr;
+
+typedef Vec(IdlAttr) IdlAttrs;
+
+typedef struct _IdlAlias
+{
+    Str name;
     Str mangled;
 
     IdlType type;
+    IdlAttrs attrs;
 } IdlAlias;
 
 typedef struct
@@ -18,14 +27,34 @@ typedef struct
 
     IdlType request;
     IdlType response;
+
+    IdlAttrs attrs;
 } IdlMethod;
 
 typedef struct
 {
     uint32_t id;
     Str name;
-
-    IdlType errors;
-    Vec(IdlAlias) aliases;
+    IdlAttrs attrs;
     Vec(IdlMethod) methods;
 } IdlIface;
+
+typedef struct _IdlImport IdlImport;
+
+typedef struct _IdlModule
+{
+    Str name;
+    IdlAttrs attrs;
+
+    Vec(IdlImport) imports;
+    Vec(Str) includes;
+    IdlType errors;
+    Vec(IdlAlias) aliases;
+    Vec(IdlIface) ifaces;
+} IdlModule;
+
+struct _IdlImport
+{
+    Str name;
+    IdlModule module;
+};

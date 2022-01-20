@@ -1,54 +1,7 @@
 #include <brutal/hash.h>
 #include <idl/ast/builder.h>
 
-IdlIface idl_iface(Str name, Alloc *alloc)
-{
-    IdlIface iface = idl_iface_barebone(name, alloc);
-
-    iface.errors = idl_enum(alloc);
-
-    idl_enum_constant(&iface.errors, str$("SUCCESS"));
-    idl_enum_constant(&iface.errors, str$("UNEXPECTED_MESSAGE"));
-    idl_enum_constant(&iface.errors, str$("BAD_COMMUNICATION"));
-
-    return iface;
-}
-
-IdlIface idl_iface_barebone(Str name, Alloc *alloc)
-{
-    IdlIface iface;
-
-    iface.errors = idl_nil();
-    iface.name = name;
-    iface.id = fnv_32(name.buf, name.len, FNV1_32_INIT);
-
-    vec_init(&iface.aliases, alloc);
-    vec_init(&iface.methods, alloc);
-
-    return iface;
-}
-
-void idl_alias(IdlIface *iface, Str name, IdlType type)
-{
-    idl_alias_mangled(iface, name, nullstr, type);
-}
-
-void idl_alias_mangled(IdlIface *iface, Str name, Str mangled, IdlType type)
-{
-    IdlAlias alias = {name, mangled, type};
-    vec_push(&iface->aliases, alias);
-}
-
-void idl_method(IdlIface *iface, Str name, IdlType request, IdlType response)
-{
-    idl_method_mangled(iface, name, nullstr, request, response);
-}
-
-void idl_method_mangled(IdlIface *iface, Str name, Str mangled, IdlType request, IdlType response)
-{
-    IdlMethod method = {name, mangled, request, response};
-    vec_push(&iface->methods, method);
-}
+/* --- Types ---------------------------------------------------------------- */
 
 IdlType idl_nil(void)
 {
@@ -57,18 +10,33 @@ IdlType idl_nil(void)
     };
 }
 
-IdlType idl_primitive(Str str)
+IdlType idl_ctype(Str ctype)
 {
-    return idl_primitive_mangled(str, nullstr);
+    return (IdlType){
+        .type = IDL_TYPE_CTYPE,
+        .ctype_ = {
+            .name = ctype,
+        },
+    };
 }
 
-IdlType idl_primitive_mangled(Str str, Str mangled)
+IdlType idl_primitive(Str str)
 {
     return (IdlType){
         .type = IDL_TYPE_PRIMITIVE,
         .primitive_ = {
             .name = str,
-            .mangled = mangled,
+        },
+    };
+}
+
+IdlType idl_primitive_resolved(Str str, IdlAlias alias, Alloc* alloc)
+{
+    return (IdlType){
+        .type = IDL_TYPE_PRIMITIVE,
+        .primitive_ = {
+            .name = str,
+            .alias = alloc_move(alloc, alias),
         },
     };
 }
@@ -129,4 +97,136 @@ IdlType idl_vec(IdlType subtype, Alloc *alloc)
             .subtype = alloc_move(alloc, subtype),
         },
     };
+}
+/* --- Attributes ----------------------------------------------------------- */
+
+IdlAttrs idl_attrs(Alloc *alloc)
+{
+    IdlAttrs attrs = {};
+    vec_init(&attrs, alloc);
+    return attrs;
+}
+
+void idl_attrs_append(IdlAttrs *attrs, IdlAttr attr)
+{
+    vec_push(attrs, attr);
+}
+
+IdlAttr idl_attr(Str name, Alloc *alloc)
+{
+    IdlAttr attr = {};
+    attr.name = name;
+    vec_init(&attr.args, alloc);
+    return attr;
+}
+
+void idl_attr_append(IdlAttr *attr, Str data)
+{
+    vec_push(&attr->args, data);
+}
+
+/* --- Methods -------------------------------------------------------------- */
+
+IdlMethod idl_method(Str name, IdlAttrs attrs, IdlType request, IdlType response)
+{
+    return idl_method_mangled(name, nullstr, attrs, request, response);
+}
+
+IdlMethod idl_method_mangled(Str name, Str mangled, IdlAttrs attrs, IdlType request, IdlType response)
+{
+    IdlMethod method = {
+        .name = name,
+        .mangled = mangled,
+        .request = request,
+        .response = response,
+        .attrs = attrs,
+    };
+
+    return method;
+}
+
+/* --- Aliases -------------------------------------------------------------- */
+
+IdlAlias idl_alias(Str name, IdlAttrs attrs, IdlType type)
+{
+    return idl_alias_mangled(name, nullstr, attrs, type);
+}
+
+IdlAlias idl_alias_mangled(Str name, Str mangled, IdlAttrs attrs, IdlType type)
+{
+    IdlAlias alias = {
+        .name = name,
+        .mangled = mangled,
+        .type = type,
+        .attrs = attrs,
+    };
+
+    return alias;
+}
+
+/* --- Interfaces ----------------------------------------------------------- */
+
+IdlIface idl_iface(Str name, IdlAttrs attrs, Alloc *alloc)
+{
+    IdlIface iface = {};
+
+    iface.id = fnv_32(name.buf, name.len, FNV1_32_INIT);
+    iface.name = name;
+    iface.attrs = attrs;
+
+    vec_init(&iface.methods, alloc);
+
+    return iface;
+}
+
+void idl_iface_methode(IdlIface *iface, IdlMethod method)
+{
+    vec_push(&iface->methods, method);
+}
+
+/* --- Modules -------------------------------------------------------------- */
+
+IdlModule idl_module(Str name, Alloc *alloc)
+{
+    IdlModule module = {
+        .name = name,
+    };
+
+    module.errors = idl_enum(alloc);
+
+    idl_enum_constant(&module.errors, str$("SUCCESS"));
+    idl_enum_constant(&module.errors, str$("UNEXPECTED_MESSAGE"));
+    idl_enum_constant(&module.errors, str$("BAD_COMMUNICATION"));
+
+    vec_init(&module.aliases, alloc);
+    vec_init(&module.imports, alloc);
+    vec_init(&module.includes, alloc);
+    vec_init(&module.aliases, alloc);
+    vec_init(&module.ifaces, alloc);
+
+    return module;
+}
+
+void idl_module_import(IdlModule *module, Str name)
+{
+    IdlImport import = {
+        .name = name,
+    };
+
+    vec_push(&module->imports, import);
+}
+
+void idl_module_include(IdlModule *module, Str name)
+{
+    vec_push(&module->includes, name);
+}
+
+void idl_module_alias(IdlModule *module, IdlAlias alias)
+{
+    vec_push(&module->aliases, alias);
+}
+
+void idl_module_iface(IdlModule *module, IdlIface iface)
+{
+    vec_push(&module->ifaces, iface);
 }

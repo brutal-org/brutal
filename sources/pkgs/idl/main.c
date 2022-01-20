@@ -8,54 +8,6 @@
 #include <idl/pass.h>
 #include <json/emit.h>
 
-void idl_emit_json(BidIface const iface, IoWriter writer)
-{
-    HeapAlloc heap;
-    heap_alloc_init(&heap, NODE_DEFAULT);
-
-    Json json = idl_jgen_iface(iface, alloc_global());
-    heap_alloc_deinit(&heap);
-
-    Emit emit;
-    emit_init(&emit, writer);
-    json_emit(json, &emit);
-    emit_deinit(&emit);
-
-    heap_alloc_deinit(&heap);
-}
-
-void idl_emit_source(BidIface const iface, IoWriter writer)
-{
-    HeapAlloc heap;
-    heap_alloc_init(&heap, NODE_DEFAULT);
-
-    CUnit unit = idl_cgen_source(iface, alloc_global());
-    heap_alloc_deinit(&heap);
-
-    Emit emit;
-    emit_init(&emit, writer);
-    cc_trans_unit(&emit, unit);
-    emit_deinit(&emit);
-
-    heap_alloc_deinit(&heap);
-}
-
-void idl_emit_header(BidIface const iface, IoWriter writer)
-{
-    HeapAlloc heap;
-    heap_alloc_init(&heap, NODE_DEFAULT);
-
-    CUnit unit = idl_cgen_header(iface, alloc_global());
-    heap_alloc_deinit(&heap);
-
-    Emit emit;
-    emit_init(&emit, writer);
-    cc_trans_unit(&emit, unit);
-    emit_deinit(&emit);
-
-    heap_alloc_deinit(&heap);
-}
-
 int main(int argc, char const *argv[])
 {
     if (argc != 3)
@@ -84,32 +36,39 @@ int main(int argc, char const *argv[])
     Scan scan;
     scan_init(&scan, buf_str(&source_buf));
 
-    IdlIface iface = idl_parse(&scan, base$(&heap));
+    IdlModule module = idl_parse(&scan, base$(&heap));
 
     if (scan_dump_error(&scan, io_chan_err()))
     {
         return -1;
     }
 
+    Emit emit;
+    emit_init(&emit, io_chan_out());
+
+    module = idl_pass_prefix(module, base$(&heap));
+
     if (str_eq(str$("--json"), str$(argv[2])))
     {
-        iface = idl_pass_prefix(iface, base$(&heap));
-        idl_emit_json(iface, io_chan_out());
+        Json json = idl_jgen_module(module, base$(&heap));
+        json_emit(json, &emit);
     }
     else if (str_eq(str$("--source"), str$(argv[2])))
     {
-        iface = idl_pass_prefix(iface, base$(&heap));
-        idl_emit_source(iface, io_chan_out());
+        CUnit unit = idl_cgen_source(module, base$(&heap));
+        cc_trans_unit(&emit, unit);
     }
     else if (str_eq(str$("--header"), str$(argv[2])))
     {
-        iface = idl_pass_prefix(iface, base$(&heap));
-        idl_emit_header(iface, io_chan_out());
+        CUnit unit = idl_cgen_header(module, base$(&heap));
+        cc_trans_unit(&emit, unit);
     }
     else
     {
         panic$("Unknow option {}", argv[2]);
     }
+
+    emit_deinit(&emit);
 
     return 0;
 }

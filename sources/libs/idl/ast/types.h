@@ -2,12 +2,17 @@
 
 #include <brutal/ds.h>
 
-typedef struct idl_type IdlType;
+typedef struct _IdlType IdlType;
 
 typedef struct
 {
     Str name;
-    Str mangled;
+} IdlCtype;
+
+typedef struct
+{
+    Str name;
+    struct _IdlAlias *alias;
 } IdlPrimitive;
 
 typedef struct
@@ -15,14 +20,14 @@ typedef struct
     IdlType *subtype;
 } IdlVec;
 
-typedef struct idl_enum_member IdlEnumMember;
+typedef struct _IdlEnumMember IdlEnumMember;
 
 typedef struct
 {
     Vec(IdlEnumMember) members;
 } IdlEnum;
 
-typedef struct idl_struct_member IdlStructMember;
+typedef struct _IdlStructMember IdlStructMember;
 
 typedef struct
 {
@@ -33,18 +38,20 @@ typedef enum
 {
     IDL_TYPE_NIL,
 
+    IDL_TYPE_CTYPE,
     IDL_TYPE_PRIMITIVE,
     IDL_TYPE_ENUM,
     IDL_TYPE_STRUCT,
     IDL_TYPE_VEC,
 } IdlTypeType;
 
-struct idl_type
+struct _IdlType
 {
     IdlTypeType type;
 
     union
     {
+        IdlCtype ctype_;
         IdlPrimitive primitive_;
         IdlEnum enum_;
         IdlStruct struct_;
@@ -52,13 +59,13 @@ struct idl_type
     };
 };
 
-struct idl_enum_member
+struct _IdlEnumMember
 {
     Str name;
     Str mangled;
 };
 
-struct idl_struct_member
+struct _IdlStructMember
 {
     Str name;
     IdlType type;

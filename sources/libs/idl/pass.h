@@ -2,4 +2,4 @@
 
 #include <idl/ast.h>
 
-IdlIface idl_pass_prefix(IdlIface iface, Alloc *alloc);
+IdlModule idl_pass_prefix(IdlModule module, Alloc *alloc);

@@ -4,7 +4,7 @@
 
 CType idl_cgen_provider_type(IdlIface const iface, Alloc *alloc)
 {
-    CType ctype = ctype_func(ctype_void(), alloc);
+    CType ctype = ctype_func(ctype_ident(str$("IpcCapability")), alloc);
     CType vtable_type = ctype_ident(str_fmt(alloc, "{}VTable", iface.name));
     CType ipc_type = ctype_ident(str$("IpcComponent"));
 
@@ -26,7 +26,7 @@ CDecl idl_cgen_provider_func(IdlIface const iface, Alloc *alloc)
     cexpr_member(&expr, cexpr_ident(str_fmt(alloc, "{case:snake}_dispatch", iface.name)));
     cexpr_member(&expr, cexpr_ident(str$("vtable")));
 
-    cstmt_block_add(&body, cstmt_expr(expr));
+    cstmt_block_add(&body, cstmt_return(expr));
 
     return cdecl_func(name, type, body);
 }
