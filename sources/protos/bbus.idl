@@ -1,5 +1,7 @@
 module bbus;
 
+import base;
+
 errors {
     NOT_FOUND,
 };
@@ -7,4 +9,4 @@ errors {
 interface Locator
 {
     method locate Str -> Cap;
-}
+};

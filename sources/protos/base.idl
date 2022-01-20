@@ -1,59 +1,45 @@
 module base;
 
-include "ipc/pack.h", "ipc/unpack.h";
+include ipc/ipc.h, ipc/pack.h, ipc/unpack.h;
 
-[no-prefix]
-[packfn(ipc_pack_bool, ipc_unpack_bool)]
+[no_prefix, packfn(ipc_pack_bool, ipc_unpack_bool)]
 type Bool = __ctype(bool);
 
-[no-prefix]
-[packfn(ipc_pack_size, ipc_unpack_size)]
+[no_prefix, packfn(ipc_pack_size, ipc_unpack_size)]
 type Size = __ctype(size_t);
 
-[no-prefix]
-[packfn(ipc_pack_s8, ipc_unpack_s8)]
+[no_prefix, packfn(ipc_pack_s8, ipc_unpack_s8)]
 type S8 = __ctype(int8_t);
 
-[no-prefix]
-[packfn(ipc_pack_s8, ipc_unpack_u8)]
+[no_prefix, packfn(ipc_pack_s8, ipc_unpack_u8)]
 type U8 = __ctype(uint8_t);
 
-[no-prefix]
-[packfn(ipc_pack_s16, ipc_unpack_s16)]
+[no_prefix, packfn(ipc_pack_s16, ipc_unpack_s16)]
 type S16 = __ctype(int16_t);
 
-[no-prefix]
-[packfn(ipc_pack_u16, ipc_unpack_u16)]
+[no_prefix, packfn(ipc_pack_u16, ipc_unpack_u16)]
 type U16 = __ctype(uint16_t);
 
-[no-prefix]
-[packfn(ipc_pack_s32, ipc_unpack_s32)]
+[no_prefix, packfn(ipc_pack_s32, ipc_unpack_s32)]
 type S32 = __ctype(int32_t);
 
-[no-prefix]
-[packfn(ipc_pack_u32, ipc_unpack_u32)]
+[no_prefix, packfn(ipc_pack_u32, ipc_unpack_u32)]
 type U32 = __ctype(uint32_t);
 
-[no-prefix]
-[packfn(ipc_pack_s64, ipc_unpack_s64)]
+[no_prefix, packfn(ipc_pack_s64, ipc_unpack_s64)]
 type S64 = __ctype(int64_t);
 
-[no-prefix]
-[packfn(ipc_pack_u64, ipc_unpack_u64)]
+[no_prefix, packfn(ipc_pack_u64, ipc_unpack_u64)]
 type U64 = __ctype(uint64_t);
 
-[no-prefix]
-[packfn(ipc_pack_f32, ipc_unpack_f32)]
+[no_prefix, packfn(ipc_pack_f32, ipc_unpack_f32)]
 type F32 = __ctype(float);
 
-[no-prefix]
-[packfn(ipc_pack_f64, ipc_unpack_f64)]
+[no_prefix, packfn(ipc_pack_f64, ipc_unpack_f64)]
 type F64 = __ctype(double);
 
-[no-prefix]
-[packfn(ipc_pack_str, ipc_unpack_str)]
-type Str = __ctype(Str);
+[no_prefix, packfn(ipc_pack_str, ipc_unpack_str)]
+type Str = __ctype;
 
-[np-prefix]
-[packfn(ipc_pack_cap, ipc_unpack_cap)]
+[no_prefix, packfn(ipc_pack_cap, ipc_unpack_cap)]
 type Cap = __ctype(IpcCapability);

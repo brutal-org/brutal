@@ -1,0 +1,7 @@
+module test;
+
+import base, math;
+
+type Test = {
+    MRect Pomme,
+};
