@@ -7,7 +7,7 @@ typedef struct _DeflateCompressor
     int compression_level;
     int min_size_to_compress;
     Alloc *alloc;
-    IoResult (*compress_block_impl)(struct _DeflateCompressor *c, const uint8_t *in,
+    IoResult (*compress_block_impl)(struct _DeflateCompressor *c, uint8_t const *in,
                                     size_t in_nbytes, bool last);
     IoBitWriter bit_writer;
 } DeflateCompressor;
@@ -34,7 +34,7 @@ void deflate_deinit(DeflateCompressor *ctx);
   @param out_len The size of the output buffer
   @return The number of bytes written to the \p out buffer (compressed size)
 */
-IoResult deflate_compress_data(DeflateCompressor *ctx, const uint8_t *in, size_t in_len, const uint8_t *out, size_t out_len);
+IoResult deflate_compress_data(DeflateCompressor *ctx, uint8_t const *in, size_t in_len, uint8_t const *out, size_t out_len);
 
 /**
   @brief Compress an entire stream
