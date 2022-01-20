@@ -47,4 +47,4 @@ interface Server
     method bar { Addr addr, U8 num } -> BarInfo;
 
     method enable_irq { Addr addr } -> U8;
-}
+};

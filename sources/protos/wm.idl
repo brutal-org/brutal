@@ -4,12 +4,11 @@ import base, math;
 
 interface Client
 {
-
 };
 
 interface Server
 {
-    method create_window {MRect bound } -> Cap;
+    method create_window { MRect bound } -> Cap;
 };
 
 interface Window
