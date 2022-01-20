@@ -1,20 +1,11 @@
 #include <brutal/debug.h>
 #include <cc/builder.h>
-#include <idl/builtin.h>
 #include <idl/cgen.h>
 
 CType idl_cgen_decl_primitive(IdlType type)
 {
     assert_truth(type.type == IDL_TYPE_PRIMITIVE);
-
-    IdlBuiltinType *builtin = idl_lookup_builtin(type.primitive_.name);
-
-    if (builtin != nullptr)
-    {
-        return ctype_ident(builtin->cname);
-    }
-
-    return ctype_ident(type.primitive_.mangled);
+    return ctype_ident(type.primitive_.alias->mangled);
 }
 
 CType idl_cgen_decl_enum(IdlType type, Alloc *alloc)
@@ -60,6 +51,9 @@ CType idl_cgen_decl_type(IdlType type, Alloc *alloc)
     {
     case IDL_TYPE_NIL:
         return ctype_void();
+
+    case IDL_TYPE_CTYPE:
+        return ctype_ident(type.ctype_.name);
 
     case IDL_TYPE_PRIMITIVE:
         return idl_cgen_decl_primitive(type);

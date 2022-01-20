@@ -17,9 +17,9 @@ CType idl_cgen_decl_type(IdlType type, Alloc *alloc);
 
 /* --- Pack ----------------------------------------------------------------- */
 
-Str idl_cgen_pack_name(Str name, Alloc *alloc);
+Str idl_cgen_pack_name(IdlAlias alias, Alloc *alloc);
 
-CExpr idl_cgen_pack_ref(Str name, Alloc *alloc);
+CExpr idl_cgen_pack_ref(IdlAlias alias, Alloc *alloc);
 
 CType idl_cgen_pack_type(IdlAlias alias, Alloc *alloc);
 
@@ -29,9 +29,9 @@ CDecl idl_cgen_pack_func(IdlAlias alias, Alloc *alloc);
 
 /* --- Unpack --------------------------------------------------------------- */
 
-Str idl_cgen_unpack_name(Str name, Alloc *alloc);
+Str idl_cgen_unpack_name(IdlAlias alias, Alloc *alloc);
 
-CExpr idl_cgen_unpack_ref(Str name, Alloc *alloc);
+CExpr idl_cgen_unpack_ref(IdlAlias alias, Alloc *alloc);
 
 CType idl_cgen_unpack_type(IdlAlias alias, Alloc *alloc);
 
@@ -45,7 +45,7 @@ CExpr idl_cgen_binding(IdlMethod method, IdlIface const iface, Alloc *alloc);
 
 /* --- Methodes ------------------------------------------------------------- */
 
-CType idl_cgen_method_type(IdlMethod method, IdlIface const iface, Alloc *alloc);
+CType idl_cgen_method_type(IdlMethod method, IdlModule const module, Alloc *alloc);
 
 CStmt idl_cgen_method_body(IdlMethod method, IdlIface const iface, Alloc *alloc);
 
@@ -69,6 +69,10 @@ CDecl idl_cgen_dispatch_func(IdlIface const iface, Alloc *alloc);
 
 /* --- Source & Header ------------------------------------------------------ */
 
-CUnit idl_cgen_header(MAYBE_UNUSED IdlIface const iface, Alloc *alloc);
+void idl_cgen_iface_header(CUnit *unit, IdlModule const module, IdlIface const iface, Alloc *alloc);
 
-CUnit idl_cgen_source(MAYBE_UNUSED IdlIface const iface, Alloc *alloc);
+CUnit idl_cgen_header(MAYBE_UNUSED IdlModule const module, Alloc *alloc);
+
+void idl_cgen_iface_source(CUnit *unit, IdlModule const module, IdlIface const iface, Alloc *alloc);
+
+CUnit idl_cgen_source(MAYBE_UNUSED IdlModule const module, Alloc *alloc);

@@ -2,6 +2,7 @@
 #include <acpi/rsdt.h>
 #include <bal/boot.h>
 #include <brutal/debug.h>
+#include <ipc/ipc.h>
 
 Iter dump_sdth(AcpiSdth *sdth, void *)
 {
@@ -9,7 +10,7 @@ Iter dump_sdth(AcpiSdth *sdth, void *)
     return ITER_CONTINUE;
 }
 
-int br_entry_handover(Handover *handover)
+int ipc_component_main(IpcComponent *self)
 {
     Acpi acpi = {};
     acpi_init(&acpi, handover->rsdp);
@@ -17,9 +18,5 @@ int br_entry_handover(Handover *handover)
     log$("RSDT Dump:");
     acpi_rsdt_iterate(&acpi, (IterFn *)dump_sdth, nullptr);
 
-    while (true)
-    {
-    }
-
-    return 0;
+    return ipc_component_run(self);
 }

@@ -1,24 +1,22 @@
 #include <brutal/debug.h>
 #include <brutal/io.h>
 #include <cc/builder.h>
-#include <idl/builtin.h>
 #include <idl/cgen.h>
 
-Str idl_cgen_pack_name(Str name, Alloc *alloc)
+Str idl_cgen_pack_name(IdlAlias alias, Alloc *alloc)
 {
-    IdlBuiltinType *builtin = idl_lookup_builtin(name);
-
-    if (builtin)
+    IdlAttr attr;
+    if (idl_attrs_get(alias.attrs, str$("packfn"), &attr))
     {
-        return builtin->pack_fn;
+        return vec_at(&attr.args, 0);
     }
 
-    return str_fmt(alloc, "{case:snake}_pack", name);
+    return str_fmt(alloc, "{case:snake}_pack", alias.mangled);
 }
 
-CExpr idl_cgen_pack_ref(Str name, Alloc *alloc)
+CExpr idl_cgen_pack_ref(IdlAlias alias, Alloc *alloc)
 {
-    return cexpr_cast(cexpr_ident(idl_cgen_pack_name(name, alloc)), ctype_ident_ptr(str$("IpcPackFn"), alloc), alloc);
+    return cexpr_cast(cexpr_ident(idl_cgen_pack_name(alias, alloc)), ctype_ident_ptr(str$("IpcPackFn"), alloc), alloc);
 }
 
 CType idl_cgen_pack_type(IdlAlias alias, Alloc *alloc)
@@ -33,12 +31,13 @@ void idl_cgen_pack_body(CStmt *block, IdlType type, CExpr path, Alloc *alloc)
 {
     switch (type.type)
     {
+    case IDL_TYPE_CTYPE:
     case IDL_TYPE_NIL:
         break;
 
     case IDL_TYPE_PRIMITIVE:
     {
-        CExpr expr = cexpr_call(alloc, cexpr_ident(idl_cgen_pack_name(type.primitive_.mangled, alloc)));
+        CExpr expr = cexpr_call(alloc, cexpr_ident(idl_cgen_pack_name(*type.primitive_.alias, alloc)));
         cexpr_member(&expr, cexpr_ident(str$("self")));
         cexpr_member(&expr, path);
 
@@ -48,7 +47,7 @@ void idl_cgen_pack_body(CStmt *block, IdlType type, CExpr path, Alloc *alloc)
 
     case IDL_TYPE_ENUM:
     {
-        CExpr expr = cexpr_call(alloc, cexpr_ident(idl_cgen_pack_name(str$("Enum"), alloc)));
+        CExpr expr = cexpr_call(alloc, cexpr_ident(str$("ipc_pack_enum")));
         cexpr_member(&expr, cexpr_ident(str$("self")));
         cexpr_member(&expr, cexpr_cast(path, ctype_ident_ptr(str$("int"), alloc), alloc));
 
@@ -72,7 +71,7 @@ void idl_cgen_pack_body(CStmt *block, IdlType type, CExpr path, Alloc *alloc)
         CExpr expr = cexpr_call(alloc, cexpr_ident(str$("ipc_pack_slice")));
         cexpr_member(&expr, cexpr_ident(str$("self")));
         cexpr_member(&expr, path);
-        cexpr_member(&expr, cexpr_ident(idl_cgen_pack_name(subtype.primitive_.mangled, alloc)));
+        cexpr_member(&expr, cexpr_ident(idl_cgen_pack_name(*subtype.primitive_.alias, alloc)));
         cstmt_block_add(block, cstmt_expr(expr));
         break;
     }
@@ -84,7 +83,7 @@ void idl_cgen_pack_body(CStmt *block, IdlType type, CExpr path, Alloc *alloc)
 
 CDecl idl_cgen_pack_func(IdlAlias alias, Alloc *alloc)
 {
-    Str name = idl_cgen_pack_name(alias.mangled, alloc);
+    Str name = idl_cgen_pack_name(alias, alloc);
     CType type = idl_cgen_pack_type(alias, alloc);
     CStmt body = cstmt_block(alloc);
     idl_cgen_pack_body(&body, alias.type, cexpr_ident(str$("data")), alloc);

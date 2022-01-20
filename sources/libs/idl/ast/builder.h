@@ -2,76 +2,64 @@
 
 #include <idl/ast.h>
 
-/* --- Interface ---------------------------------------- */
+/* --- Types ---------------------------------------------------------------- */
 
-IdlIface idl_iface(
-    Str name,
-    Alloc *alloc);
+IdlType idl_nil(void);
 
-IdlIface idl_iface_barebone(
-    Str name,
-    Alloc *alloc);
+IdlType idl_ctype(Str ctype);
 
-void idl_alias(
-    IdlIface *iface,
-    Str name,
-    IdlType type);
+IdlType idl_primitive(Str str);
 
-void idl_alias_mangled(
-    IdlIface *iface,
-    Str name,
-    Str mangled,
-    IdlType type);
+IdlType idl_primitive_resolved(Str str, IdlAlias alias, Alloc *alloc);
 
-void idl_alias_mangled(
-    IdlIface *iface,
-    Str name,
-    Str mangled,
-    IdlType type);
+IdlType idl_enum(Alloc *alloc);
 
-void idl_method(
-    IdlIface *iface,
-    Str name,
-    IdlType request,
-    IdlType response);
+void idl_enum_constant(IdlType *enum_, Str name);
 
-void idl_method_mangled(
-    IdlIface *iface,
-    Str name,
-    Str mangled,
-    IdlType request,
-    IdlType response);
+void idl_enum_constant_mangled(IdlType *enum_, Str name, Str mangled);
 
-/* --- Types -------------------------------------------- */
+IdlType idl_struct(Alloc *alloc);
 
-IdlType idl_nil(
-    void);
-
-IdlType idl_primitive(
-    Str str);
-
-IdlType idl_primitive_mangled(
-    Str str,
-    Str mangled);
-
-IdlType idl_enum(
-    Alloc *alloc);
-
-void idl_enum_constant(
-    IdlType *enum_,
-    Str name);
-
-void idl_enum_constant_mangled(
-    IdlType *enum_,
-    Str name,
-    Str mangled);
-
-IdlType idl_struct(
-    Alloc *alloc);
-
-void idl_struct_member(
-    IdlType *struct_,
-    Str name,
-    IdlType type);
+void idl_struct_member(IdlType *struct_, Str name, IdlType type);
 
 IdlType idl_vec(IdlType subtype, Alloc *alloc);
+
+/* --- Attributes ----------------------------------------------------------- */
+
+IdlAttrs idl_attrs(Alloc *alloc);
+
+void idl_attrs_append(IdlAttrs *attrs, IdlAttr attr);
+
+IdlAttr idl_attr(Str name, Alloc *alloc);
+
+void idl_attr_append(IdlAttr *attr, Str data);
+
+/* --- Methods -------------------------------------------------------------- */
+
+IdlMethod idl_method(Str name, IdlAttrs attrs, IdlType request, IdlType response);
+
+IdlMethod idl_method_mangled(Str name, Str mangled, IdlAttrs attrs, IdlType request, IdlType response);
+
+/* --- Aliases -------------------------------------------------------------- */
+
+IdlAlias idl_alias(Str name, IdlAttrs attrs, IdlType type);
+
+IdlAlias idl_alias_mangled(Str name, Str mangled, IdlAttrs attrs, IdlType type);
+
+/* --- Interfaces ----------------------------------------------------------- */
+
+IdlIface idl_iface(Str name, IdlAttrs attrs, Alloc *alloc);
+
+void idl_iface_methode(IdlIface *iface, IdlMethod method);
+
+/* --- Modules -------------------------------------------------------------- */
+
+IdlModule idl_module(Str name, Alloc *alloc);
+
+void idl_module_import(IdlModule *module, Str name);
+
+void idl_module_include(IdlModule *module, Str name);
+
+void idl_module_alias(IdlModule *module, IdlAlias alias);
+
+void idl_module_iface(IdlModule *module, IdlIface iface);

@@ -1,12 +1,28 @@
 #include <brutal/debug.h>
 #include <idl/json.h>
 
+Json idl_jgen_ctype(IdlCtype ctype_, Alloc *alloc)
+{
+    Json json = json_object_with_type(str$("IdlCtype"), alloc);
+    json_put(&json, str$("name"), json_str(ctype_.name));
+
+    return json;
+}
+
 Json idl_jgen_primitive(IdlPrimitive primitive_, Alloc *alloc)
 {
     Json json = json_object_with_type(str$("IdlPrimitive"), alloc);
 
     json_put(&json, str$("name"), json_str(primitive_.name));
-    json_put(&json, str$("mangled"), json_str(primitive_.mangled));
+
+    if (primitive_.alias)
+    {
+        json_put(&json, str$("alias"), idl_jgen_alias(*primitive_.alias, alloc));
+    }
+    else
+    {
+        json_put(&json, str$("alias"), json_null());
+    }
 
     return json;
 }
@@ -67,6 +83,9 @@ Json idl_jgen_type(IdlType const type, Alloc *alloc)
     case IDL_TYPE_NIL:
         return json_object_with_type(str$("IdlNil"), alloc);
 
+    case IDL_TYPE_CTYPE:
+        return idl_jgen_ctype(type.ctype_, alloc);
+
     case IDL_TYPE_PRIMITIVE:
         return idl_jgen_primitive(type.primitive_, alloc);
 
@@ -108,13 +127,7 @@ Json idl_jgen_method(IdlMethod const method, Alloc *alloc)
 
 Json idl_jgen_iface(IdlIface const iface, Alloc *alloc)
 {
-    Json aliases_json = json_array(alloc);
     Json methods_json = json_array(alloc);
-
-    vec_foreach_v(alias, &iface.aliases)
-    {
-        json_append(&aliases_json, idl_jgen_alias(alias, alloc));
-    }
 
     vec_foreach_v(method, &iface.methods)
     {
@@ -125,9 +138,46 @@ Json idl_jgen_iface(IdlIface const iface, Alloc *alloc)
 
     json_put(&iface_json, str$("id"), json_number(iface.id));
     json_put(&iface_json, str$("name"), json_str(iface.name));
-    json_put(&iface_json, str$("errors"), idl_jgen_type(iface.errors, alloc));
-    json_put(&iface_json, str$("aliases"), aliases_json);
     json_put(&iface_json, str$("methods"), methods_json);
 
     return iface_json;
+}
+
+Json idl_jgen_module(IdlModule const module, Alloc *alloc)
+{
+    Json imports_json = json_array(alloc);
+    Json includes_json = json_array(alloc);
+    Json aliases_json = json_array(alloc);
+    Json ifaces_json = json_array(alloc);
+
+    vec_foreach_v(import, &module.imports)
+    {
+        json_append(&imports_json, json_str(import.name));
+    }
+
+    vec_foreach_v(include, &module.includes)
+    {
+        json_append(&includes_json, json_str(include));
+    }
+
+    vec_foreach_v(alias, &module.aliases)
+    {
+        json_append(&aliases_json, idl_jgen_alias(alias, alloc));
+    }
+
+    vec_foreach_v(iface, &module.ifaces)
+    {
+        json_append(&ifaces_json, idl_jgen_iface(iface, alloc));
+    }
+
+    Json module_json = json_object_with_type(str$("IdlModule"), alloc);
+
+    json_put(&module_json, str$("name"), json_str(module.name));
+    json_put(&module_json, str$("import"), imports_json);
+    json_put(&module_json, str$("includes"), includes_json);
+    json_put(&module_json, str$("errors"), idl_jgen_type(module.errors, alloc));
+    json_put(&module_json, str$("aliases"), aliases_json);
+    json_put(&module_json, str$("ifaces"), ifaces_json);
+
+    return module_json;
 }

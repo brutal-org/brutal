@@ -13,8 +13,8 @@ CExpr idl_cgen_binding(IdlMethod method, IdlIface const iface, Alloc *alloc)
     if (method.request.type != IDL_TYPE_NIL)
     {
         cexpr_member(&init, cexpr_ident(str_fmt(alloc, "MSG_{case:constant}_REQ", method.mangled)));
-        cexpr_member(&init, idl_cgen_pack_ref(method.request.primitive_.mangled, alloc));
-        cexpr_member(&init, idl_cgen_unpack_ref(method.request.primitive_.mangled, alloc));
+        cexpr_member(&init, idl_cgen_pack_ref(*method.request.primitive_.alias, alloc));
+        cexpr_member(&init, idl_cgen_unpack_ref(*method.request.primitive_.alias, alloc));
     }
     else
     {
@@ -26,8 +26,8 @@ CExpr idl_cgen_binding(IdlMethod method, IdlIface const iface, Alloc *alloc)
     if (method.response.type != IDL_TYPE_NIL)
     {
         cexpr_member(&init, cexpr_ident(str_fmt(alloc, "MSG_{case:constant}_RESP", method.mangled)));
-        cexpr_member(&init, idl_cgen_pack_ref(method.response.primitive_.mangled, alloc));
-        cexpr_member(&init, idl_cgen_unpack_ref(method.response.primitive_.mangled, alloc));
+        cexpr_member(&init, idl_cgen_pack_ref(*method.response.primitive_.alias, alloc));
+        cexpr_member(&init, idl_cgen_unpack_ref(*method.response.primitive_.alias, alloc));
     }
     else
     {

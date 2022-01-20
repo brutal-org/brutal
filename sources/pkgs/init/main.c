@@ -1,7 +1,6 @@
 #include <brutal/alloc.h>
 #include <brutal/debug.h>
-#include <ipc/ipc.h>
-#include <protos/serv/bbus.h>
+#include <protos/bbus.h>
 #include "init/boot.h"
 #include "init/bus.h"
 
@@ -30,7 +29,7 @@ static BbusVTable _bbus_vtable = {
     .locate = handle_bbus_locate,
 };
 
-int br_entry_handover(Handover *handover)
+int br_main(Handover *handover)
 {
     boot_splashscreen(handover);
 
@@ -40,13 +39,13 @@ int br_entry_handover(Handover *handover)
     IpcComponent ev = {};
     ipc_component_init(&ev, &bus, alloc_global());
 
+    IpcCapability bbus_cap = bbus_provide(&ev, &_bbus_vtable);
+
     bus_start(&bus, str$("posix"), bal_args1(0));
     bus_start(&bus, str$("acpi"), bal_args_handover(handover));
     bus_start(&bus, str$("pci"), bal_args_handover(handover));
     bus_start(&bus, str$("ps2"), bal_args1(0));
     bus_start(&bus, str$("ahci"), bal_args1(0));
-
-    bbus_provide(&ev, &_bbus_vtable);
 
     return ipc_component_run(&ev);
 }

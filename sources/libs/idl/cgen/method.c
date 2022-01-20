@@ -2,9 +2,9 @@
 #include <cc/builder.h>
 #include <idl/cgen.h>
 
-CType idl_cgen_method_type(IdlMethod method, IdlIface const iface, Alloc *alloc)
+CType idl_cgen_method_type(IdlMethod method, IdlModule const module, Alloc *alloc)
 {
-    CType ctype = ctype_func(idl_cgen_decl_primitive(iface.errors), alloc);
+    CType ctype = ctype_func(idl_cgen_decl_primitive(module.errors), alloc);
 
     ctype_member(&ctype, str$("ev"), ctype_ident_ptr(str$("IpcComponent"), alloc));
 
