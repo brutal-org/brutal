@@ -4,7 +4,7 @@
 #include <brutal/io/mem.h>
 
 // Block compressions
-IoResult deflate_compress_block_uncompressed(DeflateCompressor *ctx, const uint8_t *in, size_t in_nbytes, bool last);
+IoResult deflate_compress_block_uncompressed(DeflateCompressor *ctx, uint8_t const *in, size_t in_nbytes, bool last);
 
 void deflate_init(DeflateCompressor *ctx, int level, Alloc *alloc)
 {
@@ -38,7 +38,7 @@ void deflate_write_block_header(
     io_bw_flush_bits(bit_writer);
 }
 
-IoResult deflate_compress_block_uncompressed(DeflateCompressor *ctx, const uint8_t *in, size_t in_nbytes, bool is_last)
+IoResult deflate_compress_block_uncompressed(DeflateCompressor *ctx, uint8_t const *in, size_t in_nbytes, bool is_last)
 {
     deflate_write_block_header(&ctx->bit_writer, is_last,
                                DEFLATE_BLOCKTYPE_UNCOMPRESSED);
@@ -54,7 +54,7 @@ IoResult deflate_compress_block_uncompressed(DeflateCompressor *ctx, const uint8
     return OK(IoResult, in_nbytes + 5);
 }
 
-IoResult deflate_compress_data(DeflateCompressor *ctx, const uint8_t *in, size_t in_len, const uint8_t *out, size_t out_len)
+IoResult deflate_compress_data(DeflateCompressor *ctx, uint8_t const *in, size_t in_len, uint8_t const *out, size_t out_len)
 {
     // Input
     IoMem in_view;

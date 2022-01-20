@@ -3,9 +3,9 @@
 #include <brutal/codec/deflate/inflate.h>
 #include <brutal/codec/errors.h>
 #include <brutal/codec/gzip/gzip.h>
+#include <brutal/debug.h>
 #include <brutal/hash/crc32.h>
 #include <brutal/io/mem.h>
-#include <brutal/debug.h>
 
 typedef enum
 {
@@ -16,7 +16,7 @@ typedef enum
     FLAG_COMMENT = 16
 } GZipFlag;
 
-IoResult gzip_decompress_data(const uint8_t *in, size_t in_len, const uint8_t *out, size_t out_len)
+IoResult gzip_decompress_data(uint8_t const *in, size_t in_len, uint8_t const *out, size_t out_len)
 {
     // Input
     IoMem in_view;
@@ -134,7 +134,7 @@ IoResult gzip_decompress_stream(IoWriter writer, IoReader reader)
     return OK(IoResult, decompressed);
 }
 
-IoResult gzip_compress_data(const uint8_t *in, size_t in_len, const uint8_t *out, size_t out_len)
+IoResult gzip_compress_data(uint8_t const *in, size_t in_len, uint8_t const *out, size_t out_len)
 {
     // Input
     IoMem in_view;

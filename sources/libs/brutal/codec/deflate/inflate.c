@@ -33,7 +33,7 @@ typedef struct
     IoWriter writer;
 } DeflateDecompressor;
 
-IoResult deflate_decompress_data(const uint8_t *in, size_t in_len, const uint8_t *out, size_t out_len)
+IoResult deflate_decompress_data(uint8_t const *in, size_t in_len, uint8_t const *out, size_t out_len)
 {
     // Input
     IoMem in_view;
