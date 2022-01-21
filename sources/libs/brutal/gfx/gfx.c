@@ -1,5 +1,4 @@
 #include <brutal/base/macros.h>
-#include <brutal/font/font.h>
 #include <brutal/gfx/gfx.h>
 #include <brutal/gfx/path.h>
 #include <stdlib.h>
@@ -431,10 +430,10 @@ void gfx_ellipsis(Gfx *self, MRect rect)
     gfx_fill_path(self, GFX_FILL_EVENODD);
 }
 
-void gfx_fill_text(Gfx *self, MVec2 origin, Str text, float scale)
+void gfx_fill_text(Gfx *self, MVec2 origin, Str text, GfxFont font)
 {
     origin = m_vec2_add(origin, gfx_peek(self)->origin);
-    bfont_render_str(bfont_builtin(), text, origin, self->buf, gfx_peek(self)->clip, scale, gfx_peek(self)->color);
+    gfx_font_render_str(font, self, origin, text);
 }
 
 void gfx_fill_svg(Gfx *self, Str path)

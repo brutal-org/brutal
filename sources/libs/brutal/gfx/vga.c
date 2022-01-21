@@ -1,6 +1,6 @@
-#include <brutal/font/builtin.h>
+#include <brutal/gfx/font.h>
 
-uint8_t bfont_builtin_data[256 * 16] = {
+uint8_t gfx_font_builtin_data[256 * 16] = {
 
     /* 0 0x00 '^@' */
     0x00, /* 00000000 */

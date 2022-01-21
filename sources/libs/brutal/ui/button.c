@@ -81,7 +81,7 @@ UiView *ui_button_create(void)
 UiView *ui_button_create_with_text(Str text)
 {
     UiView *self = ui_button_create();
-    UiView *label = ui_text_create(text, UI_TEXT_BODY, GFX_UI_BASE09);
+    UiView *label = ui_text_create(text, gfx_font_builtin(), GFX_UI_BASE09);
     ui_view_style(label, (UiStyle){.dock = UI_DOCK_FILL, .gravity = M_GRAVITY_CENTER});
     ui_view_mount(self, label);
 

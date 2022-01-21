@@ -4,16 +4,16 @@
 
 UiView *about_informations(void)
 {
-    UiView *label_title = ui_text_create(str$("BRUTAL"), UI_TEXT_HEADLINE, GFX_UI_BASE09);
+    UiView *label_title = ui_text_create(str$("BRUTAL"), gfx_font_builtin(), GFX_UI_BASE09);
     ui_view_style(label_title, (UiStyle){.dock = UI_DOCK_TOP});
 
-    UiView *label_version = ui_text_create(str$("Milestone 4 @ 3b96f95"), UI_TEXT_BODY, GFX_UI_BASE09);
+    UiView *label_version = ui_text_create(str$("Milestone 4 @ 3b96f95"), gfx_font_builtin(), GFX_UI_BASE09);
     ui_view_style(label_version, (UiStyle){.dock = UI_DOCK_TOP});
 
-    UiView *label_website = ui_text_create(str$("brutal.smnx.sh"), UI_TEXT_LINK, GFX_UI_ACCENT);
+    UiView *label_website = ui_text_create(str$("brutal.smnx.sh"), gfx_font_builtin(), GFX_UI_ACCENT);
     ui_view_style(label_website, (UiStyle){.dock = UI_DOCK_TOP});
 
-    UiView *label_license = ui_text_create(str$("The brutal operating system and its core components are licensed under the MIT License."), UI_TEXT_BODY, GFX_UI_BASE09);
+    UiView *label_license = ui_text_create(str$("The brutal operating system and its core components are licensed under the MIT License."), gfx_font_builtin(), GFX_UI_BASE09);
     ui_view_style(label_license, (UiStyle){.dock = UI_DOCK_TOP});
 
     UiView *button = ui_button_create_with_text(str$("OK"));

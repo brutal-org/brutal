@@ -1,6 +1,7 @@
 #pragma once
 
 #include <brutal/ds.h>
+#include <brutal/gfx/font.h>
 #include <brutal/gfx/paint.h>
 #include <brutal/gfx/path.h>
 #include <brutal/hash.h>
@@ -20,7 +21,7 @@ typedef enum
     GFX_FILL_NONZERO,
 } GfxFillRule;
 
-typedef struct
+typedef struct _Gfx
 {
     bool begin;
     Alloc *alloc;
@@ -56,6 +57,8 @@ void gfx_clear(Gfx *self, GfxColor color);
 void gfx_push(Gfx *self);
 
 void gfx_pop(Gfx *self);
+
+GfxCtx *gfx_peek(Gfx *self);
 
 void gfx_clip(Gfx *self, MRect rect);
 
@@ -101,6 +104,6 @@ void gfx_fill_rect(Gfx *self, MRect rect, float radius);
 
 void gfx_fill_ellipse(Gfx *self, MRect rect);
 
-void gfx_fill_text(Gfx *self, MVec2 origin, Str text, float scale);
+void gfx_fill_text(Gfx *self, MVec2 origin, Str text, GfxFont font);
 
 void gfx_fill_svg(Gfx *self, Str path);
