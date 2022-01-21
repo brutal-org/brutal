@@ -3,6 +3,7 @@
 void cscope_init(CScope *self, Alloc *alloc)
 {
     *self = (CScope){};
+    self->expected_result.type = CTYPE_INVALID;
     vec_init(&self->decls, alloc);
 }
 
@@ -13,14 +14,14 @@ void cscope_deinit(CScope *self)
 
 CDecl cscope_lookup(CScope *self, Str name)
 {
-    for (CDecl *decl = vec_begin(&self->decls); decl != vec_end(&self->decls); ++decl)
+
+    vec_foreach(decl, &self->decls)
     {
         if (str_eq(decl->name, name))
         {
             return *decl;
         }
     }
-
     return (CDecl){};
 }
 

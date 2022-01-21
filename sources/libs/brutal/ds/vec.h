@@ -54,7 +54,7 @@ void vec_swap_impl(VecImpl *impl, int idx1, int idx2);
 #define vec_push(v, val) \
     (vec_expand_impl(impl$(v)) ? ((v)->data[(v)->len++] = (val), true) : false)
 
-#define vec_pop(v) (v)->data[--(v)->len]
+#define vec_pop(v) (v)->data[--((v)->len)]
 
 #define vec_splice(v, start, count) \
     (vec_splice_impl(impl$(v), start, count), (v)->len -= (count))

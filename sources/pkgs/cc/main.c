@@ -4,6 +4,7 @@
 #include <cc/dump.h>
 #include <cc/lex/pproc.h>
 #include <cc/parse.h>
+#include <cc/sema.h>
 #include <cc/trans.h>
 
 int main(int argc, char const *argv[])
@@ -37,7 +38,9 @@ int main(int argc, char const *argv[])
     }
 
     CUnit unit = cparse_unit(&processed, base$(&heap));
-
+    CSema sema;
+    csema_init(&sema, base$(&heap));
+    unit = csema_unit(&sema, unit, base$(&heap));
     Emit emit;
     emit_init(&emit, io_chan_out());
 
