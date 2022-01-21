@@ -98,10 +98,10 @@ typedef struct
 struct cexpr
 {
     CExprType type;
-
+    CType sema_type;
     union
     {
-        CVal constant_;
+        CVal constant_; /* instead of Cval holding sema_type the cexpr holds it */
         Str ident_;
 
         struct

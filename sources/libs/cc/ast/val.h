@@ -19,7 +19,6 @@ typedef enum
 typedef struct
 {
     CValType type;
-
     union
     {
         CSigned signed_;

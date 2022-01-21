@@ -3,7 +3,6 @@
 #include <brutal/base.h>
 #include <brutal/ds.h>
 #include <cc/ast/expr.h>
-
 typedef enum
 {
     CSTMT_INVALID,
@@ -35,7 +34,7 @@ typedef struct cstmt CStmt;
 struct cstmt
 {
     CStmtType type;
-
+    CType sema_type;
     union
     {
         struct

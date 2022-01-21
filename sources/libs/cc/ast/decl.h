@@ -37,7 +37,7 @@ typedef struct cdecl
     CDeclType type;
     CDeclAttr attr;
     Str name;
-
+    CType sema_type;
     union
     {
         struct
