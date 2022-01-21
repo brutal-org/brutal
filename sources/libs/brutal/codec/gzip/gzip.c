@@ -16,6 +16,16 @@ typedef enum
     FLAG_COMMENT = 16
 } GZipFlag;
 
+bool gzip_probe(IoRSeek rseek)
+{
+    uint8_t id1 = 0, id2 = 0;
+    io_read_byte(rseek.reader, &id1);
+    io_read_byte(rseek.reader, &id2);
+    // This won't work if not called from the start of a stream
+    io_seek(rseek.seeker, io_seek_from_start(0));
+    return id1 == 0x1f && id2 == 0x8b;
+}
+
 IoResult gzip_decompress_data(uint8_t const *in, size_t in_len, uint8_t const *out, size_t out_len)
 {
     // Input
@@ -35,9 +45,9 @@ IoResult gzip_decompress_stream(IoWriter writer, IoReader reader)
 {
     uint8_t id1, id2;
     // Read CMF (compression method & flags)
-    TRY(IoResult, io_read(reader, &id1, 1));
+    TRY(IoResult, io_read_byte(reader, &id1));
     // Flags
-    TRY(IoResult, io_read(reader, &id2, 1));
+    TRY(IoResult, io_read_byte(reader, &id2));
 
     // Check this a valid gzip stream
     if (id1 != 0x1f || id2 != 0x8b)
@@ -46,7 +56,7 @@ IoResult gzip_decompress_stream(IoWriter writer, IoReader reader)
     }
 
     uint8_t cm;
-    TRY(IoResult, io_read(reader, &cm, 1));
+    TRY(IoResult, io_read_byte(reader, &cm));
 
     // Check method is deflate
     if (cm != 8)
@@ -55,7 +65,7 @@ IoResult gzip_decompress_stream(IoWriter writer, IoReader reader)
     }
 
     uint8_t flags;
-    TRY(IoResult, io_read(reader, &flags, 1));
+    TRY(IoResult, io_read_byte(reader, &flags));
 
     // Check that reserved bits are zero
     if (flags & 0xE0)
@@ -81,7 +91,7 @@ IoResult gzip_decompress_stream(IoWriter writer, IoReader reader)
         uint8_t val = 0;
         do
         {
-            TRY(IoResult, io_read(reader, &val, 1));
+            TRY(IoResult, io_read_byte(reader, &val));
         } while (val != 0);
     }
 
@@ -91,7 +101,7 @@ IoResult gzip_decompress_stream(IoWriter writer, IoReader reader)
         uint8_t val = 0;
         do
         {
-            TRY(IoResult, io_read(reader, &val, 1));
+            TRY(IoResult, io_read_byte(reader, &val));
         } while (val != 0);
     }
 
@@ -153,19 +163,19 @@ IoResult gzip_compress_stream(IoWriter writer, IoReader reader)
 {
     uint8_t id1 = 0x1f, id2 = 0x8b;
     // Write CMF (compression method & flags)
-    TRY(IoResult, io_write(writer, &id1, 1));
+    TRY(IoResult, io_write_byte(writer, id1));
     // Flags
-    TRY(IoResult, io_write(writer, &id2, 1));
+    TRY(IoResult, io_write_byte(writer, id2));
     // Compression method
     uint8_t cm = 8;
-    TRY(IoResult, io_write(writer, &cm, 1));
+    TRY(IoResult, io_write_byte(writer, cm));
     // Flags
     uint8_t flags = 0;
-    TRY(IoResult, io_write(writer, &flags, 1));
+    TRY(IoResult, io_write_byte(writer, flags));
     // Write unused bytes
     uint8_t null_byte = 0;
     for (size_t i = 0; i < 6; i++)
-        TRY(IoResult, io_write(writer, &null_byte, 1));
+        TRY(IoResult, io_write_byte(writer, null_byte));
 
     // Calculate the Crc32 checksum of the uncompressed data on the fly
     Crc32 crc;
