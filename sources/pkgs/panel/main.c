@@ -20,7 +20,7 @@ UiWin *about_win_create(UiApp *app)
     ui_view_style(btn_applications, (UiStyle){.size.max = m_vec2(160, 36), .placement = M_GRAVITY_CENTER});
     ui_view_mount(container, btn_applications);
 
-    UiView *lbl_time = ui_text_create(str$("Thue 11 Jan 16:26"), UI_TEXT_BODY, GFX_UI_BASE09);
+    UiView *lbl_time = ui_text_create(str$("Thue 11 Jan 16:26"), gfx_font_builtin(), GFX_UI_BASE09);
     ui_view_style(lbl_time, (UiStyle){.grow = 1, .placement = M_GRAVITY_CENTER});
     ui_view_mount(container, lbl_time);
 
