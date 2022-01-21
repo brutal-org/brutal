@@ -37,3 +37,5 @@ IoResult gzip_compress_data(uint8_t const *in, size_t in_len, uint8_t const *out
   @return The number of bytes written to the \p writer stream (uncompressed size)
 */
 IoResult gzip_compress_stream(IoWriter writer, IoReader reader);
+
+bool gzip_probe(IoRSeek rseek);
