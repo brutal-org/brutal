@@ -17,3 +17,5 @@ void csema_scope_enter(CSema *self);
 void csema_scope_leave(CSema *self);
 
 void csema_scope_add(CSema *self, CDecl decl);
+
+CDecl csema_lookup(CSema *self, Str name);

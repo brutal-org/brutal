@@ -30,3 +30,17 @@ void csema_scope_add(CSema *self, CDecl decl)
     CScope *scope = vec_end(&self->scopes);
     cscope_add(scope, decl);
 }
+
+CDecl csema_lookup(CSema *self, Str name)
+{
+    vec_foreach(scope, &self->scopes)
+    {
+        CDecl d = cscope_lookup(scope, name);
+        if (d.type != CDECL_NIL)
+
+        {
+            return d;
+        }
+    }
+    return (CDecl){};
+}
