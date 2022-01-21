@@ -185,27 +185,6 @@ CExpr csema_expr(CSema *sema, CExpr expr, Alloc *alloc)
     }
 }
 
-CType csema_visit_return_type(CSema *sema, CStmt stmt, Alloc *alloc)
-{
-    switch (stmt.type)
-    {
-    case CSTMT_BLOCK:
-    {
-        CType cur_return = {.type = CTYPE_INVALID};
-        vec_foreach(sub_stmt, &stmt.block_.stmts)
-        {
-            CType result = csema_visit_return_type(sema, stmt, alloc);
-            if (result.type != CTYPE_INVALID)
-            {
-                if (cur_return.type != CTYPE_INVALID && cur_return.type != result.type)
-                {
-                    log$("")
-                }
-            }
-        }
-    }
-    }
-}
 CDecl csema_decl(CSema *sema, CDecl decl, Alloc *alloc)
 {
     if (csema_lookup(sema, decl.name).type != CDECL_NIL)
@@ -224,13 +203,18 @@ CDecl csema_decl(CSema *sema, CDecl decl, Alloc *alloc)
     case CDECL_FUNC:
     {
         decl.sema_type = decl.func_.type;
+        csema_scope_add(sema, decl); /* we need to add the function to the scope before the body lookup because the body can call the function it self */
+
+        csema_scope_enter_func(sema, decl.func_.type);
         decl.func_.body = csema_stmt(sema, decl.func_.body, alloc);
+        csema_scope_leave(sema);
         break;
     }
     case CDECL_VAR:
     {
         decl.sema_type = decl.var_.type;
         decl.var_.expr = csema_expr(sema, decl.var_.expr, alloc);
+        csema_scope_add(sema, decl);
         break;
     }
     default:
@@ -239,7 +223,7 @@ CDecl csema_decl(CSema *sema, CDecl decl, Alloc *alloc)
         break;
     }
     }
-    vec_push(&sema->scopes.data[0].decls, decl);
+
     return decl;
 }
 
@@ -247,15 +231,12 @@ CUnit csema_unit(CSema *sema, CUnit unit, Alloc *alloc)
 {
     CUnit result = cunit(alloc);
 
-    csema_scope_leave(sema);
+    csema_scope_enter(sema);
 
     vec_foreach(entry, &unit.units)
     {
         if (entry->type == CUNIT_DECLARATION)
         {
-
-            csema_scope_add(sema, entry->_decl);
-            entry->_decl = csema_decl(sema, entry->_decl, alloc);
             cunit_decl(&result, csema_decl(sema, entry->_decl, alloc));
         }
     }

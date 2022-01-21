@@ -5,6 +5,7 @@
 typedef struct
 {
     Vec(CDecl) decls;
+    CType expected_result;
 } CScope;
 
 void cscope_init(CScope *self, Alloc *alloc);

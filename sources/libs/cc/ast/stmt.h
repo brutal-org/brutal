@@ -34,7 +34,6 @@ typedef struct cstmt CStmt;
 struct cstmt
 {
     CStmtType type;
-    CType sema_type;
     union
     {
         struct

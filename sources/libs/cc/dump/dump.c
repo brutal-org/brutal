@@ -151,6 +151,11 @@ void cdump_expr(Emit *emit, CExpr expr)
     emit_fmt(emit, "expr:{}\n", cexpr_type_to_str(expr.type));
     emit_ident(emit);
 
+    if (expr.sema_type.type != CTYPE_INVALID)
+    {
+        emit_fmt(emit, "\nsema_type:\n");
+        cdump_type(emit, expr.sema_type);
+    }
     switch (expr.type)
     {
     case CEXPR_EMPTY:
@@ -332,6 +337,11 @@ void cdump_decl(Emit *emit, CDecl decl)
 {
     emit_fmt(emit, " decl:");
     emit_ident(emit);
+    if (decl.sema_type.type != CTYPE_INVALID)
+    {
+        emit_fmt(emit, "\nsema_type:\n");
+        cdump_type(emit, decl.sema_type);
+    }
 
     if (decl.type == CDECL_TYPE)
     {

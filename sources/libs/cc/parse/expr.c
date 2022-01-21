@@ -190,7 +190,7 @@ CExpr cparse_expr(Lex *lex, int pre, CUnit *context, Alloc *alloc)
         return left;
     }
 
-    while (cop_pre(cparse_lexeme_to_cop(curr_lex.type)) < pre)
+    while (!lex_ended(lex) && cop_pre(cparse_lexeme_to_cop(curr_lex.type)) < pre)
     {
         COp curr_cop = cparse_lexeme_to_cop(curr_lex.type);
 
