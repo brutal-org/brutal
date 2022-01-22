@@ -1,5 +1,7 @@
 #pragma once
 
+#include <brutal/base.h>
+/* --- */
 #include <brutal/gfx/buf.h>
 #include <brutal/gfx/color.h>
 #include <brutal/gfx/fmt.h>
