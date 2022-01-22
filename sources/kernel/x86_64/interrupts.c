@@ -15,8 +15,6 @@
 #include "kernel/x86_64/smp.h"
 #include "kernel/x86_64/syscall.h"
 
-static Lock _lock;
-
 static char *_exception_messages[32] = {
     "DivisionByZero",
     "Debug",
@@ -72,8 +70,6 @@ static void dump_register(Regs const *regs)
 
 static void interrupt_error_handler(Regs *regs)
 {
-    lock_acquire(&_lock);
-
     smp_stop_all();
 
     log_unlock("");
@@ -105,6 +101,11 @@ uint64_t interrupt_handler(uint64_t rsp)
 {
     Regs *regs = (Regs *)rsp;
 
+    if (regs->int_no < 32)
+    {
+        interrupt_error_handler(regs);
+    }
+
     cpu_begin_interrupt();
 
     if (regs->int_no >= 32 && regs->int_no <= 48)
@@ -112,11 +113,7 @@ uint64_t interrupt_handler(uint64_t rsp)
         event_trigger((BrEvent){.type = BR_EVENT_IRQ, .irq = regs->int_no - 32});
     }
 
-    if (regs->int_no < 32)
-    {
-        interrupt_error_handler(regs);
-    }
-    else if (regs->int_no == 32)
+    if (regs->int_no == 32)
     {
         context_save(task_self()->context, regs);
         sched_schedule();
