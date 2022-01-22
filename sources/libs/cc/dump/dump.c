@@ -1,250 +1,244 @@
 #include <brutal/debug.h>
 #include <cc/dump.h>
+#include <json/objects.h>
 
-void cdump_value(Emit *emit, CVal value)
+Json cdump_value(CVal value, Alloc *alloc)
 {
-    emit_fmt(emit, "value:{} ", cval_type_to_str(value.type));
+    Json json = json_object(alloc);
+    json_put(&json, str$("type"), json_str(cval_type_to_str(value.type)));
 
     switch (value.type)
     {
     case CVAL_SIGNED:
-        emit_fmt(emit, "{}", value.signed_);
+    {
+        json_put(&json, str$("value"), json_number(value.signed_));
         break;
-
+    }
     case CVAL_UNSIGNED:
-        emit_fmt(emit, "{}", value.unsigned_);
+    {
+        json_put(&json, str$("value"), json_number(value.unsigned_));
         break;
-
+    }
     case CVAL_FLOAT:
-        emit_fmt(emit, "{}", value.float_);
+    {
+        json_put(&json, str$("value"), json_str(str$("float are not supported for the moment")));
         break;
-
+    }
     case CVAL_STRING:
-        emit_fmt(emit, "\"{}\"", value.string_);
+    {
+        json_put(&json, str$("value"), json_str(value.string_));
         break;
-
+    }
     default:
         panic$("unknown value type {}", value.type);
     }
+    return json;
 }
 
-void cdump_member(Emit *emit, CTypeMembers const *members)
+Json cdump_member(CTypeMembers const *members, Alloc *alloc)
 {
-    emit_fmt(emit, "members:\n");
-    emit_ident(emit);
+    Json json = json_array(alloc);
 
     vec_foreach_v(member, members)
     {
-        emit_fmt(emit, "member:{}\n", member.name);
-        emit_ident(emit);
-        cdump_type(emit, member.type);
-        emit_deident(emit);
+        Json member_json = json_object(alloc);
+        json_put(&member_json, str$("name"), json_str(member.name));
+        json_put(&member_json, str$("type"), cdump_type(member.type, alloc));
     }
-
-    emit_deident(emit);
+    return json;
 }
 
-void cdump_type(Emit *emit, CType type)
+Json cdump_type(CType type, Alloc *alloc)
 {
-    emit_fmt(emit, "type:");
-    emit_ident(emit);
-
     switch (type.type)
     {
     case CTYPE_INVALID:
-        emit_fmt(emit, "<invalid>\n");
-        break;
-
+    {
+        return json_str(str$("<invalid>"));
+    }
     case CTYPE_TAIL:
-        emit_fmt(emit, "<tail>\n");
-        break;
-
+    {
+        return json_str(str$("<tail>"));
+    }
     case CTYPE_ERROR:
-        emit_fmt(emit, "<error>\n");
-        break;
-
+    {
+        return json_str(str$("<error>"));
+    }
     case CTYPE_VOID:
-        emit_fmt(emit, "void\n");
-        break;
-
+    {
+        return json_str(str$("void"));
+    }
     case CTYPE_AUTO:
-        emit_fmt(emit, "auto\n");
-        break;
-
+    {
+        return json_str(str$("auto"));
+    }
     case CTYPE_BOOL:
-        emit_fmt(emit, "Bool\n");
-        break;
-
+    {
+        return json_str(str$("Bool"));
+    }
     case CTYPE_PTR:
-        emit_fmt(emit, "ptr\n");
-        cdump_type(emit, *type.ptr_.subtype);
-        break;
-
+    {
+        Json json = json_object(alloc);
+        json_put(&json, str$("ptr"), cdump_type(*type.ptr_.subtype, alloc));
+        return json;
+    }
     case CTYPE_PARENT:
-        emit_fmt(emit, "parent\n");
-        cdump_type(emit, *type.parent_.subtype);
-        break;
-
+    {
+        Json json = json_object(alloc);
+        json_put(&json, str$("parent"), cdump_type(*type.parent_.subtype, alloc));
+        return json;
+    }
     case CTYPE_ARRAY:
-        if (type.array_.size == CTYPE_ARRAY_UNBOUNDED)
+    {
+        Json json = json_object(alloc);
+        json_put(&json, str$("array"), cdump_type(*type.array_.subtype, alloc));
+        if (type.array_.size != CTYPE_ARRAY_UNBOUNDED)
         {
-            emit_fmt(emit, "array[]\n");
+            json_put(&json, str$("size"), json_number(type.array_.size));
         }
-        else
-        {
-            emit_fmt(emit, "array[{}]\n", type.array_.size);
-        }
-        cdump_type(emit, *type.array_.subtype);
-        break;
-
+        return json;
+    }
     case CTYPE_SIGNED:
-        emit_fmt(emit, "signed\n");
-        break;
-
+    {
+        return json_str(str$("signed"));
+    }
     case CTYPE_UNSIGNED:
-        emit_fmt(emit, "unsigned\n");
-        break;
-
+    {
+        return json_str(str$("unsigned"));
+    }
     case CTYPE_FLOAT:
-        emit_fmt(emit, "float\n");
-        break;
-
+    {
+        return json_str(str$("float"));
+    }
     case CTYPE_STRUCT:
-        emit_fmt(emit, "struct\n");
-        cdump_member(emit, &type.struct_.members);
-        break;
-
+    {
+        Json json = json_object(alloc);
+        json_put(&json, str$("struct"), cdump_member(&type.struct_.members, alloc));
+        return json;
+    }
     case CTYPE_UNION:
-        emit_fmt(emit, "union\n");
-        cdump_member(emit, &type.union_.members);
-        break;
-
+    {
+        Json json = json_object(alloc);
+        json_put(&json, str$("union"), cdump_member(&type.struct_.members, alloc));
+        return json;
+    }
     case CTYPE_ENUM:
-        emit_fmt(emit, "enum\n");
-        break;
-
+    {
+        return json_str(str$("enum"));
+    }
     case CTYPE_FUNC:
-        emit_fmt(emit, "func\n");
-        emit_fmt(emit, "return:\n");
-
-        emit_ident(emit);
-        cdump_type(emit, *type.func_.ret);
-        emit_deident(emit);
-
-        cdump_member(emit, &type.func_.params);
-
-        break;
-
+    {
+        Json json = json_object(alloc);
+        json_put(&json, str$("func"), cdump_type(*type.func_.ret, alloc));
+        json_put(&json, str$("args"), cdump_member(&type.func_.params, alloc));
+        return json;
+    }
     case CTYPE_NAME:
-        emit_fmt(emit, "name\n{}\n", type.name);
-        break;
-
+    {
+        Json json = json_object(alloc);
+        json_put(&json, str$("name"), json_str(type.name));
+        return json;
+    }
     default:
         panic$("unknown ctype type {}", type.type);
     }
-
-    emit_deident(emit);
 }
 
-void cdump_expr(Emit *emit, CExpr expr)
+Json cdump_expr(CExpr expr, Alloc *alloc)
 {
-    emit_fmt(emit, "expr:{}\n", cexpr_type_to_str(expr.type));
-    emit_ident(emit);
-
+    Json json = json_object(alloc);
     if (expr.sema_type.type != CTYPE_INVALID)
     {
-        emit_fmt(emit, "\nsema_type:\n");
-        cdump_type(emit, expr.sema_type);
+        json_put(&json, str$("sema-type"), cdump_type(expr.sema_type, alloc));
     }
+
     switch (expr.type)
     {
     case CEXPR_EMPTY:
     case CEXPR_SELF:
+    {
         break;
-
+    }
     case CEXPR_CONSTANT:
-        cdump_value(emit, expr.constant_);
-        emit_fmt(emit, "\n");
+    {
+        json_put(&json, str$("constant"), cdump_value(expr.constant_, alloc));
         break;
-
+    }
     case CEXPR_IDENT:
-        emit_fmt(emit, "{}\n", expr.ident_);
+    {
+        json_put(&json, str$("ident"), json_str(expr.ident_));
         break;
-
+    }
     case CEXPR_POSTFIX:
-        emit_fmt(emit, "op: {}\n", cop_to_str(expr.postfix_.op));
-        cdump_expr(emit, *expr.postfix_.expr);
+    {
+        json_put(&json, str$("postfix"), json_str(cop_to_str(expr.postfix_.op)));
+        json_put(&json, str$("expr"), cdump_expr(*expr.postfix_.expr, alloc));
         break;
+    }
 
     case CEXPR_PREFIX:
-        emit_fmt(emit, "op: {}\n", cop_to_str(expr.postfix_.op));
-        cdump_expr(emit, *expr.prefix_.expr);
+    {
+        json_put(&json, str$("prefix"), json_str(cop_to_str(expr.prefix_.op)));
+        json_put(&json, str$("expr"), cdump_expr(*expr.prefix_.expr, alloc));
         break;
-
+    }
     case CEXPR_INFIX:
-        emit_fmt(emit, "op: {}\n", cop_to_str(expr.infix_.op));
-        cdump_expr(emit, *expr.infix_.lhs);
-        cdump_expr(emit, *expr.infix_.rhs);
+    {
+        json_put(&json, str$("infix"), json_str(cop_to_str(expr.infix_.op)));
+        json_put(&json, str$("lhs-expr"), cdump_expr(*expr.infix_.lhs, alloc));
+        json_put(&json, str$("rhs-expr"), cdump_expr(*expr.infix_.rhs, alloc));
         break;
-
+    }
     case CEXPR_CALL:
-        cdump_expr(emit, *expr.call_.expr);
-        emit_fmt(emit, "arg:\n");
-
-        emit_ident(emit);
+    {
+        json_put(&json, str$("call"), cdump_expr(*expr.call_.expr, alloc));
+        Json args = json_array(alloc);
 
         vec_foreach_v(v, &expr.call_.args)
         {
-            cdump_expr(emit, v);
+            json_append(&args, cdump_expr(v, alloc));
         }
 
-        emit_deident(emit);
+        json_put(&json, str$("args"), args);
         break;
-
+    }
     case CEXPR_CAST:
-        cdump_type(emit, expr.cast_.type);
-        cdump_expr(emit, *expr.cast_.expr);
+    {
+        json_put(&json, str$("cast"), cdump_type(expr.cast_.type, alloc));
+        json_put(&json, str$("expr"), cdump_expr(*expr.cast_.expr, alloc));
         break;
-
+    }
     case CEXPR_TERNARY:
-        emit_fmt(emit, "cond: ");
-        cdump_expr(emit, *expr.ternary_.expr_cond);
-
-        emit_fmt(emit, "\ntrue:");
-        cdump_expr(emit, *expr.ternary_.expr_true);
-
-        emit_fmt(emit, "\nfalse: ");
-        cdump_expr(emit, *expr.ternary_.expr_false);
+    {
+        json_put(&json, str$("ternary"), cdump_expr(*expr.ternary_.expr_cond, alloc));
+        json_put(&json, str$("true"), cdump_expr(*expr.ternary_.expr_true, alloc));
+        json_put(&json, str$("false"), cdump_expr(*expr.ternary_.expr_false, alloc));
         break;
-
+    }
     case CEXPR_INITIALIZER:
+    {
+        Json members = json_array(alloc);
         vec_foreach_v(v, &expr.initializer_.initializer)
         {
-            cdump_expr(emit, v);
+            json_append(&members, cdump_expr(v, alloc));
         }
-
+        json_put(&json, str$("initializer"), members);
         break;
-
+    }
     case CEXPR_LAMBDA:
-        emit_fmt(emit, "type: ");
-        cdump_type(emit, expr.lambda_.type);
-
-        emit_fmt(emit, "\nbody: ");
-        cdump_stmt(emit, *expr.lambda_.body);
+    {
+        json_put(&json, str$("lambda"), cdump_type(expr.lambda_.type, alloc));
+        json_put(&json, str$("body"), cdump_stmt(*expr.lambda_.body, alloc));
         break;
-
+    }
     default:
         panic$("unknown cexpr type {}", expr.type);
     }
-
-    emit_deident(emit);
+    return json;
 }
 
-void cdump_stmt(Emit *emit, CStmt stmt)
+Json cdump_stmt(CStmt stmt, Alloc *alloc)
 {
-    emit_fmt(emit, "stmt:{}\n", cstmt_type_to_str(stmt.type));
-    emit_ident(emit);
-
     switch (stmt.type)
     {
     case CSTMT_INVALID:
@@ -252,173 +246,186 @@ void cdump_stmt(Emit *emit, CStmt stmt)
     case CSTMT_CONTINUE:
     case CSTMT_DEFAULT:
     case CSTMT_BREAK:
-        break;
-
+    {
+        return json_str(cstmt_type_to_str(stmt.type));
+    }
     case CSTMT_DECL:
-        cdump_decl(emit, *stmt.decl_.decl);
-        break;
-
+    {
+        return cdump_decl(*stmt.decl_.decl, alloc);
+    }
     case CSTMT_EXPR:
-        cdump_expr(emit, stmt.expr_.expr);
-        break;
-
+    {
+        return cdump_expr(stmt.expr_.expr, alloc);
+    }
     case CSTMT_BLOCK:
+    {
+        Json array = json_array(alloc);
         vec_foreach_v(inner, &stmt.block_.stmts)
         {
-            cdump_stmt(emit, inner);
+            json_append(&array, cdump_stmt(inner, alloc));
         }
-        break;
-
+        return array;
+    }
     case CSTMT_IF:
-        cdump_expr(emit, stmt.if_.expr);
-        emit_fmt(emit, "true:");
-        cdump_stmt(emit, *stmt.if_.stmt_true);
-        emit_fmt(emit, "false:");
-        cdump_stmt(emit, *stmt.if_.stmt_false);
-        break;
-
+    {
+        Json json = json_object(alloc);
+        json_put(&json, str$("if"), cdump_expr(stmt.if_.expr, alloc));
+        json_put(&json, str$("true"), cdump_stmt(*stmt.if_.stmt_true, alloc));
+        json_put(&json, str$("false"), cdump_stmt(*stmt.if_.stmt_false, alloc));
+        return json;
+    }
     case CSTMT_FOR:
-        emit_fmt(emit, "\ninit:");
-        cdump_stmt(emit, *stmt.for_.init_stmt);
-        emit_fmt(emit, "\ncond:");
-        cdump_expr(emit, stmt.for_.cond_expr);
-        emit_fmt(emit, "\ninc:");
-        cdump_expr(emit, stmt.for_.iter_expr);
-        emit_fmt(emit, "\nbody:");
-        cdump_stmt(emit, *stmt.for_.stmt);
-        emit_fmt(emit, "\n");
-        break;
-
+    {
+        Json json = json_object(alloc);
+        json_put(&json, str$("for"), cdump_stmt(*stmt.for_.init_stmt, alloc));
+        json_put(&json, str$("cond"), cdump_expr(stmt.for_.cond_expr, alloc));
+        json_put(&json, str$("inc"), cdump_expr(stmt.for_.iter_expr, alloc));
+        json_put(&json, str$("body"), cdump_stmt(*stmt.for_.stmt, alloc));
+        return json;
+    }
     case CSTMT_WHILE:
-        cdump_expr(emit, stmt.while_.expr);
-        emit_fmt(emit, "\nbody:");
-        cdump_stmt(emit, *stmt.while_.stmt);
-        emit_fmt(emit, "\n");
-        break;
-
+    {
+        Json json = json_object(alloc);
+        json_put(&json, str$("while"), cdump_expr(stmt.while_.expr, alloc));
+        json_put(&json, str$("body"), cdump_stmt(*stmt.while_.stmt, alloc));
+        return json;
+    }
     case CSTMT_DO:
-        cdump_stmt(emit, *stmt.do_.stmt);
-        emit_fmt(emit, "\nwhile:");
-        cdump_expr(emit, stmt.do_.expr);
-        emit_fmt(emit, "\n");
-        break;
-
+    {
+        Json json = json_object(alloc);
+        json_put(&json, str$("do-while"), cdump_expr(stmt.do_.expr, alloc));
+        json_put(&json, str$("body"), cdump_stmt(*stmt.do_.stmt, alloc));
+        return json;
+    }
     case CSTMT_SWITCH:
-        cdump_expr(emit, stmt.switch_.expr);
-        emit_fmt(emit, "\n");
-        cdump_stmt(emit, *stmt.switch_.stmt);
-        break;
-
+    {
+        Json json = json_object(alloc);
+        json_put(&json, str$("switch"), cdump_expr(stmt.switch_.expr, alloc));
+        json_put(&json, str$("body"), cdump_stmt(*stmt.switch_.stmt, alloc));
+        return json;
+    }
     case CSTMT_RETURN:
-        cdump_expr(emit, stmt.return_.expr);
-        break;
-
+    {
+        Json json = json_object(alloc);
+        json_put(&json, str$("return"), cdump_expr(stmt.return_.expr, alloc));
+        return json;
+    }
     case CSTMT_GOTO:
-        emit_fmt(emit, " {}\n", stmt.goto_.label);
-        break;
-
+    {
+        Json json = json_object(alloc);
+        json_put(&json, str$("goto"), json_str(stmt.goto_.label));
+        return json;
+    }
     case CSTMT_LABEL:
-        emit_fmt(emit, " {}\n", stmt.label_.label);
-        break;
-
+    {
+        Json json = json_object(alloc);
+        json_put(&json, str$("label"), json_str(stmt.goto_.label));
+        return json;
+    }
     case CSTMT_CASE:
-        cdump_expr(emit, stmt.case_.expr);
-        break;
-
+    {
+        Json json = json_object(alloc);
+        json_put(&json, str$("case"), cdump_expr(stmt.case_.expr, alloc));
+        return json;
+    }
     default:
+    {
         panic$("unknown cstmt type {}", stmt.type);
         break;
     }
-
-    emit_deident(emit);
+    }
 }
 
-void cdump_decl(Emit *emit, CDecl decl)
+Json cdump_decl(CDecl decl, Alloc *alloc)
 {
-    emit_fmt(emit, " decl:");
-    emit_ident(emit);
+    Json json = json_object(alloc);
     if (decl.sema_type.type != CTYPE_INVALID)
     {
-        emit_fmt(emit, "\nsema_type:\n");
-        cdump_type(emit, decl.sema_type);
+        json_put(&json, str$("sema-type"), cdump_type(decl.sema_type, alloc));
     }
 
     if (decl.type == CDECL_TYPE)
     {
-        emit_fmt(emit, "typedef");
-        emit_fmt(emit, " {}\n", decl.name);
-        cdump_type(emit, decl.type_.type);
+        json_put(&json, str$("typedef"), json_str(decl.name));
+        json_put(&json, str$("type"), cdump_type(decl.type_.type, alloc));
     }
     else if (decl.type == CDECL_VAR)
     {
-        emit_fmt(emit, "var");
-        emit_fmt(emit, " {}\n", decl.name);
-        cdump_type(emit, decl.var_.type);
-        cdump_expr(emit, decl.var_.expr);
+        json_put(&json, str$("var"), json_str(decl.name));
+        json_put(&json, str$("type"), cdump_type(decl.var_.type, alloc));
+        json_put(&json, str$("expr"), cdump_expr(decl.var_.expr, alloc));
     }
     else if (decl.type == CDECL_FUNC)
     {
-        emit_fmt(emit, "func");
-        emit_fmt(emit, " {}\n", decl.name);
-        cdump_type(emit, decl.func_.type);
-        cdump_stmt(emit, decl.func_.body);
+        json_put(&json, str$("func"), json_str(decl.name));
+        json_put(&json, str$("type"), cdump_type(decl.func_.type, alloc));
+        json_put(&json, str$("body"), cdump_stmt(decl.func_.body, alloc));
     }
     else if (decl.type == CDECL_EMPTY)
     {
-        emit_fmt(emit, "empty");
+        json_put(&json, str$("empty"), json_str(str$("empty")));
     }
-
-    emit_deident(emit);
+    else
+    {
+        panic$("unknown cdecl type {}", decl.type);
+    }
+    return json;
 }
 
-void cdump_unit(Emit *emit, CUnit unit)
+Json cdump_unit(CUnit unit, Alloc *alloc)
 {
-    emit_fmt(emit, " cunit:\n");
-    emit_ident(emit);
-
+    Json json = json_object(alloc);
+    /* todo: add file info and more here */
+    Json units = json_array(alloc);
     vec_foreach_v(entry, &unit.units)
     {
         switch (entry.type)
         {
         case CUNIT_INCLUDE:
-            emit_fmt(emit, " include: \n");
-            emit_ident(emit);
-            emit_fmt(emit, " path: {}\n", entry._include.path);
-            emit_fmt(emit, " system: {}\n", (int)entry._include.is_system);
-            emit_deident(emit);
+        {
+            Json include = json_object(alloc);
+            json_put(&include, str$("include"), json_str(entry._include.path));
+            json_put(&include, str$("system"), json_bool(entry._include.is_system));
+            json_append(&units, include);
             break;
-
+        }
         case CUNIT_PRAGMA:
-            emit_fmt(emit, " pragma: {}\n", entry._pragma.text);
+        {
+            Json pragma = json_object(alloc);
+            json_put(&pragma, str$("pragma"), json_str(entry._pragma.text));
+            json_append(&units, pragma);
             break;
-
+        }
         case CUNIT_DECLARATION:
-            cdump_decl(emit, entry._decl);
+        {
+            json_append(&units, cdump_decl(entry._decl, alloc));
             break;
-
+        }
         case CUNIT_DEFINE:
-            emit_fmt(emit, " define {}: \n", entry._define.name);
-            emit_ident(emit);
+        {
+            Json def = json_object(alloc);
+            json_put(&def, str$("define"), json_str(entry._define.name));
 
             if (entry._define.args.len != 0)
             {
-                emit_fmt(emit, " arg: \n");
+                Json args = json_array(alloc);
 
                 vec_foreach_v(arg_name, &entry._define.args)
                 {
-                    emit_fmt(emit, " - {}\n", arg_name);
+                    json_append(&args, json_str(arg_name));
                 }
+                json_put(&def, str$("args"), args);
             }
-
-            cdump_expr(emit, entry._define.expression);
-            emit_deident(emit);
+            json_put(&def, str$("expr"), cdump_expr(entry._define.expression, alloc));
+            json_append(&units, def);
             break;
+        }
 
         default:
             panic$("unknown cunit entry type {}", entry.type);
             break;
         }
     }
-
-    emit_deident(emit);
+    json_put(&json, str$("unit"), units);
+    return json;
 }

@@ -2,15 +2,16 @@
 
 #include <brutal/io.h>
 #include <cc/ast/unit.h>
+#include <json/objects.h>
 
-void cdump_value(Emit *target, CVal value);
+Json cdump_value(CVal value, Alloc *alloc);
 
-void cdump_type(Emit *target, CType type);
+Json cdump_type(CType type, Alloc *alloc);
 
-void cdump_expr(Emit *target, CExpr expr);
+Json cdump_expr(CExpr expr, Alloc *alloc);
 
-void cdump_stmt(Emit *target, CStmt stmt);
+Json cdump_stmt(CStmt stmt, Alloc *alloc);
 
-void cdump_decl(Emit *target, CDecl decl);
+Json cdump_decl(CDecl decl, Alloc *alloc);
 
-void cdump_unit(Emit *target, CUnit unit);
+Json cdump_unit(CUnit unit, Alloc *alloc);

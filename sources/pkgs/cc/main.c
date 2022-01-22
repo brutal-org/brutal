@@ -6,6 +6,7 @@
 #include <cc/parse.h>
 #include <cc/sema.h>
 #include <cc/trans.h>
+#include <json/emit.h>
 
 int main(int argc, char const *argv[])
 {
@@ -55,7 +56,8 @@ int main(int argc, char const *argv[])
 
     emit_ident_size(&emit, 2);
     emit_fmt(&emit, "--- BEGIN AST ---\n");
-    cdump_unit(&emit, unit);
+    Json json = cdump_unit(unit, base$(&heap));
+    json_emit(json, &emit);
     emit_fmt(&emit, "--- END AST ---\n");
 
     emit_fmt(&emit, "\n");
