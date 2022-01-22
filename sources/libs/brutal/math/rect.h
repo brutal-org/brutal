@@ -36,6 +36,11 @@ static inline MRect m_rect(float x, float y, float z, float w)
 
 #define m_rect_end(RECT) ((RECT).x + (RECT).width)
 
+static inline MVec2 m_rect_center(MRect rect)
+{
+    return m_vec2(rect.x + rect.width / 2, rect.y + rect.height / 2);
+}
+
 static inline bool m_rect_empty(MRect rect)
 {
     return (int)rect.width == 0 || (int)rect.height == 0;
@@ -96,4 +101,28 @@ static inline MRect m_rect_clip_rect(MRect recta, MRect rectb)
         m_min(recta.y + recta.height, rectb.y + rectb.height));
 
     return m_rect_from_points(p0, p1);
+}
+
+static inline MRect m_rect_cover(MRect container, MRect overlay)
+{
+    float scale_x = container.width / overlay.width;
+    float scale_y = container.height / overlay.height;
+
+    float scale = m_max(scale_x, scale_y);
+
+    MRect result = m_rect(0, 0, overlay.width * scale, overlay.height * scale);
+    result.pos = m_vec2_sub(m_rect_center(container), m_rect_center(result));
+    return result;
+}
+
+static inline MRect m_rect_fit(MRect container, MRect overlay)
+{
+    float scale_x = container.width / overlay.width;
+    float scale_y = container.height / overlay.height;
+
+    float scale = m_min(scale_x, scale_y);
+
+    MRect result = m_rect(0, 0, overlay.width * scale, overlay.height * scale);
+    result.pos = m_vec2_sub(m_rect_center(container), m_rect_center(result));
+    return result;
 }

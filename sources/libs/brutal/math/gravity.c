@@ -2,6 +2,16 @@
 
 MRect m_gravity_apply(UiGravity gravity, MFlow flow, MRect content, MRect container)
 {
+    if (gravity & M_GRAVITY_COVER)
+    {
+        content = m_rect_cover(content, container);
+    }
+
+    if (gravity & M_GRAVITY_FIT)
+    {
+        content = m_rect_fit(content, container);
+    }
+
     if (gravity & M_GRAVITY_START)
     {
         content = m_flow_set_x(flow, content, m_flow_get_start(flow, container));
