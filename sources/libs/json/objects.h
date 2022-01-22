@@ -59,6 +59,8 @@ Json json_true(void);
 
 Json json_false(void);
 
+#define json_bool(val) ((val) ? json_true() : json_false())
+
 Json json_error(void);
 
 Json json_number(long number);
