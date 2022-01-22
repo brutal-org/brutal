@@ -110,7 +110,7 @@ void event_trigger(BrEvent event)
     {
         bool expected = true;
         if (br_event_eq(binding->event, event) &&
-            atomic_compare_exchange_strong(&binding->ack, &expected, true))
+            atomic_compare_exchange_strong(&binding->ack, &expected, false))
         {
             event_dispatch(binding->task, event);
         }
