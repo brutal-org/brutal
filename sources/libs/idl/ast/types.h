@@ -62,7 +62,7 @@ struct _IdlType
 struct _IdlEnumMember
 {
     Str name;
-    Str mangled;
+    int value;
 };
 
 struct _IdlStructMember

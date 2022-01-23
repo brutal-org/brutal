@@ -1,5 +1,6 @@
 #include <brutal/hash.h>
 #include <idl/ast/builder.h>
+#include <ipc/ipc.h>
 
 /* --- Types ---------------------------------------------------------------- */
 
@@ -30,7 +31,7 @@ IdlType idl_primitive(Str str)
     };
 }
 
-IdlType idl_primitive_resolved(Str str, IdlAlias alias, Alloc* alloc)
+IdlType idl_primitive_resolved(Str str, IdlAlias alias, Alloc *alloc)
 {
     return (IdlType){
         .type = IDL_TYPE_PRIMITIVE,
@@ -52,17 +53,12 @@ IdlType idl_enum(Alloc *alloc)
     };
 }
 
-void idl_enum_constant(IdlType *enum_, Str name)
+void idl_enum_constant(IdlType *enum_, Str name, int value)
 {
-    idl_enum_constant_mangled(enum_, name, nullstr);
-}
-
-void idl_enum_constant_mangled(IdlType *enum_, Str name, Str mangled)
-{
-    IdlEnumMember member;
-
-    member.name = name;
-    member.mangled = mangled;
+    IdlEnumMember member = {
+        .name = name,
+        .value = value,
+    };
 
     vec_push(&enum_->enum_.members, member);
 }
@@ -129,14 +125,8 @@ void idl_attr_append(IdlAttr *attr, Str data)
 
 IdlMethod idl_method(Str name, IdlAttrs attrs, IdlType request, IdlType response)
 {
-    return idl_method_mangled(name, nullstr, attrs, request, response);
-}
-
-IdlMethod idl_method_mangled(Str name, Str mangled, IdlAttrs attrs, IdlType request, IdlType response)
-{
     IdlMethod method = {
         .name = name,
-        .mangled = mangled,
         .request = request,
         .response = response,
         .attrs = attrs,
@@ -149,14 +139,8 @@ IdlMethod idl_method_mangled(Str name, Str mangled, IdlAttrs attrs, IdlType requ
 
 IdlAlias idl_alias(Str name, IdlAttrs attrs, IdlType type)
 {
-    return idl_alias_mangled(name, nullstr, attrs, type);
-}
-
-IdlAlias idl_alias_mangled(Str name, Str mangled, IdlAttrs attrs, IdlType type)
-{
     IdlAlias alias = {
         .name = name,
-        .mangled = mangled,
         .type = type,
         .attrs = attrs,
     };
@@ -194,9 +178,9 @@ IdlModule idl_module(Str name, Alloc *alloc)
 
     module.errors = idl_enum(alloc);
 
-    idl_enum_constant(&module.errors, str$("SUCCESS"));
-    idl_enum_constant(&module.errors, str$("UNEXPECTED_MESSAGE"));
-    idl_enum_constant(&module.errors, str$("BAD_COMMUNICATION"));
+    idl_enum_constant(&module.errors, str$("SUCCESS"), IPC_SUCCESS);
+    idl_enum_constant(&module.errors, str$("UNEXPECTED_MESSAGE"), IPC_UNEXPECTED_MESSAGE);
+    idl_enum_constant(&module.errors, str$("BAD_COMMUNICATION"), IPC_BAD_COMMUNICATION);
 
     vec_init(&module.aliases, alloc);
     vec_init(&module.imports, alloc);

@@ -11,7 +11,7 @@ Str idl_cgen_pack_name(IdlAlias alias, Alloc *alloc)
         return vec_at(&attr.args, 0);
     }
 
-    return str_fmt(alloc, "{case:snake}_pack", alias.mangled);
+    return str_fmt(alloc, "{case:snake}_pack", alias.name);
 }
 
 CExpr idl_cgen_pack_ref(IdlAlias alias, Alloc *alloc)
@@ -23,7 +23,7 @@ CType idl_cgen_pack_type(IdlAlias alias, Alloc *alloc)
 {
     CType ctype = ctype_func(ctype_void(), alloc);
     ctype_member(&ctype, str$("self"), ctype_ident_ptr(str$("IpcPack"), alloc));
-    ctype_member(&ctype, str$("data"), ctype_ident_ptr(alias.mangled, alloc));
+    ctype_member(&ctype, str$("data"), ctype_ident_ptr(alias.name, alloc));
     return ctype;
 }
 

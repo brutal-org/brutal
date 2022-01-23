@@ -103,7 +103,7 @@ void ipc_component_deinit(IpcComponent *self)
     vec_deinit(&self->pendings);
 }
 
-void ipc_component_inject(IpcComponent *self, IpcCapability const *caps, int count)
+void ipc_component_inject(IpcComponent *self, IpcCap const *caps, int count)
 {
     for (int i = 0; i < count; i++)
     {
@@ -124,7 +124,20 @@ Iter ipc_component_query(IpcComponent *self, uint32_t proto, IterFn *iter, void 
     return ITER_CONTINUE;
 }
 
-IpcCapability ipc_component_provide(IpcComponent *self, uint32_t id, IpcHandler *fn, void *ctx)
+IpcCap ipc_component_require(IpcComponent *self, uint32_t proto)
+{
+    vec_foreach(cap, &self->capabilities)
+    {
+        if (cap->proto == proto)
+        {
+            return *cap;
+        }
+    }
+
+    panic$("No capability found for proto: {}", proto);
+}
+
+IpcCap ipc_component_provide(IpcComponent *self, uint32_t id, IpcHandler *fn, void *ctx)
 {
     static uint64_t port_id = 0;
     IpcProvider *provider = alloc_make(self->alloc, IpcProvider);
@@ -136,8 +149,8 @@ IpcCapability ipc_component_provide(IpcComponent *self, uint32_t id, IpcHandler 
 
     vec_push(&self->providers, provider);
 
-    return (IpcCapability){
-        .address = (BrAddr){
+    return (IpcCap){
+        .addr = (BrAddr){
             bal_self_id(),
             provider->port,
         },
@@ -151,13 +164,13 @@ static bool wait_pending(void *ctx)
     return pending->ok;
 }
 
-BrResult ipc_component_request(IpcComponent *self, BrAddr to, BrMsg *req, BrMsg *resp)
+BrResult ipc_component_request(IpcComponent *self, IpcCap to, BrMsg *req, BrMsg *resp)
 {
     static uint32_t seq = 0;
     req->seq = seq++;
 
     br_ipc(&(BrIpcArgs){
-        .to = to,
+        .to = to.addr,
         .msg = *req,
         .deadline = 0,
         .flags = BR_IPC_SEND,

@@ -4,7 +4,7 @@
 
 CType idl_cgen_provider_type(IdlIface const iface, Alloc *alloc)
 {
-    CType ctype = ctype_func(ctype_ident(str$("IpcCapability")), alloc);
+    CType ctype = ctype_func(ctype_ident(str$("IpcCap")), alloc);
     CType vtable_type = ctype_ident(str_fmt(alloc, "{}VTable", iface.name));
     CType ipc_type = ctype_ident(str$("IpcComponent"));
 

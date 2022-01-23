@@ -14,7 +14,6 @@ typedef Vec(IdlAttr) IdlAttrs;
 typedef struct _IdlAlias
 {
     Str name;
-    Str mangled;
 
     IdlType type;
     IdlAttrs attrs;
@@ -23,7 +22,6 @@ typedef struct _IdlAlias
 typedef struct
 {
     Str name;
-    Str mangled;
 
     IdlType request;
     IdlType response;

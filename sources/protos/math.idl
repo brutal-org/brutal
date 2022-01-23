@@ -2,10 +2,10 @@ module math;
 
 include brutal/math.h;
 
-[no_prefix, packfn(ipc_pack_rect, ipc_unpack_rect)]
+[packfn(ipc_pack_rect, ipc_unpack_rect)]
 type MRect = __ctype;
 
-[no_prefix, packfn(ipc_pack_vec2, ipc_unpack_vec2)]
+[packfn(ipc_pack_vec2, ipc_unpack_vec2)]
 type MVec2 = __ctype;
 
 

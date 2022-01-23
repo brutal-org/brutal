@@ -2,36 +2,6 @@ module pci;
 
 import base;
 
-type Identifier =
-{
-    U16 vendor,
-    U8 class,
-    U8 subclass,
-};
-
-type BarType = enum
-{
-    INVALID,
-    BAR_MMIO_32,
-    BAR_MMIO_64,
-    BAR_PIO,
-};
-
-type Addr =
-{
-    U16 seg,
-    U8 bus,
-    U8 slot,
-    U8 func,
-};
-
-type BarInfo =
-{
-    U64 base,
-    U32 size,
-    BarType type,
-};
-
 errors
 {
     NOT_FOUND,
@@ -40,11 +10,42 @@ errors
     IRQ_ALREADY_ENABLED
 };
 
-interface Server
+type PciIdentifier =
 {
-    method query Identifier -> Addr;
+    U16 vendor,
+    U8 class,
+    U8 subclass,
+};
 
-    method bar { Addr addr, U8 num } -> BarInfo;
+type PciBarType = enum
+{
+    BAR_INVALID,
+    BAR_MMIO_32,
+    BAR_MMIO_64,
+    BAR_PIO,
+};
 
-    method enable_irq { Addr addr } -> U8;
+type PciAddr =
+{
+    U16 seg,
+    U8 bus,
+    U8 slot,
+    U8 func,
+};
+
+type PciBarInfo =
+{
+    U64 base,
+    U32 size,
+    PciBarType type,
+};
+
+
+interface bus
+{
+    method query PciIdentifier -> PciAddr;
+
+    method bar { PciAddr addr, U8 num } -> PciBarInfo;
+
+    method enable_irq { PciAddr addr } -> U8;
 };

@@ -5,7 +5,7 @@
 #include <idl/cgen.h>
 #include <idl/json.h>
 #include <idl/parse.h>
-#include <idl/pass.h>
+#include <idl/sema.h>
 #include <json/emit.h>
 
 int main(int argc, char const *argv[])
@@ -36,7 +36,7 @@ int main(int argc, char const *argv[])
     Scan scan;
     scan_init(&scan, buf_str(&source_buf));
 
-    IdlModule module = idl_parse(&scan, base$(&heap));
+    IdlModule module = idl_parse_module(&scan, base$(&heap));
 
     if (scan_dump_error(&scan, io_chan_err()))
     {
@@ -46,7 +46,7 @@ int main(int argc, char const *argv[])
     Emit emit;
     emit_init(&emit, io_chan_out());
 
-    module = idl_pass_prefix(module, base$(&heap));
+    module = idl_sema_module(module, base$(&heap));
 
     if (str_eq(str$("--json"), str$(argv[2])))
     {
