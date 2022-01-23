@@ -78,7 +78,7 @@ static void bal_exec_load(BrHandle space, Elf64Header const *elf_header, BrHandl
     }
 }
 
-static uintptr_t bal_exec_stack(BrHandle space, IpcCapability *caps, size_t count, BrTaskArgs *start_args)
+static uintptr_t bal_exec_stack(BrHandle space, IpcCap *caps, size_t count, BrTaskArgs *start_args)
 {
     BrCreateArgs stack_obj = {
         .type = BR_OBJECT_MEMORY,
@@ -100,8 +100,8 @@ static uintptr_t bal_exec_stack(BrHandle space, IpcCapability *caps, size_t coun
     uint8_t *base = (uint8_t *)local_stack_map.vaddr + 0x4000;
     uint8_t *head = base;
 
-    head -= align_up$(sizeof(IpcCapability) * count, 16);
-    mem_cpy(head, caps, align_up$(sizeof(IpcCapability) * count, 16));
+    head -= align_up$(sizeof(IpcCap) * count, 16);
+    mem_cpy(head, caps, align_up$(sizeof(IpcCap) * count, 16));
 
     start_args->arg1 = 0xC0000000 - ((uintptr_t)base - (uintptr_t)head);
     start_args->arg2 = count;
@@ -130,7 +130,7 @@ static uintptr_t bal_exec_stack(BrHandle space, IpcCapability *caps, size_t coun
     return sp;
 }
 
-BrResult bal_task_exec(BalTask *task, BalMem *elf, BrRight rights, IpcCapability *caps, size_t count)
+BrResult bal_task_exec(BalTask *task, BalMem *elf, BrRight rights, IpcCap *caps, size_t count)
 {
     BrCreateArgs space = {
         .type = BR_OBJECT_SPACE,

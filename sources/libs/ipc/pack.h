@@ -1,7 +1,8 @@
 #pragma once
 
-#include <bal/abi.h>
 #include <brutal/ds.h>
+#include <brutal/math.h>
+#include <ipc/capability.h>
 
 typedef struct
 {
@@ -23,7 +24,11 @@ void ipc_pack(IpcPack *self, void const *buf, size_t len);
 
 void ipc_pack_enum(IpcPack *self, int const *s);
 
+void ipc_pack_bool(IpcPack *self, bool const *s);
+
 void ipc_pack_size(IpcPack *self, size_t const *s);
+
+void ipc_pack_ptr(IpcPack *self, uintptr_t const *s);
 
 void ipc_pack_s8(IpcPack *self, int8_t const *s);
 
@@ -45,9 +50,13 @@ void ipc_pack_f32(IpcPack *self, float const *f);
 
 void ipc_pack_f64(IpcPack *self, double const *f);
 
+void ipc_pack_rect(IpcPack *self, MRect const *v);
+
+void ipc_pack_vec2(IpcPack *self, MVec2 const *v);
+
 void ipc_pack_str(IpcPack *self, Str const *str);
 
-void ipc_pack_addr(IpcPack *self, BrAddr const *addr);
+void ipc_pack_cap(IpcPack *self, IpcCap const *addr);
 
 void ipc_pack_slice_impl(IpcPack *self, SliceImpl const *v, IpcPackFn *el);
 

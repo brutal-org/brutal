@@ -35,7 +35,7 @@ struct _IpcComponent
     void *ctx;
     Vec(IpcPending *) pendings;
     Vec(IpcProvider *) providers;
-    Vec(IpcCapability) capabilities;
+    Vec(IpcCap) capabilities;
     IpcHandler *sink;
     bool running;
     int result;
@@ -45,13 +45,15 @@ void ipc_component_init(IpcComponent *self, void *ctx, Alloc *alloc);
 
 void ipc_component_deinit(IpcComponent *self);
 
-void ipc_component_inject(IpcComponent *self, IpcCapability const *caps, int count);
+void ipc_component_inject(IpcComponent *self, IpcCap const *caps, int count);
 
 Iter ipc_component_query(IpcComponent *self, uint32_t proto, IterFn *iter, void *ctx);
 
-IpcCapability ipc_component_provide(IpcComponent *self, uint32_t id, IpcHandler *fn, void *ctx);
+IpcCap ipc_component_require(IpcComponent *self, uint32_t proto);
 
-BrResult ipc_component_request(IpcComponent *self, BrAddr to, BrMsg *req, BrMsg *resp);
+IpcCap ipc_component_provide(IpcComponent *self, uint32_t id, IpcHandler *fn, void *ctx);
+
+BrResult ipc_component_request(IpcComponent *self, IpcCap to, BrMsg *req, BrMsg *resp);
 
 BrResult ipc_component_respond(IpcComponent *self, BrMsg const *req, BrMsg *resp);
 

@@ -1,8 +1,7 @@
-#include <acpi/base.h>
 #include <acpi/rsdt.h>
-#include <bal/boot.h>
+#include <brutal/alloc.h>
 #include <brutal/debug.h>
-#include <ipc/ipc.h>
+#include <protos/boot.h>
 
 Iter dump_sdth(AcpiSdth *sdth, void *)
 {
@@ -12,8 +11,16 @@ Iter dump_sdth(AcpiSdth *sdth, void *)
 
 int ipc_component_main(IpcComponent *self)
 {
+    IpcCap infos = ipc_component_require(self, IPC_BOOT_INFO_PROTO);
+
+    uintptr_t rsdp = 0;
+    if (boot_info_get_rsdp(self, infos, &rsdp, alloc_global()) != IPC_SUCCESS)
+    {
+        panic$("No rsdp found!");
+    }
+
     Acpi acpi = {};
-    acpi_init(&acpi, handover->rsdp);
+    acpi_init(&acpi, rsdp);
 
     log$("RSDT Dump:");
     acpi_rsdt_iterate(&acpi, (IterFn *)dump_sdth, nullptr);

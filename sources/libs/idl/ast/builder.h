@@ -14,9 +14,7 @@ IdlType idl_primitive_resolved(Str str, IdlAlias alias, Alloc *alloc);
 
 IdlType idl_enum(Alloc *alloc);
 
-void idl_enum_constant(IdlType *enum_, Str name);
-
-void idl_enum_constant_mangled(IdlType *enum_, Str name, Str mangled);
+void idl_enum_constant(IdlType *enum_, Str name, int value);
 
 IdlType idl_struct(Alloc *alloc);
 
@@ -38,13 +36,9 @@ void idl_attr_append(IdlAttr *attr, Str data);
 
 IdlMethod idl_method(Str name, IdlAttrs attrs, IdlType request, IdlType response);
 
-IdlMethod idl_method_mangled(Str name, Str mangled, IdlAttrs attrs, IdlType request, IdlType response);
-
 /* --- Aliases -------------------------------------------------------------- */
 
 IdlAlias idl_alias(Str name, IdlAttrs attrs, IdlType type);
-
-IdlAlias idl_alias_mangled(Str name, Str mangled, IdlAttrs attrs, IdlType type);
 
 /* --- Interfaces ----------------------------------------------------------- */
 

@@ -15,15 +15,6 @@ Json idl_jgen_primitive(IdlPrimitive primitive_, Alloc *alloc)
 
     json_put(&json, str$("name"), json_str(primitive_.name));
 
-    if (primitive_.alias)
-    {
-        json_put(&json, str$("alias"), idl_jgen_alias(*primitive_.alias, alloc));
-    }
-    else
-    {
-        json_put(&json, str$("alias"), json_null());
-    }
-
     return json;
 }
 
@@ -37,7 +28,6 @@ Json idl_jgen_enum(IdlEnum enum_, Alloc *alloc)
         Json member_json = json_object(alloc);
 
         json_put(&member_json, str$("name"), json_str(member.name));
-        json_put(&member_json, str$("mangled"), json_str(member.mangled));
 
         json_append(&members_json, member_json);
     }
@@ -118,7 +108,6 @@ Json idl_jgen_method(IdlMethod const method, Alloc *alloc)
     Json json = json_object_with_type(str$("IdlMethod"), alloc);
 
     json_put(&json, str$("name"), json_str(method.name));
-    json_put(&json, str$("mangled"), json_str(method.mangled));
     json_put(&json, str$("request"), idl_jgen_type(method.request, alloc));
     json_put(&json, str$("response"), idl_jgen_type(method.response, alloc));
 

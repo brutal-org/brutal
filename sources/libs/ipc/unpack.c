@@ -24,6 +24,11 @@ void ipc_unpack_size(IpcUnpack *self, size_t *v)
     ipc_unpack(self, v, sizeof(*v));
 }
 
+void ipc_unpack_ptr(IpcUnpack *self, uintptr_t *v)
+{
+    ipc_unpack(self, v, sizeof(*v));
+}
+
 void ipc_unpack_s8(IpcUnpack *self, int8_t *v)
 {
     ipc_unpack(self, v, sizeof(*v));
@@ -83,10 +88,9 @@ void ipc_unpack_str(IpcUnpack *self, Str *str)
     *str = str_n$(len, buf);
 }
 
-void ipc_unpack_addr(IpcUnpack *self, BrAddr *addr)
+void ipc_unpack_cap(IpcUnpack *self, IpcCap *v)
 {
-    ipc_unpack_u64(self, &addr->id);
-    ipc_unpack_u64(self, &addr->port);
+    ipc_unpack(self, v, sizeof(*v));
 }
 
 void ipc_unpack_slice_impl(IpcUnpack *self, VoidSlice *slice, IpcUnpackFn *el, size_t el_size)

@@ -49,6 +49,10 @@ CType idl_cgen_method_type(IdlMethod method, IdlModule const module, Alloc *allo
 
 CStmt idl_cgen_method_body(IdlMethod method, IdlIface const iface, Alloc *alloc);
 
+/* --- Handler -------------------------------------------------------------- */
+
+CType idl_cgen_handler_type(IdlMethod method, IdlIface const iface, Alloc *alloc);
+
 /* --- Provider ------------------------------------------------------------- */
 
 CType idl_cgen_provider_type(IdlIface const iface, Alloc *alloc);
@@ -68,6 +72,8 @@ CStmt idl_cgen_dispatch_body(IdlIface const iface, Alloc *alloc);
 CDecl idl_cgen_dispatch_func(IdlIface const iface, Alloc *alloc);
 
 /* --- Source & Header ------------------------------------------------------ */
+
+void idl_cgen_includes(CUnit *unit, IdlModule const module, Alloc *alloc);
 
 void idl_cgen_iface_header(CUnit *unit, IdlModule const module, IdlIface const iface, Alloc *alloc);
 

@@ -27,7 +27,7 @@ BrAddr bus_lookup(Bus *bus, Str name)
     return BR_ADDR_NIL;
 }
 
-void bus_start(Bus *bus, Str name, BalArgs args)
+void bus_start(Bus *bus, Str name, IpcCap* caps, size_t len)
 {
     log$("Starting service '{case:pascal}'...", name);
 
@@ -40,7 +40,7 @@ void bus_start(Bus *bus, Str name, BalArgs args)
     BalTask elf_task;
     bal_task_init(&elf_task, name);
 
-    bal_task_exec(&elf_task, &elf_mem, BR_RIGHT_IO | BR_RIGHT_LOG | BR_RIGHT_PMM | BR_RIGHT_IRQ, args);
+    bal_task_exec(&elf_task, &elf_mem, BR_RIGHT_IO | BR_RIGHT_LOG | BR_RIGHT_PMM | BR_RIGHT_IRQ, caps, len);
 
     bal_mem_deinit(&elf_mem);
 
@@ -48,5 +48,6 @@ void bus_start(Bus *bus, Str name, BalArgs args)
         .addr.id = elf_task.id,
         .name = name,
     };
+
     vec_push(&bus->serv, comp);
 }

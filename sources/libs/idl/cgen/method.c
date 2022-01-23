@@ -8,7 +8,7 @@ CType idl_cgen_method_type(IdlMethod method, IdlModule const module, Alloc *allo
 
     ctype_member(&ctype, str$("ev"), ctype_ident_ptr(str$("IpcComponent"), alloc));
 
-    ctype_member(&ctype, str$("from"), ctype_ident(str$("BrAddr")));
+    ctype_member(&ctype, str$("from"), ctype_ident(str$("IpcCap")));
 
     if (method.request.type != IDL_TYPE_NIL)
     {

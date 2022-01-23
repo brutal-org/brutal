@@ -67,6 +67,11 @@ void ipc_pack_size(IpcPack *self, size_t const *s)
     ipc_pack(self, s, sizeof(*s));
 }
 
+void ipc_pack_ptr(IpcPack *self, uintptr_t const *s)
+{
+    ipc_pack(self, s, sizeof(*s));
+}
+
 void ipc_pack_s8(IpcPack *self, int8_t const *v)
 {
     ipc_pack(self, v, sizeof(*v));
@@ -123,10 +128,9 @@ void ipc_pack_str(IpcPack *self, Str const *v)
     ipc_pack(self, v->buf, v->len);
 }
 
-void ipc_pack_addr(IpcPack *self, BrAddr const *addr)
+void ipc_pack_cap(IpcPack *self, IpcCap const *cap)
 {
-    ipc_pack_u64(self, &addr->port);
-    ipc_pack_u64(self, &addr->id);
+    ipc_pack(self, cap, sizeof(*cap));
 }
 
 void ipc_pack_slice_impl(IpcPack *self, SliceImpl const *v, IpcPackFn *el)

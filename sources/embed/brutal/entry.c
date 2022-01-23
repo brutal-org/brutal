@@ -14,7 +14,7 @@ WEAK int br_main(
 {
     IpcComponent component;
     ipc_component_init(&component, nullptr, alloc_global());
-    ipc_component_inject(&component, (IpcCapability *)arg1, (int)arg2);
+    ipc_component_inject(&component, (IpcCap *)arg1, (int)arg2);
     int result = ipc_component_main(&component);
     ipc_component_deinit(&component);
     return result;

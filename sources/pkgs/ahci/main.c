@@ -2,51 +2,38 @@
 #include <ahci/device.h>
 #include <brutal/alloc.h>
 #include <brutal/debug.h>
-#include <ipc/ipc.h>
-#include <protos/pci.h>
 #include <protos/bbus.h>
+#include <protos/pci.h>
 
-int br_entry_args(
-    MAYBE_UNUSED long arg1,
-    MAYBE_UNUSED long arg2,
-    MAYBE_UNUSED long arg3,
-    MAYBE_UNUSED long arg4,
-    MAYBE_UNUSED long arg5)
+int ipc_component_main(IpcComponent *self)
 {
-    IpcComponent ev = {};
-    ipc_component_init(&ev, nullptr, alloc_global());
+    IpcCap pci_bus = ipc_component_require(self, IPC_PCI_BUS_PROTO);
 
-    Str req = str$("pci");
-    BrAddr resp;
-    while (bbus_locate(&ev, BR_ADDR_SUPER, &req, &resp, alloc_global()) == BBUS_NOT_FOUND)
-        ;
+    PciIdentifier id = {
+        .vendor = 0x8086,
+        .class = 1,
+        .subclass = 6,
+    };
 
-    PciFindDeviceRequest r = {
-        .identifier = {
-            .vendor = 0x8086,
-            .class = 1,
-            .subclass = 6,
-        }};
-
-    PciAddr res;
-    if (pci_find_device(&ev, resp, &r, &res, alloc_global()) == PCI_NOT_FOUND)
+    PciAddr ahci_device;
+    if (pci_bus_query(self, pci_bus, &id, &ahci_device, alloc_global()) == PCI_NOT_FOUND)
     {
-        log$("no ahci found !");
+        log$("No AHCI controller found!");
         return 0;
     }
 
-    log$("ahci: bus: {} func: {} seg: {} slot: {}", res.bus, res.func, res.seg, res.slot);
+    log$("AHCI controller found on bus: {} func: {} seg: {} slot: {}", ahci_device.bus, ahci_device.func, ahci_device.seg, ahci_device.slot);
 
-    PciBarInfo b = {};
-    PciBarRequest bar_req = {.addr = res, .num = 5};
-    pci_bar(&ev, resp, &bar_req, &b, alloc_global());
+    PciBarInfo pci_bar = {};
+    pci_bus_bar(self, pci_bus, &(PciBusBarRequest){.addr = ahci_device, .num = 5}, &pci_bar, alloc_global());
 
-    log$("ahci: bar[5] {#x}-{#x} type: {}", b.base, b.base + b.size, b.type);
+    log$("bar[5] {#x}-{#x} type: {}", pci_bar.base, pci_bar.base + pci_bar.size, pci_bar.type);
+
     Ahci ahci;
-    ahci_init(&ahci, &b, alloc_global());
+    ahci_init(&ahci, &pci_bar, alloc_global());
     AhciDevice dev = ahci.devs.data[0];
 
     UNUSED(dev);
 
-    return 0;
+    return ipc_component_run(self);
 }

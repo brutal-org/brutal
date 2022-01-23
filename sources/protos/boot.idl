@@ -1,0 +1,8 @@
+module boot;
+
+import base;
+
+interface info
+{
+    method get_rsdp -> Ptr;
+};

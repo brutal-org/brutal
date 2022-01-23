@@ -61,7 +61,7 @@ static int is_ident(int chr)
     return chr == '_' || isalnum(chr);
 }
 
-static IdlType parse_type(Scan *scan, Alloc *alloc);
+static IdlType idl_parse_type(Scan *scan, Alloc *alloc);
 
 static Str parse_ident(Scan *scan)
 {
@@ -75,7 +75,7 @@ static Str parse_ident(Scan *scan)
     return name;
 }
 
-static IdlType parse_primitive(Scan *scan)
+static IdlType idl_parse_primitive(Scan *scan)
 {
     Str ident = parse_ident(scan);
 
@@ -87,25 +87,25 @@ static IdlType parse_primitive(Scan *scan)
     return idl_primitive(ident);
 }
 
-static void parse_enum_constant(Scan *scan, IdlType *enum_)
+static void idl_parse_enum_constant(Scan *scan, IdlType *enum_, int first)
 {
     skip_separator(scan, '{');
 
     while (!skip_separator(scan, '}') && !scan_ended(scan))
     {
-        idl_enum_constant(enum_, parse_ident(scan));
+        idl_enum_constant(enum_, parse_ident(scan), first++);
         skip_separator(scan, ',');
     }
 }
 
-static IdlType parse_enum(Scan *scan, Alloc *alloc)
+static IdlType idl_parse_enum(Scan *scan, Alloc *alloc)
 {
     IdlType type = idl_enum(alloc);
-    parse_enum_constant(scan, &type);
+    idl_parse_enum_constant(scan, &type, 0);
     return type;
 }
 
-static IdlType parse_struct(Scan *scan, Alloc *alloc)
+static IdlType idl_parse_struct(Scan *scan, Alloc *alloc)
 {
     IdlType type = idl_struct(alloc);
 
@@ -113,7 +113,7 @@ static IdlType parse_struct(Scan *scan, Alloc *alloc)
 
     while (!skip_separator(scan, '}') && !scan_ended(scan))
     {
-        IdlType member_type = parse_type(scan, alloc);
+        IdlType member_type = idl_parse_type(scan, alloc);
 
         skip_comment_and_space(scan);
 
@@ -127,7 +127,7 @@ static IdlType parse_struct(Scan *scan, Alloc *alloc)
     return type;
 }
 
-static IdlType parse_vec(IdlType subtype, Scan *scan, Alloc *alloc)
+static IdlType idl_parse_vec(IdlType subtype, Scan *scan, Alloc *alloc)
 {
     skip_comment_and_space(scan);
 
@@ -141,17 +141,17 @@ static IdlType parse_vec(IdlType subtype, Scan *scan, Alloc *alloc)
     return idl_vec(subtype, alloc);
 }
 
-static IdlType parse_type(Scan *scan, Alloc *alloc)
+static IdlType idl_parse_type(Scan *scan, Alloc *alloc)
 {
     IdlType type = idl_nil();
 
     if (skip_keyword(scan, "struct") || scan_curr(scan) == '{')
     {
-        type = parse_struct(scan, alloc);
+        type = idl_parse_struct(scan, alloc);
     }
     else if (skip_keyword(scan, "enum"))
     {
-        type = parse_enum(scan, alloc);
+        type = idl_parse_enum(scan, alloc);
     }
     else if (skip_keyword(scan, "__ctype"))
     {
@@ -167,23 +167,23 @@ static IdlType parse_type(Scan *scan, Alloc *alloc)
     }
     else if (is_ident(scan_curr(scan)))
     {
-        type = parse_primitive(scan);
+        type = idl_parse_primitive(scan);
     }
     else
     {
         scan_throw(scan, str$("Un expected token"), str$(""));
     }
 
-    return parse_vec(type, scan, alloc);
+    return idl_parse_vec(type, scan, alloc);
 }
 
-static IdlAlias parse_alias(Scan *scan, IdlAttrs attrs, Alloc *alloc)
+static IdlAlias idl_parse_alias(Scan *scan, IdlAttrs attrs, Alloc *alloc)
 {
     Str name = parse_ident(scan);
 
     expect_separator(scan, '=');
 
-    IdlType type = parse_type(scan, alloc);
+    IdlType type = idl_parse_type(scan, alloc);
 
     if (type.type == IDL_TYPE_CTYPE && str_eq(nullstr, type.ctype_.name))
     {
@@ -193,35 +193,35 @@ static IdlAlias parse_alias(Scan *scan, IdlAttrs attrs, Alloc *alloc)
     return idl_alias(name, attrs, type);
 }
 
-static IdlMethod parse_method_body(Scan *scan, Str name, IdlAttrs attrs, Alloc *alloc)
+static IdlMethod idl_parse_method_body(Scan *scan, Str name, IdlAttrs attrs, Alloc *alloc)
 {
     IdlType request = idl_nil();
     IdlType response = idl_nil();
 
     if (skip_keyword(scan, "->"))
     {
-        response = parse_type(scan, alloc);
+        response = idl_parse_type(scan, alloc);
     }
     else
     {
-        request = parse_type(scan, alloc);
+        request = idl_parse_type(scan, alloc);
 
         if (skip_keyword(scan, "->"))
         {
-            response = parse_type(scan, alloc);
+            response = idl_parse_type(scan, alloc);
         }
     }
 
     return idl_method(name, attrs, request, response);
 }
 
-static IdlMethod parse_method(Scan *scan, IdlAttrs attrs, Alloc *alloc)
+static IdlMethod idl_parse_method(Scan *scan, IdlAttrs attrs, Alloc *alloc)
 {
     Str name = parse_ident(scan);
-    return parse_method_body(scan, name, attrs, alloc);
+    return idl_parse_method_body(scan, name, attrs, alloc);
 }
 
-static IdlAttrs parse_attrs(Scan *scan, Alloc *alloc)
+static IdlAttrs idl_parse_attrs(Scan *scan, Alloc *alloc)
 {
     IdlAttrs attrs = idl_attrs(alloc);
 
@@ -250,7 +250,7 @@ static IdlAttrs parse_attrs(Scan *scan, Alloc *alloc)
     return attrs;
 }
 
-static IdlIface parse_iface(Scan *scan, IdlAttrs attrs, Alloc *alloc)
+static IdlIface idl_parse_iface(Scan *scan, IdlAttrs attrs, Alloc *alloc)
 {
     skip_keyword(scan, "interface");
 
@@ -267,11 +267,11 @@ static IdlIface parse_iface(Scan *scan, IdlAttrs attrs, Alloc *alloc)
 
         while (scan_curr(scan) != '}' && !scan_ended(scan))
         {
-            IdlAttrs child_attrs = parse_attrs(scan, alloc);
+            IdlAttrs child_attrs = idl_parse_attrs(scan, alloc);
 
             if (skip_keyword(scan, "method"))
             {
-                IdlMethod method = parse_method(scan, child_attrs, alloc);
+                IdlMethod method = idl_parse_method(scan, child_attrs, alloc);
                 idl_iface_methode(&iface, method);
             }
             else
@@ -286,7 +286,7 @@ static IdlIface parse_iface(Scan *scan, IdlAttrs attrs, Alloc *alloc)
     }
     else
     {
-        parse_method_body(scan, name, attrs, alloc);
+        idl_parse_method_body(scan, name, attrs, alloc);
     }
 
     return iface;
@@ -297,12 +297,12 @@ static int is_path(int chr)
     return is_ident(chr) || chr == '/' || chr == '.';
 }
 
-Str parse_cinclude(Scan *scan)
+Str idl_parse_cinclude(Scan *scan)
 {
     return scan_skip_until(scan, is_path);
 }
 
-IdlModule idl_parse(Scan *scan, Alloc *alloc)
+IdlModule idl_parse_module(Scan *scan, Alloc *alloc)
 {
     skip_keyword(scan, "module");
     Str name = parse_ident(scan);
@@ -311,7 +311,7 @@ IdlModule idl_parse(Scan *scan, Alloc *alloc)
 
     while (!scan_ended(scan))
     {
-        IdlAttrs attrs = parse_attrs(scan, alloc);
+        IdlAttrs attrs = idl_parse_attrs(scan, alloc);
 
         if (skip_keyword(scan, "import"))
         {
@@ -328,21 +328,22 @@ IdlModule idl_parse(Scan *scan, Alloc *alloc)
 
             do
             {
-                idl_module_include(&module, parse_cinclude(scan));
+                idl_module_include(&module, idl_parse_cinclude(scan));
             } while (!scan_ended(scan) && skip_separator(scan, ','));
         }
         else if (skip_keyword(scan, "errors"))
         {
-            parse_enum_constant(scan, &module.errors);
+            // Skip zero because it's IPC_SUCCESS
+            idl_parse_enum_constant(scan, &module.errors, 1);
         }
         else if (skip_keyword(scan, "type"))
         {
-            IdlAlias alias = parse_alias(scan, attrs, alloc);
+            IdlAlias alias = idl_parse_alias(scan, attrs, alloc);
             idl_module_alias(&module, alias);
         }
         else if (skip_keyword(scan, "interface"))
         {
-            IdlIface iface = parse_iface(scan, attrs, alloc);
+            IdlIface iface = idl_parse_iface(scan, attrs, alloc);
             idl_module_iface(&module, iface);
         }
         else

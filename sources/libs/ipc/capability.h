@@ -4,6 +4,6 @@
 
 typedef struct
 {
-    BrAddr address;
+    BrAddr addr;
     uint64_t proto;
-} IpcCapability;
+} IpcCap;

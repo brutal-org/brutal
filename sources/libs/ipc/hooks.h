@@ -33,7 +33,7 @@ typedef struct
 
 int ipc_hook_call(
     IpcComponent *self,
-    BrAddr to,
+    IpcCap to,
     IdlBinding binding,
     void const *req,
     void *resp,

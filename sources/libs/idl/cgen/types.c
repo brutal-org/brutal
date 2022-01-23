@@ -5,17 +5,20 @@
 CType idl_cgen_decl_primitive(IdlType type)
 {
     assert_truth(type.type == IDL_TYPE_PRIMITIVE);
-    return ctype_ident(type.primitive_.alias->mangled);
+    if (type.primitive_.alias->type.type == IDL_TYPE_CTYPE)
+    {
+        return ctype_ident(type.primitive_.alias->type.ctype_.name);
+    }
+    return ctype_ident(type.primitive_.alias->name);
 }
 
 CType idl_cgen_decl_enum(IdlType type, Alloc *alloc)
 {
     CType ctype = ctype_enum(alloc);
 
-    int i = 0;
     vec_foreach_v(member, &type.enum_.members)
     {
-        ctype_constant(&ctype, member.mangled, cval_signed(i++));
+        ctype_constant(&ctype, member.name, cval_signed(member.value));
     }
 
     return ctype;

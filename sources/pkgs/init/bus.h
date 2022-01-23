@@ -1,5 +1,6 @@
 #pragma once
 
+#include <bal/boot.h>
 #include <bal/task.h>
 #include <brutal/ds.h>
 
@@ -21,4 +22,4 @@ void bus_deinit(Bus *bus);
 
 BrAddr bus_lookup(Bus *bus, Str name);
 
-void bus_start(Bus *bus, Str name, BalArgs args);
+void bus_start(Bus *bus, Str name, IpcCap *caps, size_t len);
