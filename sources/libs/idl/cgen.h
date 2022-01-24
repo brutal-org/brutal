@@ -51,7 +51,7 @@ CStmt idl_cgen_method_body(IdlMethod method, IdlIface const iface, Alloc *alloc)
 
 /* --- Handler -------------------------------------------------------------- */
 
-CType idl_cgen_handler_type(IdlMethod method, IdlIface const iface, Alloc *alloc);
+CType idl_cgen_handler_type(IdlMethod method, IdlModule const module, Alloc *alloc);
 
 /* --- Provider ------------------------------------------------------------- */
 
@@ -63,7 +63,7 @@ CDecl idl_cgen_provider_func(IdlIface const iface, Alloc *alloc);
 
 CType idl_cgen_dispatch_type(Alloc *alloc);
 
-CExpr idl_cgen_dispatch_handler(IdlMethod method, Alloc *alloc);
+CExpr idl_cgen_dispatch_handler(IdlMethod method, IdlIface const iface, Alloc *alloc);
 
 void idl_cgen_dispatch_case(CStmt *block, IdlMethod method, IdlIface const iface, Alloc *alloc);
 

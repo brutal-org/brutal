@@ -44,5 +44,8 @@ type F64 = __ctype(double);
 [packfn(ipc_pack_str, ipc_unpack_str)]
 type Str = __ctype;
 
+[packfn(ipc_pack_proto, ipc_unpack_proto)]
+type IpcProto = __ctype;
+
 [packfn(ipc_pack_cap, ipc_unpack_cap)]
-type Cap = __ctype(IpcCap);
+type IpcCap = __ctype;

@@ -6,28 +6,28 @@ void bus_init(Bus *bus, Handover *handover, Alloc *alloc)
     *bus = (Bus){};
 
     bus->handover = handover;
-    vec_init(&bus->serv, alloc);
+    vec_init(&bus->caps, alloc);
 }
 
 void bus_deinit(Bus *bus)
 {
-    vec_deinit(&bus->serv);
+    vec_deinit(&bus->caps);
 }
 
-BrAddr bus_lookup(Bus *bus, Str name)
+IpcCap bus_lookup(Bus *bus, IpcProto proto)
 {
-    vec_foreach_v(serv, &bus->serv)
+    vec_foreach_v(cap, &bus->caps)
     {
-        if (str_eq(serv.name, name))
+        if (cap.proto == proto)
         {
-            return serv.addr;
+            return cap;
         }
     }
 
-    return BR_ADDR_NIL;
+    return (IpcCap){};
 }
 
-void bus_start(Bus *bus, Str name, IpcCap* caps, size_t len)
+void bus_start(Bus *bus, Str name, IpcCap *caps, size_t len)
 {
     log$("Starting service '{case:pascal}'...", name);
 
@@ -43,11 +43,4 @@ void bus_start(Bus *bus, Str name, IpcCap* caps, size_t len)
     bal_task_exec(&elf_task, &elf_mem, BR_RIGHT_IO | BR_RIGHT_LOG | BR_RIGHT_PMM | BR_RIGHT_IRQ, caps, len);
 
     bal_mem_deinit(&elf_mem);
-
-    BbusComponent comp = {
-        .addr.id = elf_task.id,
-        .name = name,
-    };
-
-    vec_push(&bus->serv, comp);
 }

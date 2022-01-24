@@ -58,32 +58,15 @@ int ipc_hook_call(
     return 0;
 }
 
-static int idl_handle_invoke(IdlHandler handler, IpcComponent *ev, BrAddr addr, void *req, void *resp, Alloc *alloc)
-{
-    switch (handler.type)
-    {
-    case IDL_HANDLER_REQ_RESP:
-        return handler.func(ev, addr, req, resp, alloc);
-
-    case IDL_HANDLER_NIL_RESP:
-        return handler.func(ev, addr, resp, alloc);
-
-    case IDL_HANDLER_REQ_NIL:
-        return handler.func(ev, addr, req);
-
-    case IDL_HANDLER_NIL_NIL:
-        return handler.func(ev, addr);
-
-    default:
-        panic$("Invalid handler type {}", handler.type);
-    }
-}
-
 void ipc_hook_handle(
-    IdlHandler handler,
-    IpcComponent *ev,
+    IpcComponent *self,
+
+    IdlHandlerFn handler,
+    void *ctx,
+
     BrMsg *msg,
     IdlBinding binding,
+
     void *req,
     void *resp)
 {
@@ -102,15 +85,14 @@ void ipc_hook_handle(
         bal_mem_deinit(&shm);
     }
 
-    int result = idl_handle_invoke(
-        handler, ev, msg->from, req, resp, base$(&heap));
+    int result = handler(ctx, req, resp, base$(&heap));
 
     if (result != 0)
     {
         BrMsg resp_msg;
         resp_msg.type = BR_MSG_ERROR;
         resp_msg.args[0] = result;
-        ipc_component_respond(ev, msg, &resp_msg);
+        ipc_component_respond(self, msg, &resp_msg);
     }
     else if (resp != nullptr)
     {
@@ -125,7 +107,7 @@ void ipc_hook_handle(
         resp_msg.flags = BR_MSG_HND(0);
         resp_msg.args[0] = pack.handle;
 
-        ipc_component_respond(ev, msg, &resp_msg);
+        ipc_component_respond(self, msg, &resp_msg);
 
         ipc_pack_deinit(&pack);
     }

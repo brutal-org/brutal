@@ -58,6 +58,8 @@ void ipc_pack_str(IpcPack *self, Str const *str);
 
 void ipc_pack_cap(IpcPack *self, IpcCap const *addr);
 
+void ipc_pack_proto(IpcPack *self, IpcProto const *v);
+
 void ipc_pack_slice_impl(IpcPack *self, SliceImpl const *v, IpcPackFn *el);
 
 #define ipc_pack_slice(SELF, SLICE, EL) ipc_pack_slice_impl(SELF, &slice_impl$(*(SLICE)), (IpcPackFn *)EL)

@@ -10,13 +10,7 @@ typedef enum
     IDL_HANDLER_NIL_NIL,
 } IdlHandlerType;
 
-typedef int IdlHandlerFn();
-
-typedef struct
-{
-    IdlHandlerType type;
-    IdlHandlerFn *func;
-} IdlHandler;
+typedef int IdlHandlerFn(void *ctx, void const *req, void *resp, Alloc *alloc);
 
 typedef struct
 {
@@ -40,9 +34,13 @@ int ipc_hook_call(
     Alloc *alloc);
 
 void ipc_hook_handle(
-    IdlHandler handler,
-    IpcComponent *ev,
+    IpcComponent *self,
+
+    IdlHandlerFn handler,
+    void *ctx,
+
     BrMsg *msg,
     IdlBinding binding,
+
     void *req,
     void *resp);

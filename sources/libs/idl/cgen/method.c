@@ -6,9 +6,9 @@ CType idl_cgen_method_type(IdlMethod method, IdlModule const module, Alloc *allo
 {
     CType ctype = ctype_func(idl_cgen_decl_primitive(module.errors), alloc);
 
-    ctype_member(&ctype, str$("ev"), ctype_ident_ptr(str$("IpcComponent"), alloc));
+    ctype_member(&ctype, str$("ipc"), ctype_ident_ptr(str$("IpcComponent"), alloc));
 
-    ctype_member(&ctype, str$("from"), ctype_ident(str$("IpcCap")));
+    ctype_member(&ctype, str$("cap"), ctype_ident(str$("IpcCap")));
 
     if (method.request.type != IDL_TYPE_NIL)
     {
@@ -35,8 +35,8 @@ CStmt idl_cgen_method_body(IdlMethod method, IdlIface const iface, Alloc *alloc)
     CStmt block = cstmt_block(alloc);
 
     CExpr pack_request = cexpr_call(alloc, cexpr_ident(str$("ipc_hook_call")));
-    cexpr_member(&pack_request, cexpr_ident(str$("ev")));
-    cexpr_member(&pack_request, cexpr_ident(str$("from")));
+    cexpr_member(&pack_request, cexpr_ident(str$("ipc")));
+    cexpr_member(&pack_request, cexpr_ident(str$("cap")));
     cexpr_member(&pack_request, idl_cgen_binding(method, iface, alloc));
 
     CExpr nullptr_ident = cexpr_ident(str$("nullptr"));

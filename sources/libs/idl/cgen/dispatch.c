@@ -2,54 +2,36 @@
 #include <cc/builder.h>
 #include <idl/cgen.h>
 
+CExpr idl_cgen_dispatch_vtable(IdlIface const iface, Alloc *alloc)
+{
+    CType vtable_type = ctype_ident_ptr(str_fmt(alloc, "{}VTable", iface.name), alloc);
+    return cexpr_cast(cexpr_ident(str$("vtable")), vtable_type, alloc);
+}
+
 CType idl_cgen_dispatch_type(Alloc *alloc)
 {
     CType ctype = ctype_func(ctype_void(), alloc);
 
-    ctype_member(&ctype, str$("ev"), ctype_ident_ptr(str$("IpcComponent"), alloc));
+    ctype_member(&ctype, str$("ipc"), ctype_ident_ptr(str$("IpcComponent"), alloc));
     ctype_member(&ctype, str$("req"), ctype_ident_ptr(str$("BrMsg"), alloc));
+    ctype_member(&ctype, str$("vtable"), ctype_ptr(ctype_void(), alloc));
     ctype_member(&ctype, str$("ctx"), ctype_ptr(ctype_void(), alloc));
 
     return ctype;
 }
 
-CExpr idl_cgen_dispatch_handler(IdlMethod method, Alloc *alloc)
+CExpr idl_cgen_dispatch_handler(IdlMethod method, IdlIface const iface, Alloc *alloc)
 {
-    CExpr expr = cexpr_initializer(alloc);
-
-    Str handlerType;
-
-    if (method.request.type == IDL_TYPE_NIL && method.response.type == IDL_TYPE_NIL)
-    {
-        handlerType = str$("IDL_HANDLER_NIL_NIL");
-    }
-    else if (method.request.type != IDL_TYPE_NIL && method.response.type == IDL_TYPE_NIL)
-    {
-        handlerType = str$("IDL_HANDLER_REQ_NIL");
-    }
-    else if (method.request.type == IDL_TYPE_NIL && method.response.type != IDL_TYPE_NIL)
-    {
-        handlerType = str$("IDL_HANDLER_NIL_RESP");
-    }
-    else
-    {
-        handlerType = str$("IDL_HANDLER_REQ_RESP");
-    }
-
-    cexpr_member(&expr, cexpr_ident(handlerType));
-    CExpr vtable_field = cexpr_ptr_access(cexpr_ident(str$("vtable")), cexpr_ident(method.name), alloc);
-
-    cexpr_member(&expr, cexpr_cast(vtable_field, ctype_ident_ptr(str$("IdlHandlerFn"), alloc), alloc));
-
-    return cexpr_cast(expr, ctype_ident(str$("IdlHandler")), alloc);
+    return cexpr_cast(cexpr_ptr_access(idl_cgen_dispatch_vtable(iface, alloc), cexpr_ident(method.name), alloc), ctype_ident_ptr(str$("IdlHandlerFn"), alloc), alloc);
 }
 
 void idl_cgen_dispatch_case(CStmt *block, IdlMethod method, IdlIface const iface, Alloc *alloc)
 {
     CExpr call_handler = cexpr_call(alloc, cexpr_ident(str$("ipc_hook_handle")));
 
-    cexpr_member(&call_handler, idl_cgen_dispatch_handler(method, alloc));
-    cexpr_member(&call_handler, cexpr_ident(str$("ev")));
+    cexpr_member(&call_handler, cexpr_ident(str$("ipc")));
+    cexpr_member(&call_handler, idl_cgen_dispatch_handler(method, iface, alloc));
+    cexpr_member(&call_handler, cexpr_ident(str$("ctx")));
     cexpr_member(&call_handler, cexpr_ident(str$("req")));
     cexpr_member(&call_handler, idl_cgen_binding(method, iface, alloc));
 
@@ -81,9 +63,6 @@ void idl_cgen_dispatch_case(CStmt *block, IdlMethod method, IdlIface const iface
 CStmt idl_cgen_dispatch_body(IdlIface const iface, Alloc *alloc)
 {
     CStmt block = cstmt_block(alloc);
-    CType vtable_type = ctype_ident_ptr(str_fmt(alloc, "{}VTable", iface.name), alloc);
-
-    cstmt_block_add(&block, cstmt_decl(cdecl_var(str$("vtable"), vtable_type, cexpr_cast(cexpr_ident(str$("ctx")), vtable_type, alloc)), alloc));
 
     CStmt dispatch_body = cstmt_block(alloc);
 

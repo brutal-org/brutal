@@ -11,9 +11,9 @@ typedef struct
     PciAddr *result;
     PciIdentifier identifier;
     Pci *pci;
-} PciGetDevIterCtx;
+} PciBusQueryCtx;
 
-static Iter iter_pci_find(void *data, PciGetDevIterCtx *ctx)
+static Iter pci_bus_query_iter(void *data, PciBusQueryCtx *ctx)
 {
     PciAddr *addr = (PciAddr *)data;
     Pci *pci = ctx->pci;
@@ -36,11 +36,12 @@ static Iter iter_pci_find(void *data, PciGetDevIterCtx *ctx)
     return ITER_CONTINUE;
 }
 
-PciError pci_impl_find_device(IpcComponent *ev, MAYBE_UNUSED BrAddr from, PciFindDeviceRequest const *req, PciAddr *resp, MAYBE_UNUSED Alloc *alloc)
+static PciError pci_bus_query_handler(void *ctx, PciIdentifier const *req, PciAddr *resp, Alloc *)
 {
-    PciGetDevIterCtx ctx = {.result = resp, .identifier = req->identifier, .pci = ev->ctx};
+    Pci *pci = ctx;
+    PciBusQueryCtx query = {.result = resp, .identifier = *req, .pci = pci};
 
-    if (pci_iter(ev->ctx, (IterFn *)iter_pci_find, &ctx) == ITER_CONTINUE)
+    if (pci_iter(pci, (IterFn *)pci_bus_query_iter, &query) == ITER_CONTINUE)
     {
         return PCI_NOT_FOUND;
     }
@@ -48,24 +49,25 @@ PciError pci_impl_find_device(IpcComponent *ev, MAYBE_UNUSED BrAddr from, PciFin
     return PCI_SUCCESS;
 }
 
-static PciError pci_impl_bar(IpcComponent *ev, MAYBE_UNUSED BrAddr from, PciBarRequest const *req, PciBarInfo *resp, MAYBE_UNUSED Alloc *alloc)
+static PciError pci_bus_bar_handler(void *ctx, PciBusBarRequest const *req, PciBarInfo *resp, Alloc *)
 {
-    PciConfig *config = pci_config(ev->ctx, (PciAddr){.bus = req->addr.bus, .func = req->addr.func, .seg = req->addr.seg, .slot = req->addr.slot});
+    Pci *pci = ctx;
+    PciConfig *config = pci_config(pci, req->addr);
 
     if (config == nullptr)
     {
         return PCI_INVALID_ADDR;
     }
     config->command |= 1 << 2 | 1 << 4;
-    *resp = pci_read_bar(ev->ctx, req->addr, req->num);
+    *resp = pci_read_bar(pci, req->addr, req->num);
 
     return PCI_SUCCESS;
 }
 
-static PciError pci_impl_enable_irq(IpcComponent *ev, MAYBE_UNUSED BrAddr from, PciEnableIrqRequest const *req, uint8_t *resp, MAYBE_UNUSED Alloc *alloc)
+static PciError pci_bus_enable_irq_handler(void *ctx, PciBusEnableIrqRequest const *req, uint8_t *resp, MAYBE_UNUSED Alloc *alloc)
 {
-
-    PciConfig *config = pci_config(ev->ctx, (PciAddr){.bus = req->addr.bus, .func = req->addr.func, .seg = req->addr.seg, .slot = req->addr.slot});
+    Pci *pci = ctx;
+    PciConfig *config = pci_config(pci, req->addr);
 
     if (config == nullptr)
     {
@@ -109,10 +111,10 @@ static PciError pci_impl_enable_irq(IpcComponent *ev, MAYBE_UNUSED BrAddr from, 
     return PCI_SUCCESS;
 }
 
-static PciVTable pci_vtable = {
-    pci_impl_find_device,
-    pci_impl_bar,
-    pci_impl_enable_irq,
+static PciBusVTable pci_bus_vtable = {
+    pci_bus_query_handler,
+    pci_bus_bar_handler,
+    pci_bus_enable_irq_handler,
 };
 
 static Iter iter_pci(void *data, void *ctx)
@@ -160,10 +162,11 @@ int br_entry_handover(Handover *handover)
     pci_iter(&pci, iter_pci, &pci);
 
     IpcComponent ev = {};
-    ipc_component_init(&ev, &pci, alloc_global());
-    pci_provide(&ev, &pci_vtable);
+    ipc_component_init(&ev, alloc_global());
+    pci_bus_provide(&ev, &pci_bus_vtable, &pci);
 
     int res = ipc_component_run(&ev);
+
     pci_deinit(&pci);
     acpi_deinit(&acpi);
 

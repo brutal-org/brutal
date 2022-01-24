@@ -5,6 +5,11 @@
 #include <brutal/fibers.h>
 #include <ipc/ipc.h>
 
+WEAK int ipc_component_main(MAYBE_UNUSED IpcComponent *self)
+{
+    panic$("NO ipc_component_main() defined");
+}
+
 WEAK int br_main(
     long arg1,
     long arg2,
@@ -13,7 +18,7 @@ WEAK int br_main(
     MAYBE_UNUSED long arg5)
 {
     IpcComponent component;
-    ipc_component_init(&component, nullptr, alloc_global());
+    ipc_component_init(&component, alloc_global());
     ipc_component_inject(&component, (IpcCap *)arg1, (int)arg2);
     int result = ipc_component_main(&component);
     ipc_component_deinit(&component);

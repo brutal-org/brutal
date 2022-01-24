@@ -6,16 +6,16 @@ The following roadmap is always subject to change.
 
 ## Milestone 4 - FileSystem, Capabilities and Graphics
 
-- [ ] IPC/IDL
+- [x] IPC/IDL
   - [x] Capabilities
-  - [ ] Import
-  - [ ] Attributes
-  - [ ] Modules
+  - [x] Import
+  - [x] Attributes
+  - [x] Modules
 - [ ] Graphic Library
   - [x] SDL Backend
     - [x] Render
     - [x] Events
-  - [ ] Brutal Backend
+  - [ ] BRUTAL Backend
     - [ ] Compositor
       - [ ] Event Dispatch
       - [ ] Compositing

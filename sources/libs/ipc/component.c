@@ -7,13 +7,14 @@ typedef struct
     IpcComponent *self;
     BrMsg msg;
     IpcHandler *fn;
+    void *vtable;
     void *ctx;
 } BrEvCtx;
 
 void *br_ev_handle(BrEvCtx *ctx)
 {
     BrMsg msg = ctx->msg;
-    ctx->fn(ctx->self, &msg, ctx->ctx);
+    ctx->fn(ctx->self, &msg, ctx->vtable, ctx->ctx);
     return nullptr;
 }
 
@@ -44,18 +45,19 @@ static void *ipc_component_dispatch(IpcComponent *self)
 
             if (!handeled)
             {
-                vec_foreach_v(proto, &self->providers)
+                vec_foreach_v(provider, &self->providers)
                 {
-                    if (proto->port == ipc.msg.to.port &&
-                        proto->proto == ipc.msg.prot)
+                    if (provider->port == ipc.msg.to.port &&
+                        provider->proto == ipc.msg.prot)
                     {
                         fiber_start(
                             (FiberFn *)br_ev_handle,
                             &(BrEvCtx){
                                 .self = self,
                                 .msg = ipc.msg,
-                                .ctx = proto->ctx,
-                                .fn = proto->handler,
+                                .fn = provider->handler,
+                                .vtable = provider->vtable,
+                                .ctx = provider->ctx,
                             });
 
                         handeled = true;
@@ -82,11 +84,17 @@ static void *ipc_component_dispatch(IpcComponent *self)
     return nullptr;
 }
 
-void ipc_component_init(IpcComponent *self, void *ctx, Alloc *alloc)
+static IpcComponent *_instance = nullptr;
+
+IpcComponent *ipc_component_self(void)
+{
+    return _instance;
+}
+
+void ipc_component_init(IpcComponent *self, Alloc *alloc)
 {
     *self = (IpcComponent){};
     self->alloc = alloc;
-    self->ctx = ctx;
     self->running = true;
     self->dispatcher = fiber_start((FiberFn *)ipc_component_dispatch, self);
     self->dispatcher->state = FIBER_IDLE;
@@ -94,6 +102,8 @@ void ipc_component_init(IpcComponent *self, void *ctx, Alloc *alloc)
     vec_init(&self->pendings, alloc);
     vec_init(&self->providers, alloc);
     vec_init(&self->capabilities, alloc);
+
+    _instance = self;
 }
 
 void ipc_component_deinit(IpcComponent *self)
@@ -137,7 +147,7 @@ IpcCap ipc_component_require(IpcComponent *self, uint32_t proto)
     panic$("No capability found for proto: {}", proto);
 }
 
-IpcCap ipc_component_provide(IpcComponent *self, uint32_t id, IpcHandler *fn, void *ctx)
+IpcCap ipc_component_provide(IpcComponent *self, uint32_t id, IpcHandler *fn, void *vtable, void *ctx)
 {
     static uint64_t port_id = 0;
     IpcProvider *provider = alloc_make(self->alloc, IpcProvider);
@@ -145,6 +155,7 @@ IpcCap ipc_component_provide(IpcComponent *self, uint32_t id, IpcHandler *fn, vo
     provider->proto = id;
     provider->port = port_id++;
     provider->handler = fn;
+    provider->vtable = vtable;
     provider->ctx = ctx;
 
     vec_push(&self->providers, provider);
