@@ -17,7 +17,7 @@ CExpr cexpr_call(Alloc *alloc, CExpr name);
 
 CExpr cexpr_cast(CExpr expr, CType type, Alloc *alloc);
 
-CExpr cexpr_initializer(Alloc *alloc);
+CExpr cexpr_initializer(CType type, Alloc *alloc);
 
 CExpr cexpr_lambda(CType type, CStmt body, Alloc *alloc);
 

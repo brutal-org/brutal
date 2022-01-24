@@ -10,7 +10,7 @@ static void cc_trans_expr_pre(Emit *emit, CExpr expr, int parent_pre)
 {
     int pre = cexpr_pre(&expr);
 
-    if (pre > parent_pre)
+    if (pre >= parent_pre)
     {
         emit_fmt(emit, "(");
     }
@@ -94,6 +94,10 @@ static void cc_trans_expr_pre(Emit *emit, CExpr expr, int parent_pre)
         break;
 
     case CEXPR_INITIALIZER:
+        emit_fmt(emit, "(");
+        cc_trans_type(emit, expr.initializer_.type);
+        emit_fmt(emit, ")");
+
         emit_fmt(emit, "{{\n");
         emit_ident(emit);
 
@@ -117,7 +121,7 @@ static void cc_trans_expr_pre(Emit *emit, CExpr expr, int parent_pre)
         panic$("Unknown cexpr type {}", expr.type);
     }
 
-    if (pre > parent_pre)
+    if (pre >= parent_pre)
     {
         emit_fmt(emit, ")");
     }
