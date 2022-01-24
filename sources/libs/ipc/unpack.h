@@ -54,6 +54,8 @@ void ipc_unpack_str(IpcUnpack *self, Str *v);
 
 void ipc_unpack_cap(IpcUnpack *self, IpcCap *v);
 
+void ipc_unpack_proto(IpcUnpack *self, IpcProto *v);
+
 void ipc_unpack_slice_impl(IpcUnpack *self, VoidSlice *slice, IpcUnpackFn *el, size_t el_size);
 
 #define ipc_unpack_slice(SELF, SLICE, EL) ipc_unpack_slice_impl(SELF, (VoidSlice *)(SLICE), (IpcUnpackFn *)(EL), sizeof(*(SLICE)->buf))

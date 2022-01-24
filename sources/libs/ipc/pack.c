@@ -133,6 +133,11 @@ void ipc_pack_cap(IpcPack *self, IpcCap const *cap)
     ipc_pack(self, cap, sizeof(*cap));
 }
 
+void ipc_pack_proto(IpcPack *self, IpcProto const *v)
+{
+    ipc_pack(self, v, sizeof(*v));
+}
+
 void ipc_pack_slice_impl(IpcPack *self, SliceImpl const *v, IpcPackFn *el)
 {
     ipc_pack_size(self, &v->len);

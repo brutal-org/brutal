@@ -18,13 +18,14 @@ struct _IpcPending
     BrMsg resp;
 };
 
-typedef void IpcHandler(struct _IpcComponent *ev, BrMsg *req, void *ctx);
+typedef void IpcHandler(struct _IpcComponent *ev, BrMsg *req, void *vtable, void *ctx);
 
 struct _IpcProvider
 {
     uint64_t port;
     uint64_t proto;
     IpcHandler *handler;
+    void *vtable;
     void *ctx;
 };
 
@@ -32,7 +33,6 @@ struct _IpcComponent
 {
     Alloc *alloc;
     Fiber *dispatcher;
-    void *ctx;
     Vec(IpcPending *) pendings;
     Vec(IpcProvider *) providers;
     Vec(IpcCap) capabilities;
@@ -41,7 +41,9 @@ struct _IpcComponent
     int result;
 };
 
-void ipc_component_init(IpcComponent *self, void *ctx, Alloc *alloc);
+IpcComponent *ipc_component_self(void);
+
+void ipc_component_init(IpcComponent *self, Alloc *alloc);
 
 void ipc_component_deinit(IpcComponent *self);
 
@@ -51,7 +53,7 @@ Iter ipc_component_query(IpcComponent *self, uint32_t proto, IterFn *iter, void 
 
 IpcCap ipc_component_require(IpcComponent *self, uint32_t proto);
 
-IpcCap ipc_component_provide(IpcComponent *self, uint32_t id, IpcHandler *fn, void *ctx);
+IpcCap ipc_component_provide(IpcComponent *self, uint32_t id, IpcHandler *fn, void *vtable, void *ctx);
 
 BrResult ipc_component_request(IpcComponent *self, IpcCap to, BrMsg *req, BrMsg *resp);
 

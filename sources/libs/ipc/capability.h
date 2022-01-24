@@ -2,8 +2,10 @@
 
 #include <bal/abi.h>
 
+typedef uint64_t IpcProto;
+
 typedef struct
 {
     BrAddr addr;
-    uint64_t proto;
+    IpcProto proto;
 } IpcCap;

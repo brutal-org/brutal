@@ -93,6 +93,11 @@ void ipc_unpack_cap(IpcUnpack *self, IpcCap *v)
     ipc_unpack(self, v, sizeof(*v));
 }
 
+void ipc_unpack_proto(IpcUnpack *self, IpcProto *v)
+{
+    ipc_unpack(self, v, sizeof(*v));
+}
+
 void ipc_unpack_slice_impl(IpcUnpack *self, VoidSlice *slice, IpcUnpackFn *el, size_t el_size)
 {
     uint64_t len;

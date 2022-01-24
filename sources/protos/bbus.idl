@@ -8,5 +8,5 @@ errors {
 
 interface Locator
 {
-    method locate Str -> Cap;
+    method locate IpcProto -> IpcCap;
 };
