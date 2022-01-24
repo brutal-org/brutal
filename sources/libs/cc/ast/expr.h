@@ -138,6 +138,7 @@ struct cexpr
 
         struct
         {
+            CType type;
             Vec(CExpr) initializer;
         } initializer_;
 

@@ -101,10 +101,11 @@ CExpr cexpr_ternary(CExpr cond, CExpr etrue, CExpr efalse, Alloc *alloc)
     };
 }
 
-CExpr cexpr_initializer(Alloc *alloc)
+CExpr cexpr_initializer(CType type, Alloc *alloc)
 {
     CExpr result = {
         .type = CEXPR_INITIALIZER,
+        .initializer_.type = type,
     };
 
     vec_init(&result.initializer_.initializer, alloc);
