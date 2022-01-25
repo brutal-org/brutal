@@ -6,7 +6,8 @@ errors {
     NOT_FOUND,
 };
 
-interface Locator
+interface Server
 {
-    method locate IpcProto -> IpcCap;
+    method expose IpcCap;
+    method consume IpcProto -> IpcCap;
 };

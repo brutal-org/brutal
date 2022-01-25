@@ -2,7 +2,7 @@ module boot;
 
 import base;
 
-interface info
+interface Info
 {
     method get_rsdp -> Ptr;
 };

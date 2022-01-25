@@ -1,3 +1,4 @@
+#include <bal/task.h>
 #include <brutal/debug.h>
 #include "init/bus.h"
 
@@ -7,16 +8,33 @@ void bus_init(Bus *bus, Handover *handover, Alloc *alloc)
 
     bus->handover = handover;
     vec_init(&bus->caps, alloc);
+    vec_init(&bus->units, alloc);
 }
 
 void bus_deinit(Bus *bus)
 {
     vec_deinit(&bus->caps);
+    vec_deinit(&bus->units);
 }
 
-IpcCap bus_lookup(Bus *bus, IpcProto proto)
+void bus_expose(Bus *self, IpcCap cap)
 {
-    vec_foreach_v(cap, &bus->caps)
+    log$("Exposing capability '{case:pascal}'...", cap.proto);
+
+    vec_push(&self->caps, cap);
+
+    vec_foreach(unit, &self->units)
+    {
+        unit_provide(unit, cap);
+
+        if (unit->state == UNIT_READY)
+            unit_start(unit, self->handover);
+    }
+}
+
+IpcCap bus_consume(Bus *self, IpcProto proto)
+{
+    vec_foreach_v(cap, &self->caps)
     {
         if (cap.proto == proto)
         {
@@ -27,20 +45,17 @@ IpcCap bus_lookup(Bus *bus, IpcProto proto)
     return (IpcCap){};
 }
 
-void bus_start(Bus *bus, Str name, IpcCap *caps, size_t len)
+void bus_activate(Bus *self, Unit *unit)
 {
-    log$("Starting service '{case:pascal}'...", name);
+    log$("Activating service '{case:pascal}'...", unit->name);
 
-    HandoverModule const *elf = handover_find_module(bus->handover, name);
-    assert_not_null(elf);
+    vec_foreach(cap, &self->caps)
+    {
+        unit_provide(unit, *cap);
 
-    BalMem elf_mem;
-    bal_mem_init_pmm(&elf_mem, elf->addr, elf->size);
+        if (unit->state == UNIT_READY)
+            unit_start(unit, self->handover);
+    }
 
-    BalTask elf_task;
-    bal_task_init(&elf_task, name);
-
-    bal_task_exec(&elf_task, &elf_mem, BR_RIGHT_IO | BR_RIGHT_LOG | BR_RIGHT_PMM | BR_RIGHT_IRQ, caps, len);
-
-    bal_mem_deinit(&elf_mem);
+    vec_push(&self->units, *unit);
 }

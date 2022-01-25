@@ -4,6 +4,8 @@
 #include <brutal/alloc.h>
 #include <brutal/debug.h>
 #include <pci/pci.h>
+#include <protos/bbus.h>
+#include <protos/boot.h>
 #include <protos/pci.h>
 
 typedef struct
@@ -46,7 +48,7 @@ static PciError pci_bus_query_handler(void *ctx, PciIdentifier const *req, PciAd
         return PCI_NOT_FOUND;
     }
 
-    return PCI_SUCCESS;
+    return IPC_SUCCESS;
 }
 
 static PciError pci_bus_bar_handler(void *ctx, PciBusBarRequest const *req, PciBarInfo *resp, Alloc *)
@@ -58,10 +60,11 @@ static PciError pci_bus_bar_handler(void *ctx, PciBusBarRequest const *req, PciB
     {
         return PCI_INVALID_ADDR;
     }
+
     config->command |= 1 << 2 | 1 << 4;
     *resp = pci_read_bar(pci, req->addr, req->num);
 
-    return PCI_SUCCESS;
+    return IPC_SUCCESS;
 }
 
 static PciError pci_bus_enable_irq_handler(void *ctx, PciBusEnableIrqRequest const *req, uint8_t *resp, MAYBE_UNUSED Alloc *alloc)
@@ -108,7 +111,8 @@ static PciError pci_bus_enable_irq_handler(void *ctx, PciBusEnableIrqRequest con
         PciConfigType1 *v = (PciConfigType1 *)config;
         *resp = v->interrupt_line;
     }
-    return PCI_SUCCESS;
+
+    return IPC_SUCCESS;
 }
 
 static PciBusVTable pci_bus_vtable = {
@@ -148,29 +152,27 @@ static Iter iter_pci(void *data, void *ctx)
     return ITER_CONTINUE;
 }
 
-int br_entry_handover(Handover *handover)
+int ipc_component_main(IpcComponent *self)
 {
-    HeapAlloc heap;
-    heap_alloc_init(&heap, NODE_DEFAULT);
+    IpcCap boot_infos = ipc_component_require(self, IPC_BOOT_INFO_PROTO);
+    IpcCap bbus_server = ipc_component_require(self, IPC_BBUS_SERVER_PROTO);
+
+    uintptr_t rsdp = 0;
+    if (boot_info_get_rsdp(self, boot_infos, &rsdp, alloc_global()) != IPC_SUCCESS)
+    {
+        panic$("No rsdp found!");
+    }
 
     Acpi acpi;
-    acpi_init(&acpi, handover->rsdp);
+    acpi_init(&acpi, rsdp);
 
     Pci pci;
-    pci_init(&pci, &acpi, base$(&heap));
-
+    pci_init(&pci, &acpi, alloc_global());
     pci_iter(&pci, iter_pci, &pci);
 
-    IpcComponent ev = {};
-    ipc_component_init(&ev, alloc_global());
-    pci_bus_provide(&ev, &pci_bus_vtable, &pci);
+    IpcCap pci_cap = pci_bus_provide(self, &pci_bus_vtable, &pci);
 
-    int res = ipc_component_run(&ev);
+    bbus_server_expose(self, bbus_server, &pci_cap, alloc_global());
 
-    pci_deinit(&pci);
-    acpi_deinit(&acpi);
-
-    heap_alloc_deinit(&heap);
-
-    return res;
+    return ipc_component_run(self);
 }

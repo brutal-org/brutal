@@ -14,7 +14,7 @@ typedef int IdlHandlerFn(void *ctx, void const *req, void *resp, Alloc *alloc);
 
 typedef struct
 {
-    int proto;
+    IpcProto proto;
 
     int req_id;
     IpcPackFn *req_pack;

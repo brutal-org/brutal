@@ -9,8 +9,11 @@ void ipc_pack_init(IpcPack *self)
 
 void ipc_pack_deinit(IpcPack *self)
 {
-    assert_br_success(bal_unmap(BR_HANDLE_SELF, self->buf, self->len));
-    assert_br_success(bal_close(self->handle));
+    if (self->buf != nullptr)
+    {
+        assert_br_success(bal_unmap(BR_HANDLE_SELF, self->buf, self->len));
+        assert_br_success(bal_close(self->handle));
+    }
 }
 
 void ipc_pack_ensure(IpcPack *self, size_t cap)

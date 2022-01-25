@@ -32,4 +32,4 @@ typedef Slice(void) VoidSlice;
     (type) { .len = size, .buf = buffer }
 
 #define slice_array$(type, buffer) \
-    (type) { .len = sizeof(buffer) / sizeof(*buffer), .buf = buffer }
+    (type) { .len = sizeof(buffer) / sizeof(*buffer), .buf = &(buffer) }

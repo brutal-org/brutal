@@ -1,8 +1,9 @@
 #include <bal/abi.h>
 #include <bal/hw.h>
 #include <brutal/debug.h>
-#include <brutal/ui/event.h>
-#include "ps2.h"
+#include <brutal/ui.h>
+#include <ipc/ipc.h>
+#include "ps2/ps2.h"
 
 typedef struct
 {
@@ -237,12 +238,7 @@ void ps2_handle_irq(Ps2 *ps2)
     }
 }
 
-int br_entry_args(
-    MAYBE_UNUSED long arg1,
-    MAYBE_UNUSED long arg2,
-    MAYBE_UNUSED long arg3,
-    MAYBE_UNUSED long arg4,
-    MAYBE_UNUSED long arg5)
+int ipc_component_main(IpcComponent *self)
 {
     Ps2 ps2 = {
         .io = bal_io_port(0x60, 0x8),
@@ -276,5 +272,5 @@ int br_entry_args(
         }
     }
 
-    return 0;
+    return ipc_component_run(self);
 }
