@@ -2,14 +2,6 @@
 
 #include <ipc/component.h>
 
-typedef enum
-{
-    IDL_HANDLER_REQ_RESP,
-    IDL_HANDLER_NIL_RESP,
-    IDL_HANDLER_REQ_NIL,
-    IDL_HANDLER_NIL_NIL,
-} IdlHandlerType;
-
 typedef int IdlHandlerFn(void *ctx, void const *req, void *resp, Alloc *alloc);
 
 typedef struct
