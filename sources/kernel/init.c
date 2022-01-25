@@ -94,7 +94,7 @@ void init_start(Handover const *handover)
 
     if (elf_module == nullptr)
     {
-        panic$("can't find 'init' handover module !");
+        panic$("can't find '{}' handover module !", name);
     }
 
     Elf64Header *elf_header = (Elf64Header *)mmap_phys_to_io(elf_module->addr);

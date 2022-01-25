@@ -1,19 +1,21 @@
 #pragma once
 
 #include <bal/boot.h>
-#include <bal/task.h>
-#include <brutal/ds.h>
+#include "init/unit.h"
 
 typedef struct
 {
     Handover *handover;
+    Vec(Unit) units;
     Vec(IpcCap) caps;
 } Bus;
 
-void bus_init(Bus *bus, Handover *handover, Alloc *alloc);
+void bus_init(Bus *self, Handover *handover, Alloc *alloc);
 
-void bus_deinit(Bus *bus);
+void bus_deinit(Bus *self);
 
-IpcCap bus_lookup(Bus *bus, IpcProto proto);
+void bus_expose(Bus *self, IpcCap cap);
 
-void bus_start(Bus *bus, Str name, IpcCap *caps, size_t len);
+IpcCap bus_consume(Bus *self, IpcProto proto);
+
+void bus_activate(Bus *self, Unit *unit);

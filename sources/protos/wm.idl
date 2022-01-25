@@ -2,16 +2,16 @@ module wm;
 
 import base, math;
 
-interface client
+interface Client
 {
 };
 
-interface server
+interface Server
 {
     method create_window { MRect bound } -> IpcCap;
 };
 
-interface window
+interface Window
 {
     method resize MRect -> Nil;
     method flip MRect -> Bool;

@@ -73,10 +73,13 @@ static void interrupt_error_handler(Regs *regs)
     smp_stop_all();
 
     log_unlock("");
+
     log_unlock("------------------------------------------------------------");
     log_unlock("");
+
     log_unlock("KERNEL PANIC ON CPU N°{}", cpu_self_id());
     log_unlock("");
+
     log_unlock("{}({}) with error_code={}!", _exception_messages[regs->int_no], regs->int_no, regs->error_code);
     log_unlock("");
 
@@ -87,6 +90,8 @@ static void interrupt_error_handler(Regs *regs)
     }
 
     dump_register(regs);
+    log_unlock("");
+
     log_unlock("------------------------------------------------------------");
     log_unlock("");
 

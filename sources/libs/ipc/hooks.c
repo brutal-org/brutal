@@ -40,16 +40,16 @@ int ipc_hook_call(
 
     // Unpacking
 
-    assert_equal(resp_msg.type, (BrArg)binding.resp_id);
-
     if (resp != nullptr)
     {
+        assert_equal(resp_msg.type, (BrArg)binding.resp_id);
+
         BalMem shm;
         bal_mem_init_mobj(&shm, resp_msg.args[0]);
 
         IpcUnpack unpack;
         ipc_unpack_init(&unpack, shm.buf, shm.len, alloc);
-        binding.req_unpack(&unpack, resp);
+        binding.resp_unpack(&unpack, resp);
         bal_mem_deinit(&shm);
     }
 
@@ -90,6 +90,7 @@ void ipc_hook_handle(
     if (result != 0)
     {
         BrMsg resp_msg;
+        resp_msg.prot = binding.proto;
         resp_msg.type = BR_MSG_ERROR;
         resp_msg.args[0] = result;
         ipc_component_respond(self, msg, &resp_msg);
@@ -103,6 +104,7 @@ void ipc_hook_handle(
 
         BrMsg resp_msg;
 
+        resp_msg.prot = binding.proto;
         resp_msg.type = binding.resp_id;
         resp_msg.flags = BR_MSG_HND(0);
         resp_msg.args[0] = pack.handle;

@@ -65,16 +65,22 @@ static void *ipc_component_dispatch(IpcComponent *self)
                 }
             }
 
-            if (!handeled && self->sink)
+            if (!handeled)
             {
-                fiber_start(
-                    (FiberFn *)br_ev_handle,
-                    &(BrEvCtx){
-                        .self = self,
-                        .msg = ipc.msg,
-                        .ctx = nullptr,
-                        .fn = self->sink,
-                    });
+                log$("Unhandled message: {}:{} on port {}", ipc.msg.prot, ipc.msg.type, ipc.msg.to.port);
+
+                if (self->sink)
+                {
+
+                    fiber_start(
+                        (FiberFn *)br_ev_handle,
+                        &(BrEvCtx){
+                            .self = self,
+                            .msg = ipc.msg,
+                            .ctx = nullptr,
+                            .fn = self->sink,
+                        });
+                }
             }
         }
 
@@ -147,12 +153,12 @@ IpcCap ipc_component_require(IpcComponent *self, uint32_t proto)
     panic$("No capability found for proto: {}", proto);
 }
 
-IpcCap ipc_component_provide(IpcComponent *self, uint32_t id, IpcHandler *fn, void *vtable, void *ctx)
+IpcCap ipc_component_provide(IpcComponent *self, uint32_t proto, IpcHandler *fn, void *vtable, void *ctx)
 {
     static uint64_t port_id = 0;
     IpcProvider *provider = alloc_make(self->alloc, IpcProvider);
 
-    provider->proto = id;
+    provider->proto = proto;
     provider->port = port_id++;
     provider->handler = fn;
     provider->vtable = vtable;
@@ -165,7 +171,7 @@ IpcCap ipc_component_provide(IpcComponent *self, uint32_t id, IpcHandler *fn, vo
             bal_self_id(),
             provider->port,
         },
-        .proto = provider->port,
+        .proto = proto,
     };
 }
 
@@ -186,6 +192,11 @@ BrResult ipc_component_request(IpcComponent *self, IpcCap to, BrMsg *req, BrMsg 
         .deadline = 0,
         .flags = BR_IPC_SEND,
     });
+
+    if (resp == nullptr)
+    {
+        return BR_SUCCESS;
+    }
 
     IpcPending *pending = alloc_make(self->alloc, IpcPending);
     pending->seq = req->seq;
