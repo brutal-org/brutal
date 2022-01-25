@@ -13,7 +13,7 @@ C99 is a bit vague about whether inexact exception is
 allowed to be raised when invalid is raised.
 (F.9 explicitly allows spurious inexact exceptions, F.9.6.5
 does not make it clear if that rule applies to lrint, but
-IEEE 754r 7.8 seems to foridl spurious inexact exception in
+IEEE 754r 7.8 seems to forbid spurious inexact exception in
 the ineger conversion functions)
 
 So we try to make sure that no spurious inexact exception is
