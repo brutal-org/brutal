@@ -1,18 +1,39 @@
 #include <brutal/codec/gzip/gzip.h>
-#include <brutal/font/ssfn2/ssfn.h>
-#include <stdc/ansi/string.h>
+#include <brutal/gfx/ssfn2/ssfn.h>
+#include <string.h>
 
 /* magic bytes */
 #define SSFN_MAGIC "SFN2"
 #define SSFN_COLLECTION "SFNC"
 #define SSFN_ENDMAGIC "2NFS"
 
+typedef struct PACKED
+{
+    le_uint8_t magic[4];         /* SSFN magic bytes */
+    le_uint32_t size;            /* total size in bytes */
+} SSFN2CommonHeader;
+
+typedef struct PACKED
+{
+    le_uint8_t type;             /* font family and style */
+    le_uint8_t features;         /* format features and revision */
+    le_uint8_t width;            /* overall width of the font */
+    le_uint8_t height;           /* overall height of the font */
+    le_uint8_t baseline;         /* horizontal baseline in grid pixels */
+    le_uint8_t underline;        /* position of under line in grid pixels */
+    le_uint16_t fragments_offs;  /* offset of fragments table */
+    le_uint32_t characters_offs; /* characters table offset */
+    le_uint32_t ligature_offs;   /* ligatures table offset */
+    le_uint32_t kerning_offs;    /* kerning table offset */
+    le_uint32_t cmap_offs;       /* color map offset */
+} SSFN2FontHeader;
+
 typedef enum
 {
     FS_REGULAR = 0,
     FS_BOLD = 1,
     FS_ITALIC = 2,
-} FontStyle;
+} SSFN2FontStyle;
 
 static MaybeError ssfn2_load_internal(IoReader reader)
 {
@@ -30,7 +51,7 @@ static MaybeError ssfn2_load_internal(IoReader reader)
         SSFN2FontHeader font_header;
         TRY(MaybeError, io_read(reader, (uint8_t *)&font_header, sizeof(SSFN2FontHeader)));
 
-        FontStyle style = load_le(font_header.type);
+        SSFN2FontStyle style = load_le(font_header.type);
         UNUSED(style);
     }
     else

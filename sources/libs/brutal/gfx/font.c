@@ -2,6 +2,7 @@
 #include <brutal/gfx/gfx.h>
 #include <brutal/text/cp437.h>
 #include <brutal/text/utf8.h>
+#include <brutal/gfx/ssfn2/ssfn.h>
 
 GfxFontMetrics gfx_font_metrics(GfxFont font)
 {
@@ -93,6 +94,23 @@ void gfx_font_builtin_render(MAYBE_UNUSED void *ctx, GfxFontStyle style, Gfx *gf
 
 GfxFont gfx_font_builtin(void)
 {
+    return (GfxFont){
+        .ctx = nullptr,
+        .style = {
+            .scale = 1,
+        },
+        .metrics = gfx_font_builtin_metrics,
+        .advance = gfx_font_builtin_advance,
+        .render = gfx_font_builtin_render,
+    };
+}
+
+/* --- SSFN2 Font --------------------------------------------------------- */
+
+GfxFont gfx_font_ssfn2(IoRSeek rseek)
+{
+    ssfn2_load(rseek);
+
     return (GfxFont){
         .ctx = nullptr,
         .style = {
