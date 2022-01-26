@@ -1,8 +1,8 @@
 #include <brutal/gfx/font.h>
 #include <brutal/gfx/gfx.h>
+#include <brutal/gfx/ssfn2/ssfn2.h>
 #include <brutal/text/cp437.h>
 #include <brutal/text/utf8.h>
-#include <brutal/gfx/ssfn2/ssfn.h>
 
 GfxFontMetrics gfx_font_metrics(GfxFont font)
 {
@@ -107,16 +107,28 @@ GfxFont gfx_font_builtin(void)
 
 /* --- SSFN2 Font --------------------------------------------------------- */
 
-GfxFont gfx_font_ssfn2(IoRSeek rseek)
+GfxFontMetrics gfx_font_ssfn2_metrics(void *ctx, GfxFontStyle style)
 {
-    ssfn2_load(rseek);
+    SSFN2Font *font = (SSFN2Font *)ctx;
+    return (GfxFontMetrics){
+        .line_ascend = 12 * style.scale,
+        .ascend = 10 * style.scale,
+        .captop = 10 * style.scale,
+        .descend = 3 * style.scale,
+        .line_descend = 4 * style.scale,
 
+        .advance = load_le(font->header.width) * style.scale,
+    };
+}
+
+GfxFont gfx_font_ssfn2(struct SSFN2Font *font)
+{
     return (GfxFont){
-        .ctx = nullptr,
+        .ctx = font,
         .style = {
             .scale = 1,
         },
-        .metrics = gfx_font_builtin_metrics,
+        .metrics = gfx_font_ssfn2_metrics,
         .advance = gfx_font_builtin_advance,
         .render = gfx_font_builtin_render,
     };

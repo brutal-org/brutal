@@ -1,8 +1,8 @@
 #pragma once
 
+#include <brutal/io/traits.h>
 #include <brutal/math/rect.h>
 #include <brutal/text/rune.h>
-#include <brutal/io/traits.h>
 
 struct _Gfx;
 
@@ -102,5 +102,5 @@ extern uint8_t gfx_font_builtin_data[256 * 16];
 GfxFont gfx_font_builtin(void);
 
 /* --- SSFN2 Font ----------------------------------------------------------- */
-
-GfxFont gfx_font_ssfn2(IoRSeek rseek);
+struct SSFN2Font;
+GfxFont gfx_font_ssfn2(struct SSFN2Font *);
