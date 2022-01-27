@@ -10,8 +10,6 @@ void embed_win_init(UiWin *self, MRect bound)
         bound.width,
         bound.height,
         SDL_WINDOW_HIDDEN | SDL_WINDOW_ALLOW_HIGHDPI);
-
-    self->handle = SDL_GetWindowID(self->embed.sdl_window);
 }
 
 void embed_win_deinit(UiWin *self)

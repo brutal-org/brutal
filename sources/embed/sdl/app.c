@@ -1,6 +1,7 @@
 #include <SDL.h>
 #include <brutal/debug.h>
 #include <embed/app.h>
+#include <embed/win.h>
 
 void embed_app_init(MAYBE_UNUSED UiApp *self)
 {
@@ -15,23 +16,23 @@ void embed_app_deinit(MAYBE_UNUSED UiApp *self)
 
 static MVec2 _last_mouse_pos = {};
 
-UiEvent sdl_event_to_ui_event(SDL_Event e)
+UiEvent sdl_event_to_ui_event(SDL_Event e, uint32_t *handle)
 {
     UiEvent result = {};
 
     switch (e.type)
     {
     case SDL_WINDOWEVENT:
-        result.handle = e.window.windowID;
+        *handle = e.window.windowID;
         break;
 
     case SDL_KEYDOWN:
-        result.handle = e.key.windowID;
+        *handle = e.key.windowID;
         result.type = UI_EVENT_KEYBOARD_DOWN;
         break;
 
     case SDL_KEYUP:
-        result.handle = e.key.windowID;
+        *handle = e.key.windowID;
         result.type = UI_EVENT_KEYBOARD_UP;
         break;
 
@@ -41,7 +42,7 @@ UiEvent sdl_event_to_ui_event(SDL_Event e)
             return result;
         }
 
-        result.handle = e.motion.windowID;
+        *handle = e.motion.windowID;
         result.type = UI_EVENT_MOUSE_MOVE;
 
         result.mouse.offset.x = e.motion.xrel;
@@ -63,7 +64,7 @@ UiEvent sdl_event_to_ui_event(SDL_Event e)
         }
 
         result.type = UI_EVENT_MOUSE_UP;
-        result.handle = e.button.windowID;
+        *handle = e.button.windowID;
         result.mouse.position = _last_mouse_pos;
 
         result.mouse.buttons = (e.button.which == SDL_BUTTON_LEFT) ? MSBTN_LEFT : 0;
@@ -78,7 +79,7 @@ UiEvent sdl_event_to_ui_event(SDL_Event e)
         }
 
         result.type = UI_EVENT_MOUSE_DOWN;
-        result.handle = e.button.windowID;
+        *handle = e.button.windowID;
         result.mouse.position = _last_mouse_pos;
 
         result.mouse.buttons = (e.button.which == SDL_BUTTON_LEFT) ? MSBTN_LEFT : 0;
@@ -92,7 +93,7 @@ UiEvent sdl_event_to_ui_event(SDL_Event e)
             return result;
         }
 
-        result.handle = e.wheel.windowID;
+        *handle = e.wheel.windowID;
         result.type = UI_EVENT_MOUSE_SCROLL;
         result.mouse.scroll.x = e.wheel.x;
         result.mouse.scroll.y = e.wheel.y;
@@ -106,12 +107,15 @@ UiEvent sdl_event_to_ui_event(SDL_Event e)
     return result;
 }
 
-void embed_app_pump(MAYBE_UNUSED UiApp *self)
+void embed_app_pump(UiApp *self)
 {
     SDL_Event e;
 
     while (SDL_PollEvent(&e) != 0)
     {
+        uint32_t handle;
+        UiEvent event = sdl_event_to_ui_event(e, &handle);
+
         switch (e.type)
         {
         case SDL_QUIT:
@@ -125,7 +129,13 @@ void embed_app_pump(MAYBE_UNUSED UiApp *self)
         case SDL_MOUSEBUTTONDOWN:
         case SDL_MOUSEBUTTONUP:
         case SDL_MOUSEWHEEL:
-            ui_app_dispatch(self, sdl_event_to_ui_event(e));
+            vec_foreach_v(win, &self->windows)
+            {
+                if (SDL_GetWindowID(win->embed.sdl_window) == handle)
+                {
+                    ui_win_dispatch(win, &event);
+                }
+            }
             break;
 
         default:
