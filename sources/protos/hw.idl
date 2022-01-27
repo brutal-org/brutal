@@ -1,0 +1,18 @@
+module hw;
+
+import base, math;
+
+type DisplayMode = {
+    Size width,
+    Size height,
+    Size depth,
+    Size refresh,
+};
+
+interface Display
+{
+    method modes -> DisplayMode[];
+    method change_mode DisplayMode;
+    method buffer -> IpcHnd;
+    method flip MRect -> Bool;
+};

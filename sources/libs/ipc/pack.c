@@ -9,6 +9,11 @@ void ipc_pack_init(IpcPack *self)
 
 void ipc_pack_deinit(IpcPack *self)
 {
+    for (int i = 0; i < self->handles_count; i++)
+    {
+        bal_close(self->handles[i]);
+    }
+
     if (self->buf != nullptr)
     {
         assert_br_success(bal_unmap(BR_HANDLE_SELF, self->buf, self->len));
@@ -60,90 +65,22 @@ void ipc_pack(IpcPack *self, void const *buf, size_t len)
     self->curr += len;
 }
 
-void ipc_pack_enum(IpcPack *self, int const *v)
+void ipc_pack_handle(IpcPack *self, BrHandle *handle)
 {
-    ipc_pack(self, v, sizeof(*v));
-}
-
-void ipc_pack_size(IpcPack *self, size_t const *s)
-{
-    ipc_pack(self, s, sizeof(*s));
-}
-
-void ipc_pack_ptr(IpcPack *self, uintptr_t const *s)
-{
-    ipc_pack(self, s, sizeof(*s));
-}
-
-void ipc_pack_s8(IpcPack *self, int8_t const *v)
-{
-    ipc_pack(self, v, sizeof(*v));
-}
-
-void ipc_pack_u8(IpcPack *self, uint8_t const *v)
-{
-    ipc_pack(self, v, sizeof(*v));
-}
-
-void ipc_pack_s16(IpcPack *self, int16_t const *v)
-{
-    ipc_pack(self, v, sizeof(*v));
-}
-
-void ipc_pack_u16(IpcPack *self, uint16_t const *v)
-{
-    ipc_pack(self, v, sizeof(*v));
-}
-
-void ipc_pack_s32(IpcPack *self, int32_t const *v)
-{
-    ipc_pack(self, v, sizeof(*v));
-}
-
-void ipc_pack_u32(IpcPack *self, uint32_t const *v)
-{
-    ipc_pack(self, v, sizeof(*v));
-}
-
-void ipc_pack_s64(IpcPack *self, int64_t const *v)
-{
-    ipc_pack(self, v, sizeof(*v));
-}
-
-void ipc_pack_u64(IpcPack *self, uint64_t const *v)
-{
-    ipc_pack(self, v, sizeof(*v));
-}
-
-void ipc_pack_f32(IpcPack *self, float const *v)
-{
-    ipc_pack(self, v, sizeof(*v));
-}
-
-void ipc_pack_f64(IpcPack *self, double const *v)
-{
-    ipc_pack(self, v, sizeof(*v));
+    ipc_pack_pod(self, handle);
+    assert_lower_than(self->handles_count, BR_MSG_ARG_COUNT - 1);
+    self->handles[self->handles_count++] = *handle;
 }
 
 void ipc_pack_str(IpcPack *self, Str const *v)
 {
-    ipc_pack_size(self, &v->len);
+    ipc_pack_pod(self, &v->len);
     ipc_pack(self, v->buf, v->len);
-}
-
-void ipc_pack_cap(IpcPack *self, IpcCap const *cap)
-{
-    ipc_pack(self, cap, sizeof(*cap));
-}
-
-void ipc_pack_proto(IpcPack *self, IpcProto const *v)
-{
-    ipc_pack(self, v, sizeof(*v));
 }
 
 void ipc_pack_slice_impl(IpcPack *self, SliceImpl const *v, IpcPackFn *el)
 {
-    ipc_pack_size(self, &v->len);
+    ipc_pack_pod(self, &v->len);
 
     for (size_t i = 0; i < v->len; i++)
     {

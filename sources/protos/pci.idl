@@ -40,6 +40,10 @@ type PciBarInfo =
     PciBarType type,
 };
 
+interface Device
+{
+};
+
 interface Bus
 {
     method query PciIdentifier -> PciAddr;
