@@ -21,7 +21,6 @@ int ui_app_run(UiApp *self)
     while (self->alive)
     {
         ui_app_pump(self);
-        ui_app_animate(self);
         embed_app_wait(self);
     }
 
@@ -31,28 +30,6 @@ int ui_app_run(UiApp *self)
 void ui_app_pump(UiApp *self)
 {
     embed_app_pump(self);
-}
-
-void ui_app_animate(UiApp *self)
-{
-    vec_foreach_v(w, &self->windows)
-    {
-        if (w->flags & UI_WIN_ANIMATED)
-        {
-            ui_win_repaint(w);
-        }
-    }
-}
-
-void ui_app_dispatch(UiApp *self, UiEvent event)
-{
-    vec_foreach_v(w, &self->windows)
-    {
-        if (w->handle == event.handle)
-        {
-            ui_win_dispatch(w, &event);
-        }
-    }
 }
 
 void ui_app_attach_win(UiApp *self, UiWin *win)

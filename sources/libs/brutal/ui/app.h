@@ -8,12 +8,11 @@ typedef struct _UiWin UiWin;
 
 typedef struct _UiApp
 {
+    EmbedApp embed;
     bool alive;
     int result;
 
     Vec(UiWin *) windows;
-
-    EmbedApp embed;
 } UiApp;
 
 void ui_app_init(UiApp *self);
@@ -23,10 +22,6 @@ void ui_app_deinit(UiApp *self);
 int ui_app_run(UiApp *self);
 
 void ui_app_pump(UiApp *self);
-
-void ui_app_animate(UiApp *self);
-
-void ui_app_dispatch(UiApp *self, UiEvent event);
 
 void ui_app_attach_win(UiApp *self, UiWin *win);
 

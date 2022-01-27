@@ -12,16 +12,13 @@ enum
     UI_WIN_NIL = 0,
 
     UI_WIN_RESIZABLE = 1 << 0,
-    UI_WIN_ANIMATED = 1 << 1,
 };
 
 struct _UiWin
 {
-    UiWinHandle handle;
-    int refcount;
-
-    int flags;
     EmbedWin embed;
+    int flags;
+    int refcount;
     Gfx gfx;
 
     void (*deinit)(UiWin *self);
