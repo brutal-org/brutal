@@ -25,8 +25,15 @@ int ipc_hook_call(
     if (req != nullptr)
     {
         binding.req_pack(&pack, req);
+
         req_msg.args[0] = pack.handle;
         req_msg.flags = BR_MSG_HND(0);
+
+        for (int i = 0; i < pack.handles_count; i++)
+        {
+            req_msg.args[i + 1] = pack.handles[i];
+            req_msg.flags |= BR_MSG_HND(i + 1);
+        }
     }
 
     ipc_component_request(self, to, &req_msg, &resp_msg);

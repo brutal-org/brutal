@@ -74,3 +74,17 @@ CType idl_cgen_decl_type(IdlType type, Alloc *alloc)
         panic$("Unknow type type {}", type.type);
     }
 }
+
+CType idl_cgen_alias_type(IdlAlias alias)
+{
+    IdlType type = alias.type;
+
+    if (type.type == IDL_TYPE_CTYPE)
+    {
+        return ctype_ident(type.ctype_.name);
+    }
+    else
+    {
+        return ctype_ident(alias.name);
+    }
+}

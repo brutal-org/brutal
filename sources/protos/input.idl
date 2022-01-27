@@ -1,0 +1,16 @@
+module input;
+
+import base, math;
+include brutal/ui.h;
+
+type Event = __ctype(UiEvent);
+
+interface Source
+{
+    method connect IpcCap -> Bool;
+};
+
+interface Sink
+{
+    method handle Event -> Bool;
+};

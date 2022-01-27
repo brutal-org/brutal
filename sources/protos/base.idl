@@ -2,50 +2,38 @@ module base;
 
 include ipc/ipc.h;
 
-[packfn(ipc_pack_bool, ipc_unpack_bool)]
 type Bool = __ctype(bool);
 
-[packfn(ipc_pack_size, ipc_unpack_size)]
 type Size = __ctype(size_t);
 
-[packfn(ipc_pack_ptr, ipc_unpack_ptr)]
 type Ptr = __ctype(uintptr_t);
 
-[packfn(ipc_pack_s8, ipc_unpack_s8)]
 type S8 = __ctype(int8_t);
 
-[packfn(ipc_pack_u8, ipc_unpack_u8)]
 type U8 = __ctype(uint8_t);
 
-[packfn(ipc_pack_s16, ipc_unpack_s16)]
 type S16 = __ctype(int16_t);
 
-[packfn(ipc_pack_u16, ipc_unpack_u16)]
 type U16 = __ctype(uint16_t);
 
-[packfn(ipc_pack_s32, ipc_unpack_s32)]
 type S32 = __ctype(int32_t);
 
-[packfn(ipc_pack_u32, ipc_unpack_u32)]
 type U32 = __ctype(uint32_t);
 
-[packfn(ipc_pack_s64, ipc_unpack_s64)]
 type S64 = __ctype(int64_t);
 
-[packfn(ipc_pack_u64, ipc_unpack_u64)]
 type U64 = __ctype(uint64_t);
 
-[packfn(ipc_pack_f32, ipc_unpack_f32)]
 type F32 = __ctype(float);
 
-[packfn(ipc_pack_f64, ipc_unpack_f64)]
 type F64 = __ctype(double);
 
 [packfn(ipc_pack_str, ipc_unpack_str)]
 type Str = __ctype;
 
-[packfn(ipc_pack_proto, ipc_unpack_proto)]
 type IpcProto = __ctype;
 
-[packfn(ipc_pack_cap, ipc_unpack_cap)]
 type IpcCap = __ctype;
+
+[packfn(ipc_pack_handle, ipc_unpack_handle)]
+type IpcHnd = __ctype(BrHandle);

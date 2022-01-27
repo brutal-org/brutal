@@ -15,6 +15,8 @@ CType idl_cgen_decl_vec(IdlType type, Alloc *alloc);
 
 CType idl_cgen_decl_type(IdlType type, Alloc *alloc);
 
+CType idl_cgen_alias_type(IdlAlias alias);
+
 /* --- Pack ----------------------------------------------------------------- */
 
 Str idl_cgen_pack_name(IdlAlias alias, Alloc *alloc);
@@ -24,6 +26,8 @@ CExpr idl_cgen_pack_ref(IdlAlias alias, Alloc *alloc);
 CType idl_cgen_pack_type(IdlAlias alias, Alloc *alloc);
 
 void idl_cgen_pack_body(CStmt *block, IdlType type, CExpr path, Alloc *alloc);
+
+CDecl idl_cgen_pack_decl(IdlAlias alias, Alloc *alloc);
 
 CDecl idl_cgen_pack_func(IdlAlias alias, Alloc *alloc);
 
@@ -36,6 +40,8 @@ CExpr idl_cgen_unpack_ref(IdlAlias alias, Alloc *alloc);
 CType idl_cgen_unpack_type(IdlAlias alias, Alloc *alloc);
 
 void idl_cgen_unpack_body(CStmt *block, IdlType type, CExpr path, Alloc *alloc);
+
+CDecl idl_cgen_unpack_decl(IdlAlias alias, Alloc *alloc);
 
 CDecl idl_cgen_unpack_func(IdlAlias alias, Alloc *alloc);
 

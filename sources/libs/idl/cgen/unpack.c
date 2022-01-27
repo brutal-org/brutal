@@ -11,7 +11,7 @@ Str idl_cgen_unpack_name(IdlAlias alias, Alloc *alloc)
         return vec_at(&attr.args, 1);
     }
 
-    return str_fmt(alloc, "{case:snake}_unpack", alias.name);
+    return str_fmt(alloc, "ipc_unpack_{case:snake}", alias.name);
 }
 
 CExpr idl_cgen_unpack_ref(IdlAlias alias, Alloc *alloc)
@@ -23,7 +23,7 @@ CType idl_cgen_unpack_type(IdlAlias alias, Alloc *alloc)
 {
     CType ctype = ctype_func(ctype_void(), alloc);
     ctype_member(&ctype, str$("self"), ctype_ident_ptr(str$("IpcUnpack"), alloc));
-    ctype_member(&ctype, str$("data"), ctype_ident_ptr(alias.name, alloc));
+    ctype_member(&ctype, str$("data"), ctype_ptr(idl_cgen_alias_type(alias), alloc));
     return ctype;
 }
 
@@ -31,13 +31,13 @@ void idl_cgen_unpack_body(CStmt *block, IdlType type, CExpr path, Alloc *alloc)
 {
     switch (type.type)
     {
-    case IDL_TYPE_CTYPE:
     case IDL_TYPE_NIL:
         break;
 
-    case IDL_TYPE_PRIMITIVE:
+    case IDL_TYPE_ENUM:
+    case IDL_TYPE_CTYPE:
     {
-        CExpr expr = cexpr_call(alloc, cexpr_ident(idl_cgen_unpack_name(*type.primitive_.alias, alloc)));
+        CExpr expr = cexpr_call(alloc, cexpr_ident(str$("ipc_unpack_pod")));
         cexpr_member(&expr, cexpr_ident(str$("self")));
         cexpr_member(&expr, path);
 
@@ -45,11 +45,11 @@ void idl_cgen_unpack_body(CStmt *block, IdlType type, CExpr path, Alloc *alloc)
         break;
     }
 
-    case IDL_TYPE_ENUM:
+    case IDL_TYPE_PRIMITIVE:
     {
-        CExpr expr = cexpr_call(alloc, cexpr_ident(str$("ipc_unpack_enum")));
+        CExpr expr = cexpr_call(alloc, cexpr_ident(idl_cgen_unpack_name(*type.primitive_.alias, alloc)));
         cexpr_member(&expr, cexpr_ident(str$("self")));
-        cexpr_member(&expr, cexpr_cast(path, ctype_ident_ptr(str$("int"), alloc), alloc));
+        cexpr_member(&expr, path);
 
         cstmt_block_add(block, cstmt_expr(expr));
         break;
@@ -80,6 +80,14 @@ void idl_cgen_unpack_body(CStmt *block, IdlType type, CExpr path, Alloc *alloc)
     default:
         panic$("Unknow type type {}", type.type);
     }
+}
+
+CDecl idl_cgen_unpack_decl(IdlAlias alias, Alloc *alloc)
+{
+    Str name = idl_cgen_unpack_name(alias, alloc);
+    CType type = idl_cgen_unpack_type(alias, alloc);
+
+    return cdecl_func(name, type, cstmt_empty());
 }
 
 CDecl idl_cgen_unpack_func(IdlAlias alias, Alloc *alloc)

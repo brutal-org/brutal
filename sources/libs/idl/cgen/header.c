@@ -43,6 +43,12 @@ CUnit idl_cgen_header(IdlModule const module, Alloc *alloc)
         {
             cunit_decl(&unit, cdecl_type(alias.name, idl_cgen_decl_type(alias.type, alloc)));
         }
+
+        if (!idl_attrs_has(alias.attrs, str$("packfn")))
+        {
+            cunit_decl(&unit, idl_cgen_pack_decl(alias, alloc));
+            cunit_decl(&unit, idl_cgen_unpack_decl(alias, alloc));
+        }
     }
 
     vec_foreach_v(iface, &module.ifaces)

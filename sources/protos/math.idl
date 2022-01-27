@@ -1,11 +1,7 @@
 module math;
 
-include brutal/math.h;
+include brutal/math.h, ipc/ipc.h;
 
-[packfn(ipc_pack_rect, ipc_unpack_rect)]
 type MRect = __ctype;
 
-[packfn(ipc_pack_vec2, ipc_unpack_vec2)]
 type MVec2 = __ctype;
-
-

@@ -2,18 +2,18 @@ module wm;
 
 import base, math;
 
+
+
 interface Client
 {
+    method resize MRect -> Nil;
+    method flip MRect -> Bool;
+    method close -> Bool;
 };
 
 interface Server
 {
-    method create_window { MRect bound } -> IpcCap;
+    method connect { MRect bound } -> IpcCap;
 };
 
-interface Window
-{
-    method resize MRect -> Nil;
-    method flip MRect -> Bool;
-    method destroy -> Bool;
-};
+
