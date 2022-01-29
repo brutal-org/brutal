@@ -4,6 +4,8 @@
 
 void rwlock_acquire_read(RwLock *self)
 {
+    embed_sync_enter();
+
     while (!rwlock_try_acquire_read(self))
     {
 #ifdef EMBED_HAS_PAUSE
@@ -29,6 +31,8 @@ bool rwlock_try_acquire_read(RwLock *self)
 
     self->readers++;
 
+    embed_sync_enter();
+
     return true;
 }
 
@@ -37,12 +41,14 @@ void rwlock_release_read(RwLock *self)
     LOCK_RETAINER(&self->lock);
 
     assert_greater_than(self->readers--, 0);
+
+    embed_sync_leave();
 }
 
 void rwlock_acquire_write(RwLock *self)
 {
-
     embed_sync_enter();
+
     self->pendings++;
 
     while (!rwlock_try_acquire_write(self))
@@ -59,23 +65,20 @@ void rwlock_acquire_write(RwLock *self)
 bool rwlock_try_acquire_write(RwLock *self)
 {
     LOCK_RETAINER(&self->lock);
-    embed_sync_enter();
 
     if (self->readers)
     {
-        embed_sync_leave();
         return false;
     }
 
     if (self->writers)
     {
-        embed_sync_leave();
-
         return false;
     }
 
     self->writers++;
 
+    embed_sync_enter();
     return true;
 }
 
