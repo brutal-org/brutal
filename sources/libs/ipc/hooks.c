@@ -2,6 +2,7 @@
 #include <brutal/alloc.h>
 #include <brutal/debug.h>
 #include <ipc/hooks.h>
+#include <ipc/ipc.h>
 
 int ipc_hook_call(
     IpcComponent *self,
@@ -94,7 +95,7 @@ void ipc_hook_handle(
 
     int result = handler(ctx, req, resp, base$(&heap));
 
-    if (result != 0)
+    if (result != IPC_SUCCESS)
     {
         BrMsg resp_msg;
         resp_msg.prot = binding.proto;

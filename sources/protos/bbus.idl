@@ -2,7 +2,8 @@ module bbus;
 
 import base;
 
-errors {
+errors
+{
     NOT_FOUND,
 };
 

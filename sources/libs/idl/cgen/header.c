@@ -8,7 +8,7 @@ void idl_cgen_iface_header(CUnit *unit, IdlModule const module, IdlIface const i
     CType vtable = ctype_struct(alloc);
     CType msgtype = ctype_enum(alloc);
 
-    cunit_define(unit, str_fmt(alloc, "IPC_{case:constant}_PROTO", iface.name), cexpr_constant(cval_signed(iface.id)), alloc);
+    cunit_define(unit, str_fmt(alloc, "IPC_{case:constant}_PROTO", iface.name), cexpr_constant(cval_unsigned(iface.id)), alloc);
 
     int i = 0;
     vec_foreach_v(method, &iface.methods)

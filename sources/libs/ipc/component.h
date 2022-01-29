@@ -13,8 +13,10 @@ typedef struct _IpcProvider IpcProvider;
 
 struct _IpcPending
 {
-    uint64_t seq;
     bool ok;
+    BrId from;
+    uint64_t seq;
+
     BrMsg resp;
 };
 

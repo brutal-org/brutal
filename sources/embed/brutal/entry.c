@@ -7,7 +7,7 @@
 
 WEAK int ipc_component_main(MAYBE_UNUSED IpcComponent *self)
 {
-    panic$("NO ipc_component_main() defined");
+    panic$("No ipc_component_main() defined");
 }
 
 WEAK int br_main(

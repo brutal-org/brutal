@@ -6,7 +6,7 @@ CExpr idl_cgen_binding(IdlMethod method, IdlIface const iface, Alloc *alloc)
 {
     CExpr init = cexpr_initializer(ctype_ident(str$("IdlBinding")), alloc);
 
-    cexpr_member(&init, cexpr_constant(cval_signed(iface.id)));
+    cexpr_member(&init, cexpr_constant(cval_unsigned(iface.id)));
 
     CExpr nullptr_ident = cexpr_ident(str$("nullptr"));
 

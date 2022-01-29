@@ -2,8 +2,6 @@ module wm;
 
 import base, math;
 
-
-
 interface Client
 {
     method resize MRect -> Nil;

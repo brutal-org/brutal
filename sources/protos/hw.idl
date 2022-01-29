@@ -2,7 +2,8 @@ module hw;
 
 import base, math;
 
-type DisplayMode = {
+type DisplayMode =
+{
     Size width,
     Size height,
     Size depth,
