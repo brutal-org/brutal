@@ -1,4 +1,5 @@
 .SUFFIXES:
+.DELETE_ON_ERROR:
 
 .DEFAULT_GOAL := all
 SHELL := /bin/bash
