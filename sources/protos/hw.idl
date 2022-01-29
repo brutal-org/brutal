@@ -6,14 +6,12 @@ type DisplayMode =
 {
     Size width,
     Size height,
-    Size depth,
-    Size refresh,
+    Size pitch
+    Size format,
 };
 
 interface Display
 {
-    method modes -> DisplayMode[];
-    method change_mode DisplayMode;
+    method current -> DisplayMode;
     method buffer -> IpcHnd;
-    method flip MRect -> Bool;
 };

@@ -12,8 +12,8 @@ int ipc_hook_call(
     void *resp,
     Alloc *alloc)
 {
-    BrMsg resp_msg = {};
     BrMsg req_msg = {};
+    BrMsg resp_msg = {};
 
     // Packing
 
@@ -37,7 +37,7 @@ int ipc_hook_call(
         }
     }
 
-    ipc_component_request(self, to, &req_msg, &resp_msg);
+    ipc_component_request(self, to, &req_msg, resp != nullptr ? &resp_msg : nullptr);
 
     // Error handeling
 

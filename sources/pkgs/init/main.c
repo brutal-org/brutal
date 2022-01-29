@@ -2,6 +2,7 @@
 #include <brutal/debug.h>
 #include <protos/bbus.h>
 #include <protos/boot.h>
+#include <protos/hw.h>
 #include <protos/input.h>
 #include <protos/pci.h>
 #include "init/boot.h"
@@ -36,7 +37,7 @@ static BbusServerVTable _bbus_server_vtable = {
 
 /* --- Boot Info Protocol --------------------------------------------------- */
 
-static BootError boot_info_get_rsdp_handler(void *self, void *, uintptr_t *resp, Alloc *)
+static BootError boot_info_rsdp_handler(void *self, void *, uintptr_t *resp, Alloc *)
 {
     Handover *handover = self;
     *resp = handover->rsdp;
@@ -44,7 +45,52 @@ static BootError boot_info_get_rsdp_handler(void *self, void *, uintptr_t *resp,
 }
 
 static BootInfoVTable _bbus_info_vtable = {
-    boot_info_get_rsdp_handler,
+    boot_info_rsdp_handler,
+};
+
+/* --- Hw Display Protocol -------------------------------------------------- */
+
+HwError hw_display_current_handler(void *self, void *, DisplayMode *resp, Alloc *)
+{
+    Handover *handover = self;
+    HandoverFramebuffer const *framebuffer = &handover->framebuffer;
+
+    *resp = (DisplayMode){
+        .width = framebuffer->width,
+        .height = framebuffer->height,
+        .pitch = framebuffer->pitch,
+        .format = GFX_FMT_BGRA8888,
+    };
+
+    return IPC_SUCCESS;
+}
+
+HwError hw_display_buffer_handler(void *self, void *, BrHandle *resp, Alloc *)
+{
+    Handover *handover = self;
+    HandoverFramebuffer const *framebuffer = &handover->framebuffer;
+
+    size_t fb_size = align_up$(framebuffer->height * framebuffer->pitch, MEM_PAGE_SIZE);
+
+    BrCreateArgs fb_mem = {
+        .type = BR_OBJECT_MEMORY,
+        .memory = {
+            framebuffer->addr,
+            fb_size,
+            BR_MEM_PMM | BR_MEM_WRITABLE,
+        },
+    };
+
+    br_create(&fb_mem);
+
+    *resp = fb_mem.handle;
+
+    return IPC_SUCCESS;
+}
+
+static HwDisplayVTable _hw_display_vtable = {
+    hw_display_current_handler,
+    hw_display_buffer_handler,
 };
 
 /* --- Entry Point ---------------------------------------------------------- */
@@ -60,10 +106,13 @@ int br_main(Handover *handover)
     ipc_component_init(&self, alloc_global());
 
     IpcCap bbus_server_cap = bbus_server_provide(&self, &_bbus_server_vtable, &bus);
-    IpcCap boot_info_cap = boot_info_provide(&self, &_bbus_info_vtable, handover);
-
     bus_expose(&bus, bbus_server_cap);
+
+    IpcCap boot_info_cap = boot_info_provide(&self, &_bbus_info_vtable, handover);
     bus_expose(&bus, boot_info_cap);
+
+    IpcCap hw_display_cap = hw_display_provide(&self, &_hw_display_vtable, handover);
+    bus_expose(&bus, hw_display_cap);
 
     Unit acpi_unit;
     unit_init(&acpi_unit, str$("acpi"), alloc_global());
@@ -92,6 +141,7 @@ int br_main(Handover *handover)
     Unit wm_unit;
     unit_init(&wm_unit, str$("wm"), alloc_global());
     unit_consume(&wm_unit, IPC_BBUS_SERVER_PROTO);
+    unit_consume(&wm_unit, IPC_HW_DISPLAY_PROTO);
     bus_activate(&bus, &wm_unit);
 
     return ipc_component_run(&self);
