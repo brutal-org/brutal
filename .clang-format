@@ -17,10 +17,10 @@ ForEachMacros: ["__dummy_foreach"]
 SpaceBeforeParens: ControlStatementsExceptForEachMacros
 IncludeBlocks: Merge
 IncludeCategories:
-  - Regex:           '<([A-Za-z0-9.\/-_])+>'
+  - Regex:           '<([:alnum:.\/-_])+>'
     Priority:        0
     SortPriority:    0
-  - Regex:           '"([A-Za-z0-9.\/-_])+"'
+  - Regex:           '"([:alnum:.\/-_])+"'
     Priority:        10
     SortPriority:    10
 ...
