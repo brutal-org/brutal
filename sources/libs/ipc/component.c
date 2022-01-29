@@ -18,6 +18,70 @@ void *br_ev_handle(BrEvCtx *ctx)
     return nullptr;
 }
 
+static bool dispatch_to_pending(IpcComponent *self, BrMsg msg)
+{
+    vec_foreach_v(pending, &self->pendings)
+    {
+        if (pending->seq == msg.seq && pending->from == msg.from.id)
+        {
+            log$("Dispatched message to pending");
+            pending->resp = msg;
+            pending->ok = true;
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
+static bool dispatch_to_provider(IpcComponent *self, BrMsg msg)
+{
+    vec_foreach_v(provider, &self->providers)
+    {
+        if (provider->port == msg.to.port &&
+            provider->proto == msg.prot)
+        {
+            log$("Dispatched message to provider");
+
+            fiber_start(
+                (FiberFn *)br_ev_handle,
+                &(BrEvCtx){
+                    .self = self,
+                    .msg = msg,
+                    .fn = provider->handler,
+                    .vtable = provider->vtable,
+                    .ctx = provider->ctx,
+                });
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
+static bool dispatch_to_sink(IpcComponent *self, BrMsg msg)
+{
+    if (self->sink)
+    {
+        return false;
+    }
+
+    log$("Dispatched message to sink");
+
+    fiber_start(
+        (FiberFn *)br_ev_handle,
+        &(BrEvCtx){
+            .self = self,
+            .msg = msg,
+            .ctx = nullptr,
+            .fn = self->sink,
+        });
+
+    return true;
+}
+
 static void *ipc_component_dispatch(IpcComponent *self)
 {
     do
@@ -31,56 +95,13 @@ static void *ipc_component_dispatch(IpcComponent *self)
 
         if (result == BR_SUCCESS)
         {
-            bool handeled = false;
+            log$("Dispatching message: {}:{} from {}", ipc.msg.prot, ipc.msg.type, ipc.msg.from.id);
 
-            vec_foreach_v(pending, &self->pendings)
-            {
-                if (pending->seq == ipc.msg.seq)
-                {
-                    pending->resp = ipc.msg;
-                    pending->ok = true;
-                    handeled = true;
-                }
-            }
-
-            if (!handeled)
-            {
-                vec_foreach_v(provider, &self->providers)
-                {
-                    if (provider->port == ipc.msg.to.port &&
-                        provider->proto == ipc.msg.prot)
-                    {
-                        fiber_start(
-                            (FiberFn *)br_ev_handle,
-                            &(BrEvCtx){
-                                .self = self,
-                                .msg = ipc.msg,
-                                .fn = provider->handler,
-                                .vtable = provider->vtable,
-                                .ctx = provider->ctx,
-                            });
-
-                        handeled = true;
-                    }
-                }
-            }
-
-            if (!handeled)
+            if (!(dispatch_to_pending(self, ipc.msg) ||
+                  dispatch_to_provider(self, ipc.msg) ||
+                  dispatch_to_sink(self, ipc.msg)))
             {
                 log$("Unhandled message: {}:{} on port {}", ipc.msg.prot, ipc.msg.type, ipc.msg.to.port);
-
-                if (self->sink)
-                {
-
-                    fiber_start(
-                        (FiberFn *)br_ev_handle,
-                        &(BrEvCtx){
-                            .self = self,
-                            .msg = ipc.msg,
-                            .ctx = nullptr,
-                            .fn = self->sink,
-                        });
-                }
             }
         }
 
@@ -94,6 +115,7 @@ static IpcComponent *_instance = nullptr;
 
 IpcComponent *ipc_component_self(void)
 {
+    assert_not_null(_instance);
     return _instance;
 }
 
@@ -186,6 +208,8 @@ BrResult ipc_component_request(IpcComponent *self, IpcCap to, BrMsg *req, BrMsg 
     static uint32_t seq = 0;
     req->seq = seq++;
 
+    log$("Sending request: {}:{} to {}", req->prot, req->type, to.addr.id);
+
     br_ipc(&(BrIpcArgs){
         .to = to.addr,
         .msg = *req,
@@ -199,6 +223,7 @@ BrResult ipc_component_request(IpcComponent *self, IpcCap to, BrMsg *req, BrMsg 
     }
 
     IpcPending *pending = alloc_make(self->alloc, IpcPending);
+    pending->from = to.addr.id;
     pending->seq = req->seq;
 
     vec_push(&self->pendings, pending);
@@ -221,6 +246,8 @@ BrResult ipc_component_respond(MAYBE_UNUSED IpcComponent *self, BrMsg const *req
 {
     resp->seq = req->seq;
     resp->prot = req->prot;
+
+    log$("Sending response: {}:{} to {}", req->prot, req->type, req->from.id);
 
     return br_ipc(&(BrIpcArgs){
         .to = req->from,
