@@ -4,5 +4,5 @@ import base;
 
 interface Info
 {
-    method get_rsdp -> Ptr;
+    method rsdp -> Ptr;
 };
