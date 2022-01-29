@@ -2,6 +2,7 @@
 #include <brutal/debug.h>
 #include <protos/bbus.h>
 #include <protos/boot.h>
+#include <protos/input.h>
 #include <protos/pci.h>
 #include "init/boot.h"
 #include "init/bus.h"
@@ -79,6 +80,7 @@ int br_main(Handover *handover)
     Unit ps2_unit;
     unit_init(&ps2_unit, str$("ps2"), alloc_global());
     unit_consume(&ps2_unit, IPC_BBUS_SERVER_PROTO);
+    unit_consume(&ps2_unit, IPC_INPUT_SINK_PROTO);
     bus_activate(&bus, &ps2_unit);
 
     Unit ahci_unit;
@@ -86,6 +88,11 @@ int br_main(Handover *handover)
     unit_consume(&ahci_unit, IPC_BBUS_SERVER_PROTO);
     unit_consume(&ahci_unit, IPC_PCI_BUS_PROTO);
     bus_activate(&bus, &ahci_unit);
+
+    Unit wm_unit;
+    unit_init(&wm_unit, str$("wm"), alloc_global());
+    unit_consume(&wm_unit, IPC_BBUS_SERVER_PROTO);
+    bus_activate(&bus, &wm_unit);
 
     return ipc_component_run(&self);
 }

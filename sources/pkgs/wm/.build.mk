@@ -1,0 +1,3 @@
+WM_NAME = wm
+
+USER_PKGS += WM
