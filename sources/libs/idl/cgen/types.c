@@ -18,7 +18,7 @@ CType idl_cgen_decl_enum(IdlType type, Alloc *alloc)
 
     vec_foreach_v(member, &type.enum_.members)
     {
-        ctype_constant(&ctype, member.name, cval_unsigned(member.value));
+        ctype_constant(&ctype, member.name, cval_signed(member.value));
     }
 
     return ctype;

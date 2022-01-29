@@ -11,7 +11,7 @@ CVal cval_signed(CSigned v)
 CVal cval_unsigned(CUnsigned v)
 {
     return (CVal){
-        .type = CVAL_SIGNED,
+        .type = CVAL_UNSIGNED,
         .unsigned_ = v,
     };
 }
