@@ -41,6 +41,8 @@ void rwlock_release_read(RwLock *self)
 
 void rwlock_acquire_write(RwLock *self)
 {
+
+    embed_sync_enter();
     self->pendings++;
 
     while (!rwlock_try_acquire_write(self))
@@ -57,14 +59,18 @@ void rwlock_acquire_write(RwLock *self)
 bool rwlock_try_acquire_write(RwLock *self)
 {
     LOCK_RETAINER(&self->lock);
+    embed_sync_enter();
 
     if (self->readers)
     {
+        embed_sync_leave();
         return false;
     }
 
     if (self->writers)
     {
+        embed_sync_leave();
+
         return false;
     }
 
@@ -78,4 +84,5 @@ void rwlock_release_write(RwLock *self)
     LOCK_RETAINER(&self->lock);
 
     assert_greater_than(self->writers--, 0);
+    embed_sync_leave();
 }

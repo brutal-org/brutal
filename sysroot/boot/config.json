@@ -13,20 +13,8 @@
           "path": "/pkgs/init"
         },
         {
-          "name": "posix",
-          "path": "/pkgs/posix"
-        },
-        {
           "name": "ahci",
           "path": "/pkgs/ahci"
-        },
-        {
-          "name": "echo",
-          "path": "/pkgs/echo"
-        },
-        {
-          "name": "hello",
-          "path": "/pkgs/hello"
         },
         {
           "name": "acpi",
