@@ -1,38 +1,42 @@
 {
-  "entries": [
-    {
-      "name": "Brutal",
-      "kernel": "/boot/kernel.elf",
-      "framebuffer": {
-        "width": 1920,
-        "height": 1080
-      },
-      "modules": [
+    "entries": [
         {
-          "name": "init",
-          "path": "/pkgs/init"
-        },
-        {
-          "name": "ahci",
-          "path": "/pkgs/ahci"
-        },
-        {
-          "name": "acpi",
-          "path": "/pkgs/acpi"
-        },
-        {
-          "name": "pci",
-          "path": "/pkgs/pci"
-        },
-        {
-          "name": "ps2",
-          "path": "/pkgs/ps2"
-        },
-        {
-          "name": "bootimg",
-          "path": "/boot/logo.tga"
+            "name": "Brutal",
+            "kernel": "/boot/kernel.elf",
+            "framebuffer": {
+                "width": 800,
+                "height": 600
+            },
+            "modules": [
+                {
+                    "name": "init",
+                    "path": "/pkgs/init"
+                },
+                {
+                    "name": "ahci",
+                    "path": "/pkgs/ahci"
+                },
+                {
+                    "name": "acpi",
+                    "path": "/pkgs/acpi"
+                },
+                {
+                    "name": "pci",
+                    "path": "/pkgs/pci"
+                },
+                {
+                    "name": "ps2",
+                    "path": "/pkgs/ps2"
+                },
+                {
+                    "name": "wm",
+                    "path": "/pkgs/wm"
+                },
+                {
+                    "name": "bootimg",
+                    "path": "/boot/logo.tga"
+                }
+            ]
         }
-      ]
-    }
-  ]
+    ]
 }

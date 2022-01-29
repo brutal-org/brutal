@@ -1,8 +1,10 @@
 #include <bal/abi.h>
 #include <bal/hw.h>
+#include <brutal/alloc.h>
 #include <brutal/debug.h>
 #include <brutal/ui.h>
 #include <ipc/ipc.h>
+#include <protos/input.h>
 #include "ps2/ps2.h"
 
 typedef struct
@@ -13,15 +15,47 @@ typedef struct
     uint8_t mouse_cycle;
     uint8_t mouse_buf[4];
     bool mouse_has_wheel;
+
+    IpcCap input_sink;
 } Ps2;
 
-void ps2_keyboard_handle_key(KbKey key, KbMotion motion)
+void ps2_keyboard_handle_key(Ps2 *ps2, KbKey key, KbMotion motion)
 {
-    log$("ps2kb: key={} motion={}", kbkey_to_str(key), motion ? "up" : "down");
+    log$("ps2kb: key={} motion={}", kbkey_to_str(key), motion ? "down" : "up");
+    UiEvent event = {
+        .type = UI_EVENT_KEYBOARD_TYPED,
+    };
+
+    bool handled = false;
+    input_sink_handle(ipc_component_self(), ps2->input_sink, &event, &handled, alloc_global());
+
+    if (handled)
+    {
+        log$("ps2kb: event handled");
+    }
+    else
+    {
+        log$("ps2kb: event not handled");
+    }
 }
 
-void ps2_mouse_handle_event(MAYBE_UNUSED UiMouseEvent event)
+void ps2_mouse_handle_event(Ps2 *ps2, MAYBE_UNUSED UiMouseEvent e)
 {
+    UiEvent event = {
+        .type = UI_EVENT_KEYBOARD_TYPED,
+    };
+
+    bool handled = false;
+    input_sink_handle(ipc_component_self(), ps2->input_sink, &event, &handled, alloc_global());
+
+    if (handled)
+    {
+        log$("ps2ms: event handled");
+    }
+    else
+    {
+        log$("ps2ms: event not handled");
+    }
 }
 
 void ps2_keyboard_handle_code(Ps2 *ps2, uint8_t packet)
@@ -30,7 +64,7 @@ void ps2_keyboard_handle_code(Ps2 *ps2, uint8_t packet)
     {
         ps2->kb_escaped = false;
         KbKey key = (KbKey)((packet & 0x7f) + 0x80);
-        ps2_keyboard_handle_key(key, packet & 0x80 ? KBMOTION_UP : KBMOTION_DOWN);
+        ps2_keyboard_handle_key(ps2, key, packet & 0x80 ? KBMOTION_UP : KBMOTION_DOWN);
     }
     else if (packet == PS2_KEYBOARD_ESCAPE)
     {
@@ -39,7 +73,7 @@ void ps2_keyboard_handle_code(Ps2 *ps2, uint8_t packet)
     else
     {
         KbKey key = (KbKey)(packet & 0x7f);
-        ps2_keyboard_handle_key(key, packet & 0x80 ? KBMOTION_UP : KBMOTION_DOWN);
+        ps2_keyboard_handle_key(ps2, key, packet & 0x80 ? KBMOTION_UP : KBMOTION_DOWN);
     }
 }
 
@@ -79,7 +113,7 @@ void ps2_mouse_handle_finished(Ps2 *ps2)
     event.buttons |= ((buf[0] >> 1) & 1) ? MSBTN_RIGHT : 0;
     event.buttons |= ((buf[0] >> 2) & 1) ? MSBTN_MIDDLE : 0;
 
-    ps2_mouse_handle_event(event);
+    ps2_mouse_handle_event(ps2, event);
 }
 
 void ps2_mouse_handle_code(Ps2 *ps2, uint8_t packet)
@@ -243,6 +277,8 @@ int ipc_component_main(IpcComponent *self)
     Ps2 ps2 = {
         .io = bal_io_port(0x60, 0x8),
     };
+
+    ps2.input_sink = ipc_component_require(self, IPC_INPUT_SINK_PROTO);
 
     BrEvent keyboard_irq = {.type = BR_EVENT_IRQ, .irq = 1};
     BrEvent mouse_irq = {.type = BR_EVENT_IRQ, .irq = 12};
