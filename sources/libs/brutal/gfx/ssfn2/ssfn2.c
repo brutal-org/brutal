@@ -46,18 +46,17 @@ static MaybeError ssfn2_load_mappings(IoRSeek rseek, SSFN2FontHeader *header, SS
     size_t end = lig_offs ? lig_offs : size - 4;
 
     int unicode = 0;
-    for (size_t unicode = 0; UNWRAP(io_tell(rseek.seeker)) < end;)
+    while (TRY(MaybeError, io_tell(rseek.seeker)) < end)
     {
         uint8_t val;
         TRY(MaybeError, io_read_byte(rseek.reader, &val));
 
-        if(val == 0b11111111)
+        if (val == 0b11111111)
         {
             unicode += 65356;
         }
-        else if(val & 0b11000000)
+        else if (val & 0b11000000)
         {
-            
         }
     }
 
@@ -115,5 +114,5 @@ MaybeError font_ssfn2_init(IoRSeek rseek, SSFN2Font *font)
         reader = rseek.reader;
     }
 
-    return ssfn2_load_internal(reader, font);
+    return ssfn2_load_internal(rseek, font);
 }
