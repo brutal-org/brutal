@@ -52,13 +52,19 @@ int ipc_hook_call(
     {
         assert_equal(resp_msg.type, (BrArg)binding.resp_id);
 
-        BalMem shm;
-        bal_mem_init_mobj(&shm, resp_msg.args[0]);
+        BalMem resp_mem;
+        bal_mem_init_mobj(&resp_mem, resp_msg.args[0]);
 
-        IpcUnpack unpack;
-        ipc_unpack_init(&unpack, shm.buf, shm.len, alloc);
-        binding.resp_unpack(&unpack, resp);
-        bal_mem_deinit(&shm);
+        IpcUnpack resp_unpack;
+        ipc_unpack_init(&resp_unpack, resp_mem.buf, resp_mem.len, alloc);
+
+        for (int i = 0; i < BR_MSG_ARG_COUNT - 1; i++)
+        {
+            resp_unpack.handles[i] = resp_msg.args[i + 1];
+        }
+
+        binding.resp_unpack(&resp_unpack, resp);
+        bal_mem_deinit(&resp_mem);
     }
 
     ipc_pack_deinit(&pack);
@@ -83,14 +89,20 @@ void ipc_hook_handle(
 
     if (req != nullptr)
     {
-        BalMem shm;
-        bal_mem_init_mobj(&shm, msg->args[0]);
+        BalMem msg_mem;
+        bal_mem_init_mobj(&msg_mem, msg->args[0]);
 
-        IpcUnpack unpack;
-        ipc_unpack_init(&unpack, shm.buf, shm.len, base$(&heap));
-        binding.req_unpack(&unpack, req);
+        IpcUnpack msg_unpack;
+        ipc_unpack_init(&msg_unpack, msg_mem.buf, msg_mem.len, base$(&heap));
 
-        bal_mem_deinit(&shm);
+        for (int i = 0; i < BR_MSG_ARG_COUNT - 1; i++)
+        {
+            msg_unpack.handles[i] = msg->args[i + 1];
+        }
+
+        binding.req_unpack(&msg_unpack, req);
+
+        bal_mem_deinit(&msg_mem);
     }
 
     int result = handler(ctx, req, resp, base$(&heap));
@@ -116,6 +128,12 @@ void ipc_hook_handle(
         resp_msg.type = binding.resp_id;
         resp_msg.flags = BR_MSG_HND(0);
         resp_msg.args[0] = pack.handle;
+
+        for (int i = 0; i < pack.handles_count; i++)
+        {
+            resp_msg.args[i + 1] = pack.handles[i];
+            resp_msg.flags |= BR_MSG_HND(i + 1);
+        }
 
         ipc_component_respond(self, msg, &resp_msg);
 
