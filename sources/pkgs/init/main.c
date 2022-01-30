@@ -75,9 +75,9 @@ HwError hw_display_buffer_handler(void *self, void *, BrHandle *resp, Alloc *)
     BrCreateArgs fb_mem = {
         .type = BR_OBJECT_MEMORY,
         .memory = {
-            framebuffer->addr,
-            fb_size,
-            BR_MEM_PMM | BR_MEM_WRITABLE,
+            .addr = framebuffer->addr,
+            .size = fb_size,
+            .flags = BR_MEM_PMM,
         },
     };
 
