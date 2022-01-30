@@ -1,7 +1,7 @@
 #include <brutal/debug/assert.h>
+#include <brutal/io/funcs.h>
 #include <brutal/io/window.h>
 #include <brutal/math/clamp.h>
-#include <brutal/io/funcs.h>
 
 void io_window_init(IoWindow *self, IoWriter underlying, size_t capacity, Alloc *alloc)
 {

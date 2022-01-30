@@ -14,7 +14,7 @@ void io_mem_init(IoMem *self, size_t capacity, const void *data)
 
 static IoResult io_mem_read(void *ctx, uint8_t *data, size_t size)
 {
-    IoMem* self = ctx;
+    IoMem *self = ctx;
     size_t read = m_min(size, self->capacity - self->used);
 
     for (size_t i = 0; i < read; i++)

@@ -89,4 +89,3 @@ TEST(json_parse_comment_test)
 
     assert_str_equal(res.string, str$("world"));
 }
-

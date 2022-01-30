@@ -2,7 +2,6 @@
 
 #include <brutal/ui/view.h>
 
-
 typedef struct
 {
     UiView base;

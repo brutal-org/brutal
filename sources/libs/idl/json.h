@@ -17,4 +17,4 @@ Json idl_jgen_method(IdlMethod const method, Alloc *alloc);
 
 Json idl_jgen_iface(IdlIface const iface, Alloc *alloc);
 
-Json idl_jgen_module(IdlModule const module, Alloc* alloc);
+Json idl_jgen_module(IdlModule const module, Alloc *alloc);

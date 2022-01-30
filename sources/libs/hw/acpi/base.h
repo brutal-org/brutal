@@ -29,9 +29,9 @@ typedef struct
 } Acpi;
 
 #ifdef __kernel__
-    void acpi_init(Acpi *acpi, uintptr_t base, uintptr_t rsdp);
+void acpi_init(Acpi *acpi, uintptr_t base, uintptr_t rsdp);
 #else
-    void acpi_init(Acpi *acpi, uintptr_t rsdp);
+void acpi_init(Acpi *acpi, uintptr_t rsdp);
 #endif
 
 void acpi_deinit(Acpi *acpi);
