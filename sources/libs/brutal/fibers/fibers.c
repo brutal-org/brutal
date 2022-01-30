@@ -164,6 +164,7 @@ extern void fibers_switch(FibersContext *from, FibersContext *to);
 Fiber *fiber_wait_unblocked(void)
 {
     Fiber *next = current->next;
+
     while (true)
     {
         if (fiber_try_unblock(next) && (next->state == FIBER_RUNNING || next->state == FIBER_IDLE))
@@ -193,6 +194,7 @@ void fiber_yield(void)
     {
         return;
     }
+
     current = next;
 
     fibers_switch(&prev->ctx, &next->ctx);

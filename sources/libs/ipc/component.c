@@ -24,7 +24,6 @@ static bool dispatch_to_pending(IpcComponent *self, BrMsg msg)
     {
         if (pending->seq == msg.seq && pending->from == msg.from.id)
         {
-            log$("Dispatched message to pending");
             pending->resp = msg;
             pending->ok = true;
 
@@ -42,8 +41,6 @@ static bool dispatch_to_provider(IpcComponent *self, BrMsg msg)
         if (provider->port == msg.to.port &&
             provider->proto == msg.prot)
         {
-            log$("Dispatched message to provider");
-
             fiber_start(
                 (FiberFn *)br_ev_handle,
                 &(BrEvCtx){
@@ -95,8 +92,6 @@ static void *ipc_component_dispatch(IpcComponent *self)
 
         if (result == BR_SUCCESS)
         {
-            log$("Dispatching message: {}:{} from {}", ipc.msg.prot, ipc.msg.type, ipc.msg.from.id);
-
             if (!(dispatch_to_pending(self, ipc.msg) ||
                   dispatch_to_provider(self, ipc.msg) ||
                   dispatch_to_sink(self, ipc.msg)))
@@ -208,8 +203,6 @@ BrResult ipc_component_request(IpcComponent *self, IpcCap to, BrMsg *req, BrMsg 
     static uint32_t seq = 0;
     req->seq = seq++;
 
-    log$("Sending request: {}:{} to {}", req->prot, req->type, to.addr.id);
-
     br_ipc(&(BrIpcArgs){
         .to = to.addr,
         .msg = *req,
@@ -246,8 +239,6 @@ BrResult ipc_component_respond(MAYBE_UNUSED IpcComponent *self, BrMsg const *req
 {
     resp->seq = req->seq;
     resp->prot = req->prot;
-
-    log$("Sending response: {}:{} to {}", req->prot, req->type, req->from.id);
 
     return br_ipc(&(BrIpcArgs){
         .to = req->from,
