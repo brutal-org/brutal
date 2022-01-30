@@ -135,6 +135,18 @@ enum xcr0_bit
     XCR0_PKRU_ENABLE = (1 << 9),
 };
 
+static inline uint64_t asm_read_xcr(uint32_t i)
+{
+    uint32_t eax, edx;
+    asm volatile("xgetbv"
+
+                 : "=a"(eax), "=d"(edx)
+                 : "c"(i)
+                 : "memory");
+
+    return eax | ((uint64_t)edx << 32);
+}
+
 static inline void asm_write_xcr(uint32_t i, uint64_t value)
 {
     uint32_t edx = value >> 32;
@@ -147,14 +159,16 @@ static inline void asm_write_xcr(uint32_t i, uint64_t value)
 
 /* --- XSave/FxSave --------------------------------------------------------- */
 
-static inline void asm_xsave(void *region)
+static inline void asm_xsave(uint8_t *region)
 {
-    asm volatile("xsave (%0)" ::"a"(region));
+    asm volatile("xsave %0" ::"m"(*region), "a"(~(uintptr_t)0), "d"(~(uintptr_t)0)
+                 : "memory");
 }
 
-static inline void asm_xrstor(void *region)
+static inline void asm_xrstor(uint8_t *region)
 {
-    asm volatile("xrstor (%0)" ::"a"(region));
+    asm volatile("xrstor %0" ::"m"(*region), "a"(~(uintptr_t)0), "d"(~(uintptr_t)0)
+                 : "memory");
 }
 
 static inline void asm_fninit(void)
