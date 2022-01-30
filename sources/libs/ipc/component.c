@@ -60,7 +60,7 @@ static bool dispatch_to_provider(IpcComponent *self, BrMsg msg)
 
 static bool dispatch_to_sink(IpcComponent *self, BrMsg msg)
 {
-    if (self->sink)
+    if (!self->sink)
     {
         return false;
     }
