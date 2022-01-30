@@ -22,11 +22,11 @@ typedef struct
     Alloc *alloc;
 } GfxDynBuf;
 
-void gfx_dyn_buf_init(GfxDynBuf *self, Alloc *alloc, int width, int height, GfxFmt format);
+void gfx_dyn_buf_init(GfxDynBuf *self, int width, int height, GfxFmt format, Alloc *alloc);
 
 void gfx_dyn_buf_deinit(GfxDynBuf *self);
 
-GfxBuf gfx_dyn_buf_buf(GfxDynBuf *self);
+GfxBuf gfx_dyn_buf(GfxDynBuf *self);
 
 static inline GfxColor gfx_buf_load(GfxBuf self, int x, int y)
 {
@@ -65,7 +65,7 @@ static inline void gfx_buf_copy(GfxBuf dst, GfxBuf src, int x, int y)
         for (int xx = 0; xx < src.width; xx++)
         {
             GfxColor c = gfx_buf_load(src, xx, yy);
-            gfx_buf_blend(dst, x + xx, y + yy, c);
+            gfx_buf_store(dst, x + xx, y + yy, c);
         }
     }
 }
