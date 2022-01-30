@@ -67,9 +67,9 @@ void ipc_pack(IpcPack *self, void const *buf, size_t len)
 
 void ipc_pack_handle(IpcPack *self, BrHandle *handle)
 {
-    ipc_pack_pod(self, handle);
     assert_lower_than(self->handles_count, BR_MSG_ARG_COUNT - 1);
     self->handles[self->handles_count++] = *handle;
+    ipc_pack_pod(self, handle);
 }
 
 void ipc_pack_str(IpcPack *self, Str const *v)
