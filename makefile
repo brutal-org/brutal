@@ -12,7 +12,7 @@ CFLAGS_STD ?= \
 	-std=gnu2x
 
 CFLAGS_OPT ?= \
-	-g -O2
+	-g -O3
 
 
 CFLAGS_WARN ?= \

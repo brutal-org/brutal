@@ -1,33 +1,18 @@
 #pragma once
 
-#include <brutal/ds.h>
-#include <brutal/gfx.h>
-#include <brutal/math.h>
-#include <ipc/ipc.h>
+#include <brutal/ui.h>
+#include "wm/display.h"
 
-typedef struct _WmClient WmClient;
-typedef struct _Wm Wm;
-
-struct _WmClient
+typedef struct
 {
-    GfxBuf buffer;
+    WmDisplay *display;
+    MVec2 mouse;
+} Wm;
 
-    Wm *wm;
-};
+void wm_init(Wm *self, WmDisplay *display);
 
-WmClient wm_client_create(MRect bound);
+void wm_deinit(Wm *self);
 
-void wm_client_destroy(WmClient *client);
+void wm_dispatch(Wm *self, UiEvent event);
 
-struct _Wm
-{
-    GfxBuf screen;
-
-    Vec(WmClient *) clients;
-};
-
-void wm_init(Wm *wm);
-
-void wm_deinit(Wm *wm);
-
-IpcCap wm_connect(Wm *wm, WmClient *client);
+void wm_render(Wm *self);

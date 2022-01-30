@@ -28,34 +28,17 @@ void ps2_keyboard_handle_key(Ps2 *ps2, KbKey key, KbMotion motion)
 
     bool handled = false;
     input_sink_handle(ipc_component_self(), ps2->input_sink, &event, &handled, alloc_global());
-
-    if (handled)
-    {
-        log$("ps2kb: event handled");
-    }
-    else
-    {
-        log$("ps2kb: event not handled");
-    }
 }
 
 void ps2_mouse_handle_event(Ps2 *ps2, MAYBE_UNUSED UiMouseEvent e)
 {
     UiEvent event = {
-        .type = UI_EVENT_KEYBOARD_TYPED,
+        .type = UI_EVENT_MOUSE_MOVE,
+        .mouse = e,
     };
 
     bool handled = false;
     input_sink_handle(ipc_component_self(), ps2->input_sink, &event, &handled, alloc_global());
-
-    if (handled)
-    {
-        log$("ps2ms: event handled");
-    }
-    else
-    {
-        log$("ps2ms: event not handled");
-    }
 }
 
 void ps2_keyboard_handle_code(Ps2 *ps2, uint8_t packet)
