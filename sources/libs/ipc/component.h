@@ -57,6 +57,8 @@ IpcCap ipc_component_require(IpcComponent *self, uint32_t proto);
 
 IpcCap ipc_component_provide(IpcComponent *self, uint32_t id, IpcHandler *fn, void *vtable, void *ctx);
 
+void ipc_component_revoke(IpcComponent *self, IpcCap cap);
+
 BrResult ipc_component_request(IpcComponent *self, IpcCap to, BrMsg *req, BrMsg *resp);
 
 BrResult ipc_component_respond(IpcComponent *self, BrMsg const *req, BrMsg *resp);

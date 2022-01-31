@@ -192,6 +192,20 @@ IpcCap ipc_component_provide(IpcComponent *self, uint32_t proto, IpcHandler *fn,
     };
 }
 
+void ipc_component_revoke(IpcComponent *self, IpcCap cap)
+{
+    for (int i = 0; i < vec_len(&self->providers); i++)
+    {
+        IpcProvider *provider = vec_at(&self->providers, i);
+
+        if (provider->port == cap.addr.port)
+        {
+            vec_splice(&self->providers, i, 1);
+            return;
+        }
+    }
+}
+
 static bool wait_pending(void *ctx)
 {
     IpcPending *pending = ctx;
