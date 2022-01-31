@@ -1,4 +1,4 @@
-module input;
+module event;
 
 import base, math;
 include brutal/ui.h;
@@ -7,5 +7,5 @@ type Event = __ctype(UiEvent);
 
 interface Sink
 {
-    method handle Event -> Bool;
+    method dispatch Event -> Bool;
 };

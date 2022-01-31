@@ -35,6 +35,10 @@
                 {
                     "name": "bootimg",
                     "path": "/boot/logo.tga"
+                },
+                {
+                    "name": "about",
+                    "path": "/pkgs/about"
                 }
             ]
         }

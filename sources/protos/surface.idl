@@ -1,0 +1,16 @@
+module surface;
+
+import base;
+
+type SurfaceMode =
+{
+    Size width,
+    Size height,
+    Size pitch
+    Size format,
+};
+
+type Surface = {
+    SurfaceMode mode,
+    IpcHnd handle,
+};

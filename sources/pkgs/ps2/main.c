@@ -4,7 +4,7 @@
 #include <brutal/debug.h>
 #include <brutal/ui.h>
 #include <ipc/ipc.h>
-#include <protos/input.h>
+#include <protos/event.h>
 #include "ps2/ps2.h"
 
 typedef struct
@@ -27,7 +27,7 @@ void ps2_keyboard_handle_key(Ps2 *ps2, KbKey key, KbMotion motion)
     };
 
     bool handled = false;
-    input_sink_handle(ipc_component_self(), ps2->input_sink, &event, &handled, alloc_global());
+    event_sink_dispatch_rpc(ipc_component_self(), ps2->input_sink, &event, &handled, alloc_global());
 }
 
 void ps2_mouse_handle_event(Ps2 *ps2, MAYBE_UNUSED UiMouseEvent e)
@@ -38,7 +38,7 @@ void ps2_mouse_handle_event(Ps2 *ps2, MAYBE_UNUSED UiMouseEvent e)
     };
 
     bool handled = false;
-    input_sink_handle(ipc_component_self(), ps2->input_sink, &event, &handled, alloc_global());
+    event_sink_dispatch_rpc(ipc_component_self(), ps2->input_sink, &event, &handled, alloc_global());
 }
 
 void ps2_keyboard_handle_code(Ps2 *ps2, uint8_t packet)
@@ -261,7 +261,7 @@ int ipc_component_main(IpcComponent *self)
         .io = bal_io_port(0x60, 0x8),
     };
 
-    ps2.input_sink = ipc_component_require(self, IPC_INPUT_SINK_PROTO);
+    ps2.input_sink = ipc_component_require(self, IPC_EVENT_SINK_PROTO);
 
     BrEvent keyboard_irq = {.type = BR_EVENT_IRQ, .irq = 1};
     BrEvent mouse_irq = {.type = BR_EVENT_IRQ, .irq = 12};
