@@ -91,3 +91,8 @@ void slot_release_impl(SlotImpl *impl, SlotIndex index)
     assert_truth(impl->used[index]);
     impl->used[index] = false;
 }
+
+bool slot_valid_impl(SlotImpl *impl, SlotIndex index)
+{
+    return index >= 0 && index < impl->capacity && impl->used[index];
+}

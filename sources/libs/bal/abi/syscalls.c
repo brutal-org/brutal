@@ -59,6 +59,11 @@ BrResult br_create(BrCreateArgs *args)
     return br_syscall(BR_SC_CREATE, (BrArg)args, 0, 0, 0, 0);
 }
 
+BrResult br_dup(BrDupArgs *args)
+{
+    return br_syscall(BR_SC_DUP, (BrArg)args, 0, 0, 0, 0);
+}
+
 BrResult br_start(BrStartArgs *args)
 {
     return br_syscall(BR_SC_START, (BrArg)args, 0, 0, 0, 0);

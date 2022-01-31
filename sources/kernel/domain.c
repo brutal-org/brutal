@@ -6,7 +6,7 @@ void domain_destroy(Domain *self)
 {
     for (int i = 0; i < slot_count(&self->objects); i++)
     {
-        if (slot_used(&self->objects, i))
+        if (slot_valid(&self->objects, i))
         {
             object_deref(slot_at(&self->objects, i));
             slot_release(&self->objects, i);
@@ -53,7 +53,7 @@ BrResult domain_remove(Domain *self, BrHandle handle)
 {
     rwlock_acquire_write(&self->lock);
 
-    if (!slot_used(&self->objects, handle))
+    if (!slot_valid(&self->objects, handle))
     {
         rwlock_release_write(&self->lock);
         return BR_BAD_HANDLE;
@@ -70,7 +70,7 @@ Object *domain_lookup(Domain *self, BrHandle handle, BrType type)
 {
     rwlock_acquire_read(&self->lock);
 
-    if (!slot_used(&self->objects, handle))
+    if (!slot_valid(&self->objects, handle))
     {
         rwlock_release_read(&self->lock);
         return nullptr;

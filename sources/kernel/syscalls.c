@@ -201,6 +201,21 @@ BrResult sys_create(BrCreateArgs *args)
     }
 }
 
+BrResult sys_dup(BrDupArgs *args)
+{
+    Object *object = domain_lookup(task_self()->domain, args->handle, BR_OBJECT_ANY);
+
+    if (!object)
+    {
+        return BR_BAD_HANDLE;
+    }
+
+    args->copy = domain_add(task_self()->domain, object);
+    object_deref(object);
+
+    return BR_SUCCESS;
+}
+
 BrResult sys_start(BrStartArgs *args)
 {
     Task *task = (Task *)domain_lookup(task_self()->domain, args->handle, BR_OBJECT_TASK);
@@ -444,6 +459,7 @@ BrSyscallFn *syscalls[BR_SYSCALL_COUNT] = {
     [BR_SC_MAP] = sys_map,
     [BR_SC_UNMAP] = sys_unmap,
     [BR_SC_CREATE] = sys_create,
+    [BR_SC_DUP] = sys_dup,
     [BR_SC_START] = sys_start,
     [BR_SC_EXIT] = sys_exit,
     [BR_SC_IPC] = sys_ipc,

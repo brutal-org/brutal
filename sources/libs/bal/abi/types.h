@@ -10,6 +10,7 @@
     SYSCALL(MAP)                  \
     SYSCALL(UNMAP)                \
     SYSCALL(CREATE)               \
+    SYSCALL(DUP)                  \
     SYSCALL(START)                \
     SYSCALL(EXIT)                 \
     SYSCALL(IPC)                  \
