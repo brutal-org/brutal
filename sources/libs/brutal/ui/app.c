@@ -20,8 +20,8 @@ int ui_app_run(UiApp *self)
 {
     while (self->alive)
     {
-        ui_app_pump(self);
         embed_app_wait(self);
+        ui_app_pump(self);
     }
 
     return self->result;

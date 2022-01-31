@@ -111,7 +111,7 @@ void embed_app_pump(UiApp *self)
 {
     SDL_Event e;
 
-    while (SDL_PollEvent(&e) != 0)
+    while (SDL_PollEvent(&e) != 0 && self->alive)
     {
         uint32_t handle;
         UiEvent event = sdl_event_to_ui_event(e, &handle);
