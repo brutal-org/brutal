@@ -80,6 +80,14 @@ SYSCALL(create) (BrCreateArgs* args);
 typedef struct
 {
     BrHandle handle;
+    BrHandle copy;
+} BrDupArgs;
+
+SYSCALL(dup) (BrDupArgs* args);
+
+typedef struct
+{
+    BrHandle handle;
     uintptr_t ip;
     uintptr_t sp;
     BrTaskArgs args;

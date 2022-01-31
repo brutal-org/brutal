@@ -35,6 +35,8 @@ void slot_acquire_impl(SlotImpl *impl, size_t index);
 
 void slot_release_impl(SlotImpl *impl, SlotIndex index);
 
+bool slot_valid_impl(SlotImpl *impl, SlotIndex index);
+
 #define slot_init(self, alloc) \
     slot_init_impl(impl$(self), sizeof(*(self)->data), (alloc))
 
@@ -50,11 +52,11 @@ void slot_release_impl(SlotImpl *impl, SlotIndex index);
 #define slot_release(self, index) \
     slot_release_impl(impl$(self), index)
 
+#define slot_valid(self, index) \
+    slot_valid_impl(impl$(self), index)
+
 #define slot_capacity(self) \
     impl$(self)->capacity
-
-#define slot_used(self, index) \
-    (self)->used[index]
 
 #define slot_at(self, index) \
     (self)->data[index]
