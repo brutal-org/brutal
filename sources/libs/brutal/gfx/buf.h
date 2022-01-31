@@ -10,7 +10,11 @@ typedef struct
     int width;
     int height;
     int pitch;
+
     GfxFmt fmt;
+    GfxColor (*fmt_load_impl)(const void *);
+    void (*fmt_store_impl)(GfxColor, void *);
+    int fmt_bpp;
 
     void *buf;
     size_t size;
@@ -22,6 +26,8 @@ typedef struct
     Alloc *alloc;
 } GfxDynBuf;
 
+void gfx_buf_init(GfxBuf *self, int width, int height, GfxFmt format, int pitch, void *buf);
+
 void gfx_dyn_buf_init(GfxDynBuf *self, int width, int height, GfxFmt format, Alloc *alloc);
 
 void gfx_dyn_buf_deinit(GfxDynBuf *self);
@@ -30,25 +36,25 @@ GfxBuf gfx_dyn_buf(GfxDynBuf *self);
 
 static inline GfxColor gfx_buf_load(GfxBuf self, int x, int y)
 {
-    if (x < 0 || x > self.width || y < 0 || y > self.height)
-    {
-        return GFX_MAGENTA;
-    }
+    assert_greater_equal(x, 0);
+    assert_greater_equal(y, 0);
+    assert_lower_than(x, self.width);
+    assert_lower_than(y, self.height);
 
-    uint8_t *pixel = ((uint8_t *)self.buf) + self.pitch * y + x * gfx_fmt_size(self.fmt);
-    return gfx_fmt_load(self.fmt, pixel);
+    uint8_t *pixel = ((uint8_t *)self.buf) + self.pitch * y + x * self.fmt_bpp;
+    return (*self.fmt_load_impl)(pixel);
 }
 
 static inline void gfx_buf_store(GfxBuf self, int x, int y, GfxColor color)
 {
-    if (x < 0 || x > self.width || y < 0 || y > self.height)
-    {
-        return;
-    }
+    assert_greater_equal(x, 0);
+    assert_greater_equal(y, 0);
+    assert_lower_than(x, self.width);
+    assert_lower_than(y, self.height);
 
     uint8_t *buf = (uint8_t *)self.buf;
-    uint8_t *pixel = buf + self.pitch * y + x * gfx_fmt_size(self.fmt);
-    gfx_fmt_store(self.fmt, color, pixel);
+    uint8_t *pixel = buf + self.pitch * y + x * self.fmt_bpp;
+    (*self.fmt_store_impl)(color, pixel);
 }
 
 static inline void gfx_buf_blend(GfxBuf self, int x, int y, GfxColor color)

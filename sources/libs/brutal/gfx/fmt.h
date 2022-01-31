@@ -14,8 +14,14 @@ typedef enum
     GFX_FMT_BGRA8888,
 } GfxFmt;
 
-void gfx_fmt_store(GfxFmt self, GfxColor color, void *dst);
+void gfx_fmt_store_gs8(GfxColor color, void *dst);
+void gfx_fmt_store_rgb888(GfxColor color, void *dst);
+void gfx_fmt_store_rgba8888(GfxColor color, void *dst);
+void gfx_fmt_store_bgra8888(GfxColor color, void *dst);
 
-GfxColor gfx_fmt_load(GfxFmt self, const void *src);
+GfxColor gfx_fmt_load_gs8(const void *src);
+GfxColor gfx_fmt_load_rgb888(const void *src);
+GfxColor gfx_fmt_load_rgba8888(const void *src);
+GfxColor gfx_fmt_load_bgra8888(const void *src);
 
 size_t gfx_fmt_size(GfxFmt self);

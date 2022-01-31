@@ -41,12 +41,7 @@ void embed_win_flip(UiWin *self, MRect rect)
 GfxBuf embed_win_gfx(UiWin *self)
 {
     SDL_Surface *sdl_surface = SDL_GetWindowSurface(self->embed.sdl_window);
-
-    return (GfxBuf){
-        .width = sdl_surface->w,
-        .height = sdl_surface->h,
-        .pitch = sdl_surface->pitch,
-        .fmt = GFX_FMT_BGRA8888,
-        .buf = sdl_surface->pixels,
-    };
+    GfxBuf buf;
+    gfx_buf_init(&buf, sdl_surface->w, sdl_surface->h, GFX_FMT_BGRA8888, sdl_surface->pitch, sdl_surface->pixels);
+    return buf;
 }
