@@ -84,9 +84,9 @@ CStmt idl_cgen_dispatch_body(IdlIface const iface, Alloc *alloc)
 
 CDecl idl_cgen_dispatch_func(IdlIface const iface, Alloc *alloc)
 {
-    Str name = str_fmt(alloc, "{case:snake}_dispatch", iface.name);
+    Str name = str_fmt(alloc, "__IDL_PRIVATE__{case:snake}_dispatch_rpc", iface.name);
     CType type = idl_cgen_dispatch_type(alloc);
     CStmt body = idl_cgen_dispatch_body(iface, alloc);
 
-    return cdecl_func(name, type, body);
+    return cdecl_attrib(cdecl_func(name, type, body), CDECL_STATIC);
 }

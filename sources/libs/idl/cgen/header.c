@@ -19,7 +19,7 @@ void idl_cgen_iface_header(CUnit *unit, IdlModule const module, IdlIface const i
 
         ctype_member(&vtable, method.name, ctype_ident_ptr(name, alloc));
         cunit_decl(unit, cdecl_type(name, handler_type));
-        cunit_decl(unit, cdecl_func(method.name, method_type, cstmt_empty()));
+        cunit_decl(unit, cdecl_func(str_fmt(alloc, "{}_rpc", method.name), method_type, cstmt_empty()));
 
         ctype_constant(&msgtype, str_fmt(alloc, "MSG_{case:constant}_REQ", method.name), cval_unsigned(i++));
         ctype_constant(&msgtype, str_fmt(alloc, "MSG_{case:constant}_RESP", method.name), cval_unsigned(i++));

@@ -25,7 +25,7 @@ CDecl idl_cgen_provider_func(IdlIface const iface, Alloc *alloc)
 
     cexpr_member(&expr, cexpr_ident(str$("ipc")));
     cexpr_member(&expr, cexpr_constant(cval_unsigned(iface.id)));
-    cexpr_member(&expr, cexpr_ident(str_fmt(alloc, "{case:snake}_dispatch", iface.name)));
+    cexpr_member(&expr, cexpr_ident(str_fmt(alloc, "__IDL_PRIVATE__{case:snake}_dispatch_rpc", iface.name)));
     cexpr_member(&expr, cexpr_ident(str$("vtable")));
     cexpr_member(&expr, cexpr_ident(str$("ctx")));
 

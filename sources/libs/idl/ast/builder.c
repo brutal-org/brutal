@@ -154,7 +154,6 @@ IdlIface idl_iface(Str name, IdlAttrs attrs, Alloc *alloc)
 {
     IdlIface iface = {};
 
-    iface.id = fnv_32(name.buf, name.len, FNV1_32_INIT);
     iface.name = name;
     iface.attrs = attrs;
 

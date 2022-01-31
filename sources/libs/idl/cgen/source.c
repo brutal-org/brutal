@@ -9,7 +9,7 @@ void idl_cgen_iface_source(CUnit *unit, IdlModule const module, IdlIface const i
         CType type = idl_cgen_method_type(method, module, alloc);
         CStmt body = idl_cgen_method_body(method, iface, alloc);
 
-        cunit_decl(unit, cdecl_func(method.name, type, body));
+        cunit_decl(unit, cdecl_func(str_fmt(alloc, "{}_rpc",  method.name), type, body));
     }
 
     cunit_decl(unit, idl_cgen_dispatch_func(iface, alloc));

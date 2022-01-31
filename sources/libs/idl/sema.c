@@ -1,4 +1,5 @@
 #include <brutal/debug.h>
+#include <brutal/hash.h>
 #include <brutal/io.h>
 #include <idl/ast.h>
 #include <idl/ast/builder.h>
@@ -55,7 +56,8 @@ static IdlType idl_sema_type(IdlType type, IdlModule module, Alloc *alloc)
 IdlIface idl_sema_iface(IdlModule *module, IdlIface iface, Alloc *alloc)
 {
     IdlIface prefixed = idl_iface(str_fmt(alloc, "{case:pascal}{case:pascal}", module->name, iface.name), iface.attrs, alloc);
-    prefixed.id = iface.id;
+    prefixed.id = fnv_32(module->name.buf, module->name.len, FNV1_32_INIT);
+    prefixed.id = fnv_32(iface.name.buf, iface.name.len, prefixed.id);
 
     vec_foreach_v(method, &iface.methods)
     {
@@ -102,6 +104,7 @@ IdlModule idl_sema_module(IdlModule module, Alloc *alloc)
 
     vec_foreach_v(import, &module.imports)
     {
+        log$("Importing {}...", import.name);
         IoFile source_file;
         UNWRAP_OR_PANIC(io_file_open(&source_file, str_fmt(alloc, "sources/protos/{}.idl", import.name)), "File not found!");
 
