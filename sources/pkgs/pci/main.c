@@ -4,7 +4,7 @@
 #include <brutal/alloc.h>
 #include <brutal/debug.h>
 #include <pci/pci.h>
-#include <protos/bbus.h>
+#include <protos/bus.h>
 #include <protos/boot.h>
 #include <protos/pci.h>
 
@@ -155,10 +155,10 @@ static Iter iter_pci(void *data, void *ctx)
 int ipc_component_main(IpcComponent *self)
 {
     IpcCap boot_infos = ipc_component_require(self, IPC_BOOT_INFO_PROTO);
-    IpcCap bbus_server = ipc_component_require(self, IPC_BBUS_SERVER_PROTO);
+    IpcCap bus_server = ipc_component_require(self, IPC_BUS_SERVER_PROTO);
 
     uintptr_t rsdp = 0;
-    if (boot_info_rsdp(self, boot_infos, &rsdp, alloc_global()) != IPC_SUCCESS)
+    if (boot_info_rsdp_rpc(self, boot_infos, &rsdp, alloc_global()) != IPC_SUCCESS)
     {
         panic$("No rsdp found!");
     }
@@ -172,7 +172,7 @@ int ipc_component_main(IpcComponent *self)
 
     IpcCap pci_cap = pci_bus_provide(self, &pci_bus_vtable, &pci);
 
-    bbus_server_expose(self, bbus_server, &pci_cap, alloc_global());
+    bus_server_expose_rpc(self, bus_server, &pci_cap, alloc_global());
 
     return ipc_component_run(self);
 }

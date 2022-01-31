@@ -2,7 +2,7 @@
 #include <ahci/device.h>
 #include <brutal/alloc.h>
 #include <brutal/debug.h>
-#include <protos/bbus.h>
+#include <protos/bus.h>
 #include <protos/pci.h>
 
 int ipc_component_main(IpcComponent *self)
@@ -16,7 +16,7 @@ int ipc_component_main(IpcComponent *self)
     };
 
     PciAddr ahci_device;
-    if (pci_bus_query(self, pci_bus, &id, &ahci_device, alloc_global()) == PCI_NOT_FOUND)
+    if (pci_bus_query_rpc(self, pci_bus, &id, &ahci_device, alloc_global()) == PCI_NOT_FOUND)
     {
         log$("No AHCI controller found!");
         return 0;
@@ -25,7 +25,7 @@ int ipc_component_main(IpcComponent *self)
     log$("AHCI controller found on bus: {} func: {} seg: {} slot: {}", ahci_device.bus, ahci_device.func, ahci_device.seg, ahci_device.slot);
 
     PciBarInfo pci_bar = {};
-    pci_bus_bar(self, pci_bus, &(PciBusBarRequest){.addr = ahci_device, .num = 5}, &pci_bar, alloc_global());
+    pci_bus_bar_rpc(self, pci_bus, &(PciBusBarRequest){.addr = ahci_device, .num = 5}, &pci_bar, alloc_global());
 
     log$("bar[5] {#x}-{#x} type: {}", pci_bar.base, pci_bar.base + pci_bar.size, pci_bar.type);
 

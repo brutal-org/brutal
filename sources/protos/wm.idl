@@ -1,17 +1,22 @@
 module wm;
 
-import base, math;
+import base, math, event, surface;
 
 interface Client
 {
-    method resize MRect -> Nil;
-    method flip MRect -> Bool;
+    method show -> Bool;
+    method hide -> Bool;
     method close -> Bool;
+    method flip MRect -> Bool;
+    method move MRect -> Bool;
+
+    method surface -> Surface;
+
+    method listen IpcCap -> Bool;
 };
+
 
 interface Server
 {
-    method connect { MRect bound } -> IpcCap;
+    method create { MRect bound } -> IpcCap;
 };
-
-

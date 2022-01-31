@@ -1,6 +1,6 @@
 #include "wm/display.h"
 
-void wm_display_init(WmDisplay *self, DisplayMode mode, BalMem mem, Alloc *alloc)
+void wm_display_init(WmDisplay *self, SurfaceMode mode, BalMem mem, Alloc *alloc)
 {
     self->mode = mode;
     self->mem = mem;
@@ -16,7 +16,7 @@ void wm_display_deinit(WmDisplay *self)
 
 GfxBuf wm_display_frontbuffer(WmDisplay *self)
 {
-    DisplayMode mode = self->mode;
+    SurfaceMode mode = self->mode;
 
     return (GfxBuf){
         .width = mode.width,

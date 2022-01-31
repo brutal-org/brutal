@@ -1,17 +1,10 @@
 module hw;
 
-import base, math;
-
-type DisplayMode =
-{
-    Size width,
-    Size height,
-    Size pitch
-    Size format,
-};
+import base, surface;
 
 interface Display
 {
-    method current -> DisplayMode;
-    method buffer -> IpcHnd;
+    method modes -> SurfaceMode[];
+    method activate SurfaceMode -> Bool;
+    method surface -> Surface;
 };

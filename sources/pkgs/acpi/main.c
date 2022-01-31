@@ -14,7 +14,7 @@ int ipc_component_main(IpcComponent *self)
     IpcCap infos = ipc_component_require(self, IPC_BOOT_INFO_PROTO);
 
     uintptr_t rsdp = 0;
-    if (boot_info_rsdp(self, infos, &rsdp, alloc_global()) != IPC_SUCCESS)
+    if (boot_info_rsdp_rpc(self, infos, &rsdp, alloc_global()) != IPC_SUCCESS)
     {
         panic$("No rsdp found!");
     }

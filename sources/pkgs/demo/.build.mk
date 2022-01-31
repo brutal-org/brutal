@@ -1,3 +1,4 @@
 DEMO_NAME = demo
 
 HOST_PKGS += DEMO
+USER_PKGS += DEMO

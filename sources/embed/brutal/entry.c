@@ -17,6 +17,8 @@ WEAK int br_main(
     MAYBE_UNUSED long arg4,
     MAYBE_UNUSED long arg5)
 {
+    log$("ENTRY POINT REACHED");
+
     IpcComponent component;
     ipc_component_init(&component, alloc_global());
     ipc_component_inject(&component, (IpcCap *)arg1, (int)arg2);
