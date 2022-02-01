@@ -7,20 +7,20 @@ void gfx_buf_init(GfxBuf *self, int width, int height, GfxFmt format, int pitch,
     switch (self->fmt)
     {
     case GFX_FMT_GS8:
-        self->fmt_load_impl = gfx_fmt_load_gs8;
-        self->fmt_store_impl = gfx_fmt_store_gs8;
+        self->load = gfx_fmt_load_gs8;
+        self->store = gfx_fmt_store_gs8;
         break;
     case GFX_FMT_RGB888:
-        self->fmt_load_impl = gfx_fmt_load_rgb888;
-        self->fmt_store_impl = gfx_fmt_store_rgb888;
+        self->load = gfx_fmt_load_rgb888;
+        self->store = gfx_fmt_store_rgb888;
         break;
     case GFX_FMT_RGBA8888:
-        self->fmt_load_impl = gfx_fmt_load_rgba8888;
-        self->fmt_store_impl = gfx_fmt_store_rgba8888;
+        self->load = gfx_fmt_load_rgba8888;
+        self->store = gfx_fmt_store_rgba8888;
         break;
     case GFX_FMT_BGRA8888:
-        self->fmt_load_impl = gfx_fmt_load_bgra8888;
-        self->fmt_store_impl = gfx_fmt_store_bgra8888;
+        self->load = gfx_fmt_load_bgra8888;
+        self->store = gfx_fmt_store_bgra8888;
         break;
     default:
         panic$("Unknown pixel format {}", self->fmt);
