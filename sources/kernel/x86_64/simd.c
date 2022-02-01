@@ -3,20 +3,10 @@
 #include "kernel/x86_64/cpuid.h"
 #include "kernel/x86_64/simd.h"
 
-void simd_initialize_fpu(void)
-{
-    asm_fninit();
-    asm_write_cr0(asm_read_cr0() & ~((uint64_t)CR0_EMULATION));
-    asm_write_cr0(asm_read_cr0() | CR0_MONITOR_CO_PROCESSOR);
-    asm_write_cr0(asm_read_cr0() | CR0_NUMERIC_ERROR_ENABLE);
-
-    asm_write_cr4(asm_read_cr4() | CR4_FXSR_ENABLE);
-    asm_write_cr4(asm_read_cr4() | CR4_SIMD_EXCEPTION_SUPPORT);
-}
+static ALIGNED(MEM_PAGE_SIZE) uint8_t _smid_initial_context[MEM_PAGE_SIZE] = {};
 
 void simd_enable_xsave(void)
 {
-    asm_write_cr4(asm_read_cr4() | CR4_XSAVE_ENABLE);
 }
 
 void simd_initialize_xcr0(void)
@@ -38,22 +28,29 @@ void simd_initialize_xcr0(void)
         xcr0 |= XCR0_ZMM16_32_ENABLE;
     }
 
-    asm_write_xcr(0, asm_read_xcr(0) | xcr0);
+    asm_write_xcr(0, xcr0);
 }
 
 void simd_initialize(void)
 {
-    simd_initialize_fpu();
+    asm_write_cr0(asm_read_cr0() & ~((uint64_t)CR0_EMULATION));
+    asm_write_cr0(asm_read_cr0() | CR0_MONITOR_CO_PROCESSOR);
+    asm_write_cr0(asm_read_cr0() | CR0_NUMERIC_ERROR_ENABLE);
+
+    asm_write_cr4(asm_read_cr4() | CR4_FXSR_ENABLE);
+    asm_write_cr4(asm_read_cr4() | CR4_SIMD_EXCEPTION_SUPPORT);
 
     if (cpuid_has_xsave())
     {
         log$("XSAVE detected");
 
-        simd_enable_xsave();
+        asm_write_cr4(asm_read_cr4() | CR4_XSAVE_ENABLE);
         simd_initialize_xcr0();
     }
 
     log$("SIMD save buffer size = {}", simd_context_size());
+    asm_fninit();
+    simd_context_save(_smid_initial_context);
 }
 
 size_t simd_context_size(void)
@@ -70,7 +67,7 @@ size_t simd_context_size(void)
 
 void simd_context_init(void *ptr)
 {
-    simd_context_save(ptr);
+    mem_cpy(ptr, _smid_initial_context, simd_context_size());
 }
 
 void simd_context_save(void *ptr)
