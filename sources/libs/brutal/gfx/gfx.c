@@ -373,6 +373,27 @@ void gfx_fill_line(Gfx *self, MEdge line, float weight)
     gfx_fill_path(self, GFX_FILL_EVENODD);
 }
 
+void gfx_fill_rect_aligned(Gfx *self, MRect rect)
+{
+    if (m_rect_empty(rect))
+    {
+        return;
+    }
+
+    MRect rbound = gfx_buf_bound(self->buf);
+    rbound = m_rect_clip_rect(rbound, rect);
+    rbound = m_rect_clip_rect(rbound, gfx_peek(self)->clip);
+    GfxColor color = gfx_paint_sample(gfx_peek(self)->fill, 0, 0);
+
+    for (int y = rbound.y; y < rbound.y + rbound.height; y++)
+    {
+        for (int x = rbound.x; x < rbound.x + rbound.width; x++)
+        {
+            gfx_buf_store(self->buf, x, y, color);
+        }
+    }
+}
+
 void gfx_fill_rect(Gfx *self, MRect rect, float radius)
 {
     gfx_begin_path(self);
