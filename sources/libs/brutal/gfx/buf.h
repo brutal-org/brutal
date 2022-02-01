@@ -42,7 +42,7 @@ static inline GfxColor gfx_buf_load(GfxBuf self, int x, int y)
     assert_lower_than(y, self.height);
 
     uint8_t *pixel = ((uint8_t *)self.buf) + self.pitch * y + x * self.fmt_bpp;
-    return (*self.fmt_load_impl)(pixel);
+    return self.fmt_load_impl(pixel);
 }
 
 static inline void gfx_buf_store(GfxBuf self, int x, int y, GfxColor color)
@@ -54,7 +54,7 @@ static inline void gfx_buf_store(GfxBuf self, int x, int y, GfxColor color)
 
     uint8_t *buf = (uint8_t *)self.buf;
     uint8_t *pixel = buf + self.pitch * y + x * self.fmt_bpp;
-    (*self.fmt_store_impl)(color, pixel);
+    self.fmt_store_impl(color, pixel);
 }
 
 static inline void gfx_buf_blend(GfxBuf self, int x, int y, GfxColor color)
