@@ -36,10 +36,10 @@ static MaybeError ssfn2_load_string(IoReader reader, char *dst)
     return SUCCESS;
 }
 
-static MaybeError ssfn2_load_mappings(IoRSeek rseek, SSFN2FontHeader *header, SSFN2CommonHeader *common_header)
+static MaybeError ssfn2_load_mappings(IoRSeek rseek, SSFN2Font *font, SSFN2CommonHeader *common_header)
 {
-    size_t char_offs = load_le(header->characters_offs);
-    size_t lig_offs = load_le(header->ligature_offs);
+    size_t char_offs = load_le(font->header.characters_offs);
+    size_t lig_offs = load_le(font->header.ligature_offs);
     size_t size = load_le(common_header->size);
 
     io_seek(rseek.seeker, io_seek_from_start(char_offs));
@@ -51,12 +51,37 @@ static MaybeError ssfn2_load_mappings(IoRSeek rseek, SSFN2FontHeader *header, SS
         uint8_t val;
         TRY(MaybeError, io_read_byte(rseek.reader, &val));
 
+        // Skip UINT_MAX + 1 codepoints
         if (val == 0b11111111)
         {
             unicode += 65356;
         }
-        else if (val & 0b11000000)
+        // Skip up to 64 codepoints
+        else if ((val & 0b11000000) == 0b10000000)
         {
+            unicode += val & 0b00111111;
+        }
+        // Skip up to 16128 codepoints
+        else if ((val & 0b11000000) == 0b11000000)
+        {
+            uint8_t extra;
+            TRY(MaybeError, io_read_byte(rseek.reader, &extra));
+            unicode += ((val & 0b00111111) << 8) | extra;
+        }
+        // Get a codepoint
+        else
+        {
+            uint8_t glyph_data[6];
+            TRY(MaybeError, io_read(rseek.reader, glyph_data, sizeof(glyph_data)));
+            font->glyphs[unicode] = (SSFN2Glyph){
+                .width = glyph_data[2],
+                .height = glyph_data[3],
+                .adv_x = glyph_data[4],
+                .adv_y = glyph_data[5],
+            };
+            uint8_t extra_bytes = val & 0b01111111;
+            uint8_t extra_data[0b01111111];
+            TRY(MaybeError, io_read(rseek.reader, extra_data, extra_bytes));
         }
     }
 
@@ -90,7 +115,7 @@ static MaybeError ssfn2_load_internal(IoRSeek rseek, SSFN2Font *font)
     {
         TRY(MaybeError, io_read(reader, (uint8_t *)&font->header, sizeof(SSFN2FontHeader)));
         TRY(MaybeError, ssfn2_load_stringtable(reader, font));
-        TRY(MaybeError, ssfn2_load_mappings(rseek, &font->header, &common_header));
+        TRY(MaybeError, ssfn2_load_mappings(rseek, font, &common_header));
     }
     else
     {
