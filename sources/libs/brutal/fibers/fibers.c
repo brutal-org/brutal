@@ -60,8 +60,8 @@ Fiber *fiber_start(FiberFn fn, void *args)
         self->stack = alloc_malloc(alloc_global(), FIBER_STACK_SIZE);
         self->ctx.rsp = (uint64_t)self->stack + (FIBER_STACK_SIZE - 8);
         self->ctx.rip = (uint64_t)_fiber_entry;
-        self->ctx.fc_mxcsr = 0;
-        self->ctx.fc_x86_cw = 0;
+        self->ctx.fc_mxcsr = 0b1111110000000;
+        self->ctx.fc_x86_cw = 0b1100111111;
     }
 
     self->state = FIBER_RUNNING;
