@@ -14,7 +14,7 @@ typedef struct
     bool visible;
     MRect bound;
 
-    GfxDynBuf frontbuffer;
+    GfxSurface frontbuffer;
     BalMem backbuffer;
 
     struct _WmServer *server;

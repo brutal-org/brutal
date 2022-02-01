@@ -1,8 +1,8 @@
 #include <brutal/gfx/buf.h>
 
-void gfx_dyn_buf_init(GfxDynBuf *self, int width, int height, GfxFmt format, Alloc *alloc)
+void gfx_surface_init(GfxSurface *self, int width, int height, GfxFmt format, Alloc *alloc)
 {
-    *self = (GfxDynBuf){};
+    *self = (GfxSurface){};
 
     self->alloc = alloc;
     self->buf.fmt = format;
@@ -13,13 +13,13 @@ void gfx_dyn_buf_init(GfxDynBuf *self, int width, int height, GfxFmt format, All
     self->buf.buf = alloc_malloc(self->alloc, self->buf.size);
 }
 
-void gfx_dyn_buf_deinit(GfxDynBuf *self)
+void gfx_surface_deinit(GfxSurface *self)
 {
     alloc_free(self->alloc, self->buf.buf);
-    *self = (GfxDynBuf){};
+    *self = (GfxSurface){};
 }
 
-GfxBuf gfx_dyn_buf(GfxDynBuf *self)
+GfxBuf gfx_surface_buf(GfxSurface *self)
 {
     return self->buf;
 }
