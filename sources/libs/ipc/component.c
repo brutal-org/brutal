@@ -79,27 +79,31 @@ static bool dispatch_to_sink(IpcComponent *self, BrMsg msg)
     return true;
 }
 
+void ipc_component_pump(IpcComponent *self, BrDeadline deadline)
+{
+    BrIpcArgs ipc = {
+        .flags = BR_IPC_RECV | (deadline > 0 ? BR_IPC_BLOCK : 0),
+        .deadline = deadline,
+    };
+
+    BrResult result = br_ipc(&ipc);
+
+    if (result == BR_SUCCESS)
+    {
+        if (!(dispatch_to_pending(self, ipc.msg) ||
+              dispatch_to_provider(self, ipc.msg) ||
+              dispatch_to_sink(self, ipc.msg)))
+        {
+            log$("Unhandled message: {}:{} on port {}", ipc.msg.prot, ipc.msg.type, ipc.msg.to.port);
+        }
+    }
+}
+
 static void *ipc_component_dispatch(IpcComponent *self)
 {
     do
     {
-        BrIpcArgs ipc = {
-            .flags = BR_IPC_RECV | BR_IPC_BLOCK,
-            .deadline = fiber_deadline(),
-        };
-
-        BrResult result = br_ipc(&ipc);
-
-        if (result == BR_SUCCESS)
-        {
-            if (!(dispatch_to_pending(self, ipc.msg) ||
-                  dispatch_to_provider(self, ipc.msg) ||
-                  dispatch_to_sink(self, ipc.msg)))
-            {
-                log$("Unhandled message: {}:{} on port {}", ipc.msg.prot, ipc.msg.type, ipc.msg.to.port);
-            }
-        }
-
+        ipc_component_pump(self, fiber_deadline());
         fiber_yield();
     } while (self->running);
 
@@ -116,6 +120,8 @@ IpcComponent *ipc_component_self(void)
 
 void ipc_component_init(IpcComponent *self, Alloc *alloc)
 {
+    assert_truth(_instance == nullptr);
+
     *self = (IpcComponent){};
     self->alloc = alloc;
     self->running = true;

@@ -5,9 +5,14 @@
 #include <brutal/fibers.h>
 #include <ipc/ipc.h>
 
-WEAK int ipc_component_main(MAYBE_UNUSED IpcComponent *self)
+WEAK int main(int, char **)
 {
     panic$("No ipc_component_main() defined");
+}
+
+WEAK int ipc_component_main(MAYBE_UNUSED IpcComponent *self)
+{
+    return main(0, nullptr);
 }
 
 WEAK int br_main(
@@ -17,8 +22,6 @@ WEAK int br_main(
     MAYBE_UNUSED long arg4,
     MAYBE_UNUSED long arg5)
 {
-    log$("ENTRY POINT REACHED");
-
     IpcComponent component;
     ipc_component_init(&component, alloc_global());
     ipc_component_inject(&component, (IpcCap *)arg1, (int)arg2);

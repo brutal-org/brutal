@@ -134,7 +134,7 @@ int br_main(Handover *handover)
     unit_consume(&ahci_unit, IPC_BUS_SERVER_PROTO);
     unit_consume(&ahci_unit, IPC_PCI_BUS_PROTO);
     bus_activate(&bus, &ahci_unit);
-*/
+    */
 
     Unit wm_unit;
     unit_init(&wm_unit, str$("wm"), alloc_global());
