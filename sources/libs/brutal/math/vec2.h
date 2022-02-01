@@ -1,6 +1,7 @@
 #pragma once
 
 #include <brutal/math/angle.h>
+#include <brutal/math/clamp.h>
 #include <math.h>
 
 typedef union
@@ -47,6 +48,16 @@ M_VEC2_FUNC(add, +)
 M_VEC2_FUNC(sub, -)
 M_VEC2_FUNC(mul, *)
 M_VEC2_FUNC(div, /)
+
+static inline float m_vec2_max(MVec2 vec)
+{
+    return m_max(vec.x, vec.y);
+}
+
+static inline float m_vec2_min(MVec2 vec)
+{
+    return m_max(vec.x, vec.y);
+}
 
 static inline float m_vec2_len_squared(MVec2 vec)
 {
