@@ -42,6 +42,9 @@ int ipc_component_main(IpcComponent *self)
 
     IpcCap input_sink_cap = event_sink_provide(self, &_input_sink_vtable, &server);
     bus_server_expose_rpc(self, bus_server, &input_sink_cap, alloc_global());
+
+    bus_server_expose_rpc(self, bus_server, &server.capability, alloc_global());
+
     wm_server_render(&server);
 
     return ipc_component_run(self);
