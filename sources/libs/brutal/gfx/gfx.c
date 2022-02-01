@@ -93,6 +93,7 @@ GfxCtx *gfx_peek(Gfx *self)
 void gfx_clip(Gfx *self, MRect rect)
 {
     rect.pos = m_vec2_add(rect.pos, gfx_peek(self)->origin);
+    rect = m_rect_clip_rect(rect, gfx_peek(self)->clip);
     gfx_peek(self)->clip = rect;
 }
 
@@ -155,9 +156,7 @@ static int float_cmp(void const *lhs, void const *rhs)
 void gfx_fill_path(Gfx *self, GfxFillRule rule)
 {
     MRect pbound = m_edges_bound(vec_begin(&self->path), vec_len(&self->path));
-    MRect rbound = gfx_buf_bound(self->buf);
-    rbound = m_rect_clip_rect(rbound, pbound);
-    rbound = m_rect_clip_rect(rbound, gfx_peek(self)->clip);
+    MRect rbound = m_rect_clip_rect(pbound, gfx_peek(self)->clip);
 
     if (m_rect_empty(rbound))
     {
@@ -380,14 +379,14 @@ void gfx_fill_rect_aligned(Gfx *self, MRect rect)
         return;
     }
 
-    MRect rbound = gfx_buf_bound(self->buf);
-    rbound = m_rect_clip_rect(rbound, rect);
-    rbound = m_rect_clip_rect(rbound, gfx_peek(self)->clip);
+    rect.pos = m_vec2_add(rect.pos, gfx_peek(self)->origin);
+    rect = m_rect_clip_rect(rect, gfx_peek(self)->clip);
+
     GfxColor color = gfx_paint_sample(gfx_peek(self)->fill, 0, 0);
 
-    for (int y = rbound.y; y < rbound.y + rbound.height; y++)
+    for (int y = rect.y; y < rect.y + rect.height; y++)
     {
-        for (int x = rbound.x; x < rbound.x + rbound.width; x++)
+        for (int x = rect.x; x < rect.x + rect.width; x++)
         {
             gfx_buf_store(self->buf, x, y, color);
         }
@@ -400,10 +399,7 @@ void gfx_fill_rect(Gfx *self, MRect rect, float radius)
 
     if (radius == 0)
     {
-        gfx_move_to(self, m_vec2(rect.x, rect.y));
-        gfx_line_to(self, m_vec2(rect.x + rect.width, rect.y));
-        gfx_line_to(self, m_vec2(rect.x + rect.width, rect.y + rect.height));
-        gfx_line_to(self, m_vec2(rect.x, rect.y + rect.height));
+        gfx_fill_rect_aligned(self, rect);
     }
     else
     {
