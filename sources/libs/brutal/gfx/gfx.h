@@ -101,7 +101,6 @@ void gfx_dot(Gfx *self, MVec2 dot, float size);
 void gfx_fill_line(Gfx *self, MEdge line, float weight);
 
 void gfx_fill_rect(Gfx *self, MRect rect, float radius);
-void gfx_fill_rect_aligned(Gfx *self, MRect rect);
 
 void gfx_fill_ellipse(Gfx *self, MRect rect);
 
