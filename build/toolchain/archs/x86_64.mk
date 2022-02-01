@@ -10,7 +10,6 @@ ARCH_KCFLAGS = \
 	-mcmodel=kernel
 
 ARCH_CFLAGS = \
-	-fsanitize=undefined
 
 USER_AS=nasm
 USER_ASFLAGS=-f elf64
@@ -19,5 +18,7 @@ QEMU_ARGS= \
 		-M q35 \
 		-smp 4 \
 		-m 256M \
-		-rtc base=localtime
+		-rtc base=localtime \
+		-cpu host \
+		-enable-kvm
 
