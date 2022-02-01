@@ -20,13 +20,25 @@ typedef struct
 {
     GfxBuf buf;
     Alloc *alloc;
-} GfxDynBuf;
+} GfxSurface;
 
-void gfx_dyn_buf_init(GfxDynBuf *self, int width, int height, GfxFmt format, Alloc *alloc);
+void gfx_surface_init(GfxSurface *self, int width, int height, GfxFmt format, Alloc *alloc);
 
-void gfx_dyn_buf_deinit(GfxDynBuf *self);
+void gfx_surface_deinit(GfxSurface *self);
 
-GfxBuf gfx_dyn_buf(GfxDynBuf *self);
+GfxBuf gfx_surface_buf(GfxSurface *self);
+
+static inline GfxColor gfx_buf_load_uncheck(GfxBuf self, int x, int y)
+{
+    uint8_t *pixel = ((uint8_t *)self.buf) + self.pitch * y + x * gfx_fmt_size(self.fmt);
+    return gfx_fmt_load(self.fmt, pixel);
+}
+
+static inline void gfx_buf_store_unckeck(GfxBuf self, int x, int y, GfxColor color)
+{
+    uint8_t *pixel = ((uint8_t *)self.buf)  + self.pitch * y + x * gfx_fmt_size(self.fmt);
+    gfx_fmt_store(self.fmt, color, pixel);
+}
 
 static inline GfxColor gfx_buf_load(GfxBuf self, int x, int y)
 {
@@ -35,8 +47,7 @@ static inline GfxColor gfx_buf_load(GfxBuf self, int x, int y)
         return GFX_MAGENTA;
     }
 
-    uint8_t *pixel = ((uint8_t *)self.buf) + self.pitch * y + x * gfx_fmt_size(self.fmt);
-    return gfx_fmt_load(self.fmt, pixel);
+    return gfx_buf_load_uncheck(self, x, y);
 }
 
 static inline void gfx_buf_store(GfxBuf self, int x, int y, GfxColor color)
@@ -46,9 +57,14 @@ static inline void gfx_buf_store(GfxBuf self, int x, int y, GfxColor color)
         return;
     }
 
-    uint8_t *buf = (uint8_t *)self.buf;
-    uint8_t *pixel = buf + self.pitch * y + x * gfx_fmt_size(self.fmt);
-    gfx_fmt_store(self.fmt, color, pixel);
+    gfx_buf_store_unckeck(self, x, y, color);
+}
+
+static inline void gfx_buf_blend_unckeck(GfxBuf self, int x, int y, GfxColor color)
+{
+    GfxColor bg = gfx_buf_load_uncheck(self, x, y);
+    GfxColor blend = gfx_blend(color, bg);
+    gfx_buf_store_unckeck(self, x, y, blend);
 }
 
 static inline void gfx_buf_blend(GfxBuf self, int x, int y, GfxColor color)
@@ -76,7 +92,7 @@ static inline void gfx_buf_clear(GfxBuf self, GfxColor color)
     {
         for (int x = 0; x < self.width; x++)
         {
-            gfx_buf_store(self, x, y, color);
+            gfx_buf_store_unckeck(self, x, y, color);
         }
     }
 }

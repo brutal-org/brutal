@@ -89,7 +89,7 @@ WmClient *wm_client_create(struct _WmServer *server, MRect bound)
     self->server = server;
     self->bound = bound;
 
-    gfx_dyn_buf_init(&self->frontbuffer, bound.width, bound.height, GFX_FMT_RGBA8888, alloc_global());
+    gfx_surface_init(&self->frontbuffer, bound.width, bound.height, GFX_FMT_RGBA8888, alloc_global());
     bal_mem_init_size(&self->backbuffer, self->frontbuffer.buf.size);
 
     self->capability = wm_client_provide(ipc_component_self(), &_wm_client_vtable, self);
@@ -102,13 +102,13 @@ void wm_client_destroy(WmClient *self)
     ipc_component_revoke(ipc_component_self(), self->capability);
 
     bal_mem_deinit(&self->backbuffer);
-    gfx_dyn_buf_deinit(&self->frontbuffer);
+    gfx_surface_deinit(&self->frontbuffer);
     alloc_free(alloc_global(), self);
 }
 
 GfxBuf wm_client_frontbuffer(WmClient *self)
 {
-    return gfx_dyn_buf(&self->frontbuffer);
+    return gfx_surface_buf(&self->frontbuffer);
 }
 
 GfxBuf wm_client_backbuffer(WmClient *self)

@@ -24,7 +24,7 @@ WmServerVTable _wm_server_vtable = {
 void wm_server_init(WmServer *self, WmDisplay *display)
 {
     self->display = display;
-    self->mouse = m_vec2(64, 64);
+    self->mouse = m_vec2(0, 0);
     vec_init(&self->clients, alloc_global());
 
     self->capability = wm_server_provide(ipc_component_self(), &_wm_server_vtable, self);

@@ -9,7 +9,7 @@ typedef struct
     SurfaceMode mode;
     BalMem mem;
 
-    GfxDynBuf backbuffer;
+    GfxSurface backbuffer;
     Gfx gfx;
 } WmDisplay;
 
