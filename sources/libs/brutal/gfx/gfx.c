@@ -69,7 +69,7 @@ void gfx_end(Gfx *self)
 
 void gfx_clear(Gfx *self, GfxColor color)
 {
-    gfx_buf_clear(self->buf, color);
+    gfx_buf_clear_rect(self->buf, gfx_peek(self)->clip, color);
 }
 
 /* --- Context -------------------------------------------------------------- */
@@ -388,7 +388,7 @@ void gfx_fill_rect_aligned(Gfx *self, MRect rect)
     {
         for (int x = rect.x; x < rect.x + rect.width; x++)
         {
-            gfx_buf_store(self->buf, x, y, color);
+            gfx_buf_blend(self->buf, x, y, color);
         }
     }
 }

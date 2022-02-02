@@ -7,6 +7,7 @@
 typedef struct _WmServer
 {
     IpcCap capability;
+    GfxDirty dirty;
     WmDisplay *display;
     MVec2 mouse;
     Vec(WmClient *) clients;
@@ -18,6 +19,8 @@ void wm_server_deinit(WmServer *self);
 
 void wm_server_dispatch(WmServer *self, UiEvent event);
 
-void wm_server_dirty(WmServer *self);
+void wm_server_dirty(WmServer *self, MRect rect);
+
+void wm_server_dirty_all(WmServer *self);
 
 void wm_server_render(WmServer *self);

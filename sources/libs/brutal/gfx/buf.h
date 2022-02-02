@@ -102,6 +102,17 @@ static inline void gfx_buf_clear(GfxBuf self, GfxColor color)
     }
 }
 
+static inline void gfx_buf_clear_rect(GfxBuf self, MRect rect, GfxColor color)
+{
+    for (int y = rect.y; y < rect.y + rect.height; y++)
+    {
+        for (int x = rect.x; x < rect.x + rect.width; x++)
+        {
+            gfx_buf_store_unckeck(self, x, y, color);
+        }
+    }
+}
+
 static inline MRect gfx_buf_bound(GfxBuf self)
 {
     return m_rect(0, 0, self.width, self.height);
