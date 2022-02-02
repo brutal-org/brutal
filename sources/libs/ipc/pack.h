@@ -27,7 +27,7 @@ void ipc_pack(IpcPack *self, void const *buf, size_t len);
 
 #define ipc_pack_pod(SELF, VALUE) ipc_pack(SELF, VALUE, sizeof(*VALUE))
 
-void ipc_pack_handle(IpcPack *self, BrHandle *handle);
+void ipc_pack_handle(IpcPack *self, BrHandle const *handle);
 
 void ipc_pack_str(IpcPack *self, Str const *str);
 

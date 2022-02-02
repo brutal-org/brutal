@@ -51,34 +51,21 @@ static BootInfoVTable _bus_info_vtable = {
 
 /* --- Hw Display Protocol -------------------------------------------------- */
 
-HwError hw_display_surface_handler(void *self, void *, Surface *resp, Alloc *)
+HwError hw_display_surface_handler(void *self, void *, BalFb *resp, Alloc *)
 {
     Handover *handover = self;
     HandoverFramebuffer const *framebuffer = &handover->framebuffer;
 
     size_t fb_size = align_up$(framebuffer->height * framebuffer->pitch, MEM_PAGE_SIZE);
 
-    BrCreateArgs fb_mem = {
-        .type = BR_OBJECT_MEMORY,
-        .memory = {
-            .addr = framebuffer->addr,
-            .size = fb_size,
-            .flags = BR_MEM_PMM,
-        },
-    };
-
-    br_create(&fb_mem);
-
-    *resp = (Surface){
-        .mode = {
-            .width = framebuffer->width,
-            .height = framebuffer->height,
-            .pitch = framebuffer->pitch,
-            .format = GFX_FMT_BGRA8888,
-        },
-
-        .handle = fb_mem.handle,
-    };
+    bal_fb_init_pmm(
+        resp,
+        framebuffer->addr,
+        fb_size,
+        framebuffer->width,
+        framebuffer->height,
+        framebuffer->pitch,
+        GFX_FMT_BGRA8888);
 
     return IPC_SUCCESS;
 }

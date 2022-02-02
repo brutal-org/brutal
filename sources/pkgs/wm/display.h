@@ -2,18 +2,16 @@
 
 #include <bal/hw.h>
 #include <brutal/gfx.h>
-#include <protos/surface.h>
+#include <protos/wm.h>
 
 typedef struct
 {
-    SurfaceMode mode;
-    BalMem mem;
-
+    BalFb frontbuffer;
     GfxSurface backbuffer;
     Gfx gfx;
 } WmDisplay;
 
-void wm_display_init(WmDisplay *self, SurfaceMode mode, BalMem mem, Alloc *alloc);
+void wm_display_init(WmDisplay *self, BalFb frontbuffer, Alloc *alloc);
 
 GfxBuf wm_display_frontbuffer(WmDisplay *self);
 

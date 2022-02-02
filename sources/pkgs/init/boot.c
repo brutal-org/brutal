@@ -15,17 +15,9 @@ void boot_splashscreen(Handover const *handover)
 
     size_t fb_size = align_up$(fb->height * fb->pitch, MEM_PAGE_SIZE);
 
-    BalMem fb_mem;
-    bal_mem_init_pmm(&fb_mem, fb->addr, fb_size);
-
-    GfxBuf fb_surface = {
-        .width = fb->width,
-        .height = fb->height,
-        .pitch = fb->pitch,
-        .fmt = GFX_FMT_BGRA8888,
-        .buf = (void *)fb_mem.buf,
-        .size = fb_size,
-    };
+    BalFb fb_surface;
+    bal_fb_init_pmm(&fb_surface, fb->addr, fb_size, fb->width, fb->height, fb->pitch, GFX_FMT_BGRA8888);
+    bal_fb_map(&fb_surface);
 
     // Open the bootimage
 
@@ -34,15 +26,16 @@ void boot_splashscreen(Handover const *handover)
 
     BalMem img_mem;
     bal_mem_init_pmm(&img_mem, img->addr, img->size);
+    bal_mem_map(&img_mem);
 
     GfxBuf img_surface = tga_decode_in_memory((void *)img_mem.buf, img_mem.len);
 
     // Display the image
 
-    gfx_buf_clear(fb_surface, GFX_BLACK);
+    gfx_buf_clear(bal_fb_buf(&fb_surface), GFX_BLACK);
 
     gfx_buf_copy(
-        fb_surface,
+        bal_fb_buf(&fb_surface),
         img_surface,
         fb_surface.width / 2 - img_surface.width / 2,
         fb_surface.height / 2 - img_surface.height / 2);
@@ -50,5 +43,5 @@ void boot_splashscreen(Handover const *handover)
     // Cleanup
 
     bal_mem_deinit(&img_mem);
-    bal_mem_deinit(&fb_mem);
+    bal_fb_deinit(&fb_surface);
 }

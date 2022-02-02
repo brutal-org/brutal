@@ -2,46 +2,6 @@
 #include <brutal/base.h>
 #include <brutal/debug.h>
 
-static BrResult bal_mem_map(BalMem *self, size_t size, size_t offset)
-{
-    assert_equal(self->buf, nullptr);
-
-    BrMapArgs args = {
-        .space = BR_HANDLE_SELF,
-        .memory = self->handle,
-        .size = size,
-        .offset = offset,
-        .flags = BR_MEM_WRITABLE,
-    };
-
-    BrResult result = br_map(&args);
-
-    if (result != BR_SUCCESS)
-    {
-        return result;
-    }
-
-    self->buf = (void *)args.vaddr;
-    self->len = args.size;
-
-    return BR_SUCCESS;
-}
-
-static BrResult bal_mem_unmap(BalMem *self)
-{
-    assert_not_equal(self->buf, nullptr);
-
-    BrUnmapArgs args = {
-        .space = BR_HANDLE_SELF,
-        .size = self->len,
-        .vaddr = (uintptr_t)self->buf,
-    };
-
-    self->buf = nullptr;
-
-    return br_unmap(&args);
-}
-
 MaybeError bal_mem_init_mobj(BalMem *self, BrHandle handle)
 {
     return bal_mem_init_mobj_offset(self, handle, 0, 0);
@@ -51,14 +11,9 @@ MaybeError bal_mem_init_mobj_offset(BalMem *self, BrHandle handle, size_t offset
 {
     *self = (BalMem){};
 
+    self->off = offset;
+    self->len = len;
     self->handle = handle;
-
-    BrResult result = bal_mem_map(self, len, offset);
-
-    if (result != BR_SUCCESS)
-    {
-        return ERR(MaybeError, br_result_to_error(result));
-    }
 
     return SUCCESS;
 }
@@ -76,8 +31,6 @@ MaybeError bal_mem_init_pmm(BalMem *self, uintptr_t addr, size_t size)
 
     BrResult result = br_create(&memory);
 
-    self->paddr = memory.memory.addr;
-
     if (result != BR_SUCCESS)
     {
         return ERR(MaybeError, br_result_to_error(result));
@@ -85,16 +38,15 @@ MaybeError bal_mem_init_pmm(BalMem *self, uintptr_t addr, size_t size)
 
     TRY(MaybeError, bal_mem_init_mobj(self, memory.handle));
 
-    self->paddr = memory.memory.addr;
     return SUCCESS;
 }
 
-MaybeError bal_mem_init_size(BalMem *self, size_t size)
+MaybeError bal_mem_init(BalMem *self, size_t size)
 {
     BrCreateArgs memory_args = {
         .type = BR_OBJECT_MEMORY,
         .memory = {
-            .size = align_up$(size, 4096),
+            .size = align_up$(size, MEM_PAGE_SIZE),
             .flags = 0,
         },
     };
@@ -108,13 +60,15 @@ MaybeError bal_mem_init_size(BalMem *self, size_t size)
 
     TRY(MaybeError, bal_mem_init_mobj(self, memory_args.handle));
 
-    self->paddr = memory_args.memory.addr;
     return SUCCESS;
 }
 
 MaybeError bal_mem_deinit(BalMem *self)
 {
-    bal_mem_unmap(self);
+    if (self->buf)
+    {
+        bal_mem_unmap(self);
+    }
 
     BrResult result = bal_close(self->handle);
 
@@ -126,10 +80,58 @@ MaybeError bal_mem_deinit(BalMem *self)
     return SUCCESS;
 }
 
-MaybeError bal_memobj_paddr(BrHandle obj, uintptr_t *paddr)
+void bal_mem_dup(BalMem *dst, BalMem *src)
+{
+    bal_mem_init_mobj(dst, bal_dup(src->handle));
+}
+
+BrResult bal_mem_map(BalMem *self)
+{
+    assert_equal(self->buf, nullptr);
+
+    BrMapArgs args = {
+        .space = BR_HANDLE_SELF,
+        .memory = self->handle,
+        .size = self->len,
+        .offset = self->off,
+        .flags = BR_MEM_WRITABLE,
+    };
+
+    BrResult result = br_map(&args);
+
+    if (result != BR_SUCCESS)
+    {
+        return result;
+    }
+
+    self->buf = (void *)args.vaddr;
+    self->len = args.size;
+
+    return BR_SUCCESS;
+}
+
+BrResult bal_mem_unmap(BalMem *self)
+{
+    if (!self->buf)
+    {
+        return BR_SUCCESS;
+    }
+
+    BrUnmapArgs args = {
+        .space = BR_HANDLE_SELF,
+        .size = self->len,
+        .vaddr = (uintptr_t)self->buf,
+    };
+
+    self->buf = nullptr;
+
+    return br_unmap(&args);
+}
+
+MaybeError bal_mem_paddr(BalMem *self, uintptr_t *paddr)
 {
     BrInspectArgs args = {
-        .handle = obj,
+        .handle = self->handle,
     };
 
     BrResult res = br_inspect(&args);
@@ -142,4 +144,16 @@ MaybeError bal_memobj_paddr(BrHandle obj, uintptr_t *paddr)
     *paddr = args.memory.range.base;
 
     return SUCCESS;
+}
+
+void bal_mem_pack(IpcPack *pack, BalMem const *self)
+{
+    ipc_pack_handle(pack, &self->handle);
+}
+
+void bal_mem_unpack(IpcUnpack *pack, BalMem *self)
+{
+    *self = (BalMem){};
+    bal_mem_unmap(self);
+    ipc_unpack_handle(pack, &self->handle);
 }

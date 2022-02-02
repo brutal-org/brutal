@@ -45,20 +45,10 @@ static WmError wm_client_move_handler(void *self, MRect const *req, bool *resp, 
     return IPC_SUCCESS;
 }
 
-static WmError wm_client_surface_handler(void *self, void *, Surface *resp, Alloc *)
+static WmError wm_client_surface_handler(void *self, void *, BalFb *resp, Alloc *)
 {
     WmClient *client = self;
-
-    *resp = (Surface){
-        .mode = {
-            client->frontbuffer.buf.width,
-            client->frontbuffer.buf.height,
-            client->frontbuffer.buf.pitch,
-            client->frontbuffer.buf.fmt,
-        },
-        .handle = bal_dup(client->backbuffer.handle),
-    };
-
+    bal_fb_dup(resp, &client->backbuffer);
     return IPC_SUCCESS;
 }
 
@@ -90,7 +80,8 @@ WmClient *wm_client_create(struct _WmServer *server, MRect bound)
     self->bound = bound;
 
     gfx_surface_init(&self->frontbuffer, bound.width, bound.height, GFX_FMT_RGBA8888, alloc_global());
-    bal_mem_init_size(&self->backbuffer, self->frontbuffer.buf.size);
+    bal_fb_init(&self->backbuffer, bound.width, bound.height, GFX_FMT_RGBA8888);
+    bal_fb_map(&self->backbuffer);
 
     self->capability = wm_client_provide(ipc_component_self(), &_wm_client_vtable, self);
 
@@ -101,7 +92,7 @@ void wm_client_destroy(WmClient *self)
 {
     ipc_component_revoke(ipc_component_self(), self->capability);
 
-    bal_mem_deinit(&self->backbuffer);
+    bal_fb_deinit(&self->backbuffer);
     gfx_surface_deinit(&self->frontbuffer);
     alloc_free(alloc_global(), self);
 }
@@ -113,14 +104,7 @@ GfxBuf wm_client_frontbuffer(WmClient *self)
 
 GfxBuf wm_client_backbuffer(WmClient *self)
 {
-    return (GfxBuf){
-        self->frontbuffer.buf.width,
-        self->frontbuffer.buf.height,
-        self->frontbuffer.buf.pitch,
-        self->frontbuffer.buf.fmt,
-        .buf = self->backbuffer.buf,
-        .size = self->backbuffer.len,
-    };
+    return bal_fb_buf(&self->backbuffer);
 }
 
 void wm_client_show(WmClient *self)

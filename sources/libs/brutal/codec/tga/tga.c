@@ -18,7 +18,7 @@ IoResult tga_encode(IoWriter writer, GfxBuf surface)
     size_t written = 0;
 
     written = TRY(IoResult, io_write(writer, (uint8_t *)&header, sizeof(TgaHeader)));
-    written += TRY(IoResult, io_write(writer, (uint8_t *)surface.buf, surface.size));
+    written += TRY(IoResult, io_write(writer, (uint8_t *)surface.buf, gfx_buf_size(surface)));
 
     return OK(IoResult, written);
 }
@@ -36,6 +36,5 @@ GfxBuf tga_decode_in_memory(void *addr, size_t size)
         .pitch = load_le(header->width) * (load_le(header->bits_per_pixel) / 8),
         .fmt = GFX_FMT_RGBA8888,
         .buf = buf,
-        .size = size - sizeof(TgaHeader),
     };
 }

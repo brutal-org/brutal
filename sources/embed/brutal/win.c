@@ -12,16 +12,16 @@ void embed_win_init(UiWin *self, MRect bound)
 
     wm_server_create_rpc(ipc_component_self(), server, &req, &self->embed.client, alloc_global());
 
-    Surface surface;
+    BalFb surface;
     wm_client_surface_rpc(ipc_component_self(), self->embed.client, &surface, alloc_global());
+    bal_fb_map(&surface);
 
-    self->embed.mode = surface.mode;
-    bal_mem_init_mobj(&self->embed.mem, surface.handle);
+    self->embed.surface = surface;
 }
 
 void embed_win_deinit(UiWin *self)
 {
-    bal_mem_deinit(&self->embed.mem);
+    bal_fb_deinit(&self->embed.surface);
 
     bool resp;
     wm_client_close_rpc(ipc_component_self(), self->embed.client, &resp, alloc_global());
@@ -54,13 +54,5 @@ void embed_win_flip(UiWin *self, MRect rect)
 
 GfxBuf embed_win_gfx(UiWin *self)
 {
-    EmbedWin *embed = &self->embed;
-
-    return (GfxBuf){
-        .width = embed->mode.width,
-        .height = embed->mode.height,
-        .pitch = embed->mode.pitch,
-        .fmt = embed->mode.format,
-        .buf = embed->mem.buf,
-    };
+    return bal_fb_buf(&self->embed.surface);
 }

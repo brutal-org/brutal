@@ -21,6 +21,7 @@ void acpi_init(Acpi *acpi, uintptr_t rsdp)
     *acpi = (Acpi){};
 
     bal_mem_init_pmm(&acpi->mem, 0, GiB(4));
+    bal_mem_map(&acpi->mem);
 
     acpi->rsdp = (AcpiRsdp *)acpi_phys_to_virt(acpi, rsdp);
     acpi->rsdt = (AcpiRsdt *)acpi_phys_to_virt(acpi, acpi->rsdp->rsdt);

@@ -9,8 +9,7 @@ void gfx_surface_init(GfxSurface *self, int width, int height, GfxFmt format, Al
     self->buf.width = width;
     self->buf.height = height;
     self->buf.pitch = gfx_fmt_size(format) * width;
-    self->buf.size = gfx_fmt_size(format) * width * height;
-    self->buf.buf = alloc_malloc(self->alloc, self->buf.size);
+    self->buf.buf = alloc_malloc(self->alloc, gfx_fmt_size(format) * width * height);
 }
 
 void gfx_surface_deinit(GfxSurface *self)

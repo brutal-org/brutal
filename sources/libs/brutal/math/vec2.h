@@ -66,7 +66,7 @@ static inline float m_vec2_len_squared(MVec2 vec)
 
 static inline float m_vec2_len(MVec2 vec)
 {
-    return sqrt(m_vec2_len_squared(vec));
+    return sqrtf(m_vec2_len_squared(vec));
 }
 
 static inline float m_vec2_dist(MVec2 a, MVec2 b)

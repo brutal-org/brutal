@@ -1,6 +1,6 @@
 module base;
 
-include ipc/ipc.h;
+include ipc/ipc.h, bal/hw.h;
 
 type Bool = __ctype(bool);
 
@@ -37,3 +37,9 @@ type IpcCap = __ctype;
 
 [packfn(ipc_pack_handle, ipc_unpack_handle)]
 type IpcHnd = __ctype(BrHandle);
+
+[packfn(bal_mem_pack, bal_mem_unpack)]
+type IpcMem = __ctype(BalMem);
+
+[packfn(bal_fb_pack, bal_fb_unpack)]
+type IpcFb = __ctype(BalFb);

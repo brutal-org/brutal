@@ -18,7 +18,7 @@ The following roadmap is always subject to change.
   - [ ] BRUTAL Backend
     - [ ] Compositor
       - [ ] Event Dispatch
-      - [ ] Compositing
+      - [x] Compositing
       - [ ] Tilling Mode
       - [ ] Floating Mode
     - [ ] Client

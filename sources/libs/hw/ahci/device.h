@@ -25,4 +25,4 @@ typedef struct
 
 void ahci_device_init(AhciDevice *device, HbaPort *port, int idx);
 
-bool ahci_device_rw(AhciDevice *self, BrHandle target, uint64_t cursor, uint64_t count, bool write);
+bool ahci_device_rw(AhciDevice *self, BalMem *target, uint64_t cursor, uint64_t count, bool write);
