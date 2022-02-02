@@ -3,7 +3,7 @@
 
 UiWin *about_win_create(UiApp *app)
 {
-    UiWin *self = ui_win_create(app, m_rect(0, 0, 1280, 48), 0);
+    UiWin *self = ui_win_create(app, m_rect(0, 0, 800, 48), 0);
 
     UiView *container = ui_panel_create(GFX_UI_BASE00);
     ui_view_style(

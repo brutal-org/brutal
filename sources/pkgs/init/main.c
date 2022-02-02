@@ -135,5 +135,11 @@ int br_main(Handover *handover)
     unit_consume(&about_unit, IPC_WM_SERVER_PROTO);
     bus_activate(&bus, &about_unit);
 
+    Unit panel_unit;
+    unit_init(&panel_unit, str$("panel"), alloc_global());
+    unit_consume(&panel_unit, IPC_BUS_SERVER_PROTO);
+    unit_consume(&panel_unit, IPC_WM_SERVER_PROTO);
+    bus_activate(&bus, &panel_unit);
+
     return ipc_component_run(&self);
 }

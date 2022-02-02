@@ -22,3 +22,5 @@ void wm_display_deinit(WmDisplay *self);
 Gfx *wm_display_begin(WmDisplay *self);
 
 void wm_display_end(WmDisplay *self);
+
+MRect wm_display_bound(WmDisplay *self);

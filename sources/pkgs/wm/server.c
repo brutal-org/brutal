@@ -25,6 +25,7 @@ void wm_server_init(WmServer *self, WmDisplay *display)
 {
     self->display = display;
     self->mouse = m_vec2(0, 0);
+    gfx_dirty_init(&self->dirty, alloc_global());
     vec_init(&self->clients, alloc_global());
 
     self->capability = wm_server_provide(ipc_component_self(), &_wm_server_vtable, self);
@@ -34,13 +35,28 @@ void wm_server_deinit(WmServer *self)
 {
     ipc_component_revoke(ipc_component_self(), self->capability);
     vec_deinit(&self->clients);
+    gfx_dirty_deinit(&self->dirty);
 }
 
 void wm_server_dispatch(WmServer *self, UiEvent event)
 {
     if (event.type == UI_EVENT_MOUSE_MOVE)
     {
+        MRect mouse_bound = {
+            .pos = self->mouse,
+            .size = m_vec2(32, 32),
+        };
+
+        wm_server_dirty(self, mouse_bound);
+
         self->mouse = m_vec2_add(self->mouse, event.mouse.offset);
+
+        mouse_bound = (MRect){
+            .pos = self->mouse,
+            .size = m_vec2(32, 32),
+        };
+
+        wm_server_dirty(self, mouse_bound);
         wm_server_render(self);
     }
 }
@@ -63,21 +79,37 @@ static void wm_server_render_clients(WmServer *self, Gfx *gfx)
     }
 }
 
-void wm_server_dirty(MAYBE_UNUSED WmServer *self)
+void wm_server_dirty(WmServer *self, MRect rect)
 {
+    gfx_dirty_rect(&self->dirty, rect);
+}
+
+void wm_server_dirty_all(WmServer *self)
+{
+    wm_server_dirty(self, wm_display_bound(self->display));
 }
 
 void wm_server_render(WmServer *self)
 {
     Gfx *gfx = wm_display_begin(self->display);
 
-    gfx_clear(gfx, GFX_GAINSBORO);
+    gfx_dirty_foreach(dirty, &self->dirty)
+    {
+        gfx_push(gfx);
+        gfx_clip(gfx, dirty);
 
-    gfx_color(gfx, GFX_BLACK);
-    gfx_fill(gfx, gfx_paint_fill(GFX_BLACK));
+        gfx_clear(gfx, GFX_GAINSBORO);
 
-    wm_server_render_clients(self, gfx);
-    wm_server_render_cursor(self, gfx);
+        wm_server_render_clients(self, gfx);
+        wm_server_render_cursor(self, gfx);
+
+        gfx_fill(gfx, gfx_paint_fill(gfx_color_rand(100)));
+        gfx_fill_rect(gfx, dirty, 0);
+
+        gfx_pop(gfx);
+    }
 
     wm_display_end(self->display);
+
+    gfx_dirty_clear(&self->dirty);
 }
