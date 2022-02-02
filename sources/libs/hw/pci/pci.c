@@ -185,7 +185,7 @@ PciBarInfo pci_read_bar(Pci *pci, PciAddr addr, int bar)
         return (PciBarInfo){};
     }
 
-    PciConfigType0 *v = (PciConfigType0 *)config;
+    volatile PciConfigType0 *v = (volatile PciConfigType0 *)config;
 
     PciBarInfo res = {};
     uint32_t value = v->bars[bar];

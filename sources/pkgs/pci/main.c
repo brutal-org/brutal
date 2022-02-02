@@ -4,8 +4,8 @@
 #include <brutal/alloc.h>
 #include <brutal/debug.h>
 #include <pci/pci.h>
-#include <protos/bus.h>
 #include <protos/boot.h>
+#include <protos/bus.h>
 #include <protos/pci.h>
 
 typedef struct
