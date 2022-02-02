@@ -71,20 +71,46 @@ static MaybeError ssfn2_load_mappings(IoRSeek rseek, SSFN2Font *font, SSFN2Commo
         // Get a codepoint
         else
         {
-            uint8_t glyph_data[6];
+            uint8_t glyph_data[5];
             TRY(MaybeError, io_read(rseek.reader, glyph_data, sizeof(glyph_data)));
 
+            uint8_t attributes = val;
+            // Large fragments
+            uint8_t frag_size = attributes & 0x40 ? 6 : 5;
             uint8_t num_frags = glyph_data[0];
-            UNUSED(num_frags);
             font->glyphs[unicode] = (SSFN2Glyph){
-                .width = glyph_data[2],
-                .height = glyph_data[3],
-                .adv_x = glyph_data[4],
-                .adv_y = glyph_data[5],
+                .width = glyph_data[1],
+                .height = glyph_data[2],
+                .adv_x = glyph_data[3],
+                .adv_y = glyph_data[4],
             };
-            uint8_t extra_bytes = val & 0b01111111;
+            uint8_t extra_bytes = val;
             uint8_t extra_data[0b01111111];
             TRY(MaybeError, io_read(rseek.reader, extra_data, extra_bytes));
+
+            for (size_t frag = 0; frag < num_frags; frag++)
+            {
+                size_t data_off = frag * frag_size;
+                uint8_t x = extra_data[data_off];
+                uint8_t y = extra_data[data_off + 1];
+                // This is a color
+                if (x == 0xFF && y == 0xFF)
+                {
+                    uint8_t color_idx = extra_data[data_off + 2];
+                    // Invalid color index. See
+                    if (color_idx > 0xFD)
+                        return ERROR(ERR_NOT_FOUND);
+                }
+                else
+                {
+                    uint8_t frag_off = 0;
+                    for (size_t idx = 2; idx < frag_size; idx++)
+                    {
+                        frag_off = frag_off << 8;
+                        frag_off |= extra_data[data_off + idx];
+                    }
+                }
+            }
         }
     }
 

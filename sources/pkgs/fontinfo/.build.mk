@@ -1,3 +1,0 @@
-FONTINFO_NAME = fontinfo
-
-HOST_PKGS += FONTINFO
