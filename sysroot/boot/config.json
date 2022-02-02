@@ -39,6 +39,10 @@
                 {
                     "name": "about",
                     "path": "/pkgs/about"
+                },
+                {
+                    "name": "panel",
+                    "path": "/pkgs/panel"
                 }
             ]
         }

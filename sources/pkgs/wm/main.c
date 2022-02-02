@@ -42,6 +42,7 @@ int ipc_component_main(IpcComponent *self)
     bus_server_expose_rpc(self, bus_server, &input_sink_cap, alloc_global());
     bus_server_expose_rpc(self, bus_server, &server.capability, alloc_global());
 
+    wm_server_dirty_all(&server);
     wm_server_render(&server);
 
     return ipc_component_run(self);

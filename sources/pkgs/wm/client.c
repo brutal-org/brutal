@@ -110,30 +110,34 @@ GfxBuf wm_client_backbuffer(WmClient *self)
 void wm_client_show(WmClient *self)
 {
     self->visible = true;
-    wm_server_dirty(self->server);
+    wm_server_dirty(self->server, self->bound);
 }
 
 void wm_client_hide(WmClient *self)
 {
     self->visible = false;
-    wm_server_dirty(self->server);
+    wm_server_dirty(self->server, self->bound);
 }
 
 void wm_client_close(WmClient *self)
 {
     self->visible = true;
-    wm_server_dirty(self->server);
+    wm_server_dirty(self->server, self->bound);
 }
 
-void wm_client_flip(WmClient *self, MAYBE_UNUSED MRect bound)
+void wm_client_flip(WmClient *self, MRect bound)
 {
     gfx_buf_copy(wm_client_frontbuffer(self), wm_client_backbuffer(self), 0, 0);
+
+    bound.pos = m_vec2_add(bound.pos, self->bound.pos);
+    wm_server_dirty(self->server, self->bound);
 }
 
 void wm_client_move(WmClient *self, MRect bound)
 {
+    wm_server_dirty(self->server, self->bound);
     self->bound = bound;
-    wm_server_dirty(self->server);
+    wm_server_dirty(self->server, self->bound);
 }
 
 void wm_client_dispatch(WmClient *self, UiEvent event)
