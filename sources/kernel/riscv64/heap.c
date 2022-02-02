@@ -7,7 +7,7 @@ static Lock _lock;
 
 HeapResult heap_alloc(MAYBE_UNUSED size_t size)
 {
-    size = align_up$(size, 4096);
+    size = align_up$(size, MEM_PAGE_SIZE);
 
     LOCK_RETAINER(&_lock)
 

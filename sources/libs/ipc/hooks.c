@@ -54,6 +54,7 @@ int ipc_hook_call(
 
         BalMem resp_mem;
         bal_mem_init_mobj(&resp_mem, resp_msg.args[0]);
+        bal_mem_map(&resp_mem);
 
         IpcUnpack resp_unpack;
         ipc_unpack_init(&resp_unpack, resp_mem.buf, resp_mem.len, alloc);
@@ -91,6 +92,7 @@ void ipc_hook_handle(
     {
         BalMem msg_mem;
         bal_mem_init_mobj(&msg_mem, msg->args[0]);
+        bal_mem_map(&msg_mem);
 
         IpcUnpack msg_unpack;
         ipc_unpack_init(&msg_unpack, msg_mem.buf, msg_mem.len, base$(&heap));

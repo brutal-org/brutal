@@ -15,7 +15,7 @@ typedef struct
     MRect bound;
 
     GfxSurface frontbuffer;
-    BalMem backbuffer;
+    BalFb backbuffer;
 
     struct _WmServer *server;
 } WmClient;

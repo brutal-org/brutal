@@ -28,21 +28,18 @@ int ipc_component_main(IpcComponent *self)
     IpcCap bus_server = ipc_component_require(self, IPC_BUS_SERVER_PROTO);
     IpcCap hw_display = ipc_component_require(self, IPC_HW_DISPLAY_PROTO);
 
-    Surface display_surface;
-    hw_display_surface_rpc(self, hw_display, &display_surface, alloc_global());
-
-    BalMem display_mem;
-    bal_mem_init_mobj(&display_mem, display_surface.handle);
+    BalFb surface;
+    hw_display_surface_rpc(self, hw_display, &surface, alloc_global());
 
     WmDisplay display;
-    wm_display_init(&display, display_surface.mode, display_mem, alloc_global());
+    wm_display_init(&display, surface, alloc_global());
 
     WmServer server;
     wm_server_init(&server, &display);
 
     IpcCap input_sink_cap = event_sink_provide(self, &_input_sink_vtable, &server);
-    bus_server_expose_rpc(self, bus_server, &input_sink_cap, alloc_global());
 
+    bus_server_expose_rpc(self, bus_server, &input_sink_cap, alloc_global());
     bus_server_expose_rpc(self, bus_server, &server.capability, alloc_global());
 
     wm_server_render(&server);

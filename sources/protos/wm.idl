@@ -1,6 +1,6 @@
 module wm;
 
-import base, math, event, surface;
+import base, math, event;
 
 interface Client
 {
@@ -10,7 +10,7 @@ interface Client
     method flip MRect -> Bool;
     method move MRect -> Bool;
 
-    method surface -> Surface;
+    method surface -> IpcFb;
 
     method listen IpcCap -> Bool;
 };

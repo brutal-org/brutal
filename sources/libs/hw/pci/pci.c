@@ -27,6 +27,7 @@ void pci_init(Pci *pci, Acpi *acpi, Alloc *alloc)
         };
 
         bal_mem_init_pmm(&pci_group.mem, mcfg_rec.address, (mcfg_rec.bus_end - mcfg_rec.bus_start) << PCI_BUS_SHIFT);
+        bal_mem_map(&pci_group.mem);
 
         vec_push(&pci->groups, pci_group);
     }

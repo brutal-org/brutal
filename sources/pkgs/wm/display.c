@@ -1,10 +1,10 @@
 #include "wm/display.h"
 
-void wm_display_init(WmDisplay *self, SurfaceMode mode, BalMem mem, Alloc *alloc)
+void wm_display_init(WmDisplay *self, BalFb frontbuffer, Alloc *alloc)
 {
-    self->mode = mode;
-    self->mem = mem;
-    gfx_surface_init(&self->backbuffer, mode.width, mode.height, GFX_FMT_RGBA8888, alloc);
+    self->frontbuffer = frontbuffer;
+    bal_fb_map(&self->frontbuffer);
+    gfx_surface_init(&self->backbuffer, frontbuffer.width, frontbuffer.height, GFX_FMT_RGBA8888, alloc);
     gfx_init(&self->gfx, alloc);
 }
 
@@ -16,16 +16,7 @@ void wm_display_deinit(WmDisplay *self)
 
 GfxBuf wm_display_frontbuffer(WmDisplay *self)
 {
-    SurfaceMode mode = self->mode;
-
-    return (GfxBuf){
-        .width = mode.width,
-        .height = mode.height,
-        .pitch = mode.pitch,
-        .fmt = mode.format,
-        .buf = self->mem.buf,
-        .size = self->mem.len,
-    };
+    return bal_fb_buf(&self->frontbuffer);
 }
 
 GfxBuf wm_display_backbuffer(WmDisplay *self)

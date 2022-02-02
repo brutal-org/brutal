@@ -104,11 +104,17 @@ static void ahci_device_end_command(HbaPort *port)
 
 static void ahci_device_init_command(AhciDevice *self)
 {
-    bal_mem_init_size(&self->command_mem, sizeof(HbaCommand) * 32);
-    self->port->command_list_addr_low = self->command_mem.paddr;
-    self->port->command_list_addr_up = self->command_mem.paddr >> 32;
+    bal_mem_init(&self->command_mem, sizeof(HbaCommand) * 32);
+    bal_mem_map(&self->command_mem);
 
-    bal_mem_init_size(&self->fis_mem, sizeof(Fis));
+    uintptr_t commands_padddr = 0;
+    bal_mem_paddr(&self->command_mem, &commands_padddr);
+
+    self->port->command_list_addr_low = commands_padddr;
+    self->port->command_list_addr_up = commands_padddr >> 32;
+
+    bal_mem_init(&self->fis_mem, sizeof(Fis));
+    bal_mem_map(&self->fis_mem);
 
     Fis *fis = (Fis *)self->fis_mem.buf;
     *fis = (Fis){};
@@ -117,8 +123,11 @@ static void ahci_device_init_command(AhciDevice *self)
     fis->d2h_fis.fis_type = FIS_TYPE_REG_DEV2HOST;
     fis->sdbfis[0] = FIS_TYPE_DEV_BITS;
 
-    self->port->fis_addr_low = self->fis_mem.paddr;
-    self->port->fis_addr_up = self->fis_mem.paddr >> 32;
+    uintptr_t fis_paddr = 0;
+    bal_mem_paddr(&self->fis_mem, &fis_paddr);
+
+    self->port->fis_addr_low = fis_paddr;
+    self->port->fis_addr_up = fis_paddr >> 32;
 
     HbaCommand *commands = self->command_mem.buf;
 
@@ -127,11 +136,16 @@ static void ahci_device_init_command(AhciDevice *self)
         self->commands[i].command = &commands[i];
         commands[i].physical_region_descriptor_count = 8;
 
-        bal_mem_init_size(&self->commands[i].mem, 256);
+        bal_mem_init(&self->commands[i].mem, 256);
+        bal_mem_map(&self->commands[i].mem);
+
         self->commands[i].table = self->commands->mem.buf;
 
-        commands[i].command_table_descriptor_low = self->commands[i].mem.paddr;
-        commands[i].command_table_descriptor_up = self->commands[i].mem.paddr >> 32;
+        uintptr_t command_padddr = 0;
+        bal_mem_paddr(&self->commands[i].mem, &command_padddr);
+
+        commands[i].command_table_descriptor_low = command_padddr;
+        commands[i].command_table_descriptor_up = command_padddr >> 32;
     }
 }
 
@@ -168,7 +182,7 @@ void ahci_device_init(AhciDevice *device, HbaPort *port, int idx)
     ahci_device_init_command(device);
 }
 
-bool ahci_device_rw(AhciDevice *self, BrHandle target, uint64_t cursor, uint64_t count, bool write)
+bool ahci_device_rw(AhciDevice *self, BalMem *target, uint64_t cursor, uint64_t count, bool write)
 {
     self->port->interrupt_status = 0xFFFFFFFF;
 
@@ -184,7 +198,7 @@ bool ahci_device_rw(AhciDevice *self, BrHandle target, uint64_t cursor, uint64_t
     init_hba_command_header(cmd, write, sizeof(FisHost2Dev));
 
     uintptr_t physical_addr = 0;
-    bal_memobj_paddr(target, &physical_addr);
+    bal_mem_paddr(target, &physical_addr);
     init_hba_command_table(&self->commands[command_slot], physical_addr, count);
 
     FisHost2Dev *command_fis = (FisHost2Dev *)self->commands[command_slot].table->command_fis;

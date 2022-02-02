@@ -57,6 +57,7 @@ void unit_start(Unit *self, Handover *handover)
 
     BalMem elf_mem;
     bal_mem_init_pmm(&elf_mem, elf->addr, elf->size);
+    bal_mem_map(&elf_mem);
 
     BalTask elf_task;
     bal_task_init(&elf_task, self->name);

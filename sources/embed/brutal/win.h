@@ -1,12 +1,9 @@
 #pragma once
 
-#include <bal/hw.h>
-#include <ipc/ipc.h>
-#include <protos/surface.h>
+#include <protos/wm.h>
 
 struct _EmbedWin
 {
     IpcCap client;
-    SurfaceMode mode;
-    BalMem mem;
+    BalFb surface;
 };

@@ -11,9 +11,7 @@ typedef struct
     int height;
     int pitch;
     GfxFmt fmt;
-
     void *buf;
-    size_t size;
 } GfxBuf;
 
 typedef struct
@@ -36,7 +34,7 @@ static inline GfxColor gfx_buf_load_uncheck(GfxBuf self, int x, int y)
 
 static inline void gfx_buf_store_unckeck(GfxBuf self, int x, int y, GfxColor color)
 {
-    uint8_t *pixel = ((uint8_t *)self.buf)  + self.pitch * y + x * gfx_fmt_size(self.fmt);
+    uint8_t *pixel = ((uint8_t *)self.buf) + self.pitch * y + x * gfx_fmt_size(self.fmt);
     gfx_fmt_store(self.fmt, color, pixel);
 }
 
@@ -100,4 +98,9 @@ static inline void gfx_buf_clear(GfxBuf self, GfxColor color)
 static inline MRect gfx_buf_bound(GfxBuf self)
 {
     return m_rect(0, 0, self.width, self.height);
+}
+
+static inline size_t gfx_buf_size(GfxBuf self)
+{
+    return self.width * self.height * gfx_fmt_size(self.fmt);
 }

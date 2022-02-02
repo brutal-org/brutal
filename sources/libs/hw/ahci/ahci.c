@@ -77,6 +77,7 @@ void ahci_init(Ahci *ahci, PciBarInfo *bar, Alloc *alloc)
     BalMem ahci_mem = {};
     vec_init(&ahci->devs, alloc);
     UNWRAP(bal_mem_init_pmm(&ahci_mem, bar->base, bar->size));
+    bal_mem_map(&ahci_mem);
 
     ahci->hba_mem = ahci_mem.buf;
     log$("ahci cap: {#b}", ahci->hba_mem->capability);
