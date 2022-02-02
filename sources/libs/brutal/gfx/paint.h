@@ -125,6 +125,38 @@ static inline GfxColor gfx_paint_sample(GfxPaint paint, float x, float y)
         }
     }
 
+    case GFX_PAINT_IMAGE:
+    {
+        GfxBuf image = paint.image_.image;
+        MRect source = paint.image_.source;
+
+        if (image.width == 0 || image.height == 0)
+        {
+            return GFX_MAGENTA;
+        }
+        else if (source.width == 0 || source.height == 0)
+        {
+            return GFX_MAGENTA;
+        }
+        else if (x < 0 || x >= source.width)
+        {
+            return GFX_MAGENTA;
+        }
+        else if (y < 0 || y >= source.height)
+        {
+            return GFX_MAGENTA;
+        }
+        else
+        {
+            x *= source.width;
+            y *= source.height;
+            x += source.x;
+            y += source.y;
+
+            return gfx_buf_sample(image, x, y);
+        }
+    }
+
     default:
         panic$("Unkown paint type {}.", paint.type);
     }

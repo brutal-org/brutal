@@ -56,11 +56,10 @@ static void wm_server_render_cursor(WmServer *self, Gfx *gfx)
 
 static void wm_server_render_clients(WmServer *self, Gfx *gfx)
 {
-    gfx_fill(gfx, gfx_paint_fill(GFX_MAGENTA));
     vec_foreach_v(client, &self->clients)
     {
-        gfx_buf_copy(wm_display_backbuffer(self->display), wm_client_backbuffer(client), 0, 0);
-        // gfx_fill_rect(gfx, client->bound, 8);
+        gfx_fill(gfx, gfx_paint_image(wm_client_backbuffer(client), gfx_buf_bound(wm_client_backbuffer(client))));
+        gfx_fill_rect(gfx, client->bound, 8);
     }
 }
 

@@ -58,6 +58,13 @@ static inline void gfx_buf_store(GfxBuf self, int x, int y, GfxColor color)
     gfx_buf_store_unckeck(self, x, y, color);
 }
 
+static inline GfxColor gfx_buf_sample(GfxBuf self, float x, float y)
+{
+    int xi = (int)x;
+    int yi = (int)y;
+    return gfx_buf_load(self, xi, yi);
+}
+
 static inline void gfx_buf_blend_unckeck(GfxBuf self, int x, int y, GfxColor color)
 {
     GfxColor bg = gfx_buf_load_uncheck(self, x, y);
