@@ -73,6 +73,9 @@ static MaybeError ssfn2_load_mappings(IoRSeek rseek, SSFN2Font *font, SSFN2Commo
         {
             uint8_t glyph_data[6];
             TRY(MaybeError, io_read(rseek.reader, glyph_data, sizeof(glyph_data)));
+
+            uint8_t num_frags = glyph_data[0];
+            UNUSED(num_frags);
             font->glyphs[unicode] = (SSFN2Glyph){
                 .width = glyph_data[2],
                 .height = glyph_data[3],
@@ -138,6 +141,7 @@ MaybeError font_ssfn2_init(IoRSeek rseek, SSFN2Font *font)
     {
         reader = rseek.reader;
     }
+    UNUSED(reader);
 
     return ssfn2_load_internal(rseek, font);
 }
