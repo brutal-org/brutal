@@ -50,13 +50,15 @@ $(LIBS_BIN): $(LIBS_OBJ)
 
 define BIN_TEMPLATE
 
-$(1)_PKG = sources/pkgs/$($(1)_NAME)
+$(1)_NAME = $$(shell echo $(1) | tr A-Z a-z)
+
+$(1)_PKG = sources/pkgs/$$($(1)_NAME)
 
 $(1)_SRC = $$(wildcard $$($(1)_PKG)/*.c)
 
 $(1)_OBJ = $$(patsubst sources/%, $(BINDIR_USER)/%.o, $$($(1)_SRC))
 
-$(1)_BIN  = $(BINDIR_USER)/$($(1)_NAME)
+$(1)_BIN  = $(BINDIR_USER)/$$($(1)_NAME)
 
 DEPENDENCIES += $$($(1)_OBJ:.o=.d)
 

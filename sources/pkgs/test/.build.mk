@@ -1,3 +1,0 @@
-TEST_NAME = test
-
-HOST_PKGS += TEST

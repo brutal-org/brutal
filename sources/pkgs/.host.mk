@@ -1,24 +1,24 @@
 LIBS_HOST_SRC = \
-	$(wildcard sources/embed/posix/*.c)    \
-	$(wildcard sources/embed/sdl/*.c) \
+	$(wildcard sources/embed/posix/*.c)     \
+	$(wildcard sources/embed/sdl/*.c)       \
 	$(wildcard sources/embed/arch/$(CONFIG_HOST_ARCH)/*.s) \
 	$(wildcard sources/embed/arch/$(CONFIG_HOST_ARCH)/*.c) \
-	$(wildcard sources/libs/brutal/*.c)   \
-	$(wildcard sources/libs/brutal/*/*.c) \
+	$(wildcard sources/libs/brutal/*.c)     \
+	$(wildcard sources/libs/brutal/*/*.c)   \
 	$(wildcard sources/libs/brutal/*/*/*.c) \
-	$(wildcard sources/libs/cc/*.c)       \
+	$(wildcard sources/libs/cc/*.c)         \
 	$(wildcard sources/libs/cc/*/*.c)       \
-	$(wildcard sources/libs/cc/*/*/*.c)       \
-	$(wildcard sources/libs/ud/*.c)       \
+	$(wildcard sources/libs/cc/*/*/*.c)     \
+	$(wildcard sources/libs/ud/*.c)         \
 	$(wildcard sources/libs/ud/*/*.c)       \
-	$(wildcard sources/libs/bvm/*.c)       \
-	$(wildcard sources/libs/fs/*.c)       \
+	$(wildcard sources/libs/bvm/*.c)        \
+	$(wildcard sources/libs/fs/*.c)         \
 	$(wildcard sources/libs/fs/*/*.c)       \
-	$(wildcard sources/libs/bvm/*/*.c)       \
-	$(wildcard sources/libs/json/*.c)     \
-	$(wildcard sources/libs/elf/*.c)      \
+	$(wildcard sources/libs/bvm/*/*.c)      \
+	$(wildcard sources/libs/json/*.c)       \
+	$(wildcard sources/libs/elf/*.c)        \
 	$(wildcard sources/libs/boot/abi/handover.c) \
-	$(wildcard sources/libs/idl/*.c) \
+	$(wildcard sources/libs/idl/*.c)        \
 	$(wildcard sources/libs/idl/*/*.c)
 
 LIBS_HOST_OBJ = \
@@ -42,16 +42,18 @@ DEPENDENCIES += $(LIBS_HOST_OBJ:.o=.d)
 
 define HOST_TEMPLATE
 
+$(1)_NAME = $$(shell echo $(1) | tr A-Z a-z)
+
 $(1)_HOST_SRC = \
-	$$(wildcard sources/pkgs/$($(1)_NAME)/*.c) \
-	$$(wildcard sources/pkgs/$($(1)_NAME)/*/*.c) \
-	$$(wildcard sources/pkgs/$($(1)_NAME)/*/*/*.c)
+	$$(wildcard sources/pkgs/$$($(1)_NAME)/*.c) \
+	$$(wildcard sources/pkgs/$$($(1)_NAME)/*/*.c) \
+	$$(wildcard sources/pkgs/$$($(1)_NAME)/*/*/*.c)
 
 $(1)_HOST_OBJ = $$(patsubst sources/%, $(BINDIR_HOST)/%.o, $$($(1)_HOST_SRC))
 
-$(1)_HOST_BIN  = $(BINDIR_HOST)/$($(1)_NAME)
+$(1)_HOST_BIN  = $(BINDIR_HOST)/$$($(1)_NAME)
 ALL+=$$($(1)_HOST_BIN)
-HOST_NAMES+=$($(1)_NAME)
+HOST_NAMES+=$$($(1)_NAME)
 
 DEPENDENCIES += $$($(1)_HOST_OBJ:.o=.d)
 

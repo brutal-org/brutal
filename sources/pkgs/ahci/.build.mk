@@ -1,3 +1,0 @@
-AHCI_NAME = ahci
-
-USER_PKGS += AHCI

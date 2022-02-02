@@ -1,3 +1,0 @@
-INIT_NAME = init
-
-USER_PKGS += INIT

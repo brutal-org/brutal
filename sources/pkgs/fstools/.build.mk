@@ -1,4 +1,0 @@
-FSTOOLS_NAME = fstools
-
-HOST_PKGS += FSTOOLS
-

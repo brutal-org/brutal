@@ -1,3 +1,0 @@
-ACPI_NAME = acpi
-
-USER_PKGS += ACPI

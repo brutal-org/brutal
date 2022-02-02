@@ -1,4 +1,0 @@
-ABOUT_NAME = about
-
-HOST_PKGS += ABOUT
-USER_PKGS += ABOUT

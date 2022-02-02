@@ -1,3 +1,0 @@
-CC_NAME = cc
-
-HOST_PKGS += CC

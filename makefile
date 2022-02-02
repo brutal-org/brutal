@@ -1,6 +1,5 @@
 .SUFFIXES:
 .DELETE_ON_ERROR:
-
 .DEFAULT_GOAL := all
 SHELL := /bin/bash
 
@@ -63,8 +62,8 @@ include build/config/$(CONFIG).mk
 include build/toolchain/archs/$(CONFIG_ARCH).mk
 include build/toolchain/$(CONFIG_TOOLCHAIN)/.build.mk
 
-include sources/pkgs/*/.build.mk
 include sources/kernel/.build.mk
+include sources/pkgs/.targets.mk
 include sources/pkgs/.host.mk
 include sources/protos/.build.mk
 include sources/pkgs/.user.mk

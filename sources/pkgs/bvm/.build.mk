@@ -1,3 +1,0 @@
-BVM_NAME = bvm
-
-HOST_PKGS += BVM

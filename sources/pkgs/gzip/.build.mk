@@ -1,3 +1,0 @@
-GZIP_NAME = gzip
-
-HOST_PKGS += GZIP

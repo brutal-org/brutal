@@ -1,3 +1,0 @@
-GUNZIP_NAME = gunzip
-
-HOST_PKGS += GUNZIP
