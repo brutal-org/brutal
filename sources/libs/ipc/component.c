@@ -6,15 +6,29 @@ typedef struct
 {
     IpcComponent *self;
     BrMsg msg;
-    IpcHandler *fn;
-    void *vtable;
-    void *ctx;
-} BrEvCtx;
+    IpcProvider *provider;
+} BrRequestCtx;
 
-void *br_ev_handle(BrEvCtx *ctx)
+static void *handle_request(BrRequestCtx *ctx)
 {
     BrMsg msg = ctx->msg;
-    ctx->fn(ctx->self, &msg, ctx->vtable, ctx->ctx);
+    IpcProvider *provider = ctx->provider;
+    provider->handler(ctx->self, &msg, provider->vtable, provider->ctx);
+    return nullptr;
+}
+
+typedef struct
+{
+    IpcComponent *self;
+    BrMsg msg;
+    IpcBinding *binding;
+} BrEventCtx;
+
+static void *handle_event(BrEventCtx *ctx)
+{
+    BrMsg msg = ctx->msg;
+    IpcBinding *binding = ctx->binding;
+    binding->handler(binding->ctx, msg.event);
     return nullptr;
 }
 
@@ -42,13 +56,11 @@ static bool dispatch_to_provider(IpcComponent *self, BrMsg msg)
             provider->proto == msg.prot)
         {
             fiber_start(
-                (FiberFn *)br_ev_handle,
-                &(BrEvCtx){
+                (FiberFn *)handle_request,
+                &(BrRequestCtx){
                     .self = self,
                     .msg = msg,
-                    .fn = provider->handler,
-                    .vtable = provider->vtable,
-                    .ctx = provider->ctx,
+                    .provider = provider,
                 });
 
             return true;
@@ -58,25 +70,28 @@ static bool dispatch_to_provider(IpcComponent *self, BrMsg msg)
     return false;
 }
 
-static bool dispatch_to_sink(IpcComponent *self, BrMsg msg)
+static bool dispatch_to_binding(IpcComponent *self, BrMsg msg)
 {
-    if (!self->sink)
+    if (br_addr_eq(msg.from, BR_ADDR_EVENT))
     {
-        return false;
+        vec_foreach_v(binding, &self->bindings)
+        {
+            if (br_event_eq(msg.event, binding->event))
+            {
+                fiber_start(
+                    (FiberFn *)handle_event,
+                    &(BrEventCtx){
+                        .self = self,
+                        .msg = msg,
+                        .binding = binding,
+                    });
+
+                return true;
+            }
+        }
     }
 
-    log$("Dispatched message to sink");
-
-    fiber_start(
-        (FiberFn *)br_ev_handle,
-        &(BrEvCtx){
-            .self = self,
-            .msg = msg,
-            .ctx = nullptr,
-            .fn = self->sink,
-        });
-
-    return true;
+    return false;
 }
 
 void ipc_component_pump(IpcComponent *self, BrDeadline deadline)
@@ -92,7 +107,7 @@ void ipc_component_pump(IpcComponent *self, BrDeadline deadline)
     {
         if (!(dispatch_to_pending(self, ipc.msg) ||
               dispatch_to_provider(self, ipc.msg) ||
-              dispatch_to_sink(self, ipc.msg)))
+              dispatch_to_binding(self, ipc.msg)))
         {
             log$("Unhandled message: {}:{} on port {}", ipc.msg.prot, ipc.msg.type, ipc.msg.to.port);
         }
@@ -131,6 +146,7 @@ void ipc_component_init(IpcComponent *self, Alloc *alloc)
     vec_init(&self->pendings, alloc);
     vec_init(&self->providers, alloc);
     vec_init(&self->capabilities, alloc);
+    vec_init(&self->bindings, alloc);
 
     _instance = self;
 }
@@ -140,6 +156,7 @@ void ipc_component_deinit(IpcComponent *self)
     vec_deinit(&self->capabilities);
     vec_deinit(&self->providers);
     vec_deinit(&self->pendings);
+    vec_deinit(&self->bindings);
 }
 
 void ipc_component_inject(IpcComponent *self, IpcCap const *caps, int count)
@@ -208,6 +225,57 @@ void ipc_component_revoke(IpcComponent *self, IpcCap cap)
         {
             vec_splice(&self->providers, i, 1);
             return;
+        }
+    }
+}
+
+void ipc_component_bind(IpcComponent *self, BrEvent event, IpcEventHandler *fn, void *ctx)
+{
+    IpcBinding *binding = alloc_make(self->alloc, IpcBinding);
+
+    binding->event = event;
+    binding->handler = fn;
+    binding->ctx = ctx;
+
+    br_bind(&(BrBindArgs){
+        .event = event,
+    });
+
+    vec_push(&self->bindings, binding);
+}
+
+void ipc_component_unbind(IpcComponent *self, BrEvent event, void *ctx)
+{
+    for (int i = 0; i < vec_len(&self->bindings); i++)
+    {
+        IpcBinding *binding = vec_at(&self->bindings, i);
+
+        if (br_event_eq(binding->event, event) && binding->ctx == ctx)
+        {
+            br_unbind(&(BrUnbindArgs){
+                .event = event,
+            });
+
+            vec_splice(&self->bindings, i, 1);
+            return;
+        }
+    }
+}
+
+void ipc_component_unbind_all(IpcComponent *self, void *ctx)
+{
+    for (int i = 0; i < vec_len(&self->bindings); i++)
+    {
+        IpcBinding *binding = vec_at(&self->bindings, i);
+
+        if (binding->ctx == ctx)
+        {
+            br_unbind(&(BrUnbindArgs){
+                .event = binding->event,
+            });
+
+            vec_splice(&self->bindings, i, 1);
+            i--;
         }
     }
 }

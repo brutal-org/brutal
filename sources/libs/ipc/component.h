@@ -9,6 +9,7 @@
 
 typedef struct _IpcPending IpcPending;
 typedef struct _IpcComponent IpcComponent;
+typedef struct _IpcBinding IpcBinding;
 typedef struct _IpcProvider IpcProvider;
 
 struct _IpcPending
@@ -31,14 +32,23 @@ struct _IpcProvider
     void *ctx;
 };
 
+typedef void IpcEventHandler(void *ctx, BrEvent event);
+
+struct _IpcBinding
+{
+    BrEvent event;
+    IpcEventHandler *handler;
+    void *ctx;
+};
+
 struct _IpcComponent
 {
     Alloc *alloc;
     Fiber *dispatcher;
     Vec(IpcPending *) pendings;
     Vec(IpcProvider *) providers;
+    Vec(IpcBinding *) bindings;
     Vec(IpcCap) capabilities;
-    IpcHandler *sink;
     bool running;
     int result;
 };
@@ -58,6 +68,12 @@ IpcCap ipc_component_require(IpcComponent *self, uint32_t proto);
 IpcCap ipc_component_provide(IpcComponent *self, uint32_t id, IpcHandler *fn, void *vtable, void *ctx);
 
 void ipc_component_revoke(IpcComponent *self, IpcCap cap);
+
+void ipc_component_bind(IpcComponent *self, BrEvent event, IpcEventHandler *fn, void *ctx);
+
+void ipc_component_unbind(IpcComponent *self, BrEvent event, void *ctx);
+
+void ipc_component_unbind_all(IpcComponent *self, void *ctx);
 
 BrResult ipc_component_request(IpcComponent *self, IpcCap to, BrMsg *req, BrMsg *resp);
 

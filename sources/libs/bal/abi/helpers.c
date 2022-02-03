@@ -1,4 +1,5 @@
 #include <bal/abi/helpers.h>
+#include <brutal/debug/locked.h>
 
 char const *br_syscall_to_string(BrSyscall syscall)
 {
@@ -73,7 +74,19 @@ Error br_result_to_error(BrResult result)
 
 bool br_event_eq(BrEvent a, BrEvent b)
 {
-    return a.type == b.type && a.irq == b.irq;
+    if (a.type != b.type)
+    {
+        return false;
+    }
+
+    switch (a.type)
+    {
+    case BR_EVENT_IRQ:
+        return a.irq == b.irq;
+
+    default:
+        panic$("Unhandled event type: {}", a.type);
+    }
 }
 
 bool br_addr_eq(BrAddr a, BrAddr b)
