@@ -43,3 +43,10 @@ BrId bal_self_id(void)
 
     return cache;
 }
+
+BrResult bal_ack(BrEvent event)
+{
+    return br_ack(&(BrAckArgs){
+        .event = event,
+    });
+}
