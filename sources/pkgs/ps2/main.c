@@ -232,8 +232,10 @@ void ps2_mouse_init(Ps2 *ps2)
     }
 }
 
-void ps2_handle_irq(Ps2 *ps2)
+void ps2_handle_irq(void *ctx, BrEvent event)
 {
+    Ps2 *ps2 = ctx;
+
     uint8_t status = bal_io_in8(ps2->io, PS2_REG_STATUS);
 
     while (status & PS2_STATUS_FULL)
@@ -253,6 +255,8 @@ void ps2_handle_irq(Ps2 *ps2)
 
         status = bal_io_in8(ps2->io, PS2_REG_STATUS);
     }
+
+    bal_ack(event);
 }
 
 int ipc_component_main(IpcComponent *self)
@@ -261,35 +265,15 @@ int ipc_component_main(IpcComponent *self)
         .io = bal_io_port(0x60, 0x8),
     };
 
+    ps2_mouse_init(&ps2);
+
     ps2.input_sink = ipc_component_require(self, IPC_EVENT_SINK_PROTO);
 
     BrEvent keyboard_irq = {.type = BR_EVENT_IRQ, .irq = 1};
     BrEvent mouse_irq = {.type = BR_EVENT_IRQ, .irq = 12};
 
-    assert_br_success(br_bind(&(BrBindArgs){.event = keyboard_irq}));
-    assert_br_success(br_bind(&(BrBindArgs){.event = mouse_irq}));
-
-    BrIpcArgs ipc;
-    ipc.flags = BR_IPC_RECV | BR_IPC_BLOCK;
-    ipc.deadline = BR_DEADLINE_INFINITY;
-
-    ps2_mouse_init(&ps2);
-
-    while (br_ipc(&ipc) == BR_SUCCESS)
-    {
-        BrMsg msg = ipc.msg;
-
-        if (br_addr_eq(msg.from, BR_ADDR_EVENT) && msg.event.type == BR_EVENT_IRQ)
-        {
-            ps2_handle_irq(&ps2);
-
-            br_ack(&(BrAckArgs){.event = msg.event});
-        }
-        else
-        {
-            log$("Unknown message!");
-        }
-    }
+    ipc_component_bind(self, keyboard_irq, ps2_handle_irq, &ps2);
+    ipc_component_bind(self, mouse_irq, ps2_handle_irq, &ps2);
 
     return ipc_component_run(self);
 }
