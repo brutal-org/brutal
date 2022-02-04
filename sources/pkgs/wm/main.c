@@ -1,27 +1,7 @@
 #include <brutal/alloc.h>
-#include <ipc/ipc.h>
 #include <protos/bus.h>
-#include <protos/event.h>
 #include <protos/hw.h>
-#include "wm/display.h"
 #include "wm/server.h"
-
-/* --- Input Sink Protocol -------------------------------------------------- */
-
-static EventError input_sink_dispatch_handler(void *ctx, UiEvent const *req, bool *resp, Alloc *)
-{
-    WmServer *wm = ctx;
-    wm_server_dispatch(wm, *req);
-
-    *resp = true;
-    return IPC_SUCCESS;
-}
-
-static EventSinkVTable _input_sink_vtable = {
-    input_sink_dispatch_handler,
-};
-
-/* --- Entry Point ---------------------------------------------------------- */
 
 int ipc_component_main(IpcComponent *self)
 {
@@ -36,13 +16,8 @@ int ipc_component_main(IpcComponent *self)
 
     WmServer server;
     wm_server_init(&server, &display);
-
-    IpcCap input_sink_cap = event_sink_provide(self, &_input_sink_vtable, &server);
-
-    bus_server_expose_rpc(self, bus_server, &input_sink_cap, alloc_global());
-    bus_server_expose_rpc(self, bus_server, &server.capability, alloc_global());
-
-    wm_server_dirty_all(&server);
+    wm_server_expose(&server, bus_server);
+    wm_server_should_render_all(&server);
     wm_server_render(&server);
 
     return ipc_component_run(self);

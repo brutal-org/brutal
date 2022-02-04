@@ -8,8 +8,11 @@
 
 typedef struct
 {
-    IpcCap capability;
-    IpcCap sink;
+    UiWinType type;
+    UiWinFlags flags;
+
+    IpcCap wm_client;
+    IpcCap event_sink;
 
     bool visible;
     MRect bound;
@@ -20,7 +23,7 @@ typedef struct
     struct _WmServer *server;
 } WmClient;
 
-WmClient *wm_client_create(struct _WmServer *server, MRect bound);
+WmClient *wm_client_create(struct _WmServer *server, MRect bound, UiWinType type, UiWinFlags flags);
 
 void wm_client_destroy(WmClient *self);
 
@@ -36,6 +39,6 @@ void wm_client_close(WmClient *self);
 
 void wm_client_flip(WmClient *self, MRect bound);
 
-void wm_client_move(WmClient *self, MRect bound);
+void wm_client_resize(WmClient *self, MRect bound);
 
 void wm_client_dispatch(WmClient *self, UiEvent event);

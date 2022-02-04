@@ -1,6 +1,6 @@
 #pragma once
 
-#include <protos/wm.h>
+#include <bal/hw.h>
 
 struct _EmbedWin
 {

@@ -1,13 +1,31 @@
 module wm;
 
-import base, math, event;
+import base, math, event, ui;
+
+type WmClientProps =
+{
+    MRect bound,
+    UiWinType type,
+    UiWinFlags flags,
+};
+
+type WmLayout = enum
+{
+    WM_LAYOUT_STACK,
+    WM_LAYOUT_FIBONACCI,
+    WM_LAYOUT_MONOCLE,
+} ;
 
 interface Client
 {
     method show -> Bool;
+
     method hide -> Bool;
+
     method close -> Bool;
+
     method flip MRect -> Bool;
+
     method move MRect -> Bool;
 
     method surface -> IpcFb;
@@ -15,8 +33,7 @@ interface Client
     method listen IpcCap -> Bool;
 };
 
-
 interface Server
 {
-    method create { MRect bound } -> IpcCap;
+    method create WmClientProps -> IpcCap;
 };

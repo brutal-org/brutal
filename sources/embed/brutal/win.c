@@ -6,11 +6,11 @@ void embed_win_init(UiWin *self, MRect bound)
 {
     IpcCap server = ipc_component_require(ipc_component_self(), IPC_WM_SERVER_PROTO);
 
-    WmServerCreateRequest req = {
+    WmClientProps props = {
         .bound = bound,
     };
 
-    wm_server_create_rpc(ipc_component_self(), server, &req, &self->embed.client, alloc_global());
+    wm_server_create_rpc(ipc_component_self(), server, &props, &self->embed.client, alloc_global());
 
     BalFb surface;
     wm_client_surface_rpc(ipc_component_self(), self->embed.client, &surface, alloc_global());
