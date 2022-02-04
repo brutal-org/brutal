@@ -1,0 +1,7 @@
+module ui;
+
+include brutal/ui.h;
+
+type UiWinType = __ctype;
+
+type UiWinFlags = __ctype;

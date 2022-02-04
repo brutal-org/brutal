@@ -7,10 +7,11 @@
 
 /* --- Lifecycle ------------------------------------------------------------ */
 
-UiWin *ui_win_create(UiApp *app, MRect bound, int flags)
+UiWin *ui_win_create(UiApp *app, MRect bound, UiWinType type, int flags)
 {
     UiWin *self = alloc_make(alloc_global(), UiWin);
     self->flags = flags;
+    self->type = type;
     self->app = app;
 
     gfx_init(&self->gfx, alloc_global());
