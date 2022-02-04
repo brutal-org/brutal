@@ -91,6 +91,17 @@ static inline void gfx_buf_copy(GfxBuf dst, GfxBuf src, int x, int y)
     }
 }
 
+static inline void gfx_buf_flip(GfxBuf dst, GfxBuf src, MRect rect){
+    for (int yy = rect.y; yy < rect.y + rect.height; yy++)
+    {
+        for (int xx = rect.x; xx < rect.x + rect.width; xx++)
+        {
+            GfxColor c = gfx_buf_load(src, xx, yy);
+            gfx_buf_store(dst, xx, yy, c);
+        }
+    }
+}
+
 static inline void gfx_buf_clear(GfxBuf self, GfxColor color)
 {
     for (int y = 0; y < self.height; y++)
