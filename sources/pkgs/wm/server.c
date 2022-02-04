@@ -1,16 +1,32 @@
 #include <brutal/alloc.h>
 #include <protos/wm.h>
+#include <protos/bus.h>
 #include "wm/server.h"
+
+/* --- Input Sink Protocol -------------------------------------------------- */
+
+static EventError input_sink_dispatch_handler(void *ctx, UiEvent const *req, bool *resp, Alloc *)
+{
+    WmServer *wm = ctx;
+    wm_server_dispatch(wm, *req);
+
+    *resp = true;
+    return IPC_SUCCESS;
+}
+
+static EventSinkVTable _input_sink_vtable = {
+    input_sink_dispatch_handler,
+};
 
 /* --- Window Manager Server Protocol --------------------------------------- */
 
-WmError wm_server_create_handler(void *self, WmServerCreateRequest const *req, IpcCap *resp, Alloc *)
+WmError wm_server_create_handler(void *self, WmClientProps const *req, IpcCap *resp, Alloc *)
 {
     WmServer *server = self;
 
-    WmClient *client = wm_client_create(server, req->bound);
+    WmClient *client = wm_client_create(server, req->bound, req->type, req->flags);
     vec_push(&server->clients, client);
-    *resp = client->capability;
+    *resp = client->wm_client;
 
     return IPC_SUCCESS;
 }
@@ -28,12 +44,15 @@ void wm_server_init(WmServer *self, WmDisplay *display)
     gfx_dirty_init(&self->dirty, alloc_global());
     vec_init(&self->clients, alloc_global());
 
-    self->capability = wm_server_provide(ipc_component_self(), &_wm_server_vtable, self);
+    self->wm_server = wm_server_provide(ipc_component_self(), &_wm_server_vtable, self);
+    self->input_sink = event_sink_provide(ipc_component_self(), &_input_sink_vtable, self);
 }
 
 void wm_server_deinit(WmServer *self)
 {
-    ipc_component_revoke(ipc_component_self(), self->capability);
+    ipc_component_revoke(ipc_component_self(), self->wm_server);
+    ipc_component_revoke(ipc_component_self(), self->input_sink);
+
     vec_deinit(&self->clients);
     gfx_dirty_deinit(&self->dirty);
 }
@@ -47,7 +66,7 @@ void wm_server_dispatch(WmServer *self, UiEvent event)
             .size = m_vec2(32, 32),
         };
 
-        wm_server_dirty(self, mouse_bound);
+        wm_server_should_render(self, mouse_bound);
 
         self->mouse = m_vec2_add(self->mouse, event.mouse.offset);
 
@@ -56,7 +75,7 @@ void wm_server_dispatch(WmServer *self, UiEvent event)
             .size = m_vec2(32, 32),
         };
 
-        wm_server_dirty(self, mouse_bound);
+        wm_server_should_render(self, mouse_bound);
         wm_server_render(self);
     }
 }
@@ -79,14 +98,14 @@ static void wm_server_render_clients(WmServer *self, Gfx *gfx)
     }
 }
 
-void wm_server_dirty(WmServer *self, MRect rect)
+void wm_server_should_render(WmServer *self, MRect rect)
 {
     gfx_dirty_rect(&self->dirty, rect);
 }
 
-void wm_server_dirty_all(WmServer *self)
+void wm_server_should_render_all(WmServer *self)
 {
-    wm_server_dirty(self, wm_display_bound(self->display));
+    wm_server_should_render(self, wm_display_bound(self->display));
 }
 
 void wm_server_render(WmServer *self)
@@ -103,8 +122,8 @@ void wm_server_render(WmServer *self)
         wm_server_render_clients(self, gfx);
         wm_server_render_cursor(self, gfx);
 
-        gfx_fill(gfx, gfx_paint_fill(gfx_color_rand(100)));
-        gfx_fill_rect(gfx, dirty, 0);
+        // gfx_fill(gfx, gfx_paint_fill(gfx_color_rand(100)));
+        // gfx_fill_rect(gfx, dirty, 0);
 
         gfx_pop(gfx);
     }
@@ -112,4 +131,10 @@ void wm_server_render(WmServer *self)
     wm_display_end(self->display);
 
     gfx_dirty_clear(&self->dirty);
+}
+
+void wm_server_expose(WmServer *self, IpcCap bus_server)
+{
+    bus_server_expose_rpc(ipc_component_self(), bus_server, &self->input_sink, alloc_global());
+    bus_server_expose_rpc(ipc_component_self(), bus_server, &self->wm_server, alloc_global());
 }

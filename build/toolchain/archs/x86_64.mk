@@ -18,7 +18,4 @@ QEMU_ARGS= \
 		-M q35 \
 		-smp 4 \
 		-m 256M \
-		-rtc base=localtime \
-		-cpu host \
-		-enable-kvm
-
+		-rtc base=localtime

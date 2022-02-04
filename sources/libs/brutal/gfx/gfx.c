@@ -395,7 +395,6 @@ void gfx_fill_rect_aligned(Gfx *self, MRect rect)
 
 void gfx_fill_rect(Gfx *self, MRect rect, float radius)
 {
-    gfx_begin_path(self);
 
     if (radius == 0)
     {
@@ -403,6 +402,8 @@ void gfx_fill_rect(Gfx *self, MRect rect, float radius)
     }
     else
     {
+        gfx_begin_path(self);
+
         gfx_move_to(self, m_vec2(rect.x + radius, rect.y));
 
         // Top edge
@@ -420,11 +421,12 @@ void gfx_fill_rect(Gfx *self, MRect rect, float radius)
         // Left edge
         gfx_line_to(self, m_vec2(rect.x, rect.y + radius));
         gfx_quadratic_to(self, m_vec2(rect.x, rect.y), m_vec2(rect.x + radius, rect.y));
+
+        gfx_close_path(self);
+
+        gfx_fill_path(self, GFX_FILL_EVENODD);
     }
 
-    gfx_close_path(self);
-
-    gfx_fill_path(self, GFX_FILL_EVENODD);
 }
 
 void gfx_ellipsis(Gfx *self, MRect rect)

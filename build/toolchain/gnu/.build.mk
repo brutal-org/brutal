@@ -17,7 +17,7 @@ HOST_CFLAGS= \
 HOST_LD=ld
 HOST_LDFLAGS= \
 	-lm \
-	`pkg-config  sdl2 --libs`
+	`pkg-config sdl2 --libs`
 
 HOST_AR=ar
 HOST_ARFLAGS=rcs

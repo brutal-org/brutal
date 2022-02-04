@@ -1,3 +1,4 @@
+#include <ipc/ipc.h>
 #include <embed/app.h>
 #include <embed/win.h>
 
