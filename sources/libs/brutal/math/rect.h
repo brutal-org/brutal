@@ -46,12 +46,29 @@ static inline bool m_rect_empty(MRect rect)
     return (int)rect.width == 0 || (int)rect.height == 0;
 }
 
+static inline MRect m_rect_move(MRect self, MVec2 offset)
+{
+    return m_rect(
+        self.x + offset.x,
+        self.y + offset.y,
+        self.width,
+        self.height);
+}
+
 static inline bool m_rect_collide_rect(MRect recta, MRect rectb)
 {
     return recta.x < rectb.x + rectb.width &&
            recta.x + recta.width > rectb.x &&
            recta.y < rectb.y + rectb.height &&
            recta.height + recta.y > rectb.y;
+}
+
+static inline bool m_rect_contains_rect(MRect recta, MRect rectb)
+{
+    return recta.x <= rectb.x &&
+           recta.x + recta.width >= rectb.x + rectb.width &&
+           recta.y <= rectb.y &&
+           recta.y + recta.height >= rectb.y + rectb.height;
 }
 
 static inline bool m_rect_collide_point(MRect rect, MVec2 p)
