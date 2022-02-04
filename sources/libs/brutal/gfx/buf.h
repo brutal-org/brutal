@@ -40,7 +40,7 @@ static inline void gfx_buf_store_unckeck(GfxBuf self, int x, int y, GfxColor col
 
 static inline GfxColor gfx_buf_load(GfxBuf self, int x, int y)
 {
-    if (x < 0 || x > self.width || y < 0 || y > self.height)
+    if (x < 0 || x >= self.width || y < 0 || y >= self.height)
     {
         return GFX_MAGENTA;
     }
@@ -50,7 +50,7 @@ static inline GfxColor gfx_buf_load(GfxBuf self, int x, int y)
 
 static inline void gfx_buf_store(GfxBuf self, int x, int y, GfxColor color)
 {
-    if (x < 0 || x > self.width || y < 0 || y > self.height)
+    if (x < 0 || x >= self.width || y < 0 || y >= self.height)
     {
         return;
     }
@@ -94,9 +94,9 @@ static inline void _gfx_buf_copy_same_fmt(GfxBuf dst, GfxBuf src, int x, int y)
     for (int yy = 0; yy < src.height; yy++)
     {
         uint8_t *dst_pixels = ((uint8_t *)dst.buf) + dst.pitch * (yy + y);
-        uint8_t *src_pixels = ((uint8_t *)src.buf) + src.pitch * yy;
+        uint8_t const *src_pixels = ((uint8_t const *)src.buf) + src.pitch * yy;
 
-        mem_cpy(dst_pixels + x, src_pixels, dst.width * gfx_fmt_size(dst.fmt));
+        mem_cpy(dst_pixels + x, src_pixels, src.width * gfx_fmt_size(src.fmt));
     }
 }
 
