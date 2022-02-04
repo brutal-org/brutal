@@ -122,10 +122,12 @@ void wm_server_render(WmServer *self)
         wm_server_render_clients(self, gfx);
         wm_server_render_cursor(self, gfx);
 
-        // gfx_fill(gfx, gfx_paint_fill(gfx_color_rand(100)));
-        // gfx_fill_rect(gfx, dirty, 0);
+        gfx_fill(gfx, gfx_paint_fill(gfx_color_rand(100)));
+        gfx_fill_rect(gfx, dirty, 0);
 
         gfx_pop(gfx);
+
+        wm_display_flip(self->display, dirty);
     }
 
     wm_display_end(self->display);
