@@ -13,3 +13,7 @@
 #define CLEANUP(FUNC) __attribute__((cleanup(FUNC)))
 
 #define WEAK __attribute__((weak))
+
+#define LIKELY(EXPR) __builtin_expect((bool)(EXPR), true)
+
+#define UNLIKELY(EXPR) __builtin_expect((bool)(EXPR), false)

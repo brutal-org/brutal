@@ -1,11 +1,12 @@
 #pragma once
 
+#include <brutal/base/attributes.h>
 #include <brutal/debug/locked.h>
 #include <brutal/io/print.h>
 
 #define assert_not_null(EXPR) (                      \
     {                                                \
-        if (EXPR == nullptr)                         \
+        if (UNLIKELY(EXPR == nullptr))               \
         {                                            \
             panic$("{} is equal to nullptr", #EXPR); \
         }                                            \
@@ -15,7 +16,7 @@
     {                                     \
         typeof(EXPR) __value = (EXPR);    \
                                           \
-        if (!__value)                     \
+        if (UNLIKELY(!__value))           \
         {                                 \
             panic$("{} is false", #EXPR); \
         }                                 \
@@ -25,7 +26,7 @@
     {                                                                                                              \
         BrResult __value = (EXPR);                                                                                 \
                                                                                                                    \
-        if (__value != BR_SUCCESS)                                                                                 \
+        if (UNLIKELY(__value != BR_SUCCESS))                                                                       \
         {                                                                                                          \
             panic$("{} is not equal to BR_SUCCESS (but is equal to: '{}') ", #EXPR, br_result_to_string(__value)); \
         }                                                                                                          \
@@ -35,7 +36,7 @@
     {                                    \
         typeof(EXPR) __value = (EXPR);   \
                                          \
-        if (__value)                     \
+        if (UNLIKELY(__value))           \
         {                                \
             panic$("{} is true", #EXPR); \
         }                                \
@@ -46,7 +47,7 @@
         typeof(LHS) __lhs = LHS;                      \
         typeof(RHS) __rhs = RHS;                      \
                                                       \
-        if (__lhs != __rhs)                           \
+        if (UNLIKELY(__lhs != __rhs))                 \
         {                                             \
             panic$("{} == {}: {} is not equal to {}", \
                    #LHS, #RHS, __lhs, __rhs);         \
@@ -58,7 +59,7 @@
         typeof(LHS) __lhs = LHS;                  \
         typeof(RHS) __rhs = RHS;                  \
                                                   \
-        if (__lhs == __rhs)                       \
+        if (UNLIKELY(__lhs == __rhs))             \
         {                                         \
             panic$("{} != {}: {} is equal to {}", \
                    #LHS, #RHS, __lhs, __rhs);     \
@@ -70,7 +71,7 @@
         typeof(LHS) __lhs = LHS;                          \
         typeof(RHS) __rhs = RHS;                          \
                                                           \
-        if (!str_eq(__lhs, __rhs))                        \
+        if (UNLIKELY(!str_eq(__lhs, __rhs)))              \
         {                                                 \
             panic$("{} == {}: '{}' is not equal to '{}'", \
                    #LHS, #RHS, __lhs, __rhs);             \
@@ -82,7 +83,7 @@
         typeof(LHS) __lhs = LHS;                      \
         typeof(RHS) __rhs = RHS;                      \
                                                       \
-        if (str_eq(__lhs, __rhs))                     \
+        if (UNLIKELY(str_eq(__lhs, __rhs)))           \
         {                                             \
             panic$("{} != {}: '{}' is equal to '{}'", \
                    #LHS, #RHS, __lhs, __rhs);         \
@@ -94,7 +95,7 @@
         typeof(LHS) __lhs = LHS;                         \
         typeof(RHS) __rhs = RHS;                         \
                                                          \
-        if (!(__lhs > __rhs))                            \
+        if (UNLIKELY(!(__lhs > __rhs)))                  \
         {                                                \
             panic$("{} > {}: {} is not greater than {}", \
                    #LHS, #RHS, __lhs, __rhs);            \
@@ -118,7 +119,7 @@
         typeof(LHS) __lhs = LHS;                       \
         typeof(RHS) __rhs = RHS;                       \
                                                        \
-        if (!(__lhs < __rhs))                          \
+        if (UNLIKELY(!(__lhs < __rhs)))                \
         {                                              \
             panic$("{} < {}: {} is not lower than {}", \
                    #LHS, #RHS, __lhs, __rhs);          \
@@ -130,7 +131,7 @@
         typeof(LHS) __lhs = LHS;                                 \
         typeof(RHS) __rhs = RHS;                                 \
                                                                  \
-        if (!(__lhs <= __rhs))                                   \
+        if (UNLIKELY(!(__lhs <= __rhs)))                         \
         {                                                        \
             panic$("{} <= {}: {} is not lower or equal than {}", \
                    #LHS, #RHS, __lhs, __rhs);                    \
