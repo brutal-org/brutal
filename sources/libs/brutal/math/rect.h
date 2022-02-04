@@ -125,17 +125,9 @@ static inline void m_rect_substract(MRect rect, MRect sub, MRect t[4])
     {
         sub = m_rect_clip_rect(rect, sub);
 
-        // The following code in C
-        // l = Rect(x(), y(), other.left() - left(), height());
         t[0] = m_rect(rect.x, rect.y, sub.x - rect.x, rect.height);
-
-        // r = Rect(other.right(), y(), right() - other.right(), height());
         t[1] = m_rect(sub.x + sub.width, rect.y, rect.x + rect.width - sub.x - sub.width, rect.height);
-
-        // t = Rect(l.right(), y(), r.left() - l.right(), other.top() - top());
         t[2] = m_rect(t[0].x + t[0].width, rect.y, t[1].x - t[0].x - t[0].width, sub.y - rect.y);
-
-        // b = Rect(l.right(), other.bottom(), r.left() - l.right(), bottom() - other.bottom());
         t[3] = m_rect(t[0].x + t[0].width, sub.y + sub.height, t[1].x - t[0].x - t[0].width, rect.y + rect.height - sub.y - sub.height);
     }
     else
