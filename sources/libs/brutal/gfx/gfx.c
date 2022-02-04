@@ -380,14 +380,16 @@ void gfx_fill_rect_aligned(Gfx *self, MRect rect)
     }
 
     rect.pos = m_vec2_add(rect.pos, gfx_peek(self)->origin);
-    rect = m_rect_clip_rect(rect, gfx_peek(self)->clip);
+    MRect rbound = m_rect_clip_rect(rect, gfx_peek(self)->clip);
 
-    GfxColor color = gfx_paint_sample(gfx_peek(self)->fill, 0, 0);
-
-    for (int y = rect.y; y < rect.y + rect.height; y++)
+    for (int y = m_rect_top(rbound); y < m_rect_bottom(rbound); y++)
     {
-        for (int x = rect.x; x < rect.x + rect.width; x++)
+        for (int x = m_rect_start(rbound); x < m_rect_end(rbound); x++)
         {
+            float sx = (x - rect.x) / rect.width;
+            float sy = (y - rect.y) / rect.height;
+
+            GfxColor color = gfx_paint_sample(gfx_peek(self)->fill, sx, sy);
             gfx_buf_blend(self->buf, x, y, color);
         }
     }
@@ -395,7 +397,6 @@ void gfx_fill_rect_aligned(Gfx *self, MRect rect)
 
 void gfx_fill_rect(Gfx *self, MRect rect, float radius)
 {
-
     if (radius == 0)
     {
         gfx_fill_rect_aligned(self, rect);
@@ -426,7 +427,6 @@ void gfx_fill_rect(Gfx *self, MRect rect, float radius)
 
         gfx_fill_path(self, GFX_FILL_EVENODD);
     }
-
 }
 
 void gfx_ellipsis(Gfx *self, MRect rect)
