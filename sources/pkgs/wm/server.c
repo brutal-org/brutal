@@ -1,6 +1,6 @@
 #include <brutal/alloc.h>
-#include <protos/wm.h>
 #include <protos/bus.h>
+#include <protos/wm.h>
 #include "wm/server.h"
 
 /* --- Input Sink Protocol -------------------------------------------------- */
@@ -94,7 +94,15 @@ static void wm_server_render_clients(WmServer *self, Gfx *gfx)
     vec_foreach_v(client, &self->clients)
     {
         gfx_fill(gfx, gfx_paint_image(wm_client_backbuffer(client), gfx_buf_bound(wm_client_backbuffer(client))));
-        gfx_fill_rect(gfx, client->bound, 8);
+
+        if (client->flags & UI_WIN_BORDERLESS)
+        {
+            gfx_fill_rect(gfx, client->bound, 0);
+        }
+        else
+        {
+            gfx_fill_rect(gfx, client->bound, 8);
+        }
     }
 }
 
@@ -122,7 +130,7 @@ void wm_server_render(WmServer *self)
         wm_server_render_clients(self, gfx);
         wm_server_render_cursor(self, gfx);
 
-        gfx_fill(gfx, gfx_paint_fill(gfx_color_rand(100)));
+        gfx_fill(gfx, gfx_paint_fill(gfx_color_rand(50)));
         gfx_fill_rect(gfx, dirty, 0);
 
         gfx_pop(gfx);

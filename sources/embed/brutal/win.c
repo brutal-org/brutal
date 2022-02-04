@@ -8,6 +8,8 @@ void embed_win_init(UiWin *self, MRect bound)
 
     WmClientProps props = {
         .bound = bound,
+        .type = self->type,
+        .flags = self->flags,
     };
 
     wm_server_create_rpc(ipc_component_self(), server, &props, &self->embed.client, alloc_global());
