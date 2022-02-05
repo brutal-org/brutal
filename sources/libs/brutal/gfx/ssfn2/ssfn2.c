@@ -36,6 +36,18 @@ static MaybeError ssfn2_load_string(IoReader reader, char *dst)
     return SUCCESS;
 }
 
+
+static MaybeError ssfn2_load_stringtable(IoReader reader, SSFN2Font *font)
+{
+    TRY(MaybeError, ssfn2_load_string(reader, font->stringtable.font_name));
+    TRY(MaybeError, ssfn2_load_string(reader, font->stringtable.family_name));
+    TRY(MaybeError, ssfn2_load_string(reader, font->stringtable.subfamily_name));
+    TRY(MaybeError, ssfn2_load_string(reader, font->stringtable.revision));
+    TRY(MaybeError, ssfn2_load_string(reader, font->stringtable.manufacturer));
+    TRY(MaybeError, ssfn2_load_string(reader, font->stringtable.license));
+    return SUCCESS;
+}
+
 static MaybeError ssfn2_load_mappings(IoRSeek rseek, SSFN2Font *font, SSFN2CommonHeader *common_header)
 {
     size_t char_offs = load_le(font->header.characters_offs);
@@ -97,7 +109,7 @@ static MaybeError ssfn2_load_mappings(IoRSeek rseek, SSFN2Font *font, SSFN2Commo
                 if (x == 0xFF && y == 0xFF)
                 {
                     uint8_t color_idx = extra_data[data_off + 2];
-                    // Invalid color index. See
+                    // Invalid color index. See https://gitlab.com/bztsrc/scalable-font2/-/blob/master/docs/sfn_format.md#fragment-descriptors
                     if (color_idx > 0xFD)
                         return ERROR(ERR_NOT_FOUND);
                 }
@@ -114,17 +126,6 @@ static MaybeError ssfn2_load_mappings(IoRSeek rseek, SSFN2Font *font, SSFN2Commo
         }
     }
 
-    return SUCCESS;
-}
-
-static MaybeError ssfn2_load_stringtable(IoReader reader, SSFN2Font *font)
-{
-    TRY(MaybeError, ssfn2_load_string(reader, font->stringtable.font_name));
-    TRY(MaybeError, ssfn2_load_string(reader, font->stringtable.family_name));
-    TRY(MaybeError, ssfn2_load_string(reader, font->stringtable.subfamily_name));
-    TRY(MaybeError, ssfn2_load_string(reader, font->stringtable.revision));
-    TRY(MaybeError, ssfn2_load_string(reader, font->stringtable.manufacturer));
-    TRY(MaybeError, ssfn2_load_string(reader, font->stringtable.license));
     return SUCCESS;
 }
 
