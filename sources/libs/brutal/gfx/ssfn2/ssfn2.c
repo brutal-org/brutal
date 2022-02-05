@@ -97,33 +97,34 @@ static MaybeError ssfn2_load_mappings(IoRSeek rseek, SSFN2Font *font, SSFN2Commo
                 .adv_x = glyph_data[3],
                 .adv_y = glyph_data[4],
             };
-            uint8_t extra_bytes = val;
-            uint8_t extra_data[0b01111111];
-            TRY(MaybeError, io_read(rseek.reader, extra_data, extra_bytes));
+            uint8_t frag_bytes = num_frags * frag_size;
+            uint8_t frag_data[0b11111111];
+            TRY(MaybeError, io_read(rseek.reader, frag_data, frag_bytes));
 
             for (size_t frag = 0; frag < num_frags; frag++)
             {
                 size_t data_off = frag * frag_size;
-                UNUSED(data_off);
-                // uint8_t x = extra_data[data_off];
-                // uint8_t y = extra_data[data_off + 1];
-                // // This is a color
-                // if (x == 0xFF && y == 0xFF)
-                // {
-                //     uint8_t color_idx = extra_data[data_off + 2];
-                //     // Invalid color index. See https://gitlab.com/bztsrc/scalable-font2/-/blob/master/docs/sfn_format.md#fragment-descriptors
-                //     if (color_idx > 0xFD)
-                //         return ERROR(ERR_NOT_FOUND);
-                // }
-                // else
-                // {
-                //     uint8_t frag_off = 0;
-                //     for (size_t idx = 2; idx < frag_size; idx++)
-                //     {
-                //         frag_off = frag_off << 8;
-                //         frag_off |= extra_data[data_off + idx];
-                //     }
-                // }
+                uint8_t x = frag_data[data_off];
+                uint8_t y = frag_data[data_off + 1];
+                // This is a color
+                if (x == 0xFF && y == 0xFF)
+                {
+                    uint8_t color_idx = frag_data[data_off + 2];
+                    // Invalid color index. See https://gitlab.com/bztsrc/scalable-font2/-/blob/master/docs/sfn_format.md#fragment-descriptors
+                    if (color_idx > 0xFD)
+                        return ERROR(ERR_NOT_FOUND);
+                }
+                else
+                {
+                    size_t frag_off = 0;
+                    for (size_t idx = 2; idx < frag_size; idx++)
+                    {
+                        frag_off = frag_off << 8;
+                        frag_off |= frag_data[data_off + idx];
+                    }
+
+                    //TODO: parse fragment from fragment table
+                }
             }
         }
     }
