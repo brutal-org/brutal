@@ -52,10 +52,11 @@ static MaybeError ssfn2_load_mappings(IoRSeek rseek, SSFN2Font *font, SSFN2Commo
 {
     size_t char_offs = load_le(font->header.characters_offs);
     size_t lig_offs = load_le(font->header.ligature_offs);
+    size_t kern_offs = load_le(font->header.kerning_offs);
     size_t size = load_le(common_header->size);
 
     io_seek(rseek.seeker, io_seek_from_start(char_offs));
-    size_t end = lig_offs ? lig_offs : size - 4;
+    size_t end = lig_offs ? lig_offs : kern_offs ? kern_offs : size - 4;
 
     int unicode = 0;
     while (TRY(MaybeError, io_tell(rseek.seeker)) < end)
@@ -103,25 +104,26 @@ static MaybeError ssfn2_load_mappings(IoRSeek rseek, SSFN2Font *font, SSFN2Commo
             for (size_t frag = 0; frag < num_frags; frag++)
             {
                 size_t data_off = frag * frag_size;
-                uint8_t x = extra_data[data_off];
-                uint8_t y = extra_data[data_off + 1];
-                // This is a color
-                if (x == 0xFF && y == 0xFF)
-                {
-                    uint8_t color_idx = extra_data[data_off + 2];
-                    // Invalid color index. See https://gitlab.com/bztsrc/scalable-font2/-/blob/master/docs/sfn_format.md#fragment-descriptors
-                    if (color_idx > 0xFD)
-                        return ERROR(ERR_NOT_FOUND);
-                }
-                else
-                {
-                    uint8_t frag_off = 0;
-                    for (size_t idx = 2; idx < frag_size; idx++)
-                    {
-                        frag_off = frag_off << 8;
-                        frag_off |= extra_data[data_off + idx];
-                    }
-                }
+                UNUSED(data_off);
+                // uint8_t x = extra_data[data_off];
+                // uint8_t y = extra_data[data_off + 1];
+                // // This is a color
+                // if (x == 0xFF && y == 0xFF)
+                // {
+                //     uint8_t color_idx = extra_data[data_off + 2];
+                //     // Invalid color index. See https://gitlab.com/bztsrc/scalable-font2/-/blob/master/docs/sfn_format.md#fragment-descriptors
+                //     if (color_idx > 0xFD)
+                //         return ERROR(ERR_NOT_FOUND);
+                // }
+                // else
+                // {
+                //     uint8_t frag_off = 0;
+                //     for (size_t idx = 2; idx < frag_size; idx++)
+                //     {
+                //         frag_off = frag_off << 8;
+                //         frag_off |= extra_data[data_off + idx];
+                //     }
+                // }
             }
         }
     }
