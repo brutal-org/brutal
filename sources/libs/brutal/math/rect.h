@@ -155,3 +155,9 @@ static inline void m_rect_substract(MRect rect, MRect sub, MRect t[4])
         t[3] = (MRect){};
     }
 }
+
+static inline MVec2 m_rect_clamp_vec2(MRect rect, MVec2 vec)
+{
+    return m_vec2(m_clamp(vec.x, m_rect_start(rect), m_rect_end(rect)),
+                  m_clamp(vec.y, m_rect_top(rect), m_rect_bottom(rect)));
+}
