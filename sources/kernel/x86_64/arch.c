@@ -2,6 +2,7 @@
 #include "kernel/cpu.h"
 #include "kernel/x86_64/apic.h"
 #include "kernel/x86_64/asm.h"
+#include "kernel/x86_64/cmos.h"
 #include "kernel/x86_64/com.h"
 #include "kernel/x86_64/smp.h"
 
@@ -71,4 +72,9 @@ void arch_out(uint16_t port, int size, uint32_t data)
     {
         asm_out32(port, data);
     }
+}
+
+BrTimeStamp arch_now(void)
+{
+    return datetime_to_timestamp(cmos_read_rtc());
 }

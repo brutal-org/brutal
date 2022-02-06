@@ -24,6 +24,16 @@ BrResult sys_log(BrLogArgs *args)
     return BR_SUCCESS;
 }
 
+BrResult sys_now(BrNowArgs *args)
+{
+    *args = (BrNowArgs){
+        .tick = sched_tick(),
+        .timestamp = arch_now(),
+    };
+
+    return BR_SUCCESS;
+}
+
 BrResult sys_map(BrMapArgs *args)
 {
     Space *space = nullptr;
@@ -462,6 +472,7 @@ typedef BrResult BrSyscallFn();
 
 BrSyscallFn *syscalls[BR_SYSCALL_COUNT] = {
     [BR_SC_LOG] = sys_log,
+    [BR_SC_NOW] = sys_now,
     [BR_SC_MAP] = sys_map,
     [BR_SC_UNMAP] = sys_unmap,
     [BR_SC_CREATE] = sys_create,
@@ -490,7 +501,7 @@ BrResult syscall_dispatch(BrSyscall syscall, BrArg args)
 
     BrResult result = syscalls[syscall](args);
 
-    if (result != BR_SUCCESS)
+    if (result != BR_SUCCESS && result != BR_TIMEOUT)
     {
         log$("Syscall: Task({}): {}({#p}) -> {}",
              task_self()->id,
