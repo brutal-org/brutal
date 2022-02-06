@@ -87,3 +87,8 @@ static inline MEdge m_edge_parallel(MEdge edge, float offset)
 
     return m_edge_vec2(s, e);
 }
+
+static inline MEdge m_edge_swap(MEdge edge)
+{
+    return m_edge(edge.ex, edge.ey, edge.sx, edge.sy);
+}
