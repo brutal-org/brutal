@@ -21,6 +21,12 @@ typedef enum
     GFX_FILL_NONZERO,
 } GfxFillRule;
 
+typedef struct
+{
+    float x;
+    int winding;
+} GfxActiveEdge;
+
 typedef struct _Gfx
 {
     bool begin;
@@ -31,7 +37,7 @@ typedef struct _Gfx
     MEdges path;
     MEdges stroke;
 
-    Vec(float) active;
+    Vec(GfxActiveEdge) active;
     GfxPathFlattener flattener;
 
     float *scanline;
@@ -93,6 +99,8 @@ void gfx_bezier_to(Gfx *self, MVec2 cp1, MVec2 cp2, MVec2 point);
 void gfx_quadratic_to(Gfx *self, MVec2 cp2, MVec2 point);
 
 void gfx_arc_to(Gfx *self, float rx, float ry, float angle, int flags, MVec2 point);
+
+void gfx_rect(Gfx *self, MRect rect, float radius);
 
 /* --- Drawing -------------------------------------------------------------- */
 
