@@ -44,6 +44,11 @@ BrResult br_log(BrLogArgs *args)
     return br_syscall(BR_SC_LOG, (BrArg)args, 0, 0, 0, 0);
 }
 
+BrResult br_now(BrNowArgs *args)
+{
+    return br_syscall(BR_SC_NOW, (BrArg)args, 0, 0, 0, 0);
+}
+
 BrResult br_map(BrMapArgs *args)
 {
     return br_syscall(BR_SC_MAP, (BrArg)args, 0, 0, 0, 0);

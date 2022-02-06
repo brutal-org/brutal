@@ -7,6 +7,7 @@
 
 #define FOREACH_SYSCALLS(SYSCALL) \
     SYSCALL(LOG)                  \
+    SYSCALL(NOW)                  \
     SYSCALL(MAP)                  \
     SYSCALL(UNMAP)                \
     SYSCALL(CREATE)               \
@@ -136,6 +137,10 @@ typedef uint64_t BrDeadline;
 
 #define BR_TIMEOUT_INFINITY ((BrTimeout)-1)
 typedef uint64_t BrTimeout;
+
+typedef uint64_t BrTick;
+
+typedef uint64_t BrTimeStamp;
 
 // Events
 

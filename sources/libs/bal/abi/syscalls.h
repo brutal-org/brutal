@@ -21,6 +21,14 @@ SYSCALL(log) (BrLogArgs* args);
 
 typedef struct
 {
+    BrTick tick;
+    BrTimeStamp timestamp;
+} BrNowArgs;
+
+SYSCALL(now) (BrNowArgs* args);
+
+typedef struct
+{
     BrHandle space;
     BrHandle memory;
 
