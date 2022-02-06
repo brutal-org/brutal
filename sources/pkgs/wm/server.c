@@ -122,7 +122,7 @@ static void wm_server_render_clients(WmServer *self, Gfx *gfx)
         GfxBuf backbuffer = wm_client_backbuffer(client);
         gfx_fill(gfx, gfx_paint_image(backbuffer, gfx_buf_bound(backbuffer)));
 
-        if (client->type & UI_WIN_NORMAL)
+        if (client->type == UI_WIN_NORMAL)
         {
             gfx_fill_rect(gfx, client->bound, 8);
         }
