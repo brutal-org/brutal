@@ -20,7 +20,7 @@ void context_destroy(Context *self)
 
 void context_start(Context *self, uintptr_t ip, uintptr_t sp, uintptr_t ksp, BrTaskArgs args, BrTaskFlags flags)
 {
-    Regs regs;
+    Regs regs = {};
 
     regs.rip = ip;
     regs.rflags = RFLAGS_INTERRUPT_ENABLE | RFLAGS_RESERVED1_ONE;

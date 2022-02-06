@@ -262,11 +262,13 @@ BrResult sys_ipc(BrIpcArgs *args)
 {
     BrResult result = BR_SUCCESS;
 
+    BrMsg msg = args->msg;
+
     if (args->flags & BR_IPC_SEND)
     {
         // Make sure the task can't spoof its id
-        args->msg.from.id = task_self()->id;
-        args->msg.to = args->to;
+        msg.from.id = task_self()->id;
+        msg.to = args->to;
 
         Task *task CLEANUP(object_cleanup) = (Task *)global_lookup(args->to.id, BR_OBJECT_TASK);
 
@@ -278,7 +280,7 @@ BrResult sys_ipc(BrIpcArgs *args)
         result = channel_send(
             task->channel,
             task_self()->domain,
-            &args->msg,
+            &msg,
             args->deadline,
             args->flags);
     }
@@ -293,10 +295,12 @@ BrResult sys_ipc(BrIpcArgs *args)
         result = channel_recv(
             task_self()->channel,
             task_self()->domain,
-            &args->msg,
+            &msg,
             args->deadline,
             args->flags);
     }
+
+    args->msg = msg;
 
     return result;
 }
