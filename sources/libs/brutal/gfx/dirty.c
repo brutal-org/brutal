@@ -32,6 +32,11 @@ void gfx_dirty_rect(GfxDirty *self, MRect rect)
     vec_push(self, rect);
 }
 
+bool gfx_dirty_any(GfxDirty *self)
+{
+    return vec_len(self) > 0;
+}
+
 void gfx_dirty_clear(GfxDirty *self)
 {
     vec_clear(self);

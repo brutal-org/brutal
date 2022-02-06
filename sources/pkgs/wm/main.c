@@ -17,6 +17,7 @@ int ipc_component_main(IpcComponent *self)
     WmServer server;
     wm_server_init(&server, &display);
     wm_server_expose(&server, bus_server);
+
     wm_server_should_render_all(&server);
     wm_server_render(&server);
 

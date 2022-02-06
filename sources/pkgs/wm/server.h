@@ -8,10 +8,14 @@ typedef struct _WmServer
 {
     IpcCap wm_server;
     IpcCap input_sink;
+    Fiber *render_fiber;
 
+    bool layout_dirty;
     WmLayout layout;
-    GfxDirty dirty;
+
+    GfxDirty display_dirty;
     WmDisplay *display;
+
     MVec2 mouse;
     Vec(WmClient *) clients;
 } WmServer;
@@ -22,9 +26,9 @@ void wm_server_deinit(WmServer *self);
 
 void wm_server_dispatch(WmServer *self, UiEvent event);
 
-void wm_server_should_layout(WmServer* self);
+void wm_server_should_layout(WmServer *self);
 
-void wm_server_layout(WmServer* self);
+void wm_server_layout(WmServer *self);
 
 void wm_server_should_render(WmServer *self, MRect rect);
 
