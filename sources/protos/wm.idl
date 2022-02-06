@@ -6,7 +6,6 @@ type WmClientProps =
 {
     MRect bound,
     UiWinType type,
-    UiWinFlags flags,
 };
 
 type WmLayout = enum

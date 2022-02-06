@@ -9,7 +9,6 @@
 typedef struct
 {
     UiWinType type;
-    UiWinFlags flags;
 
     IpcCap wm_client;
     IpcCap event_sink;
@@ -23,7 +22,7 @@ typedef struct
     struct _WmServer *server;
 } WmClient;
 
-WmClient *wm_client_create(struct _WmServer *server, MRect bound, UiWinType type, UiWinFlags flags);
+WmClient *wm_client_create(struct _WmServer *server, MRect bound, UiWinType type);
 
 void wm_client_destroy(WmClient *self);
 

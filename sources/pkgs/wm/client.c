@@ -72,14 +72,13 @@ static WmClientVTable _wm_client_vtable = {
 
 /* --- Window Manager Client ------------------------------------------------ */
 
-WmClient *wm_client_create(struct _WmServer *server, MRect bound, UiWinType type, UiWinFlags flags)
+WmClient *wm_client_create(struct _WmServer *server, MRect bound, UiWinType type)
 {
     WmClient *self = alloc_make(alloc_global(), WmClient);
 
     self->server = server;
     self->bound = bound;
     self->type = type;
-    self->flags = flags;
 
     gfx_surface_init(&self->frontbuffer, bound.width, bound.height, GFX_FMT_RGBA8888, alloc_global());
     bal_fb_init(&self->backbuffer, bound.width, bound.height, GFX_FMT_RGBA8888);

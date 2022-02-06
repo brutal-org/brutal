@@ -7,18 +7,8 @@
 typedef struct _UiApp UiApp;
 typedef struct _UiWin UiWin;
 
-enum
+typedef enum
 {
-    UI_WIN_NIL = 0,
-
-    UI_WIN_RESIZABLE = 1 << 0,
-    UI_WIN_BORDERLESS = 1 << 1,
-    UI_WIN_FLOATING = 1 << 1,
-};
-
-typedef uint32_t UiWinFlags;
-
-typedef enum {
     UI_WIN_NORMAL,
     UI_WIN_MODAL,
 
@@ -31,7 +21,6 @@ typedef enum {
 struct _UiWin
 {
     EmbedWin embed;
-    UiWinFlags flags;
     UiWinType type;
     int refcount;
     Gfx gfx;
@@ -50,7 +39,7 @@ struct _UiWin
 
 /* --- Lifecycle ------------------------------------------------------------ */
 
-UiWin *ui_win_create(UiApp *app, MRect bound, UiWinType type, int flags);
+UiWin *ui_win_create(UiApp *app, MRect bound, UiWinType type);
 
 void ui_win_ref(UiWin *self);
 

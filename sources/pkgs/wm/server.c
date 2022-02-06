@@ -24,7 +24,7 @@ WmError wm_server_create_handler(void *self, WmClientProps const *req, IpcCap *r
 {
     WmServer *server = self;
 
-    WmClient *client = wm_client_create(server, req->bound, req->type, req->flags);
+    WmClient *client = wm_client_create(server, req->bound, req->type);
     vec_push(&server->clients, client);
     *resp = client->wm_client;
 
@@ -62,13 +62,14 @@ void wm_server_dispatch(WmServer *self, UiEvent event)
     if (event.type == UI_EVENT_MOUSE_MOVE)
     {
         MRect mouse_bound = {
-            .pos = self->mouse,
-            .size = m_vec2(32, 32),
+            .pos = m_vec2_sub(self->mouse, m_vec2(8, 8)),
+            .size = m_vec2(42, 42),
         };
 
         wm_server_should_render(self, mouse_bound);
 
         self->mouse = m_vec2_add(self->mouse, event.mouse.offset);
+        self->mouse = m_rect_clamp_vec2(wm_display_bound(self->display), self->mouse);
 
         mouse_bound = (MRect){
             .pos = self->mouse,
@@ -83,7 +84,7 @@ void wm_server_dispatch(WmServer *self, UiEvent event)
 static void wm_server_render_cursor(WmServer *self, Gfx *gfx)
 {
     gfx_push(gfx);
-    gfx_origin(gfx, self->mouse);
+    gfx_origin(gfx, m_vec2_sub(self->mouse, m_vec2(1, 1)));
     gfx_fill(gfx, gfx_paint_fill(GFX_BLACK));
     gfx_fill_svg(gfx, str$("M 0 0 L 16 12.279 L 9.049 13.449 L 13.374 22.266 L 9.778 24 L 5.428 15.121 L -0 19.823 Z"));
     gfx_pop(gfx);
@@ -95,13 +96,13 @@ static void wm_server_render_clients(WmServer *self, Gfx *gfx)
     {
         gfx_fill(gfx, gfx_paint_image(wm_client_backbuffer(client), gfx_buf_bound(wm_client_backbuffer(client))));
 
-        if (client->flags & UI_WIN_BORDERLESS)
+        if (client->type & UI_WIN_NORMAL)
         {
-            gfx_fill_rect(gfx, client->bound, 0);
+            gfx_fill_rect(gfx, client->bound, 8);
         }
         else
         {
-            gfx_fill_rect(gfx, client->bound, 8);
+            gfx_fill_rect(gfx, client->bound, 0);
         }
     }
 }
