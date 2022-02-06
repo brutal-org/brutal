@@ -29,7 +29,7 @@ void syscall_initialize(void)
 
     asm_write_msr(MSR_STAR, ((uint64_t)(GDT_KERNEL_CODE * 8) << STAR_KCODE_OFFSET) | ((uint64_t)(((GDT_USER_DATA - 1) * 8) | GDT_RING_3) << STAR_UCODE_OFFSET));
     asm_write_msr(MSR_LSTAR, (uint64_t)__syscall);
-    asm_write_msr(MSR_SYSCALL_FLAG_MASK, 0);
+    asm_write_msr(MSR_SYSCALL_FLAG_MASK, 0xfffffffe);
 }
 
 void syscall_set_gs(uintptr_t addr)
