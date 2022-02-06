@@ -67,6 +67,11 @@ void sched_stop(Task *task, uintptr_t result)
 
 BrResult sched_block(Blocker blocker)
 {
+    if (blocker.function && blocker.function(blocker.context))
+    {
+        return BR_SUCCESS;
+    }
+
     lock_acquire(&_lock);
 
     task_self()->blocker = blocker;
