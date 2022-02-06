@@ -10,7 +10,6 @@ static Lock _lock = {};
 static Bits _bitmap = {};
 static size_t _bestbet_upper = 0;
 static size_t _bestbet_lower = (size_t)-1;
-static size_t _used_memory = 0;
 static size_t _available_memory = 0;
 static PmmRange _usable_range = {};
 
@@ -95,8 +94,6 @@ PmmResult pmm_alloc(size_t size, bool upper)
 
     assert_truth(mem_is_size_page_aligned(size));
 
-    _used_memory += size;
-
     size_t page_size = size / MEM_PAGE_SIZE;
     BitsRange page_range = bits_find_free(&_bitmap, upper ? _bestbet_upper : _bestbet_lower, page_size, upper);
 
@@ -154,8 +151,6 @@ PmmResult pmm_unused(PmmRange range)
     LOCK_RETAINER(&_lock);
 
     assert_truth(mem_is_range_page_aligned(range));
-
-    _used_memory -= range.size;
 
     if (range.base == 0)
     {
