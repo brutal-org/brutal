@@ -19,6 +19,11 @@ void channel_destroy(Channel *self)
 
 static BrResult channel_send_unlock(Channel *self, Domain *domain, BrMsg const *msg)
 {
+    if (ring_full(&self->msgs))
+    {
+        return BR_CHANNEL_FULL;
+    }
+
     Parcel parcel = {};
     BrResult res = parcel_pack(&parcel, msg, domain);
 
@@ -27,78 +32,75 @@ static BrResult channel_send_unlock(Channel *self, Domain *domain, BrMsg const *
         return res;
     }
 
-    if (!ring_push(&self->msgs, &parcel))
-    {
-        return BR_CHANNEL_FULL;
-    }
+    ring_push(&self->msgs, &parcel);
 
     return BR_SUCCESS;
 }
 
 static BrResult channel_recv_unlock(Channel *self, Domain *domain, BrMsg *msg)
 {
-    Parcel parcel = {};
-
-    if (!ring_pop(&self->msgs, &parcel))
+    if (!ring_any(&self->msgs))
     {
         return BR_CHANNEL_EMPTY;
     }
 
-    parcel_unpack(&parcel, msg, domain);
+    Parcel parcel = {};
+    ring_pop(&self->msgs, &parcel);
 
-    return BR_SUCCESS;
+    return parcel_unpack(&parcel, msg, domain);
 }
 
-static bool channel_wait_send(Channel *self)
+typedef struct
 {
-    if (!lock_try_acquire(&self->lock))
+    Channel *channel;
+    Domain *domain;
+    BrMsg *msg;
+    BrResult result;
+} ChannelOp;
+
+static bool channel_wait_send(void *ctx)
+{
+    ChannelOp *op = ctx;
+    Channel *channel = op->channel;
+
+    if (!lock_try_acquire(&channel->lock))
     {
         return false;
     }
 
-    if (ring_full(&self->msgs))
-    {
-        lock_release(&self->lock);
-        return false;
-    }
+    op->result = channel_send_unlock(channel, op->domain, op->msg);
+    lock_release(&channel->lock);
 
-    return true;
+    return op->result != BR_CHANNEL_FULL;
 }
 
-static bool channel_wait_recv(Channel *self)
+static bool channel_wait_recv(void *ctx)
 {
-    if (!lock_try_acquire(&self->lock))
+    ChannelOp *op = ctx;
+    Channel *channel = op->channel;
+
+    if (!lock_try_acquire(&channel->lock))
     {
         return false;
     }
 
-    if (!ring_any(&self->msgs))
-    {
-        lock_release(&self->lock);
-        return false;
-    }
+    op->result = channel_recv_unlock(channel, op->domain, op->msg);
+    lock_release(&channel->lock);
 
-    return true;
+    return op->result != BR_CHANNEL_EMPTY;
 }
 
 BrResult channel_send_blocking(Channel *self, Domain *domain, BrMsg const *msg, BrDeadline deadline)
 {
-    BrResult result = BR_SUCCESS;
+    ChannelOp op = {
+        .channel = self,
+        .domain = domain,
+        .msg = (BrMsg *)msg,
+    };
 
-    if (lock_try_acquire(&self->lock))
-    {
-        result = channel_send_unlock(self, domain, msg);
-        lock_release(&self->lock);
-    }
-
-    if (result != BR_CHANNEL_FULL)
-    {
-        return result;
-    }
-
-    result = sched_block((Blocker){
-        .function = (BlockerFn *)channel_wait_send,
-        .context = self,
+    BrResult result = sched_block((Blocker){
+        .function = channel_wait_send,
+        .context = &op,
         .deadline = deadline,
     });
 
@@ -107,31 +109,22 @@ BrResult channel_send_blocking(Channel *self, Domain *domain, BrMsg const *msg, 
         return result;
     }
 
-    result = channel_send_unlock(self, domain, msg);
-
-    lock_release(&self->lock);
-
-    return result;
+    return op.result;
 }
 
 BrResult channel_recv_blocking(Channel *self, Domain *domain, BrMsg *msg, BrDeadline deadline)
 {
     BrResult result = BR_SUCCESS;
 
-    if (lock_try_acquire(&self->lock))
-    {
-        result = channel_recv_unlock(self, domain, msg);
-        lock_release(&self->lock);
-    }
-
-    if (result != BR_CHANNEL_EMPTY)
-    {
-        return result;
-    }
+    ChannelOp op = {
+        .channel = self,
+        .domain = domain,
+        .msg = (BrMsg *)msg,
+    };
 
     result = sched_block((Blocker){
-        .function = (BlockerFn *)channel_wait_recv,
-        .context = self,
+        .function = channel_wait_recv,
+        .context = &op,
         .deadline = deadline,
     });
 
@@ -140,11 +133,7 @@ BrResult channel_recv_blocking(Channel *self, Domain *domain, BrMsg *msg, BrDead
         return result;
     }
 
-    result = channel_recv_unlock(self, domain, msg);
-
-    lock_release(&self->lock);
-
-    return result;
+    return op.result;
 }
 
 BrResult channel_send_non_blocking(Channel *self, Domain *domain, BrMsg const *msg)
