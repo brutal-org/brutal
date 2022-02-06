@@ -35,17 +35,43 @@ WmServerVTable _wm_server_vtable = {
     wm_server_create_handler,
 };
 
+/* --- Render loop ---------------------------------------------------------- */
+
+static void *wm_render_fiber(void *ctx)
+{
+    WmServer *self = ctx;
+
+    while (true)
+    {
+
+        if (self->layout_dirty)
+        {
+            wm_server_layout(self);
+        }
+
+        if (gfx_dirty_any(&self->display_dirty))
+        {
+            wm_server_render(self);
+        }
+
+        fiber_sleep(16);
+    }
+
+    return nullptr;
+}
+
 /* --- Window Manager Server ------------------------------------------------ */
 
 void wm_server_init(WmServer *self, WmDisplay *display)
 {
     self->display = display;
     self->mouse = m_vec2(0, 0);
-    gfx_dirty_init(&self->dirty, alloc_global());
+    gfx_dirty_init(&self->display_dirty, alloc_global());
     vec_init(&self->clients, alloc_global());
 
     self->wm_server = wm_server_provide(ipc_component_self(), &_wm_server_vtable, self);
     self->input_sink = event_sink_provide(ipc_component_self(), &_input_sink_vtable, self);
+    self->render_fiber = fiber_start(wm_render_fiber, self);
 }
 
 void wm_server_deinit(WmServer *self)
@@ -54,7 +80,7 @@ void wm_server_deinit(WmServer *self)
     ipc_component_revoke(ipc_component_self(), self->input_sink);
 
     vec_deinit(&self->clients);
-    gfx_dirty_deinit(&self->dirty);
+    gfx_dirty_deinit(&self->display_dirty);
 }
 
 void wm_server_dispatch(WmServer *self, UiEvent event)
@@ -77,7 +103,6 @@ void wm_server_dispatch(WmServer *self, UiEvent event)
         };
 
         wm_server_should_render(self, mouse_bound);
-        wm_server_render(self);
     }
 }
 
@@ -94,7 +119,8 @@ static void wm_server_render_clients(WmServer *self, Gfx *gfx)
 {
     vec_foreach_v(client, &self->clients)
     {
-        gfx_fill(gfx, gfx_paint_image(wm_client_backbuffer(client), gfx_buf_bound(wm_client_backbuffer(client))));
+        GfxBuf backbuffer = wm_client_backbuffer(client);
+        gfx_fill(gfx, gfx_paint_image(backbuffer, gfx_buf_bound(backbuffer)));
 
         if (client->type & UI_WIN_NORMAL)
         {
@@ -107,9 +133,19 @@ static void wm_server_render_clients(WmServer *self, Gfx *gfx)
     }
 }
 
+void wm_server_should_layout(WmServer *self)
+{
+    self->layout_dirty = true;
+}
+
+void wm_server_layout(WmServer *self)
+{
+    self->layout_dirty = false;
+}
+
 void wm_server_should_render(WmServer *self, MRect rect)
 {
-    gfx_dirty_rect(&self->dirty, rect);
+    gfx_dirty_rect(&self->display_dirty, rect);
 }
 
 void wm_server_should_render_all(WmServer *self)
@@ -121,7 +157,7 @@ void wm_server_render(WmServer *self)
 {
     Gfx *gfx = wm_display_begin(self->display);
 
-    gfx_dirty_foreach(dirty, &self->dirty)
+    gfx_dirty_foreach(dirty, &self->display_dirty)
     {
         gfx_push(gfx);
         gfx_clip(gfx, dirty);
@@ -141,7 +177,7 @@ void wm_server_render(WmServer *self)
 
     wm_display_end(self->display);
 
-    gfx_dirty_clear(&self->dirty);
+    gfx_dirty_clear(&self->display_dirty);
 }
 
 void wm_server_expose(WmServer *self, IpcCap bus_server)
