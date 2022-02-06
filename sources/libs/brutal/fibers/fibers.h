@@ -73,6 +73,8 @@ Fiber *fiber_start(FiberFn fn, void *args);
 
 FiberBlockResult fiber_block(FiberBlocker blocker);
 
+void fiber_sleep(Timeout timeout);
+
 void fiber_ret(void *ret);
 
 void *fiber_await(Fiber *fiber);
