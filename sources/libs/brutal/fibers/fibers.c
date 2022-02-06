@@ -3,6 +3,7 @@
 #include <brutal/debug.h>
 #include <brutal/fibers.h>
 #include <brutal/task.h>
+#include <brutal/time.h>
 
 static Fiber *current = nullptr;
 
@@ -79,6 +80,13 @@ FiberBlockResult fiber_block(FiberBlocker blocker)
     return current->blocker.result;
 }
 
+void fiber_sleep(Timeout timeout)
+{
+    fiber_block((FiberBlocker){
+        .deadline = timeout + tick_now(),
+    });
+}
+
 void fiber_ret(void *ret)
 {
     current->ret = ret;
@@ -115,7 +123,7 @@ void *fiber_await(Fiber *fiber)
     fiber_block((FiberBlocker){
         .function = (FiberBlockerFn *)wait_fiber,
         .context = &ctx,
-        .deadline = -1,
+        .deadline = TIME_TIMEOUT_INFINITY,
     });
 
     return ctx.ret;
@@ -128,11 +136,20 @@ static bool fiber_try_unblock(Fiber *self)
         return true;
     }
 
-    FiberBlocker blocker = self->blocker;
+    FiberBlocker *blocker = &self->blocker;
 
-    if (blocker.function &&
-        blocker.function(blocker.context))
+    if (blocker->function &&
+        blocker->function(blocker->context))
     {
+        self->state = FIBER_RUNNING;
+        blocker->result = FIBER_SUCCESS;
+        return true;
+    }
+
+    if (blocker->deadline != TIME_TIMEOUT_INFINITY &&
+        blocker->deadline < tick_now())
+    {
+        blocker->result = FIBER_TIMEOUT;
         self->state = FIBER_RUNNING;
         return true;
     }
@@ -171,6 +188,7 @@ Fiber *fiber_wait_unblocked(void)
         {
             return next;
         }
+
         next = next->next;
     }
 }
