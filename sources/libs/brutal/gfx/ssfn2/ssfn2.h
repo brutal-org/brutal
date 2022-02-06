@@ -1,6 +1,8 @@
 #pragma once
 #include <brutal/base.h>
+#include <brutal/ds/vec.h>
 #include <brutal/gfx/font.h>
+#include <brutal/gfx/gfx.h>
 #include <brutal/io/traits.h>
 
 typedef struct PACKED
@@ -30,19 +32,22 @@ typedef struct
     char license[SSFN2_MAX_STR_LEN];
 } SSFN2StringTable;
 
+typedef Vec(GfxPathCmd) GfxPath;
+
 typedef struct PACKED
 {
     uint8_t width;
     uint8_t height;
     uint8_t adv_x;
     uint8_t adv_y;
+    GfxPath path;
 } SSFN2Glyph;
 
 typedef struct SSFN2Font
 {
     SSFN2FontHeader header;
     SSFN2StringTable stringtable;
-    SSFN2Glyph glyphs[0x110000];/* glyphs array */
+    SSFN2Glyph glyphs[0x110000]; /* glyphs array */
 } SSFN2Font;
 
 MaybeError font_ssfn2_init(IoRSeek reader, SSFN2Font *font);

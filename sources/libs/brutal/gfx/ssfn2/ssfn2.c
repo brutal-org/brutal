@@ -1,4 +1,7 @@
+#include <brutal/alloc/global.h>
 #include <brutal/codec/gzip/gzip.h>
+#include <brutal/debug/log.h>
+#include <brutal/gfx/gfx.h>
 #include <brutal/gfx/ssfn2/ssfn2.h>
 #include <string.h>
 
@@ -6,6 +9,11 @@
 #define SSFN2_MAGIC "SFN2"
 #define SSFN2_COLLECTION "SFNC"
 #define SSFN2_ENDMAGIC "2NFS"
+
+#define SSFN2_CMD_MOVE_TO 0
+#define SSFN2_CMD_LINE_TO 1
+#define SSFN2_CMD_QUAD_CURVE 2
+#define SSFN2_CMD_BEZIER_CURVE 3
 
 typedef struct PACKED
 {
@@ -36,7 +44,6 @@ static MaybeError ssfn2_load_string(IoReader reader, char *dst)
     return SUCCESS;
 }
 
-
 static MaybeError ssfn2_load_stringtable(IoReader reader, SSFN2Font *font)
 {
     TRY(MaybeError, ssfn2_load_string(reader, font->stringtable.font_name));
@@ -48,6 +55,85 @@ static MaybeError ssfn2_load_stringtable(IoReader reader, SSFN2Font *font)
     return SUCCESS;
 }
 
+static MaybeError ssfn2_load_fragment(IoRSeek rseek, size_t offset, GfxPath *path)
+{
+    io_seek(rseek.seeker, io_seek_from_start(offset));
+
+    uint8_t val;
+    TRY(MaybeError, io_read_byte(rseek.reader, &val));
+
+    if (!(val & 0x80))
+    {
+        size_t cmd_count = val & 0b00111111;
+        // contour with more commands (1 extra byte)
+        if (val & 0b01000000)
+        {
+            cmd_count <<= 8;
+            TRY(MaybeError, io_read_byte(rseek.reader, &val));
+            cmd_count += val;
+        }
+
+        // Read all command bytes
+        size_t cmd_bytes = (cmd_count + 3) / 4;
+        uint8_t cmd_data[0b11111111];
+        TRY(MaybeError, io_read(rseek.reader, cmd_data, cmd_bytes));
+
+        uint8_t x, y, cp1x, cp1y, cp2x, cp2y;
+        for (size_t i = 0; i < cmd_count; i++)
+        {
+            // 4 commands per byte
+            for (size_t j = 0; j < 4; j++)
+            {
+                GfxPathCmd cmd = {};
+
+                // All commands require X & Y
+                TRY(MaybeError, io_read_byte(rseek.reader, &x));
+                TRY(MaybeError, io_read_byte(rseek.reader, &y));
+
+                uint8_t ssfn2_cmd = (cmd_data[i] >> (j * 2)) & 0b00000011;
+                switch (ssfn2_cmd)
+                {
+                case SSFN2_CMD_MOVE_TO:
+                    cmd.type = GFX_CMD_MOVE_TO;
+                    cmd.point = (MVec2){.x = x, .y = y};
+                    break;
+                case SSFN2_CMD_LINE_TO:
+                    cmd.type = GFX_CMD_LINE_TO;
+                    cmd.point = (MVec2){.x = x, .y = y};
+                    break;
+                case SSFN2_CMD_QUAD_CURVE:
+                    cmd.type = GFX_CMD_QUADRATIC_TO;
+                    cmd.point = (MVec2){.x = x, .y = y};
+                    TRY(MaybeError, io_read_byte(rseek.reader, &cp1x));
+                    TRY(MaybeError, io_read_byte(rseek.reader, &cp1y));
+                    cmd.cp = (MVec2){.x = cp1x, .y = cp1y};
+                    break;
+                case SSFN2_CMD_BEZIER_CURVE:
+                    cmd.type = GFX_CMD_CUBIC_TO;
+                    cmd.point = (MVec2){.x = x, .y = y};
+                    TRY(MaybeError, io_read_byte(rseek.reader, &cp1x));
+                    TRY(MaybeError, io_read_byte(rseek.reader, &cp1y));
+                    cmd.cp1 = (MVec2){.x = cp1x, .y = cp1y};
+                    TRY(MaybeError, io_read_byte(rseek.reader, &cp2x));
+                    TRY(MaybeError, io_read_byte(rseek.reader, &cp2y));
+                    cmd.cp2 = (MVec2){.x = cp2x, .y = cp2y};
+                    break;
+                default:
+                    break;
+                }
+
+                vec_push(path, cmd);
+            }
+        }
+    }
+    else
+    {
+        log$("Non contour fragment not supported!");
+    }
+
+    return SUCCESS;
+}
+
 static MaybeError ssfn2_load_mappings(IoRSeek rseek, SSFN2Font *font, SSFN2CommonHeader *common_header)
 {
     size_t char_offs = load_le(font->header.characters_offs);
@@ -56,7 +142,8 @@ static MaybeError ssfn2_load_mappings(IoRSeek rseek, SSFN2Font *font, SSFN2Commo
     size_t size = load_le(common_header->size);
 
     io_seek(rseek.seeker, io_seek_from_start(char_offs));
-    size_t end = lig_offs ? lig_offs : kern_offs ? kern_offs : size - 4;
+    size_t end = lig_offs ? lig_offs : kern_offs ? kern_offs
+                                                 : size - 4;
 
     int unicode = 0;
     while (TRY(MaybeError, io_tell(rseek.seeker)) < end)
@@ -91,12 +178,16 @@ static MaybeError ssfn2_load_mappings(IoRSeek rseek, SSFN2Font *font, SSFN2Commo
             // Large fragments
             uint8_t frag_size = attributes & 0x40 ? 6 : 5;
             uint8_t num_frags = glyph_data[0];
+
+            // Initialize glyph
             font->glyphs[unicode] = (SSFN2Glyph){
                 .width = glyph_data[1],
                 .height = glyph_data[2],
                 .adv_x = glyph_data[3],
                 .adv_y = glyph_data[4],
             };
+            vec_init(&font->glyphs[unicode].path, alloc_global());
+
             uint8_t frag_bytes = num_frags * frag_size;
             uint8_t frag_data[0b11111111];
             TRY(MaybeError, io_read(rseek.reader, frag_data, frag_bytes));
@@ -123,7 +214,7 @@ static MaybeError ssfn2_load_mappings(IoRSeek rseek, SSFN2Font *font, SSFN2Commo
                         frag_off |= frag_data[data_off + idx];
                     }
 
-                    //TODO: parse fragment from fragment table
+                    ssfn2_load_fragment(rseek, frag_off, &font->glyphs[unicode].path);
                 }
             }
         }
