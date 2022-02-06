@@ -488,6 +488,8 @@ div.groupText {
     font-style: italic;
 }
 div.contents {
+    margin-left: 1ch; 
+    margin-right: 1ch;
 }
 td.indexkey {
     background-color: #F6F7F9;
@@ -525,8 +527,8 @@ div.center img {
     border: 0px;
 }
 address.footer {
-    text-align: right;
-    padding-right: 12px;
+    text-align: none;
+    padding-right: 0px;
 }
 img.footer {
     border: 0px;
@@ -621,15 +623,16 @@ td.tiny {
     border: 1px solid #D4D9E2;
 }
 th.dirtab {
-    background: #F6F7F9;
+    background: var(--color-base-01);
     font-weight: bold;
 }
 hr {
     height: 0px;
     border: none;
-    border-top: 1px solid #A1ABC0;
+    border-top: 1px solid var(--color-base-02);
 }
 hr.footer {
+    width: auto;
     height: 1px;
 }
 
