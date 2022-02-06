@@ -43,6 +43,7 @@ int ipc_hook_call(
 
     if (resp_msg.type == BR_MSG_ERROR)
     {
+        ipc_pack_deinit(&pack);
         return resp_msg.args[0];
     }
 

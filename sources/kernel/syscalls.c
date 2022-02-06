@@ -58,13 +58,14 @@ BrResult sys_map(BrMapArgs *args)
     {
         space_deref(space);
         memory_deref(memory);
-
         return map_result.err;
     }
 
     args->vaddr = UNWRAP(map_result).base;
     args->size = UNWRAP(map_result).size;
 
+    space_deref(space);
+    memory_deref(memory);
     return BR_SUCCESS;
 }
 
@@ -95,6 +96,7 @@ BrResult sys_unmap(BrUnmapArgs *args)
         return unmap_result.err;
     }
 
+    space_deref(space);
     return BR_SUCCESS;
 }
 
