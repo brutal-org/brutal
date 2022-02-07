@@ -21,5 +21,7 @@ int main(int argc, char const *argv[])
     }
     GfxFont font = gfx_font_ssfn2(&ssfn_font);
     log$("Style: {}", font.style.width);
+
+    font_ssfn2_deinit(&ssfn_font);
     return 0;
 }

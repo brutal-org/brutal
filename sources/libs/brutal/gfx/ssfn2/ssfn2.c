@@ -55,9 +55,19 @@ static MaybeError ssfn2_load_stringtable(IoReader reader, SSFN2Font *font)
     return SUCCESS;
 }
 
-static MaybeError ssfn2_load_fragment(IoRSeek rseek, size_t offset, GfxPath *path)
+static MaybeError ssfn2_load_fragment(IoRSeek rseek, SSFN2Font *font, size_t offset, GfxPath *path)
 {
-    io_seek(rseek.seeker, io_seek_from_start(offset));
+    uint32_t fragments_offs = load_le(font->header.fragments_offs);
+    uint32_t characters_offs = load_le(font->header.characters_offs);
+
+    if (offset < fragments_offs || offset >= characters_offs)
+    {
+        log$("SSFN2: incorrect fragment offset {}\n", offset);
+        return ERROR(ERR_BAD_ADDRESS);
+    }
+
+    size_t prev_offset = TRY(MaybeError, io_tell(rseek.seeker));
+    TRY(MaybeError, io_seek(rseek.seeker, io_seek_from_start(offset)));
 
     uint8_t val;
     TRY(MaybeError, io_read_byte(rseek.reader, &val));
@@ -75,7 +85,7 @@ static MaybeError ssfn2_load_fragment(IoRSeek rseek, size_t offset, GfxPath *pat
 
         // Read all command bytes
         size_t cmd_bytes = (cmd_count + 3) / 4;
-        uint8_t cmd_data[0b11111111];
+        uint8_t cmd_data[0b111111111111];
         TRY(MaybeError, io_read(rseek.reader, cmd_data, cmd_bytes));
 
         uint8_t x, y, cp1x, cp1y, cp2x, cp2y;
@@ -129,8 +139,11 @@ static MaybeError ssfn2_load_fragment(IoRSeek rseek, size_t offset, GfxPath *pat
     else
     {
         log$("Non contour fragment not supported!");
+        TRY(MaybeError, io_seek(rseek.seeker, io_seek_from_start(prev_offset)));
+        return ERROR(ERR_NOT_IMPLEMENTED);
     }
 
+    TRY(MaybeError, io_seek(rseek.seeker, io_seek_from_start(prev_offset)));
     return SUCCESS;
 }
 
@@ -208,13 +221,13 @@ static MaybeError ssfn2_load_mappings(IoRSeek rseek, SSFN2Font *font, SSFN2Commo
                 else
                 {
                     size_t frag_off = 0;
-                    for (size_t idx = 2; idx < frag_size; idx++)
+                    for (size_t idx = frag_size - 1; idx > 1; idx--)
                     {
                         frag_off = frag_off << 8;
                         frag_off |= frag_data[data_off + idx];
                     }
 
-                    ssfn2_load_fragment(rseek, frag_off, &font->glyphs[unicode].path);
+                    ssfn2_load_fragment(rseek, font, frag_off, &font->glyphs[unicode].path);
                 }
             }
         }
@@ -239,6 +252,8 @@ static MaybeError ssfn2_load_internal(IoRSeek rseek, SSFN2Font *font)
     {
         TRY(MaybeError, io_read(reader, (uint8_t *)&font->header, sizeof(SSFN2FontHeader)));
         TRY(MaybeError, ssfn2_load_stringtable(reader, font));
+        font->glyphs = alloc_make_array(alloc_global(), SSFN2Glyph, 0x110000);
+
         TRY(MaybeError, ssfn2_load_mappings(rseek, font, &common_header));
     }
     else
@@ -265,4 +280,9 @@ MaybeError font_ssfn2_init(IoRSeek rseek, SSFN2Font *font)
     UNUSED(reader);
 
     return ssfn2_load_internal(rseek, font);
+}
+
+void font_ssfn2_deinit(SSFN2Font *font)
+{
+    alloc_free(alloc_global(), font->glyphs);
 }
