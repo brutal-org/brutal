@@ -34,7 +34,7 @@ typedef struct
 
 typedef Vec(GfxPathCmd) GfxPath;
 
-typedef struct PACKED
+typedef struct
 {
     GfxPath path;
     uint8_t width;
