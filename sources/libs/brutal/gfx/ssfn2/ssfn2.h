@@ -36,18 +36,19 @@ typedef Vec(GfxPathCmd) GfxPath;
 
 typedef struct PACKED
 {
+    GfxPath path;
     uint8_t width;
     uint8_t height;
     uint8_t adv_x;
     uint8_t adv_y;
-    GfxPath path;
 } SSFN2Glyph;
 
 typedef struct SSFN2Font
 {
     SSFN2FontHeader header;
     SSFN2StringTable stringtable;
-    SSFN2Glyph glyphs[0x110000]; /* glyphs array */
+    SSFN2Glyph *glyphs; /* glyphs array */
 } SSFN2Font;
 
 MaybeError font_ssfn2_init(IoRSeek reader, SSFN2Font *font);
+void font_ssfn2_deinit(SSFN2Font *font);

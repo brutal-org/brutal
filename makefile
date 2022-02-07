@@ -11,8 +11,7 @@ CFLAGS_STD ?= \
 	-std=gnu2x
 
 CFLAGS_OPT ?= \
-	-g -O3
-
+	-g -O0
 
 CFLAGS_WARN ?= \
 	-Wall \
