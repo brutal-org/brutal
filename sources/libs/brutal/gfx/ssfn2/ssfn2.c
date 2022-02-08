@@ -107,10 +107,12 @@ static MaybeError ssfn2_load_fragment(IoRSeek rseek, SSFN2Font *font, size_t off
                     cmd.type = GFX_CMD_MOVE_TO;
                     cmd.point = (MVec2){.x = x, .y = y};
                     break;
+
                 case SSFN2_CMD_LINE_TO:
                     cmd.type = GFX_CMD_LINE_TO;
                     cmd.point = (MVec2){.x = x, .y = y};
                     break;
+
                 case SSFN2_CMD_QUAD_CURVE:
                     cmd.type = GFX_CMD_QUADRATIC_TO;
                     cmd.point = (MVec2){.x = x, .y = y};
@@ -118,6 +120,7 @@ static MaybeError ssfn2_load_fragment(IoRSeek rseek, SSFN2Font *font, size_t off
                     TRY(MaybeError, io_read_byte(rseek.reader, &cp1y));
                     cmd.cp = (MVec2){.x = cp1x, .y = cp1y};
                     break;
+
                 case SSFN2_CMD_BEZIER_CURVE:
                     cmd.type = GFX_CMD_CUBIC_TO;
                     cmd.point = (MVec2){.x = x, .y = y};
@@ -128,6 +131,7 @@ static MaybeError ssfn2_load_fragment(IoRSeek rseek, SSFN2Font *font, size_t off
                     TRY(MaybeError, io_read_byte(rseek.reader, &cp2y));
                     cmd.cp2 = (MVec2){.x = cp2x, .y = cp2y};
                     break;
+
                 default:
                     break;
                 }
@@ -155,8 +159,7 @@ static MaybeError ssfn2_load_mappings(IoRSeek rseek, SSFN2Font *font, SSFN2Commo
     size_t size = load_le(common_header->size);
 
     io_seek(rseek.seeker, io_seek_from_start(char_offs));
-    size_t end = lig_offs ? lig_offs : kern_offs ? kern_offs
-                                                 : size - 4;
+    size_t end = lig_offs ? lig_offs : kern_offs ? kern_offs : size - 4;
 
     int unicode = 0;
     while (TRY(MaybeError, io_tell(rseek.seeker)) < end)
@@ -199,21 +202,20 @@ static MaybeError ssfn2_load_mappings(IoRSeek rseek, SSFN2Font *font, SSFN2Commo
                 .adv_x = glyph_data[3],
                 .adv_y = glyph_data[4],
             };
-            vec_init(&font->glyphs[unicode].path, alloc_global());
 
-            uint8_t frag_bytes = num_frags * frag_size;
-            uint8_t frag_data[0b11111111];
-            TRY(MaybeError, io_read(rseek.reader, frag_data, frag_bytes));
+            vec_init(&font->glyphs[unicode].path, alloc_global());
 
             for (size_t frag = 0; frag < num_frags; frag++)
             {
-                size_t data_off = frag * frag_size;
-                uint8_t x = frag_data[data_off];
-                uint8_t y = frag_data[data_off + 1];
+                uint8_t frag_data[6];
+                TRY(MaybeError, io_read(rseek.reader, frag_data, frag_size));
+
+                uint8_t x = frag_data[0];
+                uint8_t y = frag_data[1];
                 // This is a color
                 if (x == 0xFF && y == 0xFF)
                 {
-                    uint8_t color_idx = frag_data[data_off + 2];
+                    uint8_t color_idx = frag_data[2];
                     // Invalid color index. See https://gitlab.com/bztsrc/scalable-font2/-/blob/master/docs/sfn_format.md#fragment-descriptors
                     if (color_idx > 0xFD)
                         return ERROR(ERR_NOT_FOUND);
@@ -224,12 +226,14 @@ static MaybeError ssfn2_load_mappings(IoRSeek rseek, SSFN2Font *font, SSFN2Commo
                     for (size_t idx = frag_size - 1; idx > 1; idx--)
                     {
                         frag_off = frag_off << 8;
-                        frag_off |= frag_data[data_off + idx];
+                        frag_off |= frag_data[idx];
                     }
 
                     ssfn2_load_fragment(rseek, font, frag_off, &font->glyphs[unicode].path);
                 }
             }
+
+            unicode++;
         }
     }
 
@@ -252,6 +256,7 @@ static MaybeError ssfn2_load_internal(IoRSeek rseek, SSFN2Font *font)
     {
         TRY(MaybeError, io_read(reader, (uint8_t *)&font->header, sizeof(SSFN2FontHeader)));
         TRY(MaybeError, ssfn2_load_stringtable(reader, font));
+
         font->glyphs = alloc_make_array(alloc_global(), SSFN2Glyph, 0x110000);
 
         TRY(MaybeError, ssfn2_load_mappings(rseek, font, &common_header));

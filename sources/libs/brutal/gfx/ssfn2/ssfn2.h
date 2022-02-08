@@ -22,7 +22,7 @@ typedef struct PACKED
 
 #define SSFN2_MAX_STR_LEN 255
 
-typedef struct
+typedef struct PACKED
 {
     char font_name[SSFN2_MAX_STR_LEN];
     char family_name[SSFN2_MAX_STR_LEN];
