@@ -14,14 +14,19 @@ int main(int argc, char const *argv[])
     IoFile source_file;
     UNWRAP_OR_PANIC(io_file_open(&source_file, str$(argv[1])), "File not found!");
 
+    HeapAlloc heap;
+    heap_alloc_init(&heap, NODE_DEFAULT);
+
     SSFN2Font ssfn_font;
-    if (!font_ssfn2_init(io_file_rseek(&source_file), &ssfn_font).succ)
+    if (!ssfn2_load(io_file_rseek(&source_file), &ssfn_font, base$(&heap)).succ)
     {
         return -1;
     }
+
     GfxFont font = gfx_font_ssfn2(&ssfn_font);
     log$("Style: {}", font.style.width);
 
-    font_ssfn2_deinit(&ssfn_font);
+    heap_alloc_deinit(&heap);
+
     return 0;
 }
