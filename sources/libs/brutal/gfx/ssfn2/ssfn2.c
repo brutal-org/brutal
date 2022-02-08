@@ -62,7 +62,7 @@ static MaybeError ssfn2_load_fragment(IoRSeek rseek, SSFN2Font *font, size_t off
 
     if (offset < fragments_offs || offset >= characters_offs)
     {
-        log$("SSFN2: incorrect fragment offset {}\n", offset);
+        log$("SSFN2: incorrect fragment offset {}", offset);
         return ERROR(ERR_BAD_ADDRESS);
     }
 
@@ -87,7 +87,7 @@ static MaybeError ssfn2_load_fragment(IoRSeek rseek, SSFN2Font *font, size_t off
         size_t cmd_bytes = (cmd_count + 3) / 4;
 
         if (cmd_bytes > 255){
-            log$("SSFN2: incorrect fragment command count {}\n", cmd_count);
+            log$("SSFN2: incorrect fragment command count {}", cmd_count);
             return ERROR(ERR_BAD_ADDRESS);
         }
 
@@ -95,55 +95,47 @@ static MaybeError ssfn2_load_fragment(IoRSeek rseek, SSFN2Font *font, size_t off
         TRY(MaybeError, io_read(rseek.reader, cmd_data, cmd_bytes));
 
         uint8_t x, y, cp1x, cp1y, cp2x, cp2y;
+
         for (size_t i = 0; i < cmd_count; i++)
         {
             // 4 commands per byte
             for (size_t j = 0; j < 4; j++)
             {
-                GfxPathCmd cmd = {};
-
-                // All commands require X & Y
                 TRY(MaybeError, io_read_byte(rseek.reader, &x));
                 TRY(MaybeError, io_read_byte(rseek.reader, &y));
 
-                uint8_t ssfn2_cmd = (cmd_data[i] >> (j * 2)) & 0b00000011;
+                uint8_t cmd = (cmd_data[i] >> (j * 2)) & 0b00000011;
 
-                switch (ssfn2_cmd)
+                switch (cmd)
                 {
                 case SSFN2_CMD_MOVE_TO:
-                    cmd.type = GFX_CMD_MOVE_TO;
-                    cmd.point = (MVec2){.x = x, .y = y};
+                    gfx_path_move_to(path, m_vec2(x, y));
                     break;
 
                 case SSFN2_CMD_LINE_TO:
-                    cmd.type = GFX_CMD_LINE_TO;
-                    cmd.point = (MVec2){.x = x, .y = y};
+                    gfx_path_line_to(path, m_vec2(x, y));
                     break;
 
                 case SSFN2_CMD_QUAD_CURVE:
-                    cmd.type = GFX_CMD_QUADRATIC_TO;
-                    cmd.point = (MVec2){.x = x, .y = y};
                     TRY(MaybeError, io_read_byte(rseek.reader, &cp1x));
                     TRY(MaybeError, io_read_byte(rseek.reader, &cp1y));
-                    cmd.cp = (MVec2){.x = cp1x, .y = cp1y};
+
+                    gfx_path_quadratic_to(path,  m_vec2(cp1x, cp1y), m_vec2(x, y));
                     break;
 
                 case SSFN2_CMD_BEZIER_CURVE:
-                    cmd.type = GFX_CMD_CUBIC_TO;
-                    cmd.point = (MVec2){.x = x, .y = y};
-                    TRY(MaybeError, io_read_byte(rseek.reader, &cp1x));
-                    TRY(MaybeError, io_read_byte(rseek.reader, &cp1y));
-                    cmd.cp1 = (MVec2){.x = cp1x, .y = cp1y};
                     TRY(MaybeError, io_read_byte(rseek.reader, &cp2x));
                     TRY(MaybeError, io_read_byte(rseek.reader, &cp2y));
-                    cmd.cp2 = (MVec2){.x = cp2x, .y = cp2y};
+                    TRY(MaybeError, io_read_byte(rseek.reader, &cp1x));
+                    TRY(MaybeError, io_read_byte(rseek.reader, &cp1y));
+
+                    gfx_path_cubic_to(path, m_vec2(cp1x, cp1y), m_vec2(cp2x, cp2y), m_vec2(x, y));
                     break;
 
                 default:
+                    log$("SSFN2: unknown command {}", cmd);
                     break;
                 }
-
-                vec_push(path, cmd);
             }
         }
     }
@@ -210,7 +202,7 @@ static MaybeError ssfn2_load_mappings(IoRSeek rseek, SSFN2Font *font, SSFN2Commo
                 .adv_y = glyph_data[4],
             };
 
-            vec_init(&font->glyphs[unicode].path, alloc_global());
+            gfx_path_init(&font->glyphs[unicode].path, alloc_global());
 
             for (size_t frag = 0; frag < num_frags; frag++)
             {
