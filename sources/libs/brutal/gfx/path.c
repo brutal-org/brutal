@@ -3,6 +3,86 @@
 #include <brutal/math/trans2.h>
 #include <brutal/parse/nums.h>
 
+/* --- Path Object ---------------------------------------------------------- */
+
+void gfx_path_init(GfxPath *path, Alloc *alloc)
+{
+    vec_init(path, alloc);
+}
+
+void gfx_path_deinit(GfxPath *path)
+{
+    vec_deinit(path);
+}
+
+void gfx_path_move_to(GfxPath *path, MVec2 p)
+{
+    GfxPathCmd cmd = {
+        .type = GFX_CMD_MOVE_TO,
+        .point = p,
+    };
+
+    vec_push(path, cmd);
+}
+
+void gfx_path_close(GfxPath *path)
+{
+    GfxPathCmd cmd = {
+        .type = GFX_CMD_CLOSE_PATH,
+    };
+
+    vec_push(path, cmd);
+}
+
+void gfx_path_line_to(GfxPath *path, MVec2 p)
+{
+    GfxPathCmd cmd = {
+        .type = GFX_CMD_LINE_TO,
+        .point = p,
+    };
+
+    vec_push(path, cmd);
+}
+
+void gfx_path_cubic_to(GfxPath *path, MVec2 cp1, MVec2 cp2, MVec2 p)
+{
+    GfxPathCmd cmd = {
+        .type = GFX_CMD_CUBIC_TO,
+        .cp1 = cp1,
+        .cp2 = cp2,
+        .point = p,
+    };
+
+    vec_push(path, cmd);
+}
+
+void gfx_path_quadratic_to(GfxPath *path, MVec2 cp, MVec2 p)
+{
+    GfxPathCmd cmd = {
+        .type = GFX_CMD_QUADRATIC_TO,
+        .cp = cp,
+        .point = p,
+    };
+
+    vec_push(path, cmd);
+}
+
+void gfx_path_arc_to(GfxPath *path, float rx, float ry, float angle, int flags, MVec2 p)
+{
+    GfxPathCmd cmd = {
+        .type = GFX_CMD_ARC_TO,
+        .rx = rx,
+        .ry = ry,
+        .angle = angle,
+        .flags = flags,
+        .point = p,
+    };
+
+    vec_push(path, cmd);
+}
+
+/* --- Parser --------------------------------------------------------------- */
+
 static void parse_whitespace(Scan *scan)
 {
     scan_eat_any(scan, str$(GFX_PATH_WS));
@@ -208,6 +288,8 @@ void gfx_path_parse(GfxPathParser *self, Scan *scan)
         } while (!scan_ended(scan) && !scan_curr_is_any(scan, str$(GFX_PATH_CMDS)));
     }
 }
+
+/* --- Flattener ------------------------------------------------------------ */
 
 static void flatten_line(GfxPathFlattener *self, MVec2 point)
 {

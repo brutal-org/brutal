@@ -7,23 +7,23 @@ void ui_button_paint(UiView *self, Gfx *gfx)
 {
     if (self->flags & UI_VIEW_ENABLED)
     {
-        gfx_fill(gfx, gfx_paint_fill(GFX_UI_ACCENT));
+        gfx_fill_style(gfx, gfx_paint_fill(GFX_UI_ACCENT));
     }
     else
     {
-        gfx_fill(gfx, gfx_paint_fill(GFX_UI_BASE04));
+        gfx_fill_style(gfx, gfx_paint_fill(GFX_UI_BASE04));
     }
 
     gfx_fill_rect(gfx, ui_view_container(self), 4);
 
     if (ui_button$(self)->press)
     {
-        gfx_fill(gfx, gfx_paint_fill(gfx_color_with_alpha(GFX_UI_BASE09, 75)));
+        gfx_fill_style(gfx, gfx_paint_fill(gfx_color_with_alpha(GFX_UI_BASE09, 75)));
         gfx_fill_rect(gfx, ui_view_container(self), 4);
     }
     else if (ui_button$(self)->over)
     {
-        gfx_fill(gfx, gfx_paint_fill(gfx_color_with_alpha(GFX_UI_BASE09, 50)));
+        gfx_fill_style(gfx, gfx_paint_fill(gfx_color_with_alpha(GFX_UI_BASE09, 50)));
         gfx_fill_rect(gfx, ui_view_container(self), 4);
     }
 }

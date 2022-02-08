@@ -11,10 +11,10 @@ TEST(gfx_draw_rectangle)
     gfx_init(&canvas, test_alloc(), 512, 512, GFX_FMT_RGBA8888);
     gfx_begin(&canvas);
 
-    gfx_fill(&canvas, gfx_paint_fill(GFX_BLACK));
+    gfx_fill_style(&canvas, gfx_paint_fill(GFX_BLACK));
     gfx_clear(&canvas);
 
-    gfx_fill(&canvas, gfx_paint_fill(GFX_RED));
+    gfx_fill_style(&canvas, gfx_paint_fill(GFX_RED));
     gfx_fill_rect(&canvas, m_rect(64, 64, 384, 384), 0);
 
     gfx_end(&canvas);

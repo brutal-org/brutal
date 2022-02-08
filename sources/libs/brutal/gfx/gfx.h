@@ -72,13 +72,13 @@ void gfx_clip(Gfx *self, MRect rect);
 
 void gfx_origin(Gfx *self, MVec2 pos);
 
-void gfx_fill(Gfx *self, GfxPaint paint);
+void gfx_fill_style(Gfx *self, GfxPaint paint);
 
-void gfx_reset_fill(Gfx *self);
+void gfx_fill_reset(Gfx *self);
 
-void gfx_stroke(Gfx *self, GfxStroke stroke);
+void gfx_stroke_style(Gfx *self, GfxStroke stroke);
 
-void gfx_reset_stroke(Gfx *self);
+void gfx_stroke_reset(Gfx *self);
 
 void gfx_color(Gfx *self, GfxColor color);
 
@@ -88,11 +88,13 @@ void gfx_begin_path(Gfx *self);
 
 void gfx_close_path(Gfx *self);
 
-void gfx_fill_path(Gfx *self, GfxFillRule rule);
+void gfx_fill(Gfx *self, GfxFillRule rule);
 
-void gfx_stroke_path(Gfx *self);
+void gfx_stroke(Gfx *self);
 
 void gfx_eval_cmd(Gfx *self, GfxPathCmd cmd);
+
+void gfx_eval_path(Gfx *self, GfxPath *path);
 
 void gfx_eval_svg(Gfx *self, Str path);
 
@@ -126,6 +128,10 @@ void gfx_fill_ellipse(Gfx *self, MRect rect);
 
 void gfx_stroke_ellipse(Gfx *self, MRect rect);
 
-void gfx_fill_svg(Gfx *self, Str path);
+void gfx_fill_path(Gfx *self, GfxPath *path, GfxFillRule rule);
+
+void gfx_stroke_path(Gfx *self, GfxPath *path);
+
+void gfx_fill_svg(Gfx *self, Str path, GfxFillRule rule);
 
 void gfx_stroke_svg(Gfx *self, Str path);

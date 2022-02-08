@@ -3,7 +3,7 @@
 
 void ui_panel_paint(UiView *self, Gfx *gfx)
 {
-    gfx_fill(gfx, gfx_paint_fill(ui_panel$(self)->color));
+    gfx_fill_style(gfx, gfx_paint_fill(ui_panel$(self)->color));
     gfx_fill_rect(gfx, ui_view_container(self), 0);
 }
 

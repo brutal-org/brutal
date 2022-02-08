@@ -46,15 +46,15 @@ typedef union
     float scale;
 
     /// Used to vary stroke thicknesses to give variation from lighter to blacker.
-#define GFX_FONT_WEIGHT_THIN 0.1f
-#define GFX_FONT_WEIGHT_EXTRA_LIGHT 0.2f
-#define GFX_FONT_WEIGHT_LIGHT 0.3f
-#define GFX_FONT_WEIGHT_NORMAL 0.4f
-#define GFX_FONT_WEIGHT_MEDIUM 0.5f
-#define GFX_FONT_WEIGHT_SEMI_BOLD 0.6f
-#define GFX_FONT_WEIGHT_BOLD 0.7f
-#define GFX_FONT_WEIGHT_EXTRA_BOLD 0.8f
-#define GFX_FONT_WEIGHT_BLACK 0.9f
+#define GFX_FONT_THIN 0.1f
+#define GFX_FONT_EXTRA_LIGHT 0.2f
+#define GFX_FONT_LIGHT 0.3f
+#define GFX_FONT_NORMAL 0.4f
+#define GFX_FONT_MEDIUM 0.5f
+#define GFX_FONT_SEMI_BOLD 0.6f
+#define GFX_FONT_BOLD 0.7f
+#define GFX_FONT_EXTRA_BOLD 0.8f
+#define GFX_FONT_BLACK 0.9f
     float weight;
 
     /// Used to vary width of text from narrower to wider.

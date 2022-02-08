@@ -105,24 +105,24 @@ void gfx_origin(Gfx *self, MVec2 pos)
     gfx_peek(self)->origin = m_vec2_add(pos, gfx_peek(self)->origin);
 }
 
-void gfx_stroke(Gfx *self, GfxStroke stroke)
+void gfx_stroke_style(Gfx *self, GfxStroke stroke)
 {
     gfx_peek(self)->stroke = stroke;
 }
 
-void gfx_reset_stroke(Gfx *self)
+void gfx_stroke_reset(Gfx *self)
 {
-    gfx_stroke(self, (GfxStroke){.width = 1});
+    gfx_stroke_style(self, (GfxStroke){.width = 1});
 }
 
-void gfx_fill(Gfx *self, GfxPaint paint)
+void gfx_fill_style(Gfx *self, GfxPaint paint)
 {
     gfx_peek(self)->fill = paint;
 }
 
-void gfx_reset_fill(Gfx *self)
+void gfx_fill_reset(Gfx *self)
 {
-    gfx_fill(self, gfx_paint_fill(GFX_BLACK));
+    gfx_fill_style(self, gfx_paint_fill(GFX_BLACK));
 }
 
 void gfx_color(Gfx *self, GfxColor color)
@@ -167,7 +167,7 @@ static int gfx_active_edge_cmp(void const *lhs, void const *rhs)
     return lhsf->x - rhsf->x;
 }
 
-void gfx_fill_path(Gfx *self, GfxFillRule rule)
+void gfx_fill(Gfx *self, GfxFillRule rule)
 {
     MRect pbound = m_edges_bound(vec_begin(&self->path), vec_len(&self->path));
     MRect rbound = m_rect_clip_rect(pbound, gfx_peek(self)->clip);
@@ -235,12 +235,12 @@ void gfx_fill_path(Gfx *self, GfxFillRule rule)
     }
 }
 
-void gfx_stroke_path(Gfx *self)
+void gfx_stroke(Gfx *self)
 {
     vec_clear(&self->stroke);
     gfx_stroke_apply(gfx_peek(self)->stroke, &self->path, &self->stroke);
     swap$(&self->path, &self->stroke);
-    gfx_fill_path(self, GFX_FILL_NONZERO);
+    gfx_fill(self, GFX_FILL_NONZERO);
     swap$(&self->path, &self->stroke);
 }
 
@@ -251,6 +251,14 @@ void gfx_eval_cmd(Gfx *self, GfxPathCmd cmd)
     cmd.point = m_vec2_add(cmd.point, gfx_peek(self)->origin);
 
     gfx_flattener_flatten(&self->flattener, cmd);
+}
+
+void gfx_eval_path(Gfx *self, GfxPath *path)
+{
+    vec_foreach_v(cmd, path)
+    {
+        gfx_eval_cmd(self, cmd);
+    }
 }
 
 static void eval_cmd(void *ctx, GfxPathCmd cmd)
@@ -388,7 +396,7 @@ void gfx_dot(Gfx *self, MVec2 dot, float size)
 
     gfx_close_path(self);
 
-    gfx_fill_path(self, GFX_FILL_EVENODD);
+    gfx_fill(self, GFX_FILL_EVENODD);
 }
 
 void gfx_line(Gfx *self, MEdge line, float weight)
@@ -415,7 +423,7 @@ void gfx_line(Gfx *self, MEdge line, float weight)
 
     gfx_close_path(self);
 
-    gfx_fill_path(self, GFX_FILL_EVENODD);
+    gfx_fill(self, GFX_FILL_EVENODD);
 }
 
 void gfx_text(Gfx *self, MVec2 origin, Str text, GfxFont font)
@@ -459,7 +467,7 @@ void gfx_fill_rect(Gfx *self, MRect rect, float radius)
     }
     else
     {
-        gfx_fill_path(self, GFX_FILL_EVENODD);
+        gfx_fill(self, GFX_FILL_EVENODD);
     }
 }
 
@@ -469,7 +477,7 @@ void gfx_stroke_rect(Gfx *self, MRect rect, float radius)
     gfx_rect(self, rect, radius);
     gfx_close_path(self);
 
-    gfx_stroke_path(self);
+    gfx_stroke(self);
 }
 
 void gfx_fill_ellipse(Gfx *self, MRect rect)
@@ -478,7 +486,7 @@ void gfx_fill_ellipse(Gfx *self, MRect rect)
     gfx_ellipse(self, rect);
     gfx_close_path(self);
 
-    gfx_fill_path(self, GFX_FILL_EVENODD);
+    gfx_fill(self, GFX_FILL_EVENODD);
 }
 
 void gfx_stroke_ellipse(Gfx *self, MRect rect)
@@ -487,19 +495,33 @@ void gfx_stroke_ellipse(Gfx *self, MRect rect)
     gfx_ellipse(self, rect);
     gfx_close_path(self);
 
-    gfx_stroke_path(self);
+    gfx_stroke(self);
 }
 
-void gfx_fill_svg(Gfx *self, Str path)
+void gfx_fill_path(Gfx *self, GfxPath *path, GfxFillRule rule)
+{
+    gfx_begin_path(self);
+    gfx_eval_path(self, path);
+    gfx_fill(self, rule);
+}
+
+void gfx_stroke_path(Gfx *self, GfxPath *path)
+{
+    gfx_begin_path(self);
+    gfx_eval_path(self, path);
+    gfx_stroke(self);
+}
+
+void gfx_fill_svg(Gfx *self, Str path, GfxFillRule rule)
 {
     gfx_begin_path(self);
     gfx_eval_svg(self, path);
-    gfx_fill_path(self, GFX_FILL_EVENODD);
+    gfx_fill(self, rule);
 }
 
 void gfx_stroke_svg(Gfx *self, Str path)
 {
     gfx_begin_path(self);
     gfx_eval_svg(self, path);
-    gfx_stroke_path(self);
+    gfx_stroke(self);
 }
