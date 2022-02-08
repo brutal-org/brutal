@@ -1,7 +1,7 @@
 #include <brutal/codec/gzip/gzip.h>
+#include <brutal/codec/ssfn2/ssfn2.h>
 #include <brutal/debug/log.h>
 #include <brutal/gfx/gfx.h>
-#include <brutal/gfx/ssfn2/ssfn2.h>
 
 #define SSFN2_MAGIC str$("SFN2")
 #define SSFN2_COLLECTION str$("SFNC")
