@@ -85,6 +85,12 @@ static MaybeError ssfn2_load_fragment(IoRSeek rseek, SSFN2Font *font, size_t off
 
         // Read all command bytes
         size_t cmd_bytes = (cmd_count + 3) / 4;
+
+        if (cmd_bytes > 255){
+            log$("SSFN2: incorrect fragment command count {}\n", cmd_count);
+            return ERROR(ERR_BAD_ADDRESS);
+        }
+
         uint8_t cmd_data[0b111111111111];
         TRY(MaybeError, io_read(rseek.reader, cmd_data, cmd_bytes));
 
@@ -101,6 +107,7 @@ static MaybeError ssfn2_load_fragment(IoRSeek rseek, SSFN2Font *font, size_t off
                 TRY(MaybeError, io_read_byte(rseek.reader, &y));
 
                 uint8_t ssfn2_cmd = (cmd_data[i] >> (j * 2)) & 0b00000011;
+
                 switch (ssfn2_cmd)
                 {
                 case SSFN2_CMD_MOVE_TO:
