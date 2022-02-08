@@ -1,6 +1,6 @@
+#include <brutal/codec/ssfn2/ssfn2.h>
 #include <brutal/gfx/font.h>
 #include <brutal/gfx/gfx.h>
-#include <brutal/gfx/ssfn2/ssfn2.h>
 #include <brutal/text/cp437.h>
 #include <brutal/text/utf8.h>
 
