@@ -8,13 +8,13 @@
 
 typedef struct PACKED
 {
-    le_uint8_t type;             /* font family and style */
-    le_uint8_t features;         /* format features and revision */
+    le_uint8_t type;     /* font family and style */
+    le_uint8_t features; /* format features and revision */
 
-    le_uint8_t width;            /* overall width of the font */
-    le_uint8_t height;           /* overall height of the font */
-    le_uint8_t baseline;         /* horizontal baseline in grid pixels */
-    le_uint8_t underline;        /* position of under line in grid pixels */
+    le_uint8_t width;     /* overall width of the font */
+    le_uint8_t height;    /* overall height of the font */
+    le_uint8_t baseline;  /* horizontal baseline in grid pixels */
+    le_uint8_t underline; /* position of under line in grid pixels */
 
     le_uint16_t fragments_offs;  /* offset of fragments table */
     le_uint32_t characters_offs; /* characters table offset */
@@ -51,5 +51,6 @@ typedef struct SSFN2Font
     SSFN2Glyph *glyphs; /* glyphs array */
 } SSFN2Font;
 
-MaybeError font_ssfn2_init(IoRSeek reader, SSFN2Font *font);
+MaybeError ssfn2_load(IoRSeek reader, SSFN2Font *font, Alloc *alloc);
+
 void font_ssfn2_deinit(SSFN2Font *font);
