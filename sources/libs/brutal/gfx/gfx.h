@@ -4,6 +4,7 @@
 #include <brutal/gfx/font.h>
 #include <brutal/gfx/paint.h>
 #include <brutal/gfx/path.h>
+#include <brutal/gfx/stroke.h>
 #include <brutal/hash.h>
 #include <brutal/math.h>
 
@@ -12,6 +13,7 @@ typedef struct
     MRect clip;
     MVec2 origin;
     GfxPaint fill;
+    GfxStroke stroke;
     GfxColor color;
 } GfxCtx;
 
@@ -72,7 +74,11 @@ void gfx_origin(Gfx *self, MVec2 pos);
 
 void gfx_fill(Gfx *self, GfxPaint paint);
 
-void gfx_no_fill(Gfx *self);
+void gfx_reset_fill(Gfx *self);
+
+void gfx_stroke(Gfx *self, GfxStroke stroke);
+
+void gfx_reset_stroke(Gfx *self);
 
 void gfx_color(Gfx *self, GfxColor color);
 
@@ -84,7 +90,7 @@ void gfx_close_path(Gfx *self);
 
 void gfx_fill_path(Gfx *self, GfxFillRule rule);
 
-void gfx_stroke_path(Gfx *self, float width);
+void gfx_stroke_path(Gfx *self);
 
 void gfx_eval_cmd(Gfx *self, GfxPathCmd cmd);
 
@@ -102,16 +108,24 @@ void gfx_arc_to(Gfx *self, float rx, float ry, float angle, int flags, MVec2 poi
 
 void gfx_rect(Gfx *self, MRect rect, float radius);
 
+void gfx_ellipse(Gfx *self, MRect rect);
+
 /* --- Drawing -------------------------------------------------------------- */
 
 void gfx_dot(Gfx *self, MVec2 dot, float size);
 
-void gfx_fill_line(Gfx *self, MEdge line, float weight);
+void gfx_line(Gfx *self, MEdge line, float weight);
+
+void gfx_text(Gfx *self, MVec2 origin, Str text, GfxFont font);
 
 void gfx_fill_rect(Gfx *self, MRect rect, float radius);
 
+void gfx_stroke_rect(Gfx *self, MRect rect, float radius);
+
 void gfx_fill_ellipse(Gfx *self, MRect rect);
 
-void gfx_fill_text(Gfx *self, MVec2 origin, Str text, GfxFont font);
+void gfx_stroke_ellipse(Gfx *self, MRect rect);
 
 void gfx_fill_svg(Gfx *self, Str path);
+
+void gfx_stroke_svg(Gfx *self, Str path);

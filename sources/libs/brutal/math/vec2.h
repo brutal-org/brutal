@@ -102,4 +102,4 @@ static inline float m_vec2_angle_with(MVec2 a, MVec2 b)
 }
 
 #define m_vec2_angle(a) \
-    deg2rad(atan2f((a).y, (a).x))
+    m_deg2rad(m_deg(atan2f((a).y, (a).x)))

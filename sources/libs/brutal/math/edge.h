@@ -92,3 +92,8 @@ static inline MEdge m_edge_swap(MEdge edge)
 {
     return m_edge(edge.ex, edge.ey, edge.sx, edge.sy);
 }
+
+static inline float m_edge_len(MEdge edge)
+{
+    return m_vec2_len(m_vec2_sub(edge.end, edge.start));
+}

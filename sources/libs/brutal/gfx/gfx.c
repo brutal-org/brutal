@@ -52,6 +52,9 @@ void gfx_begin(Gfx *self, GfxBuf buf)
         .clip = gfx_buf_bound(buf),
         .origin = {},
         .fill = gfx_paint_fill(GFX_WHITE),
+        .stroke = (GfxStroke){
+            .width = 1,
+        },
         .color = GFX_WHITE,
     };
 
@@ -102,12 +105,22 @@ void gfx_origin(Gfx *self, MVec2 pos)
     gfx_peek(self)->origin = m_vec2_add(pos, gfx_peek(self)->origin);
 }
 
+void gfx_stroke(Gfx *self, GfxStroke stroke)
+{
+    gfx_peek(self)->stroke = stroke;
+}
+
+void gfx_reset_stroke(Gfx *self)
+{
+    gfx_stroke(self, (GfxStroke){.width = 1});
+}
+
 void gfx_fill(Gfx *self, GfxPaint paint)
 {
     gfx_peek(self)->fill = paint;
 }
 
-void gfx_no_fill(Gfx *self)
+void gfx_reset_fill(Gfx *self)
 {
     gfx_fill(self, gfx_paint_fill(GFX_BLACK));
 }
@@ -222,32 +235,10 @@ void gfx_fill_path(Gfx *self, GfxFillRule rule)
     }
 }
 
-void gfx_stroke_path(Gfx *self, float width)
+void gfx_stroke_path(Gfx *self)
 {
     vec_clear(&self->stroke);
-
-    float outer_dist = width / 2;
-    float inner_dist = -width / 2;
-
-    for (int i = 0; i < vec_len(&self->path); i++)
-    {
-        MEdge a = vec_at(&self->path, i);
-
-        MEdge b = vec_at(&self->path, (i + 1) % vec_len(&self->path));
-
-        MEdge aa = m_edge_parallel(a, outer_dist);
-        MEdge ab = m_edge_parallel(a, inner_dist);
-
-        MEdge ba = m_edge_parallel(b, outer_dist);
-        MEdge bb = m_edge_parallel(b, inner_dist);
-
-        vec_push(&self->stroke, aa);
-        vec_push(&self->stroke, m_edge_swap(ab));
-
-        vec_push(&self->stroke, m_edge_vec2(aa.end, ba.start));
-        vec_push(&self->stroke, m_edge_swap(m_edge_vec2(ab.end, bb.start)));
-    }
-
+    gfx_stroke_apply(gfx_peek(self)->stroke, &self->path, &self->stroke);
     swap$(&self->path, &self->stroke);
     gfx_fill_path(self, GFX_FILL_NONZERO);
     swap$(&self->path, &self->stroke);
@@ -346,7 +337,7 @@ void gfx_rect(Gfx *self, MRect rect, float radius)
         gfx_line_to(self, m_vec2(rect.x + rect.width, rect.y));
         gfx_line_to(self, m_vec2(rect.x + rect.width, rect.y + rect.height));
         gfx_line_to(self, m_vec2(rect.x, rect.y + rect.height));
-        gfx_close_path(self);
+        gfx_line_to(self, m_vec2(rect.x + radius, rect.y));
     }
     else
     {
@@ -370,6 +361,20 @@ void gfx_rect(Gfx *self, MRect rect, float radius)
     }
 }
 
+void gfx_ellipse(Gfx *self, MRect rect)
+{
+    for (size_t i = 0; i < 64; i++)
+    {
+        float angle = (2 * M_PI * i) / 64;
+
+        gfx_line_to(
+            self,
+            m_vec2(
+                rect.x + rect.width * cosf(angle),
+                rect.y + rect.height * sinf(angle)));
+    }
+}
+
 /* --- Drawing -------------------------------------------------------------- */
 
 void gfx_dot(Gfx *self, MVec2 dot, float size)
@@ -386,7 +391,7 @@ void gfx_dot(Gfx *self, MVec2 dot, float size)
     gfx_fill_path(self, GFX_FILL_EVENODD);
 }
 
-void gfx_fill_line(Gfx *self, MEdge line, float weight)
+void gfx_line(Gfx *self, MEdge line, float weight)
 {
     float sx = line.sx;
     float sy = line.sy;
@@ -411,6 +416,12 @@ void gfx_fill_line(Gfx *self, MEdge line, float weight)
     gfx_close_path(self);
 
     gfx_fill_path(self, GFX_FILL_EVENODD);
+}
+
+void gfx_text(Gfx *self, MVec2 origin, Str text, GfxFont font)
+{
+    origin = m_vec2_add(origin, gfx_peek(self)->origin);
+    gfx_font_render_str(font, self, origin, text);
 }
 
 void gfx_fill_rect_aligned(Gfx *self, MRect rect)
@@ -438,42 +449,45 @@ void gfx_fill_rect_aligned(Gfx *self, MRect rect)
 
 void gfx_fill_rect(Gfx *self, MRect rect, float radius)
 {
+    gfx_begin_path(self);
+    gfx_rect(self, rect, radius);
+    gfx_close_path(self);
+
     if (radius == 0)
     {
         gfx_fill_rect_aligned(self, rect);
     }
     else
     {
-        gfx_begin_path(self);
-        gfx_rect(self, rect, radius);
         gfx_fill_path(self, GFX_FILL_EVENODD);
     }
 }
 
-void gfx_ellipsis(Gfx *self, MRect rect)
+void gfx_stroke_rect(Gfx *self, MRect rect, float radius)
 {
     gfx_begin_path(self);
+    gfx_rect(self, rect, radius);
+    gfx_close_path(self);
 
-    for (size_t i = 0; i < 64; i++)
-    {
-        float angle = (2 * M_PI * i) / 64;
+    gfx_stroke_path(self);
+}
 
-        gfx_line_to(
-            self,
-            m_vec2(
-                rect.x + rect.width * cosf(angle),
-                rect.y + rect.height * sinf(angle)));
-    }
-
+void gfx_fill_ellipse(Gfx *self, MRect rect)
+{
+    gfx_begin_path(self);
+    gfx_ellipse(self, rect);
     gfx_close_path(self);
 
     gfx_fill_path(self, GFX_FILL_EVENODD);
 }
 
-void gfx_fill_text(Gfx *self, MVec2 origin, Str text, GfxFont font)
+void gfx_stroke_ellipse(Gfx *self, MRect rect)
 {
-    origin = m_vec2_add(origin, gfx_peek(self)->origin);
-    gfx_font_render_str(font, self, origin, text);
+    gfx_begin_path(self);
+    gfx_ellipse(self, rect);
+    gfx_close_path(self);
+
+    gfx_stroke_path(self);
 }
 
 void gfx_fill_svg(Gfx *self, Str path)
@@ -481,4 +495,11 @@ void gfx_fill_svg(Gfx *self, Str path)
     gfx_begin_path(self);
     gfx_eval_svg(self, path);
     gfx_fill_path(self, GFX_FILL_EVENODD);
+}
+
+void gfx_stroke_svg(Gfx *self, Str path)
+{
+    gfx_begin_path(self);
+    gfx_eval_svg(self, path);
+    gfx_stroke_path(self);
 }

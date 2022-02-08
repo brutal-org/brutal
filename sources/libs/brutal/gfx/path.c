@@ -211,8 +211,12 @@ void gfx_path_parse(GfxPathParser *self, Scan *scan)
 
 static void flatten_line(GfxPathFlattener *self, MVec2 point)
 {
-    self->append(self->ctx, m_edge_vec2(self->last, point));
-    self->last = point;
+    MEdge edge = m_edge_vec2(self->last, point);
+    if (m_edge_len(edge) > 0.01)
+    {
+        self->append(self->ctx, edge);
+        self->last = point;
+    }
 }
 
 static void flatten_cubic_recusive(GfxPathFlattener *self, MVec2 a, MVec2 b, MVec2 c, MVec2 d, int depth)
