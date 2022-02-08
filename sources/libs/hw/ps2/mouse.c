@@ -95,21 +95,20 @@ bool ps2_mouse_interrupt_handle(Ps2Mouse *self, Ps2Controller *controller)
     return updated;
 }
 
-void ps2_mouse_send(Ps2Controller* controller, uint8_t data)
+void ps2_mouse_send(Ps2Controller *controller, uint8_t data)
 {
     ps2_second_port_write(controller, data);
     ps2_controller_read_data(controller);
 }
 
-void _ps2_mouse_init(Ps2Mouse* self, Ps2Controller* controller)
+void _ps2_mouse_init(Ps2Mouse *self, Ps2Controller *controller)
 {
-    ps2_mouse_send(controller, PS2_MOUSE_CMD_SET_DEFAULT );
+    ps2_mouse_send(controller, PS2_MOUSE_CMD_SET_DEFAULT);
     ps2_mouse_send(controller, PS2_MOUSE_CMD_ENABLE_REPORT);
 
     /* enable scrollwheel */
     ps2_mouse_send(controller, 0xF2);
     ps2_controller_read_data(controller);
-
 
     ps2_mouse_send(controller, PS2_MOUSE_CMD_SET_RATE);
     ps2_mouse_send(controller, 200);
@@ -119,7 +118,6 @@ void _ps2_mouse_init(Ps2Mouse* self, Ps2Controller* controller)
     ps2_mouse_send(controller, 80);
 
     ps2_mouse_send(controller, 0xF2);
-    ps2_controller_read_data(controller);
 
     uint8_t status = ps2_controller_read_data(controller);
 

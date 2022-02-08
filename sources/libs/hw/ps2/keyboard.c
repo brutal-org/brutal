@@ -2,7 +2,7 @@
 #include <hw/ps2/keyboard.h>
 #include "brutal/ui/event.h"
 
-void _ps2_keyboard_init(Ps2Keyboard* self, MAYBE_UNUSED Ps2Controller* controller)
+void _ps2_keyboard_init(Ps2Keyboard *self, MAYBE_UNUSED Ps2Controller *controller)
 {
     self->kb_escaped = false;
 }
@@ -14,9 +14,10 @@ void ps2_keyboard_handle_code(Ps2Keyboard *ps2, uint8_t packet)
         ps2->kb_escaped = false;
         KbKey key = (KbKey)((packet & 0x7f) + 0x80);
         ps2->callback((UiKeyboardEvent){
-            .key = key,
-            .modifiers = packet & 0x80 ? KBMOTION_UP : KBMOTION_DOWN,
-        }, ps2->ctx);
+                          .key = key,
+                          .modifiers = packet & 0x80 ? KBMOTION_UP : KBMOTION_DOWN,
+                      },
+                      ps2->ctx);
     }
     else if (packet == PS2_KEYBOARD_ESCAPED)
     {
@@ -26,14 +27,14 @@ void ps2_keyboard_handle_code(Ps2Keyboard *ps2, uint8_t packet)
     {
         KbKey key = (KbKey)((packet & 0x7f));
         ps2->callback((UiKeyboardEvent){
-            .key = key,
-            .modifiers = packet & 0x80 ? KBMOTION_UP : KBMOTION_DOWN
-        }, ps2->ctx);
+                          .key = key,
+                          .modifiers = packet & 0x80 ? KBMOTION_UP : KBMOTION_DOWN,
+                      },
+                      ps2->ctx);
     }
 }
 
-
-bool ps2_keyboard_interrupt_handle(Ps2Keyboard* self, Ps2Controller* controller)
+bool ps2_keyboard_interrupt_handle(Ps2Keyboard *self, Ps2Controller *controller)
 {
     uint8_t status = ps2_controller_status(controller);
     bool updated = false;
