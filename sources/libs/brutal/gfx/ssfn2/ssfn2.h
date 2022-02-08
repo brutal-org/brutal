@@ -1,4 +1,5 @@
 #pragma once
+
 #include <brutal/base.h>
 #include <brutal/ds/vec.h>
 #include <brutal/gfx/font.h>
@@ -33,8 +34,6 @@ typedef struct PACKED
     char manufacturer[SSFN2_MAX_STR_LEN];
     char license[SSFN2_MAX_STR_LEN];
 } SSFN2StringTable;
-
-typedef Vec(GfxPathCmd) GfxPath;
 
 typedef struct
 {
