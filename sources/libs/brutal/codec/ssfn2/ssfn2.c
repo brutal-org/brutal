@@ -1,29 +1,32 @@
 #include <brutal/codec/gzip/gzip.h>
 #include <brutal/codec/ssfn2/ssfn2.h>
-#include <brutal/debug/log.h>
-#include <brutal/gfx/gfx.h>
+#include <brutal/debug.h>
+#include <brutal/gfx.h>
 
 #define SSFN2_MAGIC str$("SFN2")
 #define SSFN2_COLLECTION str$("SFNC")
 #define SSFN2_ENDMAGIC str$("2NFS")
 
-#define SSFN2_CMD_MOVE_TO 0
-#define SSFN2_CMD_LINE_TO 1
-#define SSFN2_CMD_QUAD_CURVE 2
-#define SSFN2_CMD_BEZIER_CURVE 3
+enum
+{
+    SSFN2_CMD_MOVE_TO,
+    SSFN2_CMD_LINE_TO,
+    SSFN2_CMD_QUAD_CURVE,
+    SSFN2_CMD_BEZIER_CURVE,
+};
+
+enum
+{
+    SSFN2_STYLE_REGULAR,
+    SSFN2_STYLE_BOLD,
+    SSFN2_STYLE_ITALIC,
+};
 
 typedef struct PACKED
 {
     le_uint8_t magic[4];
     le_uint32_t size; /* total size in bytes */
 } SSFN2CommonHeader;
-
-typedef enum
-{
-    FS_REGULAR = 0,
-    FS_BOLD = 1,
-    FS_ITALIC = 2,
-} SSFN2FontStyle;
 
 static MaybeError ssfn2_load_string(IoReader reader, char *dst)
 {
@@ -54,7 +57,7 @@ static MaybeError ssfn2_load_stringtable(IoReader reader, SSFN2Font *font)
     return SUCCESS;
 }
 
-static MaybeError ssfn2_load_fragment(IoRSeek rseek, SSFN2Font *font, size_t offset, GfxPath *path)
+static MaybeError ssfn2_load_fragment(IoRSeek rseek, SSFN2Font *font, MVec2 pos, size_t offset, GfxPath *path)
 {
     uint32_t fragments_offs = load_le(font->header.fragments_offs);
     uint32_t characters_offs = load_le(font->header.characters_offs);
@@ -82,10 +85,12 @@ static MaybeError ssfn2_load_fragment(IoRSeek rseek, SSFN2Font *font, size_t off
     // contour with more commands (1 extra byte)
     if (val & 0b01000000)
     {
-        cmd_count <<= 8;
         TRY(MaybeError, io_read_byte(rseek.reader, &val));
-        cmd_count += val;
+
+        cmd_count <<= 8;
+        cmd_count |= val;
     }
+    cmd_count++;
 
     // Read all command bytes
     size_t cmd_bytes = (cmd_count + 3) / 4;
@@ -101,7 +106,7 @@ static MaybeError ssfn2_load_fragment(IoRSeek rseek, SSFN2Font *font, size_t off
 
     uint8_t x, y, cp1x, cp1y, cp2x, cp2y;
 
-    for (size_t i = 0; i < cmd_count; i++)
+    for (size_t i = 0; i < cmd_count / 4; i++)
     {
         // 4 commands per byte
         for (size_t j = 0; j < 4; j++)
@@ -114,27 +119,34 @@ static MaybeError ssfn2_load_fragment(IoRSeek rseek, SSFN2Font *font, size_t off
             switch (cmd)
             {
             case SSFN2_CMD_MOVE_TO:
-                gfx_path_move_to(path, m_vec2(x, y));
+                gfx_path_move_to(path, m_vec2_add(pos, m_vec2(x, y)));
                 break;
 
             case SSFN2_CMD_LINE_TO:
-                gfx_path_line_to(path, m_vec2(x, y));
+                gfx_path_line_to(path, m_vec2_add(pos, m_vec2(x, y)));
                 break;
 
             case SSFN2_CMD_QUAD_CURVE:
                 TRY(MaybeError, io_read_byte(rseek.reader, &cp1x));
                 TRY(MaybeError, io_read_byte(rseek.reader, &cp1y));
 
-                gfx_path_quadratic_to(path, m_vec2(cp1x, cp1y), m_vec2(x, y));
+                gfx_path_quadratic_to(
+                    path,
+                    m_vec2_add(pos, m_vec2(cp1x, cp1y)),
+                    m_vec2_add(pos, m_vec2(x, y)));
                 break;
 
             case SSFN2_CMD_BEZIER_CURVE:
-                TRY(MaybeError, io_read_byte(rseek.reader, &cp2x));
-                TRY(MaybeError, io_read_byte(rseek.reader, &cp2y));
                 TRY(MaybeError, io_read_byte(rseek.reader, &cp1x));
                 TRY(MaybeError, io_read_byte(rseek.reader, &cp1y));
+                TRY(MaybeError, io_read_byte(rseek.reader, &cp2x));
+                TRY(MaybeError, io_read_byte(rseek.reader, &cp2y));
 
-                gfx_path_cubic_to(path, m_vec2(cp1x, cp1y), m_vec2(cp2x, cp2y), m_vec2(x, y));
+                gfx_path_cubic_to(
+                    path,
+                    m_vec2_add(pos, m_vec2(cp1x, cp1y)),
+                    m_vec2_add(pos, m_vec2(cp2x, cp2y)),
+                    m_vec2_add(pos, m_vec2(x, y)));
                 break;
 
             default:
@@ -169,6 +181,7 @@ static MaybeError ssfn2_load_mapping(IoRSeek rseek, SSFN2Font *font, Rune rune, 
 
     for (size_t frag = 0; frag < num_frags; frag++)
     {
+
         uint8_t frag_data[6];
         TRY(MaybeError, io_read(rseek.reader, frag_data, frag_size));
 
@@ -194,7 +207,7 @@ static MaybeError ssfn2_load_mapping(IoRSeek rseek, SSFN2Font *font, Rune rune, 
                 frag_off |= frag_data[idx];
             }
 
-            ssfn2_load_fragment(rseek, font, frag_off, &font->glyphs[rune].path);
+            ssfn2_load_fragment(rseek, font, m_vec2(x, y), frag_off, &font->glyphs[rune].path);
         }
     }
 
@@ -239,6 +252,10 @@ static MaybeError ssfn2_load_mappings(IoRSeek rseek, SSFN2Font *font, SSFN2Commo
         {
             // Get a rune
             TRY(MaybeError, ssfn2_load_mapping(rseek, font, rune, attrs, alloc));
+            if (rune == 'B')
+            {
+                gfx_path_dump(&font->glyphs[rune].path);
+            }
             rune++;
         }
     }

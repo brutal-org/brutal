@@ -244,6 +244,14 @@ void gfx_stroke(Gfx *self)
     swap$(&self->path, &self->stroke);
 }
 
+void gfx_debug(Gfx *self)
+{
+    vec_foreach_v(edge, &self->path)
+    {
+        gfx_line(self, edge, 1);
+    }
+}
+
 void gfx_eval_cmd(Gfx *self, GfxPathCmd cmd)
 {
     cmd.cp1 = m_vec2_add(cmd.cp1, gfx_peek(self)->origin);

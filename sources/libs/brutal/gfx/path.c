@@ -1,3 +1,4 @@
+#include <brutal/debug/locked.h>
 #include <brutal/gfx/path.h>
 #include <brutal/math/funcs.h>
 #include <brutal/math/trans2.h>
@@ -13,6 +14,47 @@ void gfx_path_init(GfxPath *path, Alloc *alloc)
 void gfx_path_deinit(GfxPath *path)
 {
     vec_deinit(path);
+}
+
+void gfx_path_dump(GfxPath *path)
+{
+    vec_foreach_v(cmd, path)
+    {
+        switch (cmd.type)
+        {
+        default:
+            log$("bad");
+            break;
+
+        case GFX_CMD_NOP:
+            log$("nop");
+            break;
+
+        case GFX_CMD_MOVE_TO:
+            log$("move-to ({}, {})", cmd.point.x, cmd.point.x);
+            break;
+
+        case GFX_CMD_CLOSE_PATH:
+            log$("close-path");
+            break;
+
+        case GFX_CMD_LINE_TO:
+            log$("line-to ({}, {})", cmd.point.x, cmd.point.x);
+            break;
+
+        case GFX_CMD_CUBIC_TO:
+            log$("cubic-to ({}, {})", cmd.point.x, cmd.point.x);
+            break;
+
+        case GFX_CMD_QUADRATIC_TO:
+            log$("quadratic-to ({}, {})", cmd.point.x, cmd.point.x);
+            break;
+
+        case GFX_CMD_ARC_TO:
+            log$("arc-to ({}, {})", cmd.point.x, cmd.point.x);
+            break;
+        }
+    }
 }
 
 void gfx_path_move_to(GfxPath *path, MVec2 p)

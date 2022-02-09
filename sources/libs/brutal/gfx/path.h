@@ -44,6 +44,8 @@ void gfx_path_init(GfxPath *path, Alloc *alloc);
 
 void gfx_path_deinit(GfxPath *path);
 
+void gfx_path_dump(GfxPath *path);
+
 void gfx_path_move_to(GfxPath *path, MVec2 p);
 
 void gfx_path_close(GfxPath *path);

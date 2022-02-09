@@ -1,10 +1,8 @@
 #pragma once
 
-#include <brutal/base.h>
-#include <brutal/ds/vec.h>
-#include <brutal/gfx/font.h>
-#include <brutal/gfx/gfx.h>
-#include <brutal/io/traits.h>
+#include <brutal/ds.h>
+#include <brutal/gfx.h>
+#include <brutal/io.h>
 
 typedef struct PACKED
 {
@@ -42,6 +40,7 @@ typedef struct
     uint8_t height;
     uint8_t adv_x;
     uint8_t adv_y;
+    bool present;
 } SSFN2Glyph;
 
 typedef struct SSFN2Font
