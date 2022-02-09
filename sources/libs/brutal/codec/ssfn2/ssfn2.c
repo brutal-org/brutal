@@ -226,14 +226,14 @@ static MaybeError ssfn2_load_mappings(IoRSeek rseek, SSFN2Font *font, SSFN2Commo
         else if ((attrs & 0b11000000) == 0b10000000)
         {
             // Skip up to 64 runes
-            rune += attrs & 0b00111111;
+            rune += (attrs & 0b00111111) + 1;
         }
         else if ((attrs & 0b11000000) == 0b11000000)
         {
             // Skip up to 16128 runes
             uint8_t extra;
             TRY(MaybeError, io_read_byte(rseek.reader, &extra));
-            rune += ((attrs & 0b00111111) << 8) | extra;
+            rune += (((attrs & 0b00111111) << 8) | extra) + 1;
         }
         else
         {
