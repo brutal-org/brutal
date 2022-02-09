@@ -92,6 +92,8 @@ void gfx_fill(Gfx *self, GfxFillRule rule);
 
 void gfx_stroke(Gfx *self);
 
+void gfx_debug(Gfx *self);
+
 void gfx_eval_cmd(Gfx *self, GfxPathCmd cmd);
 
 void gfx_eval_path(Gfx *self, GfxPath *path);

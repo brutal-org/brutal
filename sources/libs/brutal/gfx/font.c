@@ -110,6 +110,7 @@ GfxFont gfx_font_builtin(void)
 GfxFontMetrics gfx_font_ssfn2_metrics(void *ctx, GfxFontStyle style)
 {
     SSFN2Font *font = (SSFN2Font *)ctx;
+
     return (GfxFontMetrics){
         .line_ascend = 12 * style.scale,
         .ascend = 10 * style.scale,
@@ -121,15 +122,32 @@ GfxFontMetrics gfx_font_ssfn2_metrics(void *ctx, GfxFontStyle style)
     };
 }
 
+float gfx_font_ssfn2_advance(MAYBE_UNUSED void *ctx, MAYBE_UNUSED GfxFontStyle style, MAYBE_UNUSED Rune rune)
+{
+    SSFN2Font *font = (SSFN2Font *)ctx;
+    return font->glyphs[rune].width;
+}
+
+void gfx_font_ssfn2_render(MAYBE_UNUSED void *ctx, MAYBE_UNUSED GfxFontStyle style, Gfx *gfx, MVec2 baseline, Rune rune)
+{
+    gfx_push(gfx);
+    SSFN2Font *font = (SSFN2Font *)ctx;
+    SSFN2Glyph glyph = font->glyphs[rune];
+    gfx_origin(gfx, baseline);
+    gfx_stroke_path(gfx, &glyph.path);
+
+    gfx_pop(gfx);
+}
+
 GfxFont gfx_font_ssfn2(struct SSFN2Font *font)
 {
     return (GfxFont){
         .ctx = font,
         .style = {
-            .scale = 1,
+            .scale = 0.01,
         },
         .metrics = gfx_font_ssfn2_metrics,
-        .advance = gfx_font_builtin_advance,
-        .render = gfx_font_builtin_render,
+        .advance = gfx_font_ssfn2_advance,
+        .render = gfx_font_ssfn2_render,
     };
 }
