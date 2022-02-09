@@ -105,11 +105,12 @@ static MaybeError ssfn2_load_fragment(IoRSeek rseek, SSFN2Font *font, MVec2 pos,
     TRY(MaybeError, io_read(rseek.reader, cmd_data, cmd_bytes));
 
     uint8_t x, y, cp1x, cp1y, cp2x, cp2y;
+    size_t cmd_cur = 0;
 
-    for (size_t i = 0; i < cmd_count / 4; i++)
+    for (size_t i = 0; i < (cmd_count / 4) + 1; i++)
     {
         // 4 commands per byte
-        for (size_t j = 0; j < 4; j++)
+        for (size_t j = 0; j < 4 && cmd_cur < cmd_count; j++)
         {
             TRY(MaybeError, io_read_byte(rseek.reader, &x));
             TRY(MaybeError, io_read_byte(rseek.reader, &y));
@@ -153,6 +154,7 @@ static MaybeError ssfn2_load_fragment(IoRSeek rseek, SSFN2Font *font, MVec2 pos,
                 log$("SSFN2: unknown command {}", cmd);
                 break;
             }
+            cmd_cur++;
         }
     }
 
