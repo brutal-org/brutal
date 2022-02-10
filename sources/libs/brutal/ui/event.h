@@ -27,7 +27,6 @@ typedef struct
 {
     KbKey key;
     KbMod modifiers;
-    KbMotion motion;
     Rune rune;
 } UiKeyboardEvent;
 

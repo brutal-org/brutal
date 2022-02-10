@@ -1,7 +1,7 @@
 #include <hw/ps2/mouse.h>
-#include "ps2/controller.h"
+#include <hw/ps2/controller.h>
 
-static UiMouseEvent ps2_mouse_status(Ps2Mouse *self)
+static UiEvent ps2_mouse_status(Ps2Mouse *self)
 {
     uint8_t const *buf = self->buf;
 
@@ -27,17 +27,23 @@ static UiMouseEvent ps2_mouse_status(Ps2Mouse *self)
     }
 
     // decode the new mouse packet
-    UiMouseEvent event = {};
+    UiMouseEvent mevent = {};
 
-    event.offset.x = offx;
-    event.offset.y = -offy;
-    event.scroll.y = scroll;
+    mevent.offset.x = offx;
+    mevent.offset.y = -offy;
+    mevent.scroll.y = scroll;
 
-    event.buttons |= ((buf[0] >> 0) & 1) ? MSBTN_LEFT : 0;
-    event.buttons |= ((buf[0] >> 1) & 1) ? MSBTN_RIGHT : 0;
-    event.buttons |= ((buf[0] >> 2) & 1) ? MSBTN_MIDDLE : 0;
+    mevent.buttons |= ((buf[0] >> 0) & 1) ? MSBTN_LEFT : 0;
+    mevent.buttons |= ((buf[0] >> 1) & 1) ? MSBTN_RIGHT : 0;
+    mevent.buttons |= ((buf[0] >> 2) & 1) ? MSBTN_MIDDLE : 0;
 
-    return event;
+
+    UiEvent ev = {
+        .type = UI_EVENT_MOUSE_MOVE,
+        .mouse = mevent,
+    };
+
+    return ev;
 }
 
 void ps2_mouse_handle_packet(Ps2Mouse *self, uint8_t packet)
@@ -101,6 +107,17 @@ void ps2_mouse_send(Ps2Controller *controller, uint8_t data)
     ps2_controller_read_data(controller);
 }
 
+static void clear_ps2_mouse_buffer(Ps2Controller* controller)
+{
+    uint8_t status = ps2_controller_status(controller);
+
+    while (status & PS2_OUTPUT_STATUS_FULL)
+    {
+        ps2_controller_read_data(controller);
+        status = ps2_controller_status(controller);
+    }
+}
+
 void _ps2_mouse_init(Ps2Mouse *self, Ps2Controller *controller)
 {
     ps2_mouse_send(controller, PS2_MOUSE_CMD_SET_DEFAULT);
@@ -122,4 +139,7 @@ void _ps2_mouse_init(Ps2Mouse *self, Ps2Controller *controller)
     uint8_t status = ps2_controller_read_data(controller);
 
     self->wheel = status == 3;
+
+    /* empty already filled in data */
+    clear_ps2_mouse_buffer(controller);
 }

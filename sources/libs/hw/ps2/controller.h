@@ -1,4 +1,5 @@
 #pragma once
+
 #include <bal/hw.h>
 
 /* PS2 8048 driver */
@@ -42,6 +43,7 @@ typedef enum
     PS2_WRITE_FIRST_PORT_OUTPUT = 0xD2,
     PS2_WRITE_SECOND_PORT_OUTPUT = 0xD3,
     PS2_WRITE_SECOND_PORT_INPUT = 0xD4,
+    PS2_DEVICE_RESET = 0xFF,
 } Ps2ControllerCommands;
 
 typedef enum
@@ -71,6 +73,7 @@ typedef struct
 } Ps2Controller;
 
 uint8_t ps2_controller_read_data(Ps2Controller *self);
+
 void ps2_controller_write_data(Ps2Controller *self, uint8_t data);
 
 void ps2_controller_write_command(Ps2Controller *self, uint8_t command);

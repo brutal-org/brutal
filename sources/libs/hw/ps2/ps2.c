@@ -1,7 +1,5 @@
 #include <bal/abi.h>
 #include <hw/ps2/ps2.h>
-#include "ps2/controller.h"
-#include "ps2/mouse.h"
 
 void ps2_interrupt_handle(Ps2 *ps2, BrEvent ev)
 {
@@ -29,7 +27,7 @@ void init_ps2_mouse(Ps2 *ps2, Ps2MouseCallback callback, void *ctx)
         .type = BR_EVENT_IRQ,
         .irq = 12,
     };
-    ipc_component_bind(ps2->ipc, ps2->mouse.interrupt_handle, (IpcEventHandler *)ps2_interrupt_handle, ps2);
+    ipc_component_bind(ipc_component_self(), ps2->mouse.interrupt_handle, (IpcEventHandler *)ps2_interrupt_handle, ps2);
     ps2->mouse.callback = callback;
     ps2->mouse.ctx = ctx;
     _ps2_mouse_init(&ps2->mouse, &ps2->controller);
@@ -44,16 +42,14 @@ void init_ps2_keyboard(Ps2 *ps2, Ps2KeyboardCallback callback, void *ctx)
         .irq = 1,
     };
 
-    ipc_component_bind(ps2->ipc, ps2->keyboard.interrupt_handle, (IpcEventHandler *)ps2_interrupt_handle, ps2);
+    ipc_component_bind(ipc_component_self(), ps2->keyboard.interrupt_handle, (IpcEventHandler *)ps2_interrupt_handle, ps2);
 
     ps2->keyboard.callback = callback;
     ps2->keyboard.ctx = ctx;
     _ps2_keyboard_init(&ps2->keyboard, &ps2->controller);
 }
-void init_ps2(Ps2 *ps2, IpcComponent *ipc)
+
+void init_ps2(Ps2 *ps2)
 {
-    ps2->ipc = ipc;
-    log$("owo");
     ps2_controller_init(&ps2->controller);
-    log$("awa");
 }

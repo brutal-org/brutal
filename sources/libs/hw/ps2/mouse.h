@@ -2,9 +2,9 @@
 
 #include <brutal/base.h>
 #include <hw/ps2/controller.h>
-#include "brutal/ui/event.h"
+#include <brutal/ui.h>
 
-typedef void (*Ps2MouseCallback)(UiMouseEvent ev, void *ctx);
+typedef void (*Ps2MouseCallback)(UiEvent ev, void *ctx);
 
 typedef struct
 {

@@ -1,10 +1,22 @@
 #include <brutal/input/keyboard.h>
 #include <hw/ps2/keyboard.h>
-#include "brutal/ui/event.h"
+
+static void clear_ps2_keyboard_buffer(Ps2Controller* controller)
+{
+    uint8_t status = ps2_controller_status(controller);
+
+    while (status & PS2_OUTPUT_STATUS_FULL)
+    {
+        ps2_controller_read_data(controller);
+        status = ps2_controller_status(controller);
+    }
+}
 
 void _ps2_keyboard_init(Ps2Keyboard *self, MAYBE_UNUSED Ps2Controller *controller)
 {
     self->kb_escaped = false;
+    /* empty already filled in data */
+    clear_ps2_keyboard_buffer(controller);
 }
 
 void ps2_keyboard_handle_code(Ps2Keyboard *ps2, uint8_t packet)
@@ -13,11 +25,14 @@ void ps2_keyboard_handle_code(Ps2Keyboard *ps2, uint8_t packet)
     {
         ps2->kb_escaped = false;
         KbKey key = (KbKey)((packet & 0x7f) + 0x80);
-        ps2->callback((UiKeyboardEvent){
-                          .key = key,
-                          .modifiers = packet & 0x80 ? KBMOTION_UP : KBMOTION_DOWN,
-                      },
-                      ps2->ctx);
+        UiEvent ev = {
+            .keyboard = {
+                .key = key,
+            },
+            .type = packet & 0x80 ? UI_EVENT_KEYBOARD_UP : UI_EVENT_KEYBOARD_DOWN,
+        };
+
+        ps2->callback(ev, ps2->ctx);
     }
     else if (packet == PS2_KEYBOARD_ESCAPED)
     {
@@ -26,11 +41,15 @@ void ps2_keyboard_handle_code(Ps2Keyboard *ps2, uint8_t packet)
     else
     {
         KbKey key = (KbKey)((packet & 0x7f));
-        ps2->callback((UiKeyboardEvent){
-                          .key = key,
-                          .modifiers = packet & 0x80 ? KBMOTION_UP : KBMOTION_DOWN,
-                      },
-                      ps2->ctx);
+
+        UiEvent ev = {
+            .keyboard = {
+                .key = key,
+            },
+            .type = packet & 0x80 ? UI_EVENT_KEYBOARD_UP : UI_EVENT_KEYBOARD_DOWN,
+        };
+
+        ps2->callback(ev, ps2->ctx);
     }
 }
 

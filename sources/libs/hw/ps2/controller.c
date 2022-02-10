@@ -1,6 +1,5 @@
 #include <hw/ps2/controller.h>
-#include "brutal/debug/assert.h"
-#include "ps2/ps2.h"
+#include <brutal/debug.h>
 
 uint8_t ps2_controller_status(Ps2Controller *self)
 {
@@ -68,6 +67,7 @@ static uint8_t ps2_controller_read_config(Ps2Controller *self)
     ps2_controller_write_command(self, PS2_CONTROLLER_CONFIG_READ);
     return ps2_controller_read_data(self);
 }
+
 static void ps2_controller_write_config(Ps2Controller *self, uint8_t data)
 {
     ps2_controller_write_command(self, PS2_CONTROLLER_CONFIG_WRITE);
