@@ -8,19 +8,28 @@
 #define SSFN2_COLLECTION str$("SFNC")
 #define SSFN2_ENDMAGIC str$("2NFS")
 
+/* font family group in font type byte */
+#define SSFN2_TYPE_FAMILY(x) ((x)&15)
+#define SSFN2_FAMILY_SERIF 0
+#define SSFN2_FAMILY_SANS 1
+#define SSFN2_FAMILY_DECOR 2
+#define SSFN2_FAMILY_MONOSPACE 3
+#define SSFN2_FAMILY_HAND 4
+
+/* font style flags in font type byte */
+#define SSFN2_TYPE_STYLE(x) (((x) >> 4) & 15)
+#define SSFN2_STYLE_REGULAR 0
+#define SSFN2_STYLE_BOLD 1
+#define SSFN2_STYLE_ITALIC 2
+#define SSFN2_STYLE_USRDEF1 4 /* user defined variant 1 */
+#define SSFN2_STYLE_USRDEF2 8 /* user defined variant 2 */
+
 enum
 {
     SSFN2_CMD_MOVE_TO,
     SSFN2_CMD_LINE_TO,
     SSFN2_CMD_QUAD_CURVE,
     SSFN2_CMD_BEZIER_CURVE,
-};
-
-enum
-{
-    SSFN2_STYLE_REGULAR,
-    SSFN2_STYLE_BOLD,
-    SSFN2_STYLE_ITALIC,
 };
 
 typedef struct PACKED
@@ -70,7 +79,7 @@ static MaybeError ssfn2_load_fragment(IoRSeek rseek, SSFN2Font *font, MVec2 pos,
     }
 
     size_t prev_offset = TRY(MaybeError, io_tell(rseek.seeker));
-    TRY(MaybeError, io_seek(rseek.seeker, io_seek_from_start(offset)));
+    TRY(MaybeError, io_seek(rseek.seeker, io_seek_from_start(font->font_start + offset)));
 
     uint8_t val;
     TRY(MaybeError, io_read_byte(rseek.reader, &val));
@@ -224,7 +233,7 @@ static MaybeError ssfn2_load_mappings(IoRSeek rseek, SSFN2Font *font, SSFN2Commo
     size_t kern_offs = load_le(font->header.kerning_offs);
     size_t size = load_le(common_header->size);
 
-    io_seek(rseek.seeker, io_seek_from_start(char_offs));
+    io_seek(rseek.seeker, io_seek_from_start(font->font_start + char_offs));
     size_t end = lig_offs ? lig_offs : kern_offs ? kern_offs
                                                  : size - 4;
 
@@ -266,26 +275,44 @@ static MaybeError ssfn2_load_mappings(IoRSeek rseek, SSFN2Font *font, SSFN2Commo
     return SUCCESS;
 }
 
-static MaybeError ssfn2_load_internal(IoRSeek rseek, SSFN2Font *font, Alloc *alloc)
+static MaybeError ssfn2_load_internal(IoRSeek rseek, SSFN2Collection *collection, Alloc *alloc)
 {
     IoReader reader = rseek.reader;
+    IoSeeker seeker = rseek.seeker;
+
+    size_t start = TRY(MaybeError, io_tell(seeker));
     SSFN2CommonHeader common_header;
     TRY(MaybeError, io_read(reader, (uint8_t *)&common_header, sizeof(SSFN2CommonHeader)));
+    size_t size = load_le(common_header.size);
 
     if (str_eq(str_n$(4, (char const *)common_header.magic), SSFN2_COLLECTION))
     {
         // uint32_t end = load_le(common_header.size);
-        while (ssfn2_load_internal(rseek, font, alloc).succ)
-            ;
+        while (TRY(MaybeError, io_tell(seeker)) != start + size)
+        {
+            TRY(MaybeError, ssfn2_load_internal(rseek, collection, alloc));
+        }
     }
     else if (str_eq(str_n$(4, (char const *)common_header.magic), SSFN2_MAGIC))
     {
-        TRY(MaybeError, io_read(reader, (uint8_t *)&font->header, sizeof(SSFN2FontHeader)));
-        TRY(MaybeError, ssfn2_load_stringtable(reader, font));
+        SSFN2Font font;
+        font.font_start = start;
+        TRY(MaybeError, io_read(reader, (uint8_t *)&font.header, sizeof(SSFN2FontHeader)));
+        TRY(MaybeError, ssfn2_load_stringtable(reader, &font));
 
-        font->glyphs = alloc_make_array(alloc, SSFN2Glyph, 0x110000);
+        font.glyphs = alloc_make_array(alloc, SSFN2Glyph, 0x110000);
 
-        TRY(MaybeError, ssfn2_load_mappings(rseek, font, &common_header, alloc));
+        TRY(MaybeError, ssfn2_load_mappings(rseek, &font, &common_header, alloc));
+        vec_push(collection, font);
+
+        // Seek to the end to verify the end magic
+        le_uint8_t end_magic[4];
+        TRY(MaybeError, io_seek(seeker, io_seek_from_start(font.font_start + size - 4)));
+        TRY(MaybeError, io_read(reader, (uint8_t *)&end_magic, 4));
+        if (!str_eq(str_n$(4, (char const *)end_magic), SSFN2_ENDMAGIC))
+        {
+            return ERROR(ERR_UNDEFINED);
+        }
     }
     else
     {
@@ -295,8 +322,10 @@ static MaybeError ssfn2_load_internal(IoRSeek rseek, SSFN2Font *font, Alloc *all
     return SUCCESS;
 }
 
-MaybeError ssfn2_load(IoRSeek rseek, SSFN2Font *font, Alloc *alloc)
+MaybeError ssfn2_load(IoRSeek rseek, SSFN2Collection *collection, Alloc *alloc)
 {
+    vec_init(collection, alloc_global());
+
     IoRSeek input = rseek;
     Buf buf;
 
@@ -308,5 +337,86 @@ MaybeError ssfn2_load(IoRSeek rseek, SSFN2Font *font, Alloc *alloc)
         input = buf_rseek(&buf);
     }
 
-    return ssfn2_load_internal(input, font, alloc);
+    return ssfn2_load_internal(input, collection, alloc);
+}
+
+/* --- SSFN2 Font --------------------------------------------------------- */
+
+SSFN2Font *gfx_font_ssfn2_select(void *ctx, GfxFontStyle style)
+{
+    SSFN2Collection *coll = (SSFN2Collection *)ctx;
+    SSFN2Font *best_match = NULL;
+    uint8_t best_score = 0;
+
+    vec_foreach(font, coll)
+    {
+        uint8_t score = 1;
+        uint8_t type = load_le(font->header.type);
+
+        if (style.italic && (SSFN2_TYPE_STYLE(type) & SSFN2_STYLE_ITALIC))
+        {
+            score++;
+        }
+        if (style.weight >= GFX_FONT_BOLD && (SSFN2_TYPE_STYLE(type) & SSFN2_STYLE_BOLD))
+        {
+            score++;
+        }
+        if (style.weight == GFX_FONT_NORMAL && (SSFN2_TYPE_STYLE(type) & SSFN2_STYLE_REGULAR))
+        {
+            score++;
+        }
+
+        if (score > best_score)
+        {
+            best_match = font;
+            best_score = score;
+        }
+    }
+
+    return best_match;
+}
+
+GfxFontMetrics gfx_font_ssfn2_metrics(void *ctx, GfxFontStyle style)
+{
+    SSFN2Font *font = gfx_font_ssfn2_select(ctx, style);
+
+    return (GfxFontMetrics){
+        .line_ascend = 12 * style.scale,
+        .ascend = 10 * style.scale,
+        .captop = 10 * style.scale,
+        .descend = 3 * style.scale,
+        .line_descend = 4 * style.scale,
+
+        .advance = load_le(font->header.width) * style.scale,
+    };
+}
+
+float gfx_font_ssfn2_advance(void *ctx, GfxFontStyle style, Rune rune)
+{
+    SSFN2Font *font = gfx_font_ssfn2_select(ctx, style);
+    return font->glyphs[rune].width;
+}
+
+void gfx_font_ssfn2_render(void *ctx, GfxFontStyle style, Gfx *gfx, MVec2 baseline, Rune rune)
+{
+    gfx_push(gfx);
+    SSFN2Font *font = gfx_font_ssfn2_select(ctx, style);
+    SSFN2Glyph glyph = font->glyphs[rune];
+    gfx_origin(gfx, baseline);
+    gfx_stroke_path(gfx, &glyph.path);
+
+    gfx_pop(gfx);
+}
+
+GfxFont gfx_font_ssfn2(SSFN2Collection *coll)
+{
+    return (GfxFont){
+        .ctx = coll,
+        .style = {
+            .scale = 0.01,
+        },
+        .metrics = gfx_font_ssfn2_metrics,
+        .advance = gfx_font_ssfn2_advance,
+        .render = gfx_font_ssfn2_render,
+    };
 }

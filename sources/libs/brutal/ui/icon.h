@@ -6,7 +6,7 @@
 typedef struct
 {
     UiView base;
-    SSFN2Font font;
+    SSFN2Collection font;
 } UiIcon;
 
 #define ui_icon$(VIEW) ((UiIcon *)(VIEW))

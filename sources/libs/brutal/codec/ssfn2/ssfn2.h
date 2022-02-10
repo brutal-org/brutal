@@ -45,11 +45,18 @@ typedef struct
 
 typedef struct SSFN2Font
 {
+    size_t font_start;
     SSFN2FontHeader header;
     SSFN2StringTable stringtable;
     SSFN2Glyph *glyphs; /* glyphs array */
 } SSFN2Font;
 
-MaybeError ssfn2_load(IoRSeek reader, SSFN2Font *font, Alloc *alloc);
+typedef Vec(SSFN2Font) SSFN2Collection;
+
+MaybeError ssfn2_load(IoRSeek reader, SSFN2Collection *collection, Alloc *alloc);
 
 void font_ssfn2_deinit(SSFN2Font *font);
+
+/* --- SSFN2 Font ----------------------------------------------------------- */
+
+GfxFont gfx_font_ssfn2(SSFN2Collection *);

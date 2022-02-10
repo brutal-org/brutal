@@ -100,8 +100,3 @@ void gfx_font_render_str(GfxFont font, struct _Gfx *gfx, MVec2 baseline, Str str
 extern uint8_t gfx_font_builtin_data[256 * 16];
 
 GfxFont gfx_font_builtin(void);
-
-/* --- SSFN2 Font ----------------------------------------------------------- */
-
-struct SSFN2Font;
-GfxFont gfx_font_ssfn2(struct SSFN2Font *);
