@@ -10,7 +10,6 @@ typedef struct
     Ps2Controller controller;
     Ps2Mouse mouse;
     Ps2Keyboard keyboard;
-    IpcComponent *ipc;
 } Ps2;
 
 typedef enum
@@ -24,4 +23,4 @@ void init_ps2_mouse(Ps2 *ps2, Ps2MouseCallback callback, void *ctx);
 
 void init_ps2_keyboard(Ps2 *ps2, Ps2KeyboardCallback callback, void *ctx);
 
-void init_ps2(Ps2 *ps2, IpcComponent *ipc);
+void init_ps2(Ps2 *ps2);
