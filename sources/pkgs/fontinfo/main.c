@@ -17,13 +17,13 @@ int main(int argc, char const *argv[])
     HeapAlloc heap;
     heap_alloc_init(&heap, NODE_DEFAULT);
 
-    SSFN2Font ssfn_font;
-    if (!ssfn2_load(io_file_rseek(&source_file), &ssfn_font, base$(&heap)).succ)
+    SSFN2Collection ssfn_coll;
+    if (!ssfn2_load(io_file_rseek(&source_file), &ssfn_coll, base$(&heap)).succ)
     {
         return -1;
     }
 
-    GfxFont font = gfx_font_ssfn2(&ssfn_font);
+    GfxFont font = gfx_font_ssfn2(&ssfn_coll);
     log$("Style: {}", font.style.width);
 
     heap_alloc_deinit(&heap);
