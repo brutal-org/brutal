@@ -1,5 +1,6 @@
 #include <brutal/base/attributes.h>
 #include <brutal/base/macros.h>
+#include <brutal/debug.h>
 #include <brutal/io/buf.h>
 #include <brutal/math/clamp.h>
 
@@ -8,6 +9,7 @@ void buf_init(Buf *self, size_t capacity, Alloc *alloc)
     *self = (Buf){
         .data = nullptr,
         .used = 0,
+        .pos = 0,
         .capacity = 0,
         .alloc = alloc,
     };
@@ -64,11 +66,11 @@ static IoResult buf_read_impl(void *ctx, uint8_t *data, size_t size)
 {
     Buf *self = (Buf *)ctx;
 
-    size_t read = m_min(size, self->used - self->read);
+    size_t read = m_min(size, self->used - self->pos);
 
     for (size_t i = 0; i < read; i++)
     {
-        data[i] = self->data[self->read++];
+        data[i] = self->data[self->pos++];
     }
 
     return OK(IoResult, read);
@@ -94,5 +96,59 @@ IoWriter buf_writer(Buf *self)
     return (IoWriter){
         .write = buf_write_impl,
         .context = self,
+    };
+}
+
+IoDuplex buf_duplex(Buf *self)
+{
+    return (IoDuplex){
+        .reader = buf_reader(self),
+        .writer = buf_writer(self),
+    };
+}
+
+IoResult buf_seek_impl(void *ctx, IoSeek seek)
+{
+    Buf *self = (Buf *)ctx;
+
+    switch (seek.whence)
+    {
+    case IO_WHENCE_START:
+        self->pos = seek.position;
+        break;
+    case IO_WHENCE_CURRENT:
+        self->pos = seek.position;
+        break;
+    case IO_WHENCE_END:
+        self->pos = self->used + seek.position;
+        break;
+    default:
+        panic$("Unknow whence {}", seek.whence);
+        break;
+    }
+    return OK(IoResult, self->pos);
+}
+
+IoSeeker buf_seeker(Buf *self)
+{
+    return (IoSeeker){
+        .seek = (IoSeekFn *)buf_seek_impl,
+        .context = self,
+    };
+}
+
+IoRSeek buf_rseek(Buf *self)
+{
+    return (IoRSeek){
+        .reader = buf_reader(self),
+        .seeker = buf_seeker(self),
+    };
+}
+
+IoWSeek buf_wseek(Buf *self)
+{
+    return (IoWSeek){
+        .writer = buf_writer(self),
+        .seeker = buf_seeker(self),
     };
 }
