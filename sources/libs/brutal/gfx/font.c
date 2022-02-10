@@ -122,13 +122,13 @@ GfxFontMetrics gfx_font_ssfn2_metrics(void *ctx, GfxFontStyle style)
     };
 }
 
-float gfx_font_ssfn2_advance(MAYBE_UNUSED void *ctx, MAYBE_UNUSED GfxFontStyle style, MAYBE_UNUSED Rune rune)
+float gfx_font_ssfn2_advance(void *ctx, MAYBE_UNUSED GfxFontStyle style, Rune rune)
 {
     SSFN2Font *font = (SSFN2Font *)ctx;
     return font->glyphs[rune].width;
 }
 
-void gfx_font_ssfn2_render(MAYBE_UNUSED void *ctx, MAYBE_UNUSED GfxFontStyle style, Gfx *gfx, MVec2 baseline, Rune rune)
+void gfx_font_ssfn2_render(void *ctx, MAYBE_UNUSED GfxFontStyle style, Gfx *gfx, MVec2 baseline, Rune rune)
 {
     gfx_push(gfx);
     SSFN2Font *font = (SSFN2Font *)ctx;

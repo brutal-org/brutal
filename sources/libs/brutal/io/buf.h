@@ -6,8 +6,8 @@
 typedef struct
 {
     uint8_t *data;
+    size_t pos;
     size_t used;
-    size_t read;
     size_t capacity;
     Alloc *alloc;
 } Buf;
@@ -49,3 +49,11 @@ Str buf_str(Buf *self);
 IoReader buf_reader(Buf *self);
 
 IoWriter buf_writer(Buf *self);
+
+IoDuplex buf_duplex(Buf *self);
+
+IoSeeker buf_seeker(Buf *self);
+
+IoRSeek buf_rseek(Buf *self);
+
+IoWSeek buf_wseek(Buf *self);

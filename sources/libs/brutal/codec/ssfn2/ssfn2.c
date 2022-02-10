@@ -1,3 +1,4 @@
+#include <brutal/alloc/global.h>
 #include <brutal/codec/gzip/gzip.h>
 #include <brutal/codec/ssfn2/ssfn2.h>
 #include <brutal/debug.h>
@@ -296,11 +297,15 @@ static MaybeError ssfn2_load_internal(IoRSeek rseek, SSFN2Font *font, Alloc *all
 
 MaybeError ssfn2_load(IoRSeek rseek, SSFN2Font *font, Alloc *alloc)
 {
+    IoRSeek input = rseek;
     if (gzip_probe(rseek))
     {
+        Buf buf;
+        buf_init(&buf, 1024, alloc_global());
+        IoWriter writer = buf_writer(&buf);
         // TODO:
-        // reader = gzip_reader(rseek.reader);
-        return ERROR(ERR_NOT_IMPLEMENTED);
+        TRY(MaybeError, gzip_decompress_stream(writer, rseek.reader));
+        input = buf_rseek(&buf);
     }
 
     return ssfn2_load_internal(rseek, font, alloc);
