@@ -11,7 +11,7 @@ void gfx_dirty_deinit(GfxDirty *self);
 
 void gfx_dirty_rect(GfxDirty *self, MRect rect);
 
-bool gfx_dirty_any(GfxDirty* self);
+bool gfx_dirty_any(GfxDirty *self);
 
 void gfx_dirty_clear(GfxDirty *self);
 
