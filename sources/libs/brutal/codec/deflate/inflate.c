@@ -297,7 +297,7 @@ IoResult deflate_decompress_stream(IoWriter writer, IoReader reader)
         total += TRY(IoResult, deflate_decompress_block(&ctx, &final_block));
     } while (!final_block);
 
-    io_window_flush(&ctx.window);
+    io_window_flush_all(&ctx.window);
     io_window_deinit(&ctx.window);
 
     return OK(IoResult, total);

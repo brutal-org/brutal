@@ -127,7 +127,8 @@ IoResult gzip_decompress_stream(IoWriter writer, IoReader reader)
     TRY(IoResult, io_read(reader, (uint8_t *)&value, 4));
     uint32_t crc32 = load_le(value);
 
-    if (crc32 != crc32_get(&crc))
+    uint32_t computed_crc32 = crc32_get(&crc);
+    if (crc32 != computed_crc32)
     {
         return ERR(IoResult, ERR_CHECKSUM_MISMATCH);
     }

@@ -117,7 +117,7 @@ IoResult buf_seek_impl(void *ctx, IoSeek seek)
         self->pos = seek.position;
         break;
     case IO_WHENCE_CURRENT:
-        self->pos = seek.position;
+        self->pos += seek.position;
         break;
     case IO_WHENCE_END:
         self->pos = self->used + seek.position;
@@ -141,14 +141,6 @@ IoRSeek buf_rseek(Buf *self)
 {
     return (IoRSeek){
         .reader = buf_reader(self),
-        .seeker = buf_seeker(self),
-    };
-}
-
-IoWSeek buf_wseek(Buf *self)
-{
-    return (IoWSeek){
-        .writer = buf_writer(self),
         .seeker = buf_seeker(self),
     };
 }

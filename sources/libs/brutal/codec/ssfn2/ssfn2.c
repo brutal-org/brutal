@@ -298,15 +298,15 @@ static MaybeError ssfn2_load_internal(IoRSeek rseek, SSFN2Font *font, Alloc *all
 MaybeError ssfn2_load(IoRSeek rseek, SSFN2Font *font, Alloc *alloc)
 {
     IoRSeek input = rseek;
+    Buf buf;
+
     if (gzip_probe(rseek))
     {
-        Buf buf;
         buf_init(&buf, 1024, alloc_global());
         IoWriter writer = buf_writer(&buf);
-        // TODO:
         TRY(MaybeError, gzip_decompress_stream(writer, rseek.reader));
         input = buf_rseek(&buf);
     }
 
-    return ssfn2_load_internal(rseek, font, alloc);
+    return ssfn2_load_internal(input, font, alloc);
 }

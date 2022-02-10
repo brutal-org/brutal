@@ -21,7 +21,7 @@ UiView *ui_icon_create(void)
     self->paint = ui_icon_paint;
 
     IoFile source_file;
-    UNWRAP_OR_PANIC(io_file_open(&source_file, str$("sysroot/pkgs/font-ssfn2/FreeSans.sfn")), "File not found!");
+    UNWRAP_OR_PANIC(io_file_open(&source_file, str$("sysroot/pkgs/font-ssfn2/FreeSans.sfn.gz")), "File not found!");
 
     HeapAlloc heap;
     heap_alloc_init(&heap, NODE_DEFAULT);

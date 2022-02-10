@@ -56,4 +56,5 @@ IoSeeker buf_seeker(Buf *self);
 
 IoRSeek buf_rseek(Buf *self);
 
-IoWSeek buf_wseek(Buf *self);
+// Can't have this yet
+// IoWSeek buf_wseek(Buf *self);
