@@ -69,8 +69,10 @@ static MaybeError ssfn2_load_stringtable(IoReader reader, SSFN2Font *font)
 
 static MaybeError ssfn2_load_fragment(IoRSeek rseek, SSFN2Font *font, MVec2 pos, size_t offset, GfxPath *path)
 {
-    uint32_t fragments_offs = load_le(font->header.fragments_offs);
-    uint32_t characters_offs = load_le(font->header.characters_offs);
+    // Add font start offset
+    offset += font->font_start;
+    uint32_t fragments_offs = font->font_start + load_le(font->header.fragments_offs);
+    uint32_t characters_offs = font->font_start + load_le(font->header.characters_offs);
 
     if (offset < fragments_offs || offset >= characters_offs)
     {
@@ -79,7 +81,7 @@ static MaybeError ssfn2_load_fragment(IoRSeek rseek, SSFN2Font *font, MVec2 pos,
     }
 
     size_t prev_offset = TRY(MaybeError, io_tell(rseek.seeker));
-    TRY(MaybeError, io_seek(rseek.seeker, io_seek_from_start(font->font_start + offset)));
+    TRY(MaybeError, io_seek(rseek.seeker, io_seek_from_start(offset)));
 
     uint8_t val;
     TRY(MaybeError, io_read_byte(rseek.reader, &val));
@@ -193,7 +195,6 @@ static MaybeError ssfn2_load_mapping(IoRSeek rseek, SSFN2Font *font, Rune rune, 
 
     for (size_t frag = 0; frag < num_frags; frag++)
     {
-
         uint8_t frag_data[6];
         TRY(MaybeError, io_read(rseek.reader, frag_data, frag_size));
 
@@ -233,9 +234,16 @@ static MaybeError ssfn2_load_mappings(IoRSeek rseek, SSFN2Font *font, SSFN2Commo
     size_t kern_offs = load_le(font->header.kerning_offs);
     size_t size = load_le(common_header->size);
 
-    io_seek(rseek.seeker, io_seek_from_start(font->font_start + char_offs));
     size_t end = lig_offs ? lig_offs : kern_offs ? kern_offs
                                                  : size - 4;
+
+    char_offs += font->font_start;
+    lig_offs += font->font_start;
+    kern_offs += font->font_start;
+    size += font->font_start;
+    end += font->font_start;
+
+    io_seek(rseek.seeker, io_seek_from_start(char_offs));
 
     int rune = 0;
     while (TRY(MaybeError, io_tell(rseek.seeker)) < end)
@@ -264,15 +272,45 @@ static MaybeError ssfn2_load_mappings(IoRSeek rseek, SSFN2Font *font, SSFN2Commo
         {
             // Get a rune
             TRY(MaybeError, ssfn2_load_mapping(rseek, font, rune, attrs, alloc));
-            if (rune == 'B')
-            {
-                gfx_path_dump(&font->glyphs[rune].path);
-            }
             rune++;
         }
     }
 
+    if (rune == 0)
+    {
+        log$("SSFN2: didn't load any runes");
+        return ERROR(ERR_UNDEFINED);
+    }
+
     return SUCCESS;
+}
+
+static void ssfn2_compute_weight(SSFN2Font *font)
+{
+    font->weight = GFX_FONT_REGULAR;
+
+    Str subfamily = str$(font->stringtable.subfamily_name);
+    // Weights
+    if (str_first(subfamily, str$("Black")) >= 0)
+        font->weight = GFX_FONT_BLACK;
+    else if (str_first(subfamily, str$("Extra Bold")) >= 0)
+        font->weight = GFX_FONT_EXTRA_BOLD;
+    else if (str_first(subfamily, str$("Semi Bold")) >= 0)
+        font->weight = GFX_FONT_SEMI_BOLD;
+    else if (str_first(subfamily, str$("Bold")) >= 0)
+        font->weight = GFX_FONT_BOLD;
+    else if (str_first(subfamily, str$("Medium")) >= 0)
+        font->weight = GFX_FONT_MEDIUM;
+    else if (str_first(subfamily, str$("Regular")) >= 0)
+        font->weight = GFX_FONT_REGULAR;
+    else if (str_first(subfamily, str$("Extra Light")) >= 0)
+        font->weight = GFX_FONT_EXTRA_LIGHT;
+    else if (str_first(subfamily, str$("Light")) >= 0)
+        font->weight = GFX_FONT_LIGHT;
+    else if (str_first(subfamily, str$("Thin")) >= 0)
+        font->weight = GFX_FONT_THIN;
+    else
+        log$("Found no match for subfamily: {}", subfamily);
 }
 
 static MaybeError ssfn2_load_internal(IoRSeek rseek, SSFN2Collection *collection, Alloc *alloc)
@@ -303,7 +341,6 @@ static MaybeError ssfn2_load_internal(IoRSeek rseek, SSFN2Collection *collection
         font.glyphs = alloc_make_array(alloc, SSFN2Glyph, 0x110000);
 
         TRY(MaybeError, ssfn2_load_mappings(rseek, &font, &common_header, alloc));
-        vec_push(collection, font);
 
         // Seek to the end to verify the end magic
         le_uint8_t end_magic[4];
@@ -313,6 +350,9 @@ static MaybeError ssfn2_load_internal(IoRSeek rseek, SSFN2Collection *collection
         {
             return ERROR(ERR_UNDEFINED);
         }
+
+        ssfn2_compute_weight(&font);
+        vec_push(collection, font);
     }
     else
     {
@@ -342,76 +382,33 @@ MaybeError ssfn2_load(IoRSeek rseek, SSFN2Collection *collection, Alloc *alloc)
 
 /* --- SSFN2 Font --------------------------------------------------------- */
 
-Str gfx_font_style_subfamily(GfxFontStyle style)
-{
-    Str result = str$("");
-    // Weights
-    if (style.weight == GFX_FONT_EXTRA_BOLD)
-        result = str$("ExtraBold");
-    else if (style.weight == GFX_FONT_BOLD)
-        result = str$("Bold");
-    else if (style.weight == GFX_FONT_SEMI_BOLD)
-        result = str$("SemiBold");
-    else if (style.weight == GFX_FONT_MEDIUM)
-        result = str$("Medium");
-    else if (style.weight == GFX_FONT_REGULAR)
-        result = str$("Regular");
-    else if (style.weight == GFX_FONT_LIGHT)
-        result = str$("Light");
-    else if (style.weight == GFX_FONT_EXTRA_LIGHT)
-        result = str$("ExtraLight");
-    else if (style.weight == GFX_FONT_THIN)
-        result = str$("Thin");
-
-    // Italic
-    if (style.italic)
-        str_concat(result, str$("Italic"), alloc_global());
-
-    return result;
-}
-
 SSFN2Font *gfx_font_ssfn2_select(void *ctx, GfxFontStyle style)
 {
     SSFN2Collection *coll = (SSFN2Collection *)ctx;
-    
-    // Check if any font is an exact match
-    Str wanted_sub = gfx_font_style_subfamily(style);
+
+    SSFN2Font *candiate = NULL;
+    uint8_t best_match = 0;
+
+    // Get the best match
     vec_foreach(font, coll)
     {
-        if (str_eq(str$(font->stringtable.subfamily_name), wanted_sub))
-            return font;
-    }
+        uint8_t match = 1;
 
-    // Fallback heuristic
-    SSFN2Font *best_match = NULL;
-    uint8_t best_score = 0;
+        if (style.weight == font->weight)
+            match++;
 
-    vec_foreach(font, coll)
-    {
-        uint8_t score = 1;
         uint8_t type = load_le(font->header.type);
+        if (style.italic == ((SSFN2_TYPE_STYLE(type) & SSFN2_STYLE_ITALIC) > 0))
+            match++;
 
-        if (style.italic && (SSFN2_TYPE_STYLE(type) & SSFN2_STYLE_ITALIC))
+        if (match > best_match)
         {
-            score++;
-        }
-        if (style.weight >= GFX_FONT_BOLD && (SSFN2_TYPE_STYLE(type) & SSFN2_STYLE_BOLD))
-        {
-            score++;
-        }
-        if (style.weight == GFX_FONT_REGULAR && (SSFN2_TYPE_STYLE(type) & SSFN2_STYLE_REGULAR))
-        {
-            score++;
-        }
-
-        if (score > best_score)
-        {
-            best_match = font;
-            best_score = score;
+            best_match = match;
+            candiate = font;
         }
     }
 
-    return best_match;
+    return candiate;
 }
 
 GfxFontMetrics gfx_font_ssfn2_metrics(void *ctx, GfxFontStyle style)
@@ -441,7 +438,7 @@ void gfx_font_ssfn2_render(void *ctx, GfxFontStyle style, Gfx *gfx, MVec2 baseli
     SSFN2Font *font = gfx_font_ssfn2_select(ctx, style);
     SSFN2Glyph glyph = font->glyphs[rune];
     gfx_origin(gfx, baseline);
-    gfx_stroke_path(gfx, &glyph.path);
+    gfx_fill_path(gfx, &glyph.path, GFX_FILL_EVENODD);
 
     gfx_pop(gfx);
 }
@@ -454,7 +451,7 @@ GfxFont gfx_font_ssfn2(SSFN2Collection *coll)
             .scale = 0.01,
             .weight = GFX_FONT_REGULAR,
             .italic = false,
-        },
+            .width = 0.01},
         .metrics = gfx_font_ssfn2_metrics,
         .advance = gfx_font_ssfn2_advance,
         .render = gfx_font_ssfn2_render,

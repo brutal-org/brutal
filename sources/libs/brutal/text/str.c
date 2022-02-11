@@ -121,10 +121,10 @@ int str_first(Str const lStr, Str const rStr)
 {
     if (lStr.len < rStr.len)
     {
-        return 0;
+        return -1;
     }
 
-    for (size_t i = 0; i < lStr.len - rStr.len; i++)
+    for (size_t i = 0; i <= lStr.len - rStr.len; i++)
     {
         Str substr = str_n$(rStr.len, lStr.buf + i);
 

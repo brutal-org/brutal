@@ -23,8 +23,18 @@ int main(int argc, char const *argv[])
         return -1;
     }
 
-    GfxFont font = gfx_font_ssfn2(&ssfn_coll);
-    log$("Style: {}", font.style.width);
+    log$("SSFN2 Font Collection");
+
+    size_t idx = 0;
+    vec_foreach(font, &ssfn_coll)
+    {
+        log$("");
+        log$("[{}] Name: {}", idx, font->stringtable.font_name);
+        log$("[{}] Family: {}", idx, font->stringtable.family_name);
+        log$("[{}] Subfamily: {}", idx, font->stringtable.subfamily_name);
+
+        idx++;
+    }
 
     heap_alloc_deinit(&heap);
 
