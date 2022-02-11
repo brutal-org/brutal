@@ -23,7 +23,7 @@ int main(int argc, char const *argv[])
         return -1;
     }
 
-    log$("SSFN2 Font Collection");
+    log$("SSFN2 Font Collection: {} entries", ssfn_coll.len);
 
     size_t idx = 0;
     vec_foreach(font, &ssfn_coll)
