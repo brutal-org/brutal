@@ -41,7 +41,7 @@ typedef struct
 
 // https://docs.microsoft.com/en-us/typography/opentype/otspec180/fvar
 // https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Fonts/Variable_Fonts_Guide
-typedef union
+typedef struct
 {
     /// Used to vary the size of the text
     float scale;
@@ -50,7 +50,7 @@ typedef union
 #define GFX_FONT_THIN 0.1f
 #define GFX_FONT_EXTRA_LIGHT 0.2f
 #define GFX_FONT_LIGHT 0.3f
-#define GFX_FONT_NORMAL 0.4f
+#define GFX_FONT_REGULAR 0.4f
 #define GFX_FONT_MEDIUM 0.5f
 #define GFX_FONT_SEMI_BOLD 0.6f
 #define GFX_FONT_BOLD 0.7f

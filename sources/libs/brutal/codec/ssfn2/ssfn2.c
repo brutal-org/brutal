@@ -342,9 +342,47 @@ MaybeError ssfn2_load(IoRSeek rseek, SSFN2Collection *collection, Alloc *alloc)
 
 /* --- SSFN2 Font --------------------------------------------------------- */
 
+Str gfx_font_style_subfamily(GfxFontStyle style)
+{
+    Str result = str$("");
+    // Weights
+    if (style.weight == GFX_FONT_EXTRA_BOLD)
+        result = str$("ExtraBold");
+    else if (style.weight == GFX_FONT_BOLD)
+        result = str$("Bold");
+    else if (style.weight == GFX_FONT_SEMI_BOLD)
+        result = str$("SemiBold");
+    else if (style.weight == GFX_FONT_MEDIUM)
+        result = str$("Medium");
+    else if (style.weight == GFX_FONT_REGULAR)
+        result = str$("Regular");
+    else if (style.weight == GFX_FONT_LIGHT)
+        result = str$("Light");
+    else if (style.weight == GFX_FONT_EXTRA_LIGHT)
+        result = str$("ExtraLight");
+    else if (style.weight == GFX_FONT_THIN)
+        result = str$("Thin");
+
+    // Italic
+    if (style.italic)
+        str_concat(result, str$("Italic"), alloc_global());
+
+    return result;
+}
+
 SSFN2Font *gfx_font_ssfn2_select(void *ctx, GfxFontStyle style)
 {
     SSFN2Collection *coll = (SSFN2Collection *)ctx;
+    
+    // Check if any font is an exact match
+    Str wanted_sub = gfx_font_style_subfamily(style);
+    vec_foreach(font, coll)
+    {
+        if (str_eq(str$(font->stringtable.subfamily_name), wanted_sub))
+            return font;
+    }
+
+    // Fallback heuristic
     SSFN2Font *best_match = NULL;
     uint8_t best_score = 0;
 
@@ -361,7 +399,7 @@ SSFN2Font *gfx_font_ssfn2_select(void *ctx, GfxFontStyle style)
         {
             score++;
         }
-        if (style.weight == GFX_FONT_NORMAL && (SSFN2_TYPE_STYLE(type) & SSFN2_STYLE_REGULAR))
+        if (style.weight == GFX_FONT_REGULAR && (SSFN2_TYPE_STYLE(type) & SSFN2_STYLE_REGULAR))
         {
             score++;
         }
@@ -414,6 +452,8 @@ GfxFont gfx_font_ssfn2(SSFN2Collection *coll)
         .ctx = coll,
         .style = {
             .scale = 0.01,
+            .weight = GFX_FONT_REGULAR,
+            .italic = false,
         },
         .metrics = gfx_font_ssfn2_metrics,
         .advance = gfx_font_ssfn2_advance,
