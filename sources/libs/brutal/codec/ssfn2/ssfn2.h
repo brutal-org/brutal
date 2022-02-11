@@ -46,6 +46,7 @@ typedef struct
 typedef struct SSFN2Font
 {
     size_t font_start;
+    float weight;
     SSFN2FontHeader header;
     SSFN2StringTable stringtable;
     SSFN2Glyph *glyphs; /* glyphs array */
