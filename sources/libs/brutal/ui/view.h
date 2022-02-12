@@ -2,6 +2,7 @@
 
 #include <brutal/gfx/gfx.h>
 #include <brutal/io/emit.h>
+#include <brutal/ui/color.h>
 #include <brutal/ui/event.h>
 #include <brutal/ui/style.h>
 
@@ -21,13 +22,15 @@ struct _UiView
     UiFlags flags;
     MRect bound;
     MVec2 scroll;
-    UiStyle style;
+
+    UiLayout layout;
+    UiPalette palette;
 
     void (*deinit)(UiView *self);
-    void (*paint)(UiView *self, Gfx *painter);
+    void (*repaint)(UiView *self, Gfx *painter);
     void (*event)(UiView *self, UiEvent *event);
     MRect (*size)(UiView *self);
-    void (*layout)(UiView *self);
+    void (*relayout)(UiView *self);
 
     struct _UiApp *app;
     struct _UiWin *window;
@@ -73,7 +76,11 @@ MRect ui_view_container(UiView *self);
 
 void ui_view_resize(UiView *self, MRect rect);
 
-void ui_view_style(UiView *self, UiStyle style);
+void ui_view_layout(UiView *self, UiLayout layout);
+
+GfxColor ui_view_color(UiView *self, UiRole role);
+
+void ui_view_overide_color(UiView *self, UiRole role, GfxColor color);
 
 struct _UiWin *ui_view_window(UiView *self);
 
@@ -83,7 +90,7 @@ void ui_view_should_repaint(UiView *self);
 
 void ui_view_should_repaint_rect(UiView *self, MRect dirty);
 
-void ui_view_paint(UiView *self, Gfx *gfx);
+void ui_view_repaint(UiView *self, Gfx *gfx);
 
 /* --- Layout --------------------------------------------------------------- */
 
@@ -93,7 +100,7 @@ MRect ui_view_size(UiView *self, MRect parent);
 
 void ui_view_place(UiView *self, MRect container);
 
-void ui_view_layout(UiView *self);
+void ui_view_relayout(UiView *self);
 
 /* --- Events --------------------------------------------------------------- */
 

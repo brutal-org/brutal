@@ -1,4 +1,5 @@
 #include <brutal/alloc/global.h>
+#include <brutal/ui/app.h>
 #include <brutal/ui/view.h>
 #include <brutal/ui/win.h>
 
@@ -83,7 +84,7 @@ MRect ui_view_bound(UiView *self)
 
 MRect ui_view_content(UiView *self)
 {
-    return ui_spacing_shrink(self->style.padding, self->style.flow, ui_view_container(self));
+    return m_spacing_shrink(self->layout.padding, self->layout.flow, ui_view_container(self));
 }
 
 MRect ui_view_container(UiView *self)
@@ -98,10 +99,32 @@ void ui_view_resize(UiView *self, MRect rect)
     self->bound = rect;
 }
 
-void ui_view_style(UiView *self, UiStyle style)
+void ui_view_layout(UiView *self, UiLayout layout)
 {
-    self->style = style;
-    ui_view_should_repaint(self);
+    self->layout = layout;
+    ui_view_should_relayout(self);
+}
+
+GfxColor ui_view_color(UiView *self, UiRole role)
+{
+    GfxColor color;
+    if (!ui_palette_color(&self->palette, role, &color))
+    {
+        if (!self->parent)
+        {
+            color = ui_view_color(self->parent, role);
+        }
+        else
+        {
+            color = ui_app_color(ui_app_self(), role);
+        }
+    }
+    return color;
+}
+
+void ui_view_overide_color(UiView *self, UiRole role, GfxColor color)
+{
+    ui_palette_overide(&self->palette, role, color);
 }
 
 struct _UiWin *ui_view_window(UiView *self)
@@ -145,20 +168,20 @@ void ui_view_should_repaint_rect(UiView *self, MRect dirty)
     }
 }
 
-void ui_view_paint(UiView *self, Gfx *gfx)
+void ui_view_repaint(UiView *self, Gfx *gfx)
 {
     gfx_push(gfx);
     gfx_origin(gfx, ui_view_orgin(self));
     gfx_clip(gfx, m_rect(0, 0, self->bound.width, self->bound.height));
 
-    if (self->paint)
+    if (self->repaint)
     {
-        self->paint(self, gfx);
+        self->repaint(self, gfx);
     }
 
     vec_foreach_v(child, &self->children)
     {
-        ui_view_paint(child, gfx);
+        ui_view_repaint(child, gfx);
     }
 
     gfx_pop(gfx);
@@ -170,48 +193,48 @@ MRect ui_view_size(MAYBE_UNUSED UiView *self, MAYBE_UNUSED MRect parent)
 {
     MRect result = parent;
 
-    UiStyle style = self->style;
+    UiLayout layout = self->layout;
 
     if (self->size)
     {
         result = self->size(self);
-        result = ui_spacing_grow(style.padding, style.flow, result);
+        result = m_spacing_grow(layout.padding, layout.flow, result);
     }
 
-    result.size = ui_size_apply(style.size, result.size);
-    result = ui_spacing_grow(style.margin, self->style.flow, result);
+    result.size = ui_size_apply(layout.size, result.size);
+    result = m_spacing_grow(layout.margin, layout.flow, result);
 
     return result;
 }
 
 void ui_view_place(UiView *self, MRect container)
 {
-    UiStyle style = self->style;
+    UiLayout layout = self->layout;
 
-    if (style.placement != M_GRAVITY_NONE)
+    if (layout.placement != M_GRAVITY_NONE)
     {
         MRect bound = ui_view_size(self, container);
-        container = m_gravity_apply(style.placement, M_FLOW_LEFT_TO_RIGHT, bound, container);
+        container = m_gravity_apply(layout.placement, M_FLOW_LEFT_TO_RIGHT, bound, container);
     }
 
-    container = ui_spacing_shrink(style.margin, self->style.flow, container);
+    container = m_spacing_shrink(layout.margin, layout.flow, container);
     ui_view_resize(self, container);
 }
 
-void ui_layout_dock(UiStyle style, MRect container, UiView *views[], size_t len)
+void ui_layout_dock(UiLayout layout, MRect container, UiView *views[], size_t len)
 {
     for (size_t i = 0; i < len; i++)
     {
         UiView *child = views[i];
         MRect content = ui_view_size(child, container);
-        content = ui_dock_apply(child->style.dock, style.flow, content, &container);
+        content = m_dock_apply(child->layout.dock, layout.flow, content, &container);
         ui_view_place(child, content);
     }
 }
 
-void ui_layout_flex(UiStyle style, MRect container, UiView *views[], size_t len)
+void ui_layout_flex(UiLayout layout, MRect container, UiView *views[], size_t len)
 {
-    MFlow flow = style.flow;
+    MFlow flow = layout.flow;
 
     float grows = 0;
     float total = 0;
@@ -219,11 +242,11 @@ void ui_layout_flex(UiStyle style, MRect container, UiView *views[], size_t len)
     for (size_t i = 0; i < len; i++)
     {
         UiView *child = views[i];
-        UiStyle child_style = child->style;
+        UiLayout child_layout = child->layout;
 
-        if (child_style.grow > 0.01)
+        if (child_layout.grow > 0.01)
         {
-            grows += child_style.grow;
+            grows += child_layout.grow;
         }
         else
         {
@@ -231,7 +254,7 @@ void ui_layout_flex(UiStyle style, MRect container, UiView *views[], size_t len)
         }
     }
 
-    float all = m_flow_get_width(flow, container) - style.gaps.x * len;
+    float all = m_flow_get_width(flow, container) - layout.gaps.x * len;
     float grow_total = m_max(0, all - total);
     float grow_unit = (grow_total) / m_max(1, grows);
     float start = m_flow_get_start(flow, container);
@@ -239,13 +262,13 @@ void ui_layout_flex(UiStyle style, MRect container, UiView *views[], size_t len)
     for (size_t i = 0; i < len; i++)
     {
         UiView *child = views[i];
-        UiStyle child_style = child->style;
+        UiLayout child_layout = child->layout;
         MRect child_bound = {};
 
-        if (child_style.grow > 0.01)
+        if (child_layout.grow > 0.01)
         {
             child_bound = m_flow_set_start(flow, child_bound, start);
-            child_bound = m_flow_set_width(flow, child_bound, grow_unit * child_style.grow);
+            child_bound = m_flow_set_width(flow, child_bound, grow_unit * child_layout.grow);
         }
         else
         {
@@ -257,29 +280,29 @@ void ui_layout_flex(UiStyle style, MRect container, UiView *views[], size_t len)
         child_bound = m_flow_set_height(flow, child_bound, m_flow_get_height(flow, container));
 
         ui_view_place(child, child_bound);
-        start += m_flow_get_width(flow, child_bound) + style.gaps.x;
+        start += m_flow_get_width(flow, child_bound) + layout.gaps.x;
     }
 }
 
-void ui_view_layout(UiView *self)
+void ui_view_relayout(UiView *self)
 {
-    if (self->layout)
+    if (self->relayout)
     {
-        self->layout(self);
+        self->relayout(self);
         return;
     }
 
-    UiStyle const style = self->style;
+    UiLayout layout = self->layout;
 
-    switch (style.layout)
+    switch (layout.type)
     {
     default:
     case UI_LAYOUT_DOCK:
-        ui_layout_dock(style, ui_view_content(self), self->children.data, self->children.len);
+        ui_layout_dock(layout, ui_view_content(self), self->children.data, self->children.len);
         break;
 
     case UI_LAYOUT_FLEX:
-        ui_layout_flex(style, ui_view_content(self), self->children.data, self->children.len);
+        ui_layout_flex(layout, ui_view_content(self), self->children.data, self->children.len);
         break;
 
     case UI_LAYOUT_GRID:
@@ -288,7 +311,20 @@ void ui_view_layout(UiView *self)
 
     vec_foreach_v(child, &self->children)
     {
-        ui_view_layout(child);
+        ui_view_relayout(child);
+    }
+}
+
+void ui_view_should_relayout(UiView *self)
+{
+    if (self->parent)
+    {
+        ui_view_relayout(self->parent);
+    }
+
+    if (self->window)
+    {
+        ui_win_should_relayout(self->window);
     }
 }
 

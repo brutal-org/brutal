@@ -135,7 +135,7 @@ void ui_win_repaint_rect(UiWin *self, MRect rect)
     if (self->root)
     {
         gfx_push(&self->gfx);
-        ui_view_paint(self->root, &self->gfx);
+        ui_view_repaint(self->root, &self->gfx);
         gfx_pop(&self->gfx);
     }
 
@@ -157,6 +157,12 @@ void ui_win_flip_full(UiWin *self)
 
 /* --- Layout --------------------------------------------------------------- */
 
+void ui_win_should_relayout(UiWin *self)
+{
+    ui_win_relayout(self);
+    ui_win_repaint(self);
+}
+
 void ui_win_relayout(UiWin *self)
 {
     if (!self->root)
@@ -165,7 +171,7 @@ void ui_win_relayout(UiWin *self)
     }
 
     ui_view_resize(self->root, ui_win_content(self));
-    ui_view_layout(self->root);
+    ui_view_relayout(self->root);
 }
 
 /* --- Events --------------------------------------------------------------- */

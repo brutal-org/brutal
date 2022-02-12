@@ -55,6 +55,8 @@ void gfx_begin(Gfx *self, GfxBuf buf)
         .stroke = (GfxStroke){
             .width = 1,
         },
+        .font_family = gfx_font_builtin(),
+        .font_style = GFX_FONT_DEFAULT,
         .color = GFX_WHITE,
     };
 
@@ -123,6 +125,16 @@ void gfx_fill_style(Gfx *self, GfxPaint paint)
 void gfx_fill_reset(Gfx *self)
 {
     gfx_fill_style(self, gfx_paint_fill(GFX_BLACK));
+}
+
+void gfx_font_family(Gfx *self, GfxFont family)
+{
+    gfx_peek(self)->font_family = family;
+}
+
+void gfx_font_style(Gfx *self, GfxFontStyle style)
+{
+    gfx_peek(self)->font_style = style;
 }
 
 void gfx_color(Gfx *self, GfxColor color)
@@ -434,10 +446,12 @@ void gfx_line(Gfx *self, MEdge line, float weight)
     gfx_fill(self, GFX_FILL_EVENODD);
 }
 
-void gfx_text(Gfx *self, MVec2 origin, Str text, GfxFont font)
+void gfx_text(Gfx *self, MVec2 origin, Str text)
 {
+    GfxFont family = gfx_peek(self)->font_family;
+    GfxFontStyle style = gfx_peek(self)->font_style;
     origin = m_vec2_add(origin, gfx_peek(self)->origin);
-    gfx_font_render_str(font, self, origin, text);
+    gfx_font_render_str(family, style, self, origin, text);
 }
 
 void gfx_fill_rect_aligned(Gfx *self, MRect rect)

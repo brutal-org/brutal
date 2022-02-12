@@ -1,6 +1,6 @@
 #include <brutal/math/gravity.h>
 
-MRect m_gravity_apply(UiGravity gravity, MFlow flow, MRect content, MRect container)
+MRect m_gravity_apply(MGravity gravity, MFlow flow, MRect content, MRect container)
 {
     if (gravity & M_GRAVITY_COVER)
     {
