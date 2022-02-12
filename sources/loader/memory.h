@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 typedef uintptr_t Pages;
-
+typedef Pages* VmmSpace;
 typedef Range(uint64_t) VmmRange;
 typedef Range(uint64_t) PmmRange;
 
@@ -26,11 +26,11 @@ typedef Range(uint64_t) PmmRange;
 #define MMAP_IO_BASE (0xffff800000000000)
 #define MMAP_KERNEL_BASE (0xffffffff80000000)
 
-void memory_init(void);
+VmmSpace memory_create(void);
 
-void memory_flush_tlb(void);
+void memory_switch(VmmSpace self);
 
-void memory_map_range(VmmRange vmm_range, PmmRange pmm_range);
+void memory_map_range(VmmSpace self, VmmRange vmm_range, PmmRange pmm_range);
 
 uint64_t loader_phys_alloc_page(size_t count);
 
