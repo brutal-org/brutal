@@ -15,6 +15,9 @@ typedef struct
     GfxPaint fill;
     GfxStroke stroke;
     GfxColor color;
+
+    GfxFont font_family;
+    GfxFontStyle font_style;
 } GfxCtx;
 
 typedef enum
@@ -80,6 +83,10 @@ void gfx_stroke_style(Gfx *self, GfxStroke stroke);
 
 void gfx_stroke_reset(Gfx *self);
 
+void gfx_font_family(Gfx *self, GfxFont font);
+
+void gfx_font_style(Gfx *self, GfxFontStyle style);
+
 void gfx_color(Gfx *self, GfxColor color);
 
 /* --- Path Building -------------------------------------------------------- */
@@ -120,7 +127,7 @@ void gfx_dot(Gfx *self, MVec2 dot, float size);
 
 void gfx_line(Gfx *self, MEdge line, float weight);
 
-void gfx_text(Gfx *self, MVec2 origin, Str text, GfxFont font);
+void gfx_text(Gfx *self, MVec2 origin, Str text);
 
 void gfx_fill_rect(Gfx *self, MRect rect, float radius);
 

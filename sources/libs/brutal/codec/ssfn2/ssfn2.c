@@ -380,7 +380,7 @@ MaybeError ssfn2_load(IoRSeek rseek, SSFN2Collection *collection, Alloc *alloc)
     return ssfn2_load_internal(input, collection, alloc);
 }
 
-/* --- SSFN2 Font --------------------------------------------------------- */
+/* --- SSFN2 Font ----------------------------------------------------------- */
 
 SSFN2Font *gfx_font_ssfn2_select(void *ctx, GfxFontStyle style)
 {
@@ -447,11 +447,6 @@ GfxFont gfx_font_ssfn2(SSFN2Collection *coll)
 {
     return (GfxFont){
         .ctx = coll,
-        .style = {
-            .scale = 0.01,
-            .weight = GFX_FONT_REGULAR,
-            .italic = false,
-            .width = 0.01},
         .metrics = gfx_font_ssfn2_metrics,
         .advance = gfx_font_ssfn2_advance,
         .render = gfx_font_ssfn2_render,

@@ -19,11 +19,6 @@ PrintValue print_val_unsigned(FmtUInt val)
 PrintValue print_val_float(MAYBE_UNUSED double val)
 {
     return (PrintValue){nullstr, PRINT_FLOAT, {._float = val}};
-    return (PrintValue){
-        nullstr,
-        PRINT_STRING,
-        {._string = str$("<float>")},
-    };
 }
 #endif
 

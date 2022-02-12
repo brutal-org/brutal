@@ -25,6 +25,6 @@
 #define M_GRAVITY_CENTER (M_GRAVITY_HCENTER | M_GRAVITY_VCENTER)
 #define M_GRAVITY_FILL (M_GRAVITY_VFILL | M_GRAVITY_HFILL)
 
-typedef uint64_t UiGravity;
+typedef uint64_t MGravity;
 
-MRect m_gravity_apply(UiGravity gravity, MFlow flow, MRect content, MRect container);
+MRect m_gravity_apply(MGravity gravity, MFlow flow, MRect content, MRect container);

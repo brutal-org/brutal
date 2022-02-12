@@ -4,27 +4,27 @@
 #include <brutal/text/cp437.h>
 #include <brutal/text/utf8.h>
 
-GfxFontMetrics gfx_font_metrics(GfxFont font)
+GfxFontMetrics gfx_font_metrics(GfxFont font, GfxFontStyle style)
 {
-    return font.metrics(font.ctx, font.style);
+    return font.metrics(font.ctx, style);
 }
 
-float gfx_font_advance(GfxFont font, Rune rune)
+float gfx_font_advance(GfxFont font, GfxFontStyle style, Rune rune)
 {
-    return font.advance(font.ctx, font.style, rune);
+    return font.advance(font.ctx, style, rune);
 }
 
-GfxFontMesure gfx_font_mesure(GfxFont font, Str str)
+GfxFontMesure gfx_font_mesure(GfxFont font, GfxFontStyle style, Str str)
 {
     float len = 0;
 
     Rune rune;
     while (uft8_next_rune(&str, &rune))
     {
-        len += gfx_font_advance(font, rune);
+        len += gfx_font_advance(font, style, rune);
     }
 
-    GfxFontMetrics metrics = gfx_font_metrics(font);
+    GfxFontMetrics metrics = gfx_font_metrics(font, style);
 
     return (GfxFontMesure){
         .capbound = m_rect(0, 0, len, metrics.ascend + metrics.descend),
@@ -33,18 +33,18 @@ GfxFontMesure gfx_font_mesure(GfxFont font, Str str)
     };
 }
 
-void gfx_font_render_rune(GfxFont font, struct _Gfx *gfx, MVec2 baseline, Rune rune)
+void gfx_font_render_rune(GfxFont font, GfxFontStyle style, struct _Gfx *gfx, MVec2 baseline, Rune rune)
 {
-    font.render(font.ctx, font.style, gfx, baseline, rune);
+    font.render(font.ctx, style, gfx, baseline, rune);
 }
 
-void gfx_font_render_str(GfxFont font, struct _Gfx *gfx, MVec2 baseline, Str str)
+void gfx_font_render_str(GfxFont font, GfxFontStyle style, struct _Gfx *gfx, MVec2 baseline, Str str)
 {
     Rune rune;
     while (uft8_next_rune(&str, &rune))
     {
-        gfx_font_render_rune(font, gfx, baseline, rune);
-        baseline = m_vec2_add(baseline, m_vec2(gfx_font_advance(font, rune), 0));
+        gfx_font_render_rune(font, style, gfx, baseline, rune);
+        baseline = m_vec2_add(baseline, m_vec2(gfx_font_advance(font, style, rune), 0));
     }
 }
 
@@ -70,6 +70,7 @@ float gfx_font_builtin_advance(MAYBE_UNUSED void *ctx, MAYBE_UNUSED GfxFontStyle
 
 void gfx_font_builtin_render(MAYBE_UNUSED void *ctx, GfxFontStyle style, Gfx *gfx, MVec2 baseline, Rune rune)
 {
+    GfxFontMetrics metrics = gfx_font_builtin_metrics(ctx, style);
     uint8_t index = cp437_from_rune(rune);
 
     for (int y = 0; y < GFX_FONT_BUILTIN_HEIGHT * style.scale; y++)
@@ -82,7 +83,7 @@ void gfx_font_builtin_render(MAYBE_UNUSED void *ctx, GfxFontStyle style, Gfx *gf
             uint8_t byte = gfx_font_builtin_data[yy];
             uint8_t bit = (byte >> xx) & 0b1;
 
-            MVec2 pos = m_vec2_add(baseline, m_vec2(x, y - (gfx_font_builtin_metrics(ctx, style).ascend * style.scale)));
+            MVec2 pos = m_vec2_add(baseline, m_vec2(x, y - (metrics.ascend)));
 
             if (bit && m_rect_collide_point(gfx_peek(gfx)->clip, pos))
             {
@@ -96,9 +97,6 @@ GfxFont gfx_font_builtin(void)
 {
     return (GfxFont){
         .ctx = nullptr,
-        .style = {
-            .scale = 1,
-        },
         .metrics = gfx_font_builtin_metrics,
         .advance = gfx_font_builtin_advance,
         .render = gfx_font_builtin_render,

@@ -66,7 +66,20 @@ typedef struct
 
     /// Used to vary between non-italic and italic.
     bool italic;
+
+    /// Used to vary between monospace and proportional.
+    bool monospace;
 } GfxFontStyle;
+
+#define GFX_FONT_DEFAULT            \
+    (GfxFontStyle)                  \
+    {                               \
+        .scale = 1.0f,              \
+        .weight = GFX_FONT_REGULAR, \
+        .width = 1.0f,              \
+        .slant = 0.0f,              \
+        .italic = false,            \
+    }
 
 typedef GfxFontMetrics GfxFontMetricsFn(void *ctx, GfxFontStyle style);
 typedef float GfxFontAdvanceFn(void *ctx, GfxFontStyle style, Rune rune);
@@ -75,22 +88,21 @@ typedef void GfxFontRenderFn(void *ctx, GfxFontStyle style, struct _Gfx *gfx, MV
 typedef struct
 {
     void *ctx;
-    GfxFontStyle style;
 
     GfxFontMetricsFn *metrics;
     GfxFontAdvanceFn *advance;
     GfxFontRenderFn *render;
 } GfxFont;
 
-GfxFontMetrics gfx_font_metrics(GfxFont font);
+GfxFontMetrics gfx_font_metrics(GfxFont font, GfxFontStyle style);
 
-float gfx_font_advance(GfxFont font, Rune rune);
+float gfx_font_advance(GfxFont font, GfxFontStyle style, Rune rune);
 
-GfxFontMesure gfx_font_mesure(GfxFont font, Str str);
+GfxFontMesure gfx_font_mesure(GfxFont font, GfxFontStyle style, Str str);
 
-void gfx_font_render_rune(GfxFont font, struct _Gfx *gfx, MVec2 baseline, Rune rune);
+void gfx_font_render_rune(GfxFont font, GfxFontStyle style, struct _Gfx *gfx, MVec2 baseline, Rune rune);
 
-void gfx_font_render_str(GfxFont font, struct _Gfx *gfx, MVec2 baseline, Str str);
+void gfx_font_render_str(GfxFont font, GfxFontStyle style, struct _Gfx *gfx, MVec2 baseline, Str str);
 
 /* --- Builtin Font --------------------------------------------------------- */
 

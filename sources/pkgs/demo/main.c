@@ -7,20 +7,13 @@ UiWin *demo_win_create(UiApp *app)
     UiWin *self = ui_win_create(app, m_rect(0, 0, 800, 600), UI_WIN_NORMAL);
 
     UiView *container = ui_panel_create(GFX_DARK_GRAY);
-    ui_view_style(
-        container,
-        (UiStyle){
-            .layout = UI_LAYOUT_DOCK,
-            .flow = M_FLOW_LEFT_TO_RIGHT,
-        });
 
     UiView *toolbar = ui_panel_create(GFX_GRAY);
-    ui_view_style(
+    ui_view_layout(
         toolbar,
-        (UiStyle){
-            .layout = UI_LAYOUT_DOCK,
-            .dock = UI_DOCK_TOP,
-            .padding = (UiSpacing){6, 6, 6, 6},
+        (UiLayout){
+            .dock = M_DOCK_TOP,
+            .padding = (MSpacing){6, 6, 6, 6},
             .size.max.height = 48,
         });
 
@@ -29,10 +22,10 @@ UiWin *demo_win_create(UiApp *app)
     for (int i = 0; i < 5; i++)
     {
         UiView *item = ui_panel_create(GFX_DIM_GRAY);
-        ui_view_style(
+        ui_view_layout(
             item,
-            (UiStyle){
-                .dock = UI_DOCK_START,
+            (UiLayout){
+                .dock = M_DOCK_START,
                 .margin.start = 4,
                 .size.square = true,
             });
@@ -43,32 +36,32 @@ UiWin *demo_win_create(UiApp *app)
     ui_win_mount(self, container);
 
     UiView *button = ui_button_create_with_text(str$("HELLO WORLD!"));
-    ui_view_style(
+    ui_view_layout(
         button,
-        (UiStyle){
+        (UiLayout){
             .margin.start = 4,
-            .dock = UI_DOCK_START,
+            .dock = M_DOCK_START,
             .size.max.width = 160,
         });
 
     ui_view_mount(toolbar, button);
 
     UiView *button1 = ui_button_create_with_text(str$("HELLO FRIENDS!"));
-    ui_view_style(
+    ui_view_layout(
         button1,
-        (UiStyle){
+        (UiLayout){
             .margin.start = 4,
-            .dock = UI_DOCK_START,
+            .dock = M_DOCK_START,
             .size.max.width = 160,
         });
 
     ui_view_mount(toolbar, button1);
 
     UiView *icon1 = ui_icon_create();
-    ui_view_style(
+    ui_view_layout(
         icon1,
-        (UiStyle){
-            .dock = UI_DOCK_FILL,
+        (UiLayout){
+            .dock = M_DOCK_FILL,
         });
     ui_view_mount(container, icon1);
 

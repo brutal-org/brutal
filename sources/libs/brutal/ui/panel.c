@@ -11,7 +11,7 @@ UiView *ui_panel_create(GfxColor color)
 {
     UiView *self = ui_view_create(UiPanel);
 
-    self->paint = ui_panel_paint;
+    self->repaint = ui_panel_paint;
 
     ui_panel$(self)->color = color;
 

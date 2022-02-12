@@ -171,7 +171,10 @@ void wm_server_render(WmServer *self)
         gfx_fill_rect(gfx, dirty, 0);
 
         gfx_pop(gfx);
+    }
 
+    gfx_dirty_foreach(dirty, &self->display_dirty)
+    {
         wm_display_flip(self->display, dirty);
     }
 

@@ -19,9 +19,13 @@ typedef struct
 } IoWindow;
 
 void io_window_init(IoWindow *self, IoWriter underlying, size_t windowsize, Alloc *alloc);
+
 void io_window_deinit(IoWindow *self);
+
 void io_window_flush_chunk(IoWindow *self);
+
 void io_window_flush_all(IoWindow *self);
 
 uint8_t io_window_peek_from_back(IoWindow *self, size_t offset);
+
 IoWriter io_window_writer(IoWindow *self);

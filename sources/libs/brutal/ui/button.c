@@ -1,29 +1,30 @@
 #include <brutal/alloc/global.h>
 #include <brutal/ui/button.h>
-#include <brutal/ui/colors.h>
+#include <brutal/ui/color.h>
+#include <brutal/ui/font.h>
 #include <brutal/ui/text.h>
 
 void ui_button_paint(UiView *self, Gfx *gfx)
 {
     if (self->flags & UI_VIEW_ENABLED)
     {
-        gfx_fill_style(gfx, gfx_paint_fill(GFX_UI_ACCENT));
+        gfx_fill_style(gfx, gfx_paint_fill(UI_COLOR_BLUE));
     }
     else
     {
-        gfx_fill_style(gfx, gfx_paint_fill(GFX_UI_BASE04));
+        gfx_fill_style(gfx, gfx_paint_fill(UI_COLOR_BASE04));
     }
 
     gfx_fill_rect(gfx, ui_view_container(self), 4);
 
     if (ui_button$(self)->press)
     {
-        gfx_fill_style(gfx, gfx_paint_fill(gfx_color_with_alpha(GFX_UI_BASE09, 75)));
+        gfx_fill_style(gfx, gfx_paint_fill(gfx_color_with_alpha(UI_COLOR_BASE09, 75)));
         gfx_fill_rect(gfx, ui_view_container(self), 4);
     }
     else if (ui_button$(self)->over)
     {
-        gfx_fill_style(gfx, gfx_paint_fill(gfx_color_with_alpha(GFX_UI_BASE09, 50)));
+        gfx_fill_style(gfx, gfx_paint_fill(gfx_color_with_alpha(UI_COLOR_BASE09, 50)));
         gfx_fill_rect(gfx, ui_view_container(self), 4);
     }
 }
@@ -66,14 +67,10 @@ UiView *ui_button_create(void)
     UiView *self = ui_view_create(UiButton);
 
     self->flags |= UI_VIEW_GREEDY;
-    self->paint = ui_button_paint;
+    self->repaint = ui_button_paint;
     self->event = ui_button_event;
 
-    ui_view_style(
-        self,
-        (UiStyle){
-            .size.max.height = 36,
-        });
+    ui_view_layout(self, (UiLayout){.size.max.height = 36});
 
     return self;
 }
@@ -81,8 +78,8 @@ UiView *ui_button_create(void)
 UiView *ui_button_create_with_text(Str text)
 {
     UiView *self = ui_button_create();
-    UiView *label = ui_text_create(text, gfx_font_builtin(), GFX_UI_BASE09);
-    ui_view_style(label, (UiStyle){.dock = UI_DOCK_FILL, .gravity = M_GRAVITY_CENTER});
+    UiView *label = ui_text_create(text, UI_FONT_BODY);
+    ui_view_layout(label, (UiLayout){.dock = M_DOCK_FILL, .gravity = M_GRAVITY_CENTER});
     ui_view_mount(self, label);
 
     return self;
