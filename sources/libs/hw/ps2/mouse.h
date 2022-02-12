@@ -14,6 +14,7 @@ typedef struct
     BrEvent interrupt_handle;
     Ps2MouseCallback callback;
     void *ctx;
+    Ps2Controller* controller;
 } Ps2Mouse;
 
 typedef enum
@@ -37,4 +38,3 @@ typedef enum
 
 void _ps2_mouse_init(Ps2Mouse *self, Ps2Controller *controller);
 
-bool ps2_mouse_interrupt_handle(Ps2Mouse *self, Ps2Controller *controller);

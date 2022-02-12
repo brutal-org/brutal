@@ -11,10 +11,10 @@ typedef struct
     BrEvent interrupt_handle;
     Ps2KeyboardCallback callback;
     void *ctx;
+    Ps2Controller* controller;
 } Ps2Keyboard;
 
 #define PS2_KEYBOARD_ESCAPED 0xE0
 
-void _ps2_keyboard_init(Ps2Keyboard *self, Ps2Controller *controller);
+void _ps2_keyboard_init(Ps2Keyboard *self, Ps2Controller* controller);
 
-bool ps2_keyboard_interrupt_handle(Ps2Keyboard *self, Ps2Controller *controller);

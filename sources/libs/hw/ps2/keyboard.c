@@ -1,25 +1,8 @@
 #include <brutal/input/keyboard.h>
 #include <hw/ps2/keyboard.h>
+#include <ipc/ipc.h>
 
-static void clear_ps2_keyboard_buffer(Ps2Controller* controller)
-{
-    uint8_t status = ps2_controller_status(controller);
-
-    while (status & PS2_OUTPUT_STATUS_FULL)
-    {
-        ps2_controller_read_data(controller);
-        status = ps2_controller_status(controller);
-    }
-}
-
-void _ps2_keyboard_init(Ps2Keyboard *self, MAYBE_UNUSED Ps2Controller *controller)
-{
-    self->kb_escaped = false;
-    /* empty already filled in data */
-    clear_ps2_keyboard_buffer(controller);
-}
-
-void ps2_keyboard_handle_code(Ps2Keyboard *ps2, uint8_t packet)
+static void ps2_keyboard_handle_code(Ps2Keyboard *ps2, uint8_t packet)
 {
     if (ps2->kb_escaped)
     {
@@ -51,21 +34,34 @@ void ps2_keyboard_handle_code(Ps2Keyboard *ps2, uint8_t packet)
 
         ps2->callback(ev, ps2->ctx);
     }
+
 }
 
-bool ps2_keyboard_interrupt_handle(Ps2Keyboard *self, Ps2Controller *controller)
+static void ps2_keyboard_interrupt_handle(Ps2Keyboard *self, BrEvent ev)
 {
-    uint8_t status = ps2_controller_status(controller);
-    bool updated = false;
+    uint8_t status = ps2_controller_status(self->controller);
 
     while (status & PS2_OUTPUT_STATUS_FULL && !(status & 0x20))
     {
-        uint8_t packet = ps2_controller_read_data(controller);
+        uint8_t packet = ps2_controller_read_data(self->controller);
 
         ps2_keyboard_handle_code(self, packet);
-        status = ps2_controller_status(controller);
-        updated = true;
+        status = ps2_controller_status(self->controller);
     }
 
-    return updated;
+    br_ack(&(BrAckArgs){.event = ev});
+}
+
+void _ps2_keyboard_init(Ps2Keyboard *self, MAYBE_UNUSED Ps2Controller *controller)
+{
+    self->kb_escaped = false;
+    /* empty already filled in data */
+    self->controller = controller;
+
+    self->interrupt_handle = (BrEvent){
+        .type = BR_EVENT_IRQ,
+        .irq = 1,
+    };
+
+    ipc_component_bind(ipc_component_self(), self->interrupt_handle, (IpcEventHandler *)ps2_keyboard_interrupt_handle, self);
 }

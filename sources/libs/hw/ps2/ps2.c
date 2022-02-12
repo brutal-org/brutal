@@ -1,55 +1,20 @@
 #include <bal/abi.h>
 #include <hw/ps2/ps2.h>
 
-void ps2_interrupt_handle(Ps2 *ps2, BrEvent ev)
+void init_ps2_mouse(Ps2Mouse* mouse, Ps2Controller* controller, Ps2MouseCallback callback, void *ctx)
 {
-    if (ev.type != BR_EVENT_IRQ || (ev.irq != 1 && ev.irq != 12))
-    {
-        return;
-    }
-    if (ev.irq == 1 && ps2_keyboard_interrupt_handle(&ps2->keyboard, &ps2->controller))
-    {
-        br_ack(&(BrAckArgs){.event = ev});
-        return;
-    }
-    else if (ev.irq == 12 && ps2_mouse_interrupt_handle(&ps2->mouse, &ps2->controller))
-    {
-        br_ack(&(BrAckArgs){.event = ev});
-        return;
-    }
-    br_ack(&(BrAckArgs){.event = ev});
+    *mouse = (Ps2Mouse){};
+    ps2_second_port_init(controller);
+    mouse->callback = callback;
+    mouse->ctx = ctx;
+    _ps2_mouse_init(mouse, controller);
 }
 
-void init_ps2_mouse(Ps2 *ps2, Ps2MouseCallback callback, void *ctx)
+void init_ps2_keyboard(Ps2Keyboard *kb, Ps2Controller* controller,  Ps2KeyboardCallback callback, void *ctx)
 {
-    ps2_second_port_init(&ps2->controller);
-    ps2->mouse.interrupt_handle = (BrEvent){
-        .type = BR_EVENT_IRQ,
-        .irq = 12,
-    };
-    ipc_component_bind(ipc_component_self(), ps2->mouse.interrupt_handle, (IpcEventHandler *)ps2_interrupt_handle, ps2);
-    ps2->mouse.callback = callback;
-    ps2->mouse.ctx = ctx;
-    _ps2_mouse_init(&ps2->mouse, &ps2->controller);
-}
-
-void init_ps2_keyboard(Ps2 *ps2, Ps2KeyboardCallback callback, void *ctx)
-{
-
-    ps2_first_port_init(&ps2->controller);
-    ps2->keyboard.interrupt_handle = (BrEvent){
-        .type = BR_EVENT_IRQ,
-        .irq = 1,
-    };
-
-    ipc_component_bind(ipc_component_self(), ps2->keyboard.interrupt_handle, (IpcEventHandler *)ps2_interrupt_handle, ps2);
-
-    ps2->keyboard.callback = callback;
-    ps2->keyboard.ctx = ctx;
-    _ps2_keyboard_init(&ps2->keyboard, &ps2->controller);
-}
-
-void init_ps2(Ps2 *ps2)
-{
-    ps2_controller_init(&ps2->controller);
+    *kb = (Ps2Keyboard){};
+    ps2_first_port_init(controller);
+    kb->callback = callback;
+    kb->ctx = ctx;
+    _ps2_keyboard_init(kb, controller);
 }
