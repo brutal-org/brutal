@@ -18,7 +18,7 @@ void loader_splash(void)
     print(io_chan_out(), "Brutal boot\n");
 }
 
-void loader_load(Elf64Header const *elf_header, void *base)
+void loader_load(Elf64Header const *elf_header, void *base, VmmSpace vmm)
 {
     Elf64ProgramHeader *prog_header = (Elf64ProgramHeader *)(base + elf_header->programs_offset);
 
@@ -32,7 +32,7 @@ void loader_load(Elf64Header const *elf_header, void *base)
 
             mem_cpy(mem_phys_segment, file_segment, prog_header->file_size);
             mem_set(mem_phys_segment + prog_header->file_size, 0, prog_header->memory_size - prog_header->file_size);
-            memory_map_range((VmmRange){
+            memory_map_range(vmm, (VmmRange){
                                  .base = prog_header->virtual_address,
                                  .size = align_up$(prog_header->memory_size, PAGE_SIZE),
                              },
@@ -50,7 +50,7 @@ void loader_load(Elf64Header const *elf_header, void *base)
     }
 }
 
-EntryPointFn loader_load_kernel(Str path)
+EntryPointFn loader_load_kernel(Str path, VmmSpace vmm)
 {
     log$("Loading elf file...");
 
@@ -70,7 +70,7 @@ EntryPointFn loader_load_kernel(Str path)
 
     log$("Elf file loaded in memory, mapping it...");
 
-    loader_load(header, buf.data);
+    loader_load(header, buf.data, vmm);
 
     uintptr_t entry = header->entry;
 
@@ -81,11 +81,11 @@ EntryPointFn loader_load_kernel(Str path)
     return (EntryPointFn)entry;
 }
 
-Handover *allocate_handover(void)
+Handover *allocate_handover(VmmSpace vmm)
 {
     uintptr_t handover_copy_phys = kernel_module_phys_alloc_page((sizeof(Handover) / PAGE_SIZE) + 1);
 
-    memory_map_range((VmmRange){
+    memory_map_range(vmm, (VmmRange){
                          .base = handover_copy_phys + MMAP_KERNEL_BASE,
                          .size = align_up$(sizeof(Handover), PAGE_SIZE),
                      },
@@ -94,23 +94,25 @@ Handover *allocate_handover(void)
                          .size = align_up$(sizeof(Handover), PAGE_SIZE),
                      });
 
-    memory_flush_tlb();
-    return (Handover *)(handover_copy_phys + MMAP_KERNEL_BASE);
+    return (Handover *)(handover_copy_phys);
 }
 
 void loader_boot(LoaderEntry const *entry)
 {
+    VmmSpace vmm = memory_create();
+
     log$("Loading kernel...");
 
-    EntryPointFn entry_point = loader_load_kernel(entry->kernel);
+    EntryPointFn entry_point = loader_load_kernel(entry->kernel, vmm);
 
     log$("Kernel loaded, jumping in to it...");
-    Handover *handover = allocate_handover();
+    Handover *handover = allocate_handover(vmm);
     efi_populate_handover(entry, handover);
 
     efi_deinit();
+    memory_switch(vmm);
 
-    entry_point(handover, 0xC001B001);
+    entry_point(((void*)handover) + MMAP_KERNEL_BASE , 0xC001B001);
 
     panic$("entry_point should no return!");
 }
@@ -118,12 +120,10 @@ void loader_boot(LoaderEntry const *entry)
 EfiStatus efi_main(EFIHandle handle, EFISystemTable *st)
 {
     efi_init(handle, st);
-
     st->boot_services->set_watchdog_timer(0, 0, 0, nullptr);
 
     efi_tty_reset();
 
-    memory_init();
     loader_splash();
 
     LoaderEntry entry = config_get_entry(str$("Brutal"), str$("/boot/config.json"));
