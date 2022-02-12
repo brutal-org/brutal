@@ -55,7 +55,7 @@ void ps2_controller_write_data(Ps2Controller *self, uint8_t data)
     bal_io_out8(self->io, PS2_DATA_PORT, data);
 }
 
-void ps2_controller_init(Ps2Controller *self)
+void init_ps2_controller(Ps2Controller *self)
 {
     *self = (Ps2Controller){
         .io = bal_io_port(0x60, 0x8),
@@ -108,4 +108,15 @@ void ps2_first_port_write(Ps2Controller *self, uint8_t data)
 {
     ps2_controller_write_command(self, PS2_WRITE_FIRST_PORT_OUTPUT);
     ps2_controller_write_data(self, data);
+}
+
+void ps2_controller_flush(Ps2Controller* self)
+{
+    uint8_t status = ps2_controller_status(self);
+
+    while (status & PS2_OUTPUT_STATUS_FULL)
+    {
+        ps2_controller_read_data(self);
+        status = ps2_controller_status(self);
+    }
 }

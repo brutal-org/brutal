@@ -1,5 +1,6 @@
 #include <hw/ps2/mouse.h>
 #include <hw/ps2/controller.h>
+#include <ipc/ipc.h>
 
 static UiEvent ps2_mouse_status(Ps2Mouse *self)
 {
@@ -83,22 +84,20 @@ void ps2_mouse_handle_packet(Ps2Mouse *self, uint8_t packet)
     }
 }
 
-bool ps2_mouse_interrupt_handle(Ps2Mouse *self, Ps2Controller *controller)
+static void ps2_mouse_interrupt_handle(Ps2Mouse* self, BrEvent ev)
 {
-    uint8_t status = ps2_controller_status(controller);
-    bool updated = false;
+    uint8_t status = ps2_controller_status(self->controller);
 
     while (status & PS2_OUTPUT_STATUS_FULL && status & 0x20)
     {
-        uint8_t packet = ps2_controller_read_data(controller);
+        uint8_t packet = ps2_controller_read_data(self->controller);
 
         ps2_mouse_handle_packet(self, packet);
 
-        status = ps2_controller_status(controller);
-        updated = true;
+        status = ps2_controller_status(self->controller);
     }
 
-    return updated;
+    br_ack(&(BrAckArgs){.event = ev});
 }
 
 void ps2_mouse_send(Ps2Controller *controller, uint8_t data)
@@ -107,19 +106,11 @@ void ps2_mouse_send(Ps2Controller *controller, uint8_t data)
     ps2_controller_read_data(controller);
 }
 
-static void clear_ps2_mouse_buffer(Ps2Controller* controller)
-{
-    uint8_t status = ps2_controller_status(controller);
-
-    while (status & PS2_OUTPUT_STATUS_FULL)
-    {
-        ps2_controller_read_data(controller);
-        status = ps2_controller_status(controller);
-    }
-}
-
 void _ps2_mouse_init(Ps2Mouse *self, Ps2Controller *controller)
 {
+
+    self->controller = controller;
+
     ps2_mouse_send(controller, PS2_MOUSE_CMD_SET_DEFAULT);
     ps2_mouse_send(controller, PS2_MOUSE_CMD_ENABLE_REPORT);
 
@@ -141,5 +132,12 @@ void _ps2_mouse_init(Ps2Mouse *self, Ps2Controller *controller)
     self->wheel = status == 3;
 
     /* empty already filled in data */
-    clear_ps2_mouse_buffer(controller);
+
+    self->interrupt_handle = (BrEvent){
+        .type = BR_EVENT_IRQ,
+        .irq = 12,
+    };
+
+    ipc_component_bind(ipc_component_self(), self->interrupt_handle, (IpcEventHandler *)ps2_mouse_interrupt_handle, self);
+
 }

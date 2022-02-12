@@ -91,3 +91,7 @@ uint8_t ps2_second_port_read(Ps2Controller *self);
 void ps2_first_port_init(Ps2Controller *self);
 
 void ps2_first_port_write(Ps2Controller *self, uint8_t val);
+
+void init_ps2_controller(Ps2Controller* self);
+
+void ps2_controller_flush(Ps2Controller* self);
