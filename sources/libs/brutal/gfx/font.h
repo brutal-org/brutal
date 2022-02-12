@@ -37,7 +37,7 @@ typedef struct
     MRect capbound;
     MRect linebound;
     MVec2 baseline;
-} GfxFontMesure;
+} GfxFontMeasure;
 
 // https://docs.microsoft.com/en-us/typography/opentype/otspec180/fvar
 // https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Fonts/Variable_Fonts_Guide
@@ -98,7 +98,7 @@ GfxFontMetrics gfx_font_metrics(GfxFont font, GfxFontStyle style);
 
 float gfx_font_advance(GfxFont font, GfxFontStyle style, Rune rune);
 
-GfxFontMesure gfx_font_mesure(GfxFont font, GfxFontStyle style, Str str);
+GfxFontMeasure gfx_font_measure(GfxFont font, GfxFontStyle style, Str str);
 
 void gfx_font_render_rune(GfxFont font, GfxFontStyle style, struct _Gfx *gfx, MVec2 baseline, Rune rune);
 
