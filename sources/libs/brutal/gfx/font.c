@@ -14,7 +14,7 @@ float gfx_font_advance(GfxFont font, GfxFontStyle style, Rune rune)
     return font.advance(font.ctx, style, rune);
 }
 
-GfxFontMesure gfx_font_mesure(GfxFont font, GfxFontStyle style, Str str)
+GfxFontMeasure gfx_font_measure(GfxFont font, GfxFontStyle style, Str str)
 {
     float len = 0;
 
@@ -26,7 +26,7 @@ GfxFontMesure gfx_font_mesure(GfxFont font, GfxFontStyle style, Str str)
 
     GfxFontMetrics metrics = gfx_font_metrics(font, style);
 
-    return (GfxFontMesure){
+    return (GfxFontMeasure){
         .capbound = m_rect(0, 0, len, metrics.ascend + metrics.descend),
         .linebound = m_rect(0, 0, len, metrics.line_ascend + metrics.line_descend),
         .baseline = m_vec2(0, metrics.ascend),

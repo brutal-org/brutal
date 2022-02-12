@@ -2,16 +2,16 @@
 #include <brutal/ui/app.h>
 #include <brutal/ui/text.h>
 
-GfxFontMesure ui_text_mesure(UiView *self)
+GfxFontMeasure ui_text_measure(UiView *self)
 {
-    return gfx_font_mesure(ui_app_self()->font, ui_text$(self)->font, ui_text$(self)->text);
+    return gfx_font_measure(ui_app_self()->font, ui_text$(self)->font, ui_text$(self)->text);
 }
 
 void ui_text_repaint(UiView *self, Gfx *gfx)
 {
-    GfxFontMesure mesures = ui_text_mesure(self);
-    MRect centered = m_gravity_apply(self->layout.gravity, M_FLOW_LEFT_TO_RIGHT, mesures.capbound, ui_view_content(self));
-    MVec2 orgin = m_vec2_add(centered.pos, mesures.baseline);
+    GfxFontMeasure measures = ui_text_measure(self);
+    MRect centered = m_gravity_apply(self->layout.gravity, M_FLOW_LEFT_TO_RIGHT, measures.capbound, ui_view_content(self));
+    MVec2 orgin = m_vec2_add(centered.pos, measures.baseline);
 
     gfx_color(gfx, ui_view_color(self, UI_COLOR_ROLE_TEXT));
     gfx_font_style(gfx, ui_text$(self)->font);
@@ -20,7 +20,7 @@ void ui_text_repaint(UiView *self, Gfx *gfx)
 
 MRect ui_text_size(UiView *self)
 {
-    return ui_text_mesure(self).linebound;
+    return ui_text_measure(self).linebound;
 }
 
 UiView *ui_text_create(Str text, GfxFontStyle font)
