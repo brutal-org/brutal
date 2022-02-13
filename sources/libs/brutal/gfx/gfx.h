@@ -12,6 +12,8 @@ typedef struct
 {
     MRect clip;
     MVec2 origin;
+    MTrans2 trans;
+
     GfxPaint fill;
     GfxStroke stroke;
     GfxColor color;
@@ -74,6 +76,8 @@ GfxCtx *gfx_peek(Gfx *self);
 void gfx_clip(Gfx *self, MRect rect);
 
 void gfx_origin(Gfx *self, MVec2 pos);
+
+void gfx_trans(Gfx *self, MTrans2 trans);
 
 void gfx_fill_style(Gfx *self, GfxPaint paint);
 
