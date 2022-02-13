@@ -4,9 +4,6 @@
 
 void ui_icon_paint(MAYBE_UNUSED UiView *self, Gfx *gfx)
 {
-    gfx_fill_style(gfx, gfx_paint_fill(GFX_BLACK));
-    gfx_fill_rect(gfx, ui_view_container(self), 0);
-
     gfx_fill_style(gfx, gfx_paint_fill(GFX_RED));
     gfx_fill_rect(gfx, m_rect(0, 0, 100, 100), 32);
 

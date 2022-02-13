@@ -16,7 +16,6 @@ typedef struct
 
     GfxPaint fill;
     GfxStroke stroke;
-    GfxColor color;
 
     GfxFont font_family;
     GfxFontStyle font_style;
