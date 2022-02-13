@@ -57,7 +57,6 @@ void gfx_begin(Gfx *self, GfxBuf buf)
         },
         .font_family = gfx_font_builtin(),
         .font_style = GFX_FONT_DEFAULT,
-        .color = GFX_WHITE,
     };
 
     vec_push(&self->ctx, ctx);
@@ -140,11 +139,6 @@ void gfx_font_family(Gfx *self, GfxFont family)
 void gfx_font_style(Gfx *self, GfxFontStyle style)
 {
     gfx_peek(self)->font_style = style;
-}
-
-void gfx_color(Gfx *self, GfxColor color)
-{
-    gfx_peek(self)->color = color;
 }
 
 /* --- Path Building -------------------------------------------------------- */

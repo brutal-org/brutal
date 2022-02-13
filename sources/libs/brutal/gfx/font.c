@@ -70,8 +70,11 @@ float gfx_font_builtin_advance(MAYBE_UNUSED void *ctx, MAYBE_UNUSED GfxFontStyle
 
 void gfx_font_builtin_render(MAYBE_UNUSED void *ctx, GfxFontStyle style, Gfx *gfx, MVec2 baseline, Rune rune)
 {
+    baseline = m_vec2_add(gfx_peek(gfx)->origin, baseline);
+
     GfxFontMetrics metrics = gfx_font_builtin_metrics(ctx, style);
     uint8_t index = cp437_from_rune(rune);
+    GfxColor color = gfx_paint_sample(gfx_peek(gfx)->fill, 0, 0);
 
     for (int y = 0; y < GFX_FONT_BUILTIN_HEIGHT * style.scale; y++)
     {
@@ -87,7 +90,7 @@ void gfx_font_builtin_render(MAYBE_UNUSED void *ctx, GfxFontStyle style, Gfx *gf
 
             if (bit && m_rect_collide_point(gfx_peek(gfx)->clip, pos))
             {
-                gfx_buf_blend(gfx->buf, pos.x, pos.y, gfx_peek(gfx)->color);
+                gfx_buf_blend(gfx->buf, pos.x, pos.y, color);
             }
         }
     }
