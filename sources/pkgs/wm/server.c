@@ -105,6 +105,14 @@ void wm_server_dispatch(WmServer *self, UiEvent event)
 
         wm_server_should_render(self, mouse_bound);
     }
+    else if (event.type == UI_EVENT_MOUSE_DOWN)
+    {
+        log$("down!");
+    }
+    else if (event.type == UI_EVENT_MOUSE_UP)
+    {
+        log$("up!");
+    }
 }
 
 static void wm_server_render_cursor(WmServer *self, Gfx *gfx)

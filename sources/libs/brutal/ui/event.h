@@ -35,7 +35,6 @@ typedef struct
     MVec2 position;
     MVec2 offset;
     MVec2 scroll;
-
     MsBtns buttons;
 } UiMouseEvent;
 

@@ -2,8 +2,35 @@
 #include <hw/ps2/mouse.h>
 #include <ipc/ipc.h>
 
-static UiEvent ps2_mouse_status(Ps2Mouse *self)
+UiEventType ps2_mouse_event_type(UiMouseEvent prev, UiMouseEvent next)
 {
+    if (next.buttons > prev.buttons)
+    {
+        return UI_EVENT_MOUSE_DOWN;
+    }
+
+    if (next.buttons < prev.buttons)
+    {
+        return UI_EVENT_MOUSE_UP;
+    }
+
+    if (m_vec2_len(prev.offset) > 0)
+    {
+        return UI_EVENT_MOUSE_MOVE;
+    }
+
+    if (m_vec2_len(prev.scroll) > 0)
+    {
+        return UI_EVENT_MOUSE_SCROLL;
+    }
+
+    return UI_EVENT_IGNORE;
+}
+
+static void ps2_mouse_handle_packed(Ps2Mouse *self)
+{
+    self->cycle = 0;
+
     uint8_t const *buf = self->buf;
 
     int offx = buf[1];
@@ -28,22 +55,24 @@ static UiEvent ps2_mouse_status(Ps2Mouse *self)
     }
 
     // decode the new mouse packet
-    UiMouseEvent mevent = {};
+    UiMouseEvent event = {};
 
-    mevent.offset.x = offx;
-    mevent.offset.y = -offy;
-    mevent.scroll.y = scroll;
+    event.offset.x = offx;
+    event.offset.y = -offy;
+    event.scroll.y = scroll;
 
-    mevent.buttons |= ((buf[0] >> 0) & 1) ? MSBTN_LEFT : 0;
-    mevent.buttons |= ((buf[0] >> 1) & 1) ? MSBTN_RIGHT : 0;
-    mevent.buttons |= ((buf[0] >> 2) & 1) ? MSBTN_MIDDLE : 0;
+    event.buttons |= ((buf[0] >> 0) & 1) ? MSBTN_LEFT : 0;
+    event.buttons |= ((buf[0] >> 1) & 1) ? MSBTN_RIGHT : 0;
+    event.buttons |= ((buf[0] >> 2) & 1) ? MSBTN_MIDDLE : 0;
 
-    UiEvent ev = {
-        .type = UI_EVENT_MOUSE_MOVE,
-        .mouse = mevent,
-    };
+    self->callback(
+        (UiEvent){
+            .type = ps2_mouse_event_type(self->prev, event),
+            .mouse = event,
+        },
+        self->ctx);
 
-    return ev;
+    self->prev = event;
 }
 
 void ps2_mouse_handle_packet(Ps2Mouse *self, uint8_t packet)
@@ -57,10 +86,12 @@ void ps2_mouse_handle_packet(Ps2Mouse *self, uint8_t packet)
             self->cycle++;
         }
         break;
+
     case 1:
         self->buf[1] = packet;
         self->cycle++;
         break;
+
     case 2:
         self->buf[2] = packet;
 
@@ -70,15 +101,14 @@ void ps2_mouse_handle_packet(Ps2Mouse *self, uint8_t packet)
         }
         else
         {
-            self->callback(ps2_mouse_status(self), self->ctx);
-            self->cycle = 0;
+            ps2_mouse_handle_packed(self);
         }
 
         break;
+
     case 3:
         self->buf[3] = packet;
-        self->callback(ps2_mouse_status(self), self->ctx);
-        self->cycle = 0;
+        ps2_mouse_handle_packed(self);
         break;
     }
 }

@@ -15,6 +15,7 @@ typedef struct
     Ps2MouseCallback callback;
     void *ctx;
     Ps2Controller *controller;
+    UiMouseEvent prev;
 } Ps2Mouse;
 
 typedef enum
