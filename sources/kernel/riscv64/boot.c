@@ -13,15 +13,12 @@
 static Uart *_uart = NULL;
 static Handover _handover = {};
 
-extern uintptr_t _kernel_end;
-extern uintptr_t _kernel_start;
-
-void arch_entry_main(uint64_t hart_id, uint64_t fdt_addr)
+void arch_entry_main(uint64_t hart_id, uint64_t fdt_addr, uint64_t kstart, uint64_t kend)
 {
     _uart = uart8250_init();
     arch_use_uart(_uart);
 
-    log$("Started hart: {} with fdt: {}", hart_id, fdt_addr);
+    log$("Started hart: {} with fdt: {} ({}-{})", hart_id, fdt_addr, (uintptr_t)kstart, (uintptr_t)kend);
 
     FdtHeader *header = (FdtHeader *)fdt_from_data((void *)fdt_addr);
     Emit target;
@@ -31,8 +28,8 @@ void arch_entry_main(uint64_t hart_id, uint64_t fdt_addr)
     init_interrupts();
 
     HandoverMmapEntry kernel_entry = {
-        .base = (uintptr_t)&_kernel_start,
-        .size = (uintptr_t)&_kernel_end - (uintptr_t)&_kernel_start,
+        .base = (uintptr_t)kstart,
+        .size = (uintptr_t)kend - (uintptr_t)kstart,
         .type = HANDOVER_MMAP_USED,
     };
 

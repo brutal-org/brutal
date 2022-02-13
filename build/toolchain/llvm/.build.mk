@@ -68,7 +68,8 @@ USER_LD=ld.lld
 USER_KLDFLAGS= \
 	-Tsources/embed/kernel/$(CONFIG_ARCH)/$(CONFIG_BOARD)/link.ld \
 	-z max-page-size=0x1000 \
-	$(ARCH_LDFLAGS)
+	$(ARCH_LDFLAGS) \
+	$(ARCH_KLDFLAGS)
 
 USER_ULDFLAGS= \
 	-Tsources/embed/brutal/$(CONFIG_ARCH)/link.ld \
