@@ -385,6 +385,8 @@ SSFN2Font *gfx_font_ssfn2_select(void *ctx, GfxFontStyle style)
         }
     }
 
+    assert_truth(candiate);
+
     return candiate;
 }
 
