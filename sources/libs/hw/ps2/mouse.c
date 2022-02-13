@@ -1,5 +1,5 @@
-#include <hw/ps2/mouse.h>
 #include <hw/ps2/controller.h>
+#include <hw/ps2/mouse.h>
 #include <ipc/ipc.h>
 
 static UiEvent ps2_mouse_status(Ps2Mouse *self)
@@ -37,7 +37,6 @@ static UiEvent ps2_mouse_status(Ps2Mouse *self)
     mevent.buttons |= ((buf[0] >> 0) & 1) ? MSBTN_LEFT : 0;
     mevent.buttons |= ((buf[0] >> 1) & 1) ? MSBTN_RIGHT : 0;
     mevent.buttons |= ((buf[0] >> 2) & 1) ? MSBTN_MIDDLE : 0;
-
 
     UiEvent ev = {
         .type = UI_EVENT_MOUSE_MOVE,
@@ -84,7 +83,7 @@ void ps2_mouse_handle_packet(Ps2Mouse *self, uint8_t packet)
     }
 }
 
-static void ps2_mouse_interrupt_handle(Ps2Mouse* self, BrEvent ev)
+static void ps2_mouse_interrupt_handle(Ps2Mouse *self, BrEvent ev)
 {
     uint8_t status = ps2_controller_status(self->controller);
 
@@ -106,10 +105,15 @@ void ps2_mouse_send(Ps2Controller *controller, uint8_t data)
     ps2_controller_read_data(controller);
 }
 
-void _ps2_mouse_init(Ps2Mouse *self, Ps2Controller *controller)
+void ps2_mouse_init(Ps2Mouse *self, Ps2Controller *controller, Ps2MouseCallback callback, void *ctx)
 {
+    *self = (Ps2Mouse){
+        .callback = callback,
+        .ctx = ctx,
+        .controller = controller,
+    };
 
-    self->controller = controller;
+    ps2_second_port_init(controller);
 
     ps2_mouse_send(controller, PS2_MOUSE_CMD_SET_DEFAULT);
     ps2_mouse_send(controller, PS2_MOUSE_CMD_ENABLE_REPORT);
@@ -139,5 +143,4 @@ void _ps2_mouse_init(Ps2Mouse *self, Ps2Controller *controller)
     };
 
     ipc_component_bind(ipc_component_self(), self->interrupt_handle, (IpcEventHandler *)ps2_mouse_interrupt_handle, self);
-
 }

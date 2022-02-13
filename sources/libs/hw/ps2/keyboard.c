@@ -34,7 +34,6 @@ static void ps2_keyboard_handle_code(Ps2Keyboard *ps2, uint8_t packet)
 
         ps2->callback(ev, ps2->ctx);
     }
-
 }
 
 static void ps2_keyboard_interrupt_handle(Ps2Keyboard *self, BrEvent ev)
@@ -52,11 +51,16 @@ static void ps2_keyboard_interrupt_handle(Ps2Keyboard *self, BrEvent ev)
     br_ack(&(BrAckArgs){.event = ev});
 }
 
-void _ps2_keyboard_init(Ps2Keyboard *self, MAYBE_UNUSED Ps2Controller *controller)
+void ps2_keyboard_init(Ps2Keyboard *self, Ps2Controller *controller, Ps2KeyboardCallback callback, void *ctx)
 {
-    self->kb_escaped = false;
-    /* empty already filled in data */
-    self->controller = controller;
+    *self = (Ps2Keyboard){
+        .ctx = ctx,
+        .callback = callback,
+        .controller = controller,
+        .kb_escaped = false,
+    };
+
+    ps2_first_port_init(controller);
 
     self->interrupt_handle = (BrEvent){
         .type = BR_EVENT_IRQ,
