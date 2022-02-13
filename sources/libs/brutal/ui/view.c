@@ -110,7 +110,7 @@ GfxColor ui_view_color(UiView *self, UiRole role)
     GfxColor color;
     if (!ui_palette_color(&self->palette, role, &color))
     {
-        if (!self->parent)
+        if (self->parent)
         {
             color = ui_view_color(self->parent, role);
         }
