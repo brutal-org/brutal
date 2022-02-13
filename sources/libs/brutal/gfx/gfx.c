@@ -208,22 +208,25 @@ void gfx_fill(Gfx *self, GfxFillRule rule)
                 }
             }
 
-            qsort(self->active.data, self->active.len, sizeof(GfxActiveEdge), gfx_active_edge_cmp);
-
-            int r = 0;
-
-            for (int i = 0; i + 1 < self->active.len; i++)
+            if (vec_len(&self->active) > 0)
             {
-                GfxActiveEdge start_edge = vec_at(&self->active, i);
-                GfxActiveEdge end_edge = vec_at(&self->active, i + 1);
+                qsort(self->active.data, self->active.len, sizeof(GfxActiveEdge), gfx_active_edge_cmp);
 
-                r += start_edge.winding;
+                int r = 0;
 
-                if ((rule == GFX_FILL_EVENODD && r % 2) || (rule == GFX_FILL_NONZERO && r != 0))
+                for (int i = 0; i + 1 < self->active.len; i++)
                 {
-                    for (float x = start_edge.x; x < end_edge.x; x += 1.0f / RAST_AA)
+                    GfxActiveEdge start_edge = vec_at(&self->active, i);
+                    GfxActiveEdge end_edge = vec_at(&self->active, i + 1);
+
+                    r += start_edge.winding;
+
+                    if ((rule == GFX_FILL_EVENODD && r % 2) || (rule == GFX_FILL_NONZERO && r != 0))
                     {
-                        self->scanline[(int)x] += 1.0;
+                        for (float x = start_edge.x; x < end_edge.x; x += 1.0f / RAST_AA)
+                        {
+                            self->scanline[(int)x] += 1.0;
+                        }
                     }
                 }
             }
@@ -450,7 +453,6 @@ void gfx_text(Gfx *self, MVec2 origin, Str text)
 {
     GfxFont family = gfx_peek(self)->font_family;
     GfxFontStyle style = gfx_peek(self)->font_style;
-    origin = m_vec2_add(origin, gfx_peek(self)->origin);
     gfx_font_render_str(family, style, self, origin, text);
 }
 

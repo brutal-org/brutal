@@ -124,6 +124,8 @@ void ui_win_repaint_rect(UiWin *self, MRect rect)
     gfx_begin(&self->gfx, ui_win_gfx(self));
     gfx_clear(&self->gfx, GFX_BLACK);
     gfx_clip(&self->gfx, rect);
+    gfx_font_style(&self->gfx, UI_FONT_BODY);
+    gfx_font_family(&self->gfx, self->app->font);
 
     if (self->paint)
     {

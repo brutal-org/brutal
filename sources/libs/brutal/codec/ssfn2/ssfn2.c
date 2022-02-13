@@ -4,40 +4,6 @@
 #include <brutal/debug.h>
 #include <brutal/gfx.h>
 
-#define SSFN2_MAGIC str$("SFN2")
-#define SSFN2_COLLECTION str$("SFNC")
-#define SSFN2_ENDMAGIC str$("2NFS")
-
-/* font family group in font type byte */
-#define SSFN2_TYPE_FAMILY(x) ((x)&15)
-#define SSFN2_FAMILY_SERIF 0
-#define SSFN2_FAMILY_SANS 1
-#define SSFN2_FAMILY_DECOR 2
-#define SSFN2_FAMILY_MONOSPACE 3
-#define SSFN2_FAMILY_HAND 4
-
-/* font style flags in font type byte */
-#define SSFN2_TYPE_STYLE(x) (((x) >> 4) & 15)
-#define SSFN2_STYLE_REGULAR 0
-#define SSFN2_STYLE_BOLD 1
-#define SSFN2_STYLE_ITALIC 2
-#define SSFN2_STYLE_USRDEF1 4 /* user defined variant 1 */
-#define SSFN2_STYLE_USRDEF2 8 /* user defined variant 2 */
-
-enum
-{
-    SSFN2_CMD_MOVE_TO,
-    SSFN2_CMD_LINE_TO,
-    SSFN2_CMD_QUAD_CURVE,
-    SSFN2_CMD_BEZIER_CURVE,
-};
-
-typedef struct PACKED
-{
-    le_uint8_t magic[4];
-    le_uint32_t size; /* total size in bytes */
-} SSFN2CommonHeader;
-
 static MaybeError ssfn2_load_string(IoReader reader, char *dst)
 {
     for (size_t i = 0; i < SSFN2_MAX_STR_LEN; i++)
@@ -64,6 +30,19 @@ static MaybeError ssfn2_load_stringtable(IoReader reader, SSFN2Font *font)
     TRY(MaybeError, ssfn2_load_string(reader, font->stringtable.manufacturer));
     TRY(MaybeError, ssfn2_load_string(reader, font->stringtable.license));
 
+    return SUCCESS;
+}
+
+static MaybeError ssfn2_read_point(IoRSeek rseek, MAYBE_UNUSED SSFN2FontHeader *header, MVec2 pos, MVec2 *result)
+{
+    uint8_t x, y;
+    TRY(MaybeError, io_read_byte(rseek.reader, &x));
+    TRY(MaybeError, io_read_byte(rseek.reader, &y));
+    MVec2 point = m_vec2_add(pos, m_vec2(x, y));
+    point = m_vec2_sub(point, m_vec2(0, load_le(header->baseline)));
+    point = m_vec2_div_v(point, load_le(header->baseline));
+    point = m_vec2_mul_v(point, 16);
+    *result = point;
     return SUCCESS;
 }
 
@@ -116,7 +95,7 @@ static MaybeError ssfn2_load_fragment(IoRSeek rseek, SSFN2Font *font, MVec2 pos,
     uint8_t cmd_data[0b111111111111];
     TRY(MaybeError, io_read(rseek.reader, cmd_data, cmd_bytes));
 
-    uint8_t x, y, cp1x, cp1y, cp2x, cp2y;
+    MVec2 point, cp1, cp2;
     size_t cmd_cur = 0;
 
     for (size_t i = 0; i < (cmd_count / 4) + 1; i++)
@@ -124,42 +103,31 @@ static MaybeError ssfn2_load_fragment(IoRSeek rseek, SSFN2Font *font, MVec2 pos,
         // 4 commands per byte
         for (size_t j = 0; j < 4 && cmd_cur < cmd_count; j++)
         {
-            TRY(MaybeError, io_read_byte(rseek.reader, &x));
-            TRY(MaybeError, io_read_byte(rseek.reader, &y));
+            TRY(MaybeError, ssfn2_read_point(rseek, &font->header, pos, &point));
 
             uint8_t cmd = (cmd_data[i] >> (j * 2)) & 0b00000011;
 
             switch (cmd)
             {
             case SSFN2_CMD_MOVE_TO:
-                gfx_path_move_to(path, m_vec2_add(pos, m_vec2(x, y)));
+                gfx_path_move_to(path, point);
                 break;
 
             case SSFN2_CMD_LINE_TO:
-                gfx_path_line_to(path, m_vec2_add(pos, m_vec2(x, y)));
+                gfx_path_line_to(path, point);
                 break;
 
             case SSFN2_CMD_QUAD_CURVE:
-                TRY(MaybeError, io_read_byte(rseek.reader, &cp1x));
-                TRY(MaybeError, io_read_byte(rseek.reader, &cp1y));
+                TRY(MaybeError, ssfn2_read_point(rseek, &font->header, pos, &cp1));
 
-                gfx_path_quadratic_to(
-                    path,
-                    m_vec2_add(pos, m_vec2(cp1x, cp1y)),
-                    m_vec2_add(pos, m_vec2(x, y)));
+                gfx_path_quadratic_to(path, cp1, point);
                 break;
 
             case SSFN2_CMD_BEZIER_CURVE:
-                TRY(MaybeError, io_read_byte(rseek.reader, &cp1x));
-                TRY(MaybeError, io_read_byte(rseek.reader, &cp1y));
-                TRY(MaybeError, io_read_byte(rseek.reader, &cp2x));
-                TRY(MaybeError, io_read_byte(rseek.reader, &cp2y));
+                TRY(MaybeError, ssfn2_read_point(rseek, &font->header, pos, &cp1));
+                TRY(MaybeError, ssfn2_read_point(rseek, &font->header, pos, &cp2));
 
-                gfx_path_cubic_to(
-                    path,
-                    m_vec2_add(pos, m_vec2(cp1x, cp1y)),
-                    m_vec2_add(pos, m_vec2(cp2x, cp2y)),
-                    m_vec2_add(pos, m_vec2(x, y)));
+                gfx_path_cubic_to(path, cp1, cp2, point);
                 break;
 
             default:
@@ -183,12 +151,22 @@ static MaybeError ssfn2_load_mapping(IoRSeek rseek, SSFN2Font *font, Rune rune, 
     uint8_t frag_size = attrs & 0x40 ? 6 : 5;
     uint8_t num_frags = glyph_data[0];
 
+    if (rune >= 0x110000)
+    {
+        log$("SSFN2: rune out of range {x}", rune);
+        return ERROR(ERR_BAD_ADDRESS);
+    }
+
+    SSFN2FontHeader const *header = &font->header;
+
     // Initialize glyph
     font->glyphs[rune] = (SSFN2Glyph){
-        .width = glyph_data[1],
-        .height = glyph_data[2],
-        .adv_x = glyph_data[3],
-        .adv_y = glyph_data[4],
+        .present = true,
+        .bound = m_vec2((glyph_data[1] / (float)load_le(header->baseline)) * 16.0f,
+                        (glyph_data[2] / (float)load_le(header->baseline) * 16.0f)),
+
+        .advance = m_vec2((glyph_data[3] / (float)load_le(header->baseline)) * 16.0f,
+                          (glyph_data[4] / (float)load_le(header->baseline) * 16.0f)),
     };
 
     gfx_path_init(&font->glyphs[rune].path, alloc);
@@ -325,7 +303,6 @@ static MaybeError ssfn2_load_internal(IoRSeek rseek, SSFN2Collection *collection
 
     if (str_eq(str_n$(4, (char const *)common_header.magic), SSFN2_COLLECTION))
     {
-        // uint32_t end = load_le(common_header.size);
         while (TRY(MaybeError, io_tell(seeker)) != start + size)
         {
             TRY(MaybeError, ssfn2_load_internal(rseek, collection, alloc));
@@ -421,7 +398,6 @@ GfxFontMetrics gfx_font_ssfn2_metrics(void *ctx, GfxFontStyle style)
         .captop = 10 * style.scale,
         .descend = 3 * style.scale,
         .line_descend = 4 * style.scale,
-
         .advance = load_le(font->header.width) * style.scale,
     };
 }
@@ -429,7 +405,7 @@ GfxFontMetrics gfx_font_ssfn2_metrics(void *ctx, GfxFontStyle style)
 float gfx_font_ssfn2_advance(void *ctx, GfxFontStyle style, Rune rune)
 {
     SSFN2Font *font = gfx_font_ssfn2_select(ctx, style);
-    return font->glyphs[rune].width;
+    return font->glyphs[rune].advance.x * style.scale;
 }
 
 void gfx_font_ssfn2_render(void *ctx, GfxFontStyle style, Gfx *gfx, MVec2 baseline, Rune rune)
@@ -443,7 +419,7 @@ void gfx_font_ssfn2_render(void *ctx, GfxFontStyle style, Gfx *gfx, MVec2 baseli
     gfx_pop(gfx);
 }
 
-GfxFont gfx_font_ssfn2(SSFN2Collection *coll)
+GfxFont ssfn2_font(SSFN2Collection *coll)
 {
     return (GfxFont){
         .ctx = coll,
