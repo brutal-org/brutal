@@ -50,7 +50,7 @@ void gfx_begin(Gfx *self, GfxBuf buf)
 
     GfxCtx ctx = (GfxCtx){
         .clip = gfx_buf_bound(buf),
-        .origin = {},
+        .trans = m_trans2_identity(),
         .fill = gfx_paint_fill(GFX_WHITE),
         .stroke = (GfxStroke){
             .width = 1,
@@ -105,6 +105,11 @@ void gfx_clip(Gfx *self, MRect rect)
 void gfx_origin(Gfx *self, MVec2 pos)
 {
     gfx_peek(self)->origin = m_vec2_add(pos, gfx_peek(self)->origin);
+}
+
+void gfx_trans(Gfx *self, MTrans2 trans)
+{
+    gfx_peek(self)->trans = trans;
 }
 
 void gfx_stroke_style(Gfx *self, GfxStroke stroke)
@@ -269,9 +274,20 @@ void gfx_debug(Gfx *self)
 
 void gfx_eval_cmd(Gfx *self, GfxPathCmd cmd)
 {
-    cmd.cp1 = m_vec2_add(cmd.cp1, gfx_peek(self)->origin);
-    cmd.cp2 = m_vec2_add(cmd.cp2, gfx_peek(self)->origin);
-    cmd.point = m_vec2_add(cmd.point, gfx_peek(self)->origin);
+    MTrans2 trans = gfx_peek(self)->trans;
+
+    if (!m_trans2_is_identity(trans))
+    {
+        cmd.cp1 = m_trans2_apply_point(trans, cmd.cp1);
+        cmd.cp2 = m_trans2_apply_point(trans, cmd.cp2);
+        cmd.point = m_trans2_apply_point(trans, cmd.point);
+    }
+
+    MVec2 origin = gfx_peek(self)->origin;
+
+    cmd.cp1 = m_vec2_add(origin, cmd.cp1);
+    cmd.cp2 = m_vec2_add(origin, cmd.cp2);
+    cmd.point = m_vec2_add(origin, cmd.point);
 
     gfx_flattener_flatten(&self->flattener, cmd);
 }
@@ -485,7 +501,7 @@ void gfx_fill_rect(Gfx *self, MRect rect, float radius)
     gfx_rect(self, rect, radius);
     gfx_close_path(self);
 
-    if (radius == 0)
+    if (radius == 0 && m_trans2_is_identity(gfx_peek(self)->trans))
     {
         gfx_fill_rect_aligned(self, rect);
     }

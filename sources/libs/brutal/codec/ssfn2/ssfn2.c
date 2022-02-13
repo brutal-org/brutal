@@ -414,6 +414,7 @@ void gfx_font_ssfn2_render(void *ctx, GfxFontStyle style, Gfx *gfx, MVec2 baseli
     SSFN2Font *font = gfx_font_ssfn2_select(ctx, style);
     SSFN2Glyph glyph = font->glyphs[rune];
     gfx_origin(gfx, baseline);
+    gfx_trans(gfx, m_trans2_scale(style.scale));
     gfx_fill_path(gfx, &glyph.path, GFX_FILL_EVENODD);
 
     gfx_pop(gfx);
