@@ -41,3 +41,8 @@ uint32_t arch_in(MAYBE_UNUSED uint16_t port, MAYBE_UNUSED int size)
 void arch_out(MAYBE_UNUSED uint16_t port, MAYBE_UNUSED int size, MAYBE_UNUSED uint32_t data)
 {
 }
+
+BrTimeStamp arch_now(void)
+{
+    return datetime_to_timestamp((DateTime){});
+}
