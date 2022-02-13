@@ -1,8 +1,8 @@
 #pragma once
 
 #include <brutal/base.h>
-#include <hw/ps2/controller.h>
 #include <brutal/ui.h>
+#include <hw/ps2/controller.h>
 
 typedef void (*Ps2MouseCallback)(UiEvent ev, void *ctx);
 
@@ -14,7 +14,7 @@ typedef struct
     BrEvent interrupt_handle;
     Ps2MouseCallback callback;
     void *ctx;
-    Ps2Controller* controller;
+    Ps2Controller *controller;
 } Ps2Mouse;
 
 typedef enum
@@ -36,5 +36,4 @@ typedef enum
     PS2_MOUSE_CMD_SET_SCALING = 0xe6,
 } Ps2MouseCommands;
 
-void _ps2_mouse_init(Ps2Mouse *self, Ps2Controller *controller);
-
+void ps2_mouse_init(Ps2Mouse *self, Ps2Controller *controller, Ps2MouseCallback callback, void *ctx);

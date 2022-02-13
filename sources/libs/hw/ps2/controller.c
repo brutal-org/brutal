@@ -1,5 +1,5 @@
-#include <hw/ps2/controller.h>
 #include <brutal/debug.h>
+#include <hw/ps2/controller.h>
 
 uint8_t ps2_controller_status(Ps2Controller *self)
 {
@@ -55,7 +55,7 @@ void ps2_controller_write_data(Ps2Controller *self, uint8_t data)
     bal_io_out8(self->io, PS2_DATA_PORT, data);
 }
 
-void init_ps2_controller(Ps2Controller *self)
+void ps2_controller_init(Ps2Controller *self)
 {
     *self = (Ps2Controller){
         .io = bal_io_port(0x60, 0x8),
@@ -110,7 +110,7 @@ void ps2_first_port_write(Ps2Controller *self, uint8_t data)
     ps2_controller_write_data(self, data);
 }
 
-void ps2_controller_flush(Ps2Controller* self)
+void ps2_controller_flush(Ps2Controller *self)
 {
     uint8_t status = ps2_controller_status(self);
 

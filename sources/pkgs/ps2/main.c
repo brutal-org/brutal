@@ -33,9 +33,9 @@ int ipc_component_main(IpcComponent *self)
 
     IpcCap input_sink = ipc_component_require(self, IPC_EVENT_SINK_PROTO);
 
-    init_ps2_controller(&controller);
-    init_ps2_keyboard(&kb, &controller,  (Ps2KeyboardCallback)&ps2_keyboard_callback, &input_sink);
-    init_ps2_mouse(&mouse, &controller, (Ps2MouseCallback)&ps2_mouse_callback, &input_sink);
+    ps2_controller_init(&controller);
+    ps2_keyboard_init(&kb, &controller,  (Ps2KeyboardCallback)&ps2_keyboard_callback, &input_sink);
+    ps2_mouse_init(&mouse, &controller, (Ps2MouseCallback)&ps2_mouse_callback, &input_sink);
 
     ps2_controller_flush(&controller);
 
