@@ -1,4 +1,5 @@
 #include <brutal/alloc.h>
+#include <brutal/gfx.h>
 #include <protos/bus.h>
 #include <protos/wm.h>
 #include "wm/server.h"
@@ -112,6 +113,11 @@ static void wm_server_render_cursor(WmServer *self, Gfx *gfx)
     gfx_origin(gfx, m_vec2_sub(self->mouse, m_vec2(1, 1)));
     gfx_fill_style(gfx, gfx_paint_fill(GFX_BLACK));
     gfx_fill_svg(gfx, str$("M 0 0 L 16 12.279 L 9.049 13.449 L 13.374 22.266 L 9.778 24 L 5.428 15.121 L -0 19.823 Z"), GFX_FILL_EVENODD);
+
+    gfx_stroke_style(gfx, (GfxStroke){.pos = GFX_STOKE_OUTSIDE, .width = 1});
+    gfx_fill_style(gfx, gfx_paint_fill(UI_COLOR_BASE09));
+    gfx_stroke(gfx);
+
     gfx_pop(gfx);
 }
 
@@ -130,6 +136,10 @@ static void wm_server_render_clients(WmServer *self, Gfx *gfx)
         {
             gfx_fill_rect(gfx, client->bound, 0);
         }
+
+        gfx_stroke_style(gfx, (GfxStroke){.pos = GFX_STOKE_INSIDE, .width = 1});
+        gfx_fill_style(gfx, gfx_paint_fill(UI_COLOR_BASE02));
+        gfx_stroke(gfx);
     }
 }
 
@@ -167,8 +177,8 @@ void wm_server_render(WmServer *self)
         wm_server_render_clients(self, gfx);
         wm_server_render_cursor(self, gfx);
 
-        gfx_fill_style(gfx, gfx_paint_fill(gfx_color_rand(50)));
-        gfx_fill_rect(gfx, dirty, 0);
+        // gfx_fill_style(gfx, gfx_paint_fill(gfx_color_rand(50)));
+        // gfx_fill_rect(gfx, dirty, 0);
 
         gfx_pop(gfx);
     }
