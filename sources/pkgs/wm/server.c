@@ -104,14 +104,13 @@ void wm_server_dispatch(WmServer *self, UiEvent event)
         };
 
         wm_server_should_render(self, mouse_bound);
+        event.mouse.position = self->mouse;
     }
-    else if (event.type == UI_EVENT_MOUSE_DOWN)
+
+    WmClient *client = wm_server_client_at(self, self->mouse);
+    if (client)
     {
-        log$("down!");
-    }
-    else if (event.type == UI_EVENT_MOUSE_UP)
-    {
-        log$("up!");
+        wm_client_dispatch(client, event);
     }
 }
 
@@ -205,4 +204,17 @@ void wm_server_expose(WmServer *self, IpcCap bus_server)
 {
     bus_server_expose_rpc(ipc_component_self(), bus_server, &self->input_sink, alloc_global());
     bus_server_expose_rpc(ipc_component_self(), bus_server, &self->wm_server, alloc_global());
+}
+
+WmClient *wm_server_client_at(WmServer *self, MVec2 vec)
+{
+    vec_foreach_v(client, &self->clients)
+    {
+        if (m_rect_collide_point(client->bound, vec))
+        {
+            return client;
+        }
+    }
+
+    return nullptr;
 }

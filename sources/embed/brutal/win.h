@@ -4,6 +4,7 @@
 
 struct _EmbedWin
 {
-    IpcCap client;
+    IpcCap wm_client;
+    IpcCap input_sink;
     BalFb surface;
 };

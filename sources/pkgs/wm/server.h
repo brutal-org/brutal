@@ -37,3 +37,5 @@ void wm_server_should_render_all(WmServer *self);
 void wm_server_render(WmServer *self);
 
 void wm_server_expose(WmServer *self, IpcCap bus);
+
+WmClient *wm_server_client_at(WmServer *self, MVec2 vec);
