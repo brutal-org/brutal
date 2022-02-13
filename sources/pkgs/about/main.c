@@ -56,6 +56,12 @@ int main(int argc, char const *argv[])
     UiApp app;
     ui_app_init(&app);
 
+    IoFile file;
+    assert_truth(io_file_open(&file, str$("sysroot/pkgs/font-inter/Inter.sfnc.gz")).succ);
+    SSFN2Collection collection;
+    ssfn2_load(io_file_rseek(&file), &collection, alloc_global());
+    ui_app_font(&app, ssfn2_font(&collection));
+
     UiWin *win = about_win_create(&app);
     ui_win_show(win);
 

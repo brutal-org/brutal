@@ -13,7 +13,7 @@ void ui_text_repaint(UiView *self, Gfx *gfx)
     MRect centered = m_gravity_apply(self->layout.gravity, M_FLOW_LEFT_TO_RIGHT, measures.capbound, ui_view_content(self));
     MVec2 orgin = m_vec2_add(centered.pos, measures.baseline);
 
-    gfx_color(gfx, ui_view_color(self, UI_COLOR_ROLE_TEXT));
+    gfx_fill_style(gfx, gfx_paint_fill(ui_view_color(self, UI_COLOR_ROLE_TEXT)));
     gfx_font_style(gfx, ui_text$(self)->font);
     gfx_text(gfx, orgin, ui_text$(self)->text);
 }
