@@ -49,15 +49,27 @@ bool test_run(Test test)
     }
 }
 
-void test_run_by_pattern(Str pattern)
+int test_run_by_pattern(Str pattern)
 {
+    int pass_count = 0;
+    int fail_count = 0;
+
     for (size_t i = 0; i < _len; i++)
     {
         if (glob_match_str(pattern, str$(_tests[i].name)))
         {
-            test_run(_tests[i]);
+            if(test_run(_tests[i]))
+            {
+                pass_count++;
+            }
+            else
+            {
+                fail_count++;
+            }
         }
     }
+
+    return fail_count != 0 ? TASK_EXIT_FAILURE : TASK_EXIT_SUCCESS;
 }
 
 int test_run_all(void)
@@ -93,7 +105,7 @@ int main(int argc, char const *argv[])
 {
     if (argc == 3 && str_eq(str$(argv[1]), str$("-t")))
     {
-        test_run_by_pattern(str$(argv[2]));
+        return test_run_by_pattern(str$(argv[2]));
     }
     else
     {
