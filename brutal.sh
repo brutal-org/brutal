@@ -52,8 +52,8 @@ eval_arg()
       ;;
 
     "--doc")
-      doxygen build/doxygen/Doxyfile 
-      xdg-open bin/doc/html/index.html
+      doxygen meta/doxyfile
+      xdg-open bin/doxygen/index.html
       ;;
 
     "-n" | "--nuke")

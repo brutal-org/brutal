@@ -5,7 +5,7 @@
 <br/>
 
 <p align="center">
-  <img width="256" src="book/shared/logo.png">
+  <img width="256" src="meta/shared/logo.png">
 </p>
 
 <br/>
@@ -53,7 +53,7 @@
 ## Screenshots
 
 <p align="center">
-<img src="book/screenshots/2022-02-02.png" />
+<img src="meta/screenshots/2022-02-02.png" />
 <br>
 BRUTAL running in QEMU 6.2
 </p>
@@ -62,24 +62,24 @@ BRUTAL running in QEMU 6.2
 
 BRUTAL is pretty easy to to build from source using GNUMake, NASM and LLVM.
 
-See [building.md](book/building.md) for more details.
+See [building.md](meta/building.md) for more details.
 
 ## Roadmap
 
 Right now the main goal of brutal is to run doom.
 
-See [roadmap.md](book/roadmap.md) for more information on how we plan to get there and where you can contribute.
+See [roadmap.md](meta/roadmap.md) for more information on how we plan to get there and where you can contribute.
 
 ## Credits
 
 This project takes inspirations and/or reuse code from the following projects.
 
-See [credits.md](book/credits.md)
+See [credits.md](meta/credits.md)
 
 ## License
 
 <a href="https://opensource.org/licenses/MIT">
-  <img align="right" height="96" alt="MIT License" src="book/shared/mit-license.png" />
+  <img align="right" height="96" alt="MIT License" src="meta/shared/mit-license.png" />
 </a>
 
 The brutal operating system and its core components are licensed under the **MIT License**.

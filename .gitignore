@@ -64,7 +64,7 @@ build/toolchain/gnu/build
 build/toolchain/gnu/local
 build/toolchain/gnu/tarballs
 
-book/brutal.pdf
+meta/brutal.pdf
 
 # MacOS
 .DS_STORE

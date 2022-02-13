@@ -1,12 +1,14 @@
-# Naming
+# Coding Style
 
-## IDL
+## Naming
+
+### IDL
 
 - snake_case for all methods
 - CONST_CASE for all constants
 - PascalCase for all types
 
-## C
+### C
 
 - snake_case for all identifier
 - CONST_CASE for all constants
@@ -14,11 +16,11 @@
 
 Theses rules don't apply to standard headers
 
-## Json
+### Json
 
 - snake_case for all keys
 
-## Abbreviations
+### Abbreviations
 
 | Full Word             | Abbreviations |
 | --------------------- | ------------- |
