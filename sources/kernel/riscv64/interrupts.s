@@ -77,7 +77,7 @@ interrupt_common:
     push_all
 
     addi a0, sp, 0
-    call interrupt_handler
+    j interrupt_handler
 
     pop_all
     sret

@@ -12,6 +12,7 @@ enum csr_regs
     CSR_SCAUSE = 0x142,  // supervisor trap cause
     CSR_STVAL = 0x143,   // supervisor trap value
     CSR_SIP = 0x144,     // supervisor interrupt pending
+    CSR_SATP = 0x180,    // supervisor address translation and protection
     CSR_MSTATUS = 0x300, // machine status
     CSR_MISA = 0x301,    // machine extension
     CSR_MIE = 0x304,     // machine interrupt enable
