@@ -1,7 +1,6 @@
 #pragma once
 
 #include <brutal/base.h>
-#include <stdint.h>
 
 #define EXT2_SIGNATURE 0xef53
 

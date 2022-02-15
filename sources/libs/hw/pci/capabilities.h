@@ -1,7 +1,7 @@
 #pragma once
+
 #include <brutal/text.h>
-#include <stdbool.h>
-#include <stdint.h>
+
 #define MSI_CTRL_ENABLE (1 << 0)
 #define MSI_CTRL_64_BIT (1 << 7)
 #define MSI_CTRL_MME_OFF (4)

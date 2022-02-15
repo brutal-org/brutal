@@ -1,10 +1,9 @@
 #pragma once
 
 #include <brutal/base.h>
-#include <stdint.h>
 
 typedef uintptr_t Pages;
-typedef Pages* VmmSpace;
+typedef Pages *VmmSpace;
 typedef Range(uint64_t) VmmRange;
 typedef Range(uint64_t) PmmRange;
 

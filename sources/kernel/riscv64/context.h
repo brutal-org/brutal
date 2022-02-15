@@ -1,5 +1,6 @@
 #pragma once
-#include <stdint.h>
+
+#include <brutal/base.h>
 struct context
 {
     uintptr_t syscall_kernel_stack;
