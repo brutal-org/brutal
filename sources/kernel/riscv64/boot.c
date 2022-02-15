@@ -5,6 +5,7 @@
 #include <fdt/fdt.h>
 #include <fdt/handover.h>
 #include "kernel/arch.h"
+#include "kernel/vmm.h"
 #include "kernel/pmm.h"
 #include "kernel/riscv64/arch.h"
 #include "kernel/riscv64/interrupts.h"
@@ -39,6 +40,7 @@ void arch_entry_main(uint64_t hart_id, uint64_t fdt_addr, uint64_t kstart, uint6
     handover_dump(&_handover);
 
     pmm_initialize(&_handover);
+    vmm_initialize(&_handover);
     while (1)
     {
     }

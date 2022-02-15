@@ -13,4 +13,4 @@ ARCH_KLDFLAGS = \
 USER_ASFLAGS=-fpie -fPIC -mno-relax -march=rv64imafdc -target $(CONFIG_ARCH)-none-elf -c
 
 QEMU_ARGS = \
-	--machine virt -d cpu_reset -d int
+	--machine virt -d cpu_reset  -m 128M
