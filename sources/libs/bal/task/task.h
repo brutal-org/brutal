@@ -14,4 +14,4 @@ void bal_task_init(BalTask *task, Str name);
 
 void bal_task_deinit(BalTask *task);
 
-BrResult bal_task_exec(BalTask *task, BalMem *elf, BrRight rights, IpcCap *caps, size_t count);
+BrResult bal_TaskExec(BalTask *task, BalMem *elf, BrRight rights, IpcCap *caps, size_t count);

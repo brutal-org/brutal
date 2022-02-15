@@ -14,12 +14,12 @@ typedef enum
     JSON_ERROR
 } JsonType;
 
-typedef struct json Json;
+typedef struct _Json Json;
 
 typedef Map(Json) JsonObj;
 typedef Vec(Json) JsonArr;
 
-struct json
+struct _Json
 {
     JsonType type;
 

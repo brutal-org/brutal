@@ -2,9 +2,9 @@
 #include <embed/task.h>
 
 static bool task_initialized = false;
-static struct task self_task;
+static struct _Task self_task;
 
-struct task *task_self(void)
+struct _Task *task_self(void)
 {
     if (!task_initialized)
     {
@@ -15,20 +15,20 @@ struct task *task_self(void)
     return &self_task;
 }
 
-void task_fork(struct task *task)
+void task_fork(struct _Task *task)
 {
-    *task = (struct task){
+    *task = (struct _Task){
         .type = TASK_FORK,
         .fork = {},
     };
 }
 
-bool task_is_child(struct task *task)
+bool task_is_child(struct _Task *task)
 {
     return task->handle == 0;
 }
 
-void task_run(struct task *task)
+void task_run(struct _Task *task)
 {
     switch (task->type)
     {
@@ -41,17 +41,17 @@ void task_run(struct task *task)
     }
 }
 
-void task_exit(struct task *task, int result)
+void task_exit(struct _Task *task, int result)
 {
     embed_task_exit(task->handle, result);
 }
 
-void task_abort(struct task *task)
+void task_abort(struct _Task *task)
 {
     embed_task_abort(task->handle);
 }
 
-TaskWaitResult task_wait(struct task *task)
+TaskWaitResult task_wait(struct _Task *task)
 {
     return OK(TaskWaitResult, embed_task_wait(task->handle));
 }

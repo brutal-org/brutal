@@ -14,7 +14,7 @@ void test_register(Test test)
 
 bool test_run(Test test)
 {
-    struct task runner;
+    struct _Task runner;
     task_fork(&runner);
     task_run(&runner);
 
@@ -58,7 +58,7 @@ int test_run_by_pattern(Str pattern)
     {
         if (glob_match_str(pattern, str$(_tests[i].name)))
         {
-            if(test_run(_tests[i]))
+            if (test_run(_tests[i]))
             {
                 pass_count++;
             }

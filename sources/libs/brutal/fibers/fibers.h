@@ -48,9 +48,9 @@ typedef struct
     FiberBlockResult result;
 } FiberBlocker;
 
-typedef struct fiber Fiber;
+typedef struct _Fiber Fiber;
 
-struct fiber
+struct _Fiber
 {
     int id;
     FiberState state;

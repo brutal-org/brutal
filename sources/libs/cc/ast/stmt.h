@@ -29,16 +29,16 @@ typedef enum
     CSTMT_COUNT
 } CStmtType;
 
-typedef struct cstmt CStmt;
+typedef struct _CStmt CStmt;
 
-struct cstmt
+struct _CStmt
 {
     CStmtType type;
     union
     {
         struct
         {
-            struct cdecl *decl;
+            struct _CDecl *decl;
         } decl_;
 
         struct

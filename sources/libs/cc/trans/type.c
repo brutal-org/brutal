@@ -7,7 +7,7 @@ static void cc_trans_member(Emit *emit, CTypeMember type)
     cc_trans_type_end(emit, type.type);
 }
 
-static void cc_trans_constant(Emit *emit, CTypeConstant member)
+static void cc_trans_constant(Emit *emit, CTypeConst member)
 {
     emit_fmt(emit, "{}", member.name);
 

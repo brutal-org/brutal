@@ -4,17 +4,17 @@
 #include <bvm/eval/instr.h>
 #include <bvm/obj/val.h>
 
-struct bvm_local;
-struct bvm_frame;
-struct bvm_global;
+struct _BvmLocal;
+struct _BvmFrame;
+struct _BvmGlobal;
 
-struct bvm_func
+struct _BvmFunc
 {
     bool native;
 
     union
     {
-        BvmVal (*native_)(struct bvm_local *local, struct bvm_global *mem);
+        BvmVal (*native_)(struct _BvmLocal *local, struct _BvmGlobal *mem);
 
         struct
         {

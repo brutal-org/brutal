@@ -1,106 +1,106 @@
 #include <brutal/debug.h>
 #include <brutal/text.h>
 
-struct ubsan_source_location
+struct _UbsanSrc
 {
     char const *file;
     uint32_t line;
     uint32_t column;
 };
 
-struct ubsan_type_descriptor
+struct _UbsanType
 {
     uint16_t kind;
     uint16_t info;
     char name[];
 };
 
-static void ubsan_print_location(char *message, struct ubsan_source_location loc)
+static void ubsan_print_location(char *message, struct _UbsanSrc loc)
 {
     panic$("{}:{}:{}: {case:sentence}", str$(loc.file), loc.line, loc.column, message);
 }
 
-struct ubsan_overflow_data
+struct _UbsanOverflowData
 {
-    struct ubsan_source_location location;
-    struct ubsan_type_descriptor *type;
+    struct _UbsanSrc location;
+    struct _UbsanType *type;
 };
 
-void __ubsan_handle_add_overflow(struct ubsan_overflow_data *data)
+void __ubsan_handle_add_overflow(struct _UbsanOverflowData *data)
 {
     ubsan_print_location("addition overflow", data->location);
 }
 
-void __ubsan_handle_sub_overflow(struct ubsan_overflow_data *data)
+void __ubsan_handle_sub_overflow(struct _UbsanOverflowData *data)
 {
     ubsan_print_location("subtraction overflow", data->location);
 }
 
-void __ubsan_handle_mul_overflow(struct ubsan_overflow_data *data)
+void __ubsan_handle_mul_overflow(struct _UbsanOverflowData *data)
 {
     ubsan_print_location("multiplication overflow", data->location);
 }
 
-void __ubsan_handle_divrem_overflow(struct ubsan_overflow_data *data)
+void __ubsan_handle_divrem_overflow(struct _UbsanOverflowData *data)
 {
     ubsan_print_location("division overflow", data->location);
 }
 
-void __ubsan_handle_negate_overflow(struct ubsan_overflow_data *data)
+void __ubsan_handle_negate_overflow(struct _UbsanOverflowData *data)
 {
     ubsan_print_location("negation overflow", data->location);
 }
 
-void __ubsan_handle_pointer_overflow(struct ubsan_overflow_data *data)
+void __ubsan_handle_pointer_overflow(struct _UbsanOverflowData *data)
 {
     ubsan_print_location("pointer overflow", data->location);
 }
 
-struct ubsan_shift_out_of_bounds_data
+struct _UbsanShiftOobData
 {
-    struct ubsan_source_location location;
-    struct ubsan_type_descriptor *left_type;
-    struct ubsan_type_descriptor *right_type;
+    struct _UbsanSrc location;
+    struct _UbsanType *left_type;
+    struct _UbsanType *right_type;
 };
 
-void __ubsan_handle_shift_out_of_bounds(struct ubsan_shift_out_of_bounds_data *data)
+void __ubsan_handle_shift_out_of_bounds(struct _UbsanShiftOobData *data)
 {
     ubsan_print_location("shift out of bounds", data->location);
 }
 
-struct ubsan_invalid_value_data
+struct _UbsanInvalidData
 {
-    struct ubsan_source_location location;
-    struct ubsan_type_descriptor *type;
+    struct _UbsanSrc location;
+    struct _UbsanType *type;
 };
 
-void __ubsan_handle_load_invalid_value(struct ubsan_invalid_value_data *data)
+void __ubsan_handle_load_invalid_value(struct _UbsanInvalidData *data)
 {
     ubsan_print_location("invalid load value", data->location);
 }
 
-struct ubsan_array_out_of_bounds_data
+struct _UbsanArrayOobData
 {
-    struct ubsan_source_location location;
-    struct ubsan_type_descriptor *array_type;
-    struct ubsan_type_descriptor *index_type;
+    struct _UbsanSrc location;
+    struct _UbsanType *array_type;
+    struct _UbsanType *index_type;
 };
 
-void __ubsan_handle_out_of_bounds(struct ubsan_array_out_of_bounds_data *data)
+void __ubsan_handle_out_of_bounds(struct _UbsanArrayOobData *data)
 {
     log$(" for: {} at index: {}", (const char *)data->array_type->name, data->index_type->info);
     ubsan_print_location("array out of bounds", data->location);
 }
 
-struct ubsan_type_mismatch_v1_data
+struct _UbsanTypeMismatchV1Data
 {
-    struct ubsan_source_location location;
-    struct ubsan_type_descriptor *type;
+    struct _UbsanSrc location;
+    struct _UbsanType *type;
     unsigned char log_alignment;
     unsigned char type_check_kind;
 };
 
-void __ubsan_handle_type_mismatch_v1(struct ubsan_type_mismatch_v1_data *data, uintptr_t ptr)
+void __ubsan_handle_type_mismatch_v1(struct _UbsanTypeMismatchV1Data *data, uintptr_t ptr)
 {
     if (!ptr)
     {
@@ -117,30 +117,30 @@ void __ubsan_handle_type_mismatch_v1(struct ubsan_type_mismatch_v1_data *data, u
     }
 }
 
-struct ubsan_negative_vla_data
+struct _UbsanNegativeVlaData
 {
-    struct ubsan_source_location location;
-    struct ubsan_type_descriptor *type;
+    struct _UbsanSrc location;
+    struct _UbsanType *type;
 };
 
-void __ubsan_handle_vla_bound_not_positive(struct ubsan_negative_vla_data *data)
+void __ubsan_handle_vla_bound_not_positive(struct _UbsanNegativeVlaData *data)
 {
     ubsan_print_location("variable-length argument is negative", data->location);
 }
 
-struct ubsan_nonnull_return_data
+struct _UbsanNonnullReturnData
 {
-    struct ubsan_source_location location;
+    struct _UbsanSrc location;
 };
 
-void __ubsan_handle_nonnull_return(struct ubsan_nonnull_return_data *data)
+void __ubsan_handle_nonnull_return(struct _UbsanNonnullReturnData *data)
 {
     ubsan_print_location("non-null return is null", data->location);
 }
 
 struct ubsan_nonnull_arg_data
 {
-    struct ubsan_source_location location;
+    struct _UbsanSrc location;
 };
 
 void __ubsan_handle_nonnull_arg(struct ubsan_nonnull_arg_data *data)
@@ -148,40 +148,35 @@ void __ubsan_handle_nonnull_arg(struct ubsan_nonnull_arg_data *data)
     ubsan_print_location("non-null argument is null", data->location);
 }
 
-struct ubsan_unreachable_data
+struct _UbsanUnreachableData
 {
-    struct ubsan_source_location location;
+    struct _UbsanSrc location;
 };
 
-void __ubsan_handle_builtin_unreachable(struct ubsan_unreachable_data *data)
+void __ubsan_handle_builtin_unreachable(struct _UbsanUnreachableData *data)
 {
 
     ubsan_print_location("unreachable code reached", data->location);
 }
 
-struct ubsan_invalid_builtin_data
+struct _UbsanInvalidBuiltinData
 {
-    struct ubsan_source_location location;
+    struct _UbsanSrc location;
     unsigned char kind;
 };
 
-void __ubsan_handle_invalid_builtin(struct ubsan_invalid_builtin_data *data)
+void __ubsan_handle_invalid_builtin(struct _UbsanInvalidBuiltinData *data)
 {
 
     ubsan_print_location("invalid builtin", data->location);
 }
 
-struct ubsan_float$_overflow_data
+struct _UbsanFloatCastOverflowData
 {
-    struct ubsan_source_location location;
+    struct _UbsanSrc location;
 };
 
-void __ubsan_handle_float$_overflow(struct ubsan_float$_overflow_data *data)
-{
-    ubsan_print_location("float cast overflow", data->location);
-}
-
-void __ubsan_handle_float_cast_overflow(struct ubsan_float$_overflow_data *data)
+void __ubsan_handle_float_cast_overflow(struct _UbsanFloatCastOverflowData *data)
 {
     ubsan_print_location("float cast overflow", data->location);
 }

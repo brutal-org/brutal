@@ -10,7 +10,7 @@ typedef struct
     BvmVal val;
 } BvmSym;
 
-typedef struct bvm_global
+typedef struct _BvmGlobal
 {
     Alloc *alloc;
     Vec(BvmSym) data;

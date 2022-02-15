@@ -2,7 +2,7 @@
 
 #include <bvm/obj/val.h>
 
-struct bvm_obj
+struct _BvmObj
 {
     BvmObj *proto;
     size_t len;

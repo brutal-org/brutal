@@ -2,10 +2,10 @@
 
 #include <brutal/alloc/base.h>
 
-typedef struct heap_major HeapMajor;
-typedef struct heap_minor HeapMinor;
+typedef struct _HeapMajor HeapMajor;
+typedef struct _HeapMinor HeapMinor;
 
-struct heap_major
+struct _HeapMajor
 {
     size_t pages;
 
@@ -18,7 +18,7 @@ struct heap_major
     HeapMinor *first;
 };
 
-struct heap_minor
+struct _HeapMinor
 {
     size_t magic;
 

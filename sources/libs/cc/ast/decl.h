@@ -32,7 +32,7 @@ typedef struct
     CType type;
 } CDeclarator;
 
-typedef struct cdecl
+typedef struct _CDecl
 {
     CDeclType type;
     CDeclAttr attr;

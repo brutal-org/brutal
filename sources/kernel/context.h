@@ -10,7 +10,7 @@
 #    error "Arch not supported"
 #endif
 
-typedef struct context Context;
+typedef struct _Context Context;
 
 Context *context_create(void);
 

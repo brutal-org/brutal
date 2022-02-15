@@ -3,7 +3,7 @@
 #include <acpi/base.h>
 #include <acpi/stdh.h>
 
-typedef struct PACKED acpi_rsdt
+typedef struct PACKED _AcpiRsdt
 {
     AcpiSdth stdh;
     uint32_t children[];

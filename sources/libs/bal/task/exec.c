@@ -130,7 +130,7 @@ static uintptr_t bal_exec_stack(BrHandle space, IpcCap *caps, size_t count, BrTa
     return sp;
 }
 
-BrResult bal_task_exec(BalTask *task, BalMem *elf, BrRight rights, IpcCap *caps, size_t count)
+BrResult bal_TaskExec(BalTask *task, BalMem *elf, BrRight rights, IpcCap *caps, size_t count)
 {
     BrCreateArgs space = {
         .type = BR_OBJECT_SPACE,

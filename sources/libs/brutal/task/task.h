@@ -10,62 +10,63 @@
 #define TASK_EXIT_SUCCESS (0)
 #define TASK_EXIT_FAILURE (-1)
 
-enum task_type
+enum _TaskType
 {
     TASK_FORK,
     TASK_CLONE,
     TASK_EXEC,
 };
 
-struct task_fork
+struct _TaskFork
 {
     int _dummy;
 };
 
 typedef void task_clone_entry_t(void);
 
-struct task_clone
+struct _TaskClone
 {
     task_clone_entry_t *entry;
 };
 
-struct task_exec
+struct _TaskExec
 {
     int _dummy;
 };
 
-struct task
+struct _Task
 {
     TaskId handle;
-    enum task_type type;
+    enum _TaskType type;
 
     union
     {
-        struct task_fork fork;
-        struct task_clone clone;
-        struct task_exec exec;
+        struct _TaskFork fork;
+        struct _TaskClone clone;
+        struct _TaskExec exec;
     };
 };
 
-struct task *task_self(void);
+struct _Task *task_self(void);
 
-void task_fork(struct task *task);
+void task_fork(struct _Task *task);
 
-void task_fork_func(struct task *task, task_clone_entry_t *entry);
+void task_fork_func(struct _Task *task, task_clone_entry_t *entry);
 
-void task_clone(struct task *task);
+void task_clone(struct _Task *task);
 
-void task_clone_func(struct task *task, task_clone_entry_t *entry);
+void task_clone_func(struct _Task *task, task_clone_entry_t *entry);
 
-void task_exec(struct task *task);
+void task_exec(struct _Task *task);
 
-bool task_is_child(struct task *task);
+bool task_is_child(struct _Task *task);
 
-void task_run(struct task *task);
+void task_run(struct _Task *task);
 
-void task_exit(struct task *task, int result);
+void task_exit(struct _Task *task, int result);
 
-void task_abort(struct task *task);
+void task_abort(struct _Task *task);
 
 typedef Result(Error, int) TaskWaitResult;
-TaskWaitResult task_wait(struct task *task);
+
+TaskWaitResult task_wait(struct _Task *task);

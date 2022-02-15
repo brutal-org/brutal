@@ -143,7 +143,7 @@ CType ctype_enum(Alloc *alloc)
 
 void ctype_constant(CType *self, Str name, CVal val)
 {
-    CTypeConstant constant = {
+    CTypeConst constant = {
         .name = name,
         .value = val,
     };

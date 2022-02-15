@@ -6,7 +6,7 @@
 
 #define CEXPR_MAX_PRECEDENCE (16)
 
-typedef struct cstmt CStmt;
+typedef struct _CStmt CStmt;
 
 typedef enum
 {
@@ -87,7 +87,7 @@ typedef struct
     CType type;
 } CCompound;
 
-typedef struct cexpr CExpr;
+typedef struct _CExpr CExpr;
 
 typedef struct
 {
@@ -95,7 +95,7 @@ typedef struct
     CExpr *initializer;
 } CInitializer;
 
-struct cexpr
+struct _CExpr
 {
     CExprType type;
     CType sema_type;

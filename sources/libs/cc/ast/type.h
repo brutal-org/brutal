@@ -38,12 +38,12 @@ typedef enum
 
 #define CTYPE_ARRAY_UNBOUNDED (-1)
 
-typedef struct ctype CType;
-typedef struct ctype_member CTypeMember;
-typedef struct ctype_constant CTypeConstant;
+typedef struct _CType CType;
+typedef struct _CTypeMember CTypeMember;
+typedef struct _CTypeConst CTypeConst;
 typedef Vec(CTypeMember) CTypeMembers;
 
-struct ctype
+struct _CType
 {
     CTypeType type;
     CTypeAttr attr;
@@ -74,7 +74,7 @@ struct ctype
 
         struct
         {
-            Vec(CTypeConstant) constants;
+            Vec(CTypeConst) constants;
         } enum_;
 
         struct
@@ -85,13 +85,13 @@ struct ctype
     };
 };
 
-struct ctype_member
+struct _CTypeMember
 {
     CType type;
     Str name;
 };
 
-struct ctype_constant
+struct _CTypeConst
 {
     Str name;
     CVal value;

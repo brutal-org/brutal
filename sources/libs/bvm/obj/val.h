@@ -2,8 +2,8 @@
 
 #include <brutal/base.h>
 
-typedef struct bvm_obj BvmObj;
-typedef struct bvm_func BvmFunc;
+typedef struct _BvmObj BvmObj;
+typedef struct _BvmFunc BvmFunc;
 
 typedef enum
 {

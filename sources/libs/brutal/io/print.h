@@ -17,7 +17,7 @@ typedef enum
     PRINT_CHAR,
 } PrintType;
 
-typedef struct print_value PrintValue;
+typedef struct _PrintValue PrintValue;
 
 typedef struct
 {
@@ -25,7 +25,7 @@ typedef struct
     PrintValue *values;
 } PrintArgs;
 
-struct print_value
+struct _PrintValue
 {
     Str name;
     PrintType type;

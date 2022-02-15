@@ -3,7 +3,7 @@
 #include <bvm/base/res.h>
 #include <bvm/ctx/global.h>
 
-typedef struct bvm_frame
+typedef struct _BvmFrame
 {
     uintptr_t ip;
 
@@ -19,7 +19,7 @@ typedef struct bvm_frame
 #define BVM_MAX_STACK (4096)
 #define BVM_MAX_FRAME (128)
 
-typedef struct bvm_local
+typedef struct _BvmLocal
 {
     Alloc *alloc;
 

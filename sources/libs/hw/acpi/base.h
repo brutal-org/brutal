@@ -25,7 +25,7 @@ typedef struct
 #endif
 
     AcpiRsdp *rsdp;
-    struct acpi_rsdt *rsdt;
+    struct _AcpiRsdt *rsdt;
 } Acpi;
 
 #ifdef __kernel__

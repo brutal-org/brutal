@@ -1,8 +1,8 @@
 #include <embed/debug.h>
 
-struct stackframe
+struct _StackFrame
 {
-    struct stackframe *rbp;
+    struct _StackFrame *rbp;
     uint64_t rip;
 };
 

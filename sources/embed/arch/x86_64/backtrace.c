@@ -1,14 +1,14 @@
 #include <embed/debug.h>
 
-struct stackframe
+struct _StackFrame
 {
-    struct stackframe *rbp;
+    struct _StackFrame *rbp;
     uint64_t rip;
 };
 
 static size_t embed_debug_backtrace_impl(uintptr_t rbp, uintptr_t *buf, size_t cap)
 {
-    struct stackframe *stackframe = (struct stackframe *)rbp;
+    struct _StackFrame *stackframe = (struct _StackFrame *)rbp;
 
     size_t i = 0;
 

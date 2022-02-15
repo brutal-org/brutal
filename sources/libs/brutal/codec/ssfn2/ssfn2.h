@@ -13,7 +13,7 @@ typedef struct
     bool present;
 } SSFN2Glyph;
 
-typedef struct SSFN2Font
+typedef struct
 {
     size_t font_start;
     float weight;

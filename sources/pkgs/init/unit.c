@@ -62,7 +62,7 @@ void unit_start(Unit *self, Handover *handover)
     BalTask elf_task;
     bal_task_init(&elf_task, self->name);
 
-    bal_task_exec(
+    bal_TaskExec(
         &elf_task,
         &elf_mem,
         BR_RIGHT_IO | BR_RIGHT_LOG | BR_RIGHT_PMM | BR_RIGHT_IRQ,
