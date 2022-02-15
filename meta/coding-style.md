@@ -1,7 +1,6 @@
 # Coding Style
 
-> Note: coding styles may change over time.
-> Please let us know if a piece of code is not compatible with these coding styles <3 !
+For low-level styling (spaces, parentheses, brace placement, etc), all code should follow the format specified in .clang-format in the project root.
 
 ## Naming
 
@@ -16,16 +15,19 @@
 - `snake_case` for all identifier
 - `CONST_CASE` for all constants
 - `PascalCase` for all types
+- `_PascalCase` for all struct/union/enum
 
 These rules don't apply to standard headers.
 
 Try to use 'namespace' for declaration names, for example:
 
 ```c
-/* in the file foo.h */
+// foo/bar.h
+#pragma once
+
 typedef int FooBar;
 
-void foo_init(FooBar *foo);
+void foo_bar_init(FooBar *self);
 ```
 
 ### Json
@@ -50,48 +52,73 @@ void foo_init(FooBar *foo);
 
 ## Macro
 
-- Use C macros as a function only when it is needed.
-- Add a dollar at the end of the macro name when it behaves like a function: `macro$(10, int)`
+Constant macros should be `UPPER_CASE`
+
+```c
+#define FOO_BAR (1)
+```
+
+Macros that looks like functions call should be lower_case and ending with `$`
+
+```c
+#define foo_bar$(x) x
+```
 
 ## Type
-- Use the `const` attribute after the type name:
-  - do: `int const *` don't: `const int *`
-- When you are using a templated datastructure (for example `vec(T)`) for returning or as an argument in a function  Always typedef it before:
 
-Do:
+Prefer east const
+
 ```c
+// do
+
+int const* foo;
+
+// don't
+
+const int *foo;
+```
+
+When you are using a templated data type (e.g. `vec(T)`) for returning or as an argument in a function  Always typedef it before:
+
+
+```c
+// do
+
 typedef Vec(Foo) FooTable;
 
 FooTable func(void);
-```
-Don't:
-```c
+
+// Don't
+
 Vec(Foo) func(void);
 ```
 
-## Function
+## Symboles
 
-In C, functions declaration must follow these rules:
+All symbols that are not exposed to the outside world should be marked with `static`
 
-- If the function declaration is not in the header, (and not used anywhere else). It should use the `static` attribute.
+### Functions
 
-### Function Arguments
-- You should set the `const` keyword to an argument when it is possible.
-- Function without any argument must use `void` instead:
-    - Do: `void empty(void)` not: `void empty()`.
-- Function that behaves like class member must have the first argument as `type (const) * self`:
+Parameters should be marked with `const` by default.
 
-```c
-void object_resize(Object* self, Size new_size);
-```
+> In C functions without any parameters should be (void)
 
-- Function that needs an alloc object must put it at the last argument:
+Function should be namspaced with the type they operate on.
 
 ```c
-void object_foo(Object* self, Str b, Alloc* alloc);
+void object_resize(Object* self, size_t const new_size);
+
+void foo_bar(Foo* self, int const x);
 ```
 
-- If an argument is unused during the function execution you must put the `MAYBE_UNUSED` attribute:
+Function that needs an `Alloc` object must put it at the last argument:
+
+```c
+void object_foo(Object* self, Str const b, Alloc* alloc);
+```
+
+If an parameters is unused you must put the `MAYBE_UNUSED` attribute
+
 ```c
 int deinit(MAYBE_UNUSED void *data)
 {
@@ -100,76 +127,37 @@ int deinit(MAYBE_UNUSED void *data)
 ```
 ### Main function
 
-- Always put `argc` and `argv` as arguments.
-- Use a double pointer for `argv`.
-
-## Statement
-
-Each statement must put a `{` and a `}` on a new line.
-
-
-For example:
+Always put `argc` and `argv` as arguments, use a double pointer for `argv`.
 
 ```c
-if (cond)
-{
-    // ...
-}
-else
-{
-    // ...
-}
-
-while (cond)
-{
-    // ...
-}
-
-do
-{
-    // ...
-} while (cond);
-
-struct foo_bar
-{
-};
-
-union foo_bar
-{
-
-};
-
-void do_foo()
+int main(int argc, char const **argv)
 {
     // ...
 }
 ```
-
-### Keywords
-
-- You must use a space after `if`, `for`, `while`, `switch`...
-- You must use parenthesis after a `sizeof`.
-- You must use `nullptr` instead of `NULL` and `(Type*)0`.
-- You must use curly braces after a statement.
 
 ### Switch
 
 You should not put an additional indentation in the switch statement block.
 Every switch statement must have a default block, with at least a panic in case you should not land here.
 For a switch case, you must use `{}` when the code in the block start to get big.
-For example:
 
 ```c
 switch(case)
 {
+
 case 1:
 {
+    int a = 10;
+
     doa();
     dob();
-    if(is_c)
+
+    if(a)
     {
         do_d();
     }
+
     break;
 }
 
@@ -182,40 +170,36 @@ default:
 }
 ```
 
-### Returning In An Else Statement
+### If/Else Statement
 
-You must avoid returning in an else statement if no other action can be executed after the else.
+Use guard clauses when relevant
 
-For example, you should avoid doing:
 ```c
+// Do
 int func(void)
 {
-    if(x)
+    if (!x)
     {
         return 0;
     }
-    else
-    {
-        return 10;
-    }
-}
-```
 
-And do:
-```c
-int func(void)
-{
-    if(x)
-    {
-        return 0;
-    }
+    // More logic here...
 
     return 10;
 }
+
+// Don't
+int func(void)
+{
+    if (x)
+    {
+        // More logic here...
+
+        return 10;
+    }
+    else
+    {
+        return 0;
+    }
+}
 ```
-
-
-## Formatting
-
-* You can use the command `clang-format -r` for formatting your code automatically
-
