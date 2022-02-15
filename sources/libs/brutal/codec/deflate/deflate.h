@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/io/bit-write.h>
+#include <brutal/io/wbits.h>
 
 typedef struct _DeflateCompressor
 {
@@ -9,7 +9,7 @@ typedef struct _DeflateCompressor
     Alloc *alloc;
     IoResult (*compress_block_impl)(struct _DeflateCompressor *c, uint8_t const *in,
                                     size_t in_nbytes, bool last);
-    IoBitWriter bit_writer;
+    IoWBits bit_writer;
 } DeflateCompressor;
 
 /**

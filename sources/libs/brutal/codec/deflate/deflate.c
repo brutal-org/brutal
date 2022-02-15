@@ -29,20 +29,20 @@ void deflate_deinit(MAYBE_UNUSED DeflateCompressor *ctx)
 
 /* Write the header fields common to all DEFLATE block types. */
 void deflate_write_block_header(
-    IoBitWriter *bit_writer,
+    IoWBits *bit_writer,
     bool is_final_block,
     unsigned block_type)
 {
-    io_bw_add_bits(bit_writer, is_final_block, 1);
-    io_bw_add_bits(bit_writer, block_type, 2);
-    io_bw_flush_bits(bit_writer);
+    io_wbits_add_bits(bit_writer, is_final_block, 1);
+    io_wbits_add_bits(bit_writer, block_type, 2);
+    io_wbits_flush_bits(bit_writer);
 }
 
 IoResult deflate_compress_block_uncompressed(DeflateCompressor *ctx, uint8_t const *in, size_t in_nbytes, bool is_last)
 {
     deflate_write_block_header(&ctx->bit_writer, is_last,
                                DEFLATE_BLOCKTYPE_UNCOMPRESSED);
-    io_bw_align_bitstream(&ctx->bit_writer);
+    io_wbits_align_bitstream(&ctx->bit_writer);
 
     uint16_t block_len = in_nbytes;
     io_write(ctx->bit_writer.writer, (uint8_t *)&block_len, sizeof(uint16_t));
@@ -74,7 +74,7 @@ IoResult deflate_compress_stream(DeflateCompressor *ctx, IoWriter writer, IoRead
     size_t total = 0;
     bool last = false;
 
-    io_bw_init(&ctx->bit_writer, writer);
+    io_wbits_init(&ctx->bit_writer, writer);
 
     do
     {

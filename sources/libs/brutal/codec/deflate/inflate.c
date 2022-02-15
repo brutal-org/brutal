@@ -5,8 +5,8 @@
 #include <brutal/codec/deflate/inflate.h>
 #include <brutal/debug/assert.h>
 #include <brutal/io/mem.h>
+#include <brutal/io/rbits.h>
 #include <brutal/io/window.h>
-#include <brutal/io/bit-read.h>
 
 static const uint16_t LENS_BASE[30] = {/* Length codes 257..285 base */
                                        3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31,
@@ -29,7 +29,7 @@ typedef struct
     HuffTree length_tree;
     HuffTree dist_tree;
     IoWindow window;
-    IoBitReader bit_reader;
+    IoRBits bit_reader;
     IoWriter writer;
 } DeflateDecompressor;
 
@@ -57,14 +57,14 @@ MaybeError build_dynamic_huff_trees(DeflateDecompressor *ctx)
     static const uint16_t order[DEFLATE_NUM_PRECODE_SYMS] =
         {16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15};
 
-    IoBitReader *bit_reader = &ctx->bit_reader;
-    io_br_ensure_bits(bit_reader, 14);
+    IoRBits *bit_reader = &ctx->bit_reader;
+    io_rbits_ensure_bits(bit_reader, 14);
     // Get 5 bits HLIT (257-286)
-    uint32_t hlit = io_br_pop_bits(bit_reader, 5) + 257;
+    uint32_t hlit = io_rbits_pop_bits(bit_reader, 5) + 257;
     // Get 5 bits HDIST (1-32)
-    uint32_t hdist = io_br_pop_bits(bit_reader, 5) + 1;
+    uint32_t hdist = io_rbits_pop_bits(bit_reader, 5) + 1;
     // Get 4 bits HCLEN (4-19)
-    uint32_t hclen = io_br_pop_bits(bit_reader, 4) + 4;
+    uint32_t hclen = io_rbits_pop_bits(bit_reader, 4) + 4;
 
     //  The RFC 1951 limits the range of HLIT to 286, but lists HDIST as range
     //  1-32, even though distance codes 30 and 31 have no meaning. While
@@ -86,8 +86,8 @@ MaybeError build_dynamic_huff_trees(DeflateDecompressor *ctx)
     // 3 bits per code
     for (size_t i = 0; i < hclen; i++)
     {
-        io_br_ensure_bits(bit_reader, 3);
-        lengths[order[i]] = io_br_pop_bits(bit_reader, 3);
+        io_rbits_ensure_bits(bit_reader, 3);
+        lengths[order[i]] = io_rbits_pop_bits(bit_reader, 3);
     }
 
     TRY(MaybeError, build_huff_tree(&ctx->length_tree, lengths, DEFLATE_NUM_PRECODE_SYMS));
@@ -103,22 +103,22 @@ MaybeError build_dynamic_huff_trees(DeflateDecompressor *ctx)
         {
         // 3-6
         case 16:
-            io_br_ensure_bits(bit_reader, 2);
-            repeat_count = io_br_pop_bits(bit_reader, 2) + 3;
+            io_rbits_ensure_bits(bit_reader, 2);
+            repeat_count = io_rbits_pop_bits(bit_reader, 2) + 3;
             // Last element will get repeated
             symbol = lengths[num - 1];
             break;
         // 3-10
         case 17:
-            io_br_ensure_bits(bit_reader, 3);
+            io_rbits_ensure_bits(bit_reader, 3);
             symbol = 0;
-            repeat_count = io_br_pop_bits(bit_reader, 3) + 3;
+            repeat_count = io_rbits_pop_bits(bit_reader, 3) + 3;
             break;
         // 11 - 138
         case 18:
-            io_br_ensure_bits(bit_reader, 7);
+            io_rbits_ensure_bits(bit_reader, 7);
             symbol = 0;
-            repeat_count = io_br_pop_bits(bit_reader, 7) + 11;
+            repeat_count = io_rbits_pop_bits(bit_reader, 7) + 11;
             break;
         // 0-15 are literals
         default:
@@ -201,16 +201,16 @@ void build_static_huff_trees(DeflateDecompressor *ctx)
 IoResult deflate_decompress_block(DeflateDecompressor *ctx, bool *final_block)
 {
     size_t decompressed_size = 0;
-    io_br_ensure_bits(&ctx->bit_reader, 1 + 2);
+    io_rbits_ensure_bits(&ctx->bit_reader, 1 + 2);
 
-    *final_block = io_br_pop_bits(&ctx->bit_reader, 1);
-    uint32_t block_type = io_br_pop_bits(&ctx->bit_reader, 2);
+    *final_block = io_rbits_pop_bits(&ctx->bit_reader, 1);
+    uint32_t block_type = io_rbits_pop_bits(&ctx->bit_reader, 2);
 
     uint16_t len, nlen;
 
     if (block_type == DEFLATE_BLOCKTYPE_UNCOMPRESSED)
     {
-        io_br_align(&ctx->bit_reader);
+        io_rbits_align(&ctx->bit_reader);
 
         TRY(IoResult, io_read(ctx->bit_reader.reader, (uint8_t *)&len, sizeof(uint16_t)));
         TRY(IoResult, io_read(ctx->bit_reader.reader, (uint8_t *)&nlen, sizeof(uint16_t)));
@@ -255,12 +255,12 @@ IoResult deflate_decompress_block(DeflateDecompressor *ctx, bool *final_block)
                 }
 
                 symbol -= 257;
-                io_br_ensure_bits(&ctx->bit_reader, LENS_BITS[symbol]);
-                uint32_t length = LENS_BASE[symbol] + io_br_pop_bits(&ctx->bit_reader, LENS_BITS[symbol]);
+                io_rbits_ensure_bits(&ctx->bit_reader, LENS_BITS[symbol]);
+                uint32_t length = LENS_BASE[symbol] + io_rbits_pop_bits(&ctx->bit_reader, LENS_BITS[symbol]);
 
                 uint16_t dist = huff_decoder_next(&dist_dec);
-                io_br_ensure_bits(&ctx->bit_reader, DIST_BITS[dist]);
-                uint32_t offset = DIST_BASE[dist] + io_br_pop_bits(&ctx->bit_reader, DIST_BITS[dist]);
+                io_rbits_ensure_bits(&ctx->bit_reader, DIST_BITS[dist]);
+                uint32_t offset = DIST_BASE[dist] + io_rbits_pop_bits(&ctx->bit_reader, DIST_BITS[dist]);
                 // Copy match
                 decompressed_size += length;
                 for (size_t i = 0; i < length; ++i)
@@ -287,7 +287,7 @@ IoResult deflate_decompress_stream(IoWriter writer, IoReader reader)
     bool final_block;
 
     DeflateDecompressor ctx;
-    io_br_init(&ctx.bit_reader, reader);
+    io_rbits_init(&ctx.bit_reader, reader);
     // TODO: windowsize can be smaller (see RFC 1950)
     io_window_init(&ctx.window, writer, 0x8000, alloc_global());
     ctx.writer = io_window_writer(&ctx.window);

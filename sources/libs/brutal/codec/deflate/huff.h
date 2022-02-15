@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/io/bit-read.h>
+#include <brutal/io/rbits.h>
 
 typedef struct
 {
@@ -81,11 +81,11 @@ MaybeError build_huff_tree(HuffTree *t, const uint8_t *lengths, uint32_t num)
 
 typedef struct
 {
-    IoBitReader *bit_reader;
+    IoRBits *bit_reader;
     HuffTree *tree;
 } HuffDecoder;
 
-void huff_decoder_init(HuffDecoder *dec, IoBitReader *bit_reader, HuffTree *tree)
+void huff_decoder_init(HuffDecoder *dec, IoRBits *bit_reader, HuffTree *tree)
 {
     dec->bit_reader = bit_reader;
     dec->tree = tree;
@@ -108,8 +108,8 @@ static inline uint16_t huff_decoder_next(HuffDecoder *dec)
     // of offs and add one more bit to it.
     for (int32_t len = 1;; ++len)
     {
-        io_br_ensure_bits(dec->bit_reader, 1);
-        offs = 2 * offs + io_br_pop_bits(dec->bit_reader, 1);
+        io_rbits_ensure_bits(dec->bit_reader, 1);
+        offs = 2 * offs + io_rbits_pop_bits(dec->bit_reader, 1);
 
         assert_lower_equal(len, 15);
 

@@ -17,9 +17,9 @@ typedef struct
 
     /* Number of bits currently held in @bitbuf */
     size_t bitcount;
-} IoBitWriter;
+} IoWBits;
 
-static inline void io_bw_init(IoBitWriter *self, IoWriter writer)
+static inline void io_wbits_init(IoWBits *self, IoWriter writer)
 {
     self->writer = writer;
     self->bitbuf = 0;
@@ -30,7 +30,7 @@ static inline void io_bw_init(IoBitWriter *self, IoWriter writer)
  @brief Add some bits to the bitbuffer variable of the output bitstream.  The caller
         must make sure there is enough room.
 */
-static inline void io_bw_add_bits(IoBitWriter *self, const BitBuf bits, const size_t num_bits)
+static inline void io_wbits_add_bits(IoWBits *self, const BitBuf bits, const size_t num_bits)
 {
     self->bitbuf |= bits << self->bitcount;
     self->bitcount += num_bits;
@@ -39,7 +39,7 @@ static inline void io_bw_add_bits(IoBitWriter *self, const BitBuf bits, const si
 /**
   @brief Flush bits that fit into bytes
 */
-static inline void io_bw_flush_bits(IoBitWriter *self)
+static inline void io_wbits_flush_bits(IoWBits *self)
 {
     /* Flush a byte at a time. */
     while (self->bitcount >= 8)
@@ -53,9 +53,9 @@ static inline void io_bw_flush_bits(IoBitWriter *self)
 /**
   @brief Flush all remaining bits even if does not align to a byte boundary
 */
-static inline void io_bw_flush_bits_remaining(IoBitWriter *self)
+static inline void io_wbits_flush_bits_remaining(IoWBits *self)
 {
-    io_bw_flush_bits(self);
+    io_wbits_flush_bits(self);
     io_write(self->writer, (uint8_t *)&self->bitbuf, 1);
     self->bitcount = 0;
     self->bitbuf = 0;
@@ -64,8 +64,8 @@ static inline void io_bw_flush_bits_remaining(IoBitWriter *self)
 /**
   @brief Align the bitstream on a byte boundary.
 */
-static inline void io_bw_align_bitstream(IoBitWriter *self)
+static inline void io_wbits_align_bitstream(IoWBits *self)
 {
     self->bitcount += -self->bitcount & 7;
-    io_bw_flush_bits(self);
+    io_wbits_flush_bits(self);
 }
