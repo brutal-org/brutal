@@ -22,7 +22,7 @@ MaybeError bal_mem_init_mobj(BalMem *self, BrHandle handle);
 
 /**
  * @brief Create a new memory object from a memory handle with an offset and a length.
- * @note **The ownerships of the handle is given to the memory object**
+ * @note The ownerships of the handle is given to the memory object
  * @param self The memory object to create.
  * @param handle The handle to give to the created memory object.
  * @param offset, len The offset and the length of the memory object to create.

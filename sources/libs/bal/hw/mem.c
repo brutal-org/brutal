@@ -9,11 +9,11 @@ MaybeError bal_mem_init_mobj(BalMem *self, BrHandle handle)
 
 MaybeError bal_mem_init_mobj_offset(BalMem *self, BrHandle handle, size_t offset, size_t len)
 {
-    *self = (BalMem){};
-
-    self->off = offset;
-    self->len = len;
-    self->handle = handle;
+    *self = (BalMem){
+        .off = offset,
+        .len = len,
+        .handle = handle,
+    };
 
     return SUCCESS;
 }
