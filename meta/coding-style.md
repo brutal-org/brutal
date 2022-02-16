@@ -93,7 +93,7 @@ FooTable func(void);
 Vec(Foo) func(void);
 ```
 
-## Symboles
+## Symbols
 
 All symbols that are not exposed to the outside world should be marked with `static`
 

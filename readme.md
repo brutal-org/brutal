@@ -53,7 +53,7 @@
 ## Screenshots
 
 <p align="center">
-<img src="meta/screenshots/2022-02-02.png" />
+<img src="meta/screenshots/2022-02-15.png" />
 <br>
 BRUTAL running in QEMU 6.2
 </p>

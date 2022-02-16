@@ -17,10 +17,8 @@ The following roadmap is always subject to change.
     - [x] Events
   - [ ] BRUTAL Backend
     - [ ] Compositor
-      - [ ] Event Dispatch
+      - [x] Event Dispatch
       - [x] Compositing
-      - [ ] Tilling Mode
-      - [ ] Floating Mode
     - [ ] Client
       - [x] Render
       - [ ] Events
@@ -49,9 +47,14 @@ The following roadmap is always subject to change.
     - [ ] Switch
     - [ ] Slider
 - [ ] Files System
+  - [ ] GPT
+  - [ ] MBR
   - [x] Ahci
     - [x] Read
     - [x] Write
+  - [ ] Fat
+    - [ ] Read
+    - [ ] Write
   - [ ] Ext2Fs
     - [x] Read
     - [ ] Write
