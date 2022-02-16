@@ -9,7 +9,7 @@ void ui_panel_paint(UiView *self, Gfx *gfx)
 
 UiView *ui_panel_create(GfxColor color)
 {
-    UiView *self = ui_view_create(UiPanel);
+    UiView *self = ui_view_create$(UiPanel);
 
     self->repaint = ui_panel_paint;
 

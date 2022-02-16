@@ -25,7 +25,7 @@ MRect ui_text_size(UiView *self)
 
 UiView *ui_text_create(Str text, GfxFontStyle font)
 {
-    UiView *self = ui_view_create(UiText);
+    UiView *self = ui_view_create$(UiText);
 
     self->repaint = ui_text_repaint;
     self->size = ui_text_size;

@@ -64,7 +64,7 @@ void ui_button_event(UiView *self, UiEvent *event)
 
 UiView *ui_button_create(void)
 {
-    UiView *self = ui_view_create(UiButton);
+    UiView *self = ui_view_create$(UiButton);
 
     self->flags |= UI_VIEW_GREEDY;
     self->repaint = ui_button_paint;

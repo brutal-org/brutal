@@ -13,7 +13,7 @@ void ui_icon_paint(MAYBE_UNUSED UiView *self, Gfx *gfx)
 
 UiView *ui_icon_create(void)
 {
-    UiView *self = ui_view_create(UiIcon);
+    UiView *self = ui_view_create$(UiIcon);
 
     self->repaint = ui_icon_paint;
 
