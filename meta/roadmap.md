@@ -36,16 +36,16 @@ The following roadmap is always subject to change.
     - [x] Dock Layout
     - [x] Flex Layout
     - [ ] Grid Layout
-  - [ ] Views
+  - [x] Views
     - [x] Panel
-    - [ ] Icon
+    - [x] Icon
     - [x] Button
     - [x] Text
     - [x] Frame
-    - [ ] Image
-    - [ ] Splitter
-    - [ ] Switch
-    - [ ] Slider
+    - [x] Image
+    - [x] Splitter
+    - [x] Switch
+    - [x] Slider
 - [ ] Files System
   - [ ] GPT
   - [ ] MBR

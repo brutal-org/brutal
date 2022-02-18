@@ -161,8 +161,7 @@ void ui_view_should_repaint_rect(UiView *self, MRect dirty)
         dirty.pos = m_vec2_add(dirty.pos, ui_view_orgin(self->parent));
         ui_view_should_repaint_rect(self->parent, dirty);
     }
-
-    if (self->window)
+    else if (self->window)
     {
         ui_win_should_repaint_rect(self->window, dirty);
     }
@@ -184,23 +183,30 @@ void ui_view_repaint(UiView *self, Gfx *gfx)
         ui_view_repaint(child, gfx);
     }
 
+    // gfx_fill_style(gfx, gfx_paint_fill(GFX_CYAN));
+    // gfx_stroke_rect(gfx, ui_view_container(self), 1);
+
     gfx_pop(gfx);
 }
 
 /* --- Layout --------------------------------------------------------------- */
 
-MRect ui_view_size(MAYBE_UNUSED UiView *self, MAYBE_UNUSED MRect parent)
+MRect ui_view_size(MAYBE_UNUSED UiView *self)
 {
-    MRect result = parent;
+    MRect result;
 
     UiLayout layout = self->layout;
 
     if (self->size)
     {
         result = self->size(self);
-        result = m_spacing_grow(layout.padding, layout.flow, result);
+    }
+    else
+    {
+        result.size = ui_layout_size(&layout, self->children.data, self->children.len);
     }
 
+    result = m_spacing_grow(layout.padding, layout.flow, result);
     result.size = ui_size_apply(layout.size, result.size);
     result = m_spacing_grow(layout.margin, layout.flow, result);
 
@@ -211,102 +217,31 @@ void ui_view_place(UiView *self, MRect container)
 {
     UiLayout layout = self->layout;
 
-    if (layout.placement != M_GRAVITY_NONE)
-    {
-        MRect bound = ui_view_size(self, container);
-        container = m_gravity_apply(layout.placement, M_FLOW_LEFT_TO_RIGHT, bound, container);
-    }
-
+    MRect bound = ui_view_size(self);
+    container = m_gravity_apply(layout.placement, M_FLOW_LEFT_TO_RIGHT, bound, container);
     container = m_spacing_shrink(layout.margin, layout.flow, container);
+
     ui_view_resize(self, container);
-}
-
-void ui_layout_dock(UiLayout layout, MRect container, UiView *views[], size_t len)
-{
-    for (size_t i = 0; i < len; i++)
-    {
-        UiView *child = views[i];
-        MRect content = ui_view_size(child, container);
-        content = m_dock_apply(child->layout.dock, layout.flow, content, &container);
-        ui_view_place(child, content);
-    }
-}
-
-void ui_layout_flex(UiLayout layout, MRect container, UiView *views[], size_t len)
-{
-    MFlow flow = layout.flow;
-
-    float grows = 0;
-    float total = 0;
-
-    for (size_t i = 0; i < len; i++)
-    {
-        UiView *child = views[i];
-        UiLayout child_layout = child->layout;
-
-        if (child_layout.grow > 0.01)
-        {
-            grows += child_layout.grow;
-        }
-        else
-        {
-            total += m_flow_get_width(flow, ui_view_size(child, container));
-        }
-    }
-
-    float all = m_flow_get_width(flow, container) - layout.gaps.x * len;
-    float grow_total = m_max(0, all - total);
-    float grow_unit = (grow_total) / m_max(1, grows);
-    float start = m_flow_get_start(flow, container);
-
-    for (size_t i = 0; i < len; i++)
-    {
-        UiView *child = views[i];
-        UiLayout child_layout = child->layout;
-        MRect child_bound = {};
-
-        if (child_layout.grow > 0.01)
-        {
-            child_bound = m_flow_set_start(flow, child_bound, start);
-            child_bound = m_flow_set_width(flow, child_bound, grow_unit * child_layout.grow);
-        }
-        else
-        {
-            child_bound = ui_view_size(child, container);
-            child_bound = m_flow_set_x(flow, child_bound, start);
-        }
-
-        child_bound = m_flow_set_y(flow, child_bound, m_flow_get_top(flow, container));
-        child_bound = m_flow_set_height(flow, child_bound, m_flow_get_height(flow, container));
-
-        ui_view_place(child, child_bound);
-        start += m_flow_get_width(flow, child_bound) + layout.gaps.x;
-    }
 }
 
 void ui_view_relayout(UiView *self)
 {
-    if (self->relayout)
+    if (vec_len(&self->children) == 0)
     {
-        self->relayout(self);
         return;
     }
 
-    UiLayout layout = self->layout;
-
-    switch (layout.type)
+    if (self->relayout)
     {
-    default:
-    case UI_LAYOUT_DOCK:
-        ui_layout_dock(layout, ui_view_content(self), self->children.data, self->children.len);
-        break;
-
-    case UI_LAYOUT_FLEX:
-        ui_layout_flex(layout, ui_view_content(self), self->children.data, self->children.len);
-        break;
-
-    case UI_LAYOUT_GRID:
-        break;
+        self->relayout(self);
+    }
+    else
+    {
+        ui_layout_run(
+            &self->layout,
+            ui_view_content(self),
+            self->children.data,
+            self->children.len);
     }
 
     vec_foreach_v(child, &self->children)

@@ -27,7 +27,7 @@ UiWin *demo_win_create(UiApp *app)
             (UiLayout){
                 .dock = M_DOCK_START,
                 .margin.start = 4,
-                .size.square = true,
+                .size.min.width = 64,
             });
 
         ui_view_mount(toolbar, item);

@@ -2,7 +2,7 @@
 #include <brutal/alloc/heap.h>
 #include <brutal/ui/icon.h>
 
-void ui_icon_paint(MAYBE_UNUSED UiView *self, Gfx *gfx)
+void ui_icon_repaint(MAYBE_UNUSED UiView *self, Gfx *gfx)
 {
     gfx_fill_style(gfx, gfx_paint_fill(GFX_RED));
     gfx_fill_rect(gfx, m_rect(0, 0, 100, 100), 32);
@@ -15,7 +15,7 @@ UiView *ui_icon_create(void)
 {
     UiView *self = ui_view_create$(UiIcon);
 
-    self->repaint = ui_icon_paint;
+    self->repaint = ui_icon_repaint;
 
     return self;
 }

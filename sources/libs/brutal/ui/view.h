@@ -4,7 +4,7 @@
 #include <brutal/io/emit.h>
 #include <brutal/ui/color.h>
 #include <brutal/ui/event.h>
-#include <brutal/ui/style.h>
+#include <brutal/ui/layout.h>
 
 #define UI_VIEW_VISIBLE (1 << 0)
 #define UI_VIEW_ENABLED (1 << 1)
@@ -96,7 +96,7 @@ void ui_view_repaint(UiView *self, Gfx *gfx);
 
 void ui_view_should_relayout(UiView *self);
 
-MRect ui_view_size(UiView *self, MRect parent);
+MRect ui_view_size(UiView *self);
 
 void ui_view_place(UiView *self, MRect container);
 

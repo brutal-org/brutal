@@ -6,10 +6,9 @@ UiWin *about_win_create(UiApp *app)
     UiWin *self = ui_win_create(app, m_rect(0, 0, 800, 48), UI_WIN_DOCK_TOP);
 
     UiView *container = ui_panel_create(UI_COLOR_BASE00);
-    ui_view_layout(container, (UiLayout){.type = UI_LAYOUT_FLEX, .padding = {.start = 6, .end = 6}});
+    ui_view_layout(container, (UiLayout){.type = UI_LAYOUT_FLEX, .padding = m_spacing_all(8)});
 
     UiView *btn_applications = ui_button_create_with_text(str$("Applications"));
-    ui_view_layout(btn_applications, (UiLayout){.size.max = m_vec2(160, 36), .placement = M_GRAVITY_CENTER});
     ui_view_mount(container, btn_applications);
 
     UiView *lbl_time = ui_text_create(str$("Thue 11 Jan 16:26"), UI_FONT_BODY);
@@ -17,7 +16,6 @@ UiWin *about_win_create(UiApp *app)
     ui_view_mount(container, lbl_time);
 
     UiView *btn_options = ui_button_create_with_text(str$("..."));
-    ui_view_layout(btn_options, (UiLayout){.size = {.max.y = 36, .square = true}, .placement = M_GRAVITY_CENTER});
     ui_view_mount(container, btn_options);
 
     ui_win_mount(self, container);

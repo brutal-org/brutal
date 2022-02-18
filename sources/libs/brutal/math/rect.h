@@ -122,7 +122,7 @@ static inline MRect m_rect_clip_rect(MRect recta, MRect rectb)
 
 static inline MRect m_rect_cover(MRect container, MRect overlay)
 {
-    float scale = m_vec2_max(m_vec2_div(container.size, overlay.size));
+    float scale = m_vec2_comp_max(m_vec2_div(container.size, overlay.size));
     MRect result = m_rect(0, 0, overlay.width * scale, overlay.height * scale);
     result.pos = m_vec2_sub(m_rect_center(container), m_rect_center(result));
     return result;
@@ -130,7 +130,7 @@ static inline MRect m_rect_cover(MRect container, MRect overlay)
 
 static inline MRect m_rect_fit(MRect container, MRect overlay)
 {
-    float scale = m_vec2_min(m_vec2_div(container.size, overlay.size));
+    float scale = m_vec2_comp_min(m_vec2_div(container.size, overlay.size));
     MRect result = m_rect(0, 0, overlay.width * scale, overlay.height * scale);
     result.pos = m_vec2_sub(m_rect_center(container), m_rect_center(result));
     return result;

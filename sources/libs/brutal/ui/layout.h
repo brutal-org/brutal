@@ -8,13 +8,14 @@
 #include <brutal/math/rect.h>
 #include <brutal/math/spacing.h>
 
+struct _UiView;
+
 /* --- Size ----------------------------------------------------------------- */
 
 typedef struct
 {
     MVec2 min;
     MVec2 max;
-    bool square;
 } UiSize;
 
 static inline MVec2 ui_size_apply(UiSize size, MVec2 vec)
@@ -37,13 +38,6 @@ static inline MVec2 ui_size_apply(UiSize size, MVec2 vec)
     if (size.max.height)
     {
         vec.height = m_min(vec.height, size.max.height);
-    }
-
-    if (size.square)
-    {
-        float v = m_min(vec.width, vec.height);
-        vec.width = v;
-        vec.height = v;
     }
 
     return vec;
@@ -72,3 +66,7 @@ typedef struct
     float grow;
     MVec2 gaps;
 } UiLayout;
+
+MVec2 ui_layout_size(UiLayout const *self, struct _UiView *views[], size_t len);
+
+void ui_layout_run(UiLayout const *layout, MRect container, struct _UiView *views[], size_t len);

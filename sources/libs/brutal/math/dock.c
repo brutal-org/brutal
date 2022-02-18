@@ -45,3 +45,26 @@ MRect m_dock_apply(MDock dock, MFlow flow, MRect content, MRect *container)
 
     return content;
 }
+
+MOrientation m_dock_orientation(MDock dock)
+{
+    switch (dock)
+    {
+    default:
+    case M_DOCK_NONE:
+    case M_DOCK_FILL:
+        return M_ORIENTATION_NONE;
+
+    case M_DOCK_START:
+        return M_ORIENTATION_HORIZONTAL;
+
+    case M_DOCK_TOP:
+        return M_ORIENTATION_VERTICAL;
+
+    case M_DOCK_END:
+        return M_ORIENTATION_HORIZONTAL;
+
+    case M_DOCK_BOTTOM:
+        return M_ORIENTATION_VERTICAL;
+    }
+}

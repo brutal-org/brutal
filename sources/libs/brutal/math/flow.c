@@ -228,7 +228,7 @@ MRect m_flow_set_end(MFlow flow, MRect rect, float value)
         [[fallthrough]];
 
     case M_FLOW_TOP_TO_BOTTOM:
-        rect.width += d;
+        rect.height += d;
         return rect;
     }
 }

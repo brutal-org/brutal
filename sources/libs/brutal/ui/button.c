@@ -4,7 +4,7 @@
 #include <brutal/ui/font.h>
 #include <brutal/ui/text.h>
 
-void ui_button_paint(UiView *self, Gfx *gfx)
+void ui_button_repaint(UiView *self, Gfx *gfx)
 {
     if (self->flags & UI_VIEW_ENABLED)
     {
@@ -67,7 +67,7 @@ UiView *ui_button_create(void)
     UiView *self = ui_view_create$(UiButton);
 
     self->flags |= UI_VIEW_GREEDY;
-    self->repaint = ui_button_paint;
+    self->repaint = ui_button_repaint;
     self->event = ui_button_event;
 
     ui_view_layout(self, (UiLayout){.size.max.height = 36});
@@ -78,8 +78,11 @@ UiView *ui_button_create(void)
 UiView *ui_button_create_with_text(Str text)
 {
     UiView *self = ui_button_create();
+    ui_view_layout(self, (UiLayout){.padding = m_spacing_all(8)});
+
     UiView *label = ui_text_create(text, UI_FONT_BODY);
     ui_view_layout(label, (UiLayout){.dock = M_DOCK_FILL, .gravity = M_GRAVITY_CENTER});
+
     ui_view_mount(self, label);
 
     return self;

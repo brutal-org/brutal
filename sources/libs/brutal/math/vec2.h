@@ -49,12 +49,22 @@ M_VEC2_FUNC(sub, -)
 M_VEC2_FUNC(mul, *)
 M_VEC2_FUNC(div, /)
 
-static inline float m_vec2_max(MVec2 vec)
+static inline MVec2 m_vec2_max(MVec2 lhs, MVec2 rhs)
+{
+    return m_vec2(m_max(lhs.x, rhs.x), m_max(lhs.y, rhs.y));
+}
+
+static inline MVec2 m_vec2_min(MVec2 lhs, MVec2 rhs)
+{
+    return m_vec2(m_min(lhs.x, rhs.x), m_min(lhs.y, rhs.y));
+}
+
+static inline float m_vec2_comp_max(MVec2 vec)
 {
     return m_max(vec.x, vec.y);
 }
 
-static inline float m_vec2_min(MVec2 vec)
+static inline float m_vec2_comp_min(MVec2 vec)
 {
     return m_max(vec.x, vec.y);
 }
