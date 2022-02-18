@@ -11,7 +11,9 @@
 #include "kernel/riscv64/paging.h"
 #include "kernel/pmm.h"
 
-#define _cpu_paging_level DEFAULT_PAGING_DEPTH
+// will be replaced by something else, like a cpu local structure or a function
+int _cpu_paging_level = DEFAULT_PAGING_DEPTH;
+static Lock _lock;
 
 VmmResult vmm_flush(MAYBE_UNUSED VmmSpace space, VmmRange virtual_range)
 {
@@ -52,7 +54,6 @@ bool vmm_map_page(VmmSpace space, uintptr_t virtual, uintptr_t physical, BrMemor
         if(table->pages[entry].valid == 0)
         {
             uintptr_t next = mmap_io_to_phys(UNWRAP(heap_alloc(MEM_PAGE_SIZE)).base);
-            log$("next: {#x} - {} ({#x})", next, i, virtual);
             table->pages[entry] = sv_make_entry(flags, next, false);
         }
 
@@ -63,22 +64,20 @@ bool vmm_map_page(VmmSpace space, uintptr_t virtual, uintptr_t physical, BrMemor
     return true;
 
 }
+
 void vmm_initialize(MAYBE_UNUSED Handover const *handover)
 {
     SvPageTable* root = (SvPageTable*)UNWRAP(heap_alloc(MEM_PAGE_SIZE)).base;
-    log$("{#x}",(uintptr_t) root);
-    for(int i = 0; i < 512; i++)
-    {
-        root->pages[i]._raw = 0;
-    }
-    for(size_t i = 0x80000000 - 10; i < (0x88000000 + 10); i+= MEM_PAGE_SIZE)
+    mem_set(root, 0, MEM_PAGE_SIZE);
+
+    for(size_t i = handover_mmap_base(&handover->mmap); i < handover_mmap_end(&handover->mmap); i += MEM_PAGE_SIZE)
     {
         vmm_map_page((root), align_up$( i, MEM_PAGE_SIZE), align_up$(i, MEM_PAGE_SIZE), BR_MEM_EXECUTABLE | BR_MEM_READABLE | BR_MEM_WRITABLE);
     }
 
-    write_csr(CSR_SATP, satp_mode_from_paging_level(_cpu_paging_level) << 60 | ((uintptr_t)root >> 12));
-    log$("paging in riscv ?");
+    vmm_space_switch(root);
 
+    log$("Loaded kernel memory map!");
 }
 
 VmmSpace vmm_space_create(void)
@@ -92,6 +91,7 @@ void vmm_space_destroy(MAYBE_UNUSED VmmSpace space)
 
 void vmm_space_switch(MAYBE_UNUSED VmmSpace space)
 {
+    write_csr(CSR_SATP, satp_mode_from_paging_level(_cpu_paging_level) << 60 | ((uintptr_t)space >> 12));
 }
 
 VmmSpace vmm_kernel_space(void)
@@ -101,17 +101,35 @@ VmmSpace vmm_kernel_space(void)
 
 VmmResult vmm_map(MAYBE_UNUSED VmmSpace space, MAYBE_UNUSED VmmRange virtual_range, MAYBE_UNUSED PmmRange physical_range, MAYBE_UNUSED BrMemoryFlags flags)
 {
+    assert_truth(mem_is_range_page_aligned(virtual_range));
+    assert_truth(mem_is_range_page_aligned(physical_range));
+
+    LOCK_RETAINER(&_lock);
+
+    if (virtual_range.size != physical_range.size)
+    {
+        panic$("virtual_range.size must be equal to physical_range.size");
+        return ERR(VmmResult, BR_BAD_ARGUMENTS);
+    }
+
+    for (size_t i = 0; i < (virtual_range.size / MEM_PAGE_SIZE); i++)
+    {
+        vmm_map_page(
+            space,
+            i * MEM_PAGE_SIZE + virtual_range.base,
+            i * MEM_PAGE_SIZE + physical_range.base,
+            flags);
+    }
+
     return OK(VmmResult, virtual_range);
 }
 
 VmmResult vmm_unmap(MAYBE_UNUSED VmmSpace space, VmmRange virtual_range)
 {
-
     return OK(VmmResult, virtual_range);
 }
 
 PmmResult vmm_virt2phys(MAYBE_UNUSED VmmSpace space, MAYBE_UNUSED VmmRange virtual_range)
 {
-
     return OK(PmmResult, (PmmRange){});
 }
