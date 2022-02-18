@@ -12,6 +12,8 @@ void bits_init(Bits *self, void *data, size_t size)
 
 void bits_set_range(Bits *bits, BitsRange range, bool value)
 {
+    assert_lower_equal(range_end(range), bits_len(bits));
+
     for (size_t i = 0; i < range.size; i++)
     {
         bits_set(bits, range.base + i, value);
@@ -32,10 +34,8 @@ void bits_fill(Bits *bits, bool value)
 
 BitsRange bits_find_free(Bits const *bits, size_t start, size_t size, bool upper)
 {
-    if (start == (size_t)-1)
-    {
-        start = bits_len(bits);
-    }
+    assert_greater_than(bits_len(bits), 1);
+    start = m_clamp(start, 0, bits_len(bits));
 
     if (bits->size == 0)
     {
