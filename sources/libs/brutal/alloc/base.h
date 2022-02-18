@@ -39,11 +39,11 @@ struct _Alloc
 #define alloc_release(SELF, PTR) \
     ((SELF)->release((SELF), (PTR)))
 
-#define alloc_make(SELF, T) (                         \
-    {                                                 \
-        T *ptr = (T *)alloc_acquire(SELF, sizeof(T)); \
-        *ptr = (T){};                                 \
-        ptr;                                          \
+#define alloc_make(SELF, T) (                           \
+    {                                                   \
+        T *__ptr = (T *)alloc_acquire(SELF, sizeof(T)); \
+        *__ptr = (T){};                                 \
+        __ptr;                                          \
     })
 
 // Move an object to the heap
