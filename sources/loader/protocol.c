@@ -2,9 +2,9 @@
 #include <brutal/alloc.h>
 #include <brutal/debug.h>
 #include <brutal/io.h>
+#include <loader/loader.h>
 #include "loader/memory.h"
 #include "loader/protocol.h"
-#include <embed/handover.h>
 
 static void load_module(HandoverModule *target, Str path)
 {
@@ -50,11 +50,11 @@ void loader_populate_handover(LoaderEntry const *entry, Handover *ho)
 {
     ho->tag = HANDOVER_TAG;
 
-    embed_handover_fill_framebuffer(&ho->framebuffer, entry->framebuffer.width, entry->framebuffer.height);
+    loader_handover_fill_framebuffer(&ho->framebuffer, entry->framebuffer.width, entry->framebuffer.height);
 
     load_modules(entry, &ho->modules);
 
-    embed_handover_fill_mmap(&ho->mmap);
+    loader_handover_fill_mmap(&ho->mmap);
 
-    ho->rsdp = embed_handover_get_rsdp();
+    ho->rsdp = loader_handover_get_rsdp();
 }

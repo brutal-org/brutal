@@ -1,7 +1,8 @@
 #include <bal/boot.h>
-#include <efi/lib.h>
 #include <brutal/debug.h>
+#include <efi/lib.h>
 #include <efi/protos.h>
+#include <loader/loader.h>
 
 static HandoverMmapType efi_mmap_type_to_handover[] = {
     [EFI_RESERVED_MEMORY_TYPE] = HANDOVER_MMAP_RESERVED,
@@ -35,7 +36,7 @@ static EfiStatus efi_lookup_acpi(EfiGuid table_guid, void **table)
     return EFI_NOT_FOUND;
 }
 
-uintptr_t embed_handover_get_rsdp(void)
+uintptr_t loader_handover_get_rsdp(void)
 {
     void *acpi_table = nullptr;
 
@@ -51,7 +52,6 @@ uintptr_t embed_handover_get_rsdp(void)
     {
         return 0;
     }
-
 }
 
 static int efi_gop_find_mode(EFIGraphicsOutputProtocol *gop, size_t req_width, size_t req_height)
@@ -75,10 +75,12 @@ static int efi_gop_find_mode(EFIGraphicsOutputProtocol *gop, size_t req_width, s
 
     log$("Can't find efi gop mode for: {}x{}", req_width, req_height);
     log$("Available modes: ");
+
     for (uint32_t i = 0; i < gop->mode->max_mode; i++)
     {
         size_t info_size = 0;
         EfiStatus status = gop->query_mode(gop, i, &info_size, &info);
+
         if (status == EFI_ERR)
         {
             log$(" - can't get info for: {}", i);
@@ -92,7 +94,7 @@ static int efi_gop_find_mode(EFIGraphicsOutputProtocol *gop, size_t req_width, s
     return gop->mode->max_mode - 1;
 }
 
-void embed_handover_fill_framebuffer(HandoverFramebuffer *fb, uint64_t req_width, uint64_t req_height)
+void loader_handover_fill_framebuffer(HandoverFramebuffer *fb, uint64_t req_width, uint64_t req_height)
 {
     EFIGraphicsOutputProtocol *gop;
     EfiGuid gop_guid = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
@@ -119,8 +121,7 @@ void embed_handover_fill_framebuffer(HandoverFramebuffer *fb, uint64_t req_width
     fb->bpp = 32;
 }
 
-
-void embed_handover_fill_mmap(HandoverMmap *mmap)
+void loader_handover_fill_mmap(HandoverMmap *mmap)
 {
     mmap->size = 0;
 

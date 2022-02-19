@@ -1,14 +1,13 @@
 #include <brutal/debug.h>
 #include <brutal/mem.h>
-#include <embed/mem.h>
+#include <loader/loader.h>
 #include "loader/memory.h"
 
 uint64_t kernel_module_phys_alloc_page(size_t count)
 {
     uint64_t res = 0;
 
-   
-	embed_mem_acquire_pages(count, &res, EMBED_MEM_USER_PAGES);
+    loader_acquire_pages(count, &res, LOADER_MEM_KERNEL_PAGES);
 
     mem_set((void *)res, 0, PAGE_SIZE * count);
 
@@ -19,7 +18,7 @@ uint64_t kernel_module_phys_alloc_page_addr(size_t count, uint64_t addr)
 {
     uint64_t res = addr;
 
-	embed_mem_acquire_pages(count, &res, EMBED_MEM_ADDR);
+    loader_acquire_pages(count, &res, LOADER_MEM_ADDR);
 
     mem_set((void *)res, 0, PAGE_SIZE * count);
 
@@ -30,8 +29,7 @@ uint64_t loader_phys_alloc_page(size_t count)
 {
     uint64_t res = 0;
 
-   
-	embed_mem_acquire_pages(count, &res, EMBED_MEM_DATA_PAGES);
+    loader_acquire_pages(count, &res, LOADER_MEM_DATA_PAGES);
 
     mem_set((void *)res, 0, PAGE_SIZE * count);
 
@@ -84,24 +82,22 @@ VmmSpace memory_create(void)
     VmmSpace self = (Pages *)loader_phys_alloc_page(1);
 
     memory_map_range(self, (VmmRange){
-                         .base = memory_phys_to_io(0),
-                         .size = GiB(4),
-                     },
+                               .base = memory_phys_to_io(0),
+                               .size = GiB(4),
+                           },
                      (PmmRange){
                          .base = 0,
                          .size = GiB(4),
                      });
 
     memory_map_range(self, (VmmRange){
-                         .base = (0),
-                         .size = GiB(4),
-                     },
+                               .base = (0),
+                               .size = GiB(4),
+                           },
                      (PmmRange){
                          .base = 0,
                          .size = GiB(4),
                      });
 
     return self;
-
 }
-

@@ -1,9 +1,7 @@
-#include <efi/lib.h>
-#include <efi/protos.h>
 #include <brutal/debug.h>
+#include <efi/lib.h>
 #include <efi/tty.h>
-#include <embed/boot.h>
-
+#include <loader/loader.h>
 
 EfiStatus efi_main(EFIHandle handle, EFISystemTable *st)
 {
@@ -13,12 +11,12 @@ EfiStatus efi_main(EFIHandle handle, EFISystemTable *st)
 
     efi_tty_reset();
 
-	loader_boot_impl();
+    loader_entry();
 
-    panic$("loader_boot_impl shouldn't return!");
+    panic$("loader_entry shouldn't return!");
 }
 
-void embed_boot_deinit(void)
+void loader_boot_deinit(void)
 {
-	efi_deinit();
+    efi_deinit();
 }
