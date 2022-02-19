@@ -21,13 +21,14 @@ typedef struct
     LexError error;
 } Lex;
 
-#define lex_assert_no_error(LEX)                                                                                 \
-    ({                                                                                                           \
-        if ((LEX)->has_error)                                                                                    \
-        {                                                                                                        \
-            panic$("lex contains error: '{}' with lexeme: '{}'", (LEX)->error.message, (LEX)->error.lexeme.str); \
-        }                                                                                                        \
-    })
+#define lex_assert_no_error(LEX)                                                                                     \
+    (                                                                                                                \
+        {                                                                                                            \
+            if ((LEX)->has_error)                                                                                    \
+            {                                                                                                        \
+                panic$("lex contains error: '{}' with lexeme: '{}'", (LEX)->error.message, (LEX)->error.lexeme.str); \
+            }                                                                                                        \
+        })
 
 typedef LexemeType LexFn(Scan *scan);
 

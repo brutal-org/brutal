@@ -1,9 +1,7 @@
 #include <brutal/alloc.h>
 #include <brutal/debug.h>
 #include <brutal/io.h>
-#include <efi/lib.h>
-#include <efi/srvs.h>
-#include <efi/tty.h>
+#include <embed/boot.h>
 #include <elf/elf.h>
 #include "loader/config.h"
 #include "loader/memory.h"
@@ -101,33 +99,28 @@ void loader_boot(LoaderEntry const *entry)
 {
     VmmSpace vmm = memory_create();
 
-    log$("Loading kernel...");
-
     EntryPointFn entry_point = loader_load_kernel(entry->kernel, vmm);
 
-    log$("Kernel loaded, jumping in to it...");
     Handover *handover = allocate_handover(vmm);
-    efi_populate_handover(entry, handover);
 
-    efi_deinit();
+    loader_populate_handover(entry, handover);
+
     memory_switch(vmm);
+
+
+    embed_boot_deinit();
 
     entry_point(((void*)handover) + MMAP_KERNEL_BASE , 0xC001B001);
 
-    panic$("entry_point should no return!");
+    panic$("kernel shouldn't return!");
 }
 
-EfiStatus efi_main(EFIHandle handle, EFISystemTable *st)
+void loader_boot_impl(void)
 {
-    efi_init(handle, st);
-    st->boot_services->set_watchdog_timer(0, 0, 0, nullptr);
-
-    efi_tty_reset();
-
     loader_splash();
 
-    LoaderEntry entry = config_get_entry(str$("Brutal"), str$("/boot/config.json"));
-    loader_boot(&entry);
+	LoaderEntry entry = config_get_entry(str$("Brutal"), str$("/boot/config.json"));
 
-    panic$("loader_menu should no return!");
+	loader_boot(&entry);
 }
+
