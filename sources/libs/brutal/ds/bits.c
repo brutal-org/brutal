@@ -34,7 +34,7 @@ void bits_fill(Bits *bits, bool value)
 
 BitsRange bits_find_free(Bits const *bits, size_t start, size_t size, bool upper)
 {
-    assert_greater_than(bits_len(bits), 1);
+    assert_greater_than(bits_len(bits), (size_t)1);
     start = m_clamp(start, 0, bits_len(bits));
 
     if (bits->size == 0)
