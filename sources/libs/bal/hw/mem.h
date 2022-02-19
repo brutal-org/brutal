@@ -52,4 +52,3 @@ MaybeError bal_mem_paddr(BalMem *self, uintptr_t *paddr);
 void bal_mem_pack(IpcPack *pack, BalMem const *self);
 
 void bal_mem_unpack(IpcUnpack *pack, BalMem *self);
-

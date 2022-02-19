@@ -40,11 +40,12 @@ struct _UiView
 
 /* --- Lifecycle ------------------------------------------------------------ */
 
-#define ui_view_create$(T) ({                                 \
-    UiView *__view = (UiView *)alloc_make(alloc_global(), T); \
-    ui_view_init(__view);                                     \
-    __view;                                                   \
-})
+#define ui_view_create$(T) (                                      \
+    {                                                             \
+        UiView *__view = (UiView *)alloc_make(alloc_global(), T); \
+        ui_view_init(__view);                                     \
+        __view;                                                   \
+    })
 
 void ui_view_init(UiView *self);
 
