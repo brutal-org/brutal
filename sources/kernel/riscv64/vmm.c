@@ -1,15 +1,10 @@
 #include <brutal/debug.h>
 #include <brutal/sync.h>
-#include "kernel/heap.h"
-#include <brutal/debug.h>
 #include "kernel/mmap.h"
 #include "kernel/vmm.h"
 #include "kernel/heap.h"
-#include "kernel/riscv64/asm.h"
-#include <brutal/base.h>
-
 #include "kernel/riscv64/paging.h"
-#include "kernel/pmm.h"
+#include "kernel/riscv64/asm.h"
 
 // will be replaced by something else, like a cpu local structure or a function
 int _cpu_paging_level = DEFAULT_PAGING_DEPTH;
@@ -39,7 +34,7 @@ uint64_t satp_mode_from_paging_level(int level)
         case PAGING_SV57:
             return 10;
         default:
-            return 0;
+            panic$("level not supported: {}", level);
     }
 }
 
