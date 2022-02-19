@@ -98,8 +98,8 @@ PmmResult pmm_alloc(size_t size, bool upper)
 
     assert_truth(mem_is_size_page_aligned(size));
 
-    size_t page_size = size / MEM_PAGE_SIZE;
-    BitsRange page_range = bits_find_free(&_bitmap, upper ? _bestbet_upper : _bestbet_lower, page_size, upper);
+    size_t page_count = size / MEM_PAGE_SIZE;
+    BitsRange page_range = bits_find_free(&_bitmap, upper ? _bestbet_upper : _bestbet_lower, page_count, upper);
 
     if (range_empty(page_range))
     {
@@ -112,7 +112,7 @@ PmmResult pmm_alloc(size_t size, bool upper)
             _bestbet_lower = 0;
         }
 
-        page_range = bits_find_free(&_bitmap, upper ? -1 : 0, page_size, upper);
+        page_range = bits_find_free(&_bitmap, upper ? -1 : 0, page_count, upper);
     }
 
     if (!range_any(page_range))
@@ -167,7 +167,7 @@ PmmResult pmm_unused(PmmRange range)
 
     if (_bestbet_upper < range_end(page_range))
     {
-        _bestbet_upper = range_end(page_range);
+        _bestbet_upper = range_end(page_range) - 1;
     }
 
     if (_bestbet_lower > range_begin(page_range))

@@ -1,8 +1,5 @@
 #pragma once
-#include <stdint.h>
-#include <brutal/mem.h>
 #include <bal/abi.h>
-
 
 /* here we assume paging at level Sv39 and beyond, see spec Supervisor-level ISA 4.4 */
 
