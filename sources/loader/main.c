@@ -13,7 +13,7 @@ void __chkstk() { return; }
 
 void loader_splash(void)
 {
-    print(io_chan_out(), "Brutal boot\n");
+    print(io_chan_out(), "BRUTAL boot\n");
 }
 
 void loader_load(Elf64Header const *elf_header, void *base, VmmSpace vmm)
@@ -50,14 +50,11 @@ void loader_load(Elf64Header const *elf_header, void *base, VmmSpace vmm)
 
 EntryPointFn loader_load_kernel(Str path, VmmSpace vmm)
 {
-    log$("Loading elf file...");
-
     IoFile file;
     io_file_open(&file, path);
     Buf buf;
     io_read_all(io_file_reader(&file), &buf, alloc_global());
 
-    log$("Loaded elf file...");
     Elf64Header *header = (Elf64Header *)buf.data;
 
     if (buf.used < sizeof(Elf64Header) ||
@@ -66,15 +63,11 @@ EntryPointFn loader_load_kernel(Str path, VmmSpace vmm)
         panic$("Invalid elf file!");
     }
 
-    log$("Elf file loaded in memory, mapping it...");
-
     loader_load(header, buf.data, vmm);
 
     uintptr_t entry = header->entry;
 
     buf_deinit(&buf);
-
-    log$("Entry is {#x}", entry);
 
     return (EntryPointFn)entry;
 }
