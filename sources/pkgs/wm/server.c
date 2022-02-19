@@ -86,24 +86,28 @@ void wm_server_deinit(WmServer *self)
 
 void wm_server_dispatch(WmServer *self, UiEvent event)
 {
-    if (event.type == UI_EVENT_MOUSE_MOVE)
+    if (ui_event_is_mouse(&event))
     {
-        MRect mouse_bound = {
-            .pos = m_vec2_sub(self->mouse, m_vec2(8, 8)),
-            .size = m_vec2(42, 42),
-        };
+        if (event.type == UI_EVENT_MOUSE_MOVE)
+        {
+            MRect mouse_bound = {
+                .pos = m_vec2_sub(self->mouse, m_vec2(8, 8)),
+                .size = m_vec2(42, 42),
+            };
 
-        wm_server_should_render(self, mouse_bound);
+            wm_server_should_render(self, mouse_bound);
 
-        self->mouse = m_vec2_add(self->mouse, event.mouse.offset);
-        self->mouse = m_rect_clamp_vec2(wm_display_bound(self->display), self->mouse);
+            self->mouse = m_vec2_add(self->mouse, event.mouse.offset);
+            self->mouse = m_rect_clamp_vec2(wm_display_bound(self->display), self->mouse);
 
-        mouse_bound = (MRect){
-            .pos = self->mouse,
-            .size = m_vec2(32, 32),
-        };
+            mouse_bound = (MRect){
+                .pos = self->mouse,
+                .size = m_vec2(32, 32),
+            };
 
-        wm_server_should_render(self, mouse_bound);
+            wm_server_should_render(self, mouse_bound);
+        }
+
         event.mouse.position = self->mouse;
     }
 

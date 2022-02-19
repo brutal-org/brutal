@@ -49,3 +49,13 @@ typedef struct
         UiMouseEvent mouse;
     };
 } UiEvent;
+
+static inline bool ui_event_is_keyboard(UiEvent *event)
+{
+    return event->type >= UI_EVENT_KEYBOARD_UP && event->type <= UI_EVENT_KEYBOARD_DOWN;
+}
+
+static inline bool ui_event_is_mouse(UiEvent *event)
+{
+    return event->type >= UI_EVENT_MOUSE_UP && event->type <= UI_EVENT_MOUSE_SCROLL;
+}
