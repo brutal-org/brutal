@@ -1,22 +1,13 @@
 #include <brutal/debug.h>
 #include <brutal/mem.h>
-#include <efi/lib.h>
-#include <efi/srvs/bs.h>
-#include <embed/mem.h>
+#include <loader/loader.h>
 #include "loader/memory.h"
 
 uint64_t kernel_module_phys_alloc_page(size_t count)
 {
     uint64_t res = 0;
 
-    // type, memory type, pages, memory
-    EfiStatus status = efi_st()->boot_services->allocate_pages(ALLOCATE_ANY_PAGES, EFI_USER_KERNEL_MEMORY, count, &res);
-
-    if (status != EFI_SUCCESS)
-    {
-        log$("Failed to allocate {} pages of memory: {}", count, status);
-        return 0;
-    }
+    loader_acquire_pages(count, &res, LOADER_MEM_KERNEL_PAGES);
 
     mem_set((void *)res, 0, PAGE_SIZE * count);
 
@@ -27,14 +18,7 @@ uint64_t kernel_module_phys_alloc_page_addr(size_t count, uint64_t addr)
 {
     uint64_t res = addr;
 
-    // type, memory type, pages, memory
-    EfiStatus status = efi_st()->boot_services->allocate_pages(ALLOCATE_ADDRESS, EFI_USER_KERNEL_MEMORY, count, &res);
-
-    if (status != EFI_SUCCESS)
-    {
-        log$("Failed to allocate {} pages of memory: {}", count, status);
-        return 0;
-    }
+    loader_acquire_pages(count, &res, LOADER_MEM_ADDR);
 
     mem_set((void *)res, 0, PAGE_SIZE * count);
 
@@ -45,14 +29,7 @@ uint64_t loader_phys_alloc_page(size_t count)
 {
     uint64_t res = 0;
 
-    // type, memory type, pages, memory
-    EfiStatus status = efi_st()->boot_services->allocate_pages(ALLOCATE_ANY_PAGES, EFI_BOOT_SERVICES_DATA, count, &res);
-
-    if (status != EFI_SUCCESS)
-    {
-        log$("Failed to allocate {} pages of memory: {}", count, status);
-        return 0;
-    }
+    loader_acquire_pages(count, &res, LOADER_MEM_DATA_PAGES);
 
     mem_set((void *)res, 0, PAGE_SIZE * count);
 
@@ -102,31 +79,25 @@ void memory_map_range(VmmSpace self, VmmRange vmm_range, PmmRange pmm_range)
 
 VmmSpace memory_create(void)
 {
-    log$("Allocated: {x}", sizeof(Pages));
-
     VmmSpace self = (Pages *)loader_phys_alloc_page(1);
 
-    log$("Loading bootloader memory map");
-
     memory_map_range(self, (VmmRange){
-                         .base = memory_phys_to_io(0),
-                         .size = GiB(4),
-                     },
+                               .base = memory_phys_to_io(0),
+                               .size = GiB(4),
+                           },
                      (PmmRange){
                          .base = 0,
                          .size = GiB(4),
                      });
 
     memory_map_range(self, (VmmRange){
-                         .base = (0),
-                         .size = GiB(4),
-                     },
+                               .base = (0),
+                               .size = GiB(4),
+                           },
                      (PmmRange){
                          .base = 0,
                          .size = GiB(4),
                      });
 
     return self;
-
 }
-

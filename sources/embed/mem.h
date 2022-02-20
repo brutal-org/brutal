@@ -1,5 +1,6 @@
 #pragma once
 
+#include <bal/boot/handover.h>
 #include <brutal/base.h>
 
 #if defined(__x86_64__)

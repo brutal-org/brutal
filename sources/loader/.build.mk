@@ -51,7 +51,8 @@ LOADER_SRC = \
 	sources/libs/hw/fdt/fdt.c                       \
 	sources/libs/stdc/ansi/ctype.c			        \
 	sources/libs/stdc/ansi/string.c			        \
-	$(wildcard sources/loader/*.c) 					\
+	$(wildcard sources/loader/*.c) \
+	$(wildcard sources/loader/*/*.c) 				\
 	$(wildcard sources/libs/json/parser.c)		    \
 	$(wildcard sources/libs/json/objects.c)		    \
 	$(wildcard sources/libs/brutal/alloc/*.c)	    \

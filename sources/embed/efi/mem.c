@@ -1,11 +1,15 @@
 #include <brutal/debug.h>
 #include <efi/lib.h>
-#include <efi/srvs/bs.h>
 #include <embed/mem.h>
 
 Error embed_mem_acquire(size_t size, void **out_result, MAYBE_UNUSED enum embed_mem_flag flags)
 {
-    EfiStatus status = efi_st()->boot_services->allocate_pool(EFI_BOOT_SERVICES_DATA, size, out_result);
+    EfiStatus status = 0;
+
+    if (flags == EMBED_MEM_NONE)
+    {
+        status = efi_st()->boot_services->allocate_pool(EFI_BOOT_SERVICES_DATA, size, out_result);
+    }
 
     if (status != EFI_SUCCESS)
     {

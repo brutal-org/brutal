@@ -4,4 +4,4 @@
 #include <efi/protos.h>
 #include "loader/config.h"
 
-void efi_populate_handover(LoaderEntry const *entry, Handover *ho);
+void loader_populate_handover(LoaderEntry const *entry, Handover *ho);

@@ -31,14 +31,15 @@ typedef struct
 
     @param SELF (Scanner*)
 */
-#define scan_assert_no_error(SELF)                              \
-    ({                                                          \
-        if ((SELF)->has_error)                                  \
-        {                                                       \
-            scan_dump_error(SELF, io_chan_out());               \
-            panic$("scan: terminating due to previous errors"); \
-        }                                                       \
-    })
+#define scan_assert_no_error(SELF)                                  \
+    (                                                               \
+        {                                                           \
+            if ((SELF)->has_error)                                  \
+            {                                                       \
+                scan_dump_error(SELF, io_chan_out());               \
+                panic$("scan: terminating due to previous errors"); \
+            }                                                       \
+        })
 
 /*!
     @brief Initialize a scanner using a string
