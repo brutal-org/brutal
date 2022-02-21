@@ -19,7 +19,6 @@ typedef struct
     Ext2FsInode inode;
 } Ext2FsFile;
 
-
 typedef struct
 {
     Ext2Blocks block;
