@@ -56,7 +56,7 @@ static FsResult ext2_group(Ext2Fs *self, Ext2GroupBlockDescTable *group, uint64_
     size_t block_off = group_id % self->block_size;
     size_t block_id = group_id / self->block_size + self->group_desc_table_block;
 
-    Ext2GroupBlockDescTable *desc = ext2_acquire_blocks(self, block_id, 1, write ? FS_BLOCK_WRITE : FS_BLOCK_READ);
+    Ext2GroupBlockDescTable *desc = ext2_acquire_blocks(self, block_id, 1, write ? (FS_BLOCK_WRITE | FS_BLOCK_READ) : FS_BLOCK_READ);
     if (desc == nullptr)
     {
         return FS_ERROR_FROM_BLOCK;
@@ -276,7 +276,6 @@ static FsResult ext2_alloc_block(Ext2Fs *self, uint32_t preferred_group_id, uint
     size_t group_id = preferred_group_id;
     Ext2GroupBlockDescTable group_desc = {};
     FsResult res = ext2_group_read(self, &group_desc, group_id);
-
     if (res != FS_SUCCESS)
     {
         return res;
@@ -288,11 +287,11 @@ static FsResult ext2_alloc_block(Ext2Fs *self, uint32_t preferred_group_id, uint
         res = ext2_find_group_with_free_block(self, &group_id, &group_desc);
     }
 
-    size_t group_block_index = 0;
-    res = ext2_find_free_group_entry(self, group_desc.block_usage_bitmap_addr, &group_block_index);
+    size_t allocated_group_block_index = 0;
+    res = ext2_find_free_group_entry(self, group_desc.block_usage_bitmap_addr, &allocated_group_block_index);
 
     size_t final_block = (self->block_size == 1024) ? 1 : 0;
-    final_block += (group_id - 1) * self->super_block->group_block_count + group_block_index;
+    final_block += (group_id) * self->super_block->group_block_count + allocated_group_block_index;
     *result = final_block;
 
     group_desc.unallocated_block_count -= 1;
@@ -306,7 +305,7 @@ static FsResult ext2_inode_push_block_rec(Ext2Fs *self, Ext2CachedInode *inode, 
 {
     size_t block_per_level = self->block_size / sizeof(uint32_t);
 
-    size_t block_index = idx / get_entry_in_indirect_block(block_per_level, depth);
+    size_t block_index = idx / get_entry_in_indirect_block(block_per_level, depth-1);
 
     uint32_t *table = ext2_acquire_blocks(self, parent_block, 1, FS_BLOCK_READ | FS_BLOCK_WRITE);
 
@@ -319,7 +318,7 @@ static FsResult ext2_inode_push_block_rec(Ext2Fs *self, Ext2CachedInode *inode, 
             ext2_alloc_block(self, group_id, &table[block_index]);
         }
 
-        ext2_inode_push_block_rec(self, inode, new_block_ptr, parent_block, depth - 1, idx);
+        ext2_inode_push_block_rec(self, inode, new_block_ptr, table[block_index], depth - 1, idx);
     }
     else
     {
@@ -330,38 +329,37 @@ static FsResult ext2_inode_push_block_rec(Ext2Fs *self, Ext2CachedInode *inode, 
     return FS_SUCCESS;
 }
 
-static FsResult ext2_inode_push_block(Ext2Fs *self, Ext2CachedInode *inode, size_t new_block_ptr)
+static FsResult ext2_inode_insert_block(Ext2Fs *self, Ext2CachedInode *inode, size_t new_block_ptr, uint32_t idx)
 {
 
-    size_t inode_pushed_idx = align_up$(inode->inode.block.size_low, self->block_size) / self->block_size + 1;
     size_t block_per_entry = self->block_size / sizeof(uint32_t);
-    if (inode_pushed_idx < 12)
+    if (idx < 12)
     {
-        inode->inode.block.blocks_ptr[inode_pushed_idx] = new_block_ptr;
+        inode->inode.block.blocks_ptr[idx] = new_block_ptr;
         return FS_SUCCESS;
     }
 
-    inode_pushed_idx -= 12;
+    idx -= 12;
 
-    if (inode_pushed_idx < block_per_entry)
+    if (idx < block_per_entry)
     {
-        return ext2_inode_push_block_rec(self, inode, new_block_ptr, inode->inode.block.single_indirect_block_ptr, 1, inode_pushed_idx);
+        return ext2_inode_push_block_rec(self, inode, new_block_ptr, inode->inode.block.single_indirect_block_ptr, 1, idx);
     }
 
-    inode_pushed_idx -= block_per_entry;
+    idx -= block_per_entry;
 
-    if (inode_pushed_idx < block_per_entry * block_per_entry)
+    if (idx < block_per_entry * block_per_entry)
     {
-        return ext2_inode_push_block_rec(self, inode, new_block_ptr, inode->inode.block.single_indirect_block_ptr, 2, inode_pushed_idx);
+        return ext2_inode_push_block_rec(self, inode, new_block_ptr, inode->inode.block.double_indirect_block_ptr, 2, idx);
     }
-    inode_pushed_idx -= block_per_entry * block_per_entry;
+    idx -= block_per_entry * block_per_entry;
 
-    if (inode_pushed_idx < block_per_entry * block_per_entry * block_per_entry)
+    if (idx < block_per_entry * block_per_entry * block_per_entry)
     {
-        return ext2_inode_push_block_rec(self, inode, new_block_ptr, inode->inode.block.single_indirect_block_ptr, 2, inode_pushed_idx);
+        return ext2_inode_push_block_rec(self, inode, new_block_ptr, inode->inode.block.triple_indirect_block_ptr, 3, idx);
     }
 
-    panic$("inode size overflow: {#x}", inode_pushed_idx);
+    panic$("inode size overflow: {#x}", idx);
 }
 
 static FsResult ext2_inode_grow(Ext2Fs *self, Ext2CachedInode *inode, size_t new_block_count)
@@ -374,8 +372,14 @@ static FsResult ext2_inode_grow(Ext2Fs *self, Ext2CachedInode *inode, size_t new
         {
             return -1; // TODO: add more fs error
         }
+        if(block == 0)
+        {
+            panic$("can't allocate block");
+        }
 
-        ext2_inode_push_block(self, inode, block);
+        size_t idx = align_up$(inode->inode.block.size_low, self->block_size) / self->block_size + i;
+
+        ext2_inode_insert_block(self, inode, block, idx);
     }
     return FS_SUCCESS;
 }
@@ -424,31 +428,33 @@ FsResult ext2_inode_write(Ext2Fs *self, Ext2FsInode *inode, const void *data, Bl
     // allocating new block if it is necessary
     if (inode->block.size_low < range_end(range) * self->block_size)
     {
-
         // the size can be increased without allocate any newer block
-        if (align_up$(inode->block.size_low, self->block_size) / self->block_size >= (size_t)range_end(range))
+        if (align_up$(inode->block.size_low, self->block_size) / self->block_size > (size_t)range_end(range))
         {
             inode->block.size_low = range_end(range) * self->block_size;
             ext2_write_inode(self, inode);
         }
         else
         {
-            size_t new_block_count = align_up$(range_end(range) * self->block_size - inode->block.size_low, self->block_size);
-            ext2_inode_grow(self, cached_inode, new_block_count / self->block_size);
+            size_t new_block_count = range_end(range) - align_up$(inode->block.size_low, self->block_size) / self->block_size;
+            ext2_inode_grow(self, cached_inode, new_block_count);
+
 
             inode->block.size_low = range_end(range) * self->block_size;
             ext2_write_inode(self, inode);
         }
     }
-
+    vec_deinit(&cached_inode->block);
+    vec_init(&cached_inode->block, self->alloc);
     if (ext2_inode_get_blocks(self, cached_inode, align_up$(inode->block.size_low, self->block_size) / self->block_size) != FS_SUCCESS)
     {
         panic$("unable to retreive block for inode: {#x}", inode->id);
     }
 
-    for (int i = range.base; i < range_end(range); i++)
+    for (size_t i = range.base; i < (size_t)range_end(range); i++)
     {
-        uint32_t *block = ext2_acquire_blocks(self, cached_inode->block.data[i], 1, FS_BLOCK_WRITE);
+        assert_not_equal(cached_inode->block.data[i], 0);
+        uint8_t *block = ext2_acquire_blocks(self, cached_inode->block.data[i], 1, FS_BLOCK_WRITE);
 
         mem_cpy(block, data, self->block_size);
 
