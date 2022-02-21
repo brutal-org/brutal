@@ -10,20 +10,14 @@ typedef enum
 {
     MEMORY_PMM,
     MEMORY_HEAP,
+    MEMORY_DMA,
 } MemoryType;
-
-typedef enum
-{
-    MEMORY_NONE,
-    MEMORY_OWNING,
-} MemoryFlags;
 
 typedef struct
 {
     OBJECT_HEADER;
 
     MemoryType type;
-    MemoryFlags flags;
 
     union
     {
@@ -32,9 +26,11 @@ typedef struct
     };
 } Memory;
 
-Memory *memory_heap(HeapRange heap, MemoryFlags flags);
+Memory *memory_heap(HeapRange heap);
 
-Memory *memory_pmm(PmmRange range, MemoryFlags flags);
+Memory *memory_pmm(PmmRange range);
+
+Memory *memory_dma(PmmRange range);
 
 void memory_ref(Memory *self);
 

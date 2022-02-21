@@ -8,27 +8,10 @@
 
 static bool elf_supported(Elf64Header const *header, size_t data_size)
 {
-    if (data_size < sizeof(Elf64Header))
-    {
-        return false;
-    }
-
-    if (!elf_validate(header))
-    {
-        return false;
-    }
-
-    if (header->ident.elf_class != ELF_CLASS_64)
-    {
-        return false;
-    }
-
-    if (header->ident.data_encoding != ELF_ENCODING_LITTLE_ENDIAN)
-    {
-        return false;
-    }
-
-    return true;
+    return data_size >= sizeof(Elf64Header) &&
+           elf_validate(header) &&
+           header->ident.elf_class == ELF_CLASS_64 &&
+           header->ident.data_encoding == ELF_ENCODING_LITTLE_ENDIAN;
 }
 
 static void elf_load_program(Task *task, Elf64Header const *elf_header, Memory *elf_obj)
@@ -58,7 +41,7 @@ static void elf_load_program(Task *task, Elf64Header const *elf_header, Memory *
             mem_set(ptr, 0, size);
             mem_cpy(ptr, (uint8_t *)elf_header + prog_header->file_offset, prog_header->file_size);
 
-            Memory *prog_obj = memory_heap(heap, MEMORY_OWNING);
+            Memory *prog_obj = memory_heap(heap);
             UNWRAP(space_map(task->space, prog_obj, 0, 0, prog_header->virtual_address));
             memory_deref(prog_obj);
         }
@@ -70,7 +53,7 @@ static void elf_load_program(Task *task, Elf64Header const *elf_header, Memory *
 void init_stack(Task *task)
 {
     HeapRange heap = UNWRAP(heap_alloc(KERNEL_STACK_SIZE));
-    Memory *obj = memory_heap(heap, MEMORY_OWNING);
+    Memory *obj = memory_heap(heap);
     space_map(task->space, obj, 0, 0, USER_STACK_BASE - KERNEL_STACK_SIZE);
     memory_deref(obj);
 }
@@ -79,7 +62,7 @@ static uintptr_t init_pass(Task *task, Handover const *handover)
 {
     HeapRange heap = UNWRAP(heap_alloc(align_up$(sizeof(Handover), MEM_PAGE_SIZE)));
     mem_cpy((void *)heap.base, handover, sizeof(Handover));
-    Memory *obj = memory_heap(heap, MEMORY_OWNING);
+    Memory *obj = memory_heap(heap);
     uintptr_t addr = UNWRAP(space_map(task->space, obj, 0, 0, 0)).base;
     memory_deref(obj);
 
@@ -98,12 +81,12 @@ void init_start(Handover const *handover)
     }
 
     Elf64Header *elf_header = (Elf64Header *)mmap_phys_to_io(elf_module->addr);
-    Memory *elf_obj = memory_pmm((HeapRange){elf_module->addr, elf_module->size}, MEMORY_NONE);
+    Memory *elf_obj = memory_pmm((HeapRange){elf_module->addr, elf_module->size});
 
     assert_truth(elf_supported(elf_header, elf_module->size));
 
     Space *space = space_create(0);
-    Task *task = UNWRAP(task_create(space, BR_RIGHT_IRQ | BR_RIGHT_PMM | BR_RIGHT_LOG | BR_RIGHT_TASK | BR_RIGHT_IO, BR_TASK_USER));
+    Task *task = UNWRAP(task_create(space, BR_RIGHT_IRQ | BR_RIGHT_DMA | BR_RIGHT_LOG | BR_RIGHT_TASK | BR_RIGHT_PIO, BR_TASK_USER));
     space_deref(space);
 
     elf_load_program(task, elf_header, elf_obj);

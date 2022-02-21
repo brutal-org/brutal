@@ -42,12 +42,8 @@ static void pmm_bitmap_init(HandoverMmap const *memory_map)
     {
         HandoverMmapEntry entry = memory_map->entries[i];
 
-        if (entry.type != HANDOVER_MMAP_FREE)
-        {
-            continue;
-        }
-
-        if (entry.size > bitmap_size)
+        if (entry.type == HANDOVER_MMAP_FREE &&
+            entry.size > bitmap_size)
         {
             log$("Allocated memory bitmap at {x}-{x}", entry.base, entry.base + bitmap_size - 1);
 

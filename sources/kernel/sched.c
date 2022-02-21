@@ -165,18 +165,13 @@ void sched_current(Task *task, Cpu *cpu)
 
 Task *sched_pick(Task *best, Task *other)
 {
-    if (!task_runnable(other) || sched_running(other) || other->time_end == _tick)
-    {
-        return best;
-    }
-    else if (best == nullptr || other->time_end < best->time_end)
-    {
-        return other;
-    }
-    else
-    {
-        return best;
-    }
+    bool just_stopped = other->time_start == _tick;
+    bool runnable_and_not_running = task_runnable(other) && !sched_running(other);
+    bool waited_more = best == nullptr || other->time_end < best->time_end;
+
+    return (!just_stopped && runnable_and_not_running && waited_more)
+               ? other
+               : best;
 }
 
 Task *sched_peek(void)

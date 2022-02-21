@@ -4,27 +4,23 @@
 
 void memory_destroy(Memory *self)
 {
-    if (self->flags & MEMORY_OWNING)
+    if (self->type == MEMORY_HEAP)
     {
-        if (self->type == MEMORY_HEAP)
-        {
-            heap_free(self->heap);
-        }
-        else
-        {
-            pmm_unused(self->pmm);
-        }
+        heap_free(self->heap);
+    }
+    else if (self->type == MEMORY_PMM)
+    {
+        pmm_unused(self->pmm);
     }
 
     alloc_free(alloc_global(), self);
 }
 
-Memory *memory_heap(HeapRange heap, MemoryFlags flags)
+Memory *memory_heap(HeapRange heap)
 {
     Memory *self = alloc_make(alloc_global(), Memory);
 
     self->type = MEMORY_HEAP;
-    self->flags = flags;
     self->heap = heap;
 
     object_init(base$(self), BR_OBJECT_MEMORY, (ObjectDtor *)memory_destroy);
@@ -32,12 +28,23 @@ Memory *memory_heap(HeapRange heap, MemoryFlags flags)
     return self;
 }
 
-Memory *memory_pmm(PmmRange pmm, MemoryFlags flags)
+Memory *memory_pmm(PmmRange pmm)
 {
     Memory *self = alloc_make(alloc_global(), Memory);
 
     self->type = MEMORY_PMM;
-    self->flags = flags;
+    self->pmm = pmm;
+
+    object_init(base$(self), BR_OBJECT_MEMORY, (ObjectDtor *)memory_destroy);
+
+    return self;
+}
+
+Memory *memory_dma(PmmRange pmm)
+{
+    Memory *self = alloc_make(alloc_global(), Memory);
+
+    self->type = MEMORY_DMA;
     self->pmm = pmm;
 
     object_init(base$(self), BR_OBJECT_MEMORY, (ObjectDtor *)memory_destroy);

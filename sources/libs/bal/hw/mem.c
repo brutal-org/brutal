@@ -25,7 +25,7 @@ MaybeError bal_mem_init_pmm(BalMem *self, uintptr_t addr, size_t size)
         .memory = {
             .addr = addr,
             .size = size,
-            .flags = BR_MEM_PMM,
+            .flags = BR_MEM_DMA,
         },
     };
 

@@ -148,17 +148,22 @@ BrResult sys_create_memory(BrId *id, BrHandle *handle, BrMemoryProps *args)
 {
     Memory *memory = nullptr;
 
-    if (args->flags & BR_MEM_PMM)
+    if (args->flags & BR_MEM_DMA)
     {
-        if (!(task_self()->rights & BR_RIGHT_PMM))
+        if (!(task_self()->rights & BR_RIGHT_DMA))
         {
             return BR_NOT_PERMITTED;
         }
 
-        memory = memory_pmm((PmmRange){args->addr, args->size}, MEMORY_NONE);
+        memory = memory_dma((PmmRange){args->addr, args->size});
     }
     else
     {
+        if ((args->flags & BR_MEM_LOWER) && !(task_self()->rights & BR_RIGHT_DMA))
+        {
+            return BR_NOT_PERMITTED;
+        }
+
         PmmResult pmm_result = pmm_alloc(args->size, !(args->flags & BR_MEM_LOWER));
 
         if (!pmm_result.succ)
@@ -166,7 +171,7 @@ BrResult sys_create_memory(BrId *id, BrHandle *handle, BrMemoryProps *args)
             return pmm_result.err;
         }
 
-        memory = memory_pmm(UNWRAP(pmm_result), MEMORY_OWNING);
+        memory = memory_pmm(UNWRAP(pmm_result));
         args->addr = UNWRAP(pmm_result).base;
     }
 
@@ -446,7 +451,7 @@ BrResult sys_inspect(BrInspectArgs *args)
 
 BrResult sys_in(BrIoArgs *args)
 {
-    if (!(task_self()->rights & BR_RIGHT_IO))
+    if (!(task_self()->rights & BR_RIGHT_PIO))
     {
         return BR_NOT_PERMITTED;
     }
@@ -458,7 +463,7 @@ BrResult sys_in(BrIoArgs *args)
 
 BrResult sys_out(BrIoArgs *args)
 {
-    if (!(task_self()->rights & BR_RIGHT_IO))
+    if (!(task_self()->rights & BR_RIGHT_PIO))
     {
         return BR_NOT_PERMITTED;
     }

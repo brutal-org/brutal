@@ -65,7 +65,7 @@ void unit_start(Unit *self, Handover *handover)
     bal_TaskExec(
         &elf_task,
         &elf_mem,
-        BR_RIGHT_IO | BR_RIGHT_LOG | BR_RIGHT_PMM | BR_RIGHT_IRQ,
+        BR_RIGHT_PIO | BR_RIGHT_LOG | BR_RIGHT_DMA | BR_RIGHT_IRQ,
         self->consume.data,
         self->consume.len);
 

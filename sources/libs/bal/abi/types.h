@@ -96,7 +96,7 @@ typedef enum
 #define BR_MEM_EXECUTABLE ((BrMemoryFlags)(1 << 2))
 #define BR_MEM_USER ((BrMemoryFlags)(1 << 3))
 #define BR_MEM_LOWER ((BrMemoryFlags)(1 << 4))
-#define BR_MEM_PMM ((BrMemoryFlags)(1 << 5))
+#define BR_MEM_DMA ((BrMemoryFlags)(1 << 5))
 
 typedef uint64_t BrMemoryFlags;
 
@@ -205,9 +205,9 @@ typedef struct
 // Rights
 
 #define BR_RIGHT_IRQ (1 << 0)
-#define BR_RIGHT_PMM (1 << 1)
-#define BR_RIGHT_LOG (1 << 2)
-#define BR_RIGHT_TASK (1 << 3)
-#define BR_RIGHT_IO (1 << 4)
+#define BR_RIGHT_DMA (1 << 1)
+#define BR_RIGHT_PIO (1 << 2)
+#define BR_RIGHT_LOG (1 << 3)
+#define BR_RIGHT_TASK (1 << 4)
 
 typedef uint32_t BrRight;
