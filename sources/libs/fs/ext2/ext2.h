@@ -49,4 +49,6 @@ FsResult ext2_inode(Ext2Fs *self, Ext2FsInode *inode, Ext2FsInodeId id);
 
 FsResult ext2_inode_read(Ext2Fs *self, const Ext2FsInode *inode, void *data, BlockRange range);
 
+FsResult ext2_inode_write(Ext2Fs *self, Ext2FsInode *inode, const void *data, BlockRange range);
+
 void ext2_fs_dump_inode(Ext2Fs *self, Ext2FsInode *inode);
