@@ -8,7 +8,15 @@ typedef struct
     EmbedFile embed;
 } IoFile;
 
-MaybeError io_file_open(IoFile *self, Str path);
+typedef enum
+{
+    FILE_OPEN_READ_ONLY,
+    FILE_OPEN_WRITE_ONLY,
+    FILE_OPEN_READ_WRITE,
+} FileOpenFlags;
+
+
+MaybeError io_file_open(IoFile *self, Str path, FileOpenFlags flags);
 
 MaybeError io_file_create(IoFile *self, Str path);
 

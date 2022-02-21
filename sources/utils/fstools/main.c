@@ -100,7 +100,7 @@ int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char const *argv[])
     }
 
     IoFile source_file;
-    UNWRAP_OR_PANIC(io_file_open(&source_file, str$(argv[1])), "File not found!");
+    UNWRAP_OR_PANIC(io_file_open(&source_file, str$(argv[1]), FILE_OPEN_READ_WRITE), "File not found!");
 
     FileBlock block = {
         ._impl = {

@@ -156,7 +156,7 @@ Json json_parse_str(Str str, Alloc *alloc)
 Json json_parse_file(Str path, Alloc *alloc)
 {
     IoFile file;
-    io_file_open(&file, path);
+    io_file_open(&file, path,FILE_OPEN_READ_ONLY);
 
     Buf buf;
     io_read_all(io_file_reader(&file), &buf, alloc);

@@ -156,7 +156,7 @@ static void efi_populate_framebuffer(EFIBootServices *bs, HandoverFramebuffer *f
 static void efi_load_module(HandoverModule *target, Str path)
 {
     IoFile file;
-    io_file_open(&file, path);
+    io_file_open(&file, path, FILE_OPEN_READ_ONLY);
 
     // TODO: make a kernel_module alloc instead of allocating 2 time (even if the first time is always freed)
     Buf buf;
