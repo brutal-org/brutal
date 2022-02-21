@@ -2,7 +2,7 @@
 
 /* --- 7.2 Diagnostics ------------------------------------------------------ */
 
-void assert_failled_impl(void);
+void assert_failed_impl(void);
 
 #ifdef NDEBUG
 #    define assert(expr) (void)(expr)
@@ -10,7 +10,7 @@ void assert_failled_impl(void);
 #    define assert(expr)           \
         if (!expr)                 \
         {                          \
-            assert_failled_impl(); \
+            assert_failed_impl(); \
         }
 #endif
 
