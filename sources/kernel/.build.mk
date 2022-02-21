@@ -6,8 +6,8 @@ KERNEL_SRC += \
 	$(wildcard sources/kernel/*.c)                 \
 	$(wildcard sources/kernel/$(CONFIG_ARCH)/*.c)  \
 	$(wildcard sources/kernel/$(CONFIG_ARCH)/*.s)  \
-	$(wildcard sources/libs/embed/arch/$(CONFIG_ARCH)/*.c) \
-	$(wildcard sources/libs/embed/arch/$(CONFIG_ARCH)/*.s) \
+	$(wildcard sources/libs/embed/$(CONFIG_ARCH)/*.c) \
+	$(wildcard sources/libs/embed/$(CONFIG_ARCH)/*.s) \
 	$(wildcard sources/libs/embed/kernel/*.c)           \
 	sources/libs/bal/abi/helpers.c                 \
 	sources/libs/brutal/io/fmt.c                   \
@@ -18,8 +18,8 @@ KERNEL_SRC += \
 	sources/libs/brutal/time/convert.c             \
 	sources/libs/elf/elf.c                         \
 	sources/libs/bal/boot/handover.c               \
-	sources/libs/stdc/ansi/ctype.c                 \
-	sources/libs/stdc/ansi/string.c                \
+	sources/libs/stdc-ansi/ctype.c                 \
+	sources/libs/stdc-ansi/string.c                \
 	sources/libs/brutal/io/buf.c                   \
 	$(wildcard sources/libs/hw/acpi/*.c)           \
 	$(wildcard sources/libs/brutal/alloc/*.c)      \

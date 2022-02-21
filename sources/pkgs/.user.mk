@@ -2,8 +2,8 @@ LIBS_SRC = \
 	$(wildcard sources/libs/embed/brutal/*.c) \
 	$(wildcard sources/libs/embed/brutal/$(CONFIG_ARCH)/*.c) \
 	$(wildcard sources/libs/embed/brutal/$(CONFIG_ARCH)/*.s) \
-	$(wildcard sources/libs/embed/arch/$(CONFIG_ARCH)/*.c) \
-	$(wildcard sources/libs/embed/arch/$(CONFIG_ARCH)/*.s) \
+	$(wildcard sources/libs/embed/$(CONFIG_ARCH)/*.c) \
+	$(wildcard sources/libs/embed/$(CONFIG_ARCH)/*.s) \
 	$(wildcard sources/libs/ipc/*.c) \
 	$(wildcard sources/libs/ipc/*/*.c) \
 	$(wildcard sources/libs/bal/*.c) \
@@ -21,7 +21,7 @@ LIBS_SRC = \
 	$(wildcard sources/libs/hw/ahci/*.c) \
 	$(wildcard sources/libs/hw/ps2/*.c) \
 	$(wildcard sources/libs/json/*.c) \
-	$(wildcard sources/libs/stdc/*/*.c) \
+	$(wildcard sources/libs/stdc-*/*.c) \
 	$(wildcard sources/libs/ubsan/*.c)
 
 LIBS_OBJ = \

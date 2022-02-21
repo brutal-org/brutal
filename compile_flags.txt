@@ -11,9 +11,9 @@
 -Isources/pkgs
 -Isources/libs
 -Isources/libs/hw
--Isources/libs/stdc/ansi
--Isources/libs/stdc/posix
--Isources/libs/stdc/ext
+-Isources/libs/stdc-ansi
+-Isources/libs/stdc-posix
+-Isources/libs/stdc-ext
 -Ibin/generated
 -Ithirdparty
 -I/usr/include/SDL2

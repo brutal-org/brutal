@@ -1,8 +1,8 @@
 LIBS_HOST_SRC = \
 	$(wildcard sources/libs/embed/posix/*.c)     \
 	$(wildcard sources/libs/embed/sdl/*.c)       \
-	$(wildcard sources/libs/embed/arch/$(CONFIG_HOST_ARCH)/*.s) \
-	$(wildcard sources/libs/embed/arch/$(CONFIG_HOST_ARCH)/*.c) \
+	$(wildcard sources/libs/embed/$(CONFIG_HOST_ARCH)/*.s) \
+	$(wildcard sources/libs/embed/$(CONFIG_HOST_ARCH)/*.c) \
 	$(wildcard sources/libs/brutal/*.c)     \
 	$(wildcard sources/libs/brutal/*/*.c)   \
 	$(wildcard sources/libs/brutal/*/*/*.c) \
