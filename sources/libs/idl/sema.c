@@ -106,7 +106,7 @@ IdlModule idl_sema_module(IdlModule module, Alloc *alloc)
     {
         log$("Importing {}...", import.name);
         IoFile source_file;
-        UNWRAP_OR_PANIC(io_file_open(&source_file, str_fmt(alloc, "sources/protos/{}.idl", import.name)), "File not found!");
+        UNWRAP_OR_PANIC(io_file_open(&source_file, str_fmt(alloc, "sources/protos/{}.idl", import.name), FILE_OPEN_READ_ONLY), "File not found!");
 
         Buf source_buf;
         buf_init(&source_buf, 512, alloc);

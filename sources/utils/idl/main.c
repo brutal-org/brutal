@@ -26,7 +26,7 @@ int main(int argc, char const *argv[])
     heap_alloc_init(&heap, NODE_DEFAULT);
 
     IoFile source_file;
-    UNWRAP_OR_PANIC(io_file_open(&source_file, str$(argv[1])), "File not found!");
+    UNWRAP_OR_PANIC(io_file_open(&source_file, str$(argv[1]), FILE_OPEN_READ_ONLY), "File not found!");
 
     Buf source_buf;
     buf_init(&source_buf, 512, base$(&heap));

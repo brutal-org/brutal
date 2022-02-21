@@ -2,9 +2,9 @@
 #include <brutal/io/file.h>
 #include <embed/file.h>
 
-MaybeError io_file_open(IoFile *self, Str path)
+MaybeError io_file_open(IoFile *self, Str path, FileOpenFlags flags)
 {
-    return embed_file_open(self, path);
+    return embed_file_open(self, path, flags);
 }
 
 MaybeError io_file_create(IoFile *self, Str path)

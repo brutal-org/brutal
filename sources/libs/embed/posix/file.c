@@ -9,11 +9,27 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-MaybeError embed_file_open(IoFile *self, Str path)
+
+int embed_flags2posix_flags(FileOpenFlags flags)
+{
+    switch(flags)
+    {
+        case FILE_OPEN_READ_ONLY:
+            return O_RDONLY;
+        case FILE_OPEN_WRITE_ONLY:
+            return O_WRONLY;
+        case FILE_OPEN_READ_WRITE:
+            return O_RDWR;
+        default:
+            panic$("unkown embed flag: {}", flags);
+    }
+}
+
+MaybeError embed_file_open(IoFile *self, Str path, FileOpenFlags flags)
 {
     char *cstr = (char *)utf8_str_to_cstr(path, alloc_global());
 
-    self->embed.fd = open(cstr, O_RDONLY);
+    self->embed.fd = open(cstr, embed_flags2posix_flags(flags));
 
     alloc_free(alloc_global(), cstr);
 

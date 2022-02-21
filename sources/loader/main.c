@@ -55,7 +55,7 @@ EntryPointFn loader_load_kernel(Str path, VmmSpace vmm)
     log$("Loading elf file...");
 
     IoFile file;
-    io_file_open(&file, path);
+    io_file_open(&file, path, FILE_OPEN_READ_ONLY);
     Buf buf;
     io_read_all(io_file_reader(&file), &buf, alloc_global());
 

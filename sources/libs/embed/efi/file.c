@@ -67,7 +67,22 @@ EfiFileProtocol *efi_rootdir(void)
     return _rootdir;
 }
 
-MaybeError embed_file_open(IoFile *self, Str path)
+int embed_flags2efi_flags(FileOpenFlags flags)
+{
+    switch(flags)
+    {
+        case FILE_OPEN_READ_ONLY:
+            return EFI_FILE_MODE_READ;
+        case FILE_OPEN_WRITE_ONLY:
+            return EFI_FILE_MODE_WRITE;
+        case FILE_OPEN_READ_WRITE:
+            return EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE;
+        default:
+            panic$("unkown embed flag: {}", flags);
+    }
+}
+
+MaybeError embed_file_open(IoFile *self, Str path, FileOpenFlags flags)
 {
     uint16_t *cstr = utf16_str_to_cstr(path, alloc_global());
 
@@ -80,7 +95,12 @@ MaybeError embed_file_open(IoFile *self, Str path)
         }
     }
 
-    EfiStatus status = efi_rootdir()->open(efi_rootdir(), &self->embed.proto, cstr, EFI_FILE_MODE_READ, EFI_FILE_READ_ONLY);
+    EfiStatus status = efi_rootdir()->open(
+        efi_rootdir(),
+        &self->embed.proto,
+        cstr,
+        embed_flags2efi_flags(flags),
+        (flags ==FILE_OPEN_READ_ONLY ) ? EFI_FILE_READ_ONLY : 0);
 
     alloc_free(alloc_global(), cstr);
 
