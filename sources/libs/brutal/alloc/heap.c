@@ -28,7 +28,7 @@ static HeapMajor *major_block_create(size_t size, NodeSize node_size)
     HeapMajor *maj;
     if (embed_mem_acquire(st * MEM_PAGE_SIZE, (void **)&maj, EMBED_MEM_NONE).kind != ERR_KIND_SUCCESS)
     {
-        panic$("Failled to allocate memory!");
+        panic$("Failed to allocate memory!");
     }
 
     maj->prev = nullptr;

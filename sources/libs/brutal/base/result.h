@@ -71,4 +71,4 @@
     })
 
 #define UNWRAP(EXPR) \
-    UNWRAP_OR_PANIC(EXPR, "UNWRAP(" #EXPR ") failled")
+    UNWRAP_OR_PANIC(EXPR, "UNWRAP(" #EXPR ") failed")
