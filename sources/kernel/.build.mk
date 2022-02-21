@@ -6,9 +6,9 @@ KERNEL_SRC += \
 	$(wildcard sources/kernel/*.c)                 \
 	$(wildcard sources/kernel/$(CONFIG_ARCH)/*.c)  \
 	$(wildcard sources/kernel/$(CONFIG_ARCH)/*.s)  \
-	$(wildcard sources/embed/arch/$(CONFIG_ARCH)/*.c) \
-	$(wildcard sources/embed/arch/$(CONFIG_ARCH)/*.s) \
-	$(wildcard sources/embed/kernel/*.c)           \
+	$(wildcard sources/libs/embed/arch/$(CONFIG_ARCH)/*.c) \
+	$(wildcard sources/libs/embed/arch/$(CONFIG_ARCH)/*.s) \
+	$(wildcard sources/libs/embed/kernel/*.c)           \
 	sources/libs/bal/abi/helpers.c                 \
 	sources/libs/brutal/io/fmt.c                   \
 	sources/libs/brutal/io/print.c                 \
