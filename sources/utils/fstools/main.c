@@ -44,7 +44,7 @@ FsBlockResult file_block_acquire(FileBlock *self, void **buf, size_t count, size
 
     vec_push(&self->blocks, block);
 
-    return FS_BLOCK_SUCCESS;
+    return OK(FsBlockResult, (Success){});
 }
 
 FsBlockResult file_block_release(FileBlock *self, void const **buf)
@@ -63,7 +63,7 @@ FsBlockResult file_block_release(FileBlock *self, void const **buf)
 
     if (block == nullptr)
     {
-        return FS_BLOCK_ERROR;
+        return ERR(FsBlockResult, FS_BLOCK_ERROR);
     }
 
     if (block->flags & FS_BLOCK_WRITE)
@@ -75,7 +75,7 @@ FsBlockResult file_block_release(FileBlock *self, void const **buf)
 
     alloc_free(self->alloc, block->buf);
 
-    return FS_BLOCK_SUCCESS;
+    return OK(FsBlockResult, (Success){});
 }
 
 Emit emit;
@@ -116,11 +116,10 @@ int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char const *argv[])
 
     emit_init(&emit, io_chan_out());
     Ext2Fs fs = {};
-
-    ext2_init(&fs, &block._impl, alloc_global());
+    UNWRAP(ext2_init(&fs, &block._impl, alloc_global()));
     Ext2FsInode root_inode = {};
 
-    ext2_inode(&fs, &root_inode, 2);
+    UNWRAP(ext2_inode(&fs, &root_inode, 2));
 
     ext2_fs_iter(&fs, &root_inode, (Ext2IterFileFn *)file_block_dump, &fs);
 

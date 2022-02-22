@@ -10,7 +10,9 @@ typedef enum
     FS_BLOCK_ERROR,
     FS_BLOCK_INVALID_LBA,
     FS_BLOCK_INVALID_COUNT,
-} FsBlockResult;
+} FsBlockError;
+
+typedef Result(FsBlockError, Success) FsBlockResult;
 
 typedef enum
 {
