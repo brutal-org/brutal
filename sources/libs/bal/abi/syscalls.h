@@ -4,6 +4,10 @@
 
 // clang-format off
 
+/**
+ * @file syscalls.h
+ */
+
 #ifdef __kernel__
 #    define SYSCALL(NAME) BrResult sys_##NAME
 #else
@@ -19,8 +23,8 @@ typedef struct
 
 /**
  * @brief Log a message to the kernel log.
- * @param message The message to log. (in)
- * @param size The size of the message. (in)
+ * @param[in] message The message to log.
+ * @param[in] size The size of the message.
  * @return BR_SUCCESS if the message was logged.
  */
 SYSCALL(log) (BrLogArgs* args);
@@ -33,8 +37,8 @@ typedef struct
 
 /**
  * @brief Get the current time.
- * @param tick The current tick. (out)
- * @param timestamp The current timestamp. (out)
+ * @param[out] tick The current tick.
+ * @param[out] timestamp The current timestamp.
  */
 SYSCALL(now) (BrNowArgs* args);
 
@@ -51,12 +55,12 @@ typedef struct
 
 /**
  * @brief Map a memory region into a space.
- * @param space The space to map the memory into. (in)
- * @param memory The memory to map. (in)
- * @param offset The offset into the memory to map. (in)
- * @param size The size of the memory to map. (in)
- * @param vaddr The virtual address to map the memory to. (in)
- * @param flags The flags to use when mapping the memory. (in)
+ * @param[in] space The space to map the memory into.
+ * @param[in] memory The memory to map.
+ * @param[in] offset The offset into the memory to map.
+ * @param[in] size The size of the memory to map.
+ * @param[in] vaddr The virtual address to map the memory to.
+ * @param[in] flags The flags to use when mapping the memory.
  * @return BR_SUCCESS if the memory was mapped.
  */
 SYSCALL(map) (BrMapArgs* args);
@@ -71,9 +75,9 @@ typedef struct
 
 /**
  * @brief Unmap a memory region from a space.
- * @param space The space to unmap the memory from. (in)
- * @param vaddr The virtual address to unmap the memory from. (in)
- * @param size The size of the memory to unmap. (in)
+ * @param[in] space The space to unmap the memory from.
+ * @param[in] vaddr The virtual address to unmap the memory from.
+ * @param[in] size The size of the memory to unmap.
  * @return BR_SUCCESS if the memory was unmapped.
  */
 SYSCALL(unmap) (BrUnmapArgs* args);
@@ -113,12 +117,12 @@ typedef struct
 
 /**
  * @brief Create a new kernel object.
- * @param id The id of the object to create. (out)
- * @param type The type of the object to create. (in)
- * @param handle The handle of the object to create. (out)
- * @param task The properties of the task to create. (in)
- * @param memory The properties of the memory to create. (in)
- * @param space The properties of the space to create. (in)
+ * @param[out] id The id of the object to create.
+ * @param[in] type The type of the object to create.
+ * @param[out] handle The handle of the object to create.
+ * @param[in] task The properties of the task to create.
+ * @param[in] memory The properties of the memory to create.
+ * @param[in] space The properties of the space to create.
  * @return BR_SUCCESS if the object was created.
  */
 SYSCALL(create) (BrCreateArgs* args);
@@ -131,8 +135,8 @@ typedef struct
 
 /**
  * @brief Duplicate an handle to kernel object.
- * @param handle The handle to duplicate. (in)
- * @param copy The handle of the duplicated object. (out)
+ * @param[in] handle The handle to duplicate.
+ * @param[out] copy The handle of the duplicated object.
  * @return BR_SUCCESS if the object was duplicated.
  */
 SYSCALL(dup) (BrDupArgs* args);
@@ -147,10 +151,10 @@ typedef struct
 
 /**
  * @brief Start a task.
- * @param handle The handle of the task to start. (in)
- * @param ip The initial instruction pointer. (in)
- * @param sp The initial stack pointer. (in)
- * @param args The arguments to pass to the task. (in)
+ * @param[in] handle The handle of the task to start.
+ * @param[in] ip The initial instruction pointer.
+ * @param[in] sp The initial stack pointer.
+ * @param[in] args The arguments to pass to the task.
  * @return BR_SUCCESS if the task was started.
  */
 SYSCALL(start) (BrStartArgs* args);
@@ -163,8 +167,8 @@ typedef struct
 
 /**
  * @brief Exit a task.
- * @param handle The handle of the task to exit. (in)
- * @param result The result to return to the caller. (in)
+ * @param[in] handle The handle of the task to exit.
+ * @param[in] result The result to return to the caller.
  * @return BR_SUCCESS if the task was exited.
  */
 SYSCALL(exit) (BrExitArgs* args);
@@ -185,10 +189,10 @@ typedef struct
 
 /**
  * @brief Send/receive a message to/from another task.
- * @param to The address of the task to send/receive to. (in)
- * @param msg The message to send/receive. (in)
- * @param deadline The deadline to wait for the message. (in)
- * @param flags The flags to use when sending/receiving the message. (in)
+ * @param[in] to The address of the task to send/receive to.
+ * @param[in] msg The message to send/receive.
+ * @param[in] deadline The deadline to wait for the message.
+ * @param[in] flags The flags to use when sending/receiving the message.
  * @return BR_SUCCESS if the message was sent/received.
  */
 SYSCALL(ipc) (BrIpcArgs* args);
@@ -201,8 +205,8 @@ typedef struct
 
 /**
  * @brief Drop rights from a handle.
- * @param handle The handle to drop rights from. (in)
- * @param rights The rights to drop. (in)
+ * @param[in] handle The handle to drop rights from.
+ * @param[in] rights The rights to drop.
  * @return BR_SUCCESS if the rights were dropped.
  */
 SYSCALL(drop) (BrDropArgs* args);
@@ -214,7 +218,7 @@ typedef struct
 
 /**
  * @brief Close a handle.
- * @param handle The handle to close. (in)
+ * @param[in] handle The handle to close.
  * @return BR_SUCCESS if the handle was closed.
  */
 SYSCALL(close) (BrCloseArgs* args);
@@ -226,7 +230,7 @@ typedef struct
 
 /**
  * @brief Bind an event to a task.
- * @param event The event to bind. (in)
+ * @param[in] event The event to bind.
  * @return BR_SUCCESS if the event was bound.
  */
 SYSCALL(bind) (BrBindArgs* args);
@@ -238,7 +242,7 @@ typedef struct
 
 /**
  * @brief Unbind an event from a task.
- * @param event The event to unbind. (in)
+ * @param[in] event The event to unbind.
  * @return BR_SUCCESS if the event was unbound.
  */
 SYSCALL(unbind) (BrUnbindArgs* args);
@@ -250,7 +254,7 @@ typedef struct
 
 /**
  * @brief Ack an event.
- * @param event The event to ack. (in)
+ * @param[in] event The event to ack.
  * @return BR_SUCCESS if the event was acked.
  */
 SYSCALL(ack) (BrAckArgs* args);
@@ -295,13 +299,13 @@ typedef struct
 
 /**
  * @brief Inspect a kernel object.
- * @param id The id of the object to inspect. (in)
- * @param handle The handle of the object to inspect. (in)
- * @param type The type of the object to inspect. (in)
- * @param memory The properties of the memory to inspect. (out)
- * @param domain The properties of the domain to inspect. (out)
- * @param space The properties of the space to inspect. (out)
- * @param task The properties of the task to inspect. (out)
+ * @param[in] id The id of the object to inspect.
+ * @param[in] handle The handle of the object to inspect.
+ * @param[in] type The type of the object to inspect.
+ * @param[out] memory The properties of the memory to inspect.
+ * @param[out] domain The properties of the domain to inspect.
+ * @param[out] space The properties of the space to inspect.
+ * @param[out] task The properties of the task to inspect.
  * @return BR_SUCCESS if the object was inspected.
  */
 SYSCALL(inspect)(BrInspectArgs* args);
@@ -315,18 +319,18 @@ typedef struct
 
 /**
  * @brief Read from an IO port.
- * @param port The port to read from. (in)
- * @param data The data read from the port. (out)
- * @param size The size of the data read. (out)
+ * @param[in] port The port to read from.
+ * @param[out] data The data read from the port.
+ * @param[out] size The size of the data read.
  * @return BR_SUCCESS if the data was read.
  */
 SYSCALL(in)(BrIoArgs* args);
 
 /**
  * @brief Write to an IO port.
- * @param port The port to write to. (in)
- * @param data The data to write to the port. (in)
- * @param size The size of the data to write. (in)
+ * @param[in] port The port to write to.
+ * @param[in] data The data to write to the port.
+ * @param[in] size The size of the data to write.
  * @return BR_SUCCESS if the data was written.
  */
 SYSCALL(out)(BrIoArgs* args);
