@@ -55,9 +55,13 @@ The following roadmap is always subject to change.
   - [ ] Fat
     - [ ] Read
     - [ ] Write
+    - [ ] Create files
+    - [ ] Format a partition
   - [ ] Ext2Fs
     - [x] Read
-    - [ ] Write
+    - [x] Write
+    - [ ] Create files
+    - [ ] Format a partition
 
 ### Milestone 5 - Networking and Shell
 
@@ -154,6 +158,15 @@ The following roadmap is always subject to change.
 ## Architectures
 
 - [ ] riscv
+  - [x] fdt
+  - [x] interrupt
+  - [x] pmm
+  - [x] vmm
+  - [ ] irq
+  - [ ] timer
+  - [ ] smp
+  - [ ] userspace
+  - [ ] own bootloader
 - [ ] arm64
 
 ## Sub-Projects
