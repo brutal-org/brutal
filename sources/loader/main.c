@@ -2,10 +2,10 @@
 #include <brutal/debug.h>
 #include <brutal/io.h>
 #include <elf/elf.h>
-#include <loader/config.h>
-#include <loader/loader.h>
-#include <loader/memory.h>
-#include <loader/protocol.h>
+#include "config.h"
+#include "loader.h"
+#include "memory.h"
+#include "protocol.h"
 
 typedef void (*EntryPointFn)(Handover *handover, uint64_t t) __attribute__((sysv_abi));
 

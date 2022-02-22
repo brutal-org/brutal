@@ -1,4 +1,5 @@
 #pragma once
+
 #include <bal/boot.h>
 
 // Entry of the loader, called by the platform's entry point. This is needed because of EFI requiring parameters to be passed to its entry point
