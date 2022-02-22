@@ -67,22 +67,22 @@ EfiFileProtocol *efi_rootdir(void)
     return _rootdir;
 }
 
-int embed_flags2efi_flags(FileOpenFlags flags)
+int embed_flags2efi_flags(FileInitFlags flags)
 {
-    switch(flags)
+    switch (flags & IO_FILE_READ_WRITE)
     {
-        case FILE_OPEN_READ_ONLY:
-            return EFI_FILE_MODE_READ;
-        case FILE_OPEN_WRITE_ONLY:
-            return EFI_FILE_MODE_WRITE;
-        case FILE_OPEN_READ_WRITE:
-            return EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE;
-        default:
-            panic$("unkown embed flag: {}", flags);
+    case IO_FILE_READ_WRITE:
+        return EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE;
+    case IO_FILE_READ:
+        return EFI_FILE_MODE_READ;
+    case IO_FILE_WRITE:
+        return EFI_FILE_MODE_WRITE;
+    default:
+        panic$("unkown flag: {}", flags);
     }
 }
 
-MaybeError embed_file_open(IoFile *self, Str path, FileOpenFlags flags)
+MaybeError embed_file_open(IoFile *self, Str path, FileInitFlags flags)
 {
     uint16_t *cstr = utf16_str_to_cstr(path, alloc_global());
 
@@ -100,7 +100,7 @@ MaybeError embed_file_open(IoFile *self, Str path, FileOpenFlags flags)
         &self->embed.proto,
         cstr,
         embed_flags2efi_flags(flags),
-        (flags ==FILE_OPEN_READ_ONLY ) ? EFI_FILE_READ_ONLY : 0);
+        ((flags & IO_FILE_READ_WRITE) == IO_FILE_READ) ? EFI_FILE_READ_ONLY : 0);
 
     alloc_free(alloc_global(), cstr);
 

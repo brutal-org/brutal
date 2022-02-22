@@ -4,7 +4,7 @@
 
 MaybeError embed_file_create(IoFile *self, Str path);
 
-MaybeError embed_file_open(IoFile *self, Str path, FileOpenFlags flags);
+MaybeError embed_file_open(IoFile *self, Str path, FileInitFlags flags);
 
 MaybeError embed_file_close(IoFile *self);
 

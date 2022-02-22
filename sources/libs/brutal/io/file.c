@@ -2,14 +2,24 @@
 #include <brutal/io/file.h>
 #include <embed/file.h>
 
-MaybeError io_file_open(IoFile *self, Str path, FileOpenFlags flags)
+MaybeError io_file_init(IoFile *self, Str path, FileInitFlags flags)
 {
     return embed_file_open(self, path, flags);
 }
 
+MaybeError io_file_view(IoFile *self, Str path)
+{
+    return io_file_init(self, path, IO_FILE_READ);
+}
+
 MaybeError io_file_create(IoFile *self, Str path)
 {
-    return embed_file_create(self, path);
+    return embed_file_create(self,  path);
+}
+
+MaybeError io_file_edit(IoFile *self, Str path)
+{
+    return io_file_init(self, path, IO_FILE_READ | IO_FILE_WRITE);
 }
 
 IoReader io_file_reader(IoFile *self)

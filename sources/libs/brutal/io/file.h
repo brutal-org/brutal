@@ -10,15 +10,49 @@ typedef struct
 
 typedef enum
 {
-    FILE_OPEN_READ_ONLY,
-    FILE_OPEN_WRITE_ONLY,
-    FILE_OPEN_READ_WRITE,
-} FileOpenFlags;
+    IO_FILE_READ = (1 << 0),
+    IO_FILE_WRITE = (1 << 1),
+    IO_FILE_READ_WRITE = (IO_FILE_READ | IO_FILE_WRITE),
+    IO_FILE_CREATE = (1 << 2),
+/*  IO_FILE_MMAP  = (1 << 3), */
+} FileInitFlags;
 
+/**
+ * @brief Open a file in **read-only**.
+ *
+ * @param self The file to open.
+ * @param path The path of the file.
+ * @return MaybeError
+ */
+MaybeError io_file_view(IoFile *self, Str path);
 
-MaybeError io_file_open(IoFile *self, Str path, FileOpenFlags flags);
-
+/**
+ * @brief Create/Open a file in **write-only** .
+ *
+ * @param self The file to open.
+ * @param path The path of the file.
+ * @return MaybeError
+ */
 MaybeError io_file_create(IoFile *self, Str path);
+
+/**
+ * @brief Open a file in **read-write**.
+ *
+ * @param self The file to open.
+ * @param path The path of the file
+ * @return MaybeError
+ */
+MaybeError io_file_edit(IoFile *self, Str path);
+
+/**
+ * @brief Initialize a file object with specific flags.
+ *
+ * @param self The file to initialize.
+ * @param path The path of the file.
+ * @param flags Flags to use when loading the file.
+ * @return MaybeError
+ */
+MaybeError io_file_init(IoFile *self, Str path, FileInitFlags flags);
 
 IoReader io_file_reader(IoFile *self);
 
