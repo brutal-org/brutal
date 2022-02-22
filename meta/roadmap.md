@@ -11,17 +11,17 @@ The following roadmap is always subject to change.
   - [x] Import
   - [x] Attributes
   - [x] Modules
-- [ ] Graphic Library
+- [x] Graphic Library
   - [x] SDL Backend
     - [x] Render
     - [x] Events
-  - [ ] BRUTAL Backend
-    - [ ] Compositor
+  - [x] BRUTAL Backend
+    - [x] Compositor
       - [x] Event Dispatch
       - [x] Compositing
-    - [ ] Client
+    - [x] Client
       - [x] Render
-      - [ ] Events
+      - [x] Events
   - [x] Paint
     - [x] Dots
     - [x] Lines
