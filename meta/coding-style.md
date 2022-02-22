@@ -127,10 +127,10 @@ int deinit(MAYBE_UNUSED void *data)
 ```
 ### Main function
 
-Always put `argc` and `argv` as arguments, use a double pointer for `argv`.
+Always put `argc` and `argv` as arguments, use `char const*[]` for `argv`.
 
 ```c
-int main(int argc, char const **argv)
+int main(int argc, char const *argv[])
 {
     // ...
 }
