@@ -1,5 +1,3 @@
-BINDIR_KERNEL = $(BINDIR)/kernel
-
 KERNEL=$(BINDIR_KERNEL)/kernel.elf
 
 KERNEL_SRC += \

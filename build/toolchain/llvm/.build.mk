@@ -1,7 +1,8 @@
-CFLAGS_WARN += \
+BASE_CFLAGS += \
 	-Wnewline-eof \
 	-Wignored-attributes \
-	-Wunknown-attributes
+	-Wunknown-attributes \
+	-Wimplicit-fallthrough
 
 # --- Host compiler ---------------------------------------------------------- #
 
@@ -13,12 +14,7 @@ ifeq (, $(shell which $(HOST_CC) 2> /dev/null))
 endif
 
 HOST_CFLAGS= \
-	-MD \
-	$(CFLAGS_STD) \
-	$(CFLAGS_OPT) \
-	$(CFLAGS_WARN) \
-	$(HOST_CFLAGS_INC) \
-	$(HOST_CFLAGS_SAN) \
+	$(BASE_CFLAGS) \
 	`pkg-config sdl2 --cflags`
 
 HOST_LD=ld.lld
@@ -43,20 +39,19 @@ ifeq (, $(shell which clang$(LLVM_VERSION) 2> /dev/null))
 endif
 
 USER_CFLAGS= \
-	-MD \
-	$(CFLAGS_STD) \
-	$(CFLAGS_OPT) \
-	$(CFLAGS_WARN) \
-	-Wimplicit-fallthrough \
+	$(BASE_CFLAGS) \
 	$(ARCH_CFLAGS) \
 	$(USER_CFLAGS_INC) \
 	-D__brutal__=1 \
 	-ffreestanding
 
 USER_KCFLAGS= \
-	$(USER_CFLAGS) \
+	$(BASE_CFLAGS) \
 	$(ARCH_KCFLAGS) \
-	-Wimplicit-fallthrough \
+	$(USER_CFLAGS_INC) \
+	-ffreestanding \
+	-fno-stack-protector \
+	-D__brutal__=1 \
 	-D__kernel__=1 \
 	-D__freestanding__=1
 
