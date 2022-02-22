@@ -63,6 +63,8 @@ $$($(1)_HOST_BIN): $$($(1)_HOST_OBJ) $(LIBS_HOST_BIN)
 
 endef
 
+HOST_PKGS=$(APPS) $(UTILS)
+
 list-host:
 	@echo $(HOST_NAMES)
 

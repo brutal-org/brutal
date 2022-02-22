@@ -76,6 +76,8 @@ $$($(1)_BIN): $$($(1)_OBJ) $(LIBS_BIN)
 
 endef
 
+USER_PKGS:=$(APPS) $(SRVS)
+
 list-user:
 	@echo $(USER_PKGS)
 
