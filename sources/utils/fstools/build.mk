@@ -1,0 +1,3 @@
+PKG_FSTOOLS_PATH=utils/fstools
+
+UTILS+=FSTOOLS

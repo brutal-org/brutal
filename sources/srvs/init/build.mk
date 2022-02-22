@@ -1,0 +1,3 @@
+PKG_INIT_PATH=srvs/init
+
+SRVS+=INIT

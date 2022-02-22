@@ -1,2 +1,0 @@
-
-APPS+=DEMO

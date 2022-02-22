@@ -1,0 +1,3 @@
+PKG_ACPI_PATH=srvs/acpi
+
+SRVS+=ACPI

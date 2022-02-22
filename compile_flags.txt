@@ -8,7 +8,9 @@
 -Wunknown-attributes
 -Wimplicit-fallthrough
 -Isources/
--Isources/pkgs
+-Isources/apps
+-Isources/srvs
+-Isources/utils
 -Isources/libs
 -Isources/libs/hw
 -Isources/libs/stdc-ansi
@@ -17,4 +19,3 @@
 -Ibin/generated
 -Ithirdparty
 -I/usr/include/SDL2
--D_REENTRANT

@@ -37,7 +37,9 @@ HOST_CFLAGS_SAN ?= \
 HOST_CFLAGS_INC ?= \
 	$(INC_LIBBRUTAL) \
 	-Isources/libs/hw \
-	-Isources/pkgs \
+	-Isources/apps \
+	-Isources/srvs \
+	-Isources/utils \
 	-Isources/ \
 	-Ithirdparty
 
@@ -45,7 +47,9 @@ USER_CFLAGS_INC ?= \
 	$(INC_LIBS) \
 	$(INC_LIBBRUTAL) \
 	-Isources/libs/hw \
-	-Isources/pkgs \
+	-Isources/apps \
+	-Isources/srvs \
+	-Isources/utils \
 	-Isources/ \
 	-Ibin/generated \
 	-Ithirdparty
@@ -62,10 +66,12 @@ include build/toolchain/archs/$(CONFIG_ARCH).mk
 include build/toolchain/$(CONFIG_TOOLCHAIN)/.build.mk
 
 include sources/kernel/.build.mk
+include $(wildcard sources/apps/*/build.mk)
 include $(wildcard sources/pkgs/*/build.mk)
-include sources/pkgs/host.mk
+include $(wildcard sources/utils/*/build.mk)
+include sources/host.mk
 include sources/protos/.build.mk
-include sources/pkgs/target.mk
+include sources/target.mk
 include sources/loader/.build.mk
 
 include build/run/$(CONFIG_BOOTLOADER).mk
