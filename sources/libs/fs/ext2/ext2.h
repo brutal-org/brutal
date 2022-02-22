@@ -38,6 +38,8 @@ typedef struct
 
 typedef Range(long) BlockRange;
 
+typedef Result(FsError, Success) FsResult;
+
 FsResult ext2_init(Ext2Fs *self, FsBlockImpl *block, Alloc *alloc);
 
 typedef Iter Ext2IterFileFn(Ext2FsFile *val, void *ctx);

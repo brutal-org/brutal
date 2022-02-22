@@ -9,4 +9,4 @@ typedef enum
     FS_INVALID_PATH,
     FS_INVALID_FS,
     FS_NO_FREE_BLOCK
-} FsResult;
+} FsError;
