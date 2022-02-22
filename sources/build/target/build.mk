@@ -22,6 +22,7 @@ LIBS_SRC = \
 	$(wildcard sources/libs/hw/ps2/*.c) \
 	$(wildcard sources/libs/json/*.c) \
 	$(wildcard sources/libs/stdc-*/*.c) \
+	$(wildcard sources/libs/absan/*.c) \
 	$(wildcard sources/libs/ubsan/*.c)
 
 LIBS_OBJ = \

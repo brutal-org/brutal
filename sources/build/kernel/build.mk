@@ -32,6 +32,7 @@ KERNEL_SRC += \
 	$(wildcard sources/libs/brutal/mem/*.c)        \
 	$(wildcard sources/libs/brutal/sync/*.c)       \
 	$(wildcard sources/libs/brutal/text/*.c)       \
+	$(wildcard sources/libs/absan/*.c)             \
 	$(wildcard sources/libs/ubsan/*.c)
 
 KERNEL_OBJ = \
