@@ -1,0 +1,2 @@
+CFLAGS_OPT+=-g -O0
+CFLAGS_SAN+=

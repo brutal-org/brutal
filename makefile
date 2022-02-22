@@ -3,7 +3,7 @@
 .DEFAULT_GOAL := all
 SHELL := /bin/bash
 
-CONFIG ?= default
+CONFIG?=default
 
 export LC_ALL=C
 
@@ -27,15 +27,12 @@ INC_LIBS= \
 	-Isources/libs/stdc-ext \
 	-Isources/libs/stdc-posix
 
-INC_LIBBRUTAL= \
-	-Isources/libs/
-
 HOST_CFLAGS_SAN ?= \
 	-fsanitize=address \
 	-fsanitize=undefined
 
 HOST_CFLAGS_INC ?= \
-	$(INC_LIBBRUTAL) \
+	-Isources/libs/ \
 	-Isources/libs/hw \
 	-Isources/apps \
 	-Isources/srvs \
@@ -45,7 +42,7 @@ HOST_CFLAGS_INC ?= \
 
 USER_CFLAGS_INC ?= \
 	$(INC_LIBS) \
-	$(INC_LIBBRUTAL) \
+	-Isources/libs/ \
 	-Isources/libs/hw \
 	-Isources/apps \
 	-Isources/srvs \
@@ -61,18 +58,18 @@ BINDIR_HOST=bin/$(CONFIG_HOST_ARCH)-$(CONFIG_TOOLCHAIN)/host
 
 MKCWD=mkdir -p $(@D)
 
-include build/config/$(CONFIG).mk
-include build/toolchain/archs/$(CONFIG_ARCH).mk
-include build/toolchain/$(CONFIG_TOOLCHAIN)/.build.mk
-
-include sources/kernel/.build.mk
 include $(wildcard sources/apps/*/build.mk)
 include $(wildcard sources/pkgs/*/build.mk)
 include $(wildcard sources/utils/*/build.mk)
-include sources/host.mk
+
+include build/config/$(CONFIG).mk
+include build/toolchain/archs/$(CONFIG_ARCH).mk
+include build/toolchain/$(CONFIG_TOOLCHAIN)/.build.mk
+include sources/build/kernel/build.mk
+include sources/build/host/build.mk
 include sources/protos/.build.mk
-include sources/target.mk
-include sources/loader/.build.mk
+include sources/build/loader/build.mk
+include sources/build/target/build.mk
 
 include build/run/$(CONFIG_BOOTLOADER).mk
 

@@ -1,86 +1,86 @@
 name: Build and Test (Ubuntu)
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
 
 jobs:
-  dump-toolchain:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: true
+    dump-toolchain:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  submodules: true
 
-      - name: Install dependencies
-        run: .github/workflows/setup-ubuntu.sh
+            - name: Install dependencies
+              run: sources/build/scripts/setup-ubuntu.sh
 
-      - name: Dump dependencies
-        run: .github/workflows/dump.sh
+            - name: Dump dependencies
+              run: sources/build/scripts/dump.sh
 
-  build-toolchain:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        toolchain: [gnu, llvm]
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: true
+    build-toolchain:
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                toolchain: [gnu, llvm]
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  submodules: true
 
-      - name: Install dependencies
-        run: .github/workflows/setup-ubuntu.sh
+            - name: Install dependencies
+              run: sources/build/scripts/setup-ubuntu.sh
 
-      - name: Cache Toolchain (${{matrix.toolchain}})
-        uses: actions/cache@v2
-        env:
-          cache-name: cached-user-compiler
-        with:
-          path: |
-            **/build/toolchain/${{matrix.toolchain}}/local
-          key: |
-            ${{ runner.os }}-${{matrix.toolchain}}-${{hashFiles(format('build/toolchain/{0}/build.sh', matrix.toolchain)) }}
-          restore-keys: |
-            ${{ runner.os }}-${{matrix.toolchain}}-${{hashFiles(format('build/toolchain/{0}/build.sh', matrix.toolchain)) }}
+            - name: Cache Toolchain (${{matrix.toolchain}})
+              uses: actions/cache@v2
+              env:
+                  cache-name: cached-user-compiler
+              with:
+                  path: |
+                      **/build/toolchain/${{matrix.toolchain}}/local
+                  key: |
+                      ${{ runner.os }}-${{matrix.toolchain}}-${{hashFiles(format('build/toolchain/{0}/build.sh', matrix.toolchain)) }}
+                  restore-keys: |
+                      ${{ runner.os }}-${{matrix.toolchain}}-${{hashFiles(format('build/toolchain/{0}/build.sh', matrix.toolchain)) }}
 
-      - name: Build Toolchain
-        run: |
-          build/toolchain/${{matrix.toolchain}}/build.sh x86_64
+            - name: Build Toolchain
+              run: |
+                  build/toolchain/${{matrix.toolchain}}/build.sh x86_64
 
-  build-all:
-    needs: build-toolchain
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        toolchain: [gnu, llvm]
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: true
+    build-all:
+        needs: build-toolchain
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                toolchain: [gnu, llvm]
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  submodules: true
 
-      - name: Install dependencies
-        run: .github/workflows/setup-ubuntu.sh
+            - name: Install dependencies
+              run: sources/build/scripts/setup-ubuntu.sh
 
-      - name: Cache Toolchain (${{matrix.toolchain}})
-        uses: actions/cache@v2
-        env:
-          cache-name: cached-user-compiler
-        with:
-          path: |
-            **/build/toolchain/${{matrix.toolchain}}/local
-          key: |
-            ${{ runner.os }}-${{matrix.toolchain}}-${{hashFiles(format('build/toolchain/{0}/build.sh', matrix.toolchain)) }}
-          restore-keys: |
-            ${{ runner.os }}-${{matrix.toolchain}}-${{hashFiles(format('build/toolchain/{0}/build.sh', matrix.toolchain)) }}
+            - name: Cache Toolchain (${{matrix.toolchain}})
+              uses: actions/cache@v2
+              env:
+                  cache-name: cached-user-compiler
+              with:
+                  path: |
+                      **/build/toolchain/${{matrix.toolchain}}/local
+                  key: |
+                      ${{ runner.os }}-${{matrix.toolchain}}-${{hashFiles(format('build/toolchain/{0}/build.sh', matrix.toolchain)) }}
+                  restore-keys: |
+                      ${{ runner.os }}-${{matrix.toolchain}}-${{hashFiles(format('build/toolchain/{0}/build.sh', matrix.toolchain)) }}
 
-      - name: Build All
-        run: |
-          CONFIG_TOOLCHAIN=${{matrix.toolchain}} make all
+            - name: Build All
+              run: |
+                  CONFIG_TOOLCHAIN=${{matrix.toolchain}} make all
 
-      - name: Run Tests
-        run: |
-          CONFIG_TOOLCHAIN=${{matrix.toolchain}} ./brutal.sh test
+            - name: Run Tests
+              run: |
+                  CONFIG_TOOLCHAIN=${{matrix.toolchain}} ./brutal.sh test

@@ -1,0 +1,2 @@
+CFLAGS+=-O3
+CFLAGS_SAN+=
