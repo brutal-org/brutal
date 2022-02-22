@@ -4,10 +4,6 @@
 
 // clang-format off
 
-/**
- * @file syscalls.h
- */
-
 #ifdef __kernel__
 #    define SYSCALL(NAME) BrResult sys_##NAME
 #else

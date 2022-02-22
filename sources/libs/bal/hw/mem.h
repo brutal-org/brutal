@@ -6,8 +6,6 @@
 #include <ipc/pack.h>
 #include <ipc/unpack.h>
 
-/** @file */
-
 typedef struct
 {
     size_t off;
