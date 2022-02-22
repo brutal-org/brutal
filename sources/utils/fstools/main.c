@@ -100,7 +100,7 @@ int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char const *argv[])
     }
 
     IoFile source_file;
-    UNWRAP_OR_PANIC(io_file_open(&source_file, str$(argv[1]), FILE_OPEN_READ_WRITE), "File not found!");
+    UNWRAP_OR_PANIC(io_file_edit(&source_file, str$(argv[1])), "File not found!");
 
     FileBlock block = {
         ._impl = {
@@ -123,5 +123,7 @@ int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char const *argv[])
     ext2_inode(&fs, &root_inode, 2);
 
     ext2_fs_iter(&fs, &root_inode, (Ext2IterFileFn *)file_block_dump, &fs);
+
+    io_file_close(&source_file);
     return 0;
 }

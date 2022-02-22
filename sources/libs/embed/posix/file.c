@@ -10,22 +10,32 @@
 #include <unistd.h>
 
 
-int embed_flags2posix_flags(FileOpenFlags flags)
+int embed_flags2posix_flags(FileInitFlags flags)
 {
-    switch(flags)
+    int result = 0;
+    switch(flags & IO_FILE_READ_WRITE)
     {
-        case FILE_OPEN_READ_ONLY:
-            return O_RDONLY;
-        case FILE_OPEN_WRITE_ONLY:
-            return O_WRONLY;
-        case FILE_OPEN_READ_WRITE:
-            return O_RDWR;
+        case IO_FILE_READ_WRITE:
+            result = O_RDWR;
+            break;
+        case IO_FILE_WRITE:
+            result = O_WRONLY;
+            break;
+        case IO_FILE_READ:
+            result = O_RDONLY;
+            break;
         default:
-            panic$("unkown embed flag: {}", flags);
+            panic$("unkown flag: {#x}", flags);
     }
+
+    if(flags & IO_FILE_CREATE)
+    {
+        result |= O_CREAT | O_TRUNC;
+    }
+    return result;
 }
 
-MaybeError embed_file_open(IoFile *self, Str path, FileOpenFlags flags)
+MaybeError embed_file_open(IoFile *self, Str path, FileInitFlags flags)
 {
     char *cstr = (char *)utf8_str_to_cstr(path, alloc_global());
 
