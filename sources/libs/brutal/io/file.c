@@ -14,7 +14,7 @@ MaybeError io_file_view(IoFile *self, Str path)
 
 MaybeError io_file_create(IoFile *self, Str path)
 {
-    return embed_file_create(self,  path);
+    return embed_file_create(self, path);
 }
 
 MaybeError io_file_edit(IoFile *self, Str path)

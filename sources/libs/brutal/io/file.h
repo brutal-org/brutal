@@ -14,7 +14,7 @@ typedef enum
     IO_FILE_WRITE = (1 << 1),
     IO_FILE_READ_WRITE = (IO_FILE_READ | IO_FILE_WRITE),
     IO_FILE_CREATE = (1 << 2),
-/*  IO_FILE_MMAP  = (1 << 3), */
+    /*  IO_FILE_MMAP  = (1 << 3), */
 } FileInitFlags;
 
 /**

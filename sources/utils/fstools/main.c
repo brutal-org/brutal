@@ -91,7 +91,7 @@ Iter file_block_dump(Ext2FsFile *file, void *ctx)
     return ITER_CONTINUE;
 }
 
-int main(MAYBE_UNUSED int argc, MAYBE_UNUSED char const *argv[])
+int main(int argc, char const *argv[])
 {
     if (argc == 1)
     {
