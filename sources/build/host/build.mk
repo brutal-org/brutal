@@ -46,7 +46,8 @@ $(1)_NAME = $$(shell echo $(1) | tr A-Z a-z)
 
 $(1)_HOST_SRC = \
 	$$(wildcard sources/$$(PKG_$(1)_PATH)/*.c) \
-	$$(wildcard sources/$$(PKG_$(1)_PATH)/*/*.c)
+	$$(wildcard sources/$$(PKG_$(1)_PATH)/*/*.c) \
+	$$(wildcard sources/$$(PKG_$(1)_PATH)/*/*/*.c)
 
 $(1)_HOST_OBJ = $$(patsubst sources/%,$(BINDIR_HOST)/%.o, $$($(1)_HOST_SRC))
 

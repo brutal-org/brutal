@@ -109,7 +109,7 @@ if [ $# -gt 0 ]; then
     usage
   fi
 
-  PKGS=./bin/$(uname -m)-$CONFIG_TOOLCHAIN/host
+  PKGS=./bin/$(uname -m)-host-$CONFIG_TOOLCHAIN
 
   make $JOBS $SILENT $PKGS/$1
   $DEBUG $PKGS/$@
