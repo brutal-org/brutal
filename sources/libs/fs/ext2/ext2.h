@@ -53,3 +53,7 @@ FsResult ext2_inode_read(Ext2Fs *self, const Ext2FsInode *inode, void *data, Blo
 FsResult ext2_inode_write(Ext2Fs *self, Ext2FsInode *inode, const void *data, BlockRange range);
 
 void ext2_fs_dump_inode(Ext2Fs *self, Ext2FsInode *inode);
+
+FsResult ext2_group_read(Ext2Fs *self, Ext2GroupBlockDescTable *group, uint64_t group_id);
+
+FsResult ext2_group_write(Ext2Fs *self, Ext2GroupBlockDescTable *group, uint64_t group_id);

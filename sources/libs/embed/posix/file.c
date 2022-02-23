@@ -9,26 +9,25 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-
 int embed_flags2posix_flags(FileInitFlags flags)
 {
     int result = 0;
-    switch(flags & IO_FILE_READ_WRITE)
+    switch (flags & IO_FILE_READ_WRITE)
     {
-        case IO_FILE_READ_WRITE:
-            result = O_RDWR;
-            break;
-        case IO_FILE_WRITE:
-            result = O_WRONLY;
-            break;
-        case IO_FILE_READ:
-            result = O_RDONLY;
-            break;
-        default:
-            panic$("unkown flag: {#x}", flags);
+    case IO_FILE_READ_WRITE:
+        result = O_RDWR;
+        break;
+    case IO_FILE_WRITE:
+        result = O_WRONLY;
+        break;
+    case IO_FILE_READ:
+        result = O_RDONLY;
+        break;
+    default:
+        panic$("unkown flag: {#x}", flags);
     }
 
-    if(flags & IO_FILE_CREATE)
+    if (flags & IO_FILE_CREATE)
     {
         result |= O_CREAT | O_TRUNC;
     }
