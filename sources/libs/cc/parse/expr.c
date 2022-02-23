@@ -75,18 +75,19 @@ static CExpr cparse_primary_expr(Lex *lex, CUnit *context, Alloc *alloc)
         cparse_skip_separator(lex, CLEX_IDENT);
         return cexpr_ident(val);
     }
-
     else if (cparse_is_separator(lex, CLEX_INTEGER))
     {
         return cexpr_constant(cparse_val(lex));
     }
-
+    else if (cparse_is_separator(lex, CLEX_STRING))
+    {
+        return cexpr_constant(cparse_val(lex));
+    }
     else if (cparse_skip_separator(lex, CLEX_LPARENT))
     {
         CExpr expr = cparse_parent_expr(lex, context, alloc);
         return expr;
     }
-
     else if (cparse_skip_separator(lex, CLEX_LBRACKET))
     {
         // TODO: parse lambda capture

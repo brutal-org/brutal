@@ -44,6 +44,7 @@ Json cdump_member(CTypeMembers const *members, Alloc *alloc)
         Json member_json = json_object(alloc);
         json_put(&member_json, str$("name"), json_str(member.name));
         json_put(&member_json, str$("type"), cdump_type(member.type, alloc));
+        json_append(&json, member_json);
     }
     return json;
 }

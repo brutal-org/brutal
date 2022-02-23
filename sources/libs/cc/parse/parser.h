@@ -30,3 +30,5 @@ bool cparse_skip_separator(Lex *lex, LexemeType type);
 bool cparse_is_separator(Lex *lex, LexemeType type);
 
 Lexeme cparse_peek_separator(Lex *lex, int offset);
+
+bool is_cparse_type(Lex *lex, CUnit *context);

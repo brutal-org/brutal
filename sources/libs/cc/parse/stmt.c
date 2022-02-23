@@ -115,18 +115,15 @@ CStmt cparse_stmt(Lex *lex, CUnit *context, Alloc *alloc)
         CExpr expr = cparse_expr(lex, CEXPR_MAX_PRECEDENCE, context, alloc);
         return cstmt_case(expr);
     }
-    else if (cparse_is_separator(lex, CLEX_IDENT))
+    else if (cunit_contains_decl(context, lex_curr(lex).str))
     {
-        Str ident = lex_curr(lex).str;
-        if (cunit_contains_type(context, ident))
-        {
-            return cstmt_decl(cparse_decl(lex, context, alloc), alloc);
-        }
-        else
-        {
-            return cstmt_expr(cparse_expr(lex, CEXPR_MAX_PRECEDENCE, context, alloc));
-        }
+        return cstmt_expr(cparse_expr(lex, CEXPR_MAX_PRECEDENCE, context, alloc));
     }
+    else if (is_cparse_type(lex, context))
+    {
+        return cstmt_decl(cparse_decl(lex, context, alloc), alloc);
+    }
+
     else
     {
         return cstmt_expr(cparse_expr(lex, CEXPR_MAX_PRECEDENCE, context, alloc));

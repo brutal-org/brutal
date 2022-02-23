@@ -92,6 +92,14 @@ CType cparse_type(Lex *lex, Alloc *alloc)
     {
         return ctype_bool();
     }
+    else if (lex_skip_type(lex, CLEX_INT))
+    {
+        return ctype_signed(32);
+    }
+    else if (lex_skip_type(lex, CLEX_CHAR))
+    {
+        return ctype_signed(8);
+    }
     else if (lex_curr_type(lex) == CLEX_IDENT)
     {
         Str name = lex_next(lex).str;
@@ -101,5 +109,25 @@ CType cparse_type(Lex *lex, Alloc *alloc)
     {
         lex_throw(lex, str$("Unexpected token"));
         return ctype_error();
+    }
+}
+
+bool is_cparse_type(Lex *lex, CUnit *context)
+{
+    switch(lex_curr_type(lex))
+    {
+        case CLEX_STRUCT:
+        case CLEX_UNION:
+        case CLEX_ENUM:
+        case CLEX_VOID:
+        case CLEX_BOOL:
+        case CLEX_INT:
+        case CLEX_CHAR:
+            return true;
+        case CLEX_IDENT:
+            return cunit_contains_type(context, lex_curr(lex).str);
+
+        default:
+            return false;
     }
 }

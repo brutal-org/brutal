@@ -47,3 +47,5 @@ typedef struct
 } CUnit;
 
 bool cunit_contains_type(CUnit *context, Str name);
+
+bool cunit_contains_decl(CUnit *context, Str name);
