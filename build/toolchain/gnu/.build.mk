@@ -7,7 +7,7 @@ HOST_CC=cc
 HOST_CFLAGS= \
 	-fanalyzer \
 	$(BASE_CFLAGS) \
-	`pkg-config  sdl2 --cflags`
+	`pkg-config sdl2 --cflags`
 
 HOST_LD=ld
 HOST_LDFLAGS= \
@@ -35,6 +35,7 @@ USER_KCFLAGS= \
 	$(BASE_CFLAGS) \
 	$(ARCH_KCFLAGS) \
 	$(USER_CFLAGS_INC) \
+	-fanalyzer \
 	-ffreestanding \
 	-fno-stack-protector \
 	-D__brutal__=1 \
@@ -43,6 +44,7 @@ USER_KCFLAGS= \
 
 USER_UCFLAGS= \
 	$(USER_CFLAGS) \
+	-fanalyzer \
 	-nostdlib
 
 USER_LD=$(CONFIG_ARCH)-elf-ld

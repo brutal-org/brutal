@@ -10,7 +10,7 @@
   @param out_len The size of the output buffer
   @return The number of bytes written to the \p out buffer (uncompressed size)
 */
-IoResult gzip_decompress_data(uint8_t const *in, size_t in_len, uint8_t const *out, size_t out_len);
+IoResult gzip_decompress_data(uint8_t const *in, size_t in_len, uint8_t *out, size_t out_len);
 
 /**
   @brief Decompress a gzip deflate stream
@@ -28,7 +28,7 @@ IoResult gzip_decompress_stream(IoWriter writer, IoReader reader);
   @param out_len The size of the output buffer
   @return The number of bytes written to the \p out buffer (uncompressed size)
 */
-IoResult gzip_compress_data(uint8_t const *in, size_t in_len, uint8_t const *out, size_t out_len);
+IoResult gzip_compress_data(uint8_t const *in, size_t in_len, uint8_t *out, size_t out_len);
 
 /**
   @brief Compress a gzip deflate stream

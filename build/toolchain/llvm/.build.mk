@@ -1,9 +1,7 @@
 BASE_CFLAGS += \
 	-Wnewline-eof \
 	-Wignored-attributes \
-	-Wunknown-attributes \
-	-Wimplicit-fallthrough
-
+	-Wunknown-attributes
 # --- Host compiler ---------------------------------------------------------- #
 
 LLVM_VERSION ?=-12
@@ -43,7 +41,9 @@ USER_CFLAGS= \
 	$(ARCH_CFLAGS) \
 	$(USER_CFLAGS_INC) \
 	-D__brutal__=1 \
-	-ffreestanding
+	-ffreestanding \
+	-Wimplicit-fallthrough
+
 
 USER_KCFLAGS= \
 	$(BASE_CFLAGS) \
@@ -53,7 +53,9 @@ USER_KCFLAGS= \
 	-fno-stack-protector \
 	-D__brutal__=1 \
 	-D__kernel__=1 \
-	-D__freestanding__=1
+	-D__freestanding__=1 \
+	-Wimplicit-fallthrough
+
 
 USER_UCFLAGS= \
 	$(USER_CFLAGS) \

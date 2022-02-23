@@ -34,7 +34,7 @@ void deflate_deinit(DeflateCompressor *ctx);
   @param out_len The size of the output buffer
   @return The number of bytes written to the \p out buffer (compressed size)
 */
-IoResult deflate_compress_data(DeflateCompressor *ctx, uint8_t const *in, size_t in_len, uint8_t const *out, size_t out_len);
+IoResult deflate_compress_data(DeflateCompressor *ctx, uint8_t const *in, size_t in_len, uint8_t  *out, size_t out_len);
 
 /**
   @brief Compress an entire stream

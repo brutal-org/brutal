@@ -54,7 +54,7 @@ IoResult deflate_compress_block_uncompressed(DeflateCompressor *ctx, uint8_t con
     return OK(IoResult, in_nbytes + 5);
 }
 
-IoResult deflate_compress_data(DeflateCompressor *ctx, uint8_t const *in, size_t in_len, uint8_t const *out, size_t out_len)
+IoResult deflate_compress_data(DeflateCompressor *ctx, uint8_t const *in, size_t in_len, uint8_t *out, size_t out_len)
 {
     // Input
     IoMem in_view;

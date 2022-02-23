@@ -26,7 +26,7 @@ bool gzip_probe(IoRSeek rseek)
     return id1 == 0x1f && id2 == 0x8b;
 }
 
-IoResult gzip_decompress_data(uint8_t const *in, size_t in_len, uint8_t const *out, size_t out_len)
+IoResult gzip_decompress_data(uint8_t const *in, size_t in_len, uint8_t *out, size_t out_len)
 {
     // Input
     IoMem in_view;
@@ -145,7 +145,7 @@ IoResult gzip_decompress_stream(IoWriter writer, IoReader reader)
     return OK(IoResult, decompressed);
 }
 
-IoResult gzip_compress_data(uint8_t const *in, size_t in_len, uint8_t const *out, size_t out_len)
+IoResult gzip_compress_data(uint8_t const *in, size_t in_len, uint8_t *out, size_t out_len)
 {
     // Input
     IoMem in_view;
