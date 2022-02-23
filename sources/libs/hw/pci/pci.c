@@ -180,7 +180,7 @@ PciBarInfo pci_read_bar(Pci *pci, PciAddr addr, int bar)
 {
     PciConfig *config = pci_config(pci, addr);
 
-    if (config->header_type & 0x7f)
+    if (config == nullptr || config->header_type & 0x7f)
     {
         return (PciBarInfo){};
     }
