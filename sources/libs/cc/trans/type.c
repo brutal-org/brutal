@@ -49,6 +49,16 @@ void cc_trans_type_start(Emit *emit, CType type)
         emit_fmt$(emit, type.name);
         cc_trans_type_attr(emit, type.attr);
     }
+    else if(type.type == CTYPE_SIGNED)
+    {
+        emit_fmt(emit, "int{}_t", type.signed_.precision);
+        cc_trans_type_attr(emit, type.attr);
+    }
+    else if(type.type == CTYPE_UNSIGNED)
+    {
+        emit_fmt(emit, "uint{}_t", type.signed_.precision);
+        cc_trans_type_attr(emit, type.attr);
+    }
     else if (type.type == CTYPE_PTR)
     {
         cc_trans_type_start(emit, *type.ptr_.subtype);
