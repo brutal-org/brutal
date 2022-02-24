@@ -33,7 +33,9 @@ typedef struct _CStmt CStmt;
 
 struct _CStmt
 {
+    CREF;
     CStmtType type;
+
     union
     {
         struct

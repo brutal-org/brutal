@@ -50,7 +50,7 @@ static CExpr csema_prefix_expr(CSema *sema, CExpr expr, Alloc *alloc)
     {
         if (!(expr.prefix_.expr->sema_type.type == CTYPE_PTR))
         {
-            log$("trying to deref a ptr");
+            csema_report$(sema, CSEMA_ERR, expr, "trying to dereference a non-ptr expression");
             return expr;
         }
         expr.sema_type = *expr.prefix_.expr->sema_type.ptr_.subtype;
@@ -129,6 +129,11 @@ CExpr csema_expr(CSema *sema, CExpr expr, Alloc *alloc)
     case CEXPR_CONSTANT:
     {
         expr.sema_type = csema_value_type(sema, expr.constant_, alloc);
+        return expr;
+    }
+    case CEXPR_EMPTY:
+    {
+        expr.sema_type = ctype_void();
         return expr;
     }
     case CEXPR_IDENT:

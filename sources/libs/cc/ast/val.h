@@ -1,6 +1,7 @@
 #pragma once
 
 #include <brutal-base>
+#include <cc/ast/ref.h>
 
 typedef int CSigned;
 typedef unsigned int CUnsigned;
@@ -18,7 +19,9 @@ typedef enum
 
 typedef struct
 {
+    CREF;
     CValType type;
+
     union
     {
         CSigned signed_;

@@ -31,7 +31,9 @@ typedef enum
 
 typedef struct
 {
+    CREF;
     CUnitType type;
+
     union
     {
         CInclude _include;

@@ -1,6 +1,6 @@
 #include <cc/parse/parser.h>
 
-CType cparse_compound_type(Lex *lex, bool is_union, Alloc *alloc)
+static CType cparse_compound_type(Lex *lex, bool is_union, Alloc *alloc)
 {
     CType compound;
 
@@ -45,13 +45,14 @@ CType cparse_compound_type(Lex *lex, bool is_union, Alloc *alloc)
 
 CType cparse_type(Lex *lex, Alloc *alloc)
 {
+    int begin = lex->head;
     if (lex_skip_type(lex, CLEX_STRUCT))
     {
-        return cparse_compound_type(lex, false, alloc);
+        return with_cref$(cparse_compound_type(lex, false, alloc), begin, lex);
     }
     else if (lex_skip_type(lex, CLEX_UNION))
     {
-        return cparse_compound_type(lex, true, alloc);
+        return with_cref$(cparse_compound_type(lex, true, alloc), begin, lex);
     }
     else if (lex_skip_type(lex, CLEX_ENUM))
     {
@@ -68,7 +69,7 @@ CType cparse_type(Lex *lex, Alloc *alloc)
 
         if (!lex_skip_type(lex, CLEX_LBRACE))
         {
-            return enum_type;
+            return with_cref$(enum_type, begin, lex);
         }
 
         cparse_whitespace(lex);
@@ -82,33 +83,33 @@ CType cparse_type(Lex *lex, Alloc *alloc)
 
         lex_expect(lex, CLEX_RBRACE);
 
-        return enum_type;
+        return with_cref$(enum_type, begin, lex);
     }
     else if (lex_skip_type(lex, CLEX_VOID))
     {
-        return ctype_void();
+        return with_cref$(ctype_void(), begin, lex);
     }
     else if (lex_skip_type(lex, CLEX_BOOL))
     {
-        return ctype_bool();
+        return with_cref$(ctype_bool(), begin, lex);
     }
     else if (lex_skip_type(lex, CLEX_INT))
     {
-        return ctype_signed(32);
+        return with_cref$(ctype_signed(32), begin, lex);
     }
     else if (lex_skip_type(lex, CLEX_CHAR))
     {
-        return ctype_signed(8);
+        return with_cref$(ctype_signed(8), begin, lex);
     }
     else if (lex_curr_type(lex) == CLEX_IDENT)
     {
         Str name = lex_next(lex).str;
-        return ctype_ident(name);
+        return with_cref$(ctype_ident(name), begin, lex);
     }
     else
     {
         lex_throw(lex, str$("Unexpected token"));
-        return ctype_error();
+        return with_cref$(ctype_error(), begin, lex);
     }
 }
 

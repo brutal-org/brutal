@@ -50,7 +50,7 @@ COp cparse_lexeme_to_cop(LexemeType type)
 static CExpr cparse_parent_expr(Lex *lex, CUnit *context, Alloc *alloc)
 {
     CExpr result;
-
+    int begin = lex->head;
     cparse_whitespace(lex);
     if (lex_curr_type(lex) == CLEX_IDENT && cunit_contains_type(context, lex_curr(lex).str))
     {
@@ -65,28 +65,29 @@ static CExpr cparse_parent_expr(Lex *lex, CUnit *context, Alloc *alloc)
         cparse_skip_separator(lex, CLEX_RPARENT);
     }
 
-    return result;
+    return with_cref$(result, begin, lex);
 }
 static CExpr cparse_primary_expr(Lex *lex, CUnit *context, Alloc *alloc)
 {
+    int begin = lex->head;
     if (cparse_is_separator(lex, CLEX_IDENT))
     {
         Str val = lex_curr(lex).str;
         cparse_skip_separator(lex, CLEX_IDENT);
-        return cexpr_ident(val);
+        return with_cref$(cexpr_ident(val), begin, lex);
     }
     else if (cparse_is_separator(lex, CLEX_INTEGER))
     {
-        return cexpr_constant(cparse_val(lex));
+        return with_cref$(cexpr_constant(cparse_val(lex)), begin, lex);
     }
     else if (cparse_is_separator(lex, CLEX_STRING))
     {
-        return cexpr_constant(cparse_val(lex));
+        return with_cref$(cexpr_constant(cparse_val(lex)), begin, lex);
     }
     else if (cparse_skip_separator(lex, CLEX_LPARENT))
     {
         CExpr expr = cparse_parent_expr(lex, context, alloc);
-        return expr;
+        return with_cref$(expr, begin, lex);
     }
     else if (cparse_skip_separator(lex, CLEX_LBRACKET))
     {
@@ -101,14 +102,14 @@ static CExpr cparse_primary_expr(Lex *lex, CUnit *context, Alloc *alloc)
 
         CStmt body = cparse_stmt(lex, context, alloc);
 
-        return cexpr_lambda(type, body, alloc);
+        return with_cref$(cexpr_lambda(type, body, alloc), begin, lex);
     }
     else
     {
         lex_throw(lex, str$("Unexpect token!"));
-        return cexpr_empty();
+        return with_cref$(cexpr_empty(), begin, lex);
     }
-    return cexpr_constant(cval$(0));
+    return with_cref$(cexpr_constant(cval$(0)), begin, lex);
 }
 
 static void cparse_func_call_args(Lex *lex, CExpr *target, CUnit *context, Alloc *alloc)
@@ -127,7 +128,7 @@ static void cparse_func_call_args(Lex *lex, CExpr *target, CUnit *context, Alloc
 }
 static void cparse_postfix_expr(Lex *lex, CExpr *target, CUnit *context, Alloc *alloc)
 {
-
+    int begin = lex->head;
     if (cparse_skip_separator(lex, CLEX_LPARENT))
     {
         *target = cexpr_call(alloc, *target);
@@ -147,11 +148,12 @@ static void cparse_postfix_expr(Lex *lex, CExpr *target, CUnit *context, Alloc *
     {
         *target = cexpr_postdec(*target, alloc);
     }
+    *target = with_cref$(*target, begin, lex);
 }
 static CExpr cparse_prefix_expr(Lex *lex, CUnit *context, Alloc *alloc)
 {
     CExpr result;
-
+    int begin = lex->head;
     // FIXME: put every parse prefix
     if (cparse_skip_separator(lex, CLEX_MINUS))
     {
@@ -170,7 +172,7 @@ static CExpr cparse_prefix_expr(Lex *lex, CUnit *context, Alloc *alloc)
         cparse_postfix_expr(lex, &result, context, alloc);
     }
 
-    return result;
+    return with_cref$(result, begin, lex);
 }
 
 bool cparse_is_end_expr(LexemeType type)
@@ -180,6 +182,7 @@ bool cparse_is_end_expr(LexemeType type)
 
 CExpr cparse_expr(Lex *lex, int pre, CUnit *context, Alloc *alloc)
 {
+    int begin = lex->head;
     CExpr left = cparse_prefix_expr(lex, context, alloc);
     CExpr right;
 
@@ -188,7 +191,7 @@ CExpr cparse_expr(Lex *lex, int pre, CUnit *context, Alloc *alloc)
 
     if (cparse_is_end_expr(curr_lex.type))
     {
-        return left;
+        return with_cref$(left, begin, lex);
     }
 
     while (!lex_ended(lex) && cop_pre(cparse_lexeme_to_cop(curr_lex.type)) < pre)
@@ -206,12 +209,9 @@ CExpr cparse_expr(Lex *lex, int pre, CUnit *context, Alloc *alloc)
 
         if (cparse_is_end_expr(curr_lex.type))
         {
-            return left;
+            return with_cref$(left, begin, lex);
         }
     }
-    return left;
+    return with_cref$(left, begin, lex);
 }
 
-/*
-}
-*/

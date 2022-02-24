@@ -34,10 +34,12 @@ typedef struct
 
 typedef struct _CDecl
 {
+    CREF;
     CDeclType type;
     CDeclAttr attr;
     Str name;
     CType sema_type;
+
     union
     {
         struct

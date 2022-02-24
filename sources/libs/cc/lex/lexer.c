@@ -181,7 +181,7 @@ static LexemeType clex_impl(Scan *scan)
     return (LEXEME_INVALID);
 }
 
-Lex clex(Scan *scan, Alloc *alloc)
+Lex clex(Scan *scan, Alloc *alloc, int tu)
 {
-    return lex(scan, clex_impl, alloc);
+    return lex_tu(scan, clex_impl, alloc, tu);
 }

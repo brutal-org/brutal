@@ -5,6 +5,7 @@ void csema_init(CSema *self, Alloc *alloc)
     *self = (CSema){};
     self->alloc = alloc;
     vec_init(&self->scopes, alloc);
+    vec_init(&self->reports, alloc);
 }
 
 void csema_deinit(CSema *self)
@@ -78,4 +79,15 @@ void csema_scope_enter_func(CSema *self, CType func_type)
         cscope_add(&scope, decl);
     }
     vec_push(&self->scopes, scope);
+}
+
+void csema_report_impl(CSema *self, CSemaReportLevel level, CRef ref, Str msg)
+{
+    CSemaReport rep = {
+        .level = level,
+        .msg = msg,
+        .ref = ref,
+    };
+
+    vec_push(&self->reports, rep);
 }

@@ -32,4 +32,4 @@ static inline Str clex_to_str(LexemeType type)
     return lexeme_to_str(type);
 }
 
-Lex clex(Scan *scan, Alloc *alloc);
+Lex clex(Scan *scan, Alloc *alloc, int tu);

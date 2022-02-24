@@ -29,7 +29,7 @@ int main(int argc, char const *argv[])
     Scan scan;
     scan_init(&scan, buf_str(&source_buf));
 
-    Lex unprocessed = clex(&scan, base$(&heap));
+    Lex unprocessed = clex(&scan, base$(&heap), 0);
     Lex processed = cproc_file(&unprocessed, str$(argv[1]), base$(&heap));
 
     if (scan_dump_error(&scan, io_chan_err()))
