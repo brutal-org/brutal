@@ -116,20 +116,6 @@ void srand(unsigned int seed)
 
 /* --- 7.22.3 - Memory management functions --------------------------------- */
 
-static HeapAlloc _heap;
-static bool _heap_init = false;
-
-static Alloc *heap(void)
-{
-    if (!_heap_init)
-    {
-        heap_alloc_init(&_heap, NODE_DEFAULT);
-        _heap_init = true;
-    }
-
-    return base$(&_heap);
-}
-
 void *aligned_alloc(size_t alignment, size_t size)
 {
     if (alignment > 16)
@@ -142,22 +128,22 @@ void *aligned_alloc(size_t alignment, size_t size)
 
 void *calloc(size_t nmemb, size_t size)
 {
-    return alloc_calloc(heap(), nmemb, size);
+    return alloc_calloc(alloc_global(), nmemb, size);
 }
 
 void free(void *ptr)
 {
-    alloc_free(heap(), ptr);
+    alloc_free(alloc_global(), ptr);
 }
 
 void *malloc(size_t size)
 {
-    return alloc_malloc(heap(), size);
+    return aligned_alloc(16, size);
 }
 
 void *realloc(void *ptr, size_t size)
 {
-    return alloc_resize(heap(), ptr, size);
+    return alloc_resize(alloc_global(), ptr, size);
 }
 
 /* --- 7.22.4 - Communication with the environment -------------------------- */

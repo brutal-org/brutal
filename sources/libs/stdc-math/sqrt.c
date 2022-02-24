@@ -115,7 +115,7 @@ double sqrt(double x)
         for (i = 0; (ix0 & 0x00100000) == 0; i++)
             ix0 <<= 1;
         m -= i - 1;
-        ix0 |= ix1 >> (32 - i);
+        ix0 |= (uint64_t)ix1 >> (32 - i);
         ix1 <<= i;
     }
     m -= 1023; /* unbias exponent */
