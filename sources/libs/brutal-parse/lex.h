@@ -36,6 +36,8 @@ typedef Str LexToStrFn(LexemeType type);
 
 Lex lex(Scan *scan, LexFn *fn, Alloc *alloc);
 
+Lex lex_tu(Scan *scan, LexFn *fn, Alloc *alloc, int translation_unit);
+
 Lex lex_from_lexeme(Lexemes *from);
 
 void lex_deinit(Lex *self);
