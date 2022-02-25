@@ -38,11 +38,11 @@ bool test_run(Test test)
 
         if (pass)
         {
-            log$("[ PASS ] {}", test.name);
+            log$("[ {fg-green} ] {}", "PASS", test.name);
         }
         else
         {
-            log$("[ FAIL ] {}", test.name);
+            log$("[ {fg-red} ] {}", "FAIL", test.name);
         }
 
         return pass;
