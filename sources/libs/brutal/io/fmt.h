@@ -19,9 +19,40 @@ typedef enum
     FMT_POINTER,
 } FmtType;
 
+typedef enum
+{
+    FMT_COL_NONE,
+    FMT_BLACK,
+    FMT_WHITE,
+    FMT_RED,
+    FMT_GREEN,
+    FMT_BLUE,
+    FMT_YELLOW,
+    FMT_MAGENTA,
+    FMT_CYAN,
+    FMT_GRAY,
+    FMT_BLACK_GRAY,
+} FmtColorTypes;
+
+typedef struct
+{
+    FmtColorTypes type;
+    bool bright;
+} FmtColor;
+
+typedef struct
+{
+    bool has_style;
+    bool bold;
+    bool underline;
+    FmtColor fg_color;
+    FmtColor bg_color;
+} FmtStyle;
+
 typedef struct
 {
     FmtType type;
+    FmtStyle style;
     Case casing;
 
     long precison;
