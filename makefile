@@ -1,10 +1,18 @@
 .SUFFIXES:
 .DELETE_ON_ERROR:
-.DEFAULT_GOAL := all
-SHELL := /bin/bash
+.DEFAULT_GOAL:=all
+SHELL:=/bin/bash
+MKCWD=mkdir -p $(@D)
 
-CONFIG?=default
-include build/config/$(CONFIG).mk
+ARCH?=x86_64
+HOST_ARCH?=$(shell uname -m)
+BOARD?=pc
+BOOTLOADER?=loader
+CONFIG?=devel
+TOOLCHAIN?=llvm
+
+include sources/build/configs/$(CONFIG).mk
+include sources/build/boards/$(ARCH)-$(BOARD)/build.mk
 
 export LC_ALL=C
 
@@ -32,34 +40,35 @@ USER_CFLAGS_INC := \
 	-Isources/libs/stdc-posix
 
 CACHEDIR=.cache/
-BINDIR=bin/$(CONFIG_ARCH)-$(CONFIG_TOOLCHAIN)
-BINDIR_LOADER=bin/$(CONFIG_ARCH)-loader-$(CONFIG_TOOLCHAIN)
-BINDIR_USER=bin/$(CONFIG_ARCH)-brutal-$(CONFIG_TOOLCHAIN)
-BINDIR_KERNEL=bin/$(CONFIG_ARCH)-kernel-$(CONFIG_TOOLCHAIN)
-BINDIR_HOST=bin/$(CONFIG_HOST_ARCH)-host-$(CONFIG_TOOLCHAIN)
-
-MKCWD=mkdir -p $(@D)
+BINDIR_LOADER=bin/$(ARCH)-loader-$(TOOLCHAIN)
+BINDIR_USER=bin/$(ARCH)-brutal-$(TOOLCHAIN)
+BINDIR_KERNEL=bin/$(ARCH)-kernel-$(TOOLCHAIN)
+BINDIR_HOST=bin/$(HOST_ARCH)-host-$(TOOLCHAIN)
 
 include $(wildcard sources/apps/*/build.mk)
 include $(wildcard sources/srvs/*/build.mk)
 include $(wildcard sources/utils/*/build.mk)
 
-include build/toolchain/archs/$(CONFIG_ARCH).mk
-include build/toolchain/$(CONFIG_TOOLCHAIN)/.build.mk
+include build/toolchain/archs/$(ARCH).mk
+include build/toolchain/$(TOOLCHAIN)/build.mk
+
 include sources/build/kernel/build.mk
 include sources/build/host/build.mk
 include sources/protos/.build.mk
 include sources/build/loader/build.mk
 include sources/build/target/build.mk
 
-include build/run/$(CONFIG_BOOTLOADER).mk
+include build/run/$(BOOTLOADER).mk
 
 .PHONY: all
 all: $(ALL)
 
 .PHONY: clean
 clean:
-	rm -rf $(BINDIR)
+	rm -rf $(BINDIR_LOADER)
+	rm -rf $(BINDIR_USER)
+	rm -rf $(BINDIR_KERNEL)
+	rm -rf $(BINDIR_HOST)
 
 .PHONY: nuke
 nuke:

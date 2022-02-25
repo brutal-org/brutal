@@ -1,4 +1,4 @@
-ifeq ($(CONFIG_TOOLCHAIN), llvm)
+ifeq ($(TOOLCHAIN), llvm)
 
 LOADER_CC=clang$(LLVM_VERSION)
 ifeq (, $(shell which $(LOADER_CC) 2> /dev/null))
@@ -53,7 +53,7 @@ LOADER_SRC = \
 	$(wildcard sources/libs/brutal/ds/*.c) 		    \
 	$(wildcard sources/libs/brutal/hash/*.c)	    \
 	$(wildcard sources/libs/embed/efi/*.c)	            \
-	$(wildcard sources/libs/embed/$(CONFIG_ARCH)/*.c) \
+	$(wildcard sources/libs/embed/$(ARCH)/*.c) \
 	$(wildcard sources/libs/brutal/debug/*.c)       \
 	$(wildcard sources/libs/brutal/mem/*.c)         \
 	$(wildcard sources/libs/brutal/text/*.c)        \

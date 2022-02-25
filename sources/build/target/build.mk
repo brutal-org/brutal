@@ -1,9 +1,9 @@
 LIBS_SRC = \
 	$(wildcard sources/libs/embed/brutal/*.c) \
-	$(wildcard sources/libs/embed/brutal/$(CONFIG_ARCH)/*.c) \
-	$(wildcard sources/libs/embed/brutal/$(CONFIG_ARCH)/*.s) \
-	$(wildcard sources/libs/embed/$(CONFIG_ARCH)/*.c) \
-	$(wildcard sources/libs/embed/$(CONFIG_ARCH)/*.s) \
+	$(wildcard sources/libs/embed/brutal/$(ARCH)/*.c) \
+	$(wildcard sources/libs/embed/brutal/$(ARCH)/*.s) \
+	$(wildcard sources/libs/embed/$(ARCH)/*.c) \
+	$(wildcard sources/libs/embed/$(ARCH)/*.s) \
 	$(wildcard sources/libs/ipc/*.c) \
 	$(wildcard sources/libs/ipc/*/*.c) \
 	$(wildcard sources/libs/bal/*.c) \

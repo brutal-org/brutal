@@ -2,6 +2,7 @@ BASE_CFLAGS += \
 	-Wnewline-eof \
 	-Wignored-attributes \
 	-Wunknown-attributes
+
 # --- Host compiler ---------------------------------------------------------- #
 
 LLVM_VERSION ?=-12
@@ -31,9 +32,9 @@ USER_AS?=$(HOST_CC)
 
 # --- User-Compiler --------------------------------------------------------- #
 
-USER_CC=clang$(LLVM_VERSION) -target $(CONFIG_ARCH)-none-elf
+USER_CC=clang$(LLVM_VERSION) -target $(ARCH)-none-elf
 ifeq (, $(shell which clang$(LLVM_VERSION) 2> /dev/null))
-	USER_CC=clang -target $(CONFIG_ARCH)-none-elf
+	USER_CC=clang -target $(ARCH)-none-elf
 endif
 
 USER_CFLAGS= \
@@ -43,7 +44,6 @@ USER_CFLAGS= \
 	-D__brutal__=1 \
 	-ffreestanding \
 	-Wimplicit-fallthrough
-
 
 USER_KCFLAGS= \
 	$(BASE_CFLAGS) \
@@ -56,20 +56,19 @@ USER_KCFLAGS= \
 	-D__freestanding__=1 \
 	-Wimplicit-fallthrough
 
-
 USER_UCFLAGS= \
 	$(USER_CFLAGS) \
 	-nostdlib
 
 USER_LD=ld.lld
 USER_KLDFLAGS= \
-	-Tsources/build/boards/$(CONFIG_ARCH)-$(CONFIG_BOARD)/link.ld \
+	-Tsources/build/boards/$(ARCH)-$(BOARD)/link.ld \
 	-z max-page-size=0x1000 \
 	$(ARCH_LDFLAGS) \
 	$(ARCH_KLDFLAGS)
 
 USER_ULDFLAGS= \
-	-Tsources/build/target/$(CONFIG_ARCH)-link.ld \
+	-Tsources/build/target/$(ARCH)-link.ld \
 	-z max-page-size=0x1000 \
 	$(ARCH_LDFLAGS)
 
@@ -87,8 +86,10 @@ USER_ARFLAGS=rcs
 
 ifeq ($(COVERAGE), yes)
 	HOST_CFLAGS += \
-		-fprofile-instr-generate -fcoverage-mapping
+		-fprofile-instr-generate \
+		-fcoverage-mapping
 
 	HOST_LDFLAGS += \
-		-fprofile-instr-generate -fcoverage-mapping
+		-fprofile-instr-generate \
+		-fcoverage-mapping
 endif

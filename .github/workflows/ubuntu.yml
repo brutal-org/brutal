@@ -79,8 +79,8 @@ jobs:
 
             - name: Build All
               run: |
-                  CONFIG_TOOLCHAIN=${{matrix.toolchain}} make all
+                  TOOLCHAIN=${{matrix.toolchain}} make all
 
             - name: Run Tests
               run: |
-                  CONFIG_TOOLCHAIN=${{matrix.toolchain}} ./brutal.sh test
+                  TOOLCHAIN=${{matrix.toolchain}} ./brutal.sh test

@@ -1,6 +1,6 @@
 
 run: $(KERNEL)
-	qemu-system-$(CONFIG_ARCH) \
+	qemu-system-$(ARCH) \
 		 $(QEMU_ARGS) \
 		-serial mon:stdio \
 		-no-reboot \

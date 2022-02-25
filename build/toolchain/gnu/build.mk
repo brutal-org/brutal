@@ -2,7 +2,7 @@ export PATH := $(shell build/toolchain/gnu/use.sh):$(PATH)
 
 # --- Host compiler ---------------------------------------------------------- #
 
-HOST_CC=cc
+HOST_CC=gcc
 
 HOST_CFLAGS= \
 	-fanalyzer \
@@ -19,10 +19,11 @@ HOST_ARFLAGS=rcs
 
 # default can be changed in archs
 
-USER_AS?=$(CONFIG_ARCH)-elf-as
+USER_AS?=$(ARCH)-elf-as
 
 # --- User-Compiler ---------------------------------------------------------- #
-USER_CC=$(CONFIG_ARCH)-elf-gcc
+
+USER_CC=$(ARCH)-elf-gcc
 
 USER_CFLAGS= \
 	$(BASE_CFLAGS) \
@@ -47,22 +48,22 @@ USER_UCFLAGS= \
 	-fanalyzer \
 	-nostdlib
 
-USER_LD=$(CONFIG_ARCH)-elf-ld
+USER_LD=$(ARCH)-elf-ld
 USER_KLDFLAGS= \
-	-Tsources/build/boards/$(CONFIG_ARCH)-$(CONFIG_BOARD)/link.ld \
+	-Tsources/build/boards/$(ARCH)-$(BOARD)/link.ld \
 	-z max-page-size=0x1000 \
 	$(ARCH_LDFLAGS) \
-	build/toolchain/gnu/local/lib/gcc/$(CONFIG_ARCH)-elf/11.1.0/libgcc.a
+	build/toolchain/gnu/local/lib/gcc/$(ARCH)-elf/11.1.0/libgcc.a
 
 USER_ULDFLAGS= \
-	-Tsources/build/target/$(CONFIG_ARCH)-link.ld \
+	-Tsources/build/target/$(ARCH)-link.ld \
 	-z max-page-size=0x1000 \
 	$(ARCH_LDFLAGS) \
-	build/toolchain/gnu/local/lib/gcc/$(CONFIG_ARCH)-elf/11.1.0/libgcc.a
+	build/toolchain/gnu/local/lib/gcc/$(ARCH)-elf/11.1.0/libgcc.a
 
-USER_OBJCOPY=$(CONFIG_ARCH)-elf-objcopy
+USER_OBJCOPY=$(ARCH)-elf-objcopy
 
-USER_AR=$(CONFIG_ARCH)-elf-ar
+USER_AR=$(ARCH)-elf-ar
 USER_ARFLAGS=rcs
 
 ifeq ($(COVERAGE), yes)

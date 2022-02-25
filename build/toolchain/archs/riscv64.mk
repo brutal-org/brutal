@@ -1,7 +1,7 @@
 
 ARCH_CFLAGS = \
 	-march=rv64imafdc \
-	-D__$(CONFIG_BOARD)=1 \
+	-D__$(BOARD)=1 \
 
 ARCH_KCFLAGS = \
 	-mno-relax \
@@ -10,7 +10,7 @@ ARCH_KCFLAGS = \
 ARCH_KLDFLAGS = \
 	--pie
 
-USER_ASFLAGS=-fpie -fPIC -mno-relax -march=rv64imafdc -target $(CONFIG_ARCH)-none-elf -c
+USER_ASFLAGS=-fpie -fPIC -mno-relax -march=rv64imafdc -target $(ARCH)-none-elf -c
 
 QEMU_ARGS = \
 	--machine virt -d cpu_reset  -m 128M

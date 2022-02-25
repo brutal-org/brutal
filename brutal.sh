@@ -9,8 +9,8 @@ DEBUG=""
 TARGET=""
 export COVERAGE=""
 
-if [[ -z "${CONFIG_TOOLCHAIN}" ]]; then
-  CONFIG_TOOLCHAIN="llvm"
+if [[ -z "${TOOLCHAIN}" ]]; then
+  TOOLCHAIN="llvm"
 fi
 
 usage()
@@ -109,7 +109,7 @@ if [ $# -gt 0 ]; then
     usage
   fi
 
-  PKGS=./bin/$(uname -m)-host-$CONFIG_TOOLCHAIN
+  PKGS=./bin/$(uname -m)-host-$TOOLCHAIN
 
   make $JOBS $SILENT $PKGS/$1
   $DEBUG $PKGS/$@

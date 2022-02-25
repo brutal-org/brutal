@@ -26,7 +26,7 @@ In order to build BRUTAL with the GNU toolchain you will need to build the x86_6
 
 After building the binutils you can build BRUTAL by running:
 
-`make all CONFIG_TOOLCHAIN=gnu`
+`make all TOOLCHAIN=gnu`
 
 ## Note About Windows
 
