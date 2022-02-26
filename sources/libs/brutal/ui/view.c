@@ -1,5 +1,6 @@
 #include <brutal/alloc/global.h>
 #include <brutal/ui/app.h>
+#include <brutal/ui/parser.h>
 #include <brutal/ui/view.h>
 #include <brutal/ui/win.h>
 
@@ -101,7 +102,7 @@ void ui_view_resize(UiView *self, MRect rect)
 
 void ui_view_layout(UiView *self, char const *layout)
 {
-    ui_layout_parse_str(&self->layout, str$(layout));
+    ui_parse_layout_str(&self->layout, str$(layout));
     ui_view_should_relayout(self);
 }
 

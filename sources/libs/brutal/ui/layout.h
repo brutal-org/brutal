@@ -7,7 +7,6 @@
 #include <brutal/math/gravity.h>
 #include <brutal/math/rect.h>
 #include <brutal/math/spacing.h>
-#include <brutal/parse/scan.h>
 
 struct _UiView;
 
@@ -72,6 +71,3 @@ MVec2 ui_layout_size(UiLayout const *self, struct _UiView *views[], size_t len);
 
 void ui_layout_run(UiLayout const *layout, MRect container, struct _UiView *views[], size_t len);
 
-void ui_layout_parse(UiLayout *layout, Scan *scan);
-
-void ui_layout_parse_str(UiLayout *layout, Str str);

@@ -15,7 +15,7 @@ UiWin *demo_win_create(UiApp *app)
     for (int i = 0; i < 5; i++)
     {
         UiView *item = ui_panel_create(GFX_DIM_GRAY);
-        ui_view_layout(item, "dock-start margin-start-4 min-w-64");
+        ui_view_layout(item, "m-s-4 dock-start min-w-64");
         ui_view_mount(toolbar, item);
     }
 
@@ -36,11 +36,8 @@ UiWin *demo_win_create(UiApp *app)
     return self;
 }
 
-int main(int argc, char const *argv[])
+int main(int, char const *[])
 {
-    (void)argc;
-    (void)argv;
-
     UiApp app;
     ui_app_init(&app);
 

@@ -11,7 +11,7 @@ UiView *about_informations(void)
     ui_view_layout(button, "g-end g-vfill");
 
     UiView *container = ui_panel_create(UI_COLOR_BASE00);
-    ui_view_layout(container, "flex gaps-12 grow-1 ttb margin-16");
+    ui_view_layout(container, "flex gaps-12 grow-1 ttb m-16");
 
     ui_view_mount(container, label_title);
     ui_view_mount(container, label_version);
