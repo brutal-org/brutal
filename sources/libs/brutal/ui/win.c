@@ -180,6 +180,9 @@ void ui_win_relayout(UiWin *self)
 
 void ui_win_update_overing(UiWin *self, UiEvent *event)
 {
+    if (!self->root)
+        return;
+
     UiView *overing = ui_view_lookup(self->root, event->mouse.position);
 
     if (self->overing != overing)

@@ -44,6 +44,8 @@ Str str_concat(Str const lhs, Str const rhs, Alloc *alloc);
 
 bool str_eq(Str const lhs, Str const rhs);
 
+bool str_eq_ci(Str const lhs, Str const rhs);
+
 int str_count(Str const lStr, Str const rStr);
 
 int str_count_chr(Str const str, char chr);

@@ -6,13 +6,14 @@ UiWin *about_win_create(UiApp *app)
     UiWin *self = ui_win_create(app, m_rect(0, 0, 800, 48), UI_WIN_DOCK_TOP);
 
     UiView *container = ui_panel_create(UI_COLOR_BASE00);
-    ui_view_layout(container, (UiLayout){.type = UI_LAYOUT_FLEX, .padding = m_spacing_all(8)});
+    ui_view_layout(container, "flex p-8");
 
     UiView *btn_applications = ui_button_create_with_text(str$("Applications"));
     ui_view_mount(container, btn_applications);
 
     UiView *lbl_time = ui_text_create(str$("Thue 11 Jan 16:26"), UI_FONT_BODY);
-    ui_view_layout(lbl_time, (UiLayout){.grow = 1, .placement = M_GRAVITY_CENTER});
+    ui_view_layout(lbl_time, "grow-1 place-center");
+
     ui_view_mount(container, lbl_time);
 
     UiView *btn_options = ui_button_create_with_text(str$("..."));

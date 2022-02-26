@@ -1,5 +1,6 @@
 #include <brutal/base/keywords.h>
 #include <brutal/text/str.h>
+#include <ctype.h>
 
 Str str_concat(Str const lhs, Str const rhs, Alloc *alloc)
 {
@@ -37,6 +38,24 @@ bool str_eq(Str const lhs, Str const rhs)
     for (size_t i = 0; i < lhs.len; i++)
     {
         if (lhs.buf[i] != rhs.buf[i])
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool str_eq_ci(Str const lhs, Str const rhs)
+{
+    if (lhs.len != rhs.len)
+    {
+        return false;
+    }
+
+    for (size_t i = 0; i < lhs.len; i++)
+    {
+        if (tolower(lhs.buf[i]) != tolower(rhs.buf[i]))
         {
             return false;
         }

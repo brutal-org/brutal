@@ -12,7 +12,7 @@ UiView *ui_switch_create(void)
     UiView *self = ui_view_create$(UiSwitch);
 
     self->repaint = ui_switch_repaint;
-    ui_view_layout(self, (UiLayout){.size.max.height = 36});
+    ui_view_layout(self, "max-h-36");
 
     return self;
 }

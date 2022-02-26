@@ -99,9 +99,9 @@ void ui_view_resize(UiView *self, MRect rect)
     self->bound = rect;
 }
 
-void ui_view_layout(UiView *self, UiLayout layout)
+void ui_view_layout(UiView *self, char const *layout)
 {
-    self->layout = layout;
+    ui_layout_parse_str(&self->layout, str$(layout));
     ui_view_should_relayout(self);
 }
 

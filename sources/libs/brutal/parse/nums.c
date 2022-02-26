@@ -73,7 +73,15 @@ bool scan_next_int(Scan *self, long *value)
 
 #ifndef __freestanding__
 
-bool scan_next_float(Scan *self, double *value)
+bool scan_next_float(Scan *self, float *value)
+{
+    double v;
+    bool result = scan_next_double(self, &v);
+    *value = (float)v;
+    return result;
+}
+
+bool scan_next_double(Scan *self, double *value)
 {
     long ipart = 0;
 
@@ -147,7 +155,7 @@ bool str_to_float(Str string, double *value)
 {
     Scan scan = {0};
     scan_init(&scan, string);
-    return scan_next_float(&scan, value);
+    return scan_next_double(&scan, value);
 }
 
 #endif
