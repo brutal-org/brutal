@@ -1,4 +1,5 @@
 #include <cc/builder.h>
+#include <cc/dump.h>
 #include <cc/sema/visit.h>
 #include <brutal-debug>
 
@@ -32,8 +33,7 @@ static CType csema_decl_type(CSema *self, Str name)
             }
         }
     }
-    log$("not founded symbol: {}", name);
-    return ctype_void();
+    return ctype_error();
 }
 
 static CExpr csema_prefix_expr(CSema *sema, CExpr expr, Alloc *alloc)
@@ -50,7 +50,7 @@ static CExpr csema_prefix_expr(CSema *sema, CExpr expr, Alloc *alloc)
     {
         if (!(expr.prefix_.expr->sema_type.type == CTYPE_PTR))
         {
-            csema_report$(sema, CSEMA_ERR, expr, "trying to dereference a non-ptr expression");
+            expr.sema_type = ctype_void();
             return expr;
         }
         expr.sema_type = *expr.prefix_.expr->sema_type.ptr_.subtype;
@@ -70,6 +70,7 @@ static CExpr csema_prefix_expr(CSema *sema, CExpr expr, Alloc *alloc)
     }
     }
 }
+
 static CExpr csema_postfix_expr(CSema *sema, CExpr expr, Alloc *alloc)
 {
     *expr.postfix_.expr = csema_expr(sema, *expr.postfix_.expr, alloc);
@@ -97,7 +98,6 @@ static CExpr csema_infix_expr(CSema *sema, CExpr expr, Alloc *alloc)
     {
     case COP_INDEX:
     {
-
         if (expr.infix_.lhs->sema_type.type == CTYPE_ARRAY)
         {
             expr.sema_type = *expr.infix_.lhs->sema_type.array_.subtype;
@@ -108,8 +108,7 @@ static CExpr csema_infix_expr(CSema *sema, CExpr expr, Alloc *alloc)
         }
         else
         {
-            log$("trying to index a non array");
-            expr.sema_type = ctype_void();
+            expr.sema_type = expr.infix_.lhs->sema_type;
         }
         return expr;
     }
@@ -153,7 +152,7 @@ CExpr csema_expr(CSema *sema, CExpr expr, Alloc *alloc)
 
         if (expr.call_.expr->sema_type.type != CTYPE_FUNC)
         {
-            log$("not a function! ");
+            expr.sema_type = ctype_void();
             return expr;
         }
         /* FIXME: no check for this for the moment */
@@ -182,22 +181,84 @@ CExpr csema_expr(CSema *sema, CExpr expr, Alloc *alloc)
         return csema_postfix_expr(sema, expr, alloc);
     }
     default:
+        panic$("unhandled expr type: {}", expr.type);
+    }
+}
+
+/* for the moment statement don't have type maybe later */
+CStmt csema_stmt(CSema *sema, CStmt stmt, Alloc *alloc)
+{
+    switch (stmt.type)
     {
-        log$("unhandled expr type: {}", expr.type);
-        expr.sema_type = ctype_void();
-        return expr;
+    case CSTMT_DECL:
+    {
+        *stmt.decl_.decl = csema_decl(sema, *stmt.decl_.decl, alloc);
+        break;
+    }
+    case CSTMT_EXPR:
+    {
+        stmt.expr_.expr = csema_expr(sema, stmt.expr_.expr, alloc);
+        break;
+    }
+    case CSTMT_BLOCK:
+    {
+        csema_scope_enter(sema);
+        vec_foreach(sub_stmt, &stmt.block_.stmts)
+        {
+            *sub_stmt = csema_stmt(sema, *sub_stmt, alloc);
+        }
+        csema_scope_leave(sema);
+        break;
+    }
+    case CSTMT_IF:
+    {
+        stmt.if_.expr = csema_expr(sema, stmt.if_.expr, alloc);
+        break;
+    }
+    case CSTMT_FOR:
+    {
+        *stmt.for_.init_stmt = csema_stmt(sema, *stmt.for_.init_stmt, alloc);
+        stmt.for_.cond_expr = csema_expr(sema, stmt.for_.cond_expr, alloc);
+        stmt.for_.iter_expr = csema_expr(sema, stmt.for_.iter_expr, alloc);
+        *stmt.for_.stmt = csema_stmt(sema, *stmt.for_.stmt, alloc);
+        break;
+    }
+    case CSTMT_WHILE:
+    case CSTMT_DO:
+    case CSTMT_SWITCH:
+    {
+        *stmt.switch_.stmt = csema_stmt(sema, *stmt.switch_.stmt, alloc);
+        stmt.switch_.expr = csema_expr(sema, stmt.switch_.expr, alloc);
+        break;
+    }
+    case CSTMT_BREAK:
+    case CSTMT_CONTINUE:
+    case CSTMT_LABEL:
+    case CSTMT_DEFAULT:
+    case CSTMT_GOTO:
+    {
+        break;
+    }
+    case CSTMT_CASE:
+    {
+        stmt.case_.expr = csema_expr(sema, stmt.case_.expr, alloc);
+        break;
+    }
+    case CSTMT_RETURN:
+    {
+        stmt.return_.expr = csema_expr(sema, stmt.return_.expr, alloc);
+        break;
+    }
+    default:
+    {
+        break;
     }
     }
+    return stmt;
 }
 
 CDecl csema_decl(CSema *sema, CDecl decl, Alloc *alloc)
 {
-    if (csema_lookup(sema, decl.name).type != CDECL_NIL)
-    {
-        log$("redefinition of: {}", decl.name);
-        return cdecl_empty();
-    }
-
     switch (decl.type)
     {
     case CDECL_TYPE:

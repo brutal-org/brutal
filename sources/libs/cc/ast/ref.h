@@ -39,16 +39,16 @@ CRef cref(Lex *lex, int begin, int end);
  * @param begin Begin index of the ast element.
  * @param lex The lexer at the end of the element.
  */
-#define with_cref$(element, begin, lex)                             \
-    ({                                                              \
+#define with_cref$(element, begin, lex)                            \
+    ({                                                             \
         typeof(element) _with_ref = (element);                     \
-        if (begin == (lex)->head)                                   \
-        {                                                           \
+        if (begin == (lex)->head)                                  \
+        {                                                          \
             _with_ref.ref = cref((lex), 0, 0);                     \
-        }                                                           \
-        else                                                        \
-        {                                                           \
+        }                                                          \
+        else                                                       \
+        {                                                          \
             _with_ref.ref = cref((lex), (begin), (lex)->head - 1); \
-        }                                                           \
+        }                                                          \
         _with_ref;                                                 \
     })

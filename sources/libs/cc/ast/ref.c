@@ -16,4 +16,3 @@ CRef cref(Lex *lex, int begin, int end)
 
     return cref;
 }
-

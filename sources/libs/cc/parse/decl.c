@@ -179,8 +179,7 @@ CDecl cparse_decl(Lex *lex, CUnit *context, Alloc *alloc)
             if (cparse_is_separator(lex, CLEX_LBRACE))
             {
                 CStmt body = cparse_stmt(lex, context, alloc);
-                return with_cref$(
-                    cdecl_attrib(cdecl_func(decl.name, decl.type, body), attr), begin, lex);
+                return with_cref$(cdecl_attrib(cdecl_func(decl.name, decl.type, body), attr), begin, lex);
             }
             else
             {

@@ -1,11 +1,19 @@
+#include <brutal/debug.h>
 #include <cc/builder.h>
 #include <cc/sema/sema.h>
+
 void csema_init(CSema *self, Alloc *alloc)
 {
     *self = (CSema){};
+    self->current_pass = str$("initial");
     self->alloc = alloc;
     vec_init(&self->scopes, alloc);
     vec_init(&self->reports, alloc);
+}
+
+void csema_scope_reset(CSema *self)
+{
+    self->scopes.len = 0;
 }
 
 void csema_deinit(CSema *self)
@@ -39,7 +47,6 @@ CDecl csema_lookup(CSema *self, Str name)
     {
         CDecl d = cscope_lookup(scope, name);
         if (d.type != CDECL_NIL)
-
         {
             return d;
         }
@@ -81,13 +88,29 @@ void csema_scope_enter_func(CSema *self, CType func_type)
     vec_push(&self->scopes, scope);
 }
 
-void csema_report_impl(CSema *self, CSemaReportLevel level, CRef ref, Str msg)
+int csema_report_impl(CSema *self, CSemaReportLevel level, CRef ref, Str msg)
 {
     CSemaReport rep = {
         .level = level,
-        .msg = msg,
-        .ref = ref,
-    };
+        .pass = str_dup(self->current_pass, self->alloc),
+        .info = {
+            .msg = msg,
+            .cref = ref,
+        }};
 
+    vec_init(&rep.comments, self->alloc);
     vec_push(&self->reports, rep);
+    return self->reports.len - 1;
+}
+
+void csema_report_comment_impl(CSema *self, int report_id, CRef ref, Str msg)
+{
+    assert_lower_than(report_id, self->reports.len);
+    CSemaReport *report = &self->reports.data[report_id];
+
+    vec_push(&report->comments,
+             ((CSemaReportInfo){
+                 .cref = ref,
+                 .msg = msg,
+             }));
 }
