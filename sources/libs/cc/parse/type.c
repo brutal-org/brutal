@@ -115,20 +115,20 @@ CType cparse_type(Lex *lex, Alloc *alloc)
 
 bool is_cparse_type(Lex *lex, CUnit *context)
 {
-    switch(lex_curr_type(lex))
+    switch (lex_curr_type(lex))
     {
-        case CLEX_STRUCT:
-        case CLEX_UNION:
-        case CLEX_ENUM:
-        case CLEX_VOID:
-        case CLEX_BOOL:
-        case CLEX_INT:
-        case CLEX_CHAR:
-            return true;
-        case CLEX_IDENT:
-            return cunit_contains_type(context, lex_curr(lex).str);
+    case CLEX_STRUCT:
+    case CLEX_UNION:
+    case CLEX_ENUM:
+    case CLEX_VOID:
+    case CLEX_BOOL:
+    case CLEX_INT:
+    case CLEX_CHAR:
+        return true;
+    case CLEX_IDENT:
+        return cunit_contains_type(context, lex_curr(lex).str);
 
-        default:
-            return false;
+    default:
+        return false;
     }
 }

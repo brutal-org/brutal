@@ -67,6 +67,7 @@ static CExpr cparse_parent_expr(Lex *lex, CUnit *context, Alloc *alloc)
 
     return with_cref$(result, begin, lex);
 }
+
 static CExpr cparse_primary_expr(Lex *lex, CUnit *context, Alloc *alloc)
 {
     int begin = lex->head;
@@ -150,6 +151,7 @@ static void cparse_postfix_expr(Lex *lex, CExpr *target, CUnit *context, Alloc *
     }
     *target = with_cref$(*target, begin, lex);
 }
+
 static CExpr cparse_prefix_expr(Lex *lex, CUnit *context, Alloc *alloc)
 {
     CExpr result;
@@ -214,4 +216,3 @@ CExpr cparse_expr(Lex *lex, int pre, CUnit *context, Alloc *alloc)
     }
     return with_cref$(left, begin, lex);
 }
-
