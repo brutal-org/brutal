@@ -7,13 +7,13 @@ static UiLayout try_parse_layout(char const *str)
     scan_init(&scan, str$(str));
 
     UiLayout layout = {};
-    ui_layout_parse(&layout, &scan);
+    ui_parse_layout(&layout, &scan);
     assert_truth(!scan_dump_error(&scan, io_chan_err()));
 
     return layout;
 }
 
-TEST(ui_layout_parse_dock)
+TEST(ui_parse_layout_dock)
 {
     assert_truth(try_parse_layout("dock").type == UI_LAYOUT_DOCK);
 
@@ -29,7 +29,7 @@ TEST(ui_layout_parse_dock)
     assert_truth(try_parse_layout("dock-none").dock == M_DOCK_NONE);
 }
 
-TEST(ui_layout_parse_flex)
+TEST(ui_parse_layout_flex)
 {
     assert_truth(try_parse_layout("flex").type == UI_LAYOUT_FLEX);
 
@@ -39,12 +39,12 @@ TEST(ui_layout_parse_flex)
     assert_truth(try_parse_layout("gaps-y-3").gaps.y > 2.9);
 }
 
-TEST(ui_layout_parse_grid)
+TEST(ui_parse_layout_grid)
 {
     assert_truth(try_parse_layout("grid").type == UI_LAYOUT_GRID);
 }
 
-TEST(ui_layout_parse_min_max)
+TEST(ui_parse_layout_min_max)
 {
     assert_truth(try_parse_layout("min-width-3").size.min.width > 2.9);
     assert_truth(try_parse_layout("min-height-3").size.min.height > 2.9);
@@ -62,7 +62,7 @@ TEST(ui_layout_parse_min_max)
     assert_truth(try_parse_layout("max-y-3").size.max.height > 2.9);
 }
 
-TEST(ui_layout_parse_grivity)
+TEST(ui_parse_layout_grivity)
 {
     assert_truth(try_parse_layout("gravity-reset").gravity == M_GRAVITY_NONE);
     assert_truth(try_parse_layout("gravity-s").gravity == M_GRAVITY_START);
@@ -97,7 +97,7 @@ TEST(ui_layout_parse_grivity)
     assert_truth(try_parse_layout("g-hfill").gravity == M_GRAVITY_HFILL);
 }
 
-TEST(ui_layout_parse_placement)
+TEST(ui_parse_layout_placement)
 {
     assert_truth(try_parse_layout("placement-reset").placement == M_GRAVITY_NONE);
     assert_truth(try_parse_layout("placement-s").placement == M_GRAVITY_START);
@@ -132,7 +132,7 @@ TEST(ui_layout_parse_placement)
     assert_truth(try_parse_layout("place-hfill").placement == M_GRAVITY_HFILL);
 }
 
-TEST(ui_layout_parse_spacing)
+TEST(ui_parse_layout_spacing)
 {
     assert_truth(try_parse_layout("padding-3").padding.start > 2.9);
     assert_truth(try_parse_layout("padding-3").padding.end > 2.9);
@@ -175,7 +175,7 @@ TEST(ui_layout_parse_spacing)
     assert_truth(try_parse_layout("m-b-3").margin.bottom > 2.9);
 }
 
-TEST(ui_layout_parse_flow)
+TEST(ui_parse_layout_flow)
 {
     assert_truth(try_parse_layout("ltr").flow == M_FLOW_LEFT_TO_RIGHT);
     assert_truth(try_parse_layout("rtl").flow == M_FLOW_RIGHT_TO_LEFT);
