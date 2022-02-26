@@ -3,26 +3,10 @@
 #include <brutal/ds.h>
 #include <brutal/parse/lex.h>
 #include <brutal/parse/lexeme.h>
-typedef enum
-{
-    CREF_NONE,
-    CREF_SINGLE,
-    CREF_MULTIPLE,
-} CRefSource;
 
-typedef struct cref CRef;
-
-struct cref
-{
-    CRefSource source;
-    SrcRef ref;
-
-    Vec(CRef) sub_ref;
-};
+typedef SrcRef CRef;
 
 CRef cref(Lex *lex, int begin, int end);
-
-#define CREF CRef ref
 
 /**
  * @brief Change element to have a cref with begin = begin and end = lex.head

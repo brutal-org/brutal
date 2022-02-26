@@ -14,7 +14,6 @@ typedef struct
     int end;
 } SrcRef;
 
-
 typedef struct
 {
     LexemeType type;

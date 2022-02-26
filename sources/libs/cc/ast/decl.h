@@ -34,7 +34,7 @@ typedef struct
 
 typedef struct _CDecl
 {
-    CREF;
+    CRef ref;
     CDeclType type;
     CDeclAttr attr;
     Str name;

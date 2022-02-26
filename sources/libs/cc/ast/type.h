@@ -45,7 +45,7 @@ typedef Vec(CTypeMember) CTypeMembers;
 
 struct _CType
 {
-    CREF;
+    CRef ref;
     CTypeType type;
     CTypeAttr attr;
     Str name;

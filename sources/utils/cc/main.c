@@ -90,7 +90,7 @@ void report_csema_line(Emit *out, Str src, SrcFilePosInfo info, bool only_first_
 
 void report_csema_dump(CSemaReport report, Emit *out, Scan *source, Str filename)
 {
-    SrcRef src_ref = report.info.cref.ref;
+    SrcRef src_ref = report.info.cref;
     int begin = src_ref.begin;
     int end = src_ref.end;
 
@@ -131,15 +131,15 @@ void report_csema_dump(CSemaReport report, Emit *out, Scan *source, Str filename
     vec_foreach(v, &report.comments)
     {
 
-        bool is_comment_inline = v->cref.ref.begin >= info.line_start && v->cref.ref.end <= (info.line_len + info.line_start);
+        bool is_comment_inline = v->cref.begin >= info.line_start && v->cref.end <= (info.line_len + info.line_start);
 
         if (!info.is_multiline && is_comment_inline)
         {
             emit_fmt(out, "\n    : ");
 
-            for (int i = info.line_start; i < m_min(info.line_len + info.line_start, v->cref.ref.end + 2); i++)
+            for (int i = info.line_start; i < m_min(info.line_len + info.line_start, v->cref.end + 2); i++)
             {
-                if (i > v->cref.ref.begin && i <= v->cref.ref.end)
+                if (i > v->cref.begin && i <= v->cref.end)
                 {
                     emit_fmt(out, "{fg-blue}", "-");
                 }
@@ -152,13 +152,13 @@ void report_csema_dump(CSemaReport report, Emit *out, Scan *source, Str filename
         else
         {
             emit_fmt(out, "\n");
-            SrcFilePosInfo info2 = report_info(v->cref.ref, src);
+            SrcFilePosInfo info2 = report_info(v->cref, src);
             report_csema_line(out, src, info2, true);
 
             emit_fmt(out, "\n    : ");
-            for (int i = info2.line_start; i < m_min(info2.line_len + info2.line_start, v->cref.ref.end + 2); i++)
+            for (int i = info2.line_start; i < m_min(info2.line_len + info2.line_start, v->cref.end + 2); i++)
             {
-                if (i > v->cref.ref.begin && i <= v->cref.ref.end)
+                if (i > v->cref.begin && i <= v->cref.end)
                 {
                     emit_fmt(out, "{fg-blue}", "-");
                 }

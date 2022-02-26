@@ -65,7 +65,7 @@ Lexeme lex_peek(Lex *self, int offset)
             LEXEME_EOF,
             str$(""),
             (SrcRef){
-                .begin  =self->head + offset,
+                .begin = self->head + offset,
                 .end = self->head + offset,
                 .translation_unit = -1,
             },

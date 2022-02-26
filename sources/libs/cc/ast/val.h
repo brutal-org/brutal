@@ -19,7 +19,7 @@ typedef enum
 
 typedef struct
 {
-    CREF;
+    CRef ref;
     CValType type;
 
     union

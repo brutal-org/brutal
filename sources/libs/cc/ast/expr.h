@@ -97,7 +97,7 @@ typedef struct
 
 struct _CExpr
 {
-    CREF;
+    CRef ref;
     CExprType type;
     CType sema_type;
     union

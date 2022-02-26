@@ -33,7 +33,7 @@ typedef struct _CStmt CStmt;
 
 struct _CStmt
 {
-    CREF;
+    CRef ref;
     CStmtType type;
 
     union

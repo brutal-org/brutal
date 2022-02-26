@@ -31,7 +31,7 @@ typedef enum
 
 typedef struct
 {
-    CREF;
+    CRef ref;
     CUnitType type;
 
     union
