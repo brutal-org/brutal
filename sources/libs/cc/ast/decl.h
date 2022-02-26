@@ -39,7 +39,7 @@ typedef struct _CDecl
     CDeclAttr attr;
     Str name;
     CType sema_type;
-
+    bool global;
     union
     {
         struct
