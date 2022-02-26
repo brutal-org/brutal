@@ -12,7 +12,7 @@ UiView *ui_splitter_create(void)
     UiView *self = ui_view_create$(UiSplitter);
 
     self->repaint = ui_splitter_repaint;
-    ui_view_layout(self, (UiLayout){.size.min = m_vec2(1, 1)});
+    ui_view_layout(self, "min-1");
 
     return self;
 }

@@ -10,7 +10,9 @@ bool scan_next_int(Scan *self, long *value);
 
 #ifndef __freestanding__
 
-bool scan_next_float(Scan *self, double *value);
+bool scan_next_float(Scan *self, float *value);
+
+bool scan_next_double(Scan *self, double *value);
 
 #endif
 

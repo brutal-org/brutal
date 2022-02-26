@@ -146,7 +146,7 @@ static bool parse_whitespace_or_comma(Scan *scan)
 static float parse_float(Scan *scan)
 {
     double result = 0;
-    scan_next_float(scan, &result);
+    scan_next_double(scan, &result);
     return result;
 }
 

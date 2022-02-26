@@ -70,7 +70,7 @@ UiView *ui_button_create(void)
     self->repaint = ui_button_repaint;
     self->event = ui_button_event;
 
-    ui_view_layout(self, (UiLayout){.size.max.height = 36});
+    ui_view_layout(self, "max-h-36");
 
     return self;
 }
@@ -78,10 +78,10 @@ UiView *ui_button_create(void)
 UiView *ui_button_create_with_text(Str text)
 {
     UiView *self = ui_button_create();
-    ui_view_layout(self, (UiLayout){.padding = m_spacing_all(8)});
+    ui_view_layout(self, "dock p-8");
 
     UiView *label = ui_text_create(text, UI_FONT_BODY);
-    ui_view_layout(label, (UiLayout){.dock = M_DOCK_FILL, .gravity = M_GRAVITY_CENTER});
+    ui_view_layout(label, "dock-fill g-center");
 
     ui_view_mount(self, label);
 

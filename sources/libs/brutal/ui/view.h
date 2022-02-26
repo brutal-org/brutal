@@ -76,7 +76,7 @@ MRect ui_view_container(UiView *self);
 
 void ui_view_resize(UiView *self, MRect rect);
 
-void ui_view_layout(UiView *self, UiLayout layout);
+void ui_view_layout(UiView *self, char const* layout);
 
 GfxColor ui_view_color(UiView *self, UiRole role);
 
