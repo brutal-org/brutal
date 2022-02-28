@@ -216,11 +216,7 @@ int main(int argc, char const *argv[])
     Emit emit;
     emit_init(&emit, io_chan_out());
 
-    emit_fmt$(&emit, "\n");
-    vec_foreach_v(report, &sema.reports)
-    {
-        report_csema_dump(report, &emit, &scan, str$(argv[1]));
-    }
+    parse_reports_dump(&sema.reports, &scan, &emit, str$(argv[1]));
 
     emit_fmt(&emit, "\n");
 

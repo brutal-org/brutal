@@ -8,7 +8,7 @@ void csema_init(CSema *self, Alloc *alloc)
     self->current_pass = str$("initial");
     self->alloc = alloc;
     vec_init(&self->scopes, alloc);
-    vec_init(&self->reports, alloc);
+    parse_reports_init(&self->reports, alloc);
 }
 
 void csema_scope_reset(CSema *self)
@@ -19,6 +19,7 @@ void csema_scope_reset(CSema *self)
 void csema_deinit(CSema *self)
 {
     vec_deinit(&self->scopes);
+    parse_reports_deinit(&self->reports);
 }
 
 void csema_scope_enter(CSema *self)
@@ -86,31 +87,4 @@ void csema_scope_enter_func(CSema *self, CType func_type)
         cscope_add(&scope, decl);
     }
     vec_push(&self->scopes, scope);
-}
-
-int csema_report_impl(CSema *self, CSemaReportLevel level, CRef ref, Str msg)
-{
-    CSemaReport rep = {
-        .level = level,
-        .pass = str_dup(self->current_pass, self->alloc),
-        .info = {
-            .msg = msg,
-            .cref = ref,
-        }};
-
-    vec_init(&rep.comments, self->alloc);
-    vec_push(&self->reports, rep);
-    return self->reports.len - 1;
-}
-
-void csema_report_comment_impl(CSema *self, int report_id, CRef ref, Str msg)
-{
-    assert_lower_than(report_id, self->reports.len);
-    CSemaReport *report = &self->reports.data[report_id];
-
-    vec_push(&report->comments,
-             ((CSemaReportInfo){
-                 .cref = ref,
-                 .msg = msg,
-             }));
 }

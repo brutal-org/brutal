@@ -11,7 +11,7 @@ void sema_deref_check_expr(CSema *self, CExpr *cexpr, MAYBE_UNUSED void *ctx)
 
     if (left_type.type != CTYPE_ARRAY && left_type.type != CTYPE_PTR)
     {
-        int id = csema_report$(self, CSEMA_ERR, *cexpr, "Trying to use an deref operator with a non ptr/array object");
+        int id = csema_report$(self, PARSE_ERR, *cexpr, "Trying to use an deref operator with a non ptr/array object");
 
         Str expression_type_dump = csema_ctype_to_str(*cexpr->prefix_.expr, self->alloc);
 

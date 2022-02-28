@@ -35,7 +35,7 @@ void sema_decl_redef_check(CSema *self, CDecl *decl, MAYBE_UNUSED void *ctx)
 
     if (redefinition)
     {
-        int id = csema_report$(self, CSEMA_ERR, *decl, "redefinition of: {}", decl->name);
+        int id = csema_report$(self, PARSE_ERR, *decl, "redefinition of: {}", decl->name);
         csema_comment$(self, id, other, "already defined here");
     }
 }
@@ -51,6 +51,6 @@ void sema_decl_ref_check_expr(CSema *self, CExpr *expr, MAYBE_UNUSED void *ctx)
 
     if (prev.type == CDECL_NIL)
     {
-        csema_report$(self, CSEMA_ERR, *expr, "Not defined symbol: {}", expr->ident_);
+        csema_report$(self, PARSE_ERR, *expr, "Not defined symbol: {}", expr->ident_);
     }
 }
