@@ -9,13 +9,6 @@ typedef int LexemeType;
 
 typedef struct
 {
-    uintptr_t translation_unit;
-    int begin;
-    int end;
-} SrcRef;
-
-typedef struct
-{
     LexemeType type;
     Str str;
     SrcRef pos;
