@@ -180,17 +180,19 @@ static int gfx_active_edge_cmp(void const *lhs, void const *rhs)
 
 void gfx_fill(Gfx *self, GfxFillRule rule)
 {
-    MRect pbound = m_edges_bound(vec_begin(&self->path), vec_len(&self->path));
-    MRect rbound = m_rect_clip_rect(pbound, gfx_peek(self)->clip);
+    const MRect pbound = m_edges_bound(vec_begin(&self->path), vec_len(&self->path));
+    const MRect rbound = m_rect_clip_rect(pbound, gfx_peek(self)->clip);
 
     if (m_rect_empty(rbound))
     {
         return;
     }
-
+    bool constant_col = gfx_paint_is_constant(gfx_peek(self)->fill);
+    GfxColor const_color = gfx_paint_sample(gfx_peek(self)->fill, 0, 0);
+    vec_reserve(&self->active, self->path.len / 2);
     for (int y = m_rect_top(rbound); y < m_rect_bottom(rbound); y++)
     {
-        mem_set(self->scanline, 0, sizeof(*self->scanline) * self->scanline_len);
+        mem_set(self->scanline + (int)m_rect_start(rbound), 0, sizeof(*self->scanline) * (rbound.width));
 
         for (float yy = (y); yy < y + 1; yy += 1.0f / RAST_AA)
         {
@@ -217,14 +219,28 @@ void gfx_fill(Gfx *self, GfxFillRule rule)
                 {
                     GfxActiveEdge start_edge = vec_at(&self->active, i);
                     GfxActiveEdge end_edge = vec_at(&self->active, i + 1);
+                    Range(float) v = {.base = start_edge.x, .size = end_edge.x - start_edge.x};
+                    Range(float) v2 = {.base = rbound.x, .size = rbound.width};
 
                     r += start_edge.winding;
-
+                    if (!range_colide(v, v2))
+                    {
+                        continue;
+                    }
                     if ((rule == GFX_FILL_EVENODD && r % 2) || (rule == GFX_FILL_NONZERO && r != 0))
                     {
-                        for (float x = start_edge.x; x < end_edge.x; x += 1.0f / RAST_AA)
+                        for (float x = start_edge.x; x < ceilf(start_edge.x); x += 1.0f / RAST_AA)
                         {
                             self->scanline[(int)x] += 1.0;
+                        }
+                        for (float x = floorf(end_edge.x); x < end_edge.x; x += 1.0f / RAST_AA)
+                        {
+                            self->scanline[(int)x] += 1.0;
+                        }
+
+                        for (int x = (int)ceilf(start_edge.x); x < (int)floorf(end_edge.x); x++)
+                        {
+                            self->scanline[x] += RAST_AA;
                         }
                     }
                 }
@@ -240,10 +256,20 @@ void gfx_fill(Gfx *self, GfxFillRule rule)
                 float sx = (x - pbound.x) / pbound.width;
                 float sy = (y - pbound.y) / pbound.height;
 
-                GfxColor color = gfx_paint_sample(gfx_peek(self)->fill, sx, sy);
-                color.a = color.a * alpha;
+                if (constant_col)
+                {
+                    GfxColor forked_col = const_color;
+                    forked_col.a = forked_col.a * alpha;
 
-                gfx_buf_blend(self->buf, x, y, color);
+                    gfx_buf_blend(self->buf, x, y, forked_col);
+                }
+                else
+                {
+                    GfxColor color = gfx_paint_sample(gfx_peek(self)->fill, sx, sy);
+                    color.a = color.a * alpha;
+
+                    gfx_buf_blend(self->buf, x, y, color);
+                }
             }
         }
     }
@@ -475,32 +501,44 @@ void gfx_fill_rect_aligned(Gfx *self, MRect rect)
 
     rect.pos = m_vec2_add(rect.pos, gfx_peek(self)->origin);
     MRect rbound = m_rect_clip_rect(rect, gfx_peek(self)->clip);
+    float m_width = 1 / rect.width;
+    float m_height = 1 / rect.height;
 
-    for (int y = m_rect_top(rbound); y < m_rect_bottom(rbound); y++)
+    if (gfx_paint_is_constant(gfx_peek(self)->fill))
     {
-        for (int x = m_rect_start(rbound); x < m_rect_end(rbound); x++)
-        {
-            float sx = (x - rect.x) / rect.width;
-            float sy = (y - rect.y) / rect.height;
+        GfxColor color = gfx_paint_sample(gfx_peek(self)->fill, 0, 0);
 
-            GfxColor color = gfx_paint_sample(gfx_peek(self)->fill, sx, sy);
-            gfx_buf_blend(self->buf, x, y, color);
+        gfx_buf_clear_rect(self->buf, rbound, color);
+    }
+    else
+    {
+
+        for (int y = m_rect_top(rbound); y < m_rect_bottom(rbound); y++)
+        {
+            float sy = (y - rect.y) * m_height;
+
+            for (int x = m_rect_start(rbound); x < m_rect_end(rbound); x++)
+            {
+                float sx = (x - rect.x) * m_width;
+                GfxColor color = gfx_paint_sample(gfx_peek(self)->fill, sx, sy);
+                gfx_buf_blend_unckeck(self->buf, x, y, color);
+            }
         }
     }
 }
 
 void gfx_fill_rect(Gfx *self, MRect rect, float radius)
 {
-    gfx_begin_path(self);
-    gfx_rect(self, rect, radius);
-    gfx_close_path(self);
-
     if (radius == 0 && m_trans2_is_identity(gfx_peek(self)->trans))
     {
         gfx_fill_rect_aligned(self, rect);
     }
     else
     {
+        gfx_begin_path(self);
+        gfx_rect(self, rect, radius);
+        gfx_close_path(self);
+
         gfx_fill(self, GFX_FILL_EVENODD);
     }
 }

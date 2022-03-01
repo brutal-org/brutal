@@ -26,9 +26,9 @@ void gfx_surface_deinit(GfxSurface *self);
 
 GfxBuf gfx_surface_buf(GfxSurface *self);
 
-static inline GfxColor gfx_buf_load_uncheck(GfxBuf self, int x, int y)
+static inline GfxColor gfx_buf_load_uncheck(const GfxBuf self, int x, int y)
 {
-    uint8_t *pixel = ((uint8_t *)self.buf) + self.pitch * y + x * gfx_fmt_size(self.fmt);
+    const uint8_t *pixel = ((const uint8_t *)self.buf) + self.pitch * y + x * gfx_fmt_size(self.fmt);
     return gfx_fmt_load(self.fmt, pixel);
 }
 
@@ -40,7 +40,7 @@ static inline void gfx_buf_store_unckeck(GfxBuf self, int x, int y, GfxColor col
 
 static inline GfxColor gfx_buf_load(GfxBuf self, int x, int y)
 {
-    if (x < 0 || x >= self.width || y < 0 || y >= self.height)
+    if (UNLIKELY(x < 0 || x >= self.width || y < 0 || y >= self.height))
     {
         return GFX_MAGENTA;
     }
@@ -50,7 +50,7 @@ static inline GfxColor gfx_buf_load(GfxBuf self, int x, int y)
 
 static inline void gfx_buf_store(GfxBuf self, int x, int y, GfxColor color)
 {
-    if (x < 0 || x >= self.width || y < 0 || y >= self.height)
+    if (UNLIKELY(x < 0 || x >= self.width || y < 0 || y >= self.height))
     {
         return;
     }
@@ -77,6 +77,11 @@ static inline GfxColor gfx_buf_sample(GfxBuf self, float x, float y)
 
 static inline void gfx_buf_blend_unckeck(GfxBuf self, int x, int y, GfxColor color)
 {
+    if (color.a == 0xff)
+    {
+        return gfx_buf_store(self, x, y, color);
+    }
+
     GfxColor bg = gfx_buf_load_uncheck(self, x, y);
     GfxColor blend = gfx_blend(color, bg);
     gfx_buf_store_unckeck(self, x, y, blend);
@@ -84,9 +89,14 @@ static inline void gfx_buf_blend_unckeck(GfxBuf self, int x, int y, GfxColor col
 
 static inline void gfx_buf_blend(GfxBuf self, int x, int y, GfxColor color)
 {
+    if (color.a == 0xff)
+    {
+        return gfx_buf_store(self, x, y, color);
+    }
     GfxColor bg = gfx_buf_load(self, x, y);
     GfxColor blend = gfx_blend(color, bg);
-    gfx_buf_store(self, x, y, blend);
+
+   gfx_buf_store(self, x, y, blend);
 }
 
 static inline void _gfx_buf_copy_same_fmt(GfxBuf dst, GfxBuf src, int x, int y)
@@ -148,8 +158,47 @@ static inline void gfx_buf_flip(GfxBuf dst, GfxBuf src, MRect rect)
     }
 }
 
+static inline void gfx_buf_clear_fast(GfxBuf self, GfxColor color)
+{
+    size_t fmt_size = gfx_fmt_size(self.fmt);
+    uint8_t pixel[4];
+    gfx_fmt_store(self.fmt, color, &pixel);
+
+    uint8_t *target = self.buf;
+
+    if (fmt_size == 1)
+    {
+        for (int y = 0; y < self.height; y++)
+        {
+            for (int x = 0; x < self.width; x++)
+            {
+                uint8_t *target_pixel = (target) + self.pitch * y + x * fmt_size;
+                *target_pixel = pixel[0];
+            }
+        }
+    }
+    else if (fmt_size == 4)
+    {
+        for (int y = 0; y < self.height; y++)
+        {
+            for (int x = 0; x < self.width; x++)
+            {
+                uint32_t *target_pixel = (uint32_t *)((target) + self.pitch * y + x * fmt_size);
+                *target_pixel = *(uint32_t *)pixel;
+            }
+        }
+    }
+}
+
 static inline void gfx_buf_clear(GfxBuf self, GfxColor color)
 {
+    size_t fmt_size = gfx_fmt_size(self.fmt);
+
+    if (fmt_size == 1 || fmt_size == 4)
+    {
+        return gfx_buf_clear_fast(self, color);
+    }
+
     for (int y = 0; y < self.height; y++)
     {
         for (int x = 0; x < self.width; x++)
@@ -159,8 +208,47 @@ static inline void gfx_buf_clear(GfxBuf self, GfxColor color)
     }
 }
 
+static inline void gfx_buf_clear_fast_rect(GfxBuf self, GfxColor color, MRect rect)
+{
+    size_t fmt_size = gfx_fmt_size(self.fmt);
+    uint8_t pixel[4];
+    gfx_fmt_store(self.fmt, color, &pixel);
+
+    uint8_t *target = self.buf;
+
+    if (fmt_size == 1)
+    {
+        for (int y = rect.y; y < rect.y + rect.height; y++)
+        {
+            for (int x = rect.x; x < rect.x + rect.width; x++)
+            {
+                uint8_t *target_pixel = (target) + self.pitch * y + x * fmt_size;
+                *target_pixel = pixel[0];
+            }
+        }
+    }
+    else
+    {
+        for (int y = rect.y; y < rect.y + rect.height; y++)
+        {
+            for (int x = rect.x; x < rect.x + rect.width; x++)
+            {
+                uint32_t *target_pixel = (uint32_t *)((target) + self.pitch * y + x * fmt_size);
+                *target_pixel = *(uint32_t *)pixel;
+            }
+        }
+    }
+}
+
 static inline void gfx_buf_clear_rect(GfxBuf self, MRect rect, GfxColor color)
 {
+    size_t fmt_size = gfx_fmt_size(self.fmt);
+
+    if (fmt_size == 1 || fmt_size == 4)
+    {
+        return gfx_buf_clear_fast_rect(self, color, rect);
+    }
+
     for (int y = rect.y; y < rect.y + rect.height; y++)
     {
         for (int x = rect.x; x < rect.x + rect.width; x++)

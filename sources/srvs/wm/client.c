@@ -131,7 +131,7 @@ void wm_client_flip(WmClient *self, MRect bound)
     gfx_buf_copy(wm_client_frontbuffer(self), wm_client_backbuffer(self), 0, 0);
 
     bound.pos = m_vec2_add(bound.pos, self->bound.pos);
-    wm_server_should_render(self->server, self->bound);
+    wm_server_should_render(self->server, bound);
 }
 
 void wm_client_resize(WmClient *self, MRect bound)
