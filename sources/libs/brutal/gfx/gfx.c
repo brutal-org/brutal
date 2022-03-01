@@ -204,7 +204,10 @@ void gfx_fill(Gfx *self, GfxFillRule rule)
                 {
                     GfxActiveEdge active;
                     active.x = edge.sx + (yy - edge.sy) / (edge.ey - edge.sy) * (edge.ex - edge.sx);
+
                     active.winding = edge.sy > edge.ey ? 1 : -1;
+
+                    active.x = m_clamp(active.x, rbound.x, rbound.x + rbound.width);
                     vec_push(&self->active, active);
                 }
             }
@@ -223,24 +226,29 @@ void gfx_fill(Gfx *self, GfxFillRule rule)
                     Range(float) v2 = {.base = rbound.x, .size = rbound.width};
 
                     r += start_edge.winding;
+
                     if (!range_colide(v, v2))
                     {
                         continue;
                     }
+
+                    float begin = v.base;
+                    float end = v.base + v.size;
+
                     if ((rule == GFX_FILL_EVENODD && r % 2) || (rule == GFX_FILL_NONZERO && r != 0))
                     {
-                        for (float x = start_edge.x; x < ceilf(start_edge.x); x += 1.0f / RAST_AA)
+                        for (float x = begin; x < ceilf(begin); x += 1.0f / RAST_AA)
                         {
                             self->scanline[(int)x] += 1.0;
                         }
-                        for (float x = floorf(end_edge.x); x < end_edge.x; x += 1.0f / RAST_AA)
+                        for (float x = floorf(end); x < end; x += 1.0f / RAST_AA)
                         {
                             self->scanline[(int)x] += 1.0;
                         }
 
-                        for (int x = (int)ceilf(start_edge.x); x < (int)floorf(end_edge.x); x++)
+                        for (int x = (int)(ceilf(begin)); x < (int)(floorf(end)); x++)
                         {
-                            self->scanline[x] += RAST_AA;
+                            self->scanline[(int)x] += RAST_AA;
                         }
                     }
                 }
@@ -529,16 +537,17 @@ void gfx_fill_rect_aligned(Gfx *self, MRect rect)
 
 void gfx_fill_rect(Gfx *self, MRect rect, float radius)
 {
+    // needed because we need information for future gfx stroke invocation
+    gfx_begin_path(self);
+    gfx_rect(self, rect, radius);
+    gfx_close_path(self);
+
     if (radius == 0 && m_trans2_is_identity(gfx_peek(self)->trans))
     {
         gfx_fill_rect_aligned(self, rect);
     }
     else
     {
-        gfx_begin_path(self);
-        gfx_rect(self, rect, radius);
-        gfx_close_path(self);
-
         gfx_fill(self, GFX_FILL_EVENODD);
     }
 }
