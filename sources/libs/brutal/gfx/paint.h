@@ -79,6 +79,18 @@ static inline GfxPaint gfx_paint_image(GfxBuf buf, MRect source)
     };
 }
 
+static inline bool gfx_paint_is_constant(GfxPaint paint)
+{
+    switch (paint.type)
+    {
+    case GFX_PAINT_NONE:
+    case GFX_PAINT_FILL:
+        return true;
+    default:
+        return false;
+    }
+}
+
 static inline GfxColor gfx_paint_sample(GfxPaint paint, float x, float y)
 {
     UNUSED(y);
