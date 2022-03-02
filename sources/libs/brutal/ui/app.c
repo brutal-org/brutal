@@ -1,4 +1,5 @@
 #include <brutal/alloc/global.h>
+#include <brutal/time/query.h>
 #include <brutal/ui/app.h>
 #include <brutal/ui/win.h>
 #include <embed/app.h>
@@ -74,4 +75,30 @@ GfxColor ui_app_color(UiApp *self, UiRole role)
 void ui_app_overide_color(UiApp *self, UiRole role, GfxColor color)
 {
     ui_palette_overide(&self->palette, role, color);
+}
+
+int ui_app_benchmark(UiApp *self)
+{
+    int frames = 600;
+    Tick start = tick_now();
+
+    for (int f = 0; f < frames; f++)
+    {
+        vec_foreach_v(win, &self->windows)
+        {
+            ui_win_repaint(win);
+        }
+    }
+
+    if (!self->alive)
+    {
+        return self->result;
+    }
+
+    Tick end = tick_now();
+    float fps = frames / ((float)(end - start) / 1000.0);
+
+    log$("Benchmark ui app took: {}ms for {}frames ({}fps)", (end - start), frames, fps);
+
+    return self->result;
 }

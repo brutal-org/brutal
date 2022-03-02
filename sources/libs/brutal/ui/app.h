@@ -40,3 +40,5 @@ void ui_app_font(UiApp *self, GfxFont font);
 GfxColor ui_app_color(UiApp *self, UiRole role);
 
 void ui_app_overide_color(UiApp *self, UiRole role, GfxColor color);
+
+int ui_app_benchmark(UiApp *self);
