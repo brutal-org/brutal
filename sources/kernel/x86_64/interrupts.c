@@ -1,7 +1,7 @@
 #include <brutal/debug.h>
 #include <brutal/sync.h>
+#include <brutal/task/types.h>
 #include <brutal/time.h>
-#include <brutal/types.h>
 #include "kernel/context.h"
 #include "kernel/cpu.h"
 #include "kernel/event.h"

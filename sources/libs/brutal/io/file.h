@@ -1,7 +1,9 @@
 #pragma once
 
-#include <brutal/io/traits.h>
-#include <embed/file-decl.h>
+#ifndef __kernel__
+
+#    include <brutal/io/traits.h>
+#    include <embed/file-decl.h>
 
 typedef struct
 {
@@ -67,3 +69,5 @@ IoRSeek io_file_rseek(IoFile *self);
 IoWSeek io_file_wseek(IoFile *self);
 
 MaybeError io_file_close(IoFile *self);
+
+#endif

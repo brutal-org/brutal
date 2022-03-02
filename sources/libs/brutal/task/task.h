@@ -2,8 +2,8 @@
 
 #include <brutal/base/error.h>
 #include <brutal/base/result.h>
+#include <brutal/task/types.h>
 #include <brutal/text/str.h>
-#include <brutal/types.h>
 
 #define TASK_THIS (0)
 
