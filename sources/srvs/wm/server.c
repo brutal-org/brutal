@@ -66,7 +66,7 @@ static void *wm_render_fiber(void *ctx)
 void wm_server_init(WmServer *self, WmDisplay *display)
 {
     self->display = display;
-    self->mouse = m_vec2(0, 0);
+    self->mouse = m_vec2f(0, 0);
     gfx_dirty_init(&self->display_dirty, alloc_global());
     vec_init(&self->clients, alloc_global());
 
@@ -90,19 +90,19 @@ void wm_server_dispatch(WmServer *self, UiEvent event)
     {
         if (event.type == UI_EVENT_MOUSE_MOVE)
         {
-            MRect mouse_bound = {
-                .pos = m_vec2_sub(self->mouse, m_vec2(8, 8)),
-                .size = m_vec2(42, 42),
+            MRectf mouse_bound = {
+                .pos = m_vec2f_sub(self->mouse, m_vec2f(8, 8)),
+                .size = m_vec2f(42, 42),
             };
 
             wm_server_should_render(self, mouse_bound);
 
-            self->mouse = m_vec2_add(self->mouse, event.mouse.offset);
-            self->mouse = m_rect_clamp_vec2(wm_display_bound(self->display), self->mouse);
+            self->mouse = m_vec2f_add(self->mouse, event.mouse.offset);
+            self->mouse = m_rectf_clamp_vec2(wm_display_bound(self->display), self->mouse);
 
-            mouse_bound = (MRect){
+            mouse_bound = (MRectf){
                 .pos = self->mouse,
-                .size = m_vec2(32, 32),
+                .size = m_vec2f(32, 32),
             };
 
             wm_server_should_render(self, mouse_bound);
@@ -121,7 +121,7 @@ void wm_server_dispatch(WmServer *self, UiEvent event)
 static void wm_server_render_cursor(WmServer *self, Gfx *gfx)
 {
     gfx_push(gfx);
-    gfx_origin(gfx, m_vec2_sub(self->mouse, m_vec2(1, 1)));
+    gfx_origin(gfx, m_vec2f_sub(self->mouse, m_vec2f(1, 1)));
     gfx_fill_style(gfx, gfx_paint_fill(GFX_BLACK));
     gfx_fill_svg(gfx, str$("M 0 0 L 16 12.279 L 9.049 13.449 L 13.374 22.266 L 9.778 24 L 5.428 15.121 L -0 19.823 Z"), GFX_FILL_EVENODD);
 
@@ -164,7 +164,7 @@ void wm_server_layout(WmServer *self)
     self->layout_dirty = false;
 }
 
-void wm_server_should_render(WmServer *self, MRect rect)
+void wm_server_should_render(WmServer *self, MRectf rect)
 {
     gfx_dirty_rect(&self->display_dirty, rect);
 }
@@ -210,11 +210,11 @@ void wm_server_expose(WmServer *self, IpcCap bus_server)
     bus_server_expose_rpc(ipc_component_self(), bus_server, &self->wm_server, alloc_global());
 }
 
-WmClient *wm_server_client_at(WmServer *self, MVec2 vec)
+WmClient *wm_server_client_at(WmServer *self, MVec2f vec)
 {
     vec_foreach_v(client, &self->clients)
     {
-        if (m_rect_collide_point(client->bound, vec))
+        if (m_rectf_collide_point(client->bound, vec))
         {
             return client;
         }

@@ -33,20 +33,20 @@ static MaybeError ssfn2_load_stringtable(IoReader reader, SSFN2Font *font)
     return SUCCESS;
 }
 
-static MaybeError ssfn2_read_point(IoRSeek rseek, MAYBE_UNUSED SSFN2FontHeader *header, MVec2 pos, MVec2 *result)
+static MaybeError ssfn2_read_point(IoRSeek rseek, MAYBE_UNUSED SSFN2FontHeader *header, MVec2f pos, MVec2f *result)
 {
     uint8_t x, y;
     TRY(MaybeError, io_read_byte(rseek.reader, &x));
     TRY(MaybeError, io_read_byte(rseek.reader, &y));
-    MVec2 point = m_vec2_add(pos, m_vec2(x, y));
-    point = m_vec2_sub(point, m_vec2(0, load_le(header->baseline)));
-    point = m_vec2_div_v(point, load_le(header->baseline));
-    point = m_vec2_mul_v(point, 16);
+    MVec2f point = m_vec2f_add(pos, m_vec2f(x, y));
+    point = m_vec2f_sub(point, m_vec2f(0, load_le(header->baseline)));
+    point = m_vec2f_div_v(point, load_le(header->baseline));
+    point = m_vec2f_mul_v(point, 16);
     *result = point;
     return SUCCESS;
 }
 
-static MaybeError ssfn2_load_fragment(IoRSeek rseek, SSFN2Font *font, MVec2 pos, size_t offset, GfxPath *path)
+static MaybeError ssfn2_load_fragment(IoRSeek rseek, SSFN2Font *font, MVec2f pos, size_t offset, GfxPath *path)
 {
     // Add font start offset
     offset += font->font_start;
@@ -95,7 +95,7 @@ static MaybeError ssfn2_load_fragment(IoRSeek rseek, SSFN2Font *font, MVec2 pos,
     uint8_t cmd_data[0b111111111111];
     TRY(MaybeError, io_read(rseek.reader, cmd_data, cmd_bytes));
 
-    MVec2 point, cp1, cp2;
+    MVec2f point, cp1, cp2;
     size_t cmd_cur = 0;
 
     for (size_t i = 0; i < (cmd_count / 4) + 1; i++)
@@ -162,11 +162,11 @@ static MaybeError ssfn2_load_mapping(IoRSeek rseek, SSFN2Font *font, Rune rune, 
     // Initialize glyph
     font->glyphs[rune] = (SSFN2Glyph){
         .present = true,
-        .bound = m_vec2((glyph_data[1] / (float)load_le(header->baseline)) * 16.0f,
-                        (glyph_data[2] / (float)load_le(header->baseline) * 16.0f)),
+        .bound = m_vec2f((glyph_data[1] / (float)load_le(header->baseline)) * 16.0f,
+                         (glyph_data[2] / (float)load_le(header->baseline) * 16.0f)),
 
-        .advance = m_vec2((glyph_data[3] / (float)load_le(header->baseline)) * 16.0f,
-                          (glyph_data[4] / (float)load_le(header->baseline) * 16.0f)),
+        .advance = m_vec2f((glyph_data[3] / (float)load_le(header->baseline)) * 16.0f,
+                           (glyph_data[4] / (float)load_le(header->baseline) * 16.0f)),
     };
 
     gfx_path_init(&font->glyphs[rune].path, alloc);
@@ -198,7 +198,7 @@ static MaybeError ssfn2_load_mapping(IoRSeek rseek, SSFN2Font *font, Rune rune, 
                 frag_off |= frag_data[idx];
             }
 
-            ssfn2_load_fragment(rseek, font, m_vec2(x, y), frag_off, &font->glyphs[rune].path);
+            ssfn2_load_fragment(rseek, font, m_vec2f(x, y), frag_off, &font->glyphs[rune].path);
         }
     }
 
@@ -410,7 +410,7 @@ float gfx_font_ssfn2_advance(void *ctx, GfxFontStyle style, Rune rune)
     return font->glyphs[rune].advance.x * style.scale;
 }
 
-void gfx_font_ssfn2_render(void *ctx, GfxFontStyle style, Gfx *gfx, MVec2 baseline, Rune rune)
+void gfx_font_ssfn2_render(void *ctx, GfxFontStyle style, Gfx *gfx, MVec2f baseline, Rune rune)
 {
     gfx_push(gfx);
     SSFN2Font *font = gfx_font_ssfn2_select(ctx, style);

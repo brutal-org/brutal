@@ -5,12 +5,12 @@ void gfx_stroke_join(GfxStrokeJoin join, MEdges *stroke, MEdge curr, MEdge next,
 {
     if (join == GFX_STROKE_JOIN_MITTER)
     {
-        MVec2 curr_vec = m_vec2_sub(curr.end, curr.start);
-        MVec2 next_vec = m_vec2_sub(next.start, next.end);
-        MVec2 diff_vec = m_vec2_sub(next.start, curr.start);
+        MVec2f curr_vec = m_vec2f_sub(curr.end, curr.start);
+        MVec2f next_vec = m_vec2f_sub(next.start, next.end);
+        MVec2f diff_vec = m_vec2f_sub(next.start, curr.start);
 
-        float j = m_vec2_dot(next_vec, diff_vec) / m_vec2_dot(curr_vec, next_vec);
-        MVec2 v = m_vec2_add(curr.start, m_vec2_mul_v(curr_vec, j));
+        float j = m_vec2f_dot(next_vec, diff_vec) / m_vec2f_dot(curr_vec, next_vec);
+        MVec2f v = m_vec2f_add(curr.start, m_vec2f_mul_v(curr_vec, j));
 
         vec_push(stroke, m_edge_vec2(curr.end, v));
         vec_push(stroke, m_edge_vec2(v, next.start));
@@ -19,16 +19,16 @@ void gfx_stroke_join(GfxStrokeJoin join, MEdges *stroke, MEdge curr, MEdge next,
     {
         int divisions = 16;
 
-        MVec2 center = m_vec2_div_v(m_vec2_add(curr.end, next.start), 2);
+        MVec2f center = m_vec2f_div_v(m_vec2f_add(curr.end, next.start), 2);
 
-        float curr_angle = m_vec2_angle(m_vec2_sub(curr.end, curr.start)).v;
-        float next_angle = m_vec2_angle(m_vec2_sub(next.start, next.end)).v;
+        float curr_angle = m_vec2f_angle(m_vec2f_sub(curr.end, curr.start)).v;
+        float next_angle = m_vec2f_angle(m_vec2f_sub(next.start, next.end)).v;
 
-        MVec2 p = curr.end;
+        MVec2f p = curr.end;
         for (int i = 0; i < divisions; i++)
         {
             float angle = curr_angle + i * (next_angle - curr_angle) / (divisions - 1);
-            MVec2 v = m_vec2(center.x + cos(angle) * dist, center.y + sin(angle) * dist);
+            MVec2f v = m_vec2f(center.x + cos(angle) * dist, center.y + sin(angle) * dist);
             vec_push(stroke, m_edge_vec2(p, v));
             p = v;
         }

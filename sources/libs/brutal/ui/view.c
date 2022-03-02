@@ -9,7 +9,7 @@
 void ui_view_init(UiView *self)
 {
     vec_init(&self->children, alloc_global());
-    self->bound = m_rect(0, 0, 100, 100);
+    self->bound = m_rectf(0, 0, 100, 100);
     self->flags = UI_VIEW_ENABLED | UI_VIEW_VISIBLE;
 }
 
@@ -73,29 +73,29 @@ void ui_view_unmounted(UiView *self)
 
 /* --- Properties ----------------------------------------------------------- */
 
-MVec2 ui_view_orgin(UiView *self)
+MVec2f ui_view_orgin(UiView *self)
 {
-    return m_vec2_add(self->scroll, self->bound.pos);
+    return m_vec2f_add(self->scroll, self->bound.pos);
 }
 
-MRect ui_view_bound(UiView *self)
+MRectf ui_view_bound(UiView *self)
 {
     return self->bound;
 }
 
-MRect ui_view_content(UiView *self)
+MRectf ui_view_content(UiView *self)
 {
     return m_spacing_shrink(self->layout.padding, self->layout.flow, ui_view_container(self));
 }
 
-MRect ui_view_container(UiView *self)
+MRectf ui_view_container(UiView *self)
 {
-    MRect rect = self->bound;
-    rect.pos = m_vec2(0, 0);
+    MRectf rect = self->bound;
+    rect.pos = m_vec2f(0, 0);
     return rect;
 }
 
-void ui_view_resize(UiView *self, MRect rect)
+void ui_view_resize(UiView *self, MRectf rect)
 {
     self->bound = rect;
 }
@@ -150,16 +150,16 @@ void ui_view_should_repaint(UiView *self)
     ui_view_should_repaint_rect(self, self->bound);
 }
 
-void ui_view_should_repaint_rect(UiView *self, MRect dirty)
+void ui_view_should_repaint_rect(UiView *self, MRectf dirty)
 {
-    if (!m_rect_collide_rect(self->bound, dirty))
+    if (!m_rectf_collide_rect(self->bound, dirty))
     {
         return;
     }
 
     if (self->parent)
     {
-        dirty.pos = m_vec2_add(dirty.pos, ui_view_orgin(self->parent));
+        dirty.pos = m_vec2f_add(dirty.pos, ui_view_orgin(self->parent));
         ui_view_should_repaint_rect(self->parent, dirty);
     }
     else if (self->window)
@@ -172,7 +172,7 @@ void ui_view_repaint(UiView *self, Gfx *gfx)
 {
     gfx_push(gfx);
     gfx_origin(gfx, ui_view_orgin(self));
-    gfx_clip(gfx, m_rect(0, 0, self->bound.width, self->bound.height));
+    gfx_clip(gfx, m_rectf(0, 0, self->bound.width, self->bound.height));
 
     if (self->repaint)
     {
@@ -192,9 +192,9 @@ void ui_view_repaint(UiView *self, Gfx *gfx)
 
 /* --- Layout --------------------------------------------------------------- */
 
-MRect ui_view_size(MAYBE_UNUSED UiView *self)
+MRectf ui_view_size(MAYBE_UNUSED UiView *self)
 {
-    MRect result;
+    MRectf result;
 
     UiLayout layout = self->layout;
 
@@ -214,11 +214,11 @@ MRect ui_view_size(MAYBE_UNUSED UiView *self)
     return result;
 }
 
-void ui_view_place(UiView *self, MRect container)
+void ui_view_place(UiView *self, MRectf container)
 {
     UiLayout layout = self->layout;
 
-    MRect bound = ui_view_size(self);
+    MRectf bound = ui_view_size(self);
     container = m_gravity_apply(layout.placement, M_FLOW_LEFT_TO_RIGHT, bound, container);
     container = m_spacing_shrink(layout.margin, layout.flow, container);
 
@@ -266,7 +266,7 @@ void ui_view_should_relayout(UiView *self)
 
 /* --- Events --------------------------------------------------------------- */
 
-UiView *ui_view_lookup(UiView *self, MVec2 pos)
+UiView *ui_view_lookup(UiView *self, MVec2f pos)
 {
     if (self->flags & UI_VIEW_GREEDY)
     {
@@ -275,9 +275,9 @@ UiView *ui_view_lookup(UiView *self, MVec2 pos)
 
     vec_foreach_v(child, &self->children)
     {
-        if (m_rect_collide_point(ui_view_bound(child), pos))
+        if (m_rectf_collide_point(ui_view_bound(child), pos))
         {
-            pos = m_vec2_sub(pos, ui_view_orgin(child));
+            pos = m_vec2f_sub(pos, ui_view_orgin(child));
             return ui_view_lookup(child, pos);
         }
     }

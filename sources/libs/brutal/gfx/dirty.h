@@ -3,13 +3,13 @@
 #include <brutal/ds/vec.h>
 #include <brutal/math/rect.h>
 
-typedef Vec(MRect) GfxDirty;
+typedef Vec(MRectf) GfxDirty;
 
 void gfx_dirty_init(GfxDirty *self, Alloc *alloc);
 
 void gfx_dirty_deinit(GfxDirty *self);
 
-void gfx_dirty_rect(GfxDirty *self, MRect rect);
+void gfx_dirty_rect(GfxDirty *self, MRectf rect);
 
 bool gfx_dirty_any(GfxDirty *self);
 

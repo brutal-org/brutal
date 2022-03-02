@@ -12,6 +12,6 @@ typedef struct
 
 MSpacing m_spacing_all(float value);
 
-MRect m_spacing_shrink(MSpacing spacing, MFlow flow, MRect rect);
+MRectf m_spacing_shrink(MSpacing spacing, MFlow flow, MRectf rect);
 
-MRect m_spacing_grow(MSpacing spacing, MFlow flow, MRect rect);
+MRectf m_spacing_grow(MSpacing spacing, MFlow flow, MRectf rect);

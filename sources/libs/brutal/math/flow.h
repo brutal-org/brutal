@@ -12,40 +12,40 @@ typedef enum
 
 MFlow m_flow_relative(MFlow parent, MFlow child);
 
-MVec2 m_flow_to_vec(MFlow flow);
+MVec2f m_flow_to_vec(MFlow flow);
 
-float m_flow_get_start(MFlow flow, MRect rect);
+float m_flow_get_start(MFlow flow, MRectf rect);
 
-float m_flow_get_end(MFlow flow, MRect rect);
+float m_flow_get_end(MFlow flow, MRectf rect);
 
-float m_flow_get_top(MFlow flow, MRect rect);
+float m_flow_get_top(MFlow flow, MRectf rect);
 
-float m_flow_get_bottom(MFlow flow, MRect rect);
+float m_flow_get_bottom(MFlow flow, MRectf rect);
 
-float m_flow_get_width(MFlow flow, MRect rect);
+float m_flow_get_width(MFlow flow, MRectf rect);
 
-float m_flow_get_height(MFlow flow, MRect rect);
+float m_flow_get_height(MFlow flow, MRectf rect);
 
-MVec2 m_flow_get_origin(MFlow flow, MRect rect);
+MVec2f m_flow_get_origin(MFlow flow, MRectf rect);
 
-float m_flow_get_hcenter(MFlow flow, MRect rect);
+float m_flow_get_hcenter(MFlow flow, MRectf rect);
 
-float m_flow_get_vcenter(MFlow flow, MRect rect);
+float m_flow_get_vcenter(MFlow flow, MRectf rect);
 
-MRect m_flow_set_start(MFlow flow, MRect rect, float value);
+MRectf m_flow_set_start(MFlow flow, MRectf rect, float value);
 
-MRect m_flow_set_x(MFlow flow, MRect rect, float value);
+MRectf m_flow_set_x(MFlow flow, MRectf rect, float value);
 
-MRect m_flow_set_end(MFlow flow, MRect rect, float value);
+MRectf m_flow_set_end(MFlow flow, MRectf rect, float value);
 
-MRect m_flow_set_top(MFlow flow, MRect rect, float value);
+MRectf m_flow_set_top(MFlow flow, MRectf rect, float value);
 
-MRect m_flow_set_y(MFlow flow, MRect rect, float value);
+MRectf m_flow_set_y(MFlow flow, MRectf rect, float value);
 
-MRect m_flow_set_bottom(MFlow flow, MRect rect, float value);
+MRectf m_flow_set_bottom(MFlow flow, MRectf rect, float value);
 
-MRect m_flow_set_origin(MFlow flow, MRect rect, MVec2 value);
+MRectf m_flow_set_origin(MFlow flow, MRectf rect, MVec2f value);
 
-MRect m_flow_set_width(MFlow flow, MRect rect, float value);
+MRectf m_flow_set_width(MFlow flow, MRectf rect, float value);
 
-MRect m_flow_set_height(MFlow flow, MRect rect, float value);
+MRectf m_flow_set_height(MFlow flow, MRectf rect, float value);

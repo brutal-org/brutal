@@ -5,7 +5,6 @@
 
 typedef union
 {
-
     struct
     {
         float x;
@@ -16,46 +15,46 @@ typedef union
 
     struct
     {
-        MVec2 pos;
-        MVec2 size;
+        MVec2f pos;
+        MVec2f size;
     };
 
     float elements[4];
-} MRect;
+} MRectf;
 
-static inline MRect m_rect(float x, float y, float z, float w)
+static inline MRectf m_rectf(float x, float y, float z, float w)
 {
-    return (MRect){{x, y, z, w}};
+    return (MRectf){{x, y, z, w}};
 }
 
-#define m_rect_top(RECT) ((RECT).y)
+#define m_rectf_top(RECT) ((RECT).y)
 
-#define m_rect_bottom(RECT) ((RECT).y + (RECT).height)
+#define m_rectf_bottom(RECT) ((RECT).y + (RECT).height)
 
-#define m_rect_start(RECT) ((RECT).x)
+#define m_rectf_start(RECT) ((RECT).x)
 
-#define m_rect_end(RECT) ((RECT).x + (RECT).width)
+#define m_rectf_end(RECT) ((RECT).x + (RECT).width)
 
-static inline MVec2 m_rect_center(MRect rect)
+static inline MVec2f m_rectf_center(MRectf rect)
 {
-    return m_vec2(rect.x + rect.width / 2, rect.y + rect.height / 2);
+    return m_vec2f(rect.x + rect.width / 2, rect.y + rect.height / 2);
 }
 
-static inline bool m_rect_empty(MRect rect)
+static inline bool m_rectf_empty(MRectf rect)
 {
     return (int)rect.width == 0 || (int)rect.height == 0;
 }
 
-static inline MRect m_rect_move(MRect self, MVec2 offset)
+static inline MRectf m_rectf_move(MRectf self, MVec2f offset)
 {
-    return m_rect(
+    return m_rectf(
         self.x + offset.x,
         self.y + offset.y,
         self.width,
         self.height);
 }
 
-static inline bool m_rect_collide_rect(MRect recta, MRect rectb)
+static inline bool m_rectf_collide_rect(MRectf recta, MRectf rectb)
 {
     return recta.x < rectb.x + rectb.width &&
            recta.x + recta.width > rectb.x &&
@@ -63,7 +62,7 @@ static inline bool m_rect_collide_rect(MRect recta, MRect rectb)
            recta.height + recta.y > rectb.y;
 }
 
-static inline bool m_rect_contains_rect(MRect recta, MRect rectb)
+static inline bool m_rectf_contains_rect(MRectf recta, MRectf rectb)
 {
     return recta.x <= rectb.x &&
            recta.x + recta.width >= rectb.x + rectb.width &&
@@ -71,7 +70,7 @@ static inline bool m_rect_contains_rect(MRect recta, MRect rectb)
            recta.y + recta.height >= rectb.y + rectb.height;
 }
 
-static inline bool m_rect_collide_point(MRect rect, MVec2 p)
+static inline bool m_rectf_collide_point(MRectf rect, MVec2f p)
 {
     return rect.x + rect.width > p.x &&
            rect.x <= p.x &&
@@ -79,9 +78,9 @@ static inline bool m_rect_collide_point(MRect rect, MVec2 p)
            rect.y <= p.y;
 }
 
-static inline MRect m_rect_from_points(MVec2 a, MVec2 b)
+static inline MRectf m_rectf_from_points(MVec2f a, MVec2f b)
 {
-    return (MRect){{
+    return (MRectf){{
         m_min(a.x, b.x),
         m_min(a.y, b.y),
         m_max(a.x, b.x) - m_min(a.x, b.x),
@@ -89,75 +88,75 @@ static inline MRect m_rect_from_points(MVec2 a, MVec2 b)
     }};
 }
 
-static inline MRect m_rect_merge_rect(MRect recta, MRect rectb)
+static inline MRectf m_rectf_merge_rect(MRectf recta, MRectf rectb)
 {
-    MVec2 p0 = m_vec2(
+    MVec2f p0 = m_vec2f(
         m_min(recta.x, rectb.x),
         m_min(recta.y, rectb.y));
 
-    MVec2 p1 = m_vec2(
+    MVec2f p1 = m_vec2f(
         m_max(recta.x + recta.width, rectb.x + rectb.width),
         m_max(recta.y + recta.height, rectb.y + rectb.height));
 
-    return m_rect_from_points(p0, p1);
+    return m_rectf_from_points(p0, p1);
 }
 
-static inline MRect m_rect_clip_rect(MRect recta, MRect rectb)
+static inline MRectf m_rectf_clip_rect(MRectf recta, MRectf rectb)
 {
-    if (!m_rect_collide_rect(recta, rectb))
+    if (!m_rectf_collide_rect(recta, rectb))
     {
-        return (MRect){};
+        return (MRectf){};
     }
 
-    MVec2 p0 = m_vec2(
+    MVec2f p0 = m_vec2f(
         m_max(recta.x, rectb.x),
         m_max(recta.y, rectb.y));
 
-    MVec2 p1 = m_vec2(
+    MVec2f p1 = m_vec2f(
         m_min(recta.x + recta.width, rectb.x + rectb.width),
         m_min(recta.y + recta.height, rectb.y + rectb.height));
 
-    return m_rect_from_points(p0, p1);
+    return m_rectf_from_points(p0, p1);
 }
 
-static inline MRect m_rect_cover(MRect container, MRect overlay)
+static inline MRectf m_rectf_cover(MRectf container, MRectf overlay)
 {
-    float scale = m_vec2_comp_max(m_vec2_div(container.size, overlay.size));
-    MRect result = m_rect(0, 0, overlay.width * scale, overlay.height * scale);
-    result.pos = m_vec2_sub(m_rect_center(container), m_rect_center(result));
+    float scale = m_vec2f_comp_max(m_vec2f_div(container.size, overlay.size));
+    MRectf result = m_rectf(0, 0, overlay.width * scale, overlay.height * scale);
+    result.pos = m_vec2f_sub(m_rectf_center(container), m_rectf_center(result));
     return result;
 }
 
-static inline MRect m_rect_fit(MRect container, MRect overlay)
+static inline MRectf m_rectf_fit(MRectf container, MRectf overlay)
 {
-    float scale = m_vec2_comp_min(m_vec2_div(container.size, overlay.size));
-    MRect result = m_rect(0, 0, overlay.width * scale, overlay.height * scale);
-    result.pos = m_vec2_sub(m_rect_center(container), m_rect_center(result));
+    float scale = m_vec2f_comp_min(m_vec2f_div(container.size, overlay.size));
+    MRectf result = m_rectf(0, 0, overlay.width * scale, overlay.height * scale);
+    result.pos = m_vec2f_sub(m_rectf_center(container), m_rectf_center(result));
     return result;
 }
 
-static inline void m_rect_substract(MRect rect, MRect sub, MRect t[4])
+static inline void m_rectf_substract(MRectf rect, MRectf sub, MRectf t[4])
 {
-    if (m_rect_collide_rect(rect, sub))
+    if (m_rectf_collide_rect(rect, sub))
     {
-        sub = m_rect_clip_rect(rect, sub);
+        sub = m_rectf_clip_rect(rect, sub);
 
-        t[0] = m_rect(rect.x, rect.y, sub.x - rect.x, rect.height);
-        t[1] = m_rect(sub.x + sub.width, rect.y, rect.x + rect.width - sub.x - sub.width, rect.height);
-        t[2] = m_rect(t[0].x + t[0].width, rect.y, t[1].x - t[0].x - t[0].width, sub.y - rect.y);
-        t[3] = m_rect(t[0].x + t[0].width, sub.y + sub.height, t[1].x - t[0].x - t[0].width, rect.y + rect.height - sub.y - sub.height);
+        t[0] = m_rectf(rect.x, rect.y, sub.x - rect.x, rect.height);
+        t[1] = m_rectf(sub.x + sub.width, rect.y, rect.x + rect.width - sub.x - sub.width, rect.height);
+        t[2] = m_rectf(t[0].x + t[0].width, rect.y, t[1].x - t[0].x - t[0].width, sub.y - rect.y);
+        t[3] = m_rectf(t[0].x + t[0].width, sub.y + sub.height, t[1].x - t[0].x - t[0].width, rect.y + rect.height - sub.y - sub.height);
     }
     else
     {
         t[0] = rect;
-        t[1] = (MRect){};
-        t[2] = (MRect){};
-        t[3] = (MRect){};
+        t[1] = (MRectf){};
+        t[2] = (MRectf){};
+        t[3] = (MRectf){};
     }
 }
 
-static inline MVec2 m_rect_clamp_vec2(MRect rect, MVec2 vec)
+static inline MVec2f m_rectf_clamp_vec2(MRectf rect, MVec2f vec)
 {
-    return m_vec2(m_clamp(vec.x, m_rect_start(rect), m_rect_end(rect)),
-                  m_clamp(vec.y, m_rect_top(rect), m_rect_bottom(rect)));
+    return m_vec2f(m_clamp(vec.x, m_rectf_start(rect), m_rectf_end(rect)),
+                   m_clamp(vec.y, m_rectf_top(rect), m_rectf_bottom(rect)));
 }

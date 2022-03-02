@@ -7,7 +7,7 @@
 
 /* --- Lifecycle ------------------------------------------------------------ */
 
-UiWin *ui_win_create(UiApp *app, MRect bound, UiWinType type)
+UiWin *ui_win_create(UiApp *app, MRectf bound, UiWinType type)
 {
     UiWin *self = alloc_make(alloc_global(), UiWin);
     self->type = type;
@@ -67,15 +67,15 @@ bool ui_win_visible(UiWin *self)
     return embed_win_visible(self);
 }
 
-MRect ui_win_bound(UiWin *self)
+MRectf ui_win_bound(UiWin *self)
 {
-    return m_rect(0, 0, embed_win_gfx(self).width, embed_win_gfx(self).height);
+    return m_rectf(0, 0, embed_win_gfx(self).width, embed_win_gfx(self).height);
 }
 
-MRect ui_win_content(UiWin *self)
+MRectf ui_win_content(UiWin *self)
 {
-    MRect rect = ui_win_bound(self);
-    rect.pos = (MVec2){};
+    MRectf rect = ui_win_bound(self);
+    rect.pos = (MVec2f){};
     return rect;
 }
 
@@ -108,7 +108,7 @@ void ui_win_should_repaint(MAYBE_UNUSED UiWin *self)
     ui_win_should_repaint_rect(self, ui_win_bound(self));
 }
 
-void ui_win_should_repaint_rect(UiWin *self, MAYBE_UNUSED MRect rect)
+void ui_win_should_repaint_rect(UiWin *self, MAYBE_UNUSED MRectf rect)
 {
     ui_win_repaint_rect(self, rect);
     ui_win_flip(self, rect);
@@ -119,7 +119,7 @@ void ui_win_repaint(UiWin *self)
     ui_win_repaint_rect(self, ui_win_bound(self));
 }
 
-void ui_win_repaint_rect(UiWin *self, MRect rect)
+void ui_win_repaint_rect(UiWin *self, MRectf rect)
 {
     gfx_begin(&self->gfx, ui_win_gfx(self));
     gfx_clip(&self->gfx, rect);
@@ -147,7 +147,7 @@ void ui_win_repaint_rect(UiWin *self, MRect rect)
     gfx_end(&self->gfx);
 }
 
-void ui_win_flip(UiWin *self, MRect rect)
+void ui_win_flip(UiWin *self, MRectf rect)
 {
     return embed_win_flip(self, rect);
 }

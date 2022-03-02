@@ -16,7 +16,7 @@ typedef struct _WmServer
     GfxDirty display_dirty;
     WmDisplay *display;
 
-    MVec2 mouse;
+    MVec2f mouse;
     Vec(WmClient *) clients;
 } WmServer;
 
@@ -30,7 +30,7 @@ void wm_server_should_layout(WmServer *self);
 
 void wm_server_layout(WmServer *self);
 
-void wm_server_should_render(WmServer *self, MRect rect);
+void wm_server_should_render(WmServer *self, MRectf rect);
 
 void wm_server_should_render_all(WmServer *self);
 
@@ -38,4 +38,4 @@ void wm_server_render(WmServer *self);
 
 void wm_server_expose(WmServer *self, IpcCap bus);
 
-WmClient *wm_server_client_at(WmServer *self, MVec2 vec);
+WmClient *wm_server_client_at(WmServer *self, MVec2f vec);

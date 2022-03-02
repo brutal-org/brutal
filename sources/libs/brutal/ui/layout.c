@@ -3,30 +3,30 @@
 
 /* --- Compute Size --------------------------------------------------------- */
 
-static MVec2 ui_dock_size(UiView *views[], size_t len)
+static MVec2f ui_dock_size(UiView *views[], size_t len)
 {
-    MVec2 total_size = m_vec2(0, 0);
-    MVec2 current_size = m_vec2(0, 0);
+    MVec2f total_size = m_vec2f(0, 0);
+    MVec2f current_size = m_vec2f(0, 0);
     MOrientation previous_orientation = M_ORIENTATION_NONE;
 
     for (size_t i = 0; i < len; i++)
     {
         UiLayout const *child_layout = &views[i]->layout;
-        MRect child_bound = ui_view_size(views[i]);
+        MRectf child_bound = ui_view_size(views[i]);
         MOrientation child_orientation = m_dock_orientation(child_layout->dock);
 
         if (previous_orientation != child_orientation)
         {
-            total_size = m_vec2_add(total_size, current_size);
+            total_size = m_vec2f_add(total_size, current_size);
 
             previous_orientation = child_orientation;
-            current_size = m_vec2(0, 0);
+            current_size = m_vec2f(0, 0);
         }
 
         switch (child_orientation)
         {
         case M_ORIENTATION_NONE:
-            current_size = m_vec2_max(current_size, child_bound.size);
+            current_size = m_vec2f_max(current_size, child_bound.size);
             break;
 
         case M_ORIENTATION_HORIZONTAL:
@@ -44,20 +44,20 @@ static MVec2 ui_dock_size(UiView *views[], size_t len)
         }
     }
 
-    total_size = m_vec2_add(total_size, current_size);
+    total_size = m_vec2f_add(total_size, current_size);
 
     return total_size;
 }
 
-static MVec2 ui_flex_size(UiLayout const *self, UiView *views[], size_t len)
+static MVec2f ui_flex_size(UiLayout const *self, UiView *views[], size_t len)
 {
-    MVec2 size = m_vec2(0, 0);
+    MVec2f size = m_vec2f(0, 0);
     MFlow flow = self->flow;
 
     for (size_t i = 0; i < len; i++)
     {
         UiLayout const *child_layout = &views[i]->layout;
-        MRect child_bound = ui_view_size(views[i]);
+        MRectf child_bound = ui_view_size(views[i]);
 
         if (child_layout->dock == M_DOCK_START ||
             child_layout->dock == M_DOCK_END ||
@@ -79,13 +79,13 @@ static MVec2 ui_flex_size(UiLayout const *self, UiView *views[], size_t len)
     return size;
 }
 
-static MVec2 ui_max_size(struct _UiView *views[], size_t len)
+static MVec2f ui_max_size(struct _UiView *views[], size_t len)
 {
-    MVec2 result = m_vec2(0, 0);
+    MVec2f result = m_vec2f(0, 0);
 
     for (size_t i = 0; i < len; i++)
     {
-        MVec2 size = ui_view_size(views[i]).size;
+        MVec2f size = ui_view_size(views[i]).size;
         result.x = m_max(result.x, size.x);
         result.y = m_max(result.y, size.y);
     }
@@ -93,7 +93,7 @@ static MVec2 ui_max_size(struct _UiView *views[], size_t len)
     return result;
 }
 
-MVec2 ui_layout_size(UiLayout const *self, struct _UiView *views[], size_t len)
+MVec2f ui_layout_size(UiLayout const *self, struct _UiView *views[], size_t len)
 {
     switch (self->type)
     {
@@ -110,18 +110,18 @@ MVec2 ui_layout_size(UiLayout const *self, struct _UiView *views[], size_t len)
 
 /* --- Layout --------------------------------------------------------------- */
 
-static void ui_dock_run(UiLayout const *self, MRect container, UiView *views[], size_t len)
+static void ui_dock_run(UiLayout const *self, MRectf container, UiView *views[], size_t len)
 {
     for (size_t i = 0; i < len; i++)
     {
         UiView *child = views[i];
-        MRect content = ui_view_size(child);
+        MRectf content = ui_view_size(child);
         content = m_dock_apply(child->layout.dock, self->flow, content, &container);
         ui_view_place(child, content);
     }
 }
 
-static void ui_flex_run(UiLayout const *self, MRect container, UiView *views[], size_t len)
+static void ui_flex_run(UiLayout const *self, MRectf container, UiView *views[], size_t len)
 {
     MFlow flow = self->flow;
 
@@ -152,7 +152,7 @@ static void ui_flex_run(UiLayout const *self, MRect container, UiView *views[], 
     {
         UiView *child = views[i];
         UiLayout child_layout = child->layout;
-        MRect child_bound = {};
+        MRectf child_bound = {};
 
         if (child_layout.grow > 0.01)
         {
@@ -173,7 +173,7 @@ static void ui_flex_run(UiLayout const *self, MRect container, UiView *views[], 
     }
 }
 
-void ui_layout_run(UiLayout const *self, MRect container, UiView *views[], size_t len)
+void ui_layout_run(UiLayout const *self, MRectf container, UiView *views[], size_t len)
 {
     switch (self->type)
     {
@@ -189,4 +189,3 @@ void ui_layout_run(UiLayout const *self, MRect container, UiView *views[], size_
         break;
     }
 }
-

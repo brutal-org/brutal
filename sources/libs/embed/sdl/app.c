@@ -14,7 +14,7 @@ void embed_app_deinit(MAYBE_UNUSED UiApp *self)
     SDL_Quit();
 }
 
-static MVec2 _last_mouse_pos = {};
+static MVec2f _last_mouse_pos = {};
 
 UiEvent sdl_event_to_ui_event(SDL_Event e, uint32_t *handle)
 {

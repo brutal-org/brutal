@@ -10,8 +10,8 @@
 
 typedef struct
 {
-    MRect clip;
-    MVec2 origin;
+    MRectf clip;
+    MVec2f origin;
     MTrans2 trans;
 
     GfxPaint fill;
@@ -72,9 +72,9 @@ void gfx_pop(Gfx *self);
 
 GfxCtx *gfx_peek(Gfx *self);
 
-void gfx_clip(Gfx *self, MRect rect);
+void gfx_clip(Gfx *self, MRectf rect);
 
-void gfx_origin(Gfx *self, MVec2 pos);
+void gfx_origin(Gfx *self, MVec2f pos);
 
 void gfx_trans(Gfx *self, MTrans2 trans);
 
@@ -110,35 +110,35 @@ void gfx_eval_path(Gfx *self, GfxPath *path);
 
 void gfx_eval_svg(Gfx *self, Str path);
 
-void gfx_move_to(Gfx *self, MVec2 point);
+void gfx_move_to(Gfx *self, MVec2f point);
 
-void gfx_line_to(Gfx *self, MVec2 point);
+void gfx_line_to(Gfx *self, MVec2f point);
 
-void gfx_bezier_to(Gfx *self, MVec2 cp1, MVec2 cp2, MVec2 point);
+void gfx_bezier_to(Gfx *self, MVec2f cp1, MVec2f cp2, MVec2f point);
 
-void gfx_quadratic_to(Gfx *self, MVec2 cp2, MVec2 point);
+void gfx_quadratic_to(Gfx *self, MVec2f cp2, MVec2f point);
 
-void gfx_arc_to(Gfx *self, float rx, float ry, float angle, int flags, MVec2 point);
+void gfx_arc_to(Gfx *self, float rx, float ry, float angle, int flags, MVec2f point);
 
-void gfx_rect(Gfx *self, MRect rect, float radius);
+void gfx_rect(Gfx *self, MRectf rect, float radius);
 
-void gfx_ellipse(Gfx *self, MRect rect);
+void gfx_ellipse(Gfx *self, MRectf rect);
 
 /* --- Drawing -------------------------------------------------------------- */
 
-void gfx_dot(Gfx *self, MVec2 dot, float size);
+void gfx_dot(Gfx *self, MVec2f dot, float size);
 
 void gfx_line(Gfx *self, MEdge line, float weight);
 
-void gfx_text(Gfx *self, MVec2 origin, Str text);
+void gfx_text(Gfx *self, MVec2f origin, Str text);
 
-void gfx_fill_rect(Gfx *self, MRect rect, float radius);
+void gfx_fill_rect(Gfx *self, MRectf rect, float radius);
 
-void gfx_stroke_rect(Gfx *self, MRect rect, float radius);
+void gfx_stroke_rect(Gfx *self, MRectf rect, float radius);
 
-void gfx_fill_ellipse(Gfx *self, MRect rect);
+void gfx_fill_ellipse(Gfx *self, MRectf rect);
 
-void gfx_stroke_ellipse(Gfx *self, MRect rect);
+void gfx_stroke_ellipse(Gfx *self, MRectf rect);
 
 void gfx_fill_path(Gfx *self, GfxPath *path, GfxFillRule rule);
 

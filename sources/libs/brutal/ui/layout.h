@@ -14,11 +14,11 @@ struct _UiView;
 
 typedef struct
 {
-    MVec2 min;
-    MVec2 max;
+    MVec2f min;
+    MVec2f max;
 } UiSize;
 
-static inline MVec2 ui_size_apply(UiSize size, MVec2 vec)
+static inline MVec2f ui_size_apply(UiSize size, MVec2f vec)
 {
     if (size.min.width)
     {
@@ -64,10 +64,9 @@ typedef struct
     MSpacing margin;
     MFlow flow;
     float grow;
-    MVec2 gaps;
+    MVec2f gaps;
 } UiLayout;
 
-MVec2 ui_layout_size(UiLayout const *self, struct _UiView *views[], size_t len);
+MVec2f ui_layout_size(UiLayout const *self, struct _UiView *views[], size_t len);
 
-void ui_layout_run(UiLayout const *layout, MRect container, struct _UiView *views[], size_t len);
-
+void ui_layout_run(UiLayout const *layout, MRectf container, struct _UiView *views[], size_t len);

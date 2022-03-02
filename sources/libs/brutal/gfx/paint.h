@@ -40,7 +40,7 @@ typedef struct
         struct
         {
             GfxBuf image;
-            MRect source;
+            MRectf source;
         } image_;
     };
 } GfxPaint;
@@ -68,7 +68,7 @@ static inline GfxPaint gfx_paint_gradient(GfxGradient grad)
     };
 }
 
-static inline GfxPaint gfx_paint_image(GfxBuf buf, MRect source)
+static inline GfxPaint gfx_paint_image(GfxBuf buf, MRectf source)
 {
     return (GfxPaint){
         .type = GFX_PAINT_IMAGE,
@@ -140,7 +140,7 @@ static inline GfxColor gfx_paint_sample(GfxPaint paint, float x, float y)
     case GFX_PAINT_IMAGE:
     {
         GfxBuf image = paint.image_.image;
-        MRect source = paint.image_.source;
+        MRectf source = paint.image_.source;
 
         if (image.width == 0 || image.height == 0)
         {

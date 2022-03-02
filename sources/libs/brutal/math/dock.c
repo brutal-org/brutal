@@ -23,7 +23,7 @@ MFlow m_dock_to_flow(MDock dock)
     }
 }
 
-MRect m_dock_apply(MDock dock, MFlow flow, MRect content, MRect *container)
+MRectf m_dock_apply(MDock dock, MFlow flow, MRectf content, MRectf *container)
 {
     flow = m_flow_relative(flow, m_dock_to_flow(dock));
 

@@ -19,9 +19,9 @@ typedef union
 
     struct
     {
-        MVec2 x;
-        MVec2 y;
-        MVec2 o;
+        MVec2f x;
+        MVec2f y;
+        MVec2f o;
     };
 
     float m[6];
@@ -45,7 +45,7 @@ static inline MTrans2 m_trans2_rotate(float r)
     return m_trans2(cs, sn, -sn, cs, 0.0f, 0.0f);
 }
 
-static inline MTrans2 m_trans2_skew(MVec2 vec)
+static inline MTrans2 m_trans2_skew(MVec2f vec)
 {
     return m_trans2(
         1.0f,
@@ -93,7 +93,7 @@ static inline MTrans2 m_trans2_scaley(float y)
     return m_trans2(1, 0.0f, 0.0f, y, 0, 0);
 }
 
-static inline MTrans2 m_trans2_transale(MVec2 vec)
+static inline MTrans2 m_trans2_transale(MVec2f vec)
 {
     return m_trans2(1.0f, 0.0f, 0.0f, 1.0f, vec.x, vec.y);
 }
@@ -113,16 +113,16 @@ static inline bool m_trans2_is_identity(MTrans2 trans)
            trans.oy == 0.0f;
 }
 
-static inline MVec2 m_trans2_apply_vector(MTrans2 trans, MVec2 v)
+static inline MVec2f m_trans2_apply_vector(MTrans2 trans, MVec2f v)
 {
-    return m_vec2(
+    return m_vec2f(
         v.x * trans.xx + v.y * trans.yx,
         v.x * trans.xy + v.y * trans.yy);
 }
 
-static inline MVec2 m_trans2_apply_point(MTrans2 trans, MVec2 v)
+static inline MVec2f m_trans2_apply_point(MTrans2 trans, MVec2f v)
 {
-    return m_vec2_add(m_trans2_apply_vector(trans, v), trans.o);
+    return m_vec2f_add(m_trans2_apply_vector(trans, v), trans.o);
 }
 
 static inline MTrans2 m_trans_mult(MTrans2 lhs, MTrans2 rhs)

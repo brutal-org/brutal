@@ -95,7 +95,7 @@ static void eat_whitespace(Scan *scan)
     scan_skip_until(scan, isblank);
 }
 
-static MVec2 parse_vec(Scan *scan, MVec2 vec)
+static MVec2f parse_vec(Scan *scan, MVec2f vec)
 {
     switch (next_keyword(scan))
     {
