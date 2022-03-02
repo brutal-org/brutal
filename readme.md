@@ -66,7 +66,7 @@ See [building.md](meta/building.md) for more details.
 
 ## Roadmap
 
-Right now the main goal of brutal is to run doom.
+BRUTAL is currently at Milestone 4. Focusing on file systems and graphics.
 
 See [roadmap.md](meta/roadmap.md) for more information on how we plan to get there and where you can contribute.
 
