@@ -5,9 +5,9 @@ export PATH := $(shell build/toolchain/gnu/use.sh):$(PATH)
 HOST_CC=gcc
 
 HOST_CFLAGS= \
-	-fanalyzer \
 	$(BASE_CFLAGS) \
-	`pkg-config sdl2 --cflags`
+	`pkg-config sdl2 --cflags` \
+	-fanalyzer
 
 HOST_LD=ld
 HOST_LDFLAGS= \
