@@ -29,13 +29,13 @@ typedef struct
     float rx;
     float ry;
     float angle;
-    MVec2 cp1;
+    MVec2f cp1;
     union
     {
-        MVec2 cp2;
-        MVec2 cp;
+        MVec2f cp2;
+        MVec2f cp;
     };
-    MVec2 point;
+    MVec2f point;
 } GfxPathCmd;
 
 typedef Vec(GfxPathCmd) GfxPath;
@@ -46,17 +46,17 @@ void gfx_path_deinit(GfxPath *path);
 
 void gfx_path_dump(GfxPath *path);
 
-void gfx_path_move_to(GfxPath *path, MVec2 p);
+void gfx_path_move_to(GfxPath *path, MVec2f p);
 
 void gfx_path_close(GfxPath *path);
 
-void gfx_path_line_to(GfxPath *path, MVec2 p);
+void gfx_path_line_to(GfxPath *path, MVec2f p);
 
-void gfx_path_cubic_to(GfxPath *path, MVec2 cp1, MVec2 cp2, MVec2 p);
+void gfx_path_cubic_to(GfxPath *path, MVec2f cp1, MVec2f cp2, MVec2f p);
 
-void gfx_path_quadratic_to(GfxPath *path, MVec2 cp, MVec2 p);
+void gfx_path_quadratic_to(GfxPath *path, MVec2f cp, MVec2f p);
 
-void gfx_path_arc_to(GfxPath *path, float rx, float ry, float angle, int flags, MVec2 p);
+void gfx_path_arc_to(GfxPath *path, float rx, float ry, float angle, int flags, MVec2f p);
 
 /* --- Parser --------------------------------------------------------------- */
 
@@ -65,9 +65,9 @@ void gfx_path_arc_to(GfxPath *path, float rx, float ry, float angle, int flags, 
 
 typedef struct
 {
-    MVec2 start;
-    MVec2 cp;
-    MVec2 last;
+    MVec2f start;
+    MVec2f cp;
+    MVec2f last;
     void (*eval)(void *ctx, GfxPathCmd cmd);
     void *ctx;
 } GfxPathParser;
@@ -78,8 +78,8 @@ void gfx_path_parse(GfxPathParser *self, Scan *scan);
 
 typedef struct
 {
-    MVec2 start;
-    MVec2 last;
+    MVec2f start;
+    MVec2f last;
     void (*append)(void *ctx, MEdge edge);
     void *ctx;
 } GfxPathFlattener;

@@ -28,26 +28,26 @@ MFlow m_flow_relative(MFlow parent, MFlow child)
     return table[parent * 4 + child];
 }
 
-MVec2 m_flow_to_vec(MFlow flow)
+MVec2f m_flow_to_vec(MFlow flow)
 {
     switch (flow)
     {
     default:
     case M_FLOW_LEFT_TO_RIGHT:
-        return m_vec2(1, 0);
+        return m_vec2f(1, 0);
 
     case M_FLOW_RIGHT_TO_LEFT:
-        return m_vec2(-1, 0);
+        return m_vec2f(-1, 0);
 
     case M_FLOW_TOP_TO_BOTTOM:
-        return m_vec2(0, 1);
+        return m_vec2f(0, 1);
 
     case M_FLOW_BOTTOM_TO_TOP:
-        return m_vec2(0, -1);
+        return m_vec2f(0, -1);
     }
 }
 
-float m_flow_get_start(MFlow flow, MRect rect)
+float m_flow_get_start(MFlow flow, MRectf rect)
 {
     switch (flow)
     {
@@ -66,7 +66,7 @@ float m_flow_get_start(MFlow flow, MRect rect)
     }
 }
 
-float m_flow_get_end(MFlow flow, MRect rect)
+float m_flow_get_end(MFlow flow, MRectf rect)
 {
     switch (flow)
     {
@@ -85,7 +85,7 @@ float m_flow_get_end(MFlow flow, MRect rect)
     }
 }
 
-float m_flow_get_top(MFlow flow, MRect rect)
+float m_flow_get_top(MFlow flow, MRectf rect)
 {
     switch (flow)
     {
@@ -100,7 +100,7 @@ float m_flow_get_top(MFlow flow, MRect rect)
     }
 }
 
-float m_flow_get_bottom(MFlow flow, MRect rect)
+float m_flow_get_bottom(MFlow flow, MRectf rect)
 {
     switch (flow)
     {
@@ -115,7 +115,7 @@ float m_flow_get_bottom(MFlow flow, MRect rect)
     }
 }
 
-float m_flow_get_width(MFlow flow, MRect rect)
+float m_flow_get_width(MFlow flow, MRectf rect)
 {
     switch (flow)
     {
@@ -130,7 +130,7 @@ float m_flow_get_width(MFlow flow, MRect rect)
     }
 }
 
-float m_flow_get_height(MFlow flow, MRect rect)
+float m_flow_get_height(MFlow flow, MRectf rect)
 {
     switch (flow)
     {
@@ -145,24 +145,24 @@ float m_flow_get_height(MFlow flow, MRect rect)
     }
 }
 
-MVec2 m_flow_get_origin(MFlow flow, MRect rect)
+MVec2f m_flow_get_origin(MFlow flow, MRectf rect)
 {
-    return m_vec2(
+    return m_vec2f(
         m_flow_get_start(flow, rect),
         m_flow_get_top(flow, rect));
 }
 
-float m_flow_get_hcenter(MFlow flow, MRect rect)
+float m_flow_get_hcenter(MFlow flow, MRectf rect)
 {
     return (m_flow_get_start(flow, rect) + m_flow_get_end(flow, rect)) / 2;
 }
 
-float m_flow_get_vcenter(MFlow flow, MRect rect)
+float m_flow_get_vcenter(MFlow flow, MRectf rect)
 {
     return (m_flow_get_top(flow, rect) + m_flow_get_bottom(flow, rect)) / 2;
 }
 
-MRect m_flow_set_start(MFlow flow, MRect rect, float value)
+MRectf m_flow_set_start(MFlow flow, MRectf rect, float value)
 {
     float d = value - m_flow_get_start(flow, rect);
 
@@ -189,7 +189,7 @@ MRect m_flow_set_start(MFlow flow, MRect rect, float value)
     }
 }
 
-MRect m_flow_set_x(MFlow flow, MRect rect, float value)
+MRectf m_flow_set_x(MFlow flow, MRectf rect, float value)
 {
     float d = value - m_flow_get_start(flow, rect);
 
@@ -208,7 +208,7 @@ MRect m_flow_set_x(MFlow flow, MRect rect, float value)
     }
 }
 
-MRect m_flow_set_end(MFlow flow, MRect rect, float value)
+MRectf m_flow_set_end(MFlow flow, MRectf rect, float value)
 {
     float d = value - m_flow_get_end(flow, rect);
 
@@ -233,7 +233,7 @@ MRect m_flow_set_end(MFlow flow, MRect rect, float value)
     }
 }
 
-MRect m_flow_set_top(MFlow flow, MRect rect, float value)
+MRectf m_flow_set_top(MFlow flow, MRectf rect, float value)
 {
     float d = value - m_flow_get_top(flow, rect);
 
@@ -254,7 +254,7 @@ MRect m_flow_set_top(MFlow flow, MRect rect, float value)
     }
 }
 
-MRect m_flow_set_y(MFlow flow, MRect rect, float value)
+MRectf m_flow_set_y(MFlow flow, MRectf rect, float value)
 {
     float d = value - m_flow_get_top(flow, rect);
 
@@ -273,7 +273,7 @@ MRect m_flow_set_y(MFlow flow, MRect rect, float value)
     }
 }
 
-MRect m_flow_set_bottom(MFlow flow, MRect rect, float value)
+MRectf m_flow_set_bottom(MFlow flow, MRectf rect, float value)
 {
     float d = value - m_flow_get_bottom(flow, rect);
 
@@ -292,14 +292,14 @@ MRect m_flow_set_bottom(MFlow flow, MRect rect, float value)
     }
 }
 
-MRect m_flow_set_origin(MFlow flow, MRect rect, MVec2 value)
+MRectf m_flow_set_origin(MFlow flow, MRectf rect, MVec2f value)
 {
     rect = m_flow_set_x(flow, rect, value.x);
     rect = m_flow_set_y(flow, rect, value.y);
     return rect;
 }
 
-MRect m_flow_set_width(MFlow flow, MRect rect, float value)
+MRectf m_flow_set_width(MFlow flow, MRectf rect, float value)
 {
     switch (flow)
     {
@@ -316,7 +316,7 @@ MRect m_flow_set_width(MFlow flow, MRect rect, float value)
     }
 }
 
-MRect m_flow_set_height(MFlow flow, MRect rect, float value)
+MRectf m_flow_set_height(MFlow flow, MRectf rect, float value)
 {
     switch (flow)
     {

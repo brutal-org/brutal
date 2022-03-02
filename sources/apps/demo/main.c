@@ -4,7 +4,7 @@
 
 UiWin *demo_win_create(UiApp *app)
 {
-    UiWin *self = ui_win_create(app, m_rect(0, 0, 800, 600), UI_WIN_NORMAL);
+    UiWin *self = ui_win_create(app, m_rectf(0, 0, 800, 600), UI_WIN_NORMAL);
 
     UiView *container = ui_panel_create(GFX_DARK_GRAY);
 

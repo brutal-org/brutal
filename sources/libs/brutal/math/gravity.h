@@ -27,4 +27,4 @@
 
 typedef uint64_t MGravity;
 
-MRect m_gravity_apply(MGravity gravity, MFlow flow, MRect content, MRect container);
+MRectf m_gravity_apply(MGravity gravity, MFlow flow, MRectf content, MRectf container);

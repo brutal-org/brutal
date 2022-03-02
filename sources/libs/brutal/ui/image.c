@@ -4,10 +4,10 @@
 void ui_image_repaint(UiView *self, Gfx *gfx)
 {
     GfxBuf buf = gfx_surface_buf(&ui_image$(self)->surface);
-    MRect bound = gfx_buf_bound(buf);
+    MRectf bound = gfx_buf_bound(buf);
     gfx_fill_style(gfx, gfx_paint_image(buf, bound));
 
-    MRect dest = m_gravity_apply(self->layout.gravity, M_FLOW_LEFT_TO_RIGHT, bound, ui_view_content(self));
+    MRectf dest = m_gravity_apply(self->layout.gravity, M_FLOW_LEFT_TO_RIGHT, bound, ui_view_content(self));
     gfx_fill_rect(gfx, dest, 0);
 }
 

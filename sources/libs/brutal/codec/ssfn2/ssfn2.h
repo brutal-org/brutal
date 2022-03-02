@@ -8,8 +8,8 @@
 typedef struct
 {
     GfxPath path;
-    MVec2 bound;
-    MVec2 advance;
+    MVec2f bound;
+    MVec2f advance;
     bool present;
 } SSFN2Glyph;
 

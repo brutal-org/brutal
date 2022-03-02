@@ -39,7 +39,7 @@ struct _UiWin
 
 /* --- Lifecycle ------------------------------------------------------------ */
 
-UiWin *ui_win_create(UiApp *app, MRect bound, UiWinType type);
+UiWin *ui_win_create(UiApp *app, MRectf bound, UiWinType type);
 
 void ui_win_ref(UiWin *self);
 
@@ -53,11 +53,11 @@ void ui_win_show(UiWin *self);
 
 bool ui_win_visible(UiWin *self);
 
-void ui_win_resize(UiWin *self, MRect bound);
+void ui_win_resize(UiWin *self, MRectf bound);
 
-MRect ui_win_bound(UiWin *self);
+MRectf ui_win_bound(UiWin *self);
 
-MRect ui_win_content(UiWin *self);
+MRectf ui_win_content(UiWin *self);
 
 void ui_win_mount(UiWin *self, struct _UiView *view);
 
@@ -67,13 +67,13 @@ GfxBuf ui_win_gfx(UiWin *self);
 
 void ui_win_should_repaint(UiWin *self);
 
-void ui_win_should_repaint_rect(UiWin *self, MRect rect);
+void ui_win_should_repaint_rect(UiWin *self, MRectf rect);
 
 void ui_win_repaint(UiWin *self);
 
-void ui_win_repaint_rect(UiWin *self, MRect rect);
+void ui_win_repaint_rect(UiWin *self, MRectf rect);
 
-void ui_win_flip(UiWin *self, MRect rect);
+void ui_win_flip(UiWin *self, MRectf rect);
 
 void ui_win_flip_full(UiWin *self);
 

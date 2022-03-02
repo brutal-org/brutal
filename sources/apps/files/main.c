@@ -3,7 +3,7 @@
 
 UiWin *files_win_create(UiApp *app)
 {
-    UiWin *self = ui_win_create(app, m_rect(0, 0, 700, 500), UI_WIN_NORMAL);
+    UiWin *self = ui_win_create(app, m_rectf(0, 0, 700, 500), UI_WIN_NORMAL);
 
     UiView *container = ui_panel_create(UI_COLOR_BASE00);
     ui_view_layout(container, "flex");

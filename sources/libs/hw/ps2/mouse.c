@@ -14,12 +14,12 @@ UiEventType ps2_mouse_event_type(UiMouseEvent prev, UiMouseEvent next)
         return UI_EVENT_MOUSE_UP;
     }
 
-    if (m_vec2_len(prev.offset) > 0)
+    if (m_vec2f_len(prev.offset) > 0)
     {
         return UI_EVENT_MOUSE_MOVE;
     }
 
-    if (m_vec2_len(prev.scroll) > 0)
+    if (m_vec2f_len(prev.scroll) > 0)
     {
         return UI_EVENT_MOUSE_SCROLL;
     }

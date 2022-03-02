@@ -29,7 +29,7 @@ static WmError wm_client_close_handler(void *self, void *, bool *resp, Alloc *)
     return IPC_SUCCESS;
 }
 
-static WmError wm_client_flip_handler(void *self, MRect const *req, bool *resp, Alloc *)
+static WmError wm_client_flip_handler(void *self, MRectf const *req, bool *resp, Alloc *)
 {
     WmClient *client = self;
     wm_client_flip(client, *req);
@@ -37,7 +37,7 @@ static WmError wm_client_flip_handler(void *self, MRect const *req, bool *resp, 
     return IPC_SUCCESS;
 }
 
-static WmError wm_client_resize_handler(void *self, MRect const *req, bool *resp, Alloc *)
+static WmError wm_client_resize_handler(void *self, MRectf const *req, bool *resp, Alloc *)
 {
     WmClient *client = self;
     wm_client_resize(client, *req);
@@ -72,7 +72,7 @@ static WmClientVTable _wm_client_vtable = {
 
 /* --- Window Manager Client ------------------------------------------------ */
 
-WmClient *wm_client_create(struct _WmServer *server, MRect bound, UiWinType type)
+WmClient *wm_client_create(struct _WmServer *server, MRectf bound, UiWinType type)
 {
     WmClient *self = alloc_make(alloc_global(), WmClient);
 
@@ -126,15 +126,15 @@ void wm_client_close(WmClient *self)
     wm_server_should_render(self->server, self->bound);
 }
 
-void wm_client_flip(WmClient *self, MRect bound)
+void wm_client_flip(WmClient *self, MRectf bound)
 {
-    gfx_buf_copy(wm_client_frontbuffer(self), wm_client_backbuffer(self), 0, 0);
+    gfx_ops_copy(wm_client_frontbuffer(self), wm_client_backbuffer(self), 0, 0);
 
-    bound.pos = m_vec2_add(bound.pos, self->bound.pos);
+    bound.pos = m_vec2f_add(bound.pos, self->bound.pos);
     wm_server_should_render(self->server, bound);
 }
 
-void wm_client_resize(WmClient *self, MRect bound)
+void wm_client_resize(WmClient *self, MRectf bound)
 {
     wm_server_should_render(self->server, self->bound);
     self->bound = bound;

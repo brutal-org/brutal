@@ -20,8 +20,8 @@ struct _UiView
     int refcount;
 
     UiFlags flags;
-    MRect bound;
-    MVec2 scroll;
+    MRectf bound;
+    MVec2f scroll;
 
     UiLayout layout;
     UiPalette palette;
@@ -29,7 +29,7 @@ struct _UiView
     void (*deinit)(UiView *self);
     void (*repaint)(UiView *self, Gfx *painter);
     void (*event)(UiView *self, UiEvent *event);
-    MRect (*size)(UiView *self);
+    MRectf (*size)(UiView *self);
     void (*relayout)(UiView *self);
 
     struct _UiApp *app;
@@ -66,17 +66,17 @@ void ui_view_unmounted(UiView *self);
 
 /* --- Properties ----------------------------------------------------------- */
 
-MVec2 ui_view_orgin(UiView *self);
+MVec2f ui_view_orgin(UiView *self);
 
-MRect ui_view_bound(UiView *self);
+MRectf ui_view_bound(UiView *self);
 
-MRect ui_view_content(UiView *self);
+MRectf ui_view_content(UiView *self);
 
-MRect ui_view_container(UiView *self);
+MRectf ui_view_container(UiView *self);
 
-void ui_view_resize(UiView *self, MRect rect);
+void ui_view_resize(UiView *self, MRectf rect);
 
-void ui_view_layout(UiView *self, char const* layout);
+void ui_view_layout(UiView *self, char const *layout);
 
 GfxColor ui_view_color(UiView *self, UiRole role);
 
@@ -88,7 +88,7 @@ struct _UiWin *ui_view_window(UiView *self);
 
 void ui_view_should_repaint(UiView *self);
 
-void ui_view_should_repaint_rect(UiView *self, MRect dirty);
+void ui_view_should_repaint_rect(UiView *self, MRectf dirty);
 
 void ui_view_repaint(UiView *self, Gfx *gfx);
 
@@ -96,14 +96,14 @@ void ui_view_repaint(UiView *self, Gfx *gfx);
 
 void ui_view_should_relayout(UiView *self);
 
-MRect ui_view_size(UiView *self);
+MRectf ui_view_size(UiView *self);
 
-void ui_view_place(UiView *self, MRect container);
+void ui_view_place(UiView *self, MRectf container);
 
 void ui_view_relayout(UiView *self);
 
 /* --- Events --------------------------------------------------------------- */
 
-UiView *ui_view_lookup(UiView *self, MVec2 pos);
+UiView *ui_view_lookup(UiView *self, MVec2f pos);
 
 void ui_view_dispatch(UiView *self, UiEvent *event);

@@ -34,9 +34,9 @@ typedef struct
 
 typedef struct
 {
-    MRect capbound;
-    MRect linebound;
-    MVec2 baseline;
+    MRectf capbound;
+    MRectf linebound;
+    MVec2f baseline;
 } GfxFontMeasure;
 
 // https://docs.microsoft.com/en-us/typography/opentype/otspec180/fvar
@@ -83,7 +83,7 @@ typedef struct
 
 typedef GfxFontMetrics GfxFontMetricsFn(void *ctx, GfxFontStyle style);
 typedef float GfxFontAdvanceFn(void *ctx, GfxFontStyle style, Rune rune);
-typedef void GfxFontRenderFn(void *ctx, GfxFontStyle style, struct _Gfx *gfx, MVec2 baseline, Rune rune);
+typedef void GfxFontRenderFn(void *ctx, GfxFontStyle style, struct _Gfx *gfx, MVec2f baseline, Rune rune);
 
 typedef struct
 {
@@ -100,9 +100,9 @@ float gfx_font_advance(GfxFont font, GfxFontStyle style, Rune rune);
 
 GfxFontMeasure gfx_font_measure(GfxFont font, GfxFontStyle style, Str str);
 
-void gfx_font_render_rune(GfxFont font, GfxFontStyle style, struct _Gfx *gfx, MVec2 baseline, Rune rune);
+void gfx_font_render_rune(GfxFont font, GfxFontStyle style, struct _Gfx *gfx, MVec2f baseline, Rune rune);
 
-void gfx_font_render_str(GfxFont font, GfxFontStyle style, struct _Gfx *gfx, MVec2 baseline, Str str);
+void gfx_font_render_str(GfxFont font, GfxFontStyle style, struct _Gfx *gfx, MVec2f baseline, Str str);
 
 /* --- Builtin Font --------------------------------------------------------- */
 

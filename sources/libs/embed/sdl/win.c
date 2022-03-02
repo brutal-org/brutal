@@ -1,7 +1,7 @@
 #include <SDL.h>
 #include <embed/win.h>
 
-void embed_win_init(UiWin *self, MRect bound)
+void embed_win_init(UiWin *self, MRectf bound)
 {
     self->embed.sdl_window = SDL_CreateWindow(
         "BRUTAL",
@@ -32,7 +32,7 @@ bool embed_win_visible(UiWin *self)
     return SDL_GetWindowFlags(self->embed.sdl_window) & SDL_WINDOW_SHOWN;
 }
 
-void embed_win_flip(UiWin *self, MRect rect)
+void embed_win_flip(UiWin *self, MRectf rect)
 {
     SDL_Rect sdl_rect = {rect.x, rect.y, rect.width, rect.height};
     SDL_UpdateWindowSurfaceRects(self->embed.sdl_window, &sdl_rect, 1);

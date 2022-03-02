@@ -21,7 +21,7 @@ static EventSinkVTable _input_sink_vtable = {
 
 /* --- Win Implementation --------------------------------------------------- */
 
-void embed_win_init(UiWin *self, MRect bound)
+void embed_win_init(UiWin *self, MRectf bound)
 {
     IpcCap server = ipc_component_require(ipc_component_self(), IPC_WM_SERVER_PROTO);
 
@@ -70,7 +70,7 @@ bool embed_win_visible(UiWin *self)
     return true;
 }
 
-void embed_win_flip(UiWin *self, MRect rect)
+void embed_win_flip(UiWin *self, MRectf rect)
 {
     bool resp = false;
     wm_client_flip_rpc(ipc_component_self(), self->embed.wm_client, &rect, &resp, alloc_global());

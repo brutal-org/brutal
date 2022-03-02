@@ -5,7 +5,7 @@ MSpacing m_spacing_all(float value)
     return (MSpacing){value, value, value, value};
 }
 
-MRect m_spacing_shrink(MSpacing spacing, MFlow flow, MRect rect)
+MRectf m_spacing_shrink(MSpacing spacing, MFlow flow, MRectf rect)
 {
     rect = m_flow_set_start(flow, rect, m_flow_get_start(flow, rect) + spacing.start);
     rect = m_flow_set_top(flow, rect, m_flow_get_top(flow, rect) + spacing.top);
@@ -15,7 +15,7 @@ MRect m_spacing_shrink(MSpacing spacing, MFlow flow, MRect rect)
     return rect;
 }
 
-MRect m_spacing_grow(MSpacing spacing, MFlow flow, MRect rect)
+MRectf m_spacing_grow(MSpacing spacing, MFlow flow, MRectf rect)
 {
     rect = m_flow_set_start(flow, rect, m_flow_get_start(flow, rect) - spacing.start);
     rect = m_flow_set_top(flow, rect, m_flow_get_top(flow, rect) - spacing.top);

@@ -10,15 +10,15 @@ GfxFontMeasure ui_text_measure(UiView *self)
 void ui_text_repaint(UiView *self, Gfx *gfx)
 {
     GfxFontMeasure measures = ui_text_measure(self);
-    MRect centered = m_gravity_apply(self->layout.gravity, M_FLOW_LEFT_TO_RIGHT, measures.capbound, ui_view_content(self));
-    MVec2 orgin = m_vec2_add(centered.pos, measures.baseline);
+    MRectf centered = m_gravity_apply(self->layout.gravity, M_FLOW_LEFT_TO_RIGHT, measures.capbound, ui_view_content(self));
+    MVec2f orgin = m_vec2f_add(centered.pos, measures.baseline);
 
     gfx_fill_style(gfx, gfx_paint_fill(ui_view_color(self, UI_COLOR_ROLE_TEXT)));
     gfx_font_style(gfx, ui_text$(self)->font);
     gfx_text(gfx, orgin, ui_text$(self)->text);
 }
 
-MRect ui_text_size(UiView *self)
+MRectf ui_text_size(UiView *self)
 {
     return ui_text_measure(self).linebound;
 }

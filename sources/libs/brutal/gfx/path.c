@@ -57,7 +57,7 @@ void gfx_path_dump(GfxPath *path)
     }
 }
 
-void gfx_path_move_to(GfxPath *path, MVec2 p)
+void gfx_path_move_to(GfxPath *path, MVec2f p)
 {
     GfxPathCmd cmd = {
         .type = GFX_CMD_MOVE_TO,
@@ -76,7 +76,7 @@ void gfx_path_close(GfxPath *path)
     vec_push(path, cmd);
 }
 
-void gfx_path_line_to(GfxPath *path, MVec2 p)
+void gfx_path_line_to(GfxPath *path, MVec2f p)
 {
     GfxPathCmd cmd = {
         .type = GFX_CMD_LINE_TO,
@@ -86,7 +86,7 @@ void gfx_path_line_to(GfxPath *path, MVec2 p)
     vec_push(path, cmd);
 }
 
-void gfx_path_cubic_to(GfxPath *path, MVec2 cp1, MVec2 cp2, MVec2 p)
+void gfx_path_cubic_to(GfxPath *path, MVec2f cp1, MVec2f cp2, MVec2f p)
 {
     GfxPathCmd cmd = {
         .type = GFX_CMD_CUBIC_TO,
@@ -98,7 +98,7 @@ void gfx_path_cubic_to(GfxPath *path, MVec2 cp1, MVec2 cp2, MVec2 p)
     vec_push(path, cmd);
 }
 
-void gfx_path_quadratic_to(GfxPath *path, MVec2 cp, MVec2 p)
+void gfx_path_quadratic_to(GfxPath *path, MVec2f cp, MVec2f p)
 {
     GfxPathCmd cmd = {
         .type = GFX_CMD_QUADRATIC_TO,
@@ -109,7 +109,7 @@ void gfx_path_quadratic_to(GfxPath *path, MVec2 cp, MVec2 p)
     vec_push(path, cmd);
 }
 
-void gfx_path_arc_to(GfxPath *path, float rx, float ry, float angle, int flags, MVec2 p)
+void gfx_path_arc_to(GfxPath *path, float rx, float ry, float angle, int flags, MVec2f p)
 {
     GfxPathCmd cmd = {
         .type = GFX_CMD_ARC_TO,
@@ -150,9 +150,9 @@ static float parse_float(Scan *scan)
     return result;
 }
 
-static MVec2 parse_coordinate(Scan *scan)
+static MVec2f parse_coordinate(Scan *scan)
 {
-    MVec2 result = {};
+    MVec2f result = {};
     result.x = parse_float(scan);
     parse_whitespace_or_comma(scan);
     result.y = parse_float(scan);
@@ -178,16 +178,16 @@ static int parse_arcflags(Scan *scan)
     return flags;
 }
 
-static MVec2 eval_reflected_cp(GfxPathParser *self)
+static MVec2f eval_reflected_cp(GfxPathParser *self)
 {
-    return m_vec2_sub(m_vec2_mul_v(self->last, 2), self->cp);
+    return m_vec2f_sub(m_vec2f_mul_v(self->last, 2), self->cp);
 }
 
-static MVec2 eval_point(GfxPathParser *self, bool rel, MVec2 point)
+static MVec2f eval_point(GfxPathParser *self, bool rel, MVec2f point)
 {
     if (rel)
     {
-        return m_vec2_add(self->last, point);
+        return m_vec2f_add(self->last, point);
     }
     else
     {
@@ -240,14 +240,14 @@ static void parse_cmd(GfxPathParser *self, Scan *scan, char c)
     case 'h':
     {
         cmd.type = GFX_CMD_LINE_TO;
-        cmd.point = m_vec2(parse_float(scan), cmd.rel ? 0 : self->last.y);
+        cmd.point = m_vec2f(parse_float(scan), cmd.rel ? 0 : self->last.y);
         cmd.cp = cmd.point;
         break;
     }
 
     case 'v':
         cmd.type = GFX_CMD_LINE_TO;
-        cmd.point = m_vec2(cmd.rel ? 0 : self->last.x, parse_float(scan));
+        cmd.point = m_vec2f(cmd.rel ? 0 : self->last.x, parse_float(scan));
         cmd.cp = cmd.point;
         break;
 
@@ -333,7 +333,7 @@ void gfx_path_parse(GfxPathParser *self, Scan *scan)
 
 /* --- Flattener ------------------------------------------------------------ */
 
-static void flatten_line(GfxPathFlattener *self, MVec2 point)
+static void flatten_line(GfxPathFlattener *self, MVec2f point)
 {
     MEdge edge = m_edge_vec2(self->last, point);
     if (m_edge_len(edge) > 0.01)
@@ -343,14 +343,14 @@ static void flatten_line(GfxPathFlattener *self, MVec2 point)
     }
 }
 
-static void flatten_cubic_recusive(GfxPathFlattener *self, MVec2 a, MVec2 b, MVec2 c, MVec2 d, int depth)
+static void flatten_cubic_recusive(GfxPathFlattener *self, MVec2f a, MVec2f b, MVec2f c, MVec2f d, int depth)
 {
     if (depth > GFX_FLATTEN_MAX_DEPTH)
     {
         return;
     }
 
-    MVec2 delta1 = m_vec2_sub(d, a);
+    MVec2f delta1 = m_vec2f_sub(d, a);
     float delta2 = fabsf((b.x - d.x) * delta1.y - (b.y - d.y) * delta1.x);
     float delta3 = fabsf((c.x - d.x) * delta1.y - (c.y - d.y) * delta1.x);
 
@@ -360,33 +360,33 @@ static void flatten_cubic_recusive(GfxPathFlattener *self, MVec2 a, MVec2 b, MVe
         return;
     }
 
-    MVec2 ab = m_vec2_div_v(m_vec2_add(a, b), 2);
-    MVec2 bc = m_vec2_div_v(m_vec2_add(b, c), 2);
-    MVec2 cd = m_vec2_div_v(m_vec2_add(c, d), 2);
-    MVec2 abc = m_vec2_div_v(m_vec2_add(ab, bc), 2);
-    MVec2 bcd = m_vec2_div_v(m_vec2_add(bc, cd), 2);
-    MVec2 abcd = m_vec2_div_v(m_vec2_add(abc, bcd), 2);
+    MVec2f ab = m_vec2f_div_v(m_vec2f_add(a, b), 2);
+    MVec2f bc = m_vec2f_div_v(m_vec2f_add(b, c), 2);
+    MVec2f cd = m_vec2f_div_v(m_vec2f_add(c, d), 2);
+    MVec2f abc = m_vec2f_div_v(m_vec2f_add(ab, bc), 2);
+    MVec2f bcd = m_vec2f_div_v(m_vec2f_add(bc, cd), 2);
+    MVec2f abcd = m_vec2f_div_v(m_vec2f_add(abc, bcd), 2);
 
     flatten_cubic_recusive(self, a, ab, abc, abcd, depth + 1);
     flatten_cubic_recusive(self, abcd, bcd, cd, d, depth + 1);
 }
 
-static void flatten_cubic(GfxPathFlattener *self, MVec2 cp1, MVec2 cp2, MVec2 point)
+static void flatten_cubic(GfxPathFlattener *self, MVec2f cp1, MVec2f cp2, MVec2f point)
 {
     flatten_cubic_recusive(self, self->last, cp1, cp2, point, 0);
 }
 
-static void flatten_quadratic(GfxPathFlattener *self, MVec2 cp, MVec2 point)
+static void flatten_quadratic(GfxPathFlattener *self, MVec2f cp, MVec2f point)
 {
-    MVec2 previous = self->last;
+    MVec2f previous = self->last;
 
-    MVec2 cp1 = m_vec2_add(previous, m_vec2_mul_v(m_vec2_sub(cp, previous), 2.0f / 3.0f));
-    MVec2 cp2 = m_vec2_add(point, m_vec2_mul_v(m_vec2_sub(cp, point), (2.0f / 3.0f)));
+    MVec2f cp1 = m_vec2f_add(previous, m_vec2f_mul_v(m_vec2f_sub(cp, previous), 2.0f / 3.0f));
+    MVec2f cp2 = m_vec2f_add(point, m_vec2f_mul_v(m_vec2f_sub(cp, point), (2.0f / 3.0f)));
 
     flatten_cubic(self, cp1, cp2, point);
 }
 
-static void flatten_arc(GfxPathFlattener *self, float rx, float ry, float angle, int flags, MVec2 point)
+static void flatten_arc(GfxPathFlattener *self, float rx, float ry, float angle, int flags, MVec2f point)
 {
     // Ported from canvg (https://code.google.com/p/canvg/)
     float x1 = self->last.x; // start point
@@ -457,11 +457,11 @@ static void flatten_arc(GfxPathFlattener *self, float rx, float ry, float angle,
     float cy = sinrx * cxp + cosrx * cyp + (y1 + y2) / 2.0f;
 
     // 4) Calculate theta1, and delta theta.
-    MVec2 u = m_vec2((x1p - cxp) / rx, (y1p - cyp) / ry);
-    MVec2 v = m_vec2((-x1p - cxp) / rx, (-y1p - cyp) / ry);
+    MVec2f u = m_vec2f((x1p - cxp) / rx, (y1p - cyp) / ry);
+    MVec2f v = m_vec2f((-x1p - cxp) / rx, (-y1p - cyp) / ry);
 
-    float a1 = m_vec2_angle_with(m_vec2(1, 0), u); // Initial angle
-    float da = m_vec2_angle_with(u, v);
+    float a1 = m_vec2f_angle_with(m_vec2f(1, 0), u); // Initial angle
+    float da = m_vec2f_angle_with(u, v);
 
     if (!fs && da > 0)
     {
@@ -492,8 +492,8 @@ static void flatten_arc(GfxPathFlattener *self, float rx, float ry, float angle,
         kappa = -kappa;
     }
 
-    MVec2 current = {};
-    MVec2 ptan = {};
+    MVec2f current = {};
+    MVec2f ptan = {};
 
     for (int i = 0; i <= ndivs; i++)
     {
@@ -502,12 +502,12 @@ static void flatten_arc(GfxPathFlattener *self, float rx, float ry, float angle,
         dx = cosf(a);
         dy = sinf(a);
 
-        MVec2 p = m_trans2_apply_point(t, m_vec2(dx * rx, dy * ry));
-        MVec2 tan = m_trans2_apply_vector(t, m_vec2(-dy * rx * kappa, dx * ry * kappa));
+        MVec2f p = m_trans2_apply_point(t, m_vec2f(dx * rx, dy * ry));
+        MVec2f tan = m_trans2_apply_vector(t, m_vec2f(-dy * rx * kappa, dx * ry * kappa));
 
         if (i > 0)
         {
-            flatten_cubic(self, m_vec2_add(current, ptan), m_vec2_sub(p, tan), p);
+            flatten_cubic(self, m_vec2f_add(current, ptan), m_vec2f_sub(p, tan), p);
         }
 
         current = p;
@@ -519,8 +519,8 @@ static void flatten_arc(GfxPathFlattener *self, float rx, float ry, float angle,
 
 void gfx_flattener_begin(GfxPathFlattener *self)
 {
-    self->start = (MVec2){};
-    self->last = (MVec2){};
+    self->start = (MVec2f){};
+    self->last = (MVec2f){};
 }
 
 void gfx_flattener_flatten(GfxPathFlattener *self, GfxPathCmd cmd)

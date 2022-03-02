@@ -58,9 +58,9 @@ static inline void gfx_buf_store(GfxBuf self, int x, int y, GfxColor color)
     gfx_buf_store_unckeck(self, x, y, color);
 }
 
-static inline MRect gfx_buf_bound(GfxBuf self)
+static inline MRectf gfx_buf_bound(GfxBuf self)
 {
-    return m_rect(0, 0, self.width, self.height);
+    return m_rectf(0, 0, self.width, self.height);
 }
 
 static inline size_t gfx_buf_size(GfxBuf self)
@@ -96,164 +96,18 @@ static inline void gfx_buf_blend(GfxBuf self, int x, int y, GfxColor color)
     GfxColor bg = gfx_buf_load(self, x, y);
     GfxColor blend = gfx_blend(color, bg);
 
-   gfx_buf_store(self, x, y, blend);
+    gfx_buf_store(self, x, y, blend);
 }
 
-static inline void _gfx_buf_copy_same_fmt(GfxBuf dst, GfxBuf src, int x, int y)
-{
-    for (int yy = 0; yy < src.height; yy++)
-    {
-        uint8_t *dst_pixels = ((uint8_t *)dst.buf) + dst.pitch * (yy + y);
-        uint8_t const *src_pixels = ((uint8_t const *)src.buf) + src.pitch * yy;
 
-        mem_cpy(dst_pixels + x, src_pixels, src.width * gfx_fmt_size(src.fmt));
-    }
-}
 
-static inline void gfx_buf_copy(GfxBuf dst, GfxBuf src, int x, int y)
-{
-    if (dst.fmt == src.fmt &&
-        m_rect_contains_rect(
-            gfx_buf_bound(src),
-            m_rect_move(gfx_buf_bound(dst), m_vec2(x, y))))
-    {
-        return _gfx_buf_copy_same_fmt(dst, src, x, y);
-    }
 
-    for (int yy = 0; yy < src.height; yy++)
-    {
-        for (int xx = 0; xx < src.width; xx++)
-        {
-            GfxColor c = gfx_buf_load(src, xx, yy);
-            gfx_buf_store(dst, x + xx, y + yy, c);
-        }
-    }
-}
 
-static inline void _gfx_buf_flip_same_fmt(GfxBuf dst, GfxBuf src, MRect rect)
-{
-    for (int yy = rect.y; yy < rect.y + rect.height; yy++)
-    {
-        uint8_t *dst_pixels = ((uint8_t *)dst.buf) + dst.pitch * yy;
-        uint8_t *src_pixels = ((uint8_t *)src.buf) + src.pitch * yy;
 
-        mem_cpy(dst_pixels, src_pixels, rect.width * gfx_fmt_size(dst.fmt));
-    }
-}
 
-static inline void gfx_buf_flip(GfxBuf dst, GfxBuf src, MRect rect)
-{
-    if (dst.fmt == src.fmt)
-    {
-        return _gfx_buf_flip_same_fmt(dst, src, rect);
-    }
 
-    for (int yy = rect.y; yy < rect.y + rect.height; yy++)
-    {
-        for (int xx = rect.x; xx < rect.x + rect.width; xx++)
-        {
-            GfxColor c = gfx_buf_load(src, xx, yy);
-            gfx_buf_store(dst, xx, yy, c);
-        }
-    }
-}
 
-static inline void gfx_buf_clear_fast(GfxBuf self, GfxColor color)
-{
-    size_t fmt_size = gfx_fmt_size(self.fmt);
-    uint8_t pixel[4];
-    gfx_fmt_store(self.fmt, color, &pixel);
 
-    uint8_t *target = self.buf;
 
-    if (fmt_size == 1)
-    {
-        for (int y = 0; y < self.height; y++)
-        {
-            for (int x = 0; x < self.width; x++)
-            {
-                uint8_t *target_pixel = (target) + self.pitch * y + x * fmt_size;
-                *target_pixel = pixel[0];
-            }
-        }
-    }
-    else if (fmt_size == 4)
-    {
-        for (int y = 0; y < self.height; y++)
-        {
-            for (int x = 0; x < self.width; x++)
-            {
-                uint32_t *target_pixel = (uint32_t *)((target) + self.pitch * y + x * fmt_size);
-                *target_pixel = *(uint32_t *)pixel;
-            }
-        }
-    }
-}
 
-static inline void gfx_buf_clear(GfxBuf self, GfxColor color)
-{
-    size_t fmt_size = gfx_fmt_size(self.fmt);
 
-    if (fmt_size == 1 || fmt_size == 4)
-    {
-        return gfx_buf_clear_fast(self, color);
-    }
-
-    for (int y = 0; y < self.height; y++)
-    {
-        for (int x = 0; x < self.width; x++)
-        {
-            gfx_buf_store_unckeck(self, x, y, color);
-        }
-    }
-}
-
-static inline void gfx_buf_clear_fast_rect(GfxBuf self, GfxColor color, MRect rect)
-{
-    size_t fmt_size = gfx_fmt_size(self.fmt);
-    uint8_t pixel[4];
-    gfx_fmt_store(self.fmt, color, &pixel);
-
-    uint8_t *target = self.buf;
-
-    if (fmt_size == 1)
-    {
-        for (int y = rect.y; y < rect.y + rect.height; y++)
-        {
-            for (int x = rect.x; x < rect.x + rect.width; x++)
-            {
-                uint8_t *target_pixel = (target) + self.pitch * y + x * fmt_size;
-                *target_pixel = pixel[0];
-            }
-        }
-    }
-    else
-    {
-        for (int y = rect.y; y < rect.y + rect.height; y++)
-        {
-            for (int x = rect.x; x < rect.x + rect.width; x++)
-            {
-                uint32_t *target_pixel = (uint32_t *)((target) + self.pitch * y + x * fmt_size);
-                *target_pixel = *(uint32_t *)pixel;
-            }
-        }
-    }
-}
-
-static inline void gfx_buf_clear_rect(GfxBuf self, MRect rect, GfxColor color)
-{
-    size_t fmt_size = gfx_fmt_size(self.fmt);
-
-    if (fmt_size == 1 || fmt_size == 4)
-    {
-        return gfx_buf_clear_fast_rect(self, color, rect);
-    }
-
-    for (int y = rect.y; y < rect.y + rect.height; y++)
-    {
-        for (int x = rect.x; x < rect.x + rect.width; x++)
-        {
-            gfx_buf_store_unckeck(self, x, y, color);
-        }
-    }
-}

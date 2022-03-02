@@ -32,9 +32,9 @@ typedef struct
 
 typedef struct
 {
-    MVec2 position;
-    MVec2 offset;
-    MVec2 scroll;
+    MVec2f position;
+    MVec2f offset;
+    MVec2f scroll;
     MsBtns buttons;
 } UiMouseEvent;
 

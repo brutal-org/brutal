@@ -16,6 +16,6 @@ typedef enum
 
 MFlow m_dock_to_flow(MDock dock);
 
-MRect m_dock_apply(MDock dock, MFlow flow, MRect content, MRect *container);
+MRectf m_dock_apply(MDock dock, MFlow flow, MRectf content, MRectf *container);
 
 MOrientation m_dock_orientation(MDock dock);

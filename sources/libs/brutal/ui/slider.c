@@ -3,8 +3,8 @@
 
 void ui_slider_repaint(UiView *self, Gfx *gfx)
 {
-    MRect track = ui_view_container(self);
-    MRect numb = m_rect(0, 0, track.size.x, track.size.y / 2);
+    MRectf track = ui_view_container(self);
+    MRectf numb = m_rectf(0, 0, track.size.x, track.size.y / 2);
 
     gfx_fill_style(gfx, gfx_paint_fill(UI_COLOR_BASE09));
     gfx_fill_rect(gfx, track, 8);

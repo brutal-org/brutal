@@ -1,5 +1,6 @@
 #include <bal/hw.h>
 #include <brutal/codec/tga/tga.h>
+#include <brutal/gfx.h>
 #include "init/boot.h"
 
 void boot_splashscreen(Handover const *handover)
@@ -32,9 +33,9 @@ void boot_splashscreen(Handover const *handover)
 
     // Display the image
 
-    gfx_buf_clear(bal_fb_buf(&fb_surface), GFX_BLACK);
+    gfx_ops_clear(bal_fb_buf(&fb_surface), GFX_BLACK);
 
-    gfx_buf_copy(
+    gfx_ops_copy(
         bal_fb_buf(&fb_surface),
         img_surface,
         fb_surface.width / 2 - img_surface.width / 2,

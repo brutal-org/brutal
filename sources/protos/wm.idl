@@ -4,7 +4,7 @@ import base, math, event, ui;
 
 type WmClientProps =
 {
-    MRect bound,
+    MRectf bound,
     UiWinType type,
 };
 
@@ -23,9 +23,9 @@ interface Client
 
     method close -> Bool;
 
-    method flip MRect -> Bool;
+    method flip MRectf -> Bool;
 
-    method move MRect -> Bool;
+    method move MRectf -> Bool;
 
     method surface -> IpcFb;
 

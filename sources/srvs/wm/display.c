@@ -31,18 +31,17 @@ Gfx *wm_display_begin(WmDisplay *self)
     return &self->gfx;
 }
 
-void wm_display_flip(WmDisplay *self, MRect rect)
+void wm_display_flip(WmDisplay *self, MRectf rect)
 {
-    gfx_buf_flip(wm_display_frontbuffer(self), wm_display_backbuffer(self), rect);
+    gfx_ops_flip(wm_display_frontbuffer(self), wm_display_backbuffer(self), rect);
 }
-
 
 void wm_display_end(WmDisplay *self)
 {
     gfx_end(&self->gfx);
 }
 
-MRect wm_display_bound(WmDisplay *self)
+MRectf wm_display_bound(WmDisplay *self)
 {
     return gfx_buf_bound(wm_display_backbuffer(self));
 }
