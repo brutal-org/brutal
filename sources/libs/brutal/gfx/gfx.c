@@ -193,7 +193,7 @@ void gfx_fill(Gfx *self, GfxFillRule rule)
     vec_reserve(&self->active, self->path.len / 2);
     for (int y = m_rectf_top(rbound); y < m_rectf_bottom(rbound); y++)
     {
-        mem_set(self->scanline + (int)m_rectf_start(rbound), 0, sizeof(*self->scanline) * (rbound.width));
+        mem_set(self->scanline + (int)m_rectf_start(rbound), 0, sizeof(*self->scanline) * ceilf(rbound.width));
 
         for (float yy = (y); yy < y + 1; yy += 1.0f / RAST_AA)
         {
