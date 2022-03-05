@@ -14,3 +14,8 @@ TimeStamp embed_time_current_timestamp(void)
     br_now(&now);
     return now.timestamp;
 }
+
+unsigned long embed_time_current_nsec(void)
+{
+    return embed_time_current_tick() * 1000000000ull;
+}
