@@ -1,0 +1,4 @@
+PKG_BENCH_PATH=apps/bench
+
+APPS+=BENCH
+

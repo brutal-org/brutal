@@ -98,16 +98,3 @@ static inline void gfx_buf_blend(GfxBuf self, int x, int y, GfxColor color)
 
     gfx_buf_store(self, x, y, blend);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
