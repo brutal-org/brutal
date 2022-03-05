@@ -112,7 +112,7 @@ FLATTEN void gfx_ops_clear(GfxBuf self, GfxColor color)
         break;
 
     default:
-        assert_lower_equal(size, 64);
+        assert_lower_equal(size, 64u);
         gfx_ops_clear_common(self, color, size);
         break;
     }
@@ -159,7 +159,7 @@ FLATTEN void gfx_ops_rect(GfxBuf self, MRectf rect, GfxColor color)
         break;
 
     default:
-        assert_lower_equal(size, 64);
+        assert_lower_equal(size, 64u);
         gfx_ops_rect_common(self, rect, color, size);
         break;
     }
