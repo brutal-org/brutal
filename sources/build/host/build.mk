@@ -32,7 +32,7 @@ $(BINDIR_HOST)/%.c.o: sources/%.c
 
 $(BINDIR_HOST)/%.s.o: sources/%.s
 	@$(MKCWD)
-	$(USER_AS) -o $@ $< $(USER_ASFLAGS)
+	$(HOST_AS) -o $@ $< $(HOST_ASFLAGS)
 
 $(LIBS_HOST_BIN): $(LIBS_HOST_OBJ)
 	@$(MKCWD)

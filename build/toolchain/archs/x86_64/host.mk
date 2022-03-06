@@ -1,0 +1,3 @@
+
+HOST_AS=nasm
+HOST_ASFLAGS=-f elf64

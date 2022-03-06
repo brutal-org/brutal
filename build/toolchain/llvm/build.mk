@@ -29,6 +29,7 @@ endif
 HOST_ARFLAGS=rcs
 
 USER_AS?=$(HOST_CC)
+HOST_AS?=$(HOST_CC)
 
 # --- User-Compiler --------------------------------------------------------- #
 

@@ -20,6 +20,7 @@ HOST_ARFLAGS=rcs
 # default can be changed in archs
 
 USER_AS?=$(ARCH)-elf-as
+HOST_AS?=$(ARCH)-elf-as
 
 # --- User-Compiler ---------------------------------------------------------- #
 
