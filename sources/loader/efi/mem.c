@@ -2,7 +2,7 @@
 #include <efi/lib.h>
 #include <loader/loader.h>
 
-Error loader_acquire_pages(size_t count, uintptr_t *ret, enum loader_mem_flag flags)
+Error loader_acquire_pages(size_t count, uintptr_t *ret, LoaderMemFlag flags)
 {
     EfiStatus status = 0;
 
@@ -21,6 +21,7 @@ Error loader_acquire_pages(size_t count, uintptr_t *ret, enum loader_mem_flag fl
         break;
 
     default:
+        panic$("Invalid flag(s) for memory allocation: {}", (int)flags);
         break;
     }
 

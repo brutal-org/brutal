@@ -98,10 +98,9 @@ void loader_boot(LoaderEntry const *entry)
 
     loader_populate_handover(entry, handover);
 
-    memory_switch(vmm);
-
     loader_boot_deinit();
 
+    memory_switch(vmm);
     entry_point(((void *)handover) + MMAP_KERNEL_BASE, 0xC001B001);
 
     panic$("kernel shouldn't return!");
