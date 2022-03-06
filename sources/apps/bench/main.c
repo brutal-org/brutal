@@ -1,9 +1,7 @@
 #include <brutal/alloc.h>
-#include <brutal/io.h>
 #include <brutal/parse.h>
 #include <brutal/time.h>
 #include <brutal/ui.h>
-#include <embed/win.h>
 #include "bench.h"
 
 // frames pack: the number of frames to pack into a single tick count:
@@ -36,7 +34,7 @@ static void bench_draw_fps(Gfx *gfx, double avg_delta)
     alloc_free(alloc_global(), (void *)v.buf);
 }
 
-static float bench_run(UiApp *app, UiWin* win, Bench bench, int sec_per_bench)
+static double bench_run(UiApp *app, UiWin *win, Bench bench, int sec_per_bench)
 {
     gfx_begin(&win->gfx, ui_win_gfx(win));
     gfx_clip(&win->gfx, ui_win_bound(win));
@@ -61,28 +59,28 @@ static float bench_run(UiApp *app, UiWin* win, Bench bench, int sec_per_bench)
 
         NanoSeconds end = time_ns_now();
 
-        double delta_s = (end - start) / (double)(1000000000.f);
+        double delta_s = (end - start) / 1000000000.;
 
         // add delta_s to to the average delta time
-        avg_delta = ((avg_delta * frame) + delta_s) / (frame + 1.f);
+        avg_delta = (avg_delta * frame + delta_s) / (frame + 1);
 
         bench_draw_fps(&win->gfx, avg_delta);
-        embed_win_flip(win, ui_win_bound(win));
+
+        ui_win_flip(win, ui_win_bound(win));
 
         frame++;
 
         ui_app_pump(app);
-
     }
 
     gfx_pop(&win->gfx);
     gfx_end(&win->gfx);
 
-    log$("'{}': fps: {} / dt: {}s for {} frames", bench.name, 1 / (avg_delta), avg_delta, frame );
+    log$("'{}': fps: {} / dt: {}s for {} frames", bench.name, 1 / (avg_delta), avg_delta, frame);
     return avg_delta;
 }
 
-static int bench_run_by_pattern(Str pattern, UiApp* app, UiWin *win, int sec_per_bench)
+static int bench_run_by_pattern(Str pattern, UiApp *app, UiWin *win, int sec_per_bench)
 {
     for (size_t i = 0; i < _len; i++)
     {
@@ -95,7 +93,7 @@ static int bench_run_by_pattern(Str pattern, UiApp* app, UiWin *win, int sec_per
     return 0;
 }
 
-static int bench_run_all(UiApp* app, UiWin *win, int sec_count)
+static int bench_run_all(UiApp *app, UiWin *win, int sec_count)
 {
     for (size_t i = 0; i < _len; i++)
     {
