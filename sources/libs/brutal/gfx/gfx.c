@@ -169,14 +169,52 @@ void gfx_close_path(Gfx *self)
     gfx_eval_cmd(self, cmd);
 }
 
-#define RAST_AA 4
-
 static int gfx_active_edge_cmp(void const *lhs, void const *rhs)
 {
-    GfxActiveEdge const *lhsf = lhs;
-    GfxActiveEdge const *rhsf = rhs;
+    MEdge const *lhsf = lhs;
+    MEdge const *rhsf = rhs;
 
-    return lhsf->x - rhsf->x;
+    return lhsf->sx - rhsf->sx;
+}
+
+MEdge m_edge_normalize(MEdge edge)
+{
+    if (edge.sy > edge.ey)
+    {
+        swap$(&edge.sy, &edge.ey);
+    }
+
+    if (edge.sx > edge.ex)
+    {
+        swap$(&edge.sx, &edge.ex);
+    }
+
+    return edge;
+}
+
+int m_edge_winding(MEdge edge)
+{
+    return edge.sy > edge.ey ? 1 : -1;
+}
+
+typedef struct
+{
+    int start_px;
+    float cov_start_px;
+
+    float d;
+
+    int end_px;
+    float cov_end_px;
+} MEdgeCoverage;
+
+void m_edge_coverage(MEdge edge, MEdgeCoverage cov, float start, float end)
+{
+    cov.start_px = edge.sx;
+    cov.start_px = m_edge_max_x(edge);
+
+    float len_x = edge.ex - edge.sx;
+    float len_start_x = edge.
 }
 
 void gfx_fill(Gfx *self, GfxFillRule rule)
@@ -188,97 +226,60 @@ void gfx_fill(Gfx *self, GfxFillRule rule)
     {
         return;
     }
-    bool constant_col = gfx_paint_is_constant(gfx_peek(self)->fill);
-    GfxColor const_color = gfx_paint_sample(gfx_peek(self)->fill, 0, 0);
+
     vec_reserve(&self->active, self->path.len / 2);
+
     for (int y = m_rectf_top(rbound); y < m_rectf_bottom(rbound); y++)
     {
         mem_set(self->scanline + (int)m_rectf_start(rbound), 0, sizeof(*self->scanline) * ceilf(rbound.width));
 
-        for (float yy = (y); yy < y + 1; yy += 1.0f / RAST_AA)
+        vec_clear(&self->active);
+
+        vec_foreach_v(edge, &self->path)
         {
-            vec_clear(&self->active);
-
-            vec_foreach_v(edge, &self->path)
+            if (m_liang_barsky_clipper_y(&edge, y, y + 1) &&
+                m_edge_min_x(edge) < m_rectf_end(rbound))
             {
-                if (m_edge_min_y(edge) <= yy && m_edge_max_y(edge) > yy)
-                {
-                    GfxActiveEdge active;
-                    active.x = edge.sx + (yy - edge.sy) / (edge.ey - edge.sy) * (edge.ex - edge.sx);
-
-                    active.winding = edge.sy > edge.ey ? 1 : -1;
-
-                    active.x = m_clamp(active.x, rbound.x, rbound.x + rbound.width);
-                    vec_push(&self->active, active);
-                }
+                vec_push(&self->active, edge);
             }
+        }
 
-            if (vec_len(&self->active) > 0)
+        if (vec_len(&self->active) == 0)
+        {
+            continue;
+        }
+
+        if (rule == GFX_FILL_EVENODD)
+        {
+            qsort(self->active.data, self->active.len, sizeof(MEdge), gfx_active_edge_cmp);
+        }
+
+        for (int i = 0; i < self->active.len; i++)
+        {
+            MEdge edge = vec_at(&self->active, i);
+
+            int winding = m_edge_winding(edge);
+            edge = m_edge_normalize(edge);
+
+            for (int x = edge.sx; x < m_rectf_end(rbound); x += 1.0f)
             {
-                qsort(self->active.data, self->active.len, sizeof(GfxActiveEdge), gfx_active_edge_cmp);
-
-                int r = 0;
-
-                for (int i = 0; i + 1 < self->active.len; i++)
-                {
-                    GfxActiveEdge start_edge = vec_at(&self->active, i);
-                    GfxActiveEdge end_edge = vec_at(&self->active, i + 1);
-                    Range(float) v = {.base = start_edge.x, .size = end_edge.x - start_edge.x};
-                    Range(float) v2 = {.base = rbound.x, .size = rbound.width};
-
-                    r += start_edge.winding;
-
-                    if (!range_colide(v, v2))
-                    {
-                        continue;
-                    }
-
-                    float begin = v.base;
-                    float end = v.base + v.size;
-
-                    if ((rule == GFX_FILL_EVENODD && r % 2) || (rule == GFX_FILL_NONZERO && r != 0))
-                    {
-                        for (float x = begin; x < ceilf(begin); x += 1.0f / RAST_AA)
-                        {
-                            self->scanline[(int)x] += 1.0;
-                        }
-                        for (float x = floorf(end); x < end; x += 1.0f / RAST_AA)
-                        {
-                            self->scanline[(int)x] += 1.0;
-                        }
-
-                        for (int x = (int)(ceilf(begin)); x < (int)(floorf(end)); x++)
-                        {
-                            self->scanline[(int)x] += RAST_AA;
-                        }
-                    }
-                }
+                self->scanline[(int)x] += winding;
             }
         }
 
         for (int x = m_rectf_start(rbound); x < m_rectf_end(rbound); x++)
         {
-            float alpha = m_clamp(self->scanline[x] / (RAST_AA * RAST_AA), 0, 1);
+            float alpha = m_clamp(self->scanline[x], 0, 1);
 
             if (alpha >= 0.003f)
             {
                 float sx = (x - pbound.x) / pbound.width;
                 float sy = (y - pbound.y) / pbound.height;
 
-                if (constant_col)
-                {
-                    GfxColor forked_col = const_color;
-                    forked_col.a = forked_col.a * alpha;
+                GfxColor color = gfx_paint_sample(gfx_peek(self)->fill, sx, sy);
+                color.a = color.a * alpha;
 
-                    gfx_buf_blend(self->buf, x, y, forked_col);
-                }
-                else
-                {
-                    GfxColor color = gfx_paint_sample(gfx_peek(self)->fill, sx, sy);
-                    color.a = color.a * alpha;
-
-                    gfx_buf_blend(self->buf, x, y, color);
-                }
+                gfx_buf_blend(self->buf, x, y, color);
             }
         }
     }
@@ -406,6 +407,9 @@ void gfx_arc_to(Gfx *self, float rx, float ry, float angle, int flags, MVec2f po
 
 void gfx_rect(Gfx *self, MRectf rect, float radius)
 {
+    radius = m_min(rect.width / 2, radius);
+    radius = m_min(rect.height / 2, radius);
+
     if (radius <= 0.5)
     {
         gfx_move_to(self, m_vec2f(rect.x + radius, rect.y));

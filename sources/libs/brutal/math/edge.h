@@ -97,3 +97,157 @@ static inline float m_edge_len(MEdge edge)
 {
     return m_vec2f_len(m_vec2f_sub(edge.end, edge.start));
 }
+
+static inline float m_edge_intesect_x(MEdge edge, float y)
+{
+    return edge.sx + (y - edge.sy) / (edge.ey - edge.sy) * (edge.ex - edge.sx);
+}
+
+static inline float m_edge_intesect_y(MEdge edge, float x)
+{
+    return edge.sy + (x - edge.sx) / (edge.ex - edge.sx) * (edge.ey - edge.sy);
+}
+
+static inline bool m_liang_barsky_clipper_x(MEdge *edge, float start, float end)
+{
+    float t0 = 0.0;
+    float t1 = 1.0;
+    float xdelta = edge->ex - edge->sx;
+    float ydelta = edge->ey - edge->sy;
+
+    for (int i = 0; i < 2; i++)
+    {
+        float p, q, r;
+
+        // Traverse through left, right , top, bottom edges.
+        if (i == 0)
+        {
+            p = -xdelta;
+            q = -(start - edge->sx);
+        }
+
+        if (i == 1)
+        {
+            p = xdelta;
+            q = (end - edge->sx);
+        }
+
+        r = q / p;
+
+        if (p == 0 && q < 0)
+        {
+            // Don't draw line at all. (parallel line outside)
+            return false;
+        }
+
+        if (p < 0)
+        {
+            if (r > t1)
+            {
+                // Don't draw line at all.
+                return false;
+            }
+            else if (r > t0)
+            {
+                // Line is clipped!
+                t0 = r;
+            }
+        }
+        else if (p > 0)
+        {
+            if (r < t0)
+            {
+                // Don't draw line at all.
+                return false;
+            }
+            else if (r < t1)
+            {
+                // Line is clipped!
+                t1 = r;
+            }
+        }
+    }
+
+    edge->sx = edge->sx + t0 * xdelta;
+    edge->sy = edge->sy + t0 * ydelta;
+    edge->ex = edge->sx + t1 * xdelta;
+    edge->ey = edge->sy + t1 * ydelta;
+
+    return true;
+}
+
+static inline bool m_liang_barsky_clipper_y(MEdge *edge, float start, float end)
+{
+    float t0 = 0.0;
+    float t1 = 1.0;
+    float xdelta = edge->ex - edge->sx;
+    float ydelta = edge->ey - edge->sy;
+
+    for (int i = 0; i < 2; i++)
+    {
+        float p, q, r;
+
+        // Traverse through left, right , top, bottom edges.
+        if (i == 0)
+        {
+            p = -ydelta;
+            q = -(start - edge->sy);
+        }
+
+        if (i == 1)
+        {
+            p = ydelta;
+            q = (end - edge->sy);
+        }
+
+        r = q / p;
+
+        if (p == 0 && q < 0)
+        {
+            // Don't draw line at all. (parallel line outside)
+            return false;
+        }
+
+        if (p < 0)
+        {
+            if (r > t1)
+            {
+                // Don't draw line at all.
+                return false;
+            }
+            else if (r > t0)
+            {
+                // Line is clipped!
+                t0 = r;
+            }
+        }
+        else if (p > 0)
+        {
+            if (r < t0)
+            {
+                // Don't draw line at all.
+                return false;
+            }
+            else if (r < t1)
+            {
+                // Line is clipped!
+                t1 = r;
+            }
+        }
+    }
+
+    edge->sx = edge->sx + t0 * xdelta;
+    edge->sy = edge->sy + t0 * ydelta;
+    edge->ex = edge->sx + t1 * xdelta;
+    edge->ey = edge->sy + t1 * ydelta;
+
+    return true;
+}
+
+static inline bool m_liang_barsky_clipper_rect(MEdge *edge, MRectf rect)
+{
+    if (!m_liang_barsky_clipper_x(edge, m_rectf_start(rect), m_rectf_end(rect)))
+        return false;
+
+    return m_liang_barsky_clipper_y(edge, m_rectf_top(rect), m_rectf_bottom(rect));
+}

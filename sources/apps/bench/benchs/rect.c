@@ -12,7 +12,7 @@ BENCH(rounded_rect_fill)
 {
     gfx_fill_style(gfx, gfx_paint_fill(UI_COLOR_BASE02));
 
-    gfx_fill_rect(gfx, m_rectf(10, 10, 512, 50), 32);
+    gfx_fill_rect(gfx, m_rectf(32 + tick / 32, 32 + tick / 32, 128, 128), 32);
 }
 
 BENCH(rounded_rect_fill_gradient)

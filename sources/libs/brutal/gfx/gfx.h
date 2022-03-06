@@ -27,12 +27,6 @@ typedef enum
     GFX_FILL_NONZERO,
 } GfxFillRule;
 
-typedef struct
-{
-    float x;
-    int winding;
-} GfxActiveEdge;
-
 typedef struct _Gfx
 {
     bool begin;
@@ -42,8 +36,8 @@ typedef struct _Gfx
 
     MEdges path;
     MEdges stroke;
+    MEdges active;
 
-    Vec(GfxActiveEdge) active;
     GfxPathFlattener flattener;
 
     float *scanline;
