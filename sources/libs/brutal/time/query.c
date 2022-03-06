@@ -26,3 +26,8 @@ DateTime datetime_now(void)
 {
     return timestamp_to_datetime(timestamp_now());
 }
+
+NanoSeconds time_ns_now(void)
+{
+    return embed_time_current_nsec();
+}

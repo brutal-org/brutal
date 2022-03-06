@@ -10,6 +10,7 @@ typedef uint64_t TimeStamp;
 typedef uint64_t Timeout;
 typedef uint64_t Deadline;
 
+typedef uint64_t NanoSeconds;
 typedef uint64_t Seconds;
 typedef uint64_t Minutes;
 typedef uint64_t Hours;
