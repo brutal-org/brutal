@@ -112,7 +112,11 @@ void event_trigger(BrEvent event)
         if (br_event_eq(binding->event, event) &&
             atomic_compare_exchange_strong(&binding->ack, &expected, false))
         {
-            event_dispatch(binding->task, event);
+            if (event_dispatch(binding->task, event) == BR_CHANNEL_FULL)
+            {
+                log$("Channel full, dropping event");
+                binding->ack = false;
+            }
         }
     }
 
