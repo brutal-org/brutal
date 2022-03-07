@@ -21,9 +21,9 @@ BENCH(empty)
     // do nothing
 }
 
-static void bench_run_tick(Gfx *self, Bench bench, int tick)
+static void bench_run_tick(Gfx *self, Bench bench, float t)
 {
-    bench.func(self, tick);
+    bench.func(self, t);
 }
 
 static void bench_draw_fps(Gfx *gfx, double avg_delta)
@@ -52,10 +52,13 @@ static double bench_run(UiApp *app, UiWin *win, Bench bench, int sec_per_bench)
     {
         gfx_clear(&win->gfx, GFX_BLACK);
 
+        // avoid T calculation during benchmark
+        float t = time_ns_now() / 1000000000.;
+
         // here we calculate the time it tooks to render the benchmark
         NanoSeconds start = time_ns_now();
 
-        bench_run_tick(&win->gfx, bench, frame);
+        bench_run_tick(&win->gfx, bench,t);
 
         NanoSeconds end = time_ns_now();
 
