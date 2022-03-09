@@ -1,7 +1,7 @@
 #include <brutal-debug>
 #include <cc/trans.h>
 
-void cc_trans_value(Emit *emit, CVal value)
+void ctrans_value(Emit *emit, CVal value)
 {
     switch (value.type)
     {
@@ -18,7 +18,7 @@ void cc_trans_value(Emit *emit, CVal value)
         break;
 
     case CVAL_STRING:
-        emit_fmt$(emit, "\"{}\"", value.string_);
+        emit_fmt(emit, "\"{}\"", value.str_);
         break;
 
     default:

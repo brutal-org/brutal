@@ -7,9 +7,8 @@
 
 typedef enum
 {
-    CDECL_NIL,
-
     CDECL_EMPTY,
+
     CDECL_TYPE,
     CDECL_VAR,
     CDECL_FUNC,
@@ -34,12 +33,12 @@ typedef struct
 
 typedef struct _CDecl
 {
-    CRef ref;
+    SrcRef ref;
     CDeclType type;
     CDeclAttr attr;
     Str name;
     CType sema_type;
-    bool global;
+
     union
     {
         struct

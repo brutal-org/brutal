@@ -238,10 +238,10 @@ int main(int argc, char const *argv[])
 
     emit_ident_size(&emit, 4);
 
-    emit_fmt$(&emit, "--- BEGIN CODE ---\n");
-    cc_trans_unit(&emit, unit);
-    emit_fmt$(&emit, "--- END CODE ---\n");
-    emit_fmt$(&emit, "\n");
+    emit_fmt(&emit, "--- BEGIN CODE ---\n");
+    ctrans_unit(&emit, unit);
+    emit_fmt(&emit, "--- END CODE ---\n");
+    emit_fmt(&emit, "\n");
 
     heap_alloc_deinit(&heap);
 

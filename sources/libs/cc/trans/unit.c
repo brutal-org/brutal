@@ -1,6 +1,6 @@
 #include <cc/trans.h>
 
-static void cc_trans_include(Emit *emit, CInclude path)
+static void ctrans_include(Emit *emit, CInclude path)
 {
     emit_fmt$(emit, "#include ");
 
@@ -14,14 +14,14 @@ static void cc_trans_include(Emit *emit, CInclude path)
     }
 }
 
-static void cc_trans_pragma(Emit *emit, CPragma pragma)
+static void ctrans_pragma(Emit *emit, CPragma pragma)
 {
     emit_fmt$(emit, "#pragma ");
     emit_fmt$(emit, pragma.text);
     emit_fmt$(emit, "\n");
 }
 
-static void cc_trans_define(Emit *emit, CDefine define)
+static void ctrans_define(Emit *emit, CDefine define)
 {
     emit_fmt$(emit, "#define ");
     emit_fmt$(emit, define.name);
@@ -43,12 +43,12 @@ static void cc_trans_define(Emit *emit, CDefine define)
 
         emit_fmt$(emit, ")");
     }
-    emit_fmt$(emit, " ");
-    cc_trans_expr(emit, define.expression);
-    emit_fmt$(emit, "\n");
+    emit_fmt(emit, " ");
+    ctrans_expr(emit, define.expression);
+    emit_fmt(emit, "\n");
 }
 
-void cc_trans_unit(Emit *emit, CUnit unit)
+void ctrans_unit(Emit *emit, CUnit unit)
 {
     CUnitType prev_type = CUNIT_NONE;
 
@@ -62,17 +62,17 @@ void cc_trans_unit(Emit *emit, CUnit unit)
                 emit_fmt$(emit, "\n");
             }
 
-            cc_trans_include(emit, entry._include);
+            ctrans_include(emit, entry._include);
             break;
 
         case CUNIT_PRAGMA:
-            cc_trans_pragma(emit, entry._pragma);
+            ctrans_pragma(emit, entry._pragma);
             break;
 
         case CUNIT_DECLARATION:
             emit_fmt$(emit, "\n");
 
-            cc_trans_decl(emit, entry._decl);
+            ctrans_decl(emit, entry._decl);
 
             if (entry._decl.type != CDECL_FUNC)
             {
@@ -88,7 +88,7 @@ void cc_trans_unit(Emit *emit, CUnit unit)
                 emit_fmt$(emit, "\n");
             }
 
-            cc_trans_define(emit, entry._define);
+            ctrans_define(emit, entry._define);
             break;
 
         default:

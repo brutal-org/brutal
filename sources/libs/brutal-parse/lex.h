@@ -67,3 +67,5 @@ void lex_throw(Lex *self, Str message);
 bool lex_expect(Lex *self, LexemeType type);
 
 bool lex_ok(Lex *self);
+
+SrcRef lex_src_ref(Lex *lex, int begin, int end);

@@ -2,6 +2,7 @@
 
 #include <brutal/parse/report.h>
 #include <cc/sema/scope.h>
+
 typedef struct
 {
     Vec(CScope) scopes;
@@ -25,7 +26,9 @@ void csema_scope_reset(CSema *self);
 
 void csema_scope_add(CSema *self, CDecl decl);
 
-CDecl csema_lookup(CSema *self, Str name);
+bool csema_lookup(CSema *self, Str name, CDecl *decl);
+
+bool csema_lookup_current_scope(CSema *self, Str name, CDecl *decl);
 
 CType csema_scope_return_type(CSema *self);
 

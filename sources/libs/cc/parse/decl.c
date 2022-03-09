@@ -36,7 +36,7 @@ CType cparse_declarator_postfix(Lex *lex, CType type, Alloc *alloc)
 
         long size = CTYPE_ARRAY_UNBOUNDED;
 
-        if (lex_curr_type(lex) == CLEX_INTEGER)
+        if (lex_curr_type(lex) == CLEX_NUMBER)
         {
             str_to_int(lex_next(lex).str, &size);
         }

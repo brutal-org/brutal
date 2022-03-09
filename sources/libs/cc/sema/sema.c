@@ -42,28 +42,35 @@ void csema_scope_add(CSema *self, CDecl decl)
     cscope_add(scope, decl);
 }
 
-CDecl csema_lookup(CSema *self, Str name)
+bool csema_lookup(CSema *self, Str name, CDecl *decl)
 {
-    vec_foreach(scope, &self->scopes)
+    vec_foreach_rev(scope, &self->scopes)
     {
-        CDecl d = cscope_lookup(scope, name);
-        if (d.type != CDECL_NIL)
+        if (cscope_lookup(scope, name, decl))
         {
-            return d;
+            return true;
         }
     }
-    return (CDecl){};
+
+    return false;
+}
+
+bool csema_lookup_current_scope(CSema *self, Str name, CDecl *decl)
+{
+    CScope *scope = &vec_last(&self->scopes);
+    return cscope_lookup(scope, name, decl);
 }
 
 CType csema_scope_return_type(CSema *self)
 {
-    vec_foreach(scope, &self->scopes)
+    vec_foreach_rev(scope, &self->scopes)
     {
-        if (scope->expected_result.type != CTYPE_INVALID)
+        if (scope->ret.type != CTYPE_INVALID)
         {
-            return scope->expected_result;
+            return scope->ret;
         }
     }
+
     return (CType){.type = CTYPE_INVALID};
 }
 
@@ -71,20 +78,13 @@ void csema_scope_enter_func(CSema *self, CType func_type)
 {
     CScope scope;
     cscope_init(&scope, self->alloc);
-    scope.expected_result = *func_type.func_.ret;
+    scope.ret = *func_type.func_.ret;
 
-    // add each argument in scope
     vec_foreach(arg, &func_type.func_.params)
     {
-        CDecl decl = (CDecl){
-            .type = CDECL_VAR,
-            .name = str_dup(arg->name, self->alloc),
-            .var_ = {
-                .type = arg->type,
-                .expr = cexpr_empty(),
-            },
-        };
+        CDecl decl = cdecl_var(arg->name, arg->type, cexpr_empty());
         cscope_add(&scope, decl);
     }
+
     vec_push(&self->scopes, scope);
 }

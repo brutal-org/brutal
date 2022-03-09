@@ -77,7 +77,7 @@ static CExpr cparse_primary_expr(Lex *lex, CUnit *context, Alloc *alloc)
         cparse_skip_separator(lex, CLEX_IDENT);
         return with_cref$(cexpr_ident(val), begin, lex);
     }
-    else if (cparse_is_separator(lex, CLEX_INTEGER))
+    else if (cparse_is_separator(lex, CLEX_NUMBER))
     {
         return with_cref$(cexpr_constant(cparse_val(lex)), begin, lex);
     }

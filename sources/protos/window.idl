@@ -8,6 +8,13 @@ type WindowClientProps =
     UiWinType type,
 };
 
+type WmLayout = enum
+{
+    WM_LAYOUT_STACK,
+    WM_LAYOUT_FIBONACCI,
+    WM_LAYOUT_MONOCLE,
+};
+
 interface Client
 {
     method show -> Bool;

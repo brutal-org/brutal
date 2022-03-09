@@ -99,6 +99,55 @@ static int isidentchar(char v)
     return isalpha(v) || v == '_' || v == '$' || isdigit(v);
 }
 
+static bool skip_bin_literal(Scan *scan)
+{
+    if (scan_skip_word(scan, str$("0b")) || scan_skip_word(scan, str$("0B")))
+    {
+        while (scan_skip_any(scan, str$("01")))
+            ;
+        return true;
+    }
+
+    return false;
+}
+
+static bool skip_octal_literal(Scan *scan)
+{
+    if (scan_skip_word(scan, str$("0")))
+    {
+        while (scan_skip_any(scan, str$("01234567")))
+            ;
+        return true;
+    }
+
+    return false;
+}
+
+static bool skip_dec_literal(Scan *scan)
+{
+    while (scan_skip_any(scan, str$("0123456789")))
+        ;
+    return true;
+}
+
+static bool skip_hex_literal(Scan *scan)
+{
+    if (scan_skip_word(scan, str$("0x")) || scan_skip_word(scan, str$("0X")))
+    {
+        while (scan_skip_any_nc(scan, str$("0123456789abcdef")))
+            ;
+        return true;
+    }
+
+    return false;
+}
+
+static void skip_int_suffix(Scan *scan)
+{
+    while (scan_skip_any_nc(scan, str$("ul")))
+        ;
+}
+
 static LexemeType clex_impl(Scan *scan)
 {
 
@@ -129,7 +178,11 @@ static LexemeType clex_impl(Scan *scan)
 
         return (CLEX_COMMENT);
     }
-    else if (scan_skip_word(scan, str$("\"")))
+    else if (scan_skip_word(scan, str$("\"")) ||
+             scan_skip_word(scan, str$("u8\"")) ||
+             scan_skip_word(scan, str$("u\"")) ||
+             scan_skip_word(scan, str$("U\"")) ||
+             scan_skip_word(scan, str$("L\"")))
     {
 
         while (!scan_skip(scan, '"') && !scan_ended(scan))
@@ -141,7 +194,7 @@ static LexemeType clex_impl(Scan *scan)
     }
     else if (scan_skip_word(scan, str$("'")))
     {
-        if (scan_curr(scan) != '\'') // case for just ''
+        if (scan_curr(scan) != '\'')
         {
             scan_next(scan);
         }
@@ -158,14 +211,13 @@ static LexemeType clex_impl(Scan *scan)
         }
     }
 
-    if (isdigit(scan_curr(scan)))
+    if (skip_bin_literal(scan) ||
+        skip_octal_literal(scan) ||
+        skip_dec_literal(scan) ||
+        skip_hex_literal(scan))
     {
-        while (isdigit(scan_curr(scan)) && !scan_ended(scan))
-        {
-            scan_next(scan);
-        }
-
-        return CLEX_INTEGER;
+        skip_int_suffix(scan);
+        return CLEX_NUMBER;
     }
 
     if (isidentchar(scan_curr(scan)))

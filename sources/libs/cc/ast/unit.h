@@ -22,7 +22,8 @@ typedef struct
 
 typedef enum
 {
-    CUNIT_NONE,
+    CUNIT_INVALID,
+
     CUNIT_INCLUDE,
     CUNIT_PRAGMA,
     CUNIT_DECLARATION,
@@ -31,7 +32,7 @@ typedef enum
 
 typedef struct
 {
-    CRef ref;
+    SrcRef ref;
     CUnitType type;
 
     union
@@ -47,7 +48,3 @@ typedef struct
 {
     Vec(CUnitEntry) units;
 } CUnit;
-
-bool cunit_contains_type(CUnit *context, Str name);
-
-bool cunit_contains_decl(CUnit *context, Str name);

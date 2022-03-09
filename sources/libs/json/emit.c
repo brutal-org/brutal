@@ -1,7 +1,7 @@
 #include <brutal-debug>
 #include <json/emit.h>
 
-void json_emit_string(Str str, Emit *emit)
+void json_emit_str(Str str, Emit *emit)
 {
     emit_fmt$(emit, "\"");
 
@@ -75,8 +75,8 @@ void json_emit(Json const json, Emit *emit)
             }
             emit_fmt$(emit, "\n");
 
-            json_emit_string(k, emit);
-            emit_fmt$(emit, ": ");
+            json_emit_str(k, emit);
+            emit_fmt(emit, ": ");
             json_emit(v, emit);
 
             first = false;
@@ -93,7 +93,7 @@ void json_emit(Json const json, Emit *emit)
         break;
 
     case JSON_STRING:
-        json_emit_string(json.string, emit);
+        json_emit_str(json.str, emit);
         break;
 
     case JSON_NUMBER:

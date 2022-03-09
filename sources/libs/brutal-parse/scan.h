@@ -103,9 +103,15 @@ bool scan_skip(Scan *self, char c);
 
 bool scan_skip_word(Scan *self, Str word);
 
+bool scan_skip_word_nc(Scan *self, Str word);
+
 bool scan_skip_any(Scan *self, Str chars);
 
 bool scan_skip_match(Scan *self, ScanMatch *match);
+
+bool scan_skip_any_nc(Scan *self, Str chars);
+
+Str scan_skip_until(Scan *self, ScanMatch *match);
 
 bool scan_skip_space(Scan *self);
 

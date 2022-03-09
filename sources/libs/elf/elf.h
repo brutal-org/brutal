@@ -114,7 +114,7 @@ typedef struct PACKED
 
 bool elf_validate(Elf64Header const *header);
 
-Str elf_string(Elf64Header const *header, size_t offset);
+Str elf_str(Elf64Header const *header, size_t offset);
 
 Str elf_manifest(Elf64Header const *header);
 

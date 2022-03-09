@@ -165,3 +165,17 @@ bool lex_ok(Lex *self)
 {
     return !self->has_error;
 }
+
+SrcRef clex_src_ref(Lex *lex, int begin, int end)
+{
+    Lexeme first = lex->lexemes.data[begin];
+    Lexeme last = lex->lexemes.data[end];
+
+    SrcRef cref = {
+        .begin = first.pos.begin,
+        .end = last.pos.end,
+        .translation_unit = first.pos.translation_unit,
+    };
+
+    return cref;
+}
