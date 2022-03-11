@@ -10,6 +10,13 @@ typedef struct
 
 void m_rand_init(MRand *self, uint32_t seed);
 
+#define m_rand_init$(SEED)                                               \
+    (MRand)                                                              \
+    {                                                                    \
+        .state = SEED | (uint64_t)SEED << 32,                            \
+        .inc = (SEED | ((uint64_t)SEED << 32)) ^ ((uint64_t)SEED << 16), \
+    }
+
 uint64_t m_rand_next_u64(MRand *self);
 
 uint32_t m_rand_next_u32(MRand *self);

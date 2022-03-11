@@ -1,6 +1,8 @@
 #include <brutal/alloc.h>
 #include <brutal/debug.h>
+#include <brutal/math.h>
 #include <brutal/mem.h>
+#include <brutal/parse.h>
 #include <embed/log.h>
 #include <embed/task.h>
 #include <stdlib.h>
@@ -10,53 +12,31 @@
 
 /* --- 7.22.1 - Numeric conversion functions -------------------------------- */
 
-// double atof(char const *nptr);
+double atof(char const *nptr)
+{
+    double res = 0;
+    str_to_float(str$(nptr), &res);
+    return res;
+}
 
 int atoi(char const *nptr)
 {
-    int res = 0;
-
-    for (int i = 0; nptr[i] != 0; i++)
-    {
-        if (isdigit(nptr[i]) == 0)
-        {
-            return 0;
-        }
-        res = res * 10 + nptr[i] - '0';
-    }
-
+    long res = 0;
+    str_to_int(str$(nptr), &res);
     return res;
 }
 
 long atol(char const *nptr)
 {
     long res = 0;
-
-    for (int i = 0; nptr[i] != 0; i++)
-    {
-        if (isdigit(nptr[i]) == 0)
-        {
-            return 0;
-        }
-        res = res * 10 + nptr[i] - '0';
-    }
-
+    str_to_int(str$(nptr), &res);
     return res;
 }
 
 long long atoll(char const *nptr)
 {
-    long long res = 0;
-
-    for (int i = 0; nptr[i] != 0; i++)
-    {
-        if (isdigit(nptr[i]) == 0)
-        {
-            return 0;
-        }
-        res = res * 10 + nptr[i] - '0';
-    }
-
+    long res = 0;
+    str_to_int(str$(nptr), &res);
     return res;
 }
 
@@ -101,24 +81,23 @@ long long atoll(char const *nptr)
 
 /* --- 7.22.2 - Pseudo-random sequence generation functions ----------------- */
 
-static unsigned long next_n = 1;
+static MRand _rand = m_rand_init$(123456789);
 
 int rand()
 {
-    next_n = next_n * 1103515245 + 12345;
-    return ((unsigned)(next_n / 65536) % 32768);
+    return m_rand_next_u32(&_rand);
 }
 
 void srand(unsigned int seed)
 {
-    next_n = seed;
+    m_rand_init(&_rand, seed);
 }
 
 /* --- 7.22.3 - Memory management functions --------------------------------- */
 
 void *aligned_alloc(size_t alignment, size_t size)
 {
-    if (alignment > 16)
+    if (alignment == 16)
     {
         panic$("aligned_alloc: alignment = {} is not supported!", alignment);
     }
@@ -194,6 +173,7 @@ int abs(int j)
     {
         return -j;
     }
+
     return j;
 }
 
@@ -203,6 +183,7 @@ long labs(long j)
     {
         return -j;
     }
+
     return j;
 }
 
@@ -212,6 +193,7 @@ long long llabs(long long j)
     {
         return -j;
     }
+
     return j;
 }
 
