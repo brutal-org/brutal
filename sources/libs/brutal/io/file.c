@@ -49,24 +49,27 @@ IoSeeker io_file_seeker(IoFile *self)
 IoDuplex io_file_duplex(IoFile *self)
 {
     return (IoDuplex){
-        .reader = io_file_reader(self),
-        .writer = io_file_writer(self),
+        .read = (IoReadFn *)embed_file_read,
+        .write = (IoWriteFn *)embed_file_write,
+        .context = self,
     };
 }
 
 IoRSeek io_file_rseek(IoFile *self)
 {
     return (IoRSeek){
-        .reader = io_file_reader(self),
-        .seeker = io_file_seeker(self),
+        .read = (IoReadFn *)embed_file_read,
+        .seek = (IoSeekFn *)embed_file_seek,
+        .context = self,
     };
 }
 
 IoWSeek io_file_wseek(IoFile *self)
 {
     return (IoWSeek){
-        .writer = io_file_writer(self),
-        .seeker = io_file_seeker(self),
+        .write = (IoWriteFn *)embed_file_write,
+        .seek = (IoSeekFn *)embed_file_seek,
+        .context = self,
     };
 }
 

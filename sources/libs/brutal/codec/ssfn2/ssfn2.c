@@ -33,15 +33,17 @@ static MaybeError ssfn2_load_stringtable(IoReader reader, SSFN2Font *font)
     return SUCCESS;
 }
 
-static MaybeError ssfn2_read_point(IoRSeek rseek, MAYBE_UNUSED SSFN2FontHeader *header, MVec2f pos, MVec2f *result)
+static MaybeError ssfn2_read_point(IoRSeek rseek, SSFN2FontHeader *header, MVec2f pos, MVec2f *result)
 {
     uint8_t x, y;
-    TRY(MaybeError, io_read_byte(rseek.reader, &x));
-    TRY(MaybeError, io_read_byte(rseek.reader, &y));
+    TRY(MaybeError, io_read_byte$(rseek, &x));
+    TRY(MaybeError, io_read_byte$(rseek, &y));
+
     MVec2f point = m_vec2f_add(pos, m_vec2f(x, y));
     point = m_vec2f_sub(point, m_vec2f(0, load_le(header->baseline)));
     point = m_vec2f_div_v(point, load_le(header->baseline));
     point = m_vec2f_mul_v(point, 16);
+
     *result = point;
     return SUCCESS;
 }
@@ -59,16 +61,16 @@ static MaybeError ssfn2_load_fragment(IoRSeek rseek, SSFN2Font *font, MVec2f pos
         return ERROR(ERR_BAD_ADDRESS);
     }
 
-    size_t prev_offset = TRY(MaybeError, io_tell(rseek.seeker));
-    TRY(MaybeError, io_seek(rseek.seeker, io_seek_from_start(offset)));
+    size_t prev_offset = TRY(MaybeError, io_tell$(rseek));
+    TRY(MaybeError, io_seek$(rseek, io_seek_from_start(offset)));
 
     uint8_t val;
-    TRY(MaybeError, io_read_byte(rseek.reader, &val));
+    TRY(MaybeError, io_read_byte$(rseek, &val));
 
     if (val & 0x80)
     {
         log$("Non contour fragment not supported!");
-        TRY(MaybeError, io_seek(rseek.seeker, io_seek_from_start(prev_offset)));
+        TRY(MaybeError, io_seek$(rseek, io_seek_from_start(prev_offset)));
         return ERROR(ERR_NOT_IMPLEMENTED);
     }
 
@@ -76,7 +78,7 @@ static MaybeError ssfn2_load_fragment(IoRSeek rseek, SSFN2Font *font, MVec2f pos
     // contour with more commands (1 extra byte)
     if (val & 0b01000000)
     {
-        TRY(MaybeError, io_read_byte(rseek.reader, &val));
+        TRY(MaybeError, io_read_byte$(rseek, &val));
 
         cmd_count <<= 8;
         cmd_count |= val;
@@ -93,7 +95,7 @@ static MaybeError ssfn2_load_fragment(IoRSeek rseek, SSFN2Font *font, MVec2f pos
     }
 
     uint8_t cmd_data[0b111111111111];
-    TRY(MaybeError, io_read(rseek.reader, cmd_data, cmd_bytes));
+    TRY(MaybeError, io_read$(rseek, cmd_data, cmd_bytes));
 
     MVec2f point, cp1, cp2;
     size_t cmd_cur = 0;
@@ -138,14 +140,14 @@ static MaybeError ssfn2_load_fragment(IoRSeek rseek, SSFN2Font *font, MVec2f pos
         }
     }
 
-    TRY(MaybeError, io_seek(rseek.seeker, io_seek_from_start(prev_offset)));
+    TRY(MaybeError, io_seek$(rseek, io_seek_from_start(prev_offset)));
     return SUCCESS;
 }
 
 static MaybeError ssfn2_load_mapping(IoRSeek rseek, SSFN2Font *font, Rune rune, uint8_t attrs, Alloc *alloc)
 {
     uint8_t glyph_data[5];
-    TRY(MaybeError, io_read(rseek.reader, glyph_data, sizeof(glyph_data)));
+    TRY(MaybeError, io_read$(rseek, glyph_data, sizeof(glyph_data)));
 
     // Large fragments
     uint8_t frag_size = attrs & 0x40 ? 6 : 5;
@@ -174,7 +176,7 @@ static MaybeError ssfn2_load_mapping(IoRSeek rseek, SSFN2Font *font, Rune rune, 
     for (size_t frag = 0; frag < num_frags; frag++)
     {
         uint8_t frag_data[6];
-        TRY(MaybeError, io_read(rseek.reader, frag_data, frag_size));
+        TRY(MaybeError, io_read$(rseek, frag_data, frag_size));
 
         uint8_t x = frag_data[0];
         uint8_t y = frag_data[1];
@@ -221,13 +223,13 @@ static MaybeError ssfn2_load_mappings(IoRSeek rseek, SSFN2Font *font, SSFN2Commo
     size += font->font_start;
     end += font->font_start;
 
-    io_seek(rseek.seeker, io_seek_from_start(char_offs));
+    io_seek$(rseek, io_seek_from_start(char_offs));
 
     int rune = 0;
-    while (TRY(MaybeError, io_tell(rseek.seeker)) < end)
+    while (TRY(MaybeError, io_tell$(rseek)) < end)
     {
         uint8_t attrs;
-        TRY(MaybeError, io_read_byte(rseek.reader, &attrs));
+        TRY(MaybeError, io_read_byte$(rseek, &attrs));
 
         if (attrs == 0b11111111)
         {
@@ -243,7 +245,7 @@ static MaybeError ssfn2_load_mappings(IoRSeek rseek, SSFN2Font *font, SSFN2Commo
         {
             // Skip up to 16128 runes
             uint8_t extra;
-            TRY(MaybeError, io_read_byte(rseek.reader, &extra));
+            TRY(MaybeError, io_read_byte$(rseek, &extra));
             rune += (((attrs & 0b00111111) << 8) | extra) + 1;
         }
         else
@@ -293,17 +295,15 @@ static void ssfn2_compute_weight(SSFN2Font *font)
 
 static MaybeError ssfn2_load_internal(IoRSeek rseek, SSFN2Collection *collection, Alloc *alloc)
 {
-    IoReader reader = rseek.reader;
-    IoSeeker seeker = rseek.seeker;
 
-    size_t start = TRY(MaybeError, io_tell(seeker));
+    size_t start = TRY(MaybeError, io_tell$(rseek));
     SSFN2CommonHeader common_header;
-    TRY(MaybeError, io_read(reader, (uint8_t *)&common_header, sizeof(SSFN2CommonHeader)));
+    TRY(MaybeError, io_read$(rseek, (uint8_t *)&common_header, sizeof(SSFN2CommonHeader)));
     size_t size = load_le(common_header.size);
 
     if (str_eq(str_n$(4, (char const *)common_header.magic), SSFN2_COLLECTION))
     {
-        while (TRY(MaybeError, io_tell(seeker)) != start + size)
+        while (TRY(MaybeError, io_tell$(rseek)) != start + size)
         {
             TRY(MaybeError, ssfn2_load_internal(rseek, collection, alloc));
         }
@@ -312,8 +312,8 @@ static MaybeError ssfn2_load_internal(IoRSeek rseek, SSFN2Collection *collection
     {
         SSFN2Font font;
         font.font_start = start;
-        TRY(MaybeError, io_read(reader, (uint8_t *)&font.header, sizeof(SSFN2FontHeader)));
-        TRY(MaybeError, ssfn2_load_stringtable(reader, &font));
+        TRY(MaybeError, io_read$(rseek, (uint8_t *)&font.header, sizeof(SSFN2FontHeader)));
+        TRY(MaybeError, ssfn2_load_stringtable(io_reader$(rseek), &font));
 
         font.glyphs = alloc_make_array(alloc, SSFN2Glyph, 0x110000);
 
@@ -321,8 +321,8 @@ static MaybeError ssfn2_load_internal(IoRSeek rseek, SSFN2Collection *collection
 
         // Seek to the end to verify the end magic
         le_uint8_t end_magic[4];
-        TRY(MaybeError, io_seek(seeker, io_seek_from_start(font.font_start + size - 4)));
-        TRY(MaybeError, io_read(reader, (uint8_t *)&end_magic, 4));
+        TRY(MaybeError, io_seek$(rseek, io_seek_from_start(font.font_start + size - 4)));
+        TRY(MaybeError, io_read$(rseek, (uint8_t *)&end_magic, 4));
         if (!str_eq(str_n$(4, (char const *)end_magic), SSFN2_ENDMAGIC))
         {
             return ERROR(ERR_UNDEFINED);
@@ -344,13 +344,13 @@ MaybeError ssfn2_load(IoRSeek rseek, SSFN2Collection *collection, Alloc *alloc)
     vec_init(collection, alloc_global());
 
     IoRSeek input = rseek;
-    Buf buf;
 
     if (gzip_probe(rseek))
     {
+        Buf buf;
         buf_init(&buf, 1024, alloc_global());
         IoWriter writer = buf_writer(&buf);
-        TRY(MaybeError, gzip_decompress_stream(writer, rseek.reader));
+        TRY(MaybeError, gzip_decompress_stream(writer, io_reader$(rseek)));
         input = buf_rseek(&buf);
     }
 

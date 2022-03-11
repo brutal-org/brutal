@@ -19,10 +19,10 @@ typedef enum
 bool gzip_probe(IoRSeek rseek)
 {
     uint8_t id1 = 0, id2 = 0;
-    io_read_byte(rseek.reader, &id1);
-    io_read_byte(rseek.reader, &id2);
+    io_read_byte$(rseek, &id1);
+    io_read_byte$(rseek, &id2);
     // This won't work if not called from the start of a stream
-    io_seek(rseek.seeker, io_seek_from_start(0));
+    io_seek$(rseek, io_seek_from_start(0));
     return id1 == 0x1f && id2 == 0x8b;
 }
 

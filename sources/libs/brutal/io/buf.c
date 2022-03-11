@@ -102,8 +102,9 @@ IoWriter buf_writer(Buf *self)
 IoDuplex buf_duplex(Buf *self)
 {
     return (IoDuplex){
-        .reader = buf_reader(self),
-        .writer = buf_writer(self),
+        .read = buf_read_impl,
+        .write = buf_write_impl,
+        .context = self,
     };
 }
 
@@ -116,16 +117,20 @@ IoResult buf_seek_impl(void *ctx, IoSeek seek)
     case IO_WHENCE_START:
         self->pos = seek.position;
         break;
+
     case IO_WHENCE_CURRENT:
         self->pos += seek.position;
         break;
+
     case IO_WHENCE_END:
         self->pos = self->used + seek.position;
         break;
+
     default:
         panic$("Unknow whence {}", seek.whence);
         break;
     }
+
     return OK(IoResult, self->pos);
 }
 
@@ -140,7 +145,8 @@ IoSeeker buf_seeker(Buf *self)
 IoRSeek buf_rseek(Buf *self)
 {
     return (IoRSeek){
-        .reader = buf_reader(self),
-        .seeker = buf_seeker(self),
+        .read = buf_read_impl,
+        .seek = buf_seek_impl,
+        .context = self,
     };
 }

@@ -7,13 +7,13 @@ MKCWD=mkdir -p $(@D)
 ARCH?=x86_64
 HOST_ARCH?=$(shell uname -m)
 BOARD?=pc
+BOOTLOADER?=loader
 CONFIG?=devel
 TOOLCHAIN?=llvm
 
 include sources/build/configs/$(CONFIG).mk
 include sources/build/boards/$(ARCH)-$(BOARD)/build.mk
 
-BOOTLOADER?=loader
 
 export LC_ALL=C
 
@@ -51,7 +51,7 @@ include $(wildcard sources/srvs/*/build.mk)
 include $(wildcard sources/utils/*/build.mk)
 
 include build/toolchain/archs/$(ARCH)/arch.mk
-include build/toolchain/archs/$(HOST_ARCH)/host.mk
+-include build/toolchain/archs/$(HOST_ARCH)/host.mk
 include build/toolchain/$(TOOLCHAIN)/build.mk
 
 include sources/build/kernel/build.mk

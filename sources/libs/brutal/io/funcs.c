@@ -51,8 +51,8 @@ IoResult io_read(IoReader self, uint8_t *data, size_t size)
 
 IoResult io_pread(IoRSeek self, uint8_t *data, size_t size, size_t offset)
 {
-    io_seek(self.seeker, io_seek_from_start(offset));
-    return io_read(self.reader, data, size);
+    io_seek$(self, io_seek_from_start(offset));
+    return io_read$(self, data, size);
 }
 
 IoResult io_read_line(IoReader self, Buf *buf, Alloc *alloc)
@@ -102,8 +102,8 @@ IoResult io_write(IoWriter self, uint8_t const *data, size_t size)
 
 IoResult io_pwrite(IoWSeek self, uint8_t const *data, size_t size, size_t offset)
 {
-    io_seek(self.seeker, io_seek_from_start(offset));
-    return io_write(self.writer, data, size);
+    io_seek$(self, io_seek_from_start(offset));
+    return io_write$(self, data, size);
 }
 
 IoResult io_write_str(IoWriter self, Str str)
