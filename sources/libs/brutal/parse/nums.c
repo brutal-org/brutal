@@ -38,6 +38,7 @@ bool scan_next_uint(Scan *self, unsigned long *value)
 
 bool scan_next_int(Scan *self, long *value)
 {
+    *value = 0;
     bool is_negative = false;
     char sign = scan_peek(self, 0);
 
@@ -75,7 +76,7 @@ bool scan_next_int(Scan *self, long *value)
 
 bool scan_next_float(Scan *self, float *value)
 {
-    double v;
+    double v = 0.0;
     bool result = scan_next_double(self, &v);
     *value = (float)v;
     return result;
