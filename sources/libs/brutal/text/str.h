@@ -6,7 +6,7 @@
 
 /* --- Null Terminated String ----------------------------------------------- */
 
-static inline size_t cstr_len(char const *str)
+static inline size_t cstr_len(uint8_t const *str)
 {
     size_t size = 0;
 
@@ -23,7 +23,7 @@ static inline size_t cstr_len(char const *str)
 typedef struct
 {
     size_t len;
-    char buf[];
+    uint8_t buf[];
 } InlineStr;
 
 /* --- Non Owning Strings --------------------------------------------------- */
@@ -31,7 +31,7 @@ typedef struct
 typedef struct
 {
     size_t len;
-    const char *buf;
+    uint8_t const *buf;
 } Str;
 
 #define nullstr str$("")
@@ -48,25 +48,25 @@ bool str_eq_ci(Str const lhs, Str const rhs);
 
 int str_count(Str const lStr, Str const rStr);
 
-int str_count_chr(Str const str, char chr);
+int str_count_chr(Str const str, uint8_t chr);
 
 int str_last(Str const lStr, Str const rStr);
 
-int str_last_chr(Str const str, char chr);
+int str_last_chr(Str const str, uint8_t chr);
 
 int str_first(Str const lStr, Str const rStr);
 
-int str_first_chr(Str const str, char chr);
+int str_first_chr(Str const str, uint8_t chr);
 
 bool str_any(Str const str);
 
 /* --- Fix Size Strings ----------------------------------------------------- */
 
-#define StrFix(N)    \
-    struct           \
-    {                \
-        size_t len;  \
-        char buf[N]; \
+#define StrFix(N)       \
+    struct              \
+    {                   \
+        size_t len;     \
+        uint8_t buf[N]; \
     }
 
 typedef StrFix(8) StrFix8;
@@ -79,13 +79,13 @@ typedef StrFix(128) StrFix128;
 
 static inline Str str_forward(Str str) { return str; }
 static inline Str str_make_from_inline_str(InlineStr *str) { return (Str){str->len, str->buf}; }
-static inline Str str_make_from_cstr(char const *cstr) { return (Str){cstr_len(cstr), (char *)cstr}; }
-static inline Str str_make_from_cstr8(uint8_t const *cstr) { return (Str){cstr_len((char *)cstr), (char *)cstr}; }
-static inline Str str_make_from_str_fix8(StrFix8 const *str_fix) { return (Str){str_fix->len, (char *)str_fix->buf}; }
-static inline Str str_make_from_str_fix16(StrFix16 const *str_fix) { return (Str){str_fix->len, (char *)str_fix->buf}; }
-static inline Str str_make_from_str_fix32(StrFix32 const *str_fix) { return (Str){str_fix->len, (char *)str_fix->buf}; }
-static inline Str str_make_from_str_fix64(StrFix64 const *str_fix) { return (Str){str_fix->len, (char *)str_fix->buf}; }
-static inline Str str_make_from_str_fix128(StrFix128 const *str_fix) { return (Str){str_fix->len, (char *)str_fix->buf}; }
+static inline Str str_make_from_cstr(char const *cstr) { return (Str){cstr_len((uint8_t const *)cstr), (uint8_t *)cstr}; }
+static inline Str str_make_from_cstr8(char const *cstr) { return (Str){cstr_len((uint8_t const *)cstr), (uint8_t *)cstr}; }
+static inline Str str_make_from_str_fix8(StrFix8 const *str_fix) { return (Str){str_fix->len, (uint8_t *)str_fix->buf}; }
+static inline Str str_make_from_str_fix16(StrFix16 const *str_fix) { return (Str){str_fix->len, (uint8_t *)str_fix->buf}; }
+static inline Str str_make_from_str_fix32(StrFix32 const *str_fix) { return (Str){str_fix->len, (uint8_t *)str_fix->buf}; }
+static inline Str str_make_from_str_fix64(StrFix64 const *str_fix) { return (Str){str_fix->len, (uint8_t *)str_fix->buf}; }
+static inline Str str_make_from_str_fix128(StrFix128 const *str_fix) { return (Str){str_fix->len, (uint8_t *)str_fix->buf}; }
 
 // clang-format off
 
@@ -115,7 +115,7 @@ static inline Str str_make_from_str_fix128(StrFix128 const *str_fix) { return (S
 // clang-format on
 
 #define str_n$(n, str) \
-    (Str) { (n), (str) }
+    (Str) { (n), (uint8_t const *)(str) }
 
 // Create a new instance of a fix size string.
 #define str_fix$(T, str) (                              \
@@ -128,4 +128,4 @@ static inline Str str_make_from_str_fix128(StrFix128 const *str_fix) { return (S
     })
 
 #define str_sub(str, start, end) \
-    str_n$((end) - (start), (char *)str.buf + (start))
+    str_n$((end) - (start), (uint8_t const *)str.buf + (start))

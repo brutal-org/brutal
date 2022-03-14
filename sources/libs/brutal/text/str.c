@@ -8,7 +8,7 @@ Str str_concat(Str const lhs, Str const rhs, Alloc *alloc)
         .len = lhs.len + rhs.len,
     };
 
-    char *buf = alloc_malloc(alloc, result.len);
+    uint8_t *buf = alloc_malloc(alloc, result.len);
 
     mem_cpy(buf, lhs.buf, lhs.len);
     mem_cpy(buf + lhs.len, rhs.buf, rhs.len);
@@ -23,7 +23,7 @@ Str str_dup(Str const str, Alloc *alloc)
     {
         return str_make_from_cstr("");
     }
-    char *buf = (char *)alloc_malloc(alloc, str.len);
+    uint8_t *buf = (uint8_t *)alloc_malloc(alloc, str.len);
     mem_cpy(buf, str.buf, str.len);
     return str_n$(str.len, buf);
 }
@@ -85,7 +85,7 @@ int str_count(Str const haystack, Str const needle)
     return count;
 }
 
-int str_count_chr(Str const str, char chr)
+int str_count_chr(Str const str, uint8_t chr)
 {
     int result = 0;
 
@@ -121,7 +121,7 @@ int str_last(Str const lStr, Str const rStr)
     return pos;
 }
 
-int str_last_chr(Str const str, char chr)
+int str_last_chr(Str const str, uint8_t chr)
 {
     int result = -1;
 
@@ -156,7 +156,7 @@ int str_first(Str const lStr, Str const rStr)
     return -1;
 }
 
-int str_first_chr(Str const str, char chr)
+int str_first_chr(Str const str, uint8_t chr)
 {
     for (size_t i = 0; i < str.len; i++)
     {

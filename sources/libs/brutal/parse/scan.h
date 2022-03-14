@@ -16,7 +16,7 @@ typedef struct
 
 typedef struct
 {
-    char const *buf;
+    uint8_t const *buf;
     int size;
     int head;
 

@@ -7,6 +7,7 @@
 #include <brutal/text/glob.h>
 #include <brutal/text/rune.h>
 #include <brutal/text/str.h>
+#include <brutal/text/string.h>
 #include <brutal/text/utf16.h>
 #include <brutal/text/utf8.h>
 #include <brutal/text/vals.h>
