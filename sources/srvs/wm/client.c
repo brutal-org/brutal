@@ -143,6 +143,11 @@ void wm_client_resize(WmClient *self, MRectf bound)
 
 void wm_client_dispatch(WmClient *self, UiEvent event)
 {
+    if (ui_event_is_mouse(&event))
+    {
+        event.mouse.position = m_vec2f_sub(event.mouse.position, self->bound.pos);
+    }
+
     bool resp;
     event_sink_dispatch_rpc(ipc_component_self(), self->event_sink, &event, &resp, alloc_global());
 }
