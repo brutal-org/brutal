@@ -8,6 +8,8 @@
 #elif defined(__riscv)
 #    define MMAP_IO_BASE (0)
 #    define MMAP_KERNEL_BASE (0)
+#else
+#    error "Unsupported architecture"
 #endif
 
 static inline uintptr_t mmap_phys_to_io(uintptr_t phys_addr)

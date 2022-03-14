@@ -2,12 +2,12 @@
 
 #include <bal/abi.h>
 
-#ifdef __x86_64__
+#if defined(__x86_64__)
 #    include "kernel/x86_64/context.h"
 #elif defined(__riscv)
 #    include "kernel/riscv64/context.h"
 #else
-#    error "Arch not supported"
+#    error "Unsupported architecture"
 #endif
 
 typedef struct _Context Context;
