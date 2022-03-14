@@ -122,7 +122,7 @@ void wm_client_hide(WmClient *self)
 
 void wm_client_close(WmClient *self)
 {
-    self->visible = true;
+    self->visible = false;
     wm_server_should_render(self->server, self->bound);
 }
 
