@@ -318,6 +318,7 @@ void sched_yield(void)
 {
     lock_acquire(&_lock);
 
+    sched_updated_blocked();
     sched_next(sched_peek() ?: cpu_self()->idle, cpu_self());
 
     lock_release(&_lock);
