@@ -13,11 +13,12 @@ KERNEL_SRC += \
 	sources/libs/stdc-ansi/ctype.c                 \
 	sources/libs/stdc-ansi/string.c                \
 	sources/libs/brutal/io/buf.c                   \
+	sources/libs/stivale/stivale.c                 \
 	$(wildcard sources/kernel/*.c)                 \
-	$(wildcard sources/kernel/$(ARCH)/*.c)  \
-	$(wildcard sources/kernel/$(ARCH)/*.s)  \
-	$(wildcard sources/libs/embed/$(ARCH)/*.c) \
-	$(wildcard sources/libs/embed/$(ARCH)/*.s) \
+	$(wildcard sources/kernel/$(ARCH)/*.c)         \
+	$(wildcard sources/kernel/$(ARCH)/*.s)         \
+	$(wildcard sources/libs/embed/$(ARCH)/*.c)     \
+	$(wildcard sources/libs/embed/$(ARCH)/*.s)     \
 	$(wildcard sources/libs/embed/kernel/*.c)      \
 	$(wildcard sources/libs/hw/acpi/*.c)           \
 	$(wildcard sources/libs/brutal/alloc/*.c)      \

@@ -78,12 +78,6 @@ typedef struct
 
 typedef struct
 {
-    bool present;
-    StrFix32 cmd_line;
-} HandoverCmdLines;
-
-typedef struct
-{
     uint64_t tag; // must be HANDOVER_TAG
 
     HandoverMmap mmap;
@@ -91,7 +85,6 @@ typedef struct
     HandoverModules modules;
     uintptr_t rsdp;
     uintptr_t fdt;
-    HandoverCmdLines cmd_lines;
 } Handover;
 
 HandoverModule const *handover_find_module(Handover const *handover, Str name);

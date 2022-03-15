@@ -57,17 +57,6 @@ void handover_dump(Handover const *handover)
 
     log$("Rsdp:");
     log$("\tAddress: {#p}", handover->rsdp);
-
-    log$("Cmd lines:");
-
-    if (handover->cmd_lines.present)
-    {
-        log$("\t value: '{}'", str$(&handover->cmd_lines.cmd_line));
-    }
-    else
-    {
-        log$("\tNot found!");
-    }
 }
 
 void handover_mmap_append(HandoverMmap *self, HandoverMmapEntry entry)
