@@ -32,9 +32,3 @@ void object_ref(Object *self);
 void object_deref(Object *self);
 
 Object *global_lookup(BrId id, BrType type);
-
-static inline void object_cleanup(void *object)
-{
-    object_deref(*(Object **)object);
-    *(Object **)object = nullptr;
-}

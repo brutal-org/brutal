@@ -287,7 +287,7 @@ BrResult sys_ipc(BrIpcArgs *args)
         msg.from.id = task_self()->id;
         msg.to = args->to;
 
-        Task *task CLEANUP(object_cleanup) = (Task *)global_lookup(args->to.id, BR_OBJECT_TASK);
+        Task *task = (Task *)global_lookup(args->to.id, BR_OBJECT_TASK);
 
         if (!task)
         {
@@ -300,6 +300,8 @@ BrResult sys_ipc(BrIpcArgs *args)
             &msg,
             args->deadline,
             args->flags);
+
+        task_deref(task);
     }
 
     if (result != BR_SUCCESS)
