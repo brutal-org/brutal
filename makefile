@@ -57,7 +57,7 @@ include build/toolchain/$(TOOLCHAIN)/build.mk
 include sources/build/kernel/build.mk
 include sources/build/host/build.mk
 include sources/protos/.build.mk
-include sources/build/loader/build.mk
+include sources/build/loader/$(BOOTLOADER).mk
 include sources/build/target/build.mk
 
 include build/run/$(BOOTLOADER).mk
