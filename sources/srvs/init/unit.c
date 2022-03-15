@@ -17,7 +17,7 @@ void unit_deinit(Unit *self)
 
 void unit_consume(Unit *self, IpcProto proto)
 {
-    log$("Unit '{case:pascal}' is consuming capability '{}'...", self->name, proto);
+    log$("Unit '{case:pascal}' is consuming capability '{x}'...", self->name, proto);
 
     IpcCap cap = {};
     cap.proto = proto;
@@ -30,7 +30,7 @@ void unit_provide(Unit *self, IpcCap new_cap)
     {
         if (cap->proto == new_cap.proto)
         {
-            log$("Providing service '{case:pascal}' with capability '{}'...", self->name, new_cap.proto);
+            log$("Providing service '{case:pascal}' with capability '{x}'...", self->name, new_cap.proto);
 
             *cap = new_cap;
             self->ready++;

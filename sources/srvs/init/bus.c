@@ -19,7 +19,7 @@ void bus_deinit(Bus *bus)
 
 void bus_expose(Bus *self, IpcCap cap)
 {
-    log$("Exposing capability '{case:pascal}'...", cap.proto);
+    log$("Exposing capability '{x}'...", cap.proto);
 
     vec_push(&self->caps, cap);
 
