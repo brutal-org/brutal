@@ -21,7 +21,7 @@ static inline Str ho_mmtype_to_str(HandoverMmapType type)
         return str$("FREE");
 
     case HANDOVER_MMAP_USED:
-        return str$("KERNEL");
+        return str$("USED");
 
     case HANDOVER_MMAP_RESERVED:
         return str$("RESERVED");
