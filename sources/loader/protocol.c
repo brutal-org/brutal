@@ -172,7 +172,7 @@ static void efi_load_module(HandoverModule *target, Str path)
 
     buf_deinit(&buf);
 
-    log$("Loaded module data '{}' (size: {})...", path, target->size);
+    log$("Loaded module data '{}' (begin: {p} end: {p})...", path, target->addr, target->addr + target->size);
 }
 
 static void efi_load_modules(LoaderEntry const *entry, HandoverModules *modules)
