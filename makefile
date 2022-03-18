@@ -41,10 +41,10 @@ USER_CFLAGS_INC := \
 	-Isources/libs/stdc-posix
 
 CACHEDIR=.cache/
-BINDIR_LOADER=bin/$(ARCH)-loader-$(TOOLCHAIN)
-BINDIR_USER=bin/$(ARCH)-brutal-$(TOOLCHAIN)
-BINDIR_KERNEL=bin/$(ARCH)-kernel-$(TOOLCHAIN)
-BINDIR_HOST=bin/$(HOST_ARCH)-host-$(TOOLCHAIN)
+BINDIR_LOADER=bin/$(CONFIG)/$(ARCH)-loader-$(TOOLCHAIN)
+BINDIR_USER=bin/$(CONFIG)/$(ARCH)-brutal-$(TOOLCHAIN)
+BINDIR_KERNEL=bin/$(CONFIG)/$(ARCH)-kernel-$(TOOLCHAIN)
+BINDIR_HOST=bin/$(CONFIG)/$(HOST_ARCH)-host-$(TOOLCHAIN)
 
 include $(wildcard sources/apps/*/build.mk)
 include $(wildcard sources/srvs/*/build.mk)
