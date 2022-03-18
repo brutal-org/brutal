@@ -13,7 +13,6 @@ typedef struct PACKED
 {
     uint64_t rip, rsp;
     uint64_t rbx, rbp, r12, r13, r14, r15;
-
     uint32_t fc_mxcsr;
     uint32_t fc_x86_cw;
 } FibersContext;
@@ -43,7 +42,7 @@ typedef struct
 {
     FiberBlockerFn *function;
     void *context;
-    Timeout deadline;
+    Time deadline;
 
     FiberBlockResult result;
 } FiberBlocker;
@@ -73,7 +72,7 @@ Fiber *fiber_start(FiberFn fn, void *args);
 
 FiberBlockResult fiber_block(FiberBlocker blocker);
 
-void fiber_sleep(Timeout timeout);
+void fiber_sleep_until(Time timeout);
 
 void fiber_ret(void *ret);
 
@@ -81,4 +80,4 @@ void *fiber_await(Fiber *fiber);
 
 Fiber *fiber_self(void);
 
-Tick fiber_deadline(void);
+Time fiber_deadline(void);

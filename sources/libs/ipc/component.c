@@ -312,7 +312,7 @@ BrResult ipc_component_request(IpcComponent *self, IpcCap to, BrMsg *req, BrMsg 
     fiber_block((FiberBlocker){
         .function = wait_pending,
         .context = pending,
-        .deadline = TIME_TIMEOUT_INFINITY,
+        .deadline = END_OF_TIME,
     });
 
     *resp = pending->resp;

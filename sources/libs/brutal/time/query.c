@@ -2,9 +2,14 @@
 #include <brutal/time/query.h>
 #include <embed/time.h>
 
-Tick tick_now(void)
+Tick time_now_ms(void)
 {
     return embed_time_current_tick();
+}
+
+NanoSeconds time_now_ns(void)
+{
+    return embed_time_current_nsec();
 }
 
 TimeStamp timestamp_now(void)
@@ -25,9 +30,4 @@ Time time_now(void)
 DateTime datetime_now(void)
 {
     return timestamp_to_datetime(timestamp_now());
-}
-
-NanoSeconds time_ns_now(void)
-{
-    return embed_time_current_nsec();
 }

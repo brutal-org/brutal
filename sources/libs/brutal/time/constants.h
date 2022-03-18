@@ -1,6 +1,5 @@
 #pragma once
 
-#define EPOCH_YEAR 1970
 
 #define SECONDS_PER_MINUTE (60)
 #define SECONDS_PER_HOURS (SECONDS_PER_MINUTE * 60)

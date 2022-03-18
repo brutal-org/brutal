@@ -84,16 +84,6 @@ BrResult sched_block(Blocker blocker)
     return task_self()->blocker.result;
 }
 
-Tick sched_deadline(BrTimeout timeout)
-{
-    if (timeout == BR_TIMEOUT_INFINITY)
-    {
-        return -1;
-    }
-
-    return _tick + timeout;
-}
-
 /* --- Attach/Detach -------------------------------------------------------- */
 
 Cpu *sched_cpu(Task *task)
@@ -273,7 +263,7 @@ static void sched_updated_blocked(void)
             blocker->function(blocker->context);
 
         bool has_reached_deadline =
-            blocker->deadline != (Tick)-1 &&
+            blocker->deadline != END_OF_TIME &&
             blocker->deadline < _tick;
 
         if (has_reached_function)

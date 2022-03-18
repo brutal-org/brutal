@@ -1,10 +1,11 @@
 #include <brutal/alloc/global.h>
 #include <brutal/time/query.h>
 #include <brutal/ui/app.h>
+#include <brutal/ui/defer.h>
 #include <brutal/ui/win.h>
 #include <embed/app.h>
 
-static UiApp *_instance;
+static UiApp *_instance = nullptr;
 
 UiApp *ui_app_self(void)
 {
@@ -15,7 +16,10 @@ UiApp *ui_app_self(void)
 void ui_app_init(UiApp *self)
 {
     vec_init(&self->windows, alloc_global());
+    vec_init(&self->defers, alloc_global());
+
     embed_app_init(self);
+
     self->alive = true;
     self->font = gfx_font_builtin();
     ui_palette_init(&self->palette);
@@ -25,6 +29,8 @@ void ui_app_init(UiApp *self)
 void ui_app_deinit(UiApp *self)
 {
     embed_app_deinit(self);
+
+    vec_deinit(&self->defers);
     vec_deinit(&self->windows);
 }
 
@@ -32,7 +38,8 @@ int ui_app_run(UiApp *self)
 {
     while (self->alive)
     {
-        embed_app_wait(self);
+        ui_app_update(self);
+        embed_app_wait(self, ui_app_deadline(self));
         ui_app_pump(self);
     }
 
@@ -52,6 +59,39 @@ void ui_app_attach_win(UiApp *self, UiWin *win)
 void ui_app_detach_win(UiApp *self, UiWin *win)
 {
     vec_remove(&self->windows, win);
+}
+
+void ui_app_attach_defer(UiApp *self, UiDefer *defer)
+{
+    vec_push(&self->defers, defer);
+}
+
+void ui_app_detach_defer(UiApp *self, UiDefer *defer)
+{
+    vec_remove(&self->defers, defer);
+}
+
+Tick ui_app_deadline(UiApp *self)
+{
+    Tick deadline = -1;
+    vec_foreach_v(defer, &self->defers)
+    {
+        deadline = m_min(deadline, defer->deadline);
+    }
+    return deadline;
+}
+
+void ui_app_update(UiApp *self)
+{
+    Tick tick = time_now_ms();
+
+    vec_foreach_v(defer, &self->defers)
+    {
+        if (defer->deadline <= tick)
+        {
+            ui_defer_invoke(defer);
+        }
+    }
 }
 
 void ui_app_exit(UiApp *self, int result)
@@ -75,30 +115,4 @@ GfxColor ui_app_color(UiApp *self, UiRole role)
 void ui_app_overide_color(UiApp *self, UiRole role, GfxColor color)
 {
     ui_palette_overide(&self->palette, role, color);
-}
-
-int ui_app_benchmark(UiApp *self)
-{
-    int frames = 600;
-    Tick start = tick_now();
-
-    for (int f = 0; f < frames; f++)
-    {
-        vec_foreach_v(win, &self->windows)
-        {
-            ui_win_repaint(win);
-        }
-    }
-
-    if (!self->alive)
-    {
-        return self->result;
-    }
-
-    Tick end = tick_now();
-    float fps = frames / ((float)(end - start) / 1000.0);
-
-    log$("Benchmark ui app took: {}ms for {}frames ({}fps)", (end - start), frames, fps);
-
-    return self->result;
 }

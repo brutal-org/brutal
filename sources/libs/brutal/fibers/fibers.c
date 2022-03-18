@@ -80,10 +80,10 @@ FiberBlockResult fiber_block(FiberBlocker blocker)
     return current->blocker.result;
 }
 
-void fiber_sleep(Timeout timeout)
+void fiber_sleep_until(Time time)
 {
     fiber_block((FiberBlocker){
-        .deadline = timeout + tick_now(),
+        .deadline = time,
     });
 }
 
@@ -123,7 +123,7 @@ void *fiber_await(Fiber *fiber)
     fiber_block((FiberBlocker){
         .function = (FiberBlockerFn *)wait_fiber,
         .context = &ctx,
-        .deadline = TIME_TIMEOUT_INFINITY,
+        .deadline = END_OF_TIME,
     });
 
     return ctx.ret;
@@ -146,8 +146,8 @@ static bool fiber_try_unblock(Fiber *self)
         return true;
     }
 
-    if (blocker->deadline != TIME_TIMEOUT_INFINITY &&
-        blocker->deadline < tick_now())
+    if (blocker->deadline != END_OF_TIME &&
+        blocker->deadline < time_now_ms())
     {
         blocker->result = FIBER_TIMEOUT;
         self->state = FIBER_RUNNING;
@@ -223,9 +223,9 @@ void fiber_yield(void)
     }
 }
 
-Tick fiber_deadline(void)
+Time fiber_deadline(void)
 {
-    Tick min = -1;
+    Time min = -1;
     Fiber *f = current;
 
     do

@@ -268,8 +268,8 @@ bool scan_dump_error(Scan *self, IoWriter writer)
     ScanError err = self->error;
     Str src = str_n$(self->size, (char *)self->buf);
 
-    print(writer, "error: {}: {}\n", err.message, str$(&err.token));
-    print(writer, "    :\n");
+    io_print$(writer, "error: {}: {}\n", err.message, str$(&err.token));
+    io_print$(writer, "    :\n");
 
     int line_number = str_count_chr(str_sub(src, 0, err.position), '\n') + 1;
     int line_start = str_last_chr(str_sub(src, 0, err.position), '\n') + 1;
@@ -285,16 +285,15 @@ bool scan_dump_error(Scan *self, IoWriter writer)
     }
 
     Str line = str_sub(src, line_start, line_end);
-    print(writer, "{3d} | {}\n", line_number, line);
-
-    print(writer, "    : ");
+    io_print$(writer, "{3d} | {}\n", line_number, line);
+    io_print$(writer, "    : ");
 
     for (int i = 0; i < err.position - line_start; i++)
     {
-        print(writer, " ");
+        io_print$(writer, " ");
     }
 
-    print(writer, "^ here\n");
+    io_print$(writer, "^ here\n");
 
     return true;
 }

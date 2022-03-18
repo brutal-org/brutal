@@ -1,6 +1,7 @@
 #pragma once
 
 #include <brutal/io/buf.h>
+#include <brutal/io/print.h>
 
 typedef struct
 {
@@ -22,4 +23,4 @@ void emit_deident(Emit *self);
 
 IoWriter emit_writer(Emit *self);
 
-#define emit_fmt(SELF, FMT, ...) print_impl(emit_writer(SELF), str$(FMT), PRINT_ARGS(__VA_ARGS__));
+#define emit_fmt$(SELF, FMT, ...) print_impl(emit_writer(SELF), str$(FMT), PRINT_ARGS(__VA_ARGS__));

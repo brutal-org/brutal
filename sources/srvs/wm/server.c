@@ -55,7 +55,7 @@ static void *wm_render_fiber(void *ctx)
             wm_server_render(self);
         }
 
-        fiber_sleep(16);
+        fiber_sleep_until(16);
     }
 
     return nullptr;

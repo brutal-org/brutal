@@ -9,12 +9,12 @@ void log_unlock_impl(LogLevel level, SourceLocation location, Str fmt, PrintArgs
 
     if (level == LOG_PANIC)
     {
-        print(embed_log_writer(), "panic: ");
+        io_print$(embed_log_writer(), "panic: ");
     }
 
-    print(embed_log_writer(), "{}:{3d}: ", location.filename, location.line);
+    io_print$(embed_log_writer(), "{}:{3d}: ", location.filename, location.line);
     print_impl(embed_log_writer(), fmt, args);
-    print(embed_log_writer(), "\n");
+    io_print$(embed_log_writer(), "\n");
 }
 
 void log_impl(LogLevel level, SourceLocation location, Str fmt, PrintArgs args)

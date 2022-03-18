@@ -15,7 +15,7 @@ void __chkstk() { return; }
 
 void loader_splash(void)
 {
-    print(io_chan_out(), "Brutal boot\n");
+    io_print$(io_chan_out(), "Brutal boot\n");
 }
 
 void loader_load(Elf64Header const *elf_header, void *base, VmmSpace vmm)
@@ -33,9 +33,9 @@ void loader_load(Elf64Header const *elf_header, void *base, VmmSpace vmm)
             mem_cpy(mem_phys_segment, file_segment, prog_header->file_size);
             mem_set(mem_phys_segment + prog_header->file_size, 0, prog_header->memory_size - prog_header->file_size);
             memory_map_range(vmm, (VmmRange){
-                                 .base = prog_header->virtual_address,
-                                 .size = align_up$(prog_header->memory_size, PAGE_SIZE),
-                             },
+                                      .base = prog_header->virtual_address,
+                                      .size = align_up$(prog_header->memory_size, PAGE_SIZE),
+                                  },
                              (PmmRange){
                                  .base = (uintptr_t)mem_phys_segment,
                                  .size = align_up$(prog_header->memory_size, PAGE_SIZE),
@@ -86,9 +86,9 @@ Handover *allocate_handover(VmmSpace vmm)
     uintptr_t handover_copy_phys = kernel_module_phys_alloc_page((sizeof(Handover) / PAGE_SIZE) + 1);
 
     memory_map_range(vmm, (VmmRange){
-                         .base = handover_copy_phys + MMAP_KERNEL_BASE,
-                         .size = align_up$(sizeof(Handover), PAGE_SIZE),
-                     },
+                              .base = handover_copy_phys + MMAP_KERNEL_BASE,
+                              .size = align_up$(sizeof(Handover), PAGE_SIZE),
+                          },
                      (PmmRange){
                          .base = handover_copy_phys,
                          .size = align_up$(sizeof(Handover), PAGE_SIZE),
@@ -112,7 +112,7 @@ void loader_boot(LoaderEntry const *entry)
     efi_deinit();
     memory_switch(vmm);
 
-    entry_point(((void*)handover) + MMAP_KERNEL_BASE , 0xC001B001);
+    entry_point(((void *)handover) + MMAP_KERNEL_BASE, 0xC001B001);
 
     panic$("entry_point should no return!");
 }

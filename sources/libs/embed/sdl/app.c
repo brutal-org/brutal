@@ -145,7 +145,15 @@ void embed_app_pump(UiApp *self)
     }
 }
 
-void embed_app_wait(MAYBE_UNUSED UiApp *self)
+void embed_app_wait(MAYBE_UNUSED UiApp *self, Tick deadline)
 {
-    SDL_WaitEventTimeout(nullptr, 1000);
+    Tick now = time_now_ms();
+    int wait = 0;
+
+    if (now < deadline)
+    {
+        wait = deadline - now;
+    }
+
+    SDL_WaitEventTimeout(nullptr, wait);
 }

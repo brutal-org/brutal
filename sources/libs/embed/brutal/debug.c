@@ -3,5 +3,5 @@
 
 void embed_log_prefix(IoWriter writer)
 {
-    print(writer, "user: {}: ", embed_task_self());
+    io_print$(writer, "user: {}: ", embed_task_self());
 }

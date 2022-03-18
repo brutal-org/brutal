@@ -3,7 +3,7 @@
 
 static void cc_trans_op_fix(Emit *emit, COp op)
 {
-    emit_fmt(emit, "{}", cop_to_str(op));
+    emit_fmt$(emit, "{}", cop_to_str(op));
 }
 
 static void cc_trans_expr_pre(Emit *emit, CExpr expr, int parent_pre)
@@ -12,7 +12,7 @@ static void cc_trans_expr_pre(Emit *emit, CExpr expr, int parent_pre)
 
     if (pre >= parent_pre)
     {
-        emit_fmt(emit, "(");
+        emit_fmt$(emit, "(");
     }
 
     switch (expr.type)
@@ -25,7 +25,7 @@ static void cc_trans_expr_pre(Emit *emit, CExpr expr, int parent_pre)
         break;
 
     case CEXPR_IDENT:
-        emit_fmt(emit, "{}", expr.ident_);
+        emit_fmt$(emit, "{}", expr.ident_);
         break;
 
     case CEXPR_SELF:
@@ -54,13 +54,13 @@ static void cc_trans_expr_pre(Emit *emit, CExpr expr, int parent_pre)
         cc_trans_expr_pre(emit, *expr.infix_.rhs, pre);
         if (expr.infix_.op == COP_INDEX)
         {
-            emit_fmt(emit, "]");
+            emit_fmt$(emit, "]");
         }
         break;
 
     case CEXPR_CALL:
         cc_trans_expr_pre(emit, *expr.call_.expr, pre);
-        emit_fmt(emit, "(");
+        emit_fmt$(emit, "(");
         bool first = true;
         vec_foreach_v(v, &expr.call_.args)
         {
@@ -70,49 +70,49 @@ static void cc_trans_expr_pre(Emit *emit, CExpr expr, int parent_pre)
             }
             else
             {
-                emit_fmt(emit, ", ");
+                emit_fmt$(emit, ", ");
             }
 
             cc_trans_expr_pre(emit, v, CEXPR_MAX_PRECEDENCE);
         }
-        emit_fmt(emit, ")");
+        emit_fmt$(emit, ")");
         break;
 
     case CEXPR_CAST:
-        emit_fmt(emit, "(");
+        emit_fmt$(emit, "(");
         cc_trans_type(emit, expr.cast_.type);
-        emit_fmt(emit, ")");
+        emit_fmt$(emit, ")");
         cc_trans_expr_pre(emit, *expr.cast_.expr, pre);
         break;
 
     case CEXPR_TERNARY:
         cc_trans_expr_pre(emit, *expr.ternary_.expr_cond, pre);
-        emit_fmt(emit, " ? ");
+        emit_fmt$(emit, " ? ");
         cc_trans_expr_pre(emit, *expr.ternary_.expr_true, pre);
-        emit_fmt(emit, " : ");
+        emit_fmt$(emit, " : ");
         cc_trans_expr_pre(emit, *expr.ternary_.expr_false, pre);
         break;
 
     case CEXPR_INITIALIZER:
-        emit_fmt(emit, "(");
+        emit_fmt$(emit, "(");
         cc_trans_type(emit, expr.initializer_.type);
-        emit_fmt(emit, ")");
+        emit_fmt$(emit, ")");
 
-        emit_fmt(emit, "{{\n");
+        emit_fmt$(emit, "{{\n");
         emit_ident(emit);
 
         vec_foreach_v(v, &expr.initializer_.initializer)
         {
             cc_trans_expr_pre(emit, v, CEXPR_MAX_PRECEDENCE);
-            emit_fmt(emit, ",\n");
+            emit_fmt$(emit, ",\n");
         }
 
         emit_deident(emit);
-        emit_fmt(emit, "}}");
+        emit_fmt$(emit, "}}");
         break;
 
     case CEXPR_LAMBDA:
-        emit_fmt(emit, "[]");
+        emit_fmt$(emit, "[]");
         cc_trans_func_params(emit, expr.lambda_.type);
         cc_trans_stmt(emit, *expr.lambda_.body);
         break;
@@ -123,7 +123,7 @@ static void cc_trans_expr_pre(Emit *emit, CExpr expr, int parent_pre)
 
     if (pre >= parent_pre)
     {
-        emit_fmt(emit, ")");
+        emit_fmt$(emit, ")");
     }
 }
 

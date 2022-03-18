@@ -1,13 +1,15 @@
 #include <brutal/time/constants.h>
 #include <brutal/time/convert.h>
 
+
+
 Date timestamp_to_date(TimeStamp timestamp)
 {
     Date date = {};
 
     int days = timestamp / SECONDS_PER_DAY;
 
-    date.year = EPOCH_YEAR;
+    date.year = TIME_EPOCH;
 
     while (days - DAYS_PER_YEAR[is_leap_year(date.year)] > 0)
     {
@@ -32,9 +34,9 @@ Date timestamp_to_date(TimeStamp timestamp)
 Time timestamp_to_time(TimeStamp timestamp)
 {
     return (Time){
-        .second = (int)(timestamp % 60),
-        .minute = (int)((timestamp / SECONDS_PER_MINUTE) % 60),
-        .hour = (int)((timestamp / SECONDS_PER_HOURS) % 24),
+        .second = timestamp % 60,
+        .minute = (timestamp / SECONDS_PER_MINUTE) % 60,
+        .hour = (timestamp / SECONDS_PER_HOURS) % 24,
     };
 }
 
@@ -50,12 +52,12 @@ TimeStamp datetime_to_timestamp(DateTime datetime)
 {
     TimeStamp timestamp = 0;
 
-    for (Year year = EPOCH_YEAR; year < datetime.year; year++)
+    for (uint64_t year = TIME_EPOCH; year < datetime.year; year++)
     {
         timestamp += DAYS_PER_YEAR[is_leap_year(year)] * SECONDS_PER_DAY;
     }
 
-    for (Mounth month = 0; month < datetime.month - 1; month++)
+    for (uint64_t month = 0; month < datetime.month - 1; month++)
     {
         timestamp += DAYS_PER_MONTH[is_leap_year(datetime.year)][month] * SECONDS_PER_DAY;
     }

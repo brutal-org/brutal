@@ -19,7 +19,7 @@ static void finalizer(void)
         sched_finalize();
 
         sched_block((Blocker){
-            .deadline = sched_deadline(2500),
+            .deadline = sched_tick() + 2500,
         });
     }
 }

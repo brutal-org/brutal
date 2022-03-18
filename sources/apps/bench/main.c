@@ -43,24 +43,24 @@ static double bench_run(UiApp *app, UiWin *win, Bench bench, int sec_per_bench)
     gfx_push(&win->gfx);
 
     // only used to know when we need to stop the benchmark, this hasn't any implication in the calculation of the framerate/dt
-    TimeStamp time_begin = timestamp_now();
+    Time time_begin = time_now();
 
     double avg_delta = 0;
     long frame = 0;
 
-    while (time_begin + sec_per_bench > timestamp_now() && app->alive)
+    while (time_begin + sec_per_bench > time_now() && app->alive)
     {
         gfx_clear(&win->gfx, GFX_BLACK);
 
         // avoid T calculation during benchmark
-        float t = time_ns_now() / 1000000000.;
+        float t = time_now_ns() / 1000000000.;
 
         // here we calculate the time it tooks to render the benchmark
-        NanoSeconds start = time_ns_now();
+        NanoSeconds start = time_now_ns();
 
-        bench_run_tick(&win->gfx, bench,t);
+        bench_run_tick(&win->gfx, bench, t);
 
-        NanoSeconds end = time_ns_now();
+        NanoSeconds end = time_now_ns();
 
         double delta_s = (end - start) / 1000000000.;
 

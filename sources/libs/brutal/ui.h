@@ -4,6 +4,7 @@
 /* --- */
 #include <brutal/ui/app.h>
 #include <brutal/ui/color.h>
+#include <brutal/ui/defer.h>
 #include <brutal/ui/event.h>
 #include <brutal/ui/font.h>
 #include <brutal/ui/parser.h>

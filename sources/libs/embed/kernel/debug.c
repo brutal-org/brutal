@@ -3,10 +3,10 @@
 
 void embed_log_prefix(IoWriter writer)
 {
-    print(writer, "cpu{}: ", cpu_self_id());
+    io_print$(writer, "cpu{}: ", cpu_self_id());
 
     if (task_self())
     {
-        print(writer, "{}: ", task_self()->id);
+        io_print$(writer, "{}: ", task_self()->id);
     }
 }

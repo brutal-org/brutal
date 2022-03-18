@@ -129,7 +129,7 @@ PrintValue print_val_pointer(void *);
 
 IoResult print_impl(IoWriter writer, Str format, PrintArgs args);
 
-#define print(writer, fmt, ...) \
+#define io_print$(writer, fmt, ...) \
     print_impl(writer, str$(fmt), PRINT_ARGS(__VA_ARGS__))
 
 Str str_fmt_impl(Alloc *alloc, Str format, PrintArgs args);

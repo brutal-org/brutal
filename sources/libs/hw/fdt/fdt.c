@@ -257,7 +257,7 @@ static void fdt_dump_props_value(FdtProp *prop, Emit *out)
         be_uint32_t *val = ((be_uint32_t *)prop->value.buf);
         for (unsigned int i = 0; i < prop->value.len / sizeof(uint32_t); i++)
         {
-            emit_fmt(out, "- as uint32_t: {#x} \n", load_be(val[i]));
+            emit_fmt$(out, "- as uint32_t: {#x} \n", load_be(val[i]));
         }
     }
     if (prop->value.len % sizeof(uint64_t) == 0)
@@ -265,21 +265,21 @@ static void fdt_dump_props_value(FdtProp *prop, Emit *out)
         be_uint64_t *val = ((be_uint64_t *)prop->value.buf);
         for (unsigned int i = 0; i < prop->value.len / sizeof(uint64_t); i++)
         {
-            emit_fmt(out, "- as uint64_t: {#x}\n", load_be(val[i]));
+            emit_fmt$(out, "- as uint64_t: {#x}\n", load_be(val[i]));
         }
     }
     if (prop->value.len > 2)
     {
         Str as_string = str_n$(prop->value.len, (char *)prop->value.buf);
-        emit_fmt(out, "- as string: {} \n", as_string);
+        emit_fmt$(out, "- as string: {} \n", as_string);
     }
 
-    emit_fmt(out, "- as data: ");
+    emit_fmt$(out, "- as data: ");
     for (unsigned int i = 0; i < prop->value.len; i++)
     {
-        emit_fmt(out, "{#x} ", ((uint8_t *)prop->value.buf)[i]);
+        emit_fmt$(out, "{#x} ", ((uint8_t *)prop->value.buf)[i]);
     }
-    emit_fmt(out, "\n");
+    emit_fmt$(out, "\n");
 }
 
 typedef struct
@@ -290,7 +290,7 @@ typedef struct
 
 static Iter fdt_dump_props_iter(FdtProp *prop, IterDumpCtx *ctx)
 {
-    emit_fmt(ctx->out, "- prop: {}\n", prop->name);
+    emit_fmt$(ctx->out, "- prop: {}\n", prop->name);
     emit_ident(ctx->out);
     if (ctx->dump_values)
     {
@@ -302,7 +302,7 @@ static Iter fdt_dump_props_iter(FdtProp *prop, IterDumpCtx *ctx)
 
 static Iter fdt_dump_node_iter(FdtNode *node, IterDumpCtx *ctx)
 {
-    emit_fmt(ctx->out, "node: {}\n", node->name);
+    emit_fmt$(ctx->out, "node: {}\n", node->name);
     emit_ident(ctx->out);
     fdt_node_props(*node, (IterFn *)fdt_dump_props_iter, ctx);
     fdt_node_childs(*node, (IterFn *)fdt_dump_node_iter, ctx);
@@ -318,18 +318,18 @@ void fdt_dump(FdtHeader *fdt, Emit *out, bool dump_values)
         .dump_values = dump_values,
     };
 
-    emit_fmt(out, "fdt-dump:\n");
+    emit_fmt$(out, "fdt-dump:\n");
     emit_ident(out);
     fdt_node_childs(root, (IterFn *)fdt_dump_node_iter, &ctx);
 
     emit_deident(out);
 
-    emit_fmt(out, "fdt reserved memory:\n");
+    emit_fmt$(out, "fdt reserved memory:\n");
     FdtReservationEntry *entry = ((void *)fdt) + load_be(fdt->memory_reservation_offset);
     emit_ident(out);
     while (load_be(entry->size) != 0 || load_be(entry->address) != 0)
     {
-        emit_fmt(out, "- [{#x}] - [{#x}] \n", load_be(entry->address), load_be(entry->address) + load_be(entry->size));
+        emit_fmt$(out, "- [{#x}] - [{#x}] \n", load_be(entry->address), load_be(entry->address) + load_be(entry->size));
         entry++;
     }
     emit_deident(out);
