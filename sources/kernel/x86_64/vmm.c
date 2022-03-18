@@ -85,15 +85,9 @@ static void vmm_load_memory_map(VmmSpace target, HandoverMmap const *memory_map)
         USizeRange entry_range = {entry.base, entry.size};
         PmmRange physical_range = range_align_smaller(entry_range, MEM_PAGE_SIZE);
 
-        log$("Loading kernel memory map {}/{} ({x} - {x})",
-             i + 1,
-             memory_map->size,
-             entry.base,
-             entry.base + entry.size);
-
         if (entry.type == HANDOVER_MMAP_USED)
         {
-            log$(" - Mapped to kernel");
+            log$("Mapping ({x} - {x}) to kernel", entry.base, entry.base + entry.size);
 
             VmmRange vrange = {mmap_phys_to_kernel(physical_range.base), physical_range.size};
             vmm_map(target, vrange, physical_range, BR_MEM_WRITABLE);
@@ -101,14 +95,12 @@ static void vmm_load_memory_map(VmmSpace target, HandoverMmap const *memory_map)
 
         if (entry.base >= GiB(4)) // The bottom 4Gio are already mapped
         {
-            log$(" - Mapped to IO");
+            log$("Mapping ({x} - {x}) to IO", entry.base, entry.base + entry.size);
 
             VmmRange vrange = {mmap_phys_to_io(physical_range.base), physical_range.size};
             vmm_map(target, vrange, physical_range, BR_MEM_WRITABLE);
         }
     }
-
-    vmm_space_switch(target);
 }
 
 void vmm_initialize(Handover const *handover)
