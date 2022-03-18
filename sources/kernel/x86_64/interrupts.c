@@ -50,6 +50,29 @@ static char *_exception_messages[32] = {
     "Reserved",
 };
 
+struct _StackFrame
+{
+    struct _StackFrame *rbp;
+    uint64_t rip;
+};
+
+static bool _has_panic = false;
+
+static size_t dump_backtrace(uintptr_t rbp)
+{
+    struct _StackFrame *stackframe = (struct _StackFrame *)rbp;
+
+    size_t i = 0;
+
+    while (stackframe)
+    {
+        log_unlock("- {p}", stackframe->rip);
+        stackframe = stackframe->rbp;
+    }
+
+    return i;
+}
+
 static void dump_register(Regs const *regs)
 {
     log_unlock("RIP: {#016p} | RSP: {#016p}", regs->rip, regs->rsp);
@@ -70,6 +93,19 @@ static void dump_register(Regs const *regs)
 
 static void interrupt_error_handler(Regs *regs)
 {
+    if (_has_panic)
+    {
+        log_unlock("[NESTED PANIC]");
+        while (true)
+        {
+            asm_cli();
+            asm_hlt();
+        }
+        return;
+    }
+
+    _has_panic = true;
+
     smp_stop_all();
 
     log_unlock("");
@@ -90,6 +126,9 @@ static void interrupt_error_handler(Regs *regs)
     }
 
     dump_register(regs);
+    log_unlock("");
+
+    dump_backtrace(regs->rbp);
     log_unlock("");
 
     log_unlock("------------------------------------------------------------");
