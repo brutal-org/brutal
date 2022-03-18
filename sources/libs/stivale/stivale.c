@@ -28,12 +28,6 @@ static HandoverMmapType stivale_mmap_type_to_handover_type(int stivale_entry)
     case STIVALE2_MMAP_KERNEL_AND_MODULES:
         return HANDOVER_MMAP_USED;
 
-    case STIVALE2_MMAP_ACPI_NVS:
-    case STIVALE2_MMAP_RESERVED:
-    case STIVALE2_MMAP_BAD_MEMORY:
-    case STIVALE2_MMAP_FRAMEBUFFER:
-        return HANDOVER_MMAP_RESERVED;
-
     case STIVALE2_MMAP_BOOTLOADER_RECLAIMABLE:
     case STIVALE2_MMAP_ACPI_RECLAIMABLE:
         return HANDOVER_MMAP_RECLAIMABLE;
@@ -51,9 +45,9 @@ static void fill_handover_mmap(Handover *target, struct stivale2_struct_tag_memm
     {
         HandoverMmapEntry *entry = &target->mmap.entries[i];
 
-        entry->size = memory_map->memmap[i].length;
-        entry->base = memory_map->memmap[i].base;
         entry->type = stivale_mmap_type_to_handover_type(memory_map->memmap[i].type);
+        entry->base = memory_map->memmap[i].base;
+        entry->size = memory_map->memmap[i].length;
     }
 }
 
