@@ -1,5 +1,7 @@
 #include <stivale/stivale.h>
 
+#define STIVALE2_IO_OFFSET 0xffff800000000000
+
 void *stivale2_get_tag(struct stivale2_struct const *stivale2_struct, uint64_t id)
 {
     struct stivale2_tag *current_tag = (struct stivale2_tag *)stivale2_struct->tags;
@@ -46,20 +48,20 @@ static void fill_handover_mmap(Handover *target, struct stivale2_struct_tag_memm
         HandoverMmapEntry *entry = &target->mmap.entries[i];
 
         entry->type = stivale_mmap_type_to_handover_type(memory_map->memmap[i].type);
-        entry->base = memory_map->memmap[i].base;
+        entry->base = (memory_map->memmap[i].base) ;
         entry->size = memory_map->memmap[i].length;
     }
 }
 
 static void fill_handover_rsdp(Handover *target, struct stivale2_struct_tag_rsdp const *rsdp)
 {
-    target->rsdp = rsdp->rsdp;
+    target->rsdp = rsdp->rsdp - STIVALE2_IO_OFFSET;
 }
 
 static void fill_handover_framebuffer(Handover *target, struct stivale2_struct_tag_framebuffer const *framebuffer)
 {
     target->framebuffer.present = true;
-    target->framebuffer.addr = framebuffer->framebuffer_addr;
+    target->framebuffer.addr = framebuffer->framebuffer_addr - STIVALE2_IO_OFFSET;
     target->framebuffer.width = framebuffer->framebuffer_width;
     target->framebuffer.height = framebuffer->framebuffer_height;
     target->framebuffer.pitch = framebuffer->framebuffer_pitch;
@@ -72,7 +74,7 @@ void fill_handover_modules(Handover *target, struct stivale2_struct_tag_modules 
 
     for (size_t i = 0; i < m_min(modules->module_count, MAX_MODULE_COUNT); i++)
     {
-        target->modules.module[i].addr = modules->modules[i].begin;
+        target->modules.module[i].addr = modules->modules[i].begin - STIVALE2_IO_OFFSET;
         target->modules.module[i].size = align_up$(modules->modules[i].end - modules->modules[i].begin, MEM_PAGE_SIZE);
 
         target->modules.module[i].module_name = str_fix$(StrFix32, modules->modules[i].string);
@@ -94,6 +96,7 @@ void stivale2_copy_to_handover(struct stivale2_struct const *info, Handover *han
 
     if (rsdp)
     {
+
         fill_handover_rsdp(handover, (struct stivale2_struct_tag_rsdp const *)rsdp);
     }
 
