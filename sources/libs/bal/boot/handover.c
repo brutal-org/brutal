@@ -22,7 +22,7 @@ void handover_dump(Handover const *handover)
         panic$("Invalid handover tag: {08x}", handover->tag);
     }
 
-    log$("Memory Map:");
+    log$("Memory Map[{}]:", handover->mmap.size);
 
     for (size_t i = 0; i < handover->mmap.size; i++)
     {

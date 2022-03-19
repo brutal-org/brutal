@@ -83,7 +83,7 @@ static void vmm_load_memory_map(VmmSpace target, HandoverMmap const *memory_map)
     {
         HandoverMmapEntry entry = memory_map->entries[i];
         USizeRange entry_range = {entry.base, entry.size};
-        PmmRange physical_range = range_align_smaller(entry_range, MEM_PAGE_SIZE);
+        PmmRange physical_range = range_align_bigger(entry_range, MEM_PAGE_SIZE);
 
         if (entry.type == HANDOVER_MMAP_USED)
         {
