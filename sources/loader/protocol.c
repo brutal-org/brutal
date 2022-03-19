@@ -158,19 +158,13 @@ static void efi_load_module(HandoverModule *target, Str path)
     IoFile file;
     io_file_view(&file, path);
 
-    // TODO: make a kernel_module alloc instead of allocating 2 time (even if the first time is always freed)
-    Buf buf;
-    io_read_all(io_file_reader(&file), &buf, alloc_global());
+    size_t module_size = UNWRAP(io_size(io_file_seeker(&file)));
+    uintptr_t module_addr = kernel_module_phys_alloc_page(align_up$(module_size, PAGE_SIZE) / PAGE_SIZE);
 
-    uintptr_t buf_page_size = align_up$(buf.used, PAGE_SIZE) / PAGE_SIZE;
-    uintptr_t module_addr = kernel_module_phys_alloc_page(buf_page_size);
+    UNWRAP(io_read(io_file_reader(&file), (void *)module_addr, module_size));
 
-    memcpy((void *)module_addr, buf.data, buf.used);
-
-    target->size = align_up$(buf.used, PAGE_SIZE);
     target->addr = module_addr;
-
-    buf_deinit(&buf);
+    target->size = align_up$(module_size, PAGE_SIZE);
 
     log$("Loaded module data '{}' (begin: {p} end: {p})...", path, target->addr, target->addr + target->size);
 }
