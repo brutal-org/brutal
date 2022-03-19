@@ -7,6 +7,7 @@ JOBS=""
 SILENT="-s"
 DEBUG=""
 TARGET=""
+export CONFIG=${CONFIG:="devel"}
 export COVERAGE=""
 
 if [[ -z "${TOOLCHAIN}" ]]; then
@@ -109,7 +110,7 @@ if [ $# -gt 0 ]; then
     usage
   fi
 
-  PKGS=./bin/$(uname -m)-host-$TOOLCHAIN
+  PKGS=./bin/$CONFIG/$(uname -m)-host-$TOOLCHAIN
 
   make $JOBS $SILENT $PKGS/$1
   $DEBUG $PKGS/$@
