@@ -152,7 +152,39 @@ IoResult embed_file_write(IoFile *self, uint8_t const *data, size_t size)
 
 IoResult embed_file_seek(IoFile *self, IoSeek seek)
 {
-    UNUSED(self);
-    UNUSED(seek);
-    panic$("embed_file_seek() not implemented");
+    EfiFileProtocol* proto = self->embed.proto;
+
+    uint64_t current = 0;
+    EfiStatus status = proto->get_position(proto, &current);
+
+    if (status != EFI_SUCCESS)
+    {
+        return ERR(IoResult, ERR_UNDEFINED);
+    }
+
+    uint64_t info_size = 0;
+    status = proto->get_info(proto, &EFI_FILE_INFO_ID, &info_size, nullptr);
+    assert_truth(status == EFI_BUFFER_TOO_SMALL);
+
+    EFIFileInfo *info = alloc_malloc(alloc_global(), info_size);
+    status = proto->get_info(proto, &EFI_FILE_INFO_ID, &info_size, info);
+
+    if (status != EFI_SUCCESS)
+    {
+        alloc_free(alloc_global(), info);
+        return ERR(IoResult, ERR_UNDEFINED);
+    }
+
+    current = io_seek_eval(seek, current, info->file_size);
+    status = proto->set_position(proto, current);
+    alloc_free(alloc_global(), info);
+
+    if (status != EFI_SUCCESS)
+    {
+        return ERR(IoResult, ERR_UNDEFINED);
+    }
+    else
+    {
+        return OK(IoResult, current);
+    }
 }

@@ -111,26 +111,7 @@ IoDuplex buf_duplex(Buf *self)
 IoResult buf_seek_impl(void *ctx, IoSeek seek)
 {
     Buf *self = (Buf *)ctx;
-
-    switch (seek.whence)
-    {
-    case IO_WHENCE_START:
-        self->pos = seek.position;
-        break;
-
-    case IO_WHENCE_CURRENT:
-        self->pos += seek.position;
-        break;
-
-    case IO_WHENCE_END:
-        self->pos = self->used + seek.position;
-        break;
-
-    default:
-        panic$("Unknow whence {}", seek.whence);
-        break;
-    }
-
+    self->pos = io_seek_eval(seek, self->pos, self->used);
     return OK(IoResult, self->pos);
 }
 

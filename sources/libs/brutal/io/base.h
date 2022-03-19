@@ -27,4 +27,6 @@ IoSeek io_seek_from_current(SSize position);
 
 IoSeek io_seek_from_end(SSize position);
 
+SSize io_seek_eval(IoSeek seek, SSize current, SSize size);
+
 typedef Result(Error, size_t) IoResult;

@@ -1,3 +1,4 @@
+#include <brutal/debug/locked.h>
 #include <brutal/io/base.h>
 
 IoSeek io_seek_from_start(SSize position)
@@ -13,4 +14,22 @@ IoSeek io_seek_from_current(SSize position)
 IoSeek io_seek_from_end(SSize position)
 {
     return (IoSeek){IO_WHENCE_END, position};
+}
+
+SSize io_seek_eval(IoSeek seek, SSize current, SSize size)
+{
+    switch (seek.whence)
+    {
+    case IO_WHENCE_START:
+        return seek.position;
+
+    case IO_WHENCE_CURRENT:
+        return current + seek.position;
+
+    case IO_WHENCE_END:
+        return size + seek.position;
+
+    default:
+        panic$("Unknow whence {}", seek.whence);
+    }
 }
