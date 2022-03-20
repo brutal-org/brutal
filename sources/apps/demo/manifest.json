@@ -1,0 +1,7 @@
+{
+    "name": "demo",
+    "consume": [
+        "system::Server",
+        "window::Server"
+    ]
+}

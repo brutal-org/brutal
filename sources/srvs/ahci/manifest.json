@@ -1,0 +1,7 @@
+{
+    "name": "ahci",
+    "consume": [
+        "system::Server",
+        "pci::Bus"
+    ]
+}

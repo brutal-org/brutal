@@ -1,0 +1,7 @@
+{
+    "name": "about",
+    "consume": [
+        "system::Server",
+        "window::Server"
+    ]
+}

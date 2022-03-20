@@ -1,7 +1,7 @@
 {
-    "name": "bench",
+    "name": "window",
     "consume": [
         "system::Server",
-        "window::Server"
+        "hw::Display"
     ]
 }

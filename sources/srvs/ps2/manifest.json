@@ -1,10 +1,7 @@
 {
+    "name": "ps2",
     "consume": [
-        "brutal.right.irq",
-        "brutal.right.log"
-    ],
-    "provide": [
-        "brutal.input.mouse",
-        "brutal.input.keyboard"
+        "system::Server",
+        "event::Sink"
     ]
 }

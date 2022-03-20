@@ -104,7 +104,6 @@ IdlModule idl_sema_module(IdlModule module, Alloc *alloc)
 
     vec_foreach_v(import, &module.imports)
     {
-        log$("Importing {}...", import.name);
         IoFile source_file;
         UNWRAP_OR_PANIC(io_file_view(&source_file, str_fmt(alloc, "sources/protos/{}.idl", import.name)), "File not found!");
 

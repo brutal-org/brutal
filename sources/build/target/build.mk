@@ -62,16 +62,22 @@ $(1)_OBJ = $$(patsubst sources/%,$(BINDIR_USER)/%.o, $$($(1)_SRC))
 
 $(1)_BIN = $(BINDIR_USER)/$$($(1)_NAME)
 
+$(1)_JSON = $(BINDIR_USER)/$$($(1)_NAME).json
+
 DEPENDENCIES += $$($(1)_OBJ:.o=.d)
 
 PKGS+=$$($(1)_BIN)
 ALL+=$$($(1)_BIN)
 
-$$($(1)_BIN): $$($(1)_OBJ) $(LIBS_BIN)
+$$($(1)_JSON): $$($(1)_PKG)/manifest.json $$(IDL_HOST_BIN) ./sources/build/scripts/manifest-builder.py
 	@$$(MKCWD)
-	$(USER_LD) -o $$@ $$^ $(USER_ULDFLAGS)
+	./sources/build/scripts/manifest-builder.py $$($(1)_PKG)/manifest.json > $$@
+
+$$($(1)_BIN): $$($(1)_OBJ) $(LIBS_BIN) $$($(1)_JSON)
+	@$$(MKCWD)
+	$(USER_LD) -o $$@ $$($(1)_OBJ) $(LIBS_BIN) $(USER_ULDFLAGS)
 	$(USER_OBJCOPY) \
-        --add-section .brutal.manifest=$$($(1)_PKG)/manifest.json \
+        --add-section .brutal.manifest=$$($(1)_JSON) \
         --set-section-flags .brutal.manifest=readonly,contents \
         $$@
 

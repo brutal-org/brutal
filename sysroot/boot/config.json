@@ -9,8 +9,8 @@
             },
             "modules": [
                 {
-                    "name": "init",
-                    "path": "/pkgs/init"
+                    "name": "system",
+                    "path": "/pkgs/system"
                 },
                 {
                     "name": "ahci",
@@ -29,12 +29,8 @@
                     "path": "/pkgs/ps2"
                 },
                 {
-                    "name": "wm",
-                    "path": "/pkgs/wm"
-                },
-                {
-                    "name": "bootimg",
-                    "path": "/boot/logo.tga"
+                    "name": "window",
+                    "path": "/pkgs/window"
                 },
                 {
                     "name": "about",

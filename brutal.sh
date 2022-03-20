@@ -2,7 +2,6 @@
 
 set -e
 
-TOOLS="$(make list-host) "
 JOBS=""
 SILENT="-s"
 DEBUG=""
@@ -16,6 +15,8 @@ fi
 
 usage()
 {
+  TOOLS="$(make list-host) "
+
   echo "Usage: $0 [options...] [tool] [args...]"
   echo ""
   echo "Options:"
@@ -29,6 +30,7 @@ usage()
   echo "    -h, --help     Show usage"
   echo "    -o, --coverage Generate code coverage"
   echo "    -r, --run      Start the virtual machine"
+  echo "        --resolve  print the path of the tool"
   echo "    -v, --verbose  Enable detailed logging"
   echo ""
   echo "Tools:"
@@ -98,12 +100,20 @@ if [ -z "$1" ]; then
   exit 1
 fi
 
+if [ $1 == "--resolve" ]; then
+    PKGS=./bin/$CONFIG/$(uname -m)-host-$TOOLCHAIN
+    shift
+    echo $PKGS/$1
+    exit 0
+fi
+
 while [[ $1 == -* ]]; do
   eval_arg $1
   shift
 done
 
 if [ $# -gt 0 ]; then
+  TOOLS="$(make list-host) "
   if [[ $TOOLS != *"$1 "* ]]; then
     echo "Unknown tool '$1'!"
     echo ""

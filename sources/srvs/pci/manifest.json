@@ -1,0 +1,7 @@
+{
+    "name": "pci",
+    "consume": [
+        "system::Server",
+        "boot::Info"
+    ]
+}
