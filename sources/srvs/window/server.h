@@ -1,17 +1,14 @@
 #pragma once
 
 #include <brutal/ui.h>
-#include "wm/client.h"
-#include "wm/display.h"
+#include "window/client.h"
+#include "window/display.h"
 
 typedef struct _WmServer
 {
-    IpcCap wm_server;
+    IpcCap window_server;
     IpcCap input_sink;
     Fiber *render_fiber;
-
-    bool layout_dirty;
-    WmLayout layout;
 
     GfxDirty display_dirty;
     WmDisplay *display;

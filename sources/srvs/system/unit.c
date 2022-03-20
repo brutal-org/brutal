@@ -1,6 +1,6 @@
 #include <bal/task.h>
 #include <brutal/debug.h>
-#include "init/unit.h"
+#include "system/unit.h"
 
 void unit_init(Unit *self, Str name, Alloc *alloc)
 {

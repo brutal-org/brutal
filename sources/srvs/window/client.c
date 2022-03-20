@@ -1,11 +1,11 @@
 #include <brutal/alloc.h>
-#include <protos/wm.h>
-#include "wm/client.h"
-#include "wm/server.h"
+#include <protos/window.h>
+#include "window/client.h"
+#include "window/server.h"
 
-/* --- Window Manager Client Protocol --------------------------------------- */
+/* --- Window Client Protocol ----------------------------------------------- */
 
-static WmError wm_client_show_handler(void *self, void *, bool *resp, Alloc *)
+static WindowError window_client_show_handler(void *self, void *, bool *resp, Alloc *)
 {
     WmClient *client = self;
     wm_client_show(client);
@@ -13,7 +13,7 @@ static WmError wm_client_show_handler(void *self, void *, bool *resp, Alloc *)
     return IPC_SUCCESS;
 }
 
-static WmError wm_client_hide_handler(void *self, void *, bool *resp, Alloc *)
+static WindowError window_client_hide_handler(void *self, void *, bool *resp, Alloc *)
 {
     WmClient *client = self;
     wm_client_hide(client);
@@ -21,7 +21,7 @@ static WmError wm_client_hide_handler(void *self, void *, bool *resp, Alloc *)
     return IPC_SUCCESS;
 }
 
-static WmError wm_client_close_handler(void *self, void *, bool *resp, Alloc *)
+static WindowError window_client_close_handler(void *self, void *, bool *resp, Alloc *)
 {
     WmClient *client = self;
     wm_client_close(client);
@@ -29,7 +29,7 @@ static WmError wm_client_close_handler(void *self, void *, bool *resp, Alloc *)
     return IPC_SUCCESS;
 }
 
-static WmError wm_client_flip_handler(void *self, MRectf const *req, bool *resp, Alloc *)
+static WindowError window_client_flip_handler(void *self, MRectf const *req, bool *resp, Alloc *)
 {
     WmClient *client = self;
     wm_client_flip(client, *req);
@@ -37,7 +37,7 @@ static WmError wm_client_flip_handler(void *self, MRectf const *req, bool *resp,
     return IPC_SUCCESS;
 }
 
-static WmError wm_client_resize_handler(void *self, MRectf const *req, bool *resp, Alloc *)
+static WindowError window_client_resize_handler(void *self, MRectf const *req, bool *resp, Alloc *)
 {
     WmClient *client = self;
     wm_client_resize(client, *req);
@@ -45,14 +45,14 @@ static WmError wm_client_resize_handler(void *self, MRectf const *req, bool *res
     return IPC_SUCCESS;
 }
 
-static WmError wm_client_surface_handler(void *self, void *, BalFb *resp, Alloc *)
+static WindowError window_client_surface_handler(void *self, void *, BalFb *resp, Alloc *)
 {
     WmClient *client = self;
     bal_fb_dup(resp, &client->backbuffer);
     return IPC_SUCCESS;
 }
 
-static WmError wm_client_listen_handler(void *self, IpcCap const *req, bool *resp, Alloc *)
+static WindowError window_client_listen_handler(void *self, IpcCap const *req, bool *resp, Alloc *)
 {
     WmClient *client = self;
     client->event_sink = *req;
@@ -60,14 +60,14 @@ static WmError wm_client_listen_handler(void *self, IpcCap const *req, bool *res
     return IPC_SUCCESS;
 }
 
-static WmClientVTable _wm_client_vtable = {
-    wm_client_show_handler,
-    wm_client_hide_handler,
-    wm_client_close_handler,
-    wm_client_flip_handler,
-    wm_client_resize_handler,
-    wm_client_surface_handler,
-    wm_client_listen_handler,
+static WindowClientVTable _window_client_vtable = {
+    window_client_show_handler,
+    window_client_hide_handler,
+    window_client_close_handler,
+    window_client_flip_handler,
+    window_client_resize_handler,
+    window_client_surface_handler,
+    window_client_listen_handler,
 };
 
 /* --- Window Manager Client ------------------------------------------------ */
@@ -84,7 +84,7 @@ WmClient *wm_client_create(struct _WmServer *server, MRectf bound, UiWinType typ
     bal_fb_init(&self->backbuffer, bound.width, bound.height, GFX_FMT_RGBA8888);
     bal_fb_map(&self->backbuffer);
 
-    self->wm_client = wm_client_provide(ipc_component_self(), &_wm_client_vtable, self);
+    self->wm_client = window_client_provide(ipc_component_self(), &_window_client_vtable, self);
 
     return self;
 }

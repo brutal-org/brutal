@@ -1,0 +1,3 @@
+PKG_WINDOW_PATH=srvs/window
+
+SRVS+=WINDOW

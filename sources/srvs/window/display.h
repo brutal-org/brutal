@@ -2,7 +2,6 @@
 
 #include <bal/hw.h>
 #include <brutal/gfx.h>
-#include <protos/wm.h>
 
 typedef struct
 {

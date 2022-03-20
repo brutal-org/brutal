@@ -1,39 +1,38 @@
 #include <brutal/alloc.h>
 #include <brutal/debug.h>
 #include <protos/boot.h>
-#include <protos/bus.h>
 #include <protos/event.h>
 #include <protos/hw.h>
 #include <protos/pci.h>
-#include <protos/wm.h>
-#include "init/boot.h"
-#include "init/bus.h"
+#include <protos/system.h>
+#include <protos/window.h>
+#include "system/bus.h"
 
-/* --- BBus Server Protocol ------------------------------------------------- */
+/* --- System Server Protocol ----------------------------------------------- */
 
-static BusError bus_server_expose_handler(void *self, IpcCap const *req, void *, MAYBE_UNUSED Alloc *alloc)
+static SystemError system_server_expose_handler(void *self, IpcCap const *req, void *, MAYBE_UNUSED Alloc *alloc)
 {
     Bus *bus = self;
     bus_expose(bus, *req);
     return IPC_SUCCESS;
 }
 
-static BusError bus_server_consume_handler(void *self, IpcProto const *req, IpcCap *resp, MAYBE_UNUSED Alloc *alloc)
+static SystemError system_server_consume_handler(void *self, IpcProto const *req, IpcCap *resp, MAYBE_UNUSED Alloc *alloc)
 {
     Bus *bus = self;
     *resp = bus_consume(bus, *req);
 
     if (resp->addr.id == BR_ID_NIL)
     {
-        return BUS_NOT_FOUND;
+        return SYSTEM_NOT_FOUND;
     }
 
     return IPC_SUCCESS;
 }
 
-static BusServerVTable _bus_server_vtable = {
-    bus_server_expose_handler,
-    bus_server_consume_handler,
+static SystemServerVTable _system_server_vtable = {
+    system_server_expose_handler,
+    system_server_consume_handler,
 };
 
 /* --- Boot Info Protocol --------------------------------------------------- */
@@ -80,16 +79,14 @@ static HwDisplayVTable _hw_display_vtable = {
 
 int br_main(Handover *handover)
 {
-    boot_splashscreen(handover);
-
     Bus bus;
     bus_init(&bus, handover, alloc_global());
 
     IpcComponent self = {};
     ipc_component_init(&self, alloc_global());
 
-    IpcCap bus_server_cap = bus_server_provide(&self, &_bus_server_vtable, &bus);
-    bus_expose(&bus, bus_server_cap);
+    IpcCap system_server_cap = system_server_provide(&self, &_system_server_vtable, &bus);
+    bus_expose(&bus, system_server_cap);
 
     IpcCap boot_info_cap = boot_info_provide(&self, &_bus_info_vtable, handover);
     bus_expose(&bus, boot_info_cap);
@@ -99,44 +96,44 @@ int br_main(Handover *handover)
 
     Unit acpi_unit;
     unit_init(&acpi_unit, str$("acpi"), alloc_global());
-    unit_consume(&acpi_unit, IPC_BUS_SERVER_PROTO);
+    unit_consume(&acpi_unit, IPC_SYSTEM_SERVER_PROTO);
     unit_consume(&acpi_unit, IPC_BOOT_INFO_PROTO);
     bus_activate(&bus, &acpi_unit);
 
     Unit pci_unit;
     unit_init(&pci_unit, str$("pci"), alloc_global());
-    unit_consume(&pci_unit, IPC_BUS_SERVER_PROTO);
+    unit_consume(&pci_unit, IPC_SYSTEM_SERVER_PROTO);
     unit_consume(&pci_unit, IPC_BOOT_INFO_PROTO);
     bus_activate(&bus, &pci_unit);
 
     Unit ps2_unit;
     unit_init(&ps2_unit, str$("ps2"), alloc_global());
-    unit_consume(&ps2_unit, IPC_BUS_SERVER_PROTO);
+    unit_consume(&ps2_unit, IPC_SYSTEM_SERVER_PROTO);
     unit_consume(&ps2_unit, IPC_EVENT_SINK_PROTO);
     bus_activate(&bus, &ps2_unit);
 
     Unit ahci_unit;
     unit_init(&ahci_unit, str$("ahci"), alloc_global());
-    unit_consume(&ahci_unit, IPC_BUS_SERVER_PROTO);
+    unit_consume(&ahci_unit, IPC_SYSTEM_SERVER_PROTO);
     unit_consume(&ahci_unit, IPC_PCI_BUS_PROTO);
     bus_activate(&bus, &ahci_unit);
 
-    Unit wm_unit;
-    unit_init(&wm_unit, str$("wm"), alloc_global());
-    unit_consume(&wm_unit, IPC_BUS_SERVER_PROTO);
-    unit_consume(&wm_unit, IPC_HW_DISPLAY_PROTO);
-    bus_activate(&bus, &wm_unit);
+    Unit window_unit;
+    unit_init(&window_unit, str$("window"), alloc_global());
+    unit_consume(&window_unit, IPC_SYSTEM_SERVER_PROTO);
+    unit_consume(&window_unit, IPC_HW_DISPLAY_PROTO);
+    bus_activate(&bus, &window_unit);
 
     Unit about_unit;
     unit_init(&about_unit, str$("about"), alloc_global());
-    unit_consume(&about_unit, IPC_BUS_SERVER_PROTO);
-    unit_consume(&about_unit, IPC_WM_SERVER_PROTO);
+    unit_consume(&about_unit, IPC_SYSTEM_SERVER_PROTO);
+    unit_consume(&about_unit, IPC_WINDOW_SERVER_PROTO);
     bus_activate(&bus, &about_unit);
 
     Unit panel_unit;
     unit_init(&panel_unit, str$("panel"), alloc_global());
-    unit_consume(&panel_unit, IPC_BUS_SERVER_PROTO);
-    unit_consume(&panel_unit, IPC_WM_SERVER_PROTO);
+    unit_consume(&panel_unit, IPC_SYSTEM_SERVER_PROTO);
+    unit_consume(&panel_unit, IPC_WINDOW_SERVER_PROTO);
     bus_activate(&bus, &panel_unit);
 
     return ipc_component_run(&self);

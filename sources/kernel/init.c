@@ -71,7 +71,7 @@ static uintptr_t init_pass(Task *task, Handover const *handover)
 
 void init_start(Handover const *handover)
 {
-    Str name = str$("init");
+    Str name = str$("system");
 
     HandoverModule const *elf_module = handover_find_module(handover, name);
 

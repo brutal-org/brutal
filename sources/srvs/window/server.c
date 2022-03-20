@@ -1,8 +1,8 @@
 #include <brutal/alloc.h>
 #include <brutal/gfx.h>
-#include <protos/bus.h>
-#include <protos/wm.h>
-#include "wm/server.h"
+#include <protos/system.h>
+#include <protos/window.h>
+#include "window/server.h"
 
 /* --- Input Sink Protocol -------------------------------------------------- */
 
@@ -21,7 +21,7 @@ static EventSinkVTable _input_sink_vtable = {
 
 /* --- Window Manager Server Protocol --------------------------------------- */
 
-WmError wm_server_create_handler(void *self, WmClientProps const *req, IpcCap *resp, Alloc *)
+WindowError window_server_create_handler(void *self, WindowClientProps const *req, IpcCap *resp, Alloc *)
 {
     WmServer *server = self;
 
@@ -32,8 +32,8 @@ WmError wm_server_create_handler(void *self, WmClientProps const *req, IpcCap *r
     return IPC_SUCCESS;
 }
 
-WmServerVTable _wm_server_vtable = {
-    wm_server_create_handler,
+WindowServerVTable _window_server_vtable = {
+    window_server_create_handler,
 };
 
 /* --- Render loop ---------------------------------------------------------- */
@@ -44,12 +44,6 @@ static void *wm_render_fiber(void *ctx)
 
     while (true)
     {
-
-        if (self->layout_dirty)
-        {
-            wm_server_layout(self);
-        }
-
         if (gfx_dirty_any(&self->display_dirty))
         {
             wm_server_render(self);
@@ -70,14 +64,14 @@ void wm_server_init(WmServer *self, WmDisplay *display)
     gfx_dirty_init(&self->display_dirty, alloc_global());
     vec_init(&self->clients, alloc_global());
 
-    self->wm_server = wm_server_provide(ipc_component_self(), &_wm_server_vtable, self);
+    self->window_server = window_server_provide(ipc_component_self(), &_window_server_vtable, self);
     self->input_sink = event_sink_provide(ipc_component_self(), &_input_sink_vtable, self);
     self->render_fiber = fiber_start(wm_render_fiber, self);
 }
 
 void wm_server_deinit(WmServer *self)
 {
-    ipc_component_revoke(ipc_component_self(), self->wm_server);
+    ipc_component_revoke(ipc_component_self(), self->window_server);
     ipc_component_revoke(ipc_component_self(), self->input_sink);
 
     vec_deinit(&self->clients);
@@ -154,16 +148,6 @@ static void wm_server_render_clients(WmServer *self, Gfx *gfx)
     }
 }
 
-void wm_server_should_layout(WmServer *self)
-{
-    self->layout_dirty = true;
-}
-
-void wm_server_layout(WmServer *self)
-{
-    self->layout_dirty = false;
-}
-
 void wm_server_should_render(WmServer *self, MRectf rect)
 {
     gfx_dirty_rect(&self->display_dirty, rect);
@@ -206,8 +190,8 @@ void wm_server_render(WmServer *self)
 
 void wm_server_expose(WmServer *self, IpcCap bus_server)
 {
-    bus_server_expose_rpc(ipc_component_self(), bus_server, &self->input_sink, alloc_global());
-    bus_server_expose_rpc(ipc_component_self(), bus_server, &self->wm_server, alloc_global());
+    system_server_expose_rpc(ipc_component_self(), bus_server, &self->input_sink, alloc_global());
+    system_server_expose_rpc(ipc_component_self(), bus_server, &self->window_server, alloc_global());
 }
 
 WmClient *wm_server_client_at(WmServer *self, MVec2f vec)

@@ -1,19 +1,12 @@
-module wm;
+module window;
 
 import base, math, event, ui;
 
-type WmClientProps =
+type WindowClientProps =
 {
     MRectf bound,
     UiWinType type,
 };
-
-type WmLayout = enum
-{
-    WM_LAYOUT_STACK,
-    WM_LAYOUT_FIBONACCI,
-    WM_LAYOUT_MONOCLE,
-} ;
 
 interface Client
 {
@@ -34,5 +27,5 @@ interface Client
 
 interface Server
 {
-    method create WmClientProps -> IpcCap;
+    method create WindowClientProps -> IpcCap;
 };

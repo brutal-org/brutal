@@ -1,11 +1,11 @@
 #include <brutal/alloc.h>
-#include <protos/bus.h>
 #include <protos/hw.h>
-#include "wm/server.h"
+#include <protos/system.h>
+#include "window/server.h"
 
 int ipc_component_main(IpcComponent *self)
 {
-    IpcCap bus_server = ipc_component_require(self, IPC_BUS_SERVER_PROTO);
+    IpcCap bus_server = ipc_component_require(self, IPC_SYSTEM_SERVER_PROTO);
     IpcCap hw_display = ipc_component_require(self, IPC_HW_DISPLAY_PROTO);
 
     BalFb surface;

@@ -1,4 +1,4 @@
-#include "wm/display.h"
+#include "window/display.h"
 
 void wm_display_init(WmDisplay *self, BalFb frontbuffer, Alloc *alloc)
 {

@@ -5,8 +5,8 @@
 #include <brutal/debug.h>
 #include <pci/pci.h>
 #include <protos/boot.h>
-#include <protos/bus.h>
 #include <protos/pci.h>
+#include <protos/system.h>
 
 typedef struct
 {
@@ -155,7 +155,7 @@ static Iter iter_pci(void *data, void *ctx)
 int ipc_component_main(IpcComponent *self)
 {
     IpcCap boot_infos = ipc_component_require(self, IPC_BOOT_INFO_PROTO);
-    IpcCap bus_server = ipc_component_require(self, IPC_BUS_SERVER_PROTO);
+    IpcCap system_server = ipc_component_require(self, IPC_SYSTEM_SERVER_PROTO);
 
     uintptr_t rsdp = 0;
     if (boot_info_rsdp_rpc(self, boot_infos, &rsdp, alloc_global()) != IPC_SUCCESS)
@@ -172,7 +172,7 @@ int ipc_component_main(IpcComponent *self)
 
     IpcCap pci_cap = pci_bus_provide(self, &pci_bus_vtable, &pci);
 
-    bus_server_expose_rpc(self, bus_server, &pci_cap, alloc_global());
+    system_server_expose_rpc(self, system_server, &pci_cap, alloc_global());
 
     return ipc_component_run(self);
 }
