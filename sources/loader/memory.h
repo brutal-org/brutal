@@ -27,17 +27,12 @@ typedef Range(uint64_t) PmmRange;
 
 VmmSpace memory_create(void);
 
-void memory_switch(VmmSpace self);
+void memory_switch(VmmSpace space);
 
-void memory_map_range(VmmSpace self, VmmRange vmm_range, PmmRange pmm_range);
+void memory_map_range(VmmSpace space, VmmRange vmm_range, PmmRange pmm_range);
 
 uint64_t loader_phys_alloc_page(size_t count);
 
 uint64_t kernel_module_phys_alloc_page_addr(size_t count, uint64_t addr);
 
 uint64_t kernel_module_phys_alloc_page(size_t count);
-
-static inline uintptr_t memory_phys_to_io(uintptr_t phys_addr)
-{
-    return phys_addr + MMAP_IO_BASE;
-}

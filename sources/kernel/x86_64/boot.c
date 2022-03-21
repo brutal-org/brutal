@@ -30,7 +30,7 @@ void arch_entry_main_stivale2(struct stivale2_struct const *info)
     arch_entry_main(&_handover);
 }
 
-void arch_entry_main(Handover *handover)
+void arch_entry_main(Handover *handover, uint64_t magic)
 {
     cpu_disable_interrupts();
     cpu_retain_disable();
@@ -39,7 +39,7 @@ void arch_entry_main(Handover *handover)
 
     kernel_splash();
 
-    log$("Handover at {#p}", (void *)handover);
+    log$("Handover at {#p} with magic {08x}", (void *)handover, magic);
     handover_dump(handover);
 
     gdt_initialize();

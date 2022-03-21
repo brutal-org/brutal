@@ -23,4 +23,9 @@ typedef struct
     LoaderFramebuffer framebuffer;
 } LoaderEntry;
 
-LoaderEntry config_get_entry(Str name, Str path);
+typedef struct
+{
+    Vec(LoaderEntry) entries;
+} LoaderConfig;
+
+LoaderConfig config_load(Str path, Alloc *alloc);

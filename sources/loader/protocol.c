@@ -4,6 +4,7 @@
 #include <brutal/io.h>
 #include <efi/lib.h>
 #include <efi/srvs.h>
+#include <elf/elf.h>
 #include "loader/memory.h"
 #include "loader/protocol.h"
 
@@ -25,7 +26,7 @@ static HandoverMmapType efi_mmap_type_to_handover[] = {
     [EFI_PERSISTENT_MEMORY] = HANDOVER_MMAP_RESERVED,
 };
 
-static void efi_populate_mmap(HandoverMmap *mmap)
+void efi_populate_mmap(HandoverMmap *mmap)
 {
     mmap->size = 0;
 
@@ -56,7 +57,7 @@ static void efi_populate_mmap(HandoverMmap *mmap)
     }
 }
 
-static EfiStatus efi_lookup_acpi(EfiGuid table_guid, void **table)
+EfiStatus efi_lookup_acpi(EfiGuid table_guid, void **table)
 {
     for (uint64_t i = 0; i < efi_st()->num_table_entries; i++)
     {
@@ -70,7 +71,7 @@ static EfiStatus efi_lookup_acpi(EfiGuid table_guid, void **table)
     return EFI_NOT_FOUND;
 }
 
-static uintptr_t efi_find_rsdp(void)
+uintptr_t efi_find_rsdp(void)
 {
     void *acpi_table = nullptr;
 
@@ -88,12 +89,12 @@ static uintptr_t efi_find_rsdp(void)
     }
 }
 
-static int eif_gop_find_mode(EFIGraphicsOutputProtocol *gop, size_t req_width, size_t req_height)
+int eif_gop_find_mode(EFIGraphicsOutputProtocol *gop, size_t req_width, size_t req_height)
 {
     EFIGraphicsOutputModeInfo *info;
     for (uint32_t i = 0; i < gop->mode->max_mode; i++)
     {
-        size_t info_size = 0;
+        uint64_t info_size = 0;
         EfiStatus status = gop->query_mode(gop, i, &info_size, &info);
         if (status == EFI_ERR)
         {
@@ -111,7 +112,7 @@ static int eif_gop_find_mode(EFIGraphicsOutputProtocol *gop, size_t req_width, s
     log$("Available mode: ");
     for (uint32_t i = 0; i < gop->mode->max_mode; i++)
     {
-        size_t info_size = 0;
+        uint64_t info_size = 0;
         EfiStatus status = gop->query_mode(gop, i, &info_size, &info);
         if (status == EFI_ERR)
         {
@@ -126,7 +127,7 @@ static int eif_gop_find_mode(EFIGraphicsOutputProtocol *gop, size_t req_width, s
     return gop->mode->max_mode - 1;
 }
 
-static void efi_populate_framebuffer(EFIBootServices *bs, HandoverFramebuffer *fb, LoaderFramebuffer const *req_fb)
+void efi_populate_framebuffer(EFIBootServices *bs, HandoverFramebuffer *fb, LoaderFramebuffer const *req_fb)
 {
     EFIGraphicsOutputProtocol *gop;
     EfiGuid gop_guid = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
@@ -153,7 +154,7 @@ static void efi_populate_framebuffer(EFIBootServices *bs, HandoverFramebuffer *f
     fb->bpp = 32;
 }
 
-static void efi_load_module(HandoverModule *target, Str path)
+void efi_load_module(HandoverModule *target, Str path)
 {
     IoFile file;
     io_file_view(&file, path);
@@ -169,7 +170,7 @@ static void efi_load_module(HandoverModule *target, Str path)
     log$("Loaded module data '{}' (begin: {p} end: {p})...", path, target->addr, target->addr + target->size);
 }
 
-static void efi_load_modules(LoaderEntry const *entry, HandoverModules *modules)
+void efi_load_modules(LoaderEntry const *entry, HandoverModules *modules)
 {
     int id = 0;
     vec_foreach_v(module, &entry->modules)
@@ -187,12 +188,86 @@ static void efi_load_modules(LoaderEntry const *entry, HandoverModules *modules)
     modules->size = id;
 }
 
-void efi_populate_handover(LoaderEntry const *entry, Handover *ho)
+void efi_load_elf(Elf64Header const *elf_header, void *base, VmmSpace vmm)
+{
+    Elf64ProgramHeader *prog_header = (Elf64ProgramHeader *)(base + elf_header->programs_offset);
+
+    for (int i = 0; i < elf_header->programs_count; i++)
+    {
+        if (prog_header->type == ELF_PROGRAM_HEADER_LOAD)
+        {
+            void *file_segment = (void *)((uint64_t)base + prog_header->file_offset);
+
+            void *mem_phys_segment = (void *)kernel_module_phys_alloc_page_addr(align_up$(prog_header->memory_size, PAGE_SIZE) / PAGE_SIZE, prog_header->virtual_address - MMAP_KERNEL_BASE);
+
+            mem_cpy(mem_phys_segment, file_segment, prog_header->file_size);
+            mem_set(mem_phys_segment + prog_header->file_size, 0, prog_header->memory_size - prog_header->file_size);
+            memory_map_range(vmm, (VmmRange){
+                                      .base = prog_header->virtual_address,
+                                      .size = align_up$(prog_header->memory_size, PAGE_SIZE),
+                                  },
+                             (PmmRange){
+                                 .base = (uintptr_t)mem_phys_segment,
+                                 .size = align_up$(prog_header->memory_size, PAGE_SIZE),
+                             });
+        }
+        else
+        {
+            log$("Unkown program header: {}", prog_header->type);
+        }
+
+        prog_header = (Elf64ProgramHeader *)((void *)prog_header + elf_header->programs_size);
+    }
+}
+
+EntryPointFn *efi_load_kernel(Str path, VmmSpace vmm)
+{
+    log$("Loading elf file...");
+
+    IoFile file;
+    io_file_view(&file, path);
+
+    Buf buf;
+    io_read_all(io_file_reader(&file), &buf, alloc_global());
+
+    log$("Loaded elf file...");
+    Elf64Header *header = (Elf64Header *)buf.data;
+
+    if (buf.used < sizeof(Elf64Header) ||
+        !elf_validate(header))
+    {
+        panic$("Invalid elf file!");
+    }
+
+    log$("Elf file loaded in memory, mapping it...");
+
+    efi_load_elf(header, buf.data, vmm);
+
+    uintptr_t entry = header->entry;
+
+    buf_deinit(&buf);
+
+    log$("Entry is {#x}", entry);
+
+    return (EntryPointFn *)entry;
+}
+
+EntryPointFn *efi_populate_handover(LoaderEntry const *entry, Handover *ho, VmmSpace vmm)
 {
     ho->tag = HANDOVER_TAG;
-
-    efi_populate_framebuffer(efi_st()->boot_services, &ho->framebuffer, &entry->framebuffer);
-    efi_load_modules(entry, &ho->modules);
-    efi_populate_mmap(&ho->mmap);
     ho->rsdp = efi_find_rsdp();
+
+    log$("Loading kernel...");
+    EntryPointFn *entry_point = efi_load_kernel(entry->kernel, vmm);
+
+    log$("Loading modules...");
+    efi_load_modules(entry, &ho->modules);
+
+    log$("Loading framebuffer...");
+    efi_populate_framebuffer(efi_st()->boot_services, &ho->framebuffer, &entry->framebuffer);
+
+    log$("Populating mmap...");
+    efi_populate_mmap(&ho->mmap);
+
+    return entry_point;
 }

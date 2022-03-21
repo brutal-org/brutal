@@ -40,8 +40,11 @@ LoaderEntry config_entry_parse(Json json)
     return entry;
 }
 
-LoaderEntry config_get_entry(Str name, Str path)
+LoaderConfig config_load(Str path, Alloc *alloc)
 {
+    LoaderConfig config = {};
+    vec_init(&config.entries, alloc);
+
     Json config_json = json_parse_file(path, alloc_global());
 
     Json entries_json;
@@ -54,13 +57,10 @@ LoaderEntry config_get_entry(Str name, Str path)
     {
         LoaderEntry entry = config_entry_parse(json_at(entries_json, i));
 
-        if (str_eq(entry.name, name))
-        {
-            return entry;
-        }
+        vec_push(&config.entries, entry);
 
-        return entry;
+        log$("Detected entry: {}", entry.name);
     }
 
-    panic$("Entry '{}' not found!", name);
+    return config;
 }

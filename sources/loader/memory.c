@@ -87,46 +87,35 @@ void memory_map(uint64_t phys, uint64_t virt, Pages *pml4)
     pml1[pml1_idx] = phys | LOADER_PAGING_FLAGS;
 }
 
-void memory_switch(VmmSpace page_table)
+void memory_switch(VmmSpace space)
 {
-    asm volatile("mov %0, %%cr3" ::"a"((uintptr_t)page_table));
+    asm volatile("mov %0, %%cr3"
+                 :
+                 : "a"((uintptr_t)space));
 }
 
-void memory_map_range(VmmSpace self, VmmRange vmm_range, PmmRange pmm_range)
+void memory_map_range(VmmSpace space, VmmRange vmm_range, PmmRange pmm_range)
 {
     for (size_t i = 0; i < m_min(vmm_range.size, pmm_range.size); i += PAGE_SIZE)
     {
-        memory_map(i + pmm_range.base, i + vmm_range.base, self);
+        memory_map(i + pmm_range.base, i + vmm_range.base, space);
     }
 }
 
 VmmSpace memory_create(void)
 {
-    log$("Allocated: {x}", sizeof(Pages));
-
     VmmSpace self = (Pages *)loader_phys_alloc_page(1);
 
-    log$("Loading bootloader memory map");
+    memory_map_range(
+        self,
+        (VmmRange){.base = MMAP_IO_BASE + PAGE_SIZE, .size = GiB(4) - PAGE_SIZE},
+        (PmmRange){.base = PAGE_SIZE, .size = GiB(4) - PAGE_SIZE});
 
-    memory_map_range(self, (VmmRange){
-                         .base = memory_phys_to_io(0),
-                         .size = GiB(4),
-                     },
-                     (PmmRange){
-                         .base = 0,
-                         .size = GiB(4),
-                     });
-
-    memory_map_range(self, (VmmRange){
-                         .base = (0),
-                         .size = GiB(4),
-                     },
-                     (PmmRange){
-                         .base = 0,
-                         .size = GiB(4),
-                     });
+    // Map the bootloader to make sure we don't die when we switch to the kernel's vmm
+    memory_map_range(
+        self,
+        (VmmRange){.base = PAGE_SIZE, .size = MiB(512) - PAGE_SIZE},
+        (PmmRange){.base = PAGE_SIZE, .size = MiB(512) - PAGE_SIZE});
 
     return self;
-
 }
-

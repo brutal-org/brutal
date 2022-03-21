@@ -1,0 +1,2 @@
+
+void __chkstk() { return; }

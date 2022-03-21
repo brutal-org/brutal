@@ -29,7 +29,6 @@ struct _Json
         JsonArr array;
         Str string;
         long number;
-        char character;
     };
 };
 
