@@ -28,7 +28,9 @@ void bus_expose(Bus *self, IpcCap cap)
         unit_provide(unit, cap);
 
         if (unit->state == UNIT_READY)
-            unit_start(unit, self->handover);
+        {
+            unit_start(unit);
+        }
     }
 }
 
@@ -54,7 +56,9 @@ void bus_activate(Bus *self, Unit *unit)
         unit_provide(unit, *cap);
 
         if (unit->state == UNIT_READY)
-            unit_start(unit, self->handover);
+        {
+            unit_start(unit);
+        }
     }
 
     vec_push(&self->units, *unit);

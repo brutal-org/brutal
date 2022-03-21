@@ -1,13 +1,39 @@
 #include <bal/task.h>
 #include <brutal/debug.h>
+#include <elf/elf.h>
+#include <json/parser.h>
 #include "system/unit.h"
 
-void unit_init(Unit *self, Str name, Alloc *alloc)
+void unit_init(Unit *self, Str name, BalMem payload, Alloc *alloc)
 {
     self->state = UNIT_PENDING;
     self->name = name;
     self->ready = 0;
+    self->payload = payload;
     vec_init(&self->consume, alloc);
+}
+
+void unit_init_from_module(Unit *self, HandoverModule mod, Alloc *alloc)
+{
+    BalMem module_mem = {};
+    bal_mem_init_pmm(&module_mem, mod.addr, mod.size);
+    bal_mem_map(&module_mem);
+
+    Str manifest_str = elf_manifest((Elf64Header *)module_mem.buf);
+
+    Json manifest_json = json_parse_str(manifest_str, alloc);
+
+    Str unit_name = json_get(manifest_json, str$("name")).string;
+
+    unit_init(self, unit_name, module_mem, alloc);
+
+    Json consume = json_get(manifest_json, str$("consume"));
+
+    for (int j = 0; j < json_len(consume); j++)
+    {
+        IpcProto proto = json_at(consume, j).number;
+        unit_consume(self, proto);
+    }
 }
 
 void unit_deinit(Unit *self)
@@ -45,31 +71,22 @@ void unit_provide(Unit *self, IpcCap new_cap)
     }
 }
 
-void unit_start(Unit *self, Handover *handover)
+void unit_start(Unit *self)
 {
     if (self->state != UNIT_READY)
         return;
 
     log$("Starting service '{case:pascal}'...", self->name);
 
-    HandoverModule const *elf = handover_find_module(handover, self->name);
-    assert_not_null(elf);
-
-    BalMem elf_mem;
-    bal_mem_init_pmm(&elf_mem, elf->addr, elf->size);
-    bal_mem_map(&elf_mem);
-
     BalTask elf_task;
     bal_task_init(&elf_task, self->name);
 
     bal_TaskExec(
         &elf_task,
-        &elf_mem,
+        &self->payload,
         BR_RIGHT_PIO | BR_RIGHT_LOG | BR_RIGHT_DMA | BR_RIGHT_IRQ,
         self->consume.data,
         self->consume.len);
-
-    bal_mem_deinit(&elf_mem);
 
     log$("Service '{case:pascal}' started!", self->name);
 
