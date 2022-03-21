@@ -41,15 +41,17 @@ static HandoverMmapType stivale_mmap_type_to_handover_type(int stivale_entry)
 
 static void fill_handover_mmap(Handover *target, struct stivale2_struct_tag_memmap const *memory_map)
 {
-    target->mmap.size = memory_map->entries;
+    target->mmap.size = 0;
 
     for (size_t i = 0; i < memory_map->entries; i++)
     {
-        HandoverMmapEntry *entry = &target->mmap.entries[i];
-
-        entry->type = stivale_mmap_type_to_handover_type(memory_map->memmap[i].type);
-        entry->base = (memory_map->memmap[i].base) ;
-        entry->size = memory_map->memmap[i].length;
+        handover_mmap_append(
+            &target->mmap,
+            (HandoverMmapEntry){
+                .type = stivale_mmap_type_to_handover_type(memory_map->memmap[i].type),
+                .base = memory_map->memmap[i].base,
+                .size = memory_map->memmap[i].length,
+            });
     }
 }
 
