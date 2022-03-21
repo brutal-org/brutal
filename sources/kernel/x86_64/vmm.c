@@ -82,23 +82,22 @@ static void vmm_load_memory_map(VmmSpace target, HandoverMmap const *memory_map)
     for (size_t i = 0; i < memory_map->size; i++)
     {
         HandoverMmapEntry entry = memory_map->entries[i];
-        USizeRange entry_range = {entry.base, entry.size};
-        PmmRange physical_range = range_align_bigger(entry_range, MEM_PAGE_SIZE);
+        PmmRange entry_range = {entry.base, entry.size};
 
         if (entry.type == HANDOVER_MMAP_USED)
         {
             log$("Mapping ({x} - {x}) to kernel", entry.base, entry.base + entry.size);
 
-            VmmRange vrange = {mmap_phys_to_kernel(physical_range.base), physical_range.size};
-            vmm_map(target, vrange, physical_range, BR_MEM_WRITABLE);
+            VmmRange vrange = {mmap_phys_to_kernel(entry_range.base), entry_range.size};
+            vmm_map(target, vrange, entry_range, BR_MEM_WRITABLE);
         }
 
         if (entry.base >= GiB(4)) // The bottom 4Gio are already mapped
         {
             log$("Mapping ({x} - {x}) to IO", entry.base, entry.base + entry.size);
 
-            VmmRange vrange = {mmap_phys_to_io(physical_range.base), physical_range.size};
-            vmm_map(target, vrange, physical_range, BR_MEM_WRITABLE);
+            VmmRange vrange = {mmap_phys_to_io(entry_range.base), entry_range.size};
+            vmm_map(target, vrange, entry_range, BR_MEM_WRITABLE);
         }
     }
 }

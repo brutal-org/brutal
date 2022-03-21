@@ -121,3 +121,13 @@ void handover_mmap_append(HandoverMmap *self, HandoverMmapEntry entry)
 
     self->entries[self->size++] = entry;
 }
+
+uintptr_t handover_mmap_base(HandoverMmap const *memory_map)
+{
+    return memory_map->entries[0].base;
+}
+
+uintptr_t handover_mmap_end(HandoverMmap const *memory_map)
+{
+    return range_end(memory_map->entries[memory_map->size - 1]);
+}

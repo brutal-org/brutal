@@ -93,12 +93,6 @@ void handover_dump(Handover const *handover);
 
 void handover_mmap_append(HandoverMmap *self, HandoverMmapEntry entry);
 
-static inline uintptr_t handover_mmap_base(HandoverMmap const *memory_map)
-{
-    return memory_map->entries[0].base;
-}
+uintptr_t handover_mmap_base(HandoverMmap const *memory_map);
 
-static inline uintptr_t handover_mmap_end(HandoverMmap const *memory_map)
-{
-    return range_end(memory_map->entries[memory_map->size - 1]);
-}
+uintptr_t handover_mmap_end(HandoverMmap const *memory_map);

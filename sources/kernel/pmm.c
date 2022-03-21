@@ -66,7 +66,7 @@ static void pmm_mmap_load(HandoverMmap const *memory_map)
         {
             PmmRange entry_range = {entry.base, entry.size};
 
-            pmm_unused(range_align_smaller(entry_range, MEM_PAGE_SIZE));
+            pmm_unused(entry_range);
 
             _available_memory += entry_range.size;
         }
