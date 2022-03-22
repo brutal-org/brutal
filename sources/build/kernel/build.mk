@@ -3,7 +3,6 @@ KERNEL=$(BINDIR_KERNEL)/kernel.elf
 KERNEL_SRC += \
 	sources/libs/bal/abi/helpers.c                 \
 	sources/libs/brutal/io/fmt.c                   \
-	sources/libs/brutal/io/print.c                 \
 	sources/libs/brutal/io/emit.c                  \
 	sources/libs/brutal/io/funcs.c                 \
 	sources/libs/brutal/io/base.c                  \

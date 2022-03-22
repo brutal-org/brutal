@@ -1,12 +1,10 @@
 #pragma once
 
+#include <brutal/base/any.h>
 #include <brutal/io/traits.h>
 #include <brutal/parse/scan.h>
 #include <brutal/text/case.h>
 #include <brutal/text/str.h>
-
-typedef int64_t FmtInt;
-typedef uint64_t FmtUInt;
 
 typedef enum
 {
@@ -34,9 +32,9 @@ typedef struct
 
 Fmt fmt_parse(Scan *scan);
 
-IoResult fmt_signed(Fmt self, IoWriter writer, FmtInt value);
+IoResult fmt_signed(Fmt self, IoWriter writer, int64_t value);
 
-IoResult fmt_unsigned(Fmt self, IoWriter writer, FmtUInt value);
+IoResult fmt_unsigned(Fmt self, IoWriter writer, uint64_t value);
 
 #ifndef __freestanding__
 IoResult fmt_float(Fmt self, IoWriter writer, double value);
@@ -45,3 +43,5 @@ IoResult fmt_float(Fmt self, IoWriter writer, double value);
 IoResult fmt_string(Fmt self, IoWriter writer, Str string);
 
 IoResult fmt_char(Fmt self, IoWriter writer, unsigned int character);
+
+IoResult fmt_any(Fmt self, IoWriter writer, Any value);

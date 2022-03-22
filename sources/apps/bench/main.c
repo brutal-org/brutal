@@ -28,7 +28,7 @@ static void bench_run_tick(Gfx *self, Bench bench, float t)
 
 static void bench_draw_fps(Gfx *gfx, double avg_delta)
 {
-    Str v = str_fmt(alloc_global(), "fps: {} (dt: {})", 1.f / avg_delta, avg_delta);
+    Str v = str_fmt$(alloc_global(), "fps: {} (dt: {})", 1.f / avg_delta, avg_delta);
     gfx_fill_style(gfx, gfx_paint_fill(GFX_WHITE));
     gfx_text(gfx, m_vec2f(0, 20), v);
     alloc_free(alloc_global(), (void *)v.buf);
@@ -58,7 +58,7 @@ static double bench_run(UiApp *app, UiWin *win, Bench bench, int sec_per_bench)
         // here we calculate the time it tooks to render the benchmark
         NanoSeconds start = time_ns_now();
 
-        bench_run_tick(&win->gfx, bench,t);
+        bench_run_tick(&win->gfx, bench, t);
 
         NanoSeconds end = time_ns_now();
 

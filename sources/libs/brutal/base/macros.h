@@ -33,3 +33,25 @@
         *(X) = *(Y);                    \
         *(Y) = __swap_tmp;              \
     } while (0)
+
+// clang-format off
+
+#define _MatchSigned(EXPR) \
+        char: EXPR,        \
+        short: EXPR,       \
+        int: EXPR,         \
+        long: EXPR,        \
+        long long: EXPR
+
+#define _MatchUnsigned(EXPR)      \
+        unsigned char: EXPR,      \
+        unsigned short: EXPR,     \
+        unsigned int: EXPR,       \
+        unsigned long: EXPR,      \
+        unsigned long long: EXPR
+
+#define _MatchFloat(EXPR) \
+        float: EXPR,      \
+        double: EXPR
+
+// clang-format on

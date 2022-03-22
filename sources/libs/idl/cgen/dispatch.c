@@ -1,10 +1,11 @@
 #include <brutal/io.h>
+#include <brutal/text.h>
 #include <cc/builder.h>
 #include <idl/cgen.h>
 
 CExpr idl_cgen_dispatch_vtable(IdlIface const iface, Alloc *alloc)
 {
-    CType vtable_type = ctype_ident_ptr(str_fmt(alloc, "{}VTable", iface.name), alloc);
+    CType vtable_type = ctype_ident_ptr(str_fmt$(alloc, "{}VTable", iface.name), alloc);
     return cexpr_cast(cexpr_ident(str$("vtable")), vtable_type, alloc);
 }
 
@@ -70,7 +71,7 @@ CStmt idl_cgen_dispatch_body(IdlIface const iface, Alloc *alloc)
     {
         CStmt case_body = cstmt_block(alloc);
 
-        cstmt_block_add(&dispatch_body, cstmt_case(cexpr_ident(str_fmt(alloc, "MSG_{case:upper}_REQ", method.name))));
+        cstmt_block_add(&dispatch_body, cstmt_case(cexpr_ident(str_fmt$(alloc, "MSG_{case:upper}_REQ", method.name))));
         idl_cgen_dispatch_case(&case_body, method, iface, alloc);
         cstmt_block_add(&case_body, cstmt_break());
         cstmt_block_add(&dispatch_body, case_body);
@@ -84,7 +85,7 @@ CStmt idl_cgen_dispatch_body(IdlIface const iface, Alloc *alloc)
 
 CDecl idl_cgen_dispatch_func(IdlIface const iface, Alloc *alloc)
 {
-    Str name = str_fmt(alloc, "__IDL_PRIVATE__{case:snake}_dispatch_rpc", iface.name);
+    Str name = str_fmt$(alloc, "__IDL_PRIVATE__{case:snake}_dispatch_rpc", iface.name);
     CType type = idl_cgen_dispatch_type(alloc);
     CStmt body = idl_cgen_dispatch_body(iface, alloc);
 

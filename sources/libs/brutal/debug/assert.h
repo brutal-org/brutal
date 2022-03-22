@@ -2,7 +2,6 @@
 
 #include <brutal/base/attributes.h>
 #include <brutal/debug/locked.h>
-#include <brutal/io/print.h>
 
 #define assert_not_null(EXPR) (                      \
     {                                                \

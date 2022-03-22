@@ -1,6 +1,7 @@
 #include <brutal/debug.h>
 #include <brutal/hash.h>
 #include <brutal/io.h>
+#include <brutal/text.h>
 #include <idl/ast.h>
 #include <idl/ast/builder.h>
 #include <idl/parse.h>
@@ -31,7 +32,7 @@ static IdlType idl_sema_type(IdlType type, IdlModule module, Alloc *alloc)
         prefixed = idl_enum(alloc);
         vec_foreach_v(member, &type.enum_.members)
         {
-            idl_enum_constant(&prefixed, str_fmt(alloc, "{case:constant}_{case:constant}", module.name, member.name), member.value);
+            idl_enum_constant(&prefixed, str_fmt$(alloc, "{case:constant}_{case:constant}", module.name, member.name), member.value);
         }
         return prefixed;
 
@@ -55,20 +56,20 @@ static IdlType idl_sema_type(IdlType type, IdlModule module, Alloc *alloc)
 
 IdlIface idl_sema_iface(IdlModule *module, IdlIface iface, Alloc *alloc)
 {
-    IdlIface prefixed = idl_iface(str_fmt(alloc, "{case:pascal}{case:pascal}", module->name, iface.name), iface.attrs, alloc);
+    IdlIface prefixed = idl_iface(str_fmt$(alloc, "{case:pascal}{case:pascal}", module->name, iface.name), iface.attrs, alloc);
     prefixed.id = fnv_32(module->name.buf, module->name.len, FNV1_32_INIT);
     prefixed.id = fnv_32(iface.name.buf, iface.name.len, prefixed.id);
 
     vec_foreach_v(method, &iface.methods)
     {
-        Str name = str_fmt(alloc, "{case:snake}_{case:snake}", prefixed.name, method.name);
+        Str name = str_fmt$(alloc, "{case:snake}_{case:snake}", prefixed.name, method.name);
 
         IdlType prefixed_request = idl_sema_type(method.request, *module, alloc);
         IdlType prefixed_response = idl_sema_type(method.response, *module, alloc);
 
         if (prefixed_request.type != IDL_TYPE_PRIMITIVE && prefixed_request.type != IDL_TYPE_NIL)
         {
-            Str request_name = str_fmt(alloc, "{case:pascal}Request", name);
+            Str request_name = str_fmt$(alloc, "{case:pascal}Request", name);
             IdlAlias request_alias = idl_alias(request_name, idl_attrs(alloc), prefixed_request);
             idl_module_alias(module, request_alias);
             prefixed_request = idl_primitive_resolved(request_name, request_alias, alloc);
@@ -76,7 +77,7 @@ IdlIface idl_sema_iface(IdlModule *module, IdlIface iface, Alloc *alloc)
 
         if (prefixed_response.type != IDL_TYPE_PRIMITIVE && prefixed_response.type != IDL_TYPE_NIL)
         {
-            Str response_name = str_fmt(alloc, "{case:pascal}Response", name);
+            Str response_name = str_fmt$(alloc, "{case:pascal}Response", name);
             IdlAlias response_alias = idl_alias(response_name, idl_attrs(alloc), prefixed_response);
             idl_module_alias(module, response_alias);
             prefixed_response = idl_primitive_resolved(response_name, response_alias, alloc);
@@ -96,7 +97,7 @@ IdlModule idl_sema_module(IdlModule module, Alloc *alloc)
     // Don't bother with prefixing errors if there are no interfaces
     if (vec_len(&module.ifaces) > 0)
     {
-        Str error_name = str_fmt(alloc, "{case:pascal}Error", module.name);
+        Str error_name = str_fmt$(alloc, "{case:pascal}Error", module.name);
         IdlAlias error_alias = idl_alias(error_name, idl_attrs(alloc), idl_sema_type(module.errors, prefixed, alloc));
         idl_module_alias(&prefixed, error_alias);
         prefixed.errors = idl_primitive_resolved(str$("Error"), error_alias, alloc);

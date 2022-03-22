@@ -217,7 +217,7 @@ Fmt fmt_parse(Scan *scan)
     return fmt;
 }
 
-IoResult fmt_signed(Fmt self, IoWriter writer, FmtInt value)
+IoResult fmt_signed(Fmt self, IoWriter writer, int64_t value)
 {
     size_t written = 0;
 
@@ -242,9 +242,9 @@ static void reverse(uint8_t *str, size_t len)
     }
 }
 
-IoResult fmt_unsigned(Fmt self, IoWriter writer, FmtUInt value)
+IoResult fmt_unsigned(Fmt self, IoWriter writer, uint64_t value)
 {
-    uint8_t buf[sizeof(FmtUInt) * 8] = {};
+    uint8_t buf[sizeof(uint64_t) * 8] = {};
     int i = 0;
 
     if (value == 0)
@@ -311,7 +311,7 @@ IoResult fmt_float(Fmt self, IoWriter writer, double value)
         return OK(IoResult, written);
     }
 
-    written += TRY(IoResult, fmt_unsigned(self, writer, (FmtUInt)value));
+    written += TRY(IoResult, fmt_unsigned(self, writer, (uint64_t)value));
 
     if (self.precison == 0)
     {
@@ -320,13 +320,13 @@ IoResult fmt_float(Fmt self, IoWriter writer, double value)
 
     written += TRY(IoResult, io_write_byte(writer, '.'));
 
-    value -= (FmtUInt)value;
+    value -= (uint64_t)value;
 
     for (int i = 0; i < self.precison; i++)
     {
         value *= fmt_base(self);
-        written += TRY(IoResult, io_write_byte(writer, fmt_digit(self, (FmtUInt)value)));
-        value -= (FmtUInt)value;
+        written += TRY(IoResult, io_write_byte(writer, fmt_digit(self, (uint64_t)value)));
+        value -= (uint64_t)value;
     }
 
     return OK(IoResult, written);
@@ -388,5 +388,37 @@ IoResult fmt_string(Fmt self, IoWriter writer, Str value)
         IoResult result = io_write_str(writer, buf_str(&buf));
         buf_deinit(&buf);
         return result;
+    }
+}
+
+IoResult fmt_any(Fmt self, IoWriter writer, Any value)
+{
+    switch (value.type)
+    {
+    case ANY_INT:
+        if (self.type == FMT_CHAR)
+            return fmt_char(self, writer, value.int_);
+        else
+            return fmt_signed(self, writer, value.int_);
+
+    case ANY_UINT:
+        if (self.type == FMT_CHAR)
+            return fmt_char(self, writer, value.uint_);
+        else
+            return fmt_unsigned(self, writer, value.uint_);
+
+#ifndef __freestanding__
+    case ANY_FLOAT:
+        return fmt_float(self, writer, value.float_);
+#endif
+
+    case ANY_STR:
+        return fmt_string(self, writer, value.str_);
+
+    case ANY_PTR:
+        return fmt_unsigned(self, writer, (uintptr_t)value.ptr_);
+
+    default:
+        return io_write_str(writer, str$("<unknown>"));
     }
 }

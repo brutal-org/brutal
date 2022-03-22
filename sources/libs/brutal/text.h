@@ -4,6 +4,7 @@
 /* --- */
 #include <brutal/text/case.h>
 #include <brutal/text/cp437.h>
+#include <brutal/text/fmt.h>
 #include <brutal/text/glob.h>
 #include <brutal/text/rune.h>
 #include <brutal/text/str.h>

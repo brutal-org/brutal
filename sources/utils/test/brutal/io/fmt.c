@@ -1,34 +1,34 @@
 #include <brutal/alloc.h>
-#include <brutal/io/print.h>
+#include <brutal/text.h>
 #include "test/test.h"
 
 #define SIMPLE_FMT_TEST(FORMAT, ARG1, EXPECTED) \
-    assert_str_equal(str$(EXPECTED), str_fmt(alloc_global(), str$(FORMAT), ARG1))
+    assert_str_equal(str$(EXPECTED), str_fmt$(test_alloc(), str$(FORMAT), ARG1))
 
 TEST(str_fmt)
 {
-    Str formated = str_fmt(alloc_global(), str$("hello world"));
+    Str formated = str_fmt$(alloc_global(), str$("hello world"));
 
     assert_str_equal(str$("hello world"), formated);
 }
 
 TEST(str_fmt_with_no_arg)
 {
-    Str formated = str_fmt(alloc_global(), "hello {}");
+    Str formated = str_fmt$(alloc_global(), "hello {}");
 
     assert_str_equal(str$("hello {}"), formated);
 }
 
 TEST(str_fmt_with_double_bracket)
 {
-    Str formated = str_fmt(alloc_global(), "hello {{}}");
+    Str formated = str_fmt$(alloc_global(), "hello {{}}");
 
     assert_str_equal(str$("hello {}"), formated);
 }
 
 TEST(str_fmt_with_str)
 {
-    Str formated = str_fmt(alloc_global(), "{} this cruel {}", "hello", str$("world"));
+    Str formated = str_fmt$(alloc_global(), "{} this cruel {}", "hello", str$("world"));
 
     assert_str_equal(str$("hello this cruel world"), formated);
 }
@@ -45,7 +45,7 @@ TEST(str_fmt_with_signed_number)
 
 TEST(str_fmt_with_char)
 {
-    SIMPLE_FMT_TEST("{}", (char)'a', "a");
+    SIMPLE_FMT_TEST("{c}", (char)'a', "a");
 }
 
 TEST(str_fmt_with_pointer)

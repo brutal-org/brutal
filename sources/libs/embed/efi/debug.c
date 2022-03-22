@@ -2,5 +2,5 @@
 
 void embed_log_prefix(IoWriter writer)
 {
-    print(writer, "efi: ");
+    io_fmt$(writer, "efi: ");
 }

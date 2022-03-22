@@ -116,6 +116,56 @@ IoResult io_write_byte(IoWriter self, uint8_t c)
     return io_write(self, &c, 1);
 }
 
+IoResult io_fmt(IoWriter writer, Str format, AnyVa args)
+{
+    size_t current = 0;
+    size_t written = 0;
+    bool skip_fmt = false;
+    Scan scan;
+    scan_init(&scan, format);
+
+    while (!scan_ended(&scan))
+    {
+        if (scan_skip_word(&scan, str$("{{")))
+        {
+            skip_fmt = false;
+            written += TRY(IoResult, io_write_byte(writer, '{'));
+        }
+        else if (scan_skip_word(&scan, str$("}}")))
+        {
+            skip_fmt = false;
+            written += TRY(IoResult, io_write_byte(writer, '}'));
+        }
+        else if (scan_curr(&scan) == '{' && !skip_fmt)
+        {
+            Fmt fmt = fmt_parse(&scan);
+
+            if (current < args.len)
+            {
+                written += TRY(IoResult, fmt_any(fmt, writer, args.buf[current]));
+            }
+            else
+            {
+                written += TRY(IoResult, io_write_str(writer, str$("{}")));
+            }
+
+            current++;
+        }
+        else if (scan_curr(&scan) == '\\' && skip_fmt == false)
+        {
+            skip_fmt = true;
+            scan_next(&scan);
+        }
+        else
+        {
+            skip_fmt = false;
+            written += TRY(IoResult, io_write_byte(writer, scan_next(&scan)));
+        }
+    }
+
+    return OK(IoResult, written);
+}
+
 /* --- Seek Functions ------------------------------------------------------- */
 
 IoResult io_seek(IoSeeker self, IoSeek off)

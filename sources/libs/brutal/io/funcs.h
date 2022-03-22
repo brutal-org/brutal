@@ -1,6 +1,7 @@
 #pragma once
 
 #include <brutal/io/buf.h>
+#include <brutal/io/fmt.h>
 #include <brutal/io/traits.h>
 
 /* --- Read Functions ------------------------------------------------------- */
@@ -46,6 +47,11 @@ IoResult io_write_str(IoWriter self, Str str);
 IoResult io_write_byte(IoWriter self, uint8_t c);
 
 #define io_write_byte$(SELF, C) io_write_byte(io_writer$(SELF), (C))
+
+IoResult io_fmt(IoWriter writer, Str format, AnyVa args);
+
+#define io_fmt$(SELF, FMT, ...) \
+    io_fmt(io_writer$(SELF), str$(FMT), any_va$(__VA_ARGS__))
 
 /* --- Seek Functions ------------------------------------------------------- */
 
