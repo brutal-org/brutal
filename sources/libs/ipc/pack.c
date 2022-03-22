@@ -23,7 +23,7 @@ void ipc_pack_deinit(IpcPack *self)
 
 void ipc_pack_ensure(IpcPack *self, size_t cap)
 {
-    if (self->len > cap)
+    if (self->len >= cap)
     {
         return;
     }
@@ -48,7 +48,7 @@ void ipc_pack_ensure(IpcPack *self, size_t cap)
     if (self->buf != nullptr)
     {
         mem_cpy((void *)memmap.vaddr, self->buf, self->curr);
-        bal_unmap(BR_HANDLE_SELF, self->buf, self->len);
+        assert_br_success(bal_unmap(BR_HANDLE_SELF, self->buf, self->len));
         assert_br_success(bal_close(self->handle));
     }
 

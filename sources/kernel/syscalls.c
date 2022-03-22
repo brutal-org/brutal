@@ -358,8 +358,7 @@ BrResult sys_drop(BrDropArgs *args)
 
 BrResult sys_close(BrCloseArgs *args)
 {
-    domain_remove(task_self()->domain, args->handle);
-    return BR_SUCCESS;
+    return domain_remove(task_self()->domain, args->handle);
 }
 
 BrResult sys_bind(BrBindArgs *args)
