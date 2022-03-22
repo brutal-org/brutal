@@ -1,5 +1,5 @@
 {
     "name": "pci",
-    "consume": ["system::Server", "boot::Info"],
+    "consume": ["system.Server", "boot.Info"],
     "rights": ["irq", "dma", "log"]
 }

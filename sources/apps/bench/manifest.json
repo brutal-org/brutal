@@ -1,5 +1,5 @@
 {
     "name": "bench",
-    "consume": ["system::Server", "window::Server"],
+    "consume": ["system.Server", "window.Server"],
     "rights": ["log"]
 }

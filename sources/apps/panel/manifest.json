@@ -1,5 +1,5 @@
 {
     "name": "panel",
-    "consume": ["system::Server", "window::Server"],
+    "consume": ["system.Server", "window.Server"],
     "rights": ["log"]
 }

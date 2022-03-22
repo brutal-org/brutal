@@ -24,7 +24,7 @@ def _load_module(name):
 
 
 def _load_interface(name):
-    module_name, interface_name = name.split("::", 1)
+    module_name, interface_name = name.split(".", 1)
     interface_name = module_name.title() + interface_name
     module = _load_module(module_name)
 
