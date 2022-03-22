@@ -10,7 +10,10 @@ static Lock _lock = {};
 static Bits _bitmap = {};
 static size_t _bestbet_upper = 0;
 static size_t _bestbet_lower = (size_t)-1;
+
 static size_t _available_memory = 0;
+static size_t _used_memory = 0;
+
 static PmmRange _usable_range = {};
 
 static BitsRange addr2pages(PmmRange range)
@@ -66,13 +69,19 @@ static void pmm_mmap_load(HandoverMmap const *memory_map)
         {
             PmmRange entry_range = {entry.base, entry.size};
 
+            _used_memory += entry.size;
             pmm_unused(entry_range);
-
             _available_memory += entry_range.size;
+        }
+        else if (entry.type == HANDOVER_MMAP_USED)
+        {
+            _available_memory += entry.size;
+            _used_memory += entry.size;
         }
     }
 
-    log$("Available Memory: {}kib", _available_memory / KiB(1));
+    log$("Available Memory: {}KiB", _available_memory / KiB(1));
+    log$("Used Memory: {}KiB", _used_memory / KiB(1));
 }
 
 void pmm_initialize(Handover const *handover)
@@ -130,6 +139,7 @@ PmmResult pmm_alloc(size_t size, bool upper)
 
     PmmRange pmm_range = pages2addr(page_range);
 
+    _used_memory += pmm_range.size;
     return OK(PmmResult, pmm_range);
 }
 
@@ -141,7 +151,8 @@ PmmResult pmm_used(PmmRange range)
 
     BitsRange page_range = addr2pages(range);
 
-    bits_set_range(&_bitmap, page_range, PMM_USED);
+    size_t count = bits_set_range(&_bitmap, page_range, PMM_USED);
+    _used_memory += count * MEM_PAGE_SIZE;
 
     return OK(PmmResult, range);
 }
@@ -159,7 +170,8 @@ PmmResult pmm_unused(PmmRange range)
 
     BitsRange page_range = addr2pages(range);
 
-    bits_set_range(&_bitmap, page_range, PMM_UNUSED);
+    size_t count = bits_set_range(&_bitmap, page_range, PMM_UNUSED);
+    _used_memory -= count * MEM_PAGE_SIZE;
 
     if (_bestbet_upper < range_end(page_range))
     {

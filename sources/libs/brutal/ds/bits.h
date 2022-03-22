@@ -24,22 +24,22 @@ static inline bool bits_get(Bits const *bits, size_t index)
 
 static inline void bits_set(Bits *bits, size_t index, bool value)
 {
-    size_t const byte = BITS_BYTE_INDEX(index);
+    size_t const byte_index = BITS_BYTE_INDEX(index);
     size_t const bit_index = BITS_BIT_INDEX(index);
 
     if (value)
     {
-        bits->data[byte] |= (1 << (bit_index));
+        bits->data[byte_index] |= (1 << (bit_index));
     }
     else
     {
-        bits->data[byte] &= ~(1 << (bit_index));
+        bits->data[byte_index] &= ~(1 << (bit_index));
     }
 }
 
 void bits_init(Bits *self, void *data, size_t size);
 
-void bits_set_range(Bits *bits, BitsRange range, bool value);
+size_t bits_set_range(Bits *bits, BitsRange range, bool value);
 
 static inline size_t bits_len(Bits const *bits)
 {

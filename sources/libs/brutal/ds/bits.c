@@ -10,14 +10,22 @@ void bits_init(Bits *self, void *data, size_t size)
     };
 }
 
-void bits_set_range(Bits *bits, BitsRange range, bool value)
+size_t bits_set_range(Bits *bits, BitsRange range, bool value)
 {
     assert_lower_equal(range_end(range), bits_len(bits));
 
+    size_t count = 0;
+
     for (size_t i = 0; i < range.size; i++)
     {
-        bits_set(bits, range.base + i, value);
+        if (bits_get(bits, range.base + i) != value)
+        {
+            bits_set(bits, range.base + i, value);
+            count++;
+        }
     }
+
+    return count;
 }
 
 void bits_fill(Bits *bits, bool value)
