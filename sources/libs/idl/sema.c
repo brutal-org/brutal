@@ -104,18 +104,7 @@ IdlModule idl_sema_module(IdlModule module, Alloc *alloc)
 
     vec_foreach_v(import, &module.imports)
     {
-        IoFile source_file;
-        UNWRAP_OR_PANIC(io_file_view(&source_file, str_fmt(alloc, "sources/protos/{}.idl", import.name)), "File not found!");
-
-        Buf source_buf;
-        buf_init(&source_buf, 512, alloc);
-
-        io_copy(io_file_reader(&source_file), buf_writer(&source_buf));
-
-        Scan scan;
-        scan_init(&scan, buf_str(&source_buf));
-
-        import.module = idl_parse_module(&scan, alloc);
+        UNWRAP_OR_PANIC(idl_import_module(import.name, &import.module, alloc), "File not found!");
         vec_push(&prefixed.imports, import);
     }
 

@@ -1,4 +1,5 @@
 #include <brutal/debug.h>
+#include <brutal/io.h>
 #include <idl/ast/builder.h>
 #include <idl/parse.h>
 
@@ -355,4 +356,21 @@ IdlModule idl_parse_module(Scan *scan, Alloc *alloc)
     }
 
     return module;
+}
+
+IoResult idl_import_module(Str name, IdlModule *module, Alloc *alloc)
+{
+    IoFile source_file;
+    TRY(IoResult, io_file_view(&source_file, str_fmt(alloc, "sources/protos/{}.idl", name)));
+
+    Buf source_buf;
+    buf_init(&source_buf, 512, alloc);
+
+    size_t read = TRY(IoResult, io_copy(io_file_reader(&source_file), buf_writer(&source_buf)));
+
+    Scan scan;
+    scan_init(&scan, buf_str(&source_buf));
+    *module = idl_parse_module(&scan, alloc);
+
+    return OK(IoResult, read);
 }
