@@ -70,6 +70,12 @@ Fiber *fiber_start(FiberFn fn, void *args)
     return self;
 }
 
+void fiber_start_and_forget(FiberFn fn, void *args)
+{
+    Fiber *f = fiber_start(fn, args);
+    f->fire_and_forget = true;
+}
+
 FiberBlockResult fiber_block(FiberBlocker blocker)
 {
     current->state = FIBER_BLOCKED;
@@ -90,7 +96,14 @@ void fiber_sleep(Timeout timeout)
 void fiber_ret(void *ret)
 {
     current->ret = ret;
-    current->state = FIBER_CANCELING;
+    if (current->fire_and_forget)
+    {
+        current->state = FIBER_CANCELED;
+    }
+    else
+    {
+        current->state = FIBER_CANCELING;
+    }
     fiber_yield();
 }
 
@@ -193,6 +206,23 @@ Fiber *fiber_wait_unblocked(void)
     }
 }
 
+void fiber_free_canceled(void)
+{
+    Fiber *curr = current->next;
+
+    while (curr != current)
+    {
+        Fiber *next = curr->next;
+
+        if (curr->state == FIBER_CANCELED)
+        {
+            fiber_free(curr);
+        }
+
+        curr = next;
+    }
+}
+
 void fiber_yield(void)
 {
     Fiber *prev = current;
@@ -216,11 +246,7 @@ void fiber_yield(void)
     current = next;
 
     fibers_switch(&prev->ctx, &next->ctx);
-
-    if (prev->state == FIBER_CANCELED)
-    {
-        fiber_free(prev);
-    }
+    fiber_free_canceled();
 }
 
 Tick fiber_deadline(void)

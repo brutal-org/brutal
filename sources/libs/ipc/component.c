@@ -55,7 +55,7 @@ static bool dispatch_to_provider(IpcComponent *self, BrMsg msg)
         if (provider->port == msg.to.port &&
             provider->proto == msg.prot)
         {
-            fiber_start(
+            fiber_start_and_forget(
                 (FiberFn *)handle_request,
                 &(BrRequestCtx){
                     .self = self,
@@ -78,7 +78,7 @@ static bool dispatch_to_binding(IpcComponent *self, BrMsg msg)
         {
             if (br_event_eq(msg.event, binding->event))
             {
-                fiber_start(
+                fiber_start_and_forget(
                     (FiberFn *)handle_event,
                     &(BrEventCtx){
                         .self = self,

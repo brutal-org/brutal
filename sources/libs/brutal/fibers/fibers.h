@@ -55,6 +55,7 @@ struct _Fiber
     int id;
     FiberState state;
     FiberBlocker blocker;
+    bool fire_and_forget;
 
     FiberFn *fn;
     void *args;
@@ -70,6 +71,8 @@ struct _Fiber
 void fiber_yield(void);
 
 Fiber *fiber_start(FiberFn fn, void *args);
+
+void fiber_start_and_forget(FiberFn fn, void *args);
 
 FiberBlockResult fiber_block(FiberBlocker blocker);
 
