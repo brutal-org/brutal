@@ -7,43 +7,10 @@ on:
         branches: [main]
 
 jobs:
-    build-toolchain:
-        runs-on: ubuntu-latest
-        strategy:
-            fail-fast: false
-            matrix:
-                toolchain: [llvm]
-        steps:
-            - uses: actions/checkout@v2
-              with:
-                  submodules: true
-
-            - name: Install dependencies
-              run: sources/build/scripts/setup-ubuntu.sh
-
-            - name: Cache Toolchain (${{matrix.toolchain}})
-              uses: actions/cache@v2
-              env:
-                  cache-name: cached-user-compiler
-              with:
-                  path: |
-                      **/build/toolchain/${{matrix.toolchain}}/local
-                  key: |
-                      ${{ runner.os }}-${{matrix.toolchain}}-${{hashFiles(format('build/toolchain/{0}/build.sh', matrix.toolchain)) }}
-                  restore-keys: |
-                      ${{ runner.os }}-${{matrix.toolchain}}-${{hashFiles(format('build/toolchain/{0}/build.sh', matrix.toolchain)) }}
-
-            - name: Build Toolchain
-              run: |
-                  build/toolchain/${{matrix.toolchain}}/build.sh x86_64
-
     build-all:
-        needs: build-toolchain
         runs-on: ubuntu-latest
         strategy:
             fail-fast: false
-            matrix:
-                toolchain: [llvm]
         steps:
             - uses: actions/checkout@v2
               with:
@@ -51,24 +18,12 @@ jobs:
 
             - name: Install dependencies
               run: sources/build/scripts/setup-ubuntu.sh
-
-            - name: Cache Toolchain (${{matrix.toolchain}})
-              uses: actions/cache@v2
-              env:
-                  cache-name: cached-user-compiler
-              with:
-                  path: |
-                      **/build/toolchain/${{matrix.toolchain}}/local
-                  key: |
-                      ${{ runner.os }}-${{matrix.toolchain}}-${{hashFiles(format('build/toolchain/{0}/build.sh', matrix.toolchain)) }}
-                  restore-keys: |
-                      ${{ runner.os }}-${{matrix.toolchain}}-${{hashFiles(format('build/toolchain/{0}/build.sh', matrix.toolchain)) }}
 
             - name: Run Tests
               run: |
-                  TOOLCHAIN=${{matrix.toolchain}} ./brutal.sh --coverage test
+                  TOOLCHAIN=llvm ./brutal.sh --coverage test
                   llvm-profdata-12 merge -sparse `find . -name "*.profraw"` -o coverage.profdata
-                  llvm-cov-12 show ./bin/x86_64-host-${{matrix.toolchain}}/test -instr-profile=coverage.profdata -format=text > coverage.txt
+                  llvm-cov-12 show ./bin/devel/x86_64-host-llvm/test -instr-profile=coverage.profdata -format=text > coverage.txt
 
             - name: Upload test coverage
               uses: codecov/codecov-action@v2
