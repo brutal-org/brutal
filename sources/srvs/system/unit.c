@@ -34,6 +34,20 @@ void unit_init_from_module(Unit *self, HandoverModule mod, Alloc *alloc)
         IpcProto proto = json_at(consume, j).number;
         unit_consume(self, proto);
     }
+
+    Json rights = json_get(manifest_json, str$("rights"));
+
+    for (int j = 0; j < json_len(rights); j++)
+    {
+        BrRight right = br_right_from_str(json_at(rights, j).string);
+
+        if (right == 0)
+        {
+            log$("Invalid right: {}", json_at(rights, j).string);
+        }
+
+        self->rights |= right;
+    }
 }
 
 void unit_deinit(Unit *self)
@@ -84,7 +98,7 @@ void unit_start(Unit *self)
     bal_TaskExec(
         &elf_task,
         &self->payload,
-        BR_RIGHT_PIO | BR_RIGHT_LOG | BR_RIGHT_DMA | BR_RIGHT_IRQ,
+        self->rights,
         self->consume.data,
         self->consume.len);
 

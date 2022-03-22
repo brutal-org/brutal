@@ -19,11 +19,12 @@ typedef struct
     int ready;
     BalMem payload;
     Vec(IpcCap) consume;
+    BrRight rights;
 } Unit;
 
 void unit_init(Unit *self, Str name, BalMem payload, Alloc *alloc);
 
-void unit_init_from_module(Unit* self, HandoverModule mod, Alloc* alloc);
+void unit_init_from_module(Unit *self, HandoverModule mod, Alloc *alloc);
 
 void unit_deinit(Unit *self);
 

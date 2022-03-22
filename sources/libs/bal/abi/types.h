@@ -211,3 +211,19 @@ typedef struct
 #define BR_RIGHT_TASK (1 << 4)
 
 typedef uint32_t BrRight;
+
+static inline BrRight br_right_from_str(Str str)
+{
+    if (str_eq(str, str$("irq")))
+        return BR_RIGHT_IRQ;
+    else if (str_eq(str, str$("dma")))
+        return BR_RIGHT_DMA;
+    else if (str_eq(str, str$("pio")))
+        return BR_RIGHT_PIO;
+    else if (str_eq(str, str$("log")))
+        return BR_RIGHT_LOG;
+    else if (str_eq(str, str$("task")))
+        return BR_RIGHT_TASK;
+    else
+        return 0;
+}

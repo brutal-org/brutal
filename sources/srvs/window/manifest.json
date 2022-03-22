@@ -1,7 +1,5 @@
 {
     "name": "window",
-    "consume": [
-        "system::Server",
-        "hw::Display"
-    ]
+    "consume": ["system::Server", "hw::Display"],
+    "rights": ["log"]
 }

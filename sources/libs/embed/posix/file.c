@@ -31,6 +31,7 @@ int embed_flags2posix_flags(FileInitFlags flags)
     {
         result |= O_CREAT | O_TRUNC;
     }
+
     return result;
 }
 
