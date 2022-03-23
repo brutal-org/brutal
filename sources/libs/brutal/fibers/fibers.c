@@ -5,29 +5,43 @@
 #include <brutal/task.h>
 #include <brutal/time.h>
 
-static Fiber *current = nullptr;
+static Fiber *_current = nullptr;
+static Pool _pool = {};
 
-Fiber *fiber_self(void) { return current; }
+Fiber *fiber_self(void) { return _current; }
+
+static Fiber *fiber_ctor(Alloc *alloc)
+{
+    Fiber *self = alloc_make(alloc, Fiber);
+    self->stack = alloc_malloc(alloc, FIBER_STACK_SIZE);
+    return self;
+}
+
+static void fiber_dtor(Alloc *alloc, Fiber *fiber)
+{
+    alloc_free(alloc, fiber->stack);
+    alloc_free(alloc, fiber);
+}
 
 static Fiber *fiber_alloc(void)
 {
-    Fiber *self = alloc_make(alloc_global(), Fiber);
+    Fiber *self = pool_acquire(&_pool);
     self->state = FIBER_EMBRYO;
 
-    if (current == nullptr)
+    if (_current == nullptr)
     {
         self->next = self;
         self->prev = self;
 
-        current = self;
+        _current = self;
     }
     else
     {
-        self->next = current;
-        self->prev = current->prev;
+        self->next = _current;
+        self->prev = _current->prev;
 
-        current->prev->next = self;
-        current->prev = self;
+        _current->prev->next = self;
+        _current->prev = self;
     }
 
     return self;
@@ -38,17 +52,25 @@ static void fiber_free(Fiber *self)
     self->next->prev = self->prev;
     self->prev->next = self->next;
 
-    alloc_free(alloc_global(), self->stack);
-    alloc_free(alloc_global(), self);
+    pool_release(&_pool, self);
 }
 
 static void _fiber_entry(void)
 {
-    fiber_ret(current->fn(current->args));
+    fiber_ret(_current->fn(_current->args));
 }
 
 Fiber *fiber_start(FiberFn fn, void *args)
 {
+    if (fn == nullptr && args == nullptr)
+    {
+        pool_init(
+            &_pool,
+            (PoolCtorFn *)fiber_ctor,
+            (PoolDtorFn *)fiber_dtor,
+            alloc_global());
+    }
+
     Fiber *self = fiber_alloc();
 
     static int id = 0;
@@ -58,7 +80,6 @@ Fiber *fiber_start(FiberFn fn, void *args)
 
     if (fn != nullptr)
     {
-        self->stack = alloc_malloc(alloc_global(), FIBER_STACK_SIZE);
         self->ctx.rsp = (uint64_t)self->stack + (FIBER_STACK_SIZE - 8);
         self->ctx.rip = (uint64_t)_fiber_entry;
         self->ctx.fc_mxcsr = 0b1111110000000;
@@ -78,12 +99,12 @@ void fiber_start_and_forget(FiberFn fn, void *args)
 
 FiberBlockResult fiber_block(FiberBlocker blocker)
 {
-    current->state = FIBER_BLOCKED;
-    current->blocker = blocker;
+    _current->state = FIBER_BLOCKED;
+    _current->blocker = blocker;
 
     fiber_yield();
 
-    return current->blocker.result;
+    return _current->blocker.result;
 }
 
 void fiber_sleep(Timeout timeout)
@@ -95,15 +116,13 @@ void fiber_sleep(Timeout timeout)
 
 void fiber_ret(void *ret)
 {
-    current->ret = ret;
-    if (current->fire_and_forget)
-    {
-        current->state = FIBER_CANCELED;
-    }
+    _current->ret = ret;
+
+    if (_current->fire_and_forget)
+        _current->state = FIBER_CANCELED;
     else
-    {
-        current->state = FIBER_CANCELING;
-    }
+        _current->state = FIBER_CANCELING;
+
     fiber_yield();
 }
 
@@ -172,9 +191,9 @@ static bool fiber_try_unblock(Fiber *self)
 
 static Fiber *fiber_next(FiberState expected)
 {
-    Fiber *next = current->next;
+    Fiber *next = _current->next;
 
-    while (next != current &&
+    while (next != _current &&
            !fiber_try_unblock(next) &&
            next->state != expected)
     {
@@ -193,7 +212,7 @@ extern void fibers_switch(FibersContext *from, FibersContext *to);
 
 Fiber *fiber_wait_unblocked(void)
 {
-    Fiber *next = current->next;
+    Fiber *next = _current->next;
 
     while (true)
     {
@@ -208,9 +227,9 @@ Fiber *fiber_wait_unblocked(void)
 
 void fiber_free_canceled(void)
 {
-    Fiber *curr = current->next;
+    Fiber *curr = _current->next;
 
-    while (curr != current)
+    while (curr != _current)
     {
         Fiber *next = curr->next;
 
@@ -225,7 +244,7 @@ void fiber_free_canceled(void)
 
 void fiber_yield(void)
 {
-    Fiber *prev = current;
+    Fiber *prev = _current;
     Fiber *next = fiber_next(FIBER_RUNNING);
 
     if (next == nullptr)
@@ -243,7 +262,7 @@ void fiber_yield(void)
         return;
     }
 
-    current = next;
+    _current = next;
 
     fibers_switch(&prev->ctx, &next->ctx);
     fiber_free_canceled();
@@ -252,7 +271,7 @@ void fiber_yield(void)
 Tick fiber_deadline(void)
 {
     Tick min = -1;
-    Fiber *f = current;
+    Fiber *f = _current;
 
     do
     {
@@ -265,7 +284,7 @@ Tick fiber_deadline(void)
         }
 
         f = f->next;
-    } while (f != current);
+    } while (f != _current);
 
     return min;
 }
