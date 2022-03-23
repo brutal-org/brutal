@@ -6,6 +6,8 @@
 #include "kernel/mmap.h"
 #include "kernel/pmm.h"
 
+// #define TRACE_PMM
+
 static Lock _lock = {};
 static Bits _bitmap = {};
 static size_t _bestbet_upper = 0;
@@ -101,6 +103,10 @@ PmmResult pmm_alloc(size_t size, bool upper)
 {
     LOCK_RETAINER(&_lock);
 
+#ifdef TRACE_PMM
+    log$("pmm_alloc({}, {})", size, (int)upper);
+#endif
+
     assert_truth(mem_is_size_page_aligned(size));
 
     size_t page_count = size / MEM_PAGE_SIZE;
@@ -122,7 +128,7 @@ PmmResult pmm_alloc(size_t size, bool upper)
 
     if (!range_any(page_range))
     {
-        log$("pmm_alloc({}): out of memory!", size);
+        panic$("pmm_alloc({}): out of memory!", size);
         return ERR(PmmResult, BR_OUT_OF_MEMORY);
     }
 
@@ -147,6 +153,10 @@ PmmResult pmm_used(PmmRange range)
 {
     LOCK_RETAINER(&_lock);
 
+#ifdef TRACE_PMM
+    log$("pmm_used({p}, {})", range.base, range.size);
+#endif
+
     assert_truth(mem_is_range_page_aligned(range));
 
     BitsRange page_range = addr2pages(range);
@@ -160,6 +170,10 @@ PmmResult pmm_used(PmmRange range)
 PmmResult pmm_unused(PmmRange range)
 {
     LOCK_RETAINER(&_lock);
+
+#ifdef TRACE_PMM
+    log$("pmm_unused({p}-{})", range.base, range.size);
+#endif
 
     assert_truth(mem_is_range_page_aligned(range));
 
