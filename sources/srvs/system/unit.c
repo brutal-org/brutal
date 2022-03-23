@@ -102,7 +102,7 @@ void unit_start(Unit *self)
         self->consume.data,
         self->consume.len);
 
-    log$("Service '{case:pascal}' started!", self->name);
+    log$("Service '{case:pascal}' with id={} started!", self->name, elf_task.id);
 
     self->state = UNIT_RUNNING;
 }

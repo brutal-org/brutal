@@ -154,6 +154,5 @@ void bal_mem_pack(IpcPack *pack, BalMem const *self)
 void bal_mem_unpack(IpcUnpack *pack, BalMem *self)
 {
     *self = (BalMem){};
-    bal_mem_unmap(self);
     ipc_unpack_handle(pack, &self->handle);
 }

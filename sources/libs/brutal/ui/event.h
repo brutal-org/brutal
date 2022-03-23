@@ -4,7 +4,7 @@
 #include <brutal/input/mouse.h>
 #include <brutal/math/rect.h>
 
-typedef enum
+enum
 {
     UI_EVENT_IGNORE,
 
@@ -21,7 +21,9 @@ typedef enum
     UI_EVENT_MOUSE_DOWN,
     UI_EVENT_MOUSE_MOVE,
     UI_EVENT_MOUSE_SCROLL,
-} UiEventType;
+};
+
+typedef uint8_t UiEventType;
 
 typedef struct
 {
