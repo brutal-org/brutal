@@ -1,5 +1,8 @@
-#include "kernel/x86_64/cmos.h"
+#include <brutal/sync.h>
 #include "kernel/x86_64/asm.h"
+#include "kernel/x86_64/cmos.h"
+
+static Lock _lock;
 
 static uint8_t from_binary_coded_decimal(uint8_t value)
 {
@@ -19,7 +22,7 @@ bool cmos_is_update(void)
 
 DateTime cmos_read_rtc(void)
 {
-    asm_cli();
+    lock_acquire(&_lock);
 
     wait_for$(!cmos_is_update());
 
@@ -32,7 +35,7 @@ DateTime cmos_read_rtc(void)
     datetime.month = from_binary_coded_decimal(cmos_read(CMOS_RTC_MONTH));
     datetime.year = from_binary_coded_decimal(cmos_read(CMOS_RTC_YEAR)) + 2000;
 
-    asm_sti();
+    lock_release(&_lock);
 
     return datetime;
 }
