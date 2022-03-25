@@ -4,48 +4,13 @@ The following roadmap is always subject to change.
 
 ## Current Milestone
 
-## Milestone 4 - FileSystem, Capabilities and Graphics
+# Milestone 5 - Storage and FileSystems
 
-- [x] IPC/IDL
-  - [x] Capabilities
-  - [x] Import
-  - [x] Attributes
-  - [x] Modules
-- [x] Graphic Library
-  - [x] SDL Backend
-    - [x] Render
-    - [x] Events
-  - [x] BRUTAL Backend
-    - [x] Compositor
-      - [x] Event Dispatch
-      - [x] Compositing
-    - [x] Client
-      - [x] Render
-      - [x] Events
-  - [x] Paint
-    - [x] Dots
-    - [x] Lines
-    - [x] Rect
-    - [x] Poly
-    - [x] Text
-  - [x] Event
-    - [x] Mouse Events
-    - [x] Keyboard Events
-  - [ ] Layout
-    - [x] LTR/RTL Layout
-    - [x] Dock Layout
-    - [x] Flex Layout
-    - [ ] Grid Layout
-  - [x] Views
-    - [x] Panel
-    - [x] Icon
-    - [x] Button
-    - [x] Text
-    - [x] Frame
-    - [x] Image
-    - [x] Splitter
-    - [x] Switch
-    - [x] Slider
+- [ ] DOOM :rage2:
+- [ ] Terminal
+  - [ ] TTY
+  - [ ] Shell
+  - [ ] Optimise IPCs
 - [ ] Files System
   - [ ] GPT
   - [ ] MBR
@@ -62,32 +27,6 @@ The following roadmap is always subject to change.
     - [x] Write
     - [ ] Create files
     - [ ] Format a partition
-
-### Milestone 5 - Networking and Shell
-
-- [ ] TTY
-- [ ] Shell
-- [ ] Optimise IPCs
-- [ ] Networking
-  - [ ] NICs
-    - [ ] e1000
-    - [ ] Rtl8139
-  - [ ] Protocols
-    - [ ] Ethernet
-    - [ ] Arp
-    - [ ] IPv4 (v6?)
-    - [ ] UDP
-    - [ ] TCP
-    - [ ] HTTP
-    - [ ] ICMP
-    - [ ] IRC
-    - [ ] TELNET
-  - [ ] Tools
-    - [ ] ping
-    - [ ] irc
-    - [ ] telnet
-    - [ ] fetch
-    - [ ] httpd
 
 ## Past Milestones
 
@@ -150,10 +89,51 @@ The following roadmap is always subject to change.
   - [x] Boot the kernel
   - [x] Load modules
 
+## Milestone 4 - Capabilities and Graphics
+
+- [x] IPC/IDL
+  - [x] Capabilities
+  - [x] Import
+  - [x] Attributes
+  - [x] Modules
+- [x] Graphic Library
+  - [x] SDL Backend
+    - [x] Render
+    - [x] Events
+  - [x] BRUTAL Backend
+    - [x] Compositor
+      - [x] Event Dispatch
+      - [x] Compositing
+    - [x] Client
+      - [x] Render
+      - [x] Events
+  - [x] Paint
+    - [x] Dots
+    - [x] Lines
+    - [x] Rect
+    - [x] Poly
+    - [x] Text
+  - [x] Event
+    - [x] Mouse Events
+    - [x] Keyboard Events
+  - [x] Layout
+    - [x] LTR/RTL Layout
+    - [x] Dock Layout
+    - [x] Flex Layout
+  - [x] Views
+    - [x] Panel
+    - [x] Icon
+    - [x] Button
+    - [x] Text
+    - [x] Frame
+    - [x] Image
+    - [x] Splitter
+    - [x] Switch
+    - [x] Slider
+
 # Backlog
 
 - [ ] Multiboot support
-- [ ] FAT32
 
 ## Architectures
 
@@ -224,6 +204,25 @@ The following roadmap is always subject to change.
 - [ ] wchar.h
 - [ ] wctype.h
 
-## Ports
+## Networking
 
-- [ ] DOOM :rage2:
+- [ ] Networking
+  - [ ] NICs
+    - [ ] e1000
+    - [ ] Rtl8139
+  - [ ] Protocols
+    - [ ] Ethernet
+    - [ ] Arp
+    - [ ] IPv4 (v6?)
+    - [ ] UDP
+    - [ ] TCP
+    - [ ] HTTP
+    - [ ] ICMP
+    - [ ] IRC
+    - [ ] TELNET
+  - [ ] Tools
+    - [ ] ping
+    - [ ] irc
+    - [ ] telnet
+    - [ ] fetch
+    - [ ] httpd
