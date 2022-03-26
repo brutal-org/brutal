@@ -24,10 +24,10 @@ static inline MRadian m_rad(float value)
 
 static inline MRadian m_deg2rad(MDegree deg)
 {
-    return (MRadian){(deg.v) * 180 / M_PI};
+    return (MRadian){(deg.v) * (M_PI / 180.f)};
 }
 
 static inline MDegree m_rad2deg(MRadian rad)
 {
-    return (MDegree){(rad.v) * M_PI / 180};
+    return (MDegree){(rad.v) * (180.f / M_PI)};
 }
