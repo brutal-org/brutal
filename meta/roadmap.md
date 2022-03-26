@@ -27,6 +27,7 @@ The following roadmap is always subject to change.
     - [x] Write
     - [ ] Create files
     - [ ] Format a partition
+- [ ] Benchmarking (https://github.com/benchmark-action/github-action-benchmark/tree/master)
 
 ## Past Milestones
 
