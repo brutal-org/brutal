@@ -25,7 +25,6 @@
 
 # BRUTAL
 
-
 <a href="https://github.com/brutal-org/brutal/issues">
   <img src="https://img.shields.io/github/issues/brutal-org/brutal">
 </a>
@@ -53,7 +52,7 @@
 ## Screenshots
 
 <p align="center">
-<img src="meta/screenshots/2022-02-15.png" />
+<img src="meta/screenshots/2022-03-26.png" />
 <br>
 BRUTAL running in QEMU 6.2
 </p>
