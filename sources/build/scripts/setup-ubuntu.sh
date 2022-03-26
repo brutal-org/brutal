@@ -18,4 +18,4 @@ sudo update-alternatives \
 
 # The rest
 sudo apt install -y make build-essential bison flex texinfo nasm mtools wget \
-                    unzip fuse libfuse-dev uuid-dev parted libsdl2-dev pkg-config
+                    unzip fuse libfuse-dev uuid-dev parted libsdl2-dev pkg-config xvfb

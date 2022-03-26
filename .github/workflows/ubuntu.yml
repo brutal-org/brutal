@@ -83,4 +83,5 @@ jobs:
 
             - name: Run Tests
               run: |
-                  XDG_RUNTIME_DIR=/tmp/ TOOLCHAIN=${{matrix.toolchain}} ./brutal.sh test
+                  TOOLCHAIN=${{matrix.toolchain}} xvfb-run --auto-servernum ./brutal.sh test
+
