@@ -83,4 +83,4 @@ jobs:
 
             - name: Run Tests
               run: |
-                  TOOLCHAIN=${{matrix.toolchain}} ./brutal.sh test
+                  XDG_RUNTIME_DIR=/tmp/ TOOLCHAIN=${{matrix.toolchain}} ./brutal.sh test
