@@ -32,7 +32,11 @@ BASE_CFLAGS += \
 	-Isources/srvs \
 	-Isources/utils \
 	-Isources/ \
-	-Ibin/generated
+	-Ibin/generated \
+	-Wno-unused-label \
+	-Wno-unused-function \
+	-Wno-unused-parameter \
+	-Wno-unused-variable
 
 USER_CFLAGS_INC := \
 	-Isources/libs/stdc-ansi \
