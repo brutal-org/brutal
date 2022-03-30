@@ -4,11 +4,6 @@ SECTIONS
 {
     . = 0xffffffff80200000;
 
-    .stivale2hdr : ALIGN(4K)
-    {
-        KEEP(*(.stivale2hdr))
-    }
-
     .text : ALIGN(4K)
     {
         *(.text*)

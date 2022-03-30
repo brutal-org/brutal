@@ -1,5 +1,4 @@
 #include <brutal/debug.h>
-#include <stivale/stivale.h>
 #include "kernel/arch.h"
 #include "kernel/event.h"
 #include "kernel/init.h"
@@ -22,13 +21,6 @@
 #include "kernel/x86_64/syscall.h"
 
 static atomic_int _ready = 0;
-static Handover _handover = {};
-
-void arch_entry_main_stivale2(struct stivale2_struct const *info)
-{
-    stivale2_copy_to_handover(info, &_handover);
-    arch_entry_main(&_handover);
-}
 
 void arch_entry_main(Handover *handover, uint64_t magic)
 {
