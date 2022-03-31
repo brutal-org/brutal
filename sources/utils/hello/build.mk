@@ -1,0 +1,3 @@
+PKG_HELLO_PATH=utils/hello
+
+UTILS+=HELLO

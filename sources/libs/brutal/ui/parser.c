@@ -1,5 +1,5 @@
 #include <brutal/debug/assert.h>
-#include <brutal/io/std.h>
+#include <brutal/io/chan.h>
 #include <brutal/parse/nums.h>
 #include <brutal/ui/parser.h>
 

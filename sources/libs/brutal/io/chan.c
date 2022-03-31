@@ -1,5 +1,5 @@
 #include <brutal/base/attributes.h>
-#include <brutal/io/std.h>
+#include <brutal/io/chan.h>
 #include <embed/chan.h>
 #include <embed/file.h>
 

@@ -53,6 +53,9 @@ IoResult io_fmt(IoWriter writer, Str format, AnyVa args);
 #define io_fmt$(SELF, FMT, ...) \
     io_fmt(io_writer$(SELF), str$(FMT), any_va$(__VA_ARGS__))
 
+#define io_print$(FMT, ...) \
+    io_fmt(io_chan_out(), str$(FMT), any_va$(__VA_ARGS__))
+
 /* --- Seek Functions ------------------------------------------------------- */
 
 IoResult io_seek(IoSeeker self, IoSeek off);
