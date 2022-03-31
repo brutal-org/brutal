@@ -1,4 +1,4 @@
-#include <brutal/debug/locked.h>
+#include <brutal/debug/log.h>
 #include <brutal/gfx/stroke.h>
 
 void gfx_stroke_join(GfxStrokeJoin join, MEdges *stroke, MEdge curr, MEdge next, MAYBE_UNUSED float dist)

@@ -1,6 +1,7 @@
 #pragma once
 
-#ifndef I_M_A_BAD_PROGRAMMER_OR_I_M_WRITING_A_C_LIBRARY
+// If you define this macros your are a bad programmer, or writing a c library.
+#ifndef _BRUTAL_ALLOW_BANNED
 
 #    define BANNED(FUNCTION) sorry_##FUNCTION##_is_a_banned_function
 
@@ -8,6 +9,7 @@
 #    undef strcat
 #    undef strncpy
 #    undef strncat
+#    undef printf
 #    undef sprintf
 #    undef vsprintf
 
@@ -15,6 +17,7 @@
 #    define strcat BANNED(strcat)
 #    define strncpy BANNED(strncpy)
 #    define strncat BANNED(strncat)
+#    define printf BANNED(printf)
 #    define sprintf BANNED(sprintf)
 #    define vsprintf BANNED(vsprintf)
 

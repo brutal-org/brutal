@@ -1,4 +1,4 @@
-#include <brutal/debug/locked.h>
+#include <brutal/debug/log.h>
 #include <brutal/io/base.h>
 
 IoSeek io_seek_from_start(SSize position)

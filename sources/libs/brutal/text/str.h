@@ -110,7 +110,7 @@ static inline Str str_make_from_str_fix128(StrFix128 const *str_fix) { return (S
         StrFix128 const* : str_make_from_str_fix128  \
     )(literal)
 
-#define str_const$(STR)  (Str){sizeof(STR) - 1, STR}
+#define str_const$(STR)  (Str){sizeof(STR) - 1, ((uint8_t const*)(STR))}
 
 // clang-format on
 

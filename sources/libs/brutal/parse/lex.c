@@ -1,4 +1,4 @@
-#include <brutal/debug/locked.h>
+#include <brutal/debug/log.h>
 #include <brutal/parse/lex.h>
 
 Lex lex(Scan *scan, LexFn *fn, Alloc *alloc)

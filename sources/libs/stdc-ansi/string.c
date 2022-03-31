@@ -1,4 +1,4 @@
-#define I_M_A_BAD_PROGRAMMER_OR_I_M_WRITING_A_C_LIBRARY
+#define _BRUTAL_ALLOW_BANNED
 
 /* --- 7.24 - String handling ----------------------------------------------- */
 

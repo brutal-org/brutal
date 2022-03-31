@@ -1,5 +1,5 @@
 #include <brutal/alloc/pool.h>
-#include <brutal/debug/locked.h>
+#include <brutal/debug/log.h>
 
 void pool_init(Pool *self, PoolCtorFn *ctor, PoolDtorFn *dtor, Alloc *alloc)
 {

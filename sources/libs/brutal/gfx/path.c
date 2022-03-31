@@ -1,4 +1,4 @@
-#include <brutal/debug/locked.h>
+#include <brutal/debug/log.h>
 #include <brutal/gfx/path.h>
 #include <brutal/math/funcs.h>
 #include <brutal/math/trans2.h>
