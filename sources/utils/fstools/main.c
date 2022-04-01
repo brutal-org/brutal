@@ -82,7 +82,7 @@ Emit emit;
 Iter file_block_dump(Ext2FsFile *file, void *ctx)
 {
     emit_ident(&emit);
-    emit_fmt(&emit, "- founded file: {}\n", file->name);
+    emit_fmt$(&emit, "- founded file: {}\n", file->name);
     if (!str_eq(file->name, str$(".")) && !str_eq(file->name, str$("..")))
     {
         ext2_fs_iter(ctx, &file->inode, (Ext2IterFileFn *)file_block_dump, ctx);

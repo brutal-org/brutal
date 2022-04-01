@@ -22,4 +22,4 @@ void emit_deident(Emit *self);
 
 IoWriter emit_writer(Emit *self);
 
-#define emit_fmt(SELF, FMT, ...) io_fmt(emit_writer(SELF), str$(FMT), any_va$(__VA_ARGS__));
+#define emit_fmt$(SELF, FMT, ...) io_fmt(emit_writer(SELF), str$(FMT), any_va$(__VA_ARGS__));

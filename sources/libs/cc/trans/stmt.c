@@ -29,7 +29,7 @@ void cc_trans_stmt(Emit *emit, CStmt stmt)
         return;
 
     case CSTMT_BLOCK:
-        emit_fmt(emit, "{{\n");
+        emit_fmt$(emit, "{{\n");
         emit_ident(emit);
 
         vec_foreach_v(v, &stmt.block_.stmts)
@@ -37,20 +37,20 @@ void cc_trans_stmt(Emit *emit, CStmt stmt)
             cc_trans_stmt(emit, v);
             if (cc_trans_should_stmt_endline(v.type))
             {
-                emit_fmt(emit, ";");
+                emit_fmt$(emit, ";");
             }
-            emit_fmt(emit, "\n");
+            emit_fmt$(emit, "\n");
         }
 
         emit_deident(emit);
-        emit_fmt(emit, "}}");
+        emit_fmt$(emit, "}}");
         return;
 
     case CSTMT_IF:
-        emit_fmt(emit, "if (");
+        emit_fmt$(emit, "if (");
 
         cc_trans_expr(emit, stmt.if_.expr);
-        emit_fmt(emit, ")\n");
+        emit_fmt$(emit, ")\n");
 
         if (stmt.if_.stmt_true->type != CSTMT_BLOCK)
         {
@@ -65,7 +65,7 @@ void cc_trans_stmt(Emit *emit, CStmt stmt)
 
         if (stmt.if_.stmt_false->type != CSTMT_EMPTY)
         {
-            emit_fmt(emit, "\nelse\n");
+            emit_fmt$(emit, "\nelse\n");
             if (stmt.if_.stmt_true->type != CSTMT_BLOCK)
             {
                 emit_ident(emit);
@@ -80,73 +80,73 @@ void cc_trans_stmt(Emit *emit, CStmt stmt)
         return;
 
     case CSTMT_FOR:
-        emit_fmt(emit, "for (");
+        emit_fmt$(emit, "for (");
         cc_trans_stmt(emit, *stmt.for_.init_stmt);
 
-        emit_fmt(emit, "; ");
+        emit_fmt$(emit, "; ");
         cc_trans_expr(emit, stmt.for_.cond_expr);
 
-        emit_fmt(emit, "; ");
+        emit_fmt$(emit, "; ");
         cc_trans_expr(emit, stmt.for_.iter_expr);
 
-        emit_fmt(emit, ")\n");
+        emit_fmt$(emit, ")\n");
         cc_trans_stmt(emit, *stmt.for_.stmt);
         return;
 
     case CSTMT_WHILE:
-        emit_fmt(emit, "while (");
+        emit_fmt$(emit, "while (");
         cc_trans_expr(emit, stmt.while_.expr);
-        emit_fmt(emit, ") \n");
+        emit_fmt$(emit, ") \n");
 
         cc_trans_stmt(emit, *stmt.while_.stmt);
         return;
 
     case CSTMT_DO:
-        emit_fmt(emit, "do \n ");
+        emit_fmt$(emit, "do \n ");
 
         cc_trans_stmt(emit, *stmt.do_.stmt);
 
-        emit_fmt(emit, "while (");
+        emit_fmt$(emit, "while (");
         cc_trans_expr(emit, stmt.do_.expr);
-        emit_fmt(emit, ") \n");
+        emit_fmt$(emit, ") \n");
         return;
 
     case CSTMT_SWITCH:
-        emit_fmt(emit, "switch (");
+        emit_fmt$(emit, "switch (");
         cc_trans_expr(emit, stmt.while_.expr);
-        emit_fmt(emit, ")\n");
+        emit_fmt$(emit, ")\n");
         cc_trans_stmt(emit, *stmt.while_.stmt);
         return;
 
     case CSTMT_RETURN:
-        emit_fmt(emit, "return ");
+        emit_fmt$(emit, "return ");
         cc_trans_expr(emit, stmt.return_.expr);
         return;
 
     case CSTMT_GOTO:
-        emit_fmt(emit, "goto {}", stmt.goto_.label);
+        emit_fmt$(emit, "goto {}", stmt.goto_.label);
         return;
 
     case CSTMT_BREAK:
-        emit_fmt(emit, "break");
+        emit_fmt$(emit, "break");
         return;
 
     case CSTMT_CONTINUE:
-        emit_fmt(emit, "continue");
+        emit_fmt$(emit, "continue");
         return;
 
     case CSTMT_LABEL:
-        emit_fmt(emit, "{}:", stmt.label_.label);
+        emit_fmt$(emit, "{}:", stmt.label_.label);
         return;
 
     case CSTMT_CASE:
-        emit_fmt(emit, "case ");
+        emit_fmt$(emit, "case ");
         cc_trans_expr(emit, stmt.case_.expr);
-        emit_fmt(emit, ":");
+        emit_fmt$(emit, ":");
         return;
 
     case CSTMT_DEFAULT:
-        emit_fmt(emit, "default:");
+        emit_fmt$(emit, "default:");
         return;
 
     default:

@@ -45,30 +45,30 @@ int main(int argc, char const *argv[])
     Emit emit;
     emit_init(&emit, io_chan_out());
 
-    emit_fmt(&emit, "\n");
+    emit_fmt$(&emit, "\n");
 
-    emit_fmt(&emit, "--- BEGIN OG CODE ---\n");
-    emit_fmt(&emit, "{}\n", buf_str(&source_buf));
-    emit_fmt(&emit, "--- END OG CODE ---\n");
+    emit_fmt$(&emit, "--- BEGIN OG CODE ---\n");
+    emit_fmt$(&emit, "{}\n", buf_str(&source_buf));
+    emit_fmt$(&emit, "--- END OG CODE ---\n");
 
-    emit_fmt(&emit, "\n");
-    emit_fmt(&emit, "\n");
+    emit_fmt$(&emit, "\n");
+    emit_fmt$(&emit, "\n");
 
     emit_ident_size(&emit, 2);
-    emit_fmt(&emit, "--- BEGIN AST ---\n");
+    emit_fmt$(&emit, "--- BEGIN AST ---\n");
     Json json = cdump_unit(unit, base$(&heap));
     json_emit(json, &emit);
-    emit_fmt(&emit, "--- END AST ---\n");
+    emit_fmt$(&emit, "--- END AST ---\n");
 
-    emit_fmt(&emit, "\n");
-    emit_fmt(&emit, "\n");
+    emit_fmt$(&emit, "\n");
+    emit_fmt$(&emit, "\n");
 
     emit_ident_size(&emit, 4);
 
-    emit_fmt(&emit, "--- BEGIN CODE ---\n");
+    emit_fmt$(&emit, "--- BEGIN CODE ---\n");
     cc_trans_unit(&emit, unit);
-    emit_fmt(&emit, "--- END CODE ---\n");
-    emit_fmt(&emit, "\n");
+    emit_fmt$(&emit, "--- END CODE ---\n");
+    emit_fmt$(&emit, "\n");
 
     heap_alloc_deinit(&heap);
 
