@@ -5,7 +5,11 @@
 
 void embed_app_init(MAYBE_UNUSED UiApp *self)
 {
-    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
+    if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) < 0)
+    {
+        log$("error while loading sdl!");
+        panic$("{}", SDL_GetError());
+    }
 }
 
 void embed_app_deinit(MAYBE_UNUSED UiApp *self)
