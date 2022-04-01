@@ -38,7 +38,7 @@ LOADER_SRC = \
 	sources/libs/brutal/io/fmt.c                    \
 	sources/libs/brutal/io/funcs.c                  \
 	sources/libs/brutal/io/base.c                   \
-	sources/libs/brutal/io/std.c                    \
+	sources/libs/brutal/io/chan.c                    \
 	sources/libs/brutal/parse/lex.c                 \
 	sources/libs/brutal/parse/nums.c                \
 	sources/libs/brutal/parse/scan.c                \
