@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/base.h>
+#include <bruwutal/base.h>
 
 typedef struct _BvmObj BvmObj;
 typedef struct _BvmFunc BvmFunc;

@@ -1,7 +1,7 @@
-#include <brutal/alloc.h>
-#include <brutal/parse.h>
-#include <brutal/time.h>
-#include <brutal/ui.h>
+#include <bruwutal/alloc.h>
+#include <bruwutal/parse.h>
+#include <bruwutal/time.h>
+#include <bruwutal/ui.h>
 #include "bench.h"
 
 // frames pack: the number of frames to pack into a single tick count:
@@ -111,7 +111,7 @@ int main(int argc, char const *argv[])
     long sec_per_bench = 3;
     Str test_to_run = str$("");
 
-    // FIXME: implement a good way to parse arguments in the brutal library
+    // FIXME: implement a good way to parse arguments in the bruwutal library
 
     for (int i = 1; i < argc; i++)
     {

@@ -1,4 +1,4 @@
-#include <brutal/debug.h>
+#include <bruwutal/debug.h>
 #include <fdt/fdt.h>
 
 static FdtTok *fdt_node_begin(FdtTokBegin *fdt)

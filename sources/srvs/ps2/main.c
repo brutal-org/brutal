@@ -1,13 +1,13 @@
 #include <bal/abi.h>
 #include <bal/hw.h>
-#include <brutal/alloc.h>
-#include <brutal/debug.h>
-#include <brutal/ui.h>
+#include <bruwutal/alloc.h>
+#include <bruwutal/debug.h>
+#include <bruwutal/ui.h>
 #include <hw/ps2/ps2.h>
 #include <ipc/ipc.h>
 #include <protos/event.h>
 #include "bal/abi/types.h"
-#include "brutal/ui/event.h"
+#include "bruwutal/ui/event.h"
 
 void ps2_keyboard_callback(UiEvent ev, IpcCap *input_sink)
 {

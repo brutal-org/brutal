@@ -1,6 +1,6 @@
-#include <brutal/alloc.h>
-#include <brutal/codec/tga/tga.h>
-#include <brutal/io.h>
+#include <bruwutal/alloc.h>
+#include <bruwutal/codec/tga/tga.h>
+#include <bruwutal/io.h>
 #include "test/test.h"
 
 /*

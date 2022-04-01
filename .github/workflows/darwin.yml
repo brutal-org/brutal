@@ -24,4 +24,4 @@ jobs:
 
             - name: Run Tests
               run: |
-                  sources/build/scripts/env-darwin.sh ./brutal.sh test
+                  sources/build/scripts/env-darwin.sh ./bruwutal.sh test

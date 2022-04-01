@@ -1,4 +1,4 @@
-#include <brutal/ui.h>
+#include <bruwutal/ui.h>
 #include "../bench.h"
 
 BENCH(basic_text)

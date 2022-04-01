@@ -1,6 +1,6 @@
-#include <brutal/alloc.h>
-#include <brutal/debug.h>
-#include <brutal/ds.h>
+#include <bruwutal/alloc.h>
+#include <bruwutal/debug.h>
+#include <bruwutal/ds.h>
 #include "kernel/event.h"
 
 static RwLock _lock = {};

@@ -1,11 +1,11 @@
 #pragma once
 
-#include <brutal/base.h>
+#include <bruwutal/base.h>
 
 #if defined(SYSTEM_SDL)
 #    include <embed/sdl/app.h>
-#elif defined(SYSTEM_BRUTAL)
-#    include <embed/brutal/app.h>
+#elif defined(SYSTEM_bruwutal)
+#    include <embed/bruwutal/app.h>
 #else
 #    error "Unsupported embedder!"
 #endif

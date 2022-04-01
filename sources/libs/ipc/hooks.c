@@ -1,6 +1,6 @@
 #include <bal/hw.h>
-#include <brutal/alloc.h>
-#include <brutal/debug.h>
+#include <bruwutal/alloc.h>
+#include <bruwutal/debug.h>
 #include <ipc/hooks.h>
 #include <ipc/ipc.h>
 

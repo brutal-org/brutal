@@ -1,5 +1,5 @@
-#include <brutal/debug.h>
-#include <brutal/mem.h>
+#include <bruwutal/debug.h>
+#include <bruwutal/mem.h>
 #include <embed/mem.h>
 #include "kernel/arch.h"
 #include "kernel/heap.h"

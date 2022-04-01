@@ -1,5 +1,5 @@
-#include <brutal/alloc.h>
-#include <brutal/ds.h>
+#include <bruwutal/alloc.h>
+#include <bruwutal/ds.h>
 #include "test/test.h"
 
 TEST(ds_range_alloc_used_start)

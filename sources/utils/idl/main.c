@@ -1,6 +1,6 @@
-#include <brutal/alloc.h>
-#include <brutal/debug.h>
-#include <brutal/io.h>
+#include <bruwutal/alloc.h>
+#include <bruwutal/debug.h>
+#include <bruwutal/io.h>
 #include <cc/trans.h>
 #include <idl/cgen.h>
 #include <idl/json.h>

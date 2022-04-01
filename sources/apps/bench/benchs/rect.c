@@ -1,4 +1,4 @@
-#include <brutal/ui.h>
+#include <bruwutal/ui.h>
 #include "../bench.h"
 
 BENCH(rect_fill)

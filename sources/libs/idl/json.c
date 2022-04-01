@@ -1,4 +1,4 @@
-#include <brutal/debug.h>
+#include <bruwutal/debug.h>
 #include <idl/json.h>
 
 Json idl_jgen_ctype(IdlCtype ctype_, Alloc *alloc)

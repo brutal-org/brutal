@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/ui.h>
+#include <bruwutal/ui.h>
 #include <hw/ps2/controller.h>
 
 typedef void (*Ps2KeyboardCallback)(UiEvent ev, void *context);

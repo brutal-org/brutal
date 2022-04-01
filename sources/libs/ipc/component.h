@@ -1,8 +1,8 @@
 #pragma once
 
 #include <bal/abi.h>
-#include <brutal/ds.h>
-#include <brutal/fibers.h>
+#include <bruwutal/ds.h>
+#include <bruwutal/fibers.h>
 #include <ipc/capability.h>
 #include <ipc/pack.h>
 #include <ipc/unpack.h>

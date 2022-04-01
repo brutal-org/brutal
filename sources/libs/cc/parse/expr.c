@@ -1,5 +1,5 @@
-#include <brutal/debug.h>
-#include <brutal/parse.h>
+#include <bruwutal/debug.h>
+#include <bruwutal/parse.h>
 #include <cc/builder.h>
 #include <cc/parse/parser.h>
 

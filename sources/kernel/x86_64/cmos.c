@@ -1,4 +1,4 @@
-#include <brutal/sync.h>
+#include <bruwutal/sync.h>
 #include "kernel/x86_64/asm.h"
 #include "kernel/x86_64/cmos.h"
 

@@ -4,7 +4,7 @@
 void embed_win_init(UiWin *self, MRectf bound)
 {
     self->embed.sdl_window = SDL_CreateWindow(
-        "BRUTAL",
+        "bruwutal",
         SDL_WINDOWPOS_UNDEFINED,
         SDL_WINDOWPOS_UNDEFINED,
         bound.width,

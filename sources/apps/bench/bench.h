@@ -1,7 +1,7 @@
 #pragma once
 
-#include <brutal/debug.h>
-#include <brutal/gfx.h>
+#include <bruwutal/debug.h>
+#include <bruwutal/gfx.h>
 
 typedef void BenchFunc(Gfx *self, float t);
 

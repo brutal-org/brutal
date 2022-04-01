@@ -1,5 +1,5 @@
-#include <brutal/alloc.h>
-#include <brutal/debug.h>
+#include <bruwutal/alloc.h>
+#include <bruwutal/debug.h>
 #include <bvm/eval.h>
 #include <bvm/obj.h>
 

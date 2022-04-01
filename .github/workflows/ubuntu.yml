@@ -83,4 +83,4 @@ jobs:
 
             - name: Run Tests
               run: |
-                  TOOLCHAIN=${{matrix.toolchain}} ./brutal.sh test
+                  TOOLCHAIN=${{matrix.toolchain}} ./bruwutal.sh test

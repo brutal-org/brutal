@@ -1,4 +1,4 @@
-#include <brutal/sync.h>
+#include <bruwutal/sync.h>
 #include "kernel/heap.h"
 #include "kernel/mmap.h"
 #include "kernel/pmm.h"

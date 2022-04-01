@@ -1,4 +1,4 @@
-#include <brutal/debug.h>
+#include <bruwutal/debug.h>
 #include "kernel/arch.h"
 #include "kernel/event.h"
 #include "kernel/init.h"

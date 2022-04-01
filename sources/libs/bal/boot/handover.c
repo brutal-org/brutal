@@ -1,6 +1,6 @@
 #include <bal/boot/handover.h>
-#include <brutal/debug.h>
-#include <brutal/mem.h>
+#include <bruwutal/debug.h>
+#include <bruwutal/mem.h>
 
 HandoverModule const *handover_find_module(Handover const *handover, Str name)
 {

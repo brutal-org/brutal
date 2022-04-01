@@ -1,5 +1,5 @@
-#include <brutal/debug.h>
-#include <brutal/math.h>
+#include <bruwutal/debug.h>
+#include <bruwutal/math.h>
 #include <fs/ext2/block.h>
 #include <fs/ext2/cache.h>
 #include <fs/ext2/ext2.h>

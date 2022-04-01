@@ -1,7 +1,7 @@
 #pragma once
 
-#include <brutal/base.h>
-#include <brutal/io.h>
+#include <bruwutal/base.h>
+#include <bruwutal/io.h>
 
 void embed_log_prefix(IoWriter writer);
 

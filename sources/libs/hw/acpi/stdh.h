@@ -1,7 +1,7 @@
 #pragma once
 
-#include <brutal/base.h>
-#include <brutal/text.h>
+#include <bruwutal/base.h>
+#include <bruwutal/text.h>
 
 typedef struct PACKED
 {

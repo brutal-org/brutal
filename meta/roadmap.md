@@ -101,7 +101,7 @@ The following roadmap is always subject to change.
   - [x] SDL Backend
     - [x] Render
     - [x] Events
-  - [x] BRUTAL Backend
+  - [x] bruwutal Backend
     - [x] Compositor
       - [x] Event Dispatch
       - [x] Compositing

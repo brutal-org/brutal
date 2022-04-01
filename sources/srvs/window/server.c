@@ -1,5 +1,5 @@
-#include <brutal/alloc.h>
-#include <brutal/gfx.h>
+#include <bruwutal/alloc.h>
+#include <bruwutal/gfx.h>
 #include <protos/system.h>
 #include <protos/window.h>
 #include "window/server.h"

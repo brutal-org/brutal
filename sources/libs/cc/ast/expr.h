@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/base.h>
+#include <bruwutal/base.h>
 #include <cc/ast/type.h>
 #include <cc/ast/val.h>
 

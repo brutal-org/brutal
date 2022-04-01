@@ -1,9 +1,9 @@
 #pragma once
 
 #include <bal/hw.h>
-#include <brutal/gfx.h>
-#include <brutal/math.h>
-#include <brutal/ui.h>
+#include <bruwutal/gfx.h>
+#include <bruwutal/math.h>
+#include <bruwutal/ui.h>
 #include <ipc/ipc.h>
 
 typedef struct

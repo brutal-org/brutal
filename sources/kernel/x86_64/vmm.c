@@ -1,5 +1,5 @@
-#include <brutal/debug.h>
-#include <brutal/sync.h>
+#include <bruwutal/debug.h>
+#include <bruwutal/sync.h>
 #include "kernel/heap.h"
 #include "kernel/mmap.h"
 #include "kernel/vmm.h"

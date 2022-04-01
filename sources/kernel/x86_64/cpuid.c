@@ -1,4 +1,4 @@
-#include <brutal/debug.h>
+#include <bruwutal/debug.h>
 #include "kernel/x86_64/cpuid.h"
 
 CpuidResult cpuid(uint32_t leaf, uint32_t subleaf)

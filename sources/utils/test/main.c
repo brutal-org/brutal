@@ -1,6 +1,6 @@
-#include <brutal/debug.h>
-#include <brutal/task.h>
-#include <brutal/text.h>
+#include <bruwutal/debug.h>
+#include <bruwutal/task.h>
+#include <bruwutal/text.h>
 #include "test/test.h"
 
 static size_t _len = 0;

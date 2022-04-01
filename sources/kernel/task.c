@@ -1,5 +1,5 @@
-#include <brutal/alloc.h>
-#include <brutal/debug.h>
+#include <bruwutal/alloc.h>
+#include <bruwutal/debug.h>
 #include "kernel/cpu.h"
 #include "kernel/event.h"
 #include "kernel/kernel.h"

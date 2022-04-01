@@ -1,6 +1,6 @@
-#include <brutal/alloc.h>
-#include <brutal/debug.h>
-#include <brutal/text.h>
+#include <bruwutal/alloc.h>
+#include <bruwutal/debug.h>
+#include <bruwutal/text.h>
 #include <efi/lib.h>
 #include <efi/protos.h>
 #include <embed/chan.h>

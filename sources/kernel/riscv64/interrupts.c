@@ -1,5 +1,5 @@
-#include <brutal/debug.h>
-#include <brutal/text.h>
+#include <bruwutal/debug.h>
+#include <bruwutal/text.h>
 #include "kernel/riscv64/asm.h"
 #include "kernel/riscv64/interrupts.h"
 

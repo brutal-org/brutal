@@ -1,5 +1,5 @@
-#include <brutal/alloc/global.h>
-#include <brutal/codec/zlib/zlib.h>
+#include <bruwutal/alloc/global.h>
+#include <bruwutal/codec/zlib/zlib.h>
 #include "test/test.h"
 
 TEST(zlib_empty_raw)

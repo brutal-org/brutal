@@ -1,4 +1,4 @@
-#include <brutal/debug.h>
+#include <bruwutal/debug.h>
 #include "kernel/arch.h"
 #include "kernel/x86_64/apic.h"
 #include "kernel/x86_64/gdt.h"

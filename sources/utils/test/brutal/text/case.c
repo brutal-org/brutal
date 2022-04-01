@@ -1,5 +1,5 @@
-#include <brutal/alloc.h>
-#include <brutal/text.h>
+#include <bruwutal/alloc.h>
+#include <bruwutal/text.h>
 #include "test/test.h"
 
 static void test_case(Case c, char const *input, char const *expected)

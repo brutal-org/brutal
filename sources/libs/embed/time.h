@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/time/types.h>
+#include <bruwutal/time/types.h>
 
 Tick embed_time_current_tick(void);
 

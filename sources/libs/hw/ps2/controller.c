@@ -1,4 +1,4 @@
-#include <brutal/debug.h>
+#include <bruwutal/debug.h>
 #include <hw/ps2/controller.h>
 
 uint8_t ps2_controller_status(Ps2Controller *self)

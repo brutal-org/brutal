@@ -42,7 +42,7 @@ USER_CFLAGS= \
 	$(BASE_CFLAGS) \
 	$(ARCH_CFLAGS) \
 	$(USER_CFLAGS_INC) \
-	-D__brutal__=1 \
+	-D__bruwutal__=1 \
 	-ffreestanding \
 	-Wimplicit-fallthrough
 
@@ -52,7 +52,7 @@ USER_KCFLAGS= \
 	$(USER_CFLAGS_INC) \
 	-ffreestanding \
 	-fno-stack-protector \
-	-D__brutal__=1 \
+	-D__bruwutal__=1 \
 	-D__kernel__=1 \
 	-D__freestanding__=1 \
 	-Wimplicit-fallthrough

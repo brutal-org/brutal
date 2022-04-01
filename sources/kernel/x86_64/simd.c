@@ -1,4 +1,4 @@
-#include <brutal/debug.h>
+#include <bruwutal/debug.h>
 #include "kernel/x86_64/asm.h"
 #include "kernel/x86_64/cpuid.h"
 #include "kernel/x86_64/simd.h"

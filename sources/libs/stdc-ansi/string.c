@@ -2,8 +2,8 @@
 
 /* --- 7.24 - String handling ----------------------------------------------- */
 
-#include <brutal/alloc.h>
-#include <brutal/mem.h>
+#include <bruwutal/alloc.h>
+#include <bruwutal/mem.h>
 #include <string.h>
 
 /* --- 7.24.2 - Copying functions ------------------------------------------- */

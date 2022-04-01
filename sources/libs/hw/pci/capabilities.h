@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/text.h>
+#include <bruwutal/text.h>
 
 #define MSI_CTRL_ENABLE (1 << 0)
 #define MSI_CTRL_64_BIT (1 << 7)

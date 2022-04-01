@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/base.h>
+#include <bruwutal/base.h>
 
 #define GDT_ENTRY_COUNT 5
 #define GDT_SEGMENT (0b00010000)

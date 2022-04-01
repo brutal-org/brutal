@@ -1,4 +1,4 @@
-#include <brutal/mem.h>
+#include <bruwutal/mem.h>
 #include "kernel/riscv64/sifive_uart.h"
 
 static Uart _self;

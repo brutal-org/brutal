@@ -1,5 +1,5 @@
-#include <brutal/alloc/global.h>
-#include <brutal/codec/deflate/deflate.h>
+#include <bruwutal/alloc/global.h>
+#include <bruwutal/codec/deflate/deflate.h>
 #include "test/test.h"
 
 TEST(deflate_uncompressed)

@@ -1,6 +1,6 @@
 module math;
 
-include brutal/math.h, ipc/ipc.h;
+include bruwutal/math.h, ipc/ipc.h;
 
 type MRectf = __ctype;
 

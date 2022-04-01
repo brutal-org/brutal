@@ -1,7 +1,7 @@
-#include <brutal/debug.h>
+#include <bruwutal/debug.h>
 
 void kernel_splash(void)
 {
-    log$("BRUTAL - Milestone 5");
+    log$("bruwutal - Milestone 5");
     log$("\"Long live the UNIX utopia!\"");
 }

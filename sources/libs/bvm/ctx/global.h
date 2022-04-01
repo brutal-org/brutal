@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/ds.h>
+#include <bruwutal/ds.h>
 #include <bvm/eval/instr.h>
 #include <bvm/obj/val.h>
 

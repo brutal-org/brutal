@@ -1,5 +1,5 @@
-#include <brutal/alloc.h>
-#include <brutal/debug.h>
+#include <bruwutal/alloc.h>
+#include <bruwutal/debug.h>
 #include <json/parser.h>
 #include "loader/config.h"
 

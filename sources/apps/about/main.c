@@ -1,12 +1,12 @@
-#include <brutal/io.h>
-#include <brutal/ui.h>
+#include <bruwutal/io.h>
+#include <bruwutal/ui.h>
 
 UiView *about_informations(void)
 {
-    UiView *label_title = ui_text_create(str$("BRUTAL"), UI_FONT_TITLE);
+    UiView *label_title = ui_text_create(str$("bruwutal"), UI_FONT_TITLE);
     UiView *label_version = ui_text_create(str$("Milestone 5 @ 3b96f95"), UI_FONT_BODY);
-    UiView *label_website = ui_text_create(str$("brutal.smnx.sh"), UI_FONT_LINK);
-    UiView *label_license = ui_text_create(str$("The brutal operating system and its core components are licensed under the MIT License."), UI_FONT_BODY);
+    UiView *label_website = ui_text_create(str$("bruwutal.smnx.sh"), UI_FONT_LINK);
+    UiView *label_license = ui_text_create(str$("The bruwutal operating system and its core components are licensed under the MIT License."), UI_FONT_BODY);
     UiView *button = ui_button_create_with_text(str$("OK"));
     ui_view_layout(button, "g-end g-vfill");
 

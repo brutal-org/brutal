@@ -1,5 +1,5 @@
-#include <brutal/io.h>
-#include <brutal/ui.h>
+#include <bruwutal/io.h>
+#include <bruwutal/ui.h>
 
 UiWin *files_win_create(UiApp *app)
 {

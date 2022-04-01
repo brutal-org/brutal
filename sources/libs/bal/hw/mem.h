@@ -1,8 +1,8 @@
 #pragma once
 
 #include <bal/abi.h>
-#include <brutal/base.h>
-#include <brutal/text.h>
+#include <bruwutal/base.h>
+#include <bruwutal/text.h>
 #include <ipc/pack.h>
 #include <ipc/unpack.h>
 

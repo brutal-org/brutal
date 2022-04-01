@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/base.h>
+#include <bruwutal/base.h>
 
 #define ELF_HEADER_MAGIC "\177ELF"
 

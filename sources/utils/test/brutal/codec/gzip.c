@@ -1,5 +1,5 @@
-#include <brutal/alloc/global.h>
-#include <brutal/codec/gzip/gzip.h>
+#include <bruwutal/alloc/global.h>
+#include <bruwutal/codec/gzip/gzip.h>
 #include "test/test.h"
 
 TEST(gzip_empty_raw)

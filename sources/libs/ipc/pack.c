@@ -1,5 +1,5 @@
-#include <brutal/debug.h>
-#include <brutal/mem.h>
+#include <bruwutal/debug.h>
+#include <bruwutal/mem.h>
 #include <ipc/pack.h>
 
 void ipc_pack_init(IpcPack *self)

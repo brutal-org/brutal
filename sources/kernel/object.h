@@ -1,8 +1,8 @@
 #pragma once
 
 #include <bal/abi.h>
-#include <brutal/ds.h>
-#include <brutal/sync.h>
+#include <bruwutal/ds.h>
+#include <bruwutal/sync.h>
 
 typedef void ObjectDtor(void *object);
 

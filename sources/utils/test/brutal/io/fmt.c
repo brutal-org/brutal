@@ -1,5 +1,5 @@
-#include <brutal/alloc.h>
-#include <brutal/text.h>
+#include <bruwutal/alloc.h>
+#include <bruwutal/text.h>
 #include "test/test.h"
 
 #define SIMPLE_FMT_TEST(FORMAT, ARG1, EXPECTED) \

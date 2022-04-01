@@ -1,5 +1,5 @@
-#include <brutal/alloc.h>
-#include <brutal/io.h>
+#include <bruwutal/alloc.h>
+#include <bruwutal/io.h>
 #include <json/parser.h>
 
 static bool json_skip_comment(Scan *scan)

@@ -1,4 +1,4 @@
-#define _BRUTAL_SOURCE
+#define _bruwutal_SOURCE
 #include <string.h>
 
 size_t strlcpy(char *dst, char const *src, size_t size)

@@ -1,7 +1,7 @@
 #include <acpi/madt.h>
 #include <acpi/rsdt.h>
-#include <brutal/debug.h>
-#include <brutal/mem.h>
+#include <bruwutal/debug.h>
+#include <bruwutal/mem.h>
 #include "kernel/mmap.h"
 #include "kernel/x86_64/apic.h"
 #include "kernel/x86_64/asm.h"

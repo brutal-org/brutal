@@ -1,4 +1,4 @@
-#include <brutal/debug.h>
+#include <bruwutal/debug.h>
 #include <cc/parse/parser.h>
 
 void cparse_func_params(Lex *lex, CType *type, Alloc *alloc)

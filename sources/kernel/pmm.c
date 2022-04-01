@@ -1,7 +1,7 @@
-#include <brutal/debug.h>
-#include <brutal/ds.h>
-#include <brutal/mem.h>
-#include <brutal/sync.h>
+#include <bruwutal/debug.h>
+#include <bruwutal/ds.h>
+#include <bruwutal/mem.h>
+#include <bruwutal/sync.h>
 #include "kernel/arch.h"
 #include "kernel/mmap.h"
 #include "kernel/pmm.h"

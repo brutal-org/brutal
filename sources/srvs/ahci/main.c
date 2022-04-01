@@ -1,7 +1,7 @@
 #include <ahci/ahci.h>
 #include <ahci/device.h>
-#include <brutal/alloc.h>
-#include <brutal/debug.h>
+#include <bruwutal/alloc.h>
+#include <bruwutal/debug.h>
 #include <protos/pci.h>
 
 int ipc_component_main(IpcComponent *self)

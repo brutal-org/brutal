@@ -1,5 +1,5 @@
 #include <acpi/rsdt.h>
-#include <brutal/debug.h>
+#include <bruwutal/debug.h>
 
 Iter acpi_rsdt_iterate(
     Acpi *acpi,

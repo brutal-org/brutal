@@ -1,9 +1,9 @@
 #pragma once
 
 #include <bal/abi.h>
-#include <brutal/text.h>
-#include <brutal/time.h>
-#include <brutal/task/types.h>
+#include <bruwutal/text.h>
+#include <bruwutal/time.h>
+#include <bruwutal/task/types.h>
 #include "kernel/channel.h"
 #include "kernel/context.h"
 #include "kernel/space.h"

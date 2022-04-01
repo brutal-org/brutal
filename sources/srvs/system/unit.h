@@ -2,7 +2,7 @@
 
 #include <bal/boot.h>
 #include <bal/hw.h>
-#include <brutal/ds.h>
+#include <bruwutal/ds.h>
 #include <ipc/ipc.h>
 
 typedef enum

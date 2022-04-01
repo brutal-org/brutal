@@ -1,7 +1,7 @@
 #include <bal/boot.h>
-#include <brutal/alloc.h>
-#include <brutal/debug.h>
-#include <brutal/ds.h>
+#include <bruwutal/alloc.h>
+#include <bruwutal/debug.h>
+#include <bruwutal/ds.h>
 #include <fdt/fdt.h>
 #include <fdt/handover.h>
 #include "kernel/arch.h"

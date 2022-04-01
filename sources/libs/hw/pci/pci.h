@@ -1,7 +1,7 @@
 #pragma once
 
 #include <acpi/base.h>
-#include <brutal/ds.h>
+#include <bruwutal/ds.h>
 #include <pci/addr.h>
 #include <pci/capabilities.h>
 #include <pci/config.h>

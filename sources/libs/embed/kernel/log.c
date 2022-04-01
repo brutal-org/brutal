@@ -1,4 +1,4 @@
-#include <brutal/sync.h>
+#include <bruwutal/sync.h>
 #include <embed/log.h>
 #include "kernel/arch.h"
 

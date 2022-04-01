@@ -32,30 +32,30 @@ LOADER_LDFLAGS= \
 
 LOADER_SRC = \
 	sources/libs/bal/boot/handover.c                \
-	sources/libs/brutal/io/buf.c                    \
-	sources/libs/brutal/io/emit.c                   \
-	sources/libs/brutal/io/file.c                   \
-	sources/libs/brutal/io/fmt.c                    \
-	sources/libs/brutal/io/funcs.c                  \
-	sources/libs/brutal/io/base.c                   \
-	sources/libs/brutal/io/std.c                    \
-	sources/libs/brutal/parse/lex.c                 \
-	sources/libs/brutal/parse/nums.c                \
-	sources/libs/brutal/parse/scan.c                \
+	sources/libs/bruwutal/io/buf.c                    \
+	sources/libs/bruwutal/io/emit.c                   \
+	sources/libs/bruwutal/io/file.c                   \
+	sources/libs/bruwutal/io/fmt.c                    \
+	sources/libs/bruwutal/io/funcs.c                  \
+	sources/libs/bruwutal/io/base.c                   \
+	sources/libs/bruwutal/io/std.c                    \
+	sources/libs/bruwutal/parse/lex.c                 \
+	sources/libs/bruwutal/parse/nums.c                \
+	sources/libs/bruwutal/parse/scan.c                \
 	sources/libs/hw/fdt/fdt.c                       \
 	sources/libs/stdc-ansi/ctype.c			        \
 	sources/libs/stdc-ansi/string.c			        \
 	$(wildcard sources/loader/*.c) 					\
 	$(wildcard sources/libs/json/parser.c)		    \
 	$(wildcard sources/libs/json/objects.c)		    \
-	$(wildcard sources/libs/brutal/alloc/*.c)	    \
-	$(wildcard sources/libs/brutal/ds/*.c) 		    \
-	$(wildcard sources/libs/brutal/hash/*.c)	    \
+	$(wildcard sources/libs/bruwutal/alloc/*.c)	    \
+	$(wildcard sources/libs/bruwutal/ds/*.c) 		    \
+	$(wildcard sources/libs/bruwutal/hash/*.c)	    \
 	$(wildcard sources/libs/embed/efi/*.c)	            \
 	$(wildcard sources/libs/embed/$(ARCH)/*.c) \
-	$(wildcard sources/libs/brutal/debug/*.c)       \
-	$(wildcard sources/libs/brutal/mem/*.c)         \
-	$(wildcard sources/libs/brutal/text/*.c)        \
+	$(wildcard sources/libs/bruwutal/debug/*.c)       \
+	$(wildcard sources/libs/bruwutal/mem/*.c)         \
+	$(wildcard sources/libs/bruwutal/text/*.c)        \
 	$(wildcard sources/libs/elf/elf.c) 				\
 	$(wildcard sources/libs/hw/efi/*/*.c)           \
 	$(wildcard sources/libs/hw/efi/*.c)

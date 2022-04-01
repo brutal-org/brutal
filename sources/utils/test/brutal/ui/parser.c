@@ -1,4 +1,4 @@
-#include <brutal/ui.h>
+#include <bruwutal/ui.h>
 #include "test/test.h"
 
 static UiLayout try_parse_layout(char const *str)

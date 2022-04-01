@@ -1,5 +1,5 @@
-#include <brutal/alloc.h>
-#include <brutal/debug.h>
+#include <bruwutal/alloc.h>
+#include <bruwutal/debug.h>
 #include "kernel/context.h"
 #include "kernel/x86_64/asm.h"
 #include "kernel/x86_64/gdt.h"

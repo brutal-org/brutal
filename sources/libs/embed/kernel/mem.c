@@ -1,5 +1,5 @@
-#include <brutal/debug.h>
-#include <brutal/sync.h>
+#include <bruwutal/debug.h>
+#include <bruwutal/sync.h>
 #include <embed/mem.h>
 #include "kernel/heap.h"
 

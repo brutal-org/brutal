@@ -1,6 +1,6 @@
-#include <brutal/debug.h>
-#include <brutal/io.h>
-#include <brutal/text.h>
+#include <bruwutal/debug.h>
+#include <bruwutal/io.h>
+#include <bruwutal/text.h>
 #include <idl/ast/builder.h>
 #include <idl/parse.h>
 

@@ -1,5 +1,5 @@
-#include <brutal/debug.h>
-#include <brutal/text.h>
+#include <bruwutal/debug.h>
+#include <bruwutal/text.h>
 #include <cc/builder.h>
 #include <idl/cgen.h>
 

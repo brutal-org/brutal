@@ -1,8 +1,8 @@
-#include <brutal/alloc.h>
-#include <brutal/debug.h>
-#include <brutal/math.h>
-#include <brutal/mem.h>
-#include <brutal/parse.h>
+#include <bruwutal/alloc.h>
+#include <bruwutal/debug.h>
+#include <bruwutal/math.h>
+#include <bruwutal/mem.h>
+#include <bruwutal/parse.h>
 #include <embed/log.h>
 #include <embed/task.h>
 #include <stdlib.h>

@@ -13,7 +13,7 @@ def _popen(args):
 
 
 def _tool(args):
-    code, tool_path = _popen(["./brutal.sh", "--resolve", args[0]])
+    code, tool_path = _popen(["./bruwutal.sh", "--resolve", args[0]])
     return _popen([tool_path] + args[1:])
 
 

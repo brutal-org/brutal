@@ -1,4 +1,4 @@
-#include <brutal/base/endian.h>
+#include <bruwutal/base/endian.h>
 #include "test/test.h"
 
 TEST(endian_load_store_be16)

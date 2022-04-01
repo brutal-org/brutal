@@ -1,7 +1,7 @@
 {
     "entries": [
         {
-            "name": "Brutal",
+            "name": "bruwutal",
             "kernel": "/boot/kernel.elf",
             "framebuffer": {
                 "width": 800,

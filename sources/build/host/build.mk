@@ -3,9 +3,9 @@ LIBS_HOST_SRC = \
 	$(wildcard sources/libs/embed/sdl/*.c)       \
 	$(wildcard sources/libs/embed/$(HOST_ARCH)/*.s) \
 	$(wildcard sources/libs/embed/$(HOST_ARCH)/*.c) \
-	$(wildcard sources/libs/brutal/*.c)     \
-	$(wildcard sources/libs/brutal/*/*.c)   \
-	$(wildcard sources/libs/brutal/*/*/*.c) \
+	$(wildcard sources/libs/bruwutal/*.c)     \
+	$(wildcard sources/libs/bruwutal/*/*.c)   \
+	$(wildcard sources/libs/bruwutal/*/*/*.c) \
 	$(wildcard sources/libs/cc/*.c)         \
 	$(wildcard sources/libs/cc/*/*.c)       \
 	$(wildcard sources/libs/cc/*/*/*.c)     \
@@ -24,7 +24,7 @@ LIBS_HOST_SRC = \
 LIBS_HOST_OBJ = \
 	$(patsubst sources/%, $(BINDIR_HOST)/%.o, $(LIBS_HOST_SRC))
 
-LIBS_HOST_BIN=$(BINDIR_HOST)/libbrutal.a
+LIBS_HOST_BIN=$(BINDIR_HOST)/libbruwutal.a
 
 $(BINDIR_HOST)/%.c.o: sources/%.c
 	@$(MKCWD)

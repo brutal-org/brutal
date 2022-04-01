@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/text.h>
+#include <bruwutal/text.h>
 #include <ipc/ipc.h>
 
 Str ipc_interface_str(IpcProto proto);

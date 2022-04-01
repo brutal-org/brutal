@@ -1,4 +1,4 @@
-#include <brutal/debug.h>
+#include <bruwutal/debug.h>
 #include <efi/lib.h>
 #include <efi/srvs/bs.h>
 #include <embed/mem.h>

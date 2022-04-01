@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/base.h>
+#include <bruwutal/base.h>
 
 #define EXT2_SIGNATURE 0xef53
 
@@ -27,7 +27,7 @@ typedef enum
     EXT2_OS_MASIX = 2,
     EXT2_OS_FREEBSD = 3,
     EXT2_OS_LITES = 4,
-    /*  EXT2_OS_BRUTAL = 5,  one day maybe ? */
+    /*  EXT2_OS_bruwutal = 5,  one day maybe ? */
 } Ext2FsOSId;
 
 typedef enum

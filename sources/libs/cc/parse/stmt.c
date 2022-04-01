@@ -1,4 +1,4 @@
-#include <brutal/debug.h>
+#include <bruwutal/debug.h>
 #include <cc/parse/parser.h>
 
 CStmt cparse_stmt(Lex *lex, CUnit *context, Alloc *alloc)

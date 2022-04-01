@@ -1,5 +1,5 @@
 #include <bal/abi.h>
-#include <brutal/debug.h>
+#include <bruwutal/debug.h>
 #include <embed/log.h>
 #include "kernel/arch.h"
 #include "kernel/domain.h"

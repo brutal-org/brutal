@@ -1,4 +1,4 @@
-#include <brutal/text.h>
+#include <bruwutal/text.h>
 #include "test/test.h"
 
 static void expect_match(char const *pattern, char const *input)

@@ -1,5 +1,5 @@
 #include <bal/abi.h>
-#include <brutal/debug.h>
+#include <bruwutal/debug.h>
 #include <ipc/component.h>
 
 typedef struct

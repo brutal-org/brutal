@@ -2,7 +2,7 @@
 
 #include <bal/abi.h>
 #include <bal/boot.h>
-#include <brutal/io.h>
+#include <bruwutal/io.h>
 #include "kernel/tasking.h"
 
 IoWriter arch_debug(void);

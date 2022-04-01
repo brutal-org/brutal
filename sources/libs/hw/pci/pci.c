@@ -1,6 +1,6 @@
 #include <acpi/mcfg.h>
 #include <acpi/rsdt.h>
-#include <brutal/debug.h>
+#include <bruwutal/debug.h>
 #include <pci/addr.h>
 #include "config.h"
 #include "pci.h"

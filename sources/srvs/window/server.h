@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/ui.h>
+#include <bruwutal/ui.h>
 #include "window/client.h"
 #include "window/display.h"
 

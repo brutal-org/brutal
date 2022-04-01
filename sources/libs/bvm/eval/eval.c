@@ -1,4 +1,4 @@
-#include <brutal/debug.h>
+#include <bruwutal/debug.h>
 #include <bvm/eval/eval.h>
 #include <bvm/obj/func.h>
 #include <bvm/obj/obj.h>

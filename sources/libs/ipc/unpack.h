@@ -1,7 +1,7 @@
 #pragma once
 
-#include <brutal/ds.h>
-#include <brutal/math.h>
+#include <bruwutal/ds.h>
+#include <bruwutal/math.h>
 #include <ipc/capability.h>
 
 typedef struct

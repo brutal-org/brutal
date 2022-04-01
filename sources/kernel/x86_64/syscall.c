@@ -1,4 +1,4 @@
-#include <brutal/debug.h>
+#include <bruwutal/debug.h>
 #include "kernel/heap.h"
 #include "kernel/kernel.h"
 #include "kernel/syscalls.h"

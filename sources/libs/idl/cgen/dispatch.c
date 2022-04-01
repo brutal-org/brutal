@@ -1,5 +1,5 @@
-#include <brutal/io.h>
-#include <brutal/text.h>
+#include <bruwutal/io.h>
+#include <bruwutal/text.h>
 #include <cc/builder.h>
 #include <idl/cgen.h>
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/ui.h>
+#include <bruwutal/ui.h>
 
 void embed_win_init(UiWin *self, MRectf bound);
 

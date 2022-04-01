@@ -1,6 +1,6 @@
 #include <acpi/rsdt.h>
-#include <brutal/alloc.h>
-#include <brutal/debug.h>
+#include <bruwutal/alloc.h>
+#include <bruwutal/debug.h>
 #include <protos/boot.h>
 
 Iter dump_sdth(AcpiSdth *sdth, void *)

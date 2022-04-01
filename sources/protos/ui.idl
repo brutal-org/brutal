@@ -1,5 +1,5 @@
 module ui;
 
-include brutal/ui.h;
+include bruwutal/ui.h;
 
 type UiWinType = __ctype;

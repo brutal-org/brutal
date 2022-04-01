@@ -1,6 +1,6 @@
-#include <brutal/alloc.h>
-#include <brutal/io.h>
-#include <brutal/ui.h>
+#include <bruwutal/alloc.h>
+#include <bruwutal/io.h>
+#include <bruwutal/ui.h>
 
 UiWin *demo_win_create(UiApp *app)
 {

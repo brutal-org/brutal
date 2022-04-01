@@ -1,7 +1,7 @@
 #pragma once
 
 #include <bal/hw.h>
-#include <brutal/gfx.h>
+#include <bruwutal/gfx.h>
 
 typedef struct
 {

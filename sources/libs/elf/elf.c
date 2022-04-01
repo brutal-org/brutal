@@ -22,7 +22,7 @@ Str elf_string(Elf64Header const *header, size_t offset)
 
 Str elf_manifest(Elf64Header const *header)
 {
-    Elf64SectionHeader const *manifest_section = elf_section_by_name(header, str$(".brutal.manifest"));
+    Elf64SectionHeader const *manifest_section = elf_section_by_name(header, str$(".bruwutal.manifest"));
 
     if (!manifest_section)
     {

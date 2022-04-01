@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/io.h>
+#include <bruwutal/io.h>
 #include <cc/ast/unit.h>
 
 void cc_trans_decl(Emit *emit, CDecl decl);
