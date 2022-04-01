@@ -1,24 +1,24 @@
 LIBS_HOST_SRC = \
-	$(wildcard sources/libs/embed/posix/*.c)     \
-	$(wildcard sources/libs/embed/sdl/*.c)       \
+	$(wildcard sources/libs/embed/posix/*.c) \
+	$(wildcard sources/libs/embed/sdl/*.c) \
 	$(wildcard sources/libs/embed/$(HOST_ARCH)/*.s) \
 	$(wildcard sources/libs/embed/$(HOST_ARCH)/*.c) \
-	$(wildcard sources/libs/brutal/*.c)     \
-	$(wildcard sources/libs/brutal/*/*.c)   \
+	$(wildcard sources/libs/brutal/*.c) \
+	$(wildcard sources/libs/brutal/*/*.c) \
 	$(wildcard sources/libs/brutal/*/*/*.c) \
-	$(wildcard sources/libs/cc/*.c)         \
-	$(wildcard sources/libs/cc/*/*.c)       \
-	$(wildcard sources/libs/cc/*/*/*.c)     \
-	$(wildcard sources/libs/ud/*.c)         \
-	$(wildcard sources/libs/ud/*/*.c)       \
-	$(wildcard sources/libs/bvm/*.c)        \
-	$(wildcard sources/libs/fs/*.c)         \
-	$(wildcard sources/libs/fs/*/*.c)       \
-	$(wildcard sources/libs/bvm/*/*.c)      \
-	$(wildcard sources/libs/json/*.c)       \
-	$(wildcard sources/libs/elf/*.c)        \
+	$(wildcard sources/libs/cc/*.c) \
+	$(wildcard sources/libs/cc/*/*.c) \
+	$(wildcard sources/libs/cc/*/*/*.c) \
+	$(wildcard sources/libs/ud/*.c) \
+	$(wildcard sources/libs/ud/*/*.c) \
+	$(wildcard sources/libs/bvm/*.c) \
+	$(wildcard sources/libs/fs/*.c) \
+	$(wildcard sources/libs/fs/*/*.c) \
+	$(wildcard sources/libs/bvm/*/*.c) \
+	$(wildcard sources/libs/json/*.c) \
+	$(wildcard sources/libs/elf/*.c) \
 	$(wildcard sources/libs/boot/abi/handover.c) \
-	$(wildcard sources/libs/idl/*.c)        \
+	$(wildcard sources/libs/idl/*.c) \
 	$(wildcard sources/libs/idl/*/*.c)
 
 LIBS_HOST_OBJ = \

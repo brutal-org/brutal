@@ -39,7 +39,7 @@
 
 %endmacro
 
-ALIGN	4096
+ALIGN 4096
 global __syscall
 __syscall:
     swapgs               ; swap from USER gs to KERNEL gs

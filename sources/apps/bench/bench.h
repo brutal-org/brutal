@@ -20,7 +20,7 @@ void bench_register(Bench bench);
 #define BENCH_FUNCTION_NAME(name) bench_##name
 
 #define BENCH(name)                                                              \
-    void BENCH_FUNCTION_NAME(name)(Gfx * gfx, float t);                         \
+    void BENCH_FUNCTION_NAME(name)(Gfx * gfx, float t);                          \
     [[gnu::constructor]] static inline void bench_register_##name##_detail(void) \
     {                                                                            \
         bench_register((Bench){                                                  \
