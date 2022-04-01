@@ -1,3 +1,0 @@
-PKG_SYSTEM_PATH=srvs/system
-
-SRVS+=SYSTEM

@@ -1,0 +1,6 @@
+{
+    "name": "Paint",
+    "comment": "Drawing application.",
+    "icon": "brush",
+    "command": "paint"
+}

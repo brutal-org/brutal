@@ -1,3 +1,0 @@
-PKG_GZIP_PATH=utils/gzip
-
-UTILS+=GZIP

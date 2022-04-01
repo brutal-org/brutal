@@ -1,1 +1,0 @@
-BASE_CFLAGS+=-g -O0

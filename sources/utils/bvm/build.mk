@@ -1,3 +1,0 @@
-PKG_BVM_PATH=utils/bvm
-
-UTILS+=BVM

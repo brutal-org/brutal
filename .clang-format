@@ -15,12 +15,5 @@ BreakInheritanceList: AfterColon
 IndentPPDirectives: AfterHash
 ForEachMacros: ["__dummy_foreach"]
 SpaceBeforeParens: ControlStatementsExceptForEachMacros
-IncludeBlocks: Merge
-IncludeCategories:
-  - Regex:           '<([:alnum:.\/-_])+>'
-    Priority:        0
-    SortPriority:    0
-  - Regex:           '"([:alnum:.\/-_])+"'
-    Priority:        10
-    SortPriority:    10
+AlignAfterOpenBracket: DontAlign
 ...

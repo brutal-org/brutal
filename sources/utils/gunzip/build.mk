@@ -1,3 +1,0 @@
-PKG_GUNZIP_PATH=utils/gunzip
-
-UTILS+=GUNZIP

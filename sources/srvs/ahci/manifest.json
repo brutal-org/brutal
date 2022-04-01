@@ -1,5 +1,0 @@
-{
-    "name": "ahci",
-    "consume": ["system.Server", "pci.Bus"],
-    "rights": ["irq", "dma", "log"]
-}

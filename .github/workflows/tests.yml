@@ -1,0 +1,71 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Installing dependencies
+        run: |
+          sudo toolchain/install-dependencies.sh
+
+      - name: Fetching submodules
+        run: |
+          git submodule update --init --recursive
+
+      - name: Cache cross-toolchain
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-cross-toolchain
+        with:
+          path: |
+            **/toolchain/local
+          key: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/toolchain/build-it.sh', '**/toolchain/patches/gcc.patch', '**/toolchain/patches/binutils.patch') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/toolchain/build-it.sh', '**/toolchain/patches/gcc.patch', '**/toolchain/patches/binutils.patch') }}
+
+      - name: Building cross-toolchain
+        run: |
+          toolchain/build-it.sh
+
+      - name: Dumping environement
+        run: |
+          toolchain/dump-it.sh
+
+      - name: Building skiftOS (x86_32)
+        run: |
+          make clean
+          make all CONFIG=test CONFIG_LOADER=grub CONFIG_ARCH=x86_32
+
+      - name: Building skiftOS (x86_64)
+        run: |
+          make clean
+          make all CONFIG=test CONFIG_LOADER=limine CONFIG_ARCH=x86_64
+
+      - name: Run all tests (x86_32)
+        timeout-minutes: 10
+        continue-on-error: true
+        run: |
+          python ./meta/utils/test-driver.py ./build/disks/skift-x86_32-grub-test.img
+
+      - name: Run all tests (x86_64)
+        timeout-minutes: 10
+        continue-on-error: true
+        run: |
+          python ./meta/utils/test-driver.py ./build/disks/skift-x86_64-grub-test.img
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: disks
+          path: build/disks/

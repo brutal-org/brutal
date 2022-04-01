@@ -1,0 +1,17 @@
+{
+    ".c": "text",
+    ".h": "text",
+    ".jpeg": "image",
+    ".jpg": "image",
+    ".json": "text",
+    ".png": "image",
+    ".svg": "image",
+    ".text": "text",
+    ".txt": "text",
+    ".html": "text",
+    ".css": "text",
+    ".js": "text",
+    ".md": "text",
+    ".zip": "archive",
+    ".tar": "archive"
+}

@@ -1,5 +1,0 @@
-{
-    "name": "ps2",
-    "consume": ["system.Server", "event.Sink"],
-    "rights": ["irq", "pio", "log"]
-}

@@ -1,0 +1,136 @@
+diff --git a/bfd/config.bfd b/bfd/config.bfd
+index e7b55b0d..de95ed59 100644
+--- a/bfd/config.bfd
++++ b/bfd/config.bfd
+@@ -224,6 +224,18 @@ esac
+ 
+ case "${targ}" in
+ # START OF targmatch.h
++  i[3-7]86-*-skift*)
++    targ_defvec=i386_elf32_vec
++    targ_selvecs=
++    targ64_selvecs=x86_64_elf64_vec
++    ;;
++#ifdef BFD64
++  x86_64-*-skift*)
++    targ_defvec=x86_64_elf64_vec
++    targ_selvecs=i386_elf32_vec
++    want64=true
++    ;;
++#endif
+ #ifdef BFD64
+   aarch64-*-darwin*)
+     targ_defvec=aarch64_mach_o_vec
+diff --git a/config.sub b/config.sub
+index b0f84923..45b53341 100755
+--- a/config.sub
++++ b/config.sub
+@@ -1700,7 +1700,7 @@ case $os in
+ 	     | os9* | macos* | osx* | ios* \
+ 	     | mpw* | magic* | mmixware* | mon960* | lnews* \
+ 	     | amigaos* | amigados* | msdos* | newsos* | unicos* | aof* \
+-	     | aos* | aros* | cloudabi* | sortix* | twizzler* \
++	     | aos* | aros* | cloudabi* | sortix* | skift* | twizzler* \
+ 	     | nindy* | vxsim* | vxworks* | ebmon* | hms* | mvs* \
+ 	     | clix* | riscos* | uniplus* | iris* | isc* | rtu* | xenix* \
+ 	     | mirbsd* | netbsd* | dicos* | openedition* | ose* \
+diff --git a/gas/configure.tgt b/gas/configure.tgt
+index 6f46e0a6..ebf8b50d 100644
+--- a/gas/configure.tgt
++++ b/gas/configure.tgt
+@@ -123,6 +123,7 @@ esac
+ generic_target=${cpu_type}-$vendor-$os
+ # Note: This table is alpha-sorted, please try to keep it that way.
+ case ${generic_target} in
++  i386-*-skift*)     fmt=elf;;
+   aarch64*-*-elf*)			fmt=elf;;
+   aarch64*-*-fuchsia*)			fmt=elf;;
+   aarch64*-*-linux*)			fmt=elf em=linux
+diff --git a/ld/Makefile.am b/ld/Makefile.am
+index 2c9a4873..b402e8f1 100644
+--- a/ld/Makefile.am
++++ b/ld/Makefile.am
+@@ -284,6 +284,7 @@ ALL_EMULATION_SOURCES = \
+ 	eelf32xtensa.c \
+ 	eelf32z80.c \
+ 	eelf_i386.c \
++	eelf_i386_skift.c \
+ 	eelf_i386_be.c \
+ 	eelf_i386_fbsd.c \
+ 	eelf_i386_ldso.c \
+@@ -454,6 +455,7 @@ ALL_64_EMULATION_SOURCES = \
+ 	eelf_k1om.c \
+ 	eelf_k1om_fbsd.c \
+ 	eelf_x86_64.c \
++	eelf_x86_64_skift.c \
+ 	eelf_x86_64_cloudabi.c \
+ 	eelf_x86_64_fbsd.c \
+ 	eelf_x86_64_sol2.c \
+diff --git a/ld/Makefile.in b/ld/Makefile.in
+index b41941c8..d3bfa635 100644
+--- a/ld/Makefile.in
++++ b/ld/Makefile.in
+@@ -773,6 +773,7 @@ ALL_EMULATION_SOURCES = \
+ 	eelf32xtensa.c \
+ 	eelf32z80.c \
+ 	eelf_i386.c \
++	eelf_i386_skift.c \
+ 	eelf_i386_be.c \
+ 	eelf_i386_fbsd.c \
+ 	eelf_i386_ldso.c \
+@@ -942,6 +943,7 @@ ALL_64_EMULATION_SOURCES = \
+ 	eelf_k1om.c \
+ 	eelf_k1om_fbsd.c \
+ 	eelf_x86_64.c \
++	eelf_x86_64_skift.c \
+ 	eelf_x86_64_cloudabi.c \
+ 	eelf_x86_64_fbsd.c \
+ 	eelf_x86_64_sol2.c \
+diff --git a/ld/configure.tgt b/ld/configure.tgt
+index 0c780b24..d75c7d23 100644
+--- a/ld/configure.tgt
++++ b/ld/configure.tgt
+@@ -43,6 +43,15 @@ targ64_extra_libpath=
+ # Please try to keep this table more or less in alphabetic order - it
+ # makes it much easier to lookup a specific archictecture.
+ case "${targ}" in
++i[3-7]86-*-skift*)
++			targ_emul=elf_i386_skift
++			targ_extra_emuls=elf_i386
++			targ64_extra_emuls="elf_x86_64_skift elf_x86_64"
++			;;
++x86_64-*-skift*)
++			targ_emul=elf_x86_64_skift
++			targ_extra_emuls="elf_i386_skift elf_x86_64 elf_i386"
++			;;
+ aarch64_be-*-elf)	targ_emul=aarch64elfb
+ 			targ_extra_emuls="aarch64elf aarch64elf32 aarch64elf32b armelfb armelf"
+ 			;;
+@@ -1034,6 +1043,9 @@ esac
+ 
+ NATIVE_LIB_DIRS='/usr/local/lib /lib /usr/lib'
+ case "${target}" in
++*-*-skift*)
++  NATIVE_LIB_DIRS='/System/Libraries'
++  ;;
+ 
+ *-*-dragonfly*)
+   NATIVE_LIB_DIRS='/lib /usr/lib /usr/pkg/lib /usr/local/lib'
+diff --git a/ld/emulparams/elf_i386_skift.sh b/ld/emulparams/elf_i386_skift.sh
+new file mode 100644
+index 00000000..1369b907
+--- /dev/null
++++ b/ld/emulparams/elf_i386_skift.sh
+@@ -0,0 +1,4 @@
++. ${srcdir}/emulparams/elf_i386.sh
++GENERATE_SHLIB_SCRIPT=yes
++GENERATE_PIE_SCRIPT=yes
++TEXT_START_ADDR=0x40000000
+diff --git a/ld/emulparams/elf_x86_64_skift.sh b/ld/emulparams/elf_x86_64_skift.sh
+new file mode 100644
+index 00000000..f4097a25
+--- /dev/null
++++ b/ld/emulparams/elf_x86_64_skift.sh
+@@ -0,0 +1,2 @@
++. ${srcdir}/emulparams/elf_x86_64.sh
++TEXT_START_ADDR=0x40000000

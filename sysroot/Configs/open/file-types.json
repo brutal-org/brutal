@@ -1,0 +1,11 @@
+{
+    "image": {
+        "open-with": "image-viewer"
+    },
+    "text": {
+        "open-with": "text-editor"
+    },
+    "archive": {
+        "open-with": "archive-manager"
+    }
+}

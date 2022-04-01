@@ -1,70 +1,12 @@
-# Prerequisites
-*.d
-
-# Object files
-*.o
-*.ko
-*.obj
-*.elf
-
-# Linker output
-*.ilk
-*.map
-*.exp
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Libraries
-*.lib
-*.a
-*.la
-*.lo
-
-# Shared objects (inc. Windows DLLs)
-*.dll
-*.so
-*.so.*
-*.dylib
-
-# Executables
-*.exe
-*.out
-*.app
-*.i*86
-*.x86_64
-*.hex
-
-# Debug files
-*.dSYM/
-*.su
-*.idb
-*.pdb
-
-# Kernel Module Compile Results
-*.mod*
-*.cmd
-.tmp_versions/
-modules.order
-Module.symvers
-Mkfile.old
-dkms.conf
-
-
-# VScode
 .vscode/
-
-
-# Build Output
 bin/
-.cache/
+cache/
+toolchain/build-x86_64/
+toolchain/build-x86_32/
+toolchain/tarballs/
+toolchain/local/
+vm/
 
-build/toolchain/gnu/build
-build/toolchain/gnu/local
-build/toolchain/gnu/tarballs
-
-meta/brutal.pdf
-
-# MacOS
-.DS_STORE
+*.ignored
+*.out
+*.d

@@ -1,0 +1,6 @@
+{
+    "name": "Example",
+    "comment": "A simple example application.",
+    "icon": "duck",
+    "command": "example"
+}

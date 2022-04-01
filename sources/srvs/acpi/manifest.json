@@ -1,5 +1,0 @@
-{
-    "name": "acpi",
-    "consume": ["system.Server", "boot.Info"],
-    "rights": ["irq", "dma", "log"]
-}

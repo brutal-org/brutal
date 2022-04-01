@@ -1,86 +1,71 @@
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-
+<br>
+<br>
+<br>
+<p align="center">🪦🪦🪦</p>
+<p align="center">skiftOS</p>
+<p align="center">2018-2021</p>
 <p align="center">
-  <img width="256" src="meta/shared/logo.png">
+"Long live <a href="https://github.com/brutal-org/brutal">BRUTAL</a>!"
 </p>
-
-<br/>
-<br/>
-<br/>
-
-<p align="center">
-  Striking modernist shapes and bold use of modern C are the hallmarks of <b>BRUTAL</b>.<br>
-  Inspired by brutalist design <b>BRUTAL</b> combines the ideals of UNIX from the 1970s<br> with modern technology and engineering.
-</p>
-
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-
-# BRUTAL
-
-<a href="https://github.com/brutal-org/brutal/issues">
-  <img src="https://img.shields.io/github/issues/brutal-org/brutal">
-</a>
-<a href="https://github.com/brutal-org/brutal/network">
-  <img src="https://img.shields.io/github/forks/brutal-org/brutal">
-</a>
-<a href="https://github.com/brutal-org/brutal/stargazers">
-  <img src="https://img.shields.io/github/stars/brutal-org/brutal">
-</a>
-<a href="https://github.com/brutal-org/brutal/blob/main/license">
-  <img src="https://img.shields.io/github/license/brutal-org/brutal">
-</a>
-<a href="https://codecov.io/gh/brutal-org/brutal"><img src="https://codecov.io/gh/brutal-org/brutal/branch/main/graph/badge.svg?token=T4R6TEF56Z" alt="codecov"></a>
-<a href="https://github.com/brutal-org/brutal/actions/workflows/ubuntu.yml"><img src="https://github.com/brutal-org/brutal/actions/workflows/ubuntu.yml/badge.svg" alt="Build and Test (Ubuntu)"></a>
-<a href="https://github.com/brutal-org/brutal/actions/workflows/darwin.yml"><img src="https://github.com/brutal-org/brutal/actions/workflows/darwin.yml/badge.svg" alt="Build and Test (Darwin)"></a>
+<br>
 <br>
 <br>
 
-- **BRUTAL** is an operating system built from scratch in modern C.
-- **BRUTAL** is built on top of a capabilty based micro-kernel.
-- **BRUTAL** targets x86_64, i686, RISC-V and ARM.
-- **BRUTAL** exposes its features to developers through clean APIs.
-- **BRUTAL** features a rich and modern C library complete with fibers, custom allocators, generic data structures, and more...
+# skiftOS
 
-## Screenshots
+[![No Maintenance Intended](https://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
+[![Tests](https://github.com/skiftOS/skift/actions/workflows/tests.yml/badge.svg)](https://github.com/skiftOS/skift/actions/workflows/tests.yml)
+[![Deploy](https://github.com/skiftOS/skift/actions/workflows/deploy.yml/badge.svg)](https://github.com/skiftOS/skift/actions/workflows/deploy.yml)
+[![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/skiftOS/skift?include_prereleases)](https://github.com/skiftOS/skift/releases)
+[![GitHub last commit](https://img.shields.io/github/last-commit/skiftOS/skift)](https://github.com/skiftOS/skift/commits)
+[![GitHub issues](https://img.shields.io/github/issues-raw/skiftOS/skift)](https://github.com/skiftOS/skift/issues)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/skiftOS/skift)](https://github.com/skiftOS/skift/pulls)
+
+- **skiftOS** is an operating system built from scratch in modern C++.
+- **skiftOS** is featuring a reactive UI library and has a strong emphasis on user experience.
+- **skiftOS** exposes its features to developers through clean APIs.
+- **skiftOS** includes many applications like an [Image Viewer](./userspace/apps/image-viewer), a [Text Editor](./userspace/apps/text-editor), a [Terminal Emulator](./userspace/apps/terminal), [etc](./userspace/apps)...
+- **skiftOS** features a UNIX-like terminal experience with many familiar UNIX utilities.
+- **skiftOS** is also pretty easy to build from source, just follow the [build guide](manual/meta/building.md).
+- **skiftOS** is capable of running on real hardware.
+
+# Screenshots
 
 <p align="center">
-<img src="meta/screenshots/2022-03-26.png" />
+<img src="manual/screenshots/2021-04-21.png" />
 <br>
-BRUTAL running in QEMU 6.2
+skiftOS running in QEMU 5.1
 </p>
 
-## Build Instructions
+# Links
 
-BRUTAL is pretty easy to to build from source using GNUMake, NASM and LLVM.
+- [Manual](manual/readme.md)
+- [Building](manual/meta/building.md) **(start here if you are new)**
+- [Contributing](manual/meta/contributing.md)
+- [Code of conduct](manual/meta/code_of_conduct.md)
+- [Running on Virtual Box](manual/meta/running_in_vbox.md) **(click here to experience skiftOS)**
 
-See [building.md](meta/building.md) for more details.
+# Acknowledgements
 
-## Roadmap
+## Contributors
 
-Right now the main goal of brutal is to run doom.
+<a href="https://github.com/skiftOS/skift/graphs/contributors">
+  <img src="https://contributors-img.web.app/image?repo=skiftOS/skift" />
+</a>
 
-See [roadmap.md](meta/roadmap.md) for more information on how we plan to get there and where you can contribute.
+## Projects
 
-## Credits
+- [echfs](https://github.com/qword-os/echfs)
+- [limine](https://github.com/limine-bootloader/limine) (BSD-2-Clause License)
+- [Material Design Icons](http://materialdesignicons.com/) (SIL OPEN FONT LICENSE )
+- [serenityOS AK utilities](https://github.com/SerenityOS/serenity):  while not directly used in skift, AK was a big inspiration in the creation of libutils.
 
-This project takes inspirations and/or reuse code from the following projects.
-
-See [credits.md](meta/credits.md)
-
-## License
+# License
 
 <a href="https://opensource.org/licenses/MIT">
-  <img align="right" height="96" alt="MIT License" src="meta/shared/mit-license.png" />
+  <img align="right" height="96" alt="MIT License" src="manual/mit-license.png" />
 </a>
 
-The brutal operating system and its core components are licensed under the **MIT License**.
+The skift operating system and its core components are licensed under the **MIT License**.
 
-The full text of the license can be accessed via [this link](https://opensource.org/licenses/MIT) and is also included in the [license](license) file of this software package.
+The full text of the license can be accessed via [this link](https://opensource.org/licenses/MIT) and is also included in the [license.md](license.md) file of this software package.

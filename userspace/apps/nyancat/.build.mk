@@ -1,0 +1,4 @@
+APPS += NYANCAT
+
+NYANCAT_NAME = nyancat
+NYANCAT_LIBS = io system

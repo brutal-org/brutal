@@ -1,3 +1,0 @@
-PKG_AHCI_PATH=srvs/ahci
-
-SRVS+=AHCI
