@@ -26,17 +26,14 @@ typedef union PACKED
 
 static_assert(sizeof(SvPage) == sizeof(uint64_t), "svPage must be 64bit !!!!");
 
-
 typedef struct PACKED
 {
     SvPage pages[512];
 } SvPageTable;
 
-
 SvPage sv_make_entry(BrMemoryFlags flags, uintptr_t phys, bool is_leaf)
 {
-    return (SvPage)
-    {
+    return (SvPage){
         .valid = 1,
         .read = is_leaf && (bool)(flags & BR_MEM_READABLE),
         .write = is_leaf && (bool)(flags & BR_MEM_WRITABLE),
@@ -55,4 +52,3 @@ SvPage sv_make_entry(BrMemoryFlags flags, uintptr_t phys, bool is_leaf)
 #define DEFAULT_PAGING_DEPTH (PAGING_SV39)
 
 #define SVTABLE_GET_INDEX(ADDR, LEVEL) (((uint64_t)ADDR & ((uint64_t)0x1ff << (12 + LEVEL * 9))) >> (12 + LEVEL * 9))
-
