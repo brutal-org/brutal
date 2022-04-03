@@ -21,7 +21,7 @@ CUnit idl_cgen_source(IdlModule const module, Alloc *alloc)
     CUnit unit = cunit(alloc);
 
     idl_cgen_includes(&unit, module, alloc);
-    cunit_include(&unit, false, str_fmt$(alloc, "{case:snake}.h", module.name));
+    cunit_include(&unit, false, str_fmt$(alloc, "{case-snake}.h", module.name));
 
     vec_foreach_v(alias, &module.aliases)
     {

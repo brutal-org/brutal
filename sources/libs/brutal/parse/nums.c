@@ -39,12 +39,14 @@ bool scan_next_uint(Scan *self, unsigned long *value)
 bool scan_next_int(Scan *self, long *value)
 {
     *value = 0;
+    bool is_number = false;
     bool is_negative = false;
-    char sign = scan_peek(self, 0);
 
-    if (sign == '-')
+    if (scan_peek(self, 0) == '-' &&
+        isdigit(scan_peek(self, 1)))
     {
         is_negative = true;
+        is_number = true;
         scan_next(self);
     }
 
@@ -54,6 +56,7 @@ bool scan_next_int(Scan *self, long *value)
 
         if (v >= '0' && v <= '9')
         {
+            is_number = true;
             *value *= 10;
             *value += v - '0';
             scan_next(self);
@@ -69,7 +72,7 @@ bool scan_next_int(Scan *self, long *value)
         *value *= -1;
     }
 
-    return true;
+    return is_number;
 }
 
 #ifndef __freestanding__

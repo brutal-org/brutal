@@ -189,51 +189,48 @@ static void fmt_parse_case(Fmt *fmt, Scan *scan)
     }
 }
 
-static void fmt_parse_type(Fmt *fmt, Scan *scan)
+static FmtType fmt_parse_type(char c)
 {
-
-    switch (scan_curr(scan))
+    switch (c)
     {
     case 's':
-        fmt->type = FMT_STRING;
-        break;
+        return FMT_STRING;
 
     case 'c':
-        fmt->type = FMT_CHAR;
-        break;
+        return FMT_CHAR;
 
     case 'b':
-        fmt->type = FMT_BINARY;
-        break;
+        return FMT_BINARY;
 
     case 'o':
-        fmt->type = FMT_OCTAL;
-        break;
+        return FMT_OCTAL;
 
     case 'd':
-        fmt->type = FMT_DECIMAL;
-        break;
+    case 'i':
+    case 'u':
+        return FMT_DECIMAL;
 
     case 'p':
-        fmt->type = FMT_POINTER;
-        break;
+        return FMT_POINTER;
 
     case 'x':
-        fmt->type = FMT_HEXADECIMAL;
-        break;
+    case 'X':
+        return FMT_HEXADECIMAL;
+
+    default:
+        return FMT_NONE;
     }
 }
 
 static void fmt_parse_min_width(Fmt *fmt, Scan *scan)
 {
-    if (scan_curr(scan) == '0')
+    if (scan_skip(scan, '0'))
     {
-        fmt->fill_with_zero = true;
-        scan_next(scan);
+        fmt->fill = '0';
     }
     else
     {
-        fmt->fill_with_zero = false;
+        fmt->fill = ' ';
     }
 
     scan_next_int(scan, &fmt->min_width);
@@ -264,20 +261,109 @@ Fmt fmt_parse(Scan *scan)
         {
             fmt_parse_min_width(&fmt, scan);
         }
-        else if (scan_skip_word(scan, str$("case:")))
+        else if (scan_skip_word(scan, str$("case-")))
         {
             fmt_parse_case(&fmt, scan);
         }
         else
         {
-            fmt_parse_type(&fmt, scan);
-            scan_next(scan);
+            fmt.type = fmt_parse_type(scan_next(scan));
         }
     }
 
     scan_skip(scan, '}');
 
     return fmt;
+}
+
+FmtPrintfType fmt_parse_printf_type(Scan *scan, Fmt *fmt)
+{
+    if (scan_skip_word(scan, str$("ll")))
+    {
+        char c = scan_next(scan);
+        fmt->type = fmt_parse_type(c);
+
+        if (c == 'd' || c == 'i')
+        {
+            return FMT_PRINTF_LONGLONG;
+        }
+        else
+        {
+            return FMT_PRINTF_ULONGLONG;
+        }
+    }
+    else if (scan_skip(scan, 'l'))
+    {
+        char c = scan_next(scan);
+        fmt->type = fmt_parse_type(c);
+
+        if (c == 'd' || c == 'i')
+        {
+            return FMT_PRINTF_LONG;
+        }
+        else
+        {
+            return FMT_PRINTF_ULONG;
+        }
+    }
+    else if (scan_skip(scan, 'p'))
+    {
+        return FMT_PRINTF_PTR;
+    }
+    else if (scan_skip(scan, 's'))
+    {
+        return FMT_PRINTF_STRING;
+    }
+    else
+    {
+        char c = scan_next(scan);
+        fmt->type = fmt_parse_type(c);
+
+        if (c == 'd' || c == 'i')
+        {
+            return FMT_PRINTF_INT;
+        }
+        else
+        {
+            return FMT_PRINTF_UINT;
+        }
+    }
+}
+
+FmtPrintfType fmt_parse_printf(Scan *scan, Fmt *fmt)
+{
+    *fmt = (Fmt){};
+    fmt->precison = 3;
+
+    scan_skip(scan, '%');
+
+    while (!scan_ended(scan))
+    {
+        if (scan_skip(scan, '-'))
+        {
+        }
+        else if (scan_skip(scan, '+'))
+        {
+        }
+        else if (scan_skip(scan, ' '))
+        {
+            fmt->fill = ' ';
+        }
+        else if (scan_skip(scan, '#'))
+        {
+            fmt->prefix = true;
+        }
+        else if (scan_skip(scan, '0'))
+        {
+            fmt->fill = '0';
+        }
+        else if (!scan_next_int(scan, &fmt->min_width))
+        {
+            return fmt_parse_printf_type(scan, fmt);
+        }
+    }
+
+    return FMT_PRINTF_INT;
 }
 
 IoResult fmt_signed(Fmt self, IoWriter writer, int64_t value)
@@ -327,15 +413,7 @@ IoResult fmt_unsigned(Fmt self, IoWriter writer, uint64_t value)
     {
         while (i < self.min_width)
         {
-            if (self.fill_with_zero)
-            {
-                buf[i] = '0';
-            }
-            else
-            {
-                buf[i] = ' ';
-            }
-
+            buf[i] = self.fill;
             i++;
         }
     }
@@ -463,7 +541,7 @@ static int fmt_color_id(FmtColor color)
 {
     int offset = 0;
 
-    if(color.bright)
+    if (color.bright)
     {
         offset += ANSI_ESC_BRIGHT;
     }
@@ -471,25 +549,35 @@ static int fmt_color_id(FmtColor color)
     switch (color.type)
     {
     case FMT_BLACK:
-        return  0 + offset;
+        return 0 + offset;
+
     case FMT_RED:
         return 1 + offset;
+
     case FMT_GREEN:
         return 2 + offset;
+
     case FMT_YELLOW:
         return 3 + offset;
+
     case FMT_BLUE:
         return 4 + offset;
+
     case FMT_MAGENTA:
         return 5 + offset;
+
     case FMT_CYAN:
         return 6 + offset;
+
     case FMT_WHITE:
         return 7 + ANSI_ESC_BRIGHT; // always bright
+
     case FMT_GRAY:
         return 7 + offset;
+
     case FMT_BLACK_GRAY:
         return 0 + ANSI_ESC_BRIGHT; // always bright
+
     case FMT_COL_NONE:
     default:
         return -1;

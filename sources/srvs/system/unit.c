@@ -57,7 +57,7 @@ void unit_deinit(Unit *self)
 
 void unit_consume(Unit *self, IpcProto proto)
 {
-    log$("Unit '{case:pascal}' is consuming capability '{x}'...", self->name, proto);
+    log$("Unit '{case-pascal}' is consuming capability '{x}'...", self->name, proto);
 
     IpcCap cap = {};
     cap.proto = proto;
@@ -70,14 +70,14 @@ void unit_provide(Unit *self, IpcCap new_cap)
     {
         if (cap->proto == new_cap.proto)
         {
-            log$("Providing service '{case:pascal}' with capability '{x}'...", self->name, new_cap.proto);
+            log$("Providing service '{case-pascal}' with capability '{x}'...", self->name, new_cap.proto);
 
             *cap = new_cap;
             self->ready++;
 
             if (self->ready == self->consume.len)
             {
-                log$("Service '{case:pascal}' ready!", self->name);
+                log$("Service '{case-pascal}' ready!", self->name);
                 self->state = UNIT_READY;
             }
             return;
@@ -90,7 +90,7 @@ void unit_start(Unit *self)
     if (self->state != UNIT_READY)
         return;
 
-    log$("Starting service '{case:pascal}'...", self->name);
+    log$("Starting service '{case-pascal}'...", self->name);
 
     BalTask elf_task;
     bal_task_init(&elf_task, self->name);
@@ -102,7 +102,7 @@ void unit_start(Unit *self)
         self->consume.data,
         self->consume.len);
 
-    log$("Service '{case:pascal}' with id={} started!", self->name, elf_task.id);
+    log$("Service '{case-pascal}' with id={} started!", self->name, elf_task.id);
 
     self->state = UNIT_RUNNING;
 }

@@ -50,6 +50,10 @@ IoResult io_write_byte(IoWriter self, uint8_t c);
 
 IoResult io_fmt(IoWriter writer, Str format, AnyVa args);
 
+IoResult io_vprintf(IoWriter writer, Str format, va_list args);
+
+IoResult io_printf(IoWriter writer, Str format, ...);
+
 #define io_fmt$(SELF, FMT, ...) \
     io_fmt(io_writer$(SELF), str$(FMT), any_va$(__VA_ARGS__))
 

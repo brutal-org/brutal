@@ -166,6 +166,80 @@ IoResult io_fmt(IoWriter writer, Str format, AnyVa args)
     return OK(IoResult, written);
 }
 
+IoResult io_vprintf(IoWriter writer, Str format, va_list va)
+{
+    Scan scan;
+    size_t written = 0;
+    scan_init(&scan, format);
+
+    while (!scan_ended(&scan))
+    {
+        if (scan_skip_word(&scan, str$("%%")))
+        {
+            written += TRY(IoResult, io_write_byte(writer, '%'));
+        }
+        else if (scan_curr(&scan) == '%')
+        {
+            Fmt fmt = {};
+            switch (fmt_parse_printf(&scan, &fmt))
+            {
+            default:
+            case FMT_PRINTF_INT:
+                written += TRY(IoResult, fmt_signed(fmt, writer, va_arg(va, int)));
+                break;
+
+            case FMT_PRINTF_LONG:
+                written += TRY(IoResult, fmt_signed(fmt, writer, va_arg(va, long)));
+                break;
+
+            case FMT_PRINTF_LONGLONG:
+                written += TRY(IoResult, fmt_signed(fmt, writer, va_arg(va, long long)));
+                break;
+
+            case FMT_PRINTF_UINT:
+                written += TRY(IoResult, fmt_unsigned(fmt, writer, va_arg(va, unsigned int)));
+                break;
+
+            case FMT_PRINTF_ULONG:
+                written += TRY(IoResult, fmt_unsigned(fmt, writer, va_arg(va, unsigned long)));
+                break;
+
+            case FMT_PRINTF_ULONGLONG:
+                written += TRY(IoResult, fmt_unsigned(fmt, writer, va_arg(va, unsigned long long)));
+                break;
+
+#ifndef __freestanding__
+            case FMT_PRINTF_FLOAT:
+                written += TRY(IoResult, fmt_float(fmt, writer, va_arg(va, double)));
+                break;
+#endif
+            case FMT_PRINTF_STRING:
+                written += TRY(IoResult, fmt_string(fmt, writer, str$(va_arg(va, char const *))));
+                break;
+
+            case FMT_PRINTF_PTR:
+                written += TRY(IoResult, fmt_unsigned(fmt, writer, va_arg(va, uintptr_t)));
+                break;
+            }
+        }
+        else
+        {
+            written += TRY(IoResult, io_write_byte(writer, scan_next(&scan)));
+        }
+    }
+
+    return OK(IoResult, written);
+}
+
+IoResult io_printf(IoWriter writer, Str format, ...)
+{
+    va_list va;
+    va_start(va, format);
+    IoResult result = io_vprintf(writer, format, va);
+    va_end(va);
+    return result;
+}
+
 /* --- Seek Functions ------------------------------------------------------- */
 
 IoResult io_seek(IoSeeker self, IoSeek off)

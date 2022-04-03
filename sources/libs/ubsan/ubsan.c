@@ -17,7 +17,7 @@ struct _UbsanType
 
 static void ubsan_print_location(char *message, struct _UbsanSrc loc)
 {
-    panic$("{}:{}:{}: {case:sentence}", str$(loc.file), loc.line, loc.column, message);
+    panic$("{}:{}:{}: {case-sentence}", str$(loc.file), loc.line, loc.column, message);
 }
 
 struct _UbsanOverflowData

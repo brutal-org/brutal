@@ -11,7 +11,7 @@ Str idl_cgen_unpack_name(IdlAlias alias, Alloc *alloc)
         return vec_at(&attr.args, 1);
     }
 
-    return str_fmt$(alloc, "ipc_unpack_{case:snake}", alias.name);
+    return str_fmt$(alloc, "ipc_unpack_{case-snake}", alias.name);
 }
 
 CExpr idl_cgen_unpack_ref(IdlAlias alias, Alloc *alloc)

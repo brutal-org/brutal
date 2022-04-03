@@ -49,7 +49,7 @@ IpcCap bus_consume(Bus *self, IpcProto proto)
 
 void bus_activate(Bus *self, Unit *unit)
 {
-    log$("Activating service '{case:pascal}'...", unit->name);
+    log$("Activating service '{case-pascal}'...", unit->name);
 
     vec_foreach(cap, &self->caps)
     {

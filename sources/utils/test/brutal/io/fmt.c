@@ -5,94 +5,36 @@
 #define SIMPLE_FMT_TEST(FORMAT, ARG1, EXPECTED) \
     assert_str_equal(str$(EXPECTED), str_fmt$(test_alloc(), str$(FORMAT), ARG1))
 
-TEST(str_fmt)
+#define TEST_CASE(EXPECTED, FORMAT, ...) \
+    assert_str_equal(str$(EXPECTED), str_fmt$(test_alloc(), str$(FORMAT), __VA_ARGS__))
+
+TEST(io_fmt)
 {
-    Str formated = str_fmt$(alloc_global(), str$("hello world"));
+    TEST_CASE("hello, world", "hello, world");
+    TEST_CASE("hello, world", "hello, {}", "world");
+    TEST_CASE("hello, {}", "hello, {}");
+    TEST_CASE("hello, {}", "hello, {{}}");
+    TEST_CASE("hello, {} 1234", "hello, {{}} {}", 1234);
 
-    assert_str_equal(str$("hello world"), formated);
-}
+    TEST_CASE("hello, world", "{}, {}", "hello", str$("world"));
 
-TEST(str_fmt_with_no_arg)
-{
-    Str formated = str_fmt$(alloc_global(), "hello {}");
+    TEST_CASE("the answer is 42", "the answer is {}", 42);
+    TEST_CASE("the answer is -42", "the answer is {}", -42);
 
-    assert_str_equal(str$("hello {}"), formated);
-}
+    TEST_CASE("a", "{c}", 'a');
+    TEST_CASE("97", "{}", 'a');
 
-TEST(str_fmt_with_double_bracket)
-{
-    Str formated = str_fmt$(alloc_global(), "hello {{}}");
-
-    assert_str_equal(str$("hello {}"), formated);
-}
-
-TEST(str_fmt_with_str)
-{
-    Str formated = str_fmt$(alloc_global(), "{} this cruel {}", "hello", str$("world"));
-
-    assert_str_equal(str$("hello this cruel world"), formated);
-}
-
-TEST(str_fmt_with_unsigned_number)
-{
-    SIMPLE_FMT_TEST("{}", (unsigned int)42, "42");
-}
-
-TEST(str_fmt_with_signed_number)
-{
-    SIMPLE_FMT_TEST("{}", (int)-42, "-42");
-}
-
-TEST(str_fmt_with_char)
-{
-    SIMPLE_FMT_TEST("{c}", (char)'a', "a");
-}
-
-TEST(str_fmt_with_pointer)
-{
-    SIMPLE_FMT_TEST("{}", (void *)1234567890, "1234567890");
-}
-
-TEST(str_fmt_binary)
-{
-    SIMPLE_FMT_TEST("{b}", 0b101010111011, "101010111011");
-}
-
-TEST(str_fmt_binary_prefix)
-{
-    SIMPLE_FMT_TEST("{#b}", 0b101010111011, "0b101010111011");
-}
-
-TEST(str_fmt_hex)
-{
-    SIMPLE_FMT_TEST("{x}", 0xabcdef0123456789, "abcdef0123456789");
-}
-
-TEST(str_fmt_hex_prefix)
-{
-    SIMPLE_FMT_TEST("{#x}", 0xabcdef0123456789, "0xabcdef0123456789");
-}
-
-TEST(str_fmt_octal)
-{
-    SIMPLE_FMT_TEST("{o}", 01234567, "1234567");
-}
-
-TEST(str_fmt_octal_prefix)
-{
-    SIMPLE_FMT_TEST("{#o}", 01234567, "0o1234567");
-}
-
-TEST(str_fmt_min_width)
-{
-    SIMPLE_FMT_TEST("{4}", 5, "   5");
-    SIMPLE_FMT_TEST("{4}", 50000, "50000");
-}
-
-TEST(str_fmt_min_width_with_zero)
-{
-    SIMPLE_FMT_TEST("{04}", 5, "0005");
-    SIMPLE_FMT_TEST("{04}", 50000, "50000");
-    SIMPLE_FMT_TEST("{x#04}", 0x5, "0x0005");
-    SIMPLE_FMT_TEST("{x#04}", 0x50000, "0x50000");
+    TEST_CASE("1234567890", "{}", (void *)1234567890);
+    TEST_CASE("101010111011", "{b}", 0b101010111011);
+    TEST_CASE("0b101010111011", "{#b}", 0b101010111011);
+    TEST_CASE("abcdef0123456789", "{x}", 0xabcdef0123456789);
+    TEST_CASE("0xabcdef0123456789", "{#x}", 0xabcdef0123456789);
+    TEST_CASE("1234567", "{o}", 01234567);
+    TEST_CASE("0o1234567", "{#o}", 01234567);
+    TEST_CASE("   5", "{4}", 5);
+    TEST_CASE("50000", "{4}", 50000);
+    TEST_CASE("0005", "{04}", 5);
+    TEST_CASE("50000", "{04}", 50000);
+    TEST_CASE("0x0005", "{x#04}", 0x5);
+    TEST_CASE("0x50000", "{x#04}", 0x50000);
 }

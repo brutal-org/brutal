@@ -99,7 +99,7 @@ void lex_dump(Lex *self, LexToStrFn fn)
 {
     vec_foreach_v(l, &self->lexemes)
     {
-        log$("({case:param} {})", fn(l.type), l.str);
+        log$("({case-param} {})", fn(l.type), l.str);
     }
 }
 

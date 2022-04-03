@@ -21,6 +21,22 @@ typedef enum
 
 typedef enum
 {
+    FMT_PRINTF_INT,
+    FMT_PRINTF_LONG,
+    FMT_PRINTF_LONGLONG,
+
+    FMT_PRINTF_UINT,
+    FMT_PRINTF_ULONG,
+    FMT_PRINTF_ULONGLONG,
+
+    FMT_PRINTF_FLOAT,
+
+    FMT_PRINTF_PTR,
+    FMT_PRINTF_STRING,
+} FmtPrintfType;
+
+typedef enum
+{
     FMT_COL_NONE,
     FMT_BLACK,
     FMT_WHITE,
@@ -57,11 +73,13 @@ typedef struct
 
     long precison;
     long min_width;
-    bool fill_with_zero;
+    char fill;
     bool prefix;
 } Fmt;
 
 Fmt fmt_parse(Scan *scan);
+
+FmtPrintfType fmt_parse_printf(Scan *scan, Fmt *fmt);
 
 IoResult fmt_signed(Fmt self, IoWriter writer, int64_t value);
 
