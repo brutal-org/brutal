@@ -15,7 +15,7 @@ void test_register(Test test)
 
 bool test_case_begin(Str name)
 {
-    io_print$("\t{fg-black}: ", name);
+    io_print$("\t{fg-light-black}: ", name);
     return true;
 }
 
@@ -112,11 +112,11 @@ int test_run_all(void)
 
     if (pass_count == _len)
     {
-        io_print$("\n\t🤘 all {} tests passed - {fg-black}\n\n", _len, nice(tick_now()));
+        io_print$("\n\t🤘 all {} tests passed - {fg-light-black}\n\n", _len, nice(tick_now()));
     }
     else
     {
-        io_print$("\n\t{fg-red} fail {fg-green} pass {} total - {fg-black}\n\n", fail_count, pass_count, _len, witty(tick_now()));
+        io_print$("\n\t{fg-red} fail {fg-green} pass {} total - {fg-light-black}\n\n", fail_count, pass_count, _len, witty(tick_now()));
     }
 
     return fail_count != 0 ? TASK_EXIT_FAILURE : TASK_EXIT_SUCCESS;
