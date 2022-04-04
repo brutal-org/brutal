@@ -1,6 +1,13 @@
 #include <brutal/ui.h>
 #include "test/test.h"
 
+#define TEST_CASE(STR, EXPECTED)                      \
+    if (test_case_begin(str$(STR ": " #EXPECTED)))    \
+    {                                                 \
+        assert_truth(try_parse_layout(STR) EXPECTED); \
+        test_case_end();                              \
+    }
+
 static UiLayout try_parse_layout(char const *str)
 {
     Scan scan;
@@ -15,170 +22,169 @@ static UiLayout try_parse_layout(char const *str)
 
 TEST(ui_parse_layout_dock)
 {
-    assert_truth(try_parse_layout("dock").type == UI_LAYOUT_DOCK);
-
-    assert_truth(try_parse_layout("dock-start").dock == M_DOCK_START);
-    assert_truth(try_parse_layout("dock-s").dock == M_DOCK_START);
-    assert_truth(try_parse_layout("dock-end").dock == M_DOCK_END);
-    assert_truth(try_parse_layout("dock-e").dock == M_DOCK_END);
-    assert_truth(try_parse_layout("dock-top").dock == M_DOCK_TOP);
-    assert_truth(try_parse_layout("dock-t").dock == M_DOCK_TOP);
-    assert_truth(try_parse_layout("dock-bottom").dock == M_DOCK_BOTTOM);
-    assert_truth(try_parse_layout("dock-b").dock == M_DOCK_BOTTOM);
-    assert_truth(try_parse_layout("dock-fill").dock == M_DOCK_FILL);
-    assert_truth(try_parse_layout("dock-none").dock == M_DOCK_NONE);
+    TEST_CASE("dock", .type == UI_LAYOUT_DOCK);
+    TEST_CASE("dock-start", .dock == M_DOCK_START);
+    TEST_CASE("dock-s", .dock == M_DOCK_START);
+    TEST_CASE("dock-end", .dock == M_DOCK_END);
+    TEST_CASE("dock-e", .dock == M_DOCK_END);
+    TEST_CASE("dock-top", .dock == M_DOCK_TOP);
+    TEST_CASE("dock-t", .dock == M_DOCK_TOP);
+    TEST_CASE("dock-bottom", .dock == M_DOCK_BOTTOM);
+    TEST_CASE("dock-b", .dock == M_DOCK_BOTTOM);
+    TEST_CASE("dock-fill", .dock == M_DOCK_FILL);
+    TEST_CASE("dock-none", .dock == M_DOCK_NONE);
 }
 
 TEST(ui_parse_layout_flex)
 {
-    assert_truth(try_parse_layout("flex").type == UI_LAYOUT_FLEX);
+    TEST_CASE("flex", .type == UI_LAYOUT_FLEX);
 
-    assert_truth(try_parse_layout("grow-3").grow > 2.9);
-    assert_truth(try_parse_layout("gaps-3").gaps.x > 2.9);
-    assert_truth(try_parse_layout("gaps-x-3").gaps.x > 2.9);
-    assert_truth(try_parse_layout("gaps-y-3").gaps.y > 2.9);
+    TEST_CASE("grow-3", .grow > 2.9);
+    TEST_CASE("gaps-3", .gaps.x > 2.9);
+    TEST_CASE("gaps-x-3", .gaps.x > 2.9);
+    TEST_CASE("gaps-y-3", .gaps.y > 2.9);
 }
 
 TEST(ui_parse_layout_grid)
 {
-    assert_truth(try_parse_layout("grid").type == UI_LAYOUT_GRID);
+    TEST_CASE("grid", .type == UI_LAYOUT_GRID);
 }
 
 TEST(ui_parse_layout_min_max)
 {
-    assert_truth(try_parse_layout("min-width-3").size.min.width > 2.9);
-    assert_truth(try_parse_layout("min-height-3").size.min.height > 2.9);
-    assert_truth(try_parse_layout("max-width-3").size.max.width > 2.9);
-    assert_truth(try_parse_layout("max-height-3").size.max.height > 2.9);
+    TEST_CASE("min-width-3", .size.min.width > 2.9);
+    TEST_CASE("min-height-3", .size.min.height > 2.9);
+    TEST_CASE("max-width-3", .size.max.width > 2.9);
+    TEST_CASE("max-height-3", .size.max.height > 2.9);
 
-    assert_truth(try_parse_layout("min-w-3").size.min.width > 2.9);
-    assert_truth(try_parse_layout("min-h-3").size.min.height > 2.9);
-    assert_truth(try_parse_layout("max-w-3").size.max.width > 2.9);
-    assert_truth(try_parse_layout("max-h-3").size.max.height > 2.9);
+    TEST_CASE("min-w-3", .size.min.width > 2.9);
+    TEST_CASE("min-h-3", .size.min.height > 2.9);
+    TEST_CASE("max-w-3", .size.max.width > 2.9);
+    TEST_CASE("max-h-3", .size.max.height > 2.9);
 
-    assert_truth(try_parse_layout("min-x-3").size.min.width > 2.9);
-    assert_truth(try_parse_layout("min-y-3").size.min.height > 2.9);
-    assert_truth(try_parse_layout("max-x-3").size.max.width > 2.9);
-    assert_truth(try_parse_layout("max-y-3").size.max.height > 2.9);
+    TEST_CASE("min-x-3", .size.min.width > 2.9);
+    TEST_CASE("min-y-3", .size.min.height > 2.9);
+    TEST_CASE("max-x-3", .size.max.width > 2.9);
+    TEST_CASE("max-y-3", .size.max.height > 2.9);
 }
 
 TEST(ui_parse_layout_grivity)
 {
-    assert_truth(try_parse_layout("gravity-reset").gravity == M_GRAVITY_NONE);
-    assert_truth(try_parse_layout("gravity-s").gravity == M_GRAVITY_START);
-    assert_truth(try_parse_layout("gravity-start").gravity == M_GRAVITY_START);
-    assert_truth(try_parse_layout("gravity-e").gravity == M_GRAVITY_END);
-    assert_truth(try_parse_layout("gravity-end").gravity == M_GRAVITY_END);
-    assert_truth(try_parse_layout("gravity-t").gravity == M_GRAVITY_TOP);
-    assert_truth(try_parse_layout("gravity-top").gravity == M_GRAVITY_TOP);
-    assert_truth(try_parse_layout("gravity-b").gravity == M_GRAVITY_BOTTOM);
-    assert_truth(try_parse_layout("gravity-bottom").gravity == M_GRAVITY_BOTTOM);
-    assert_truth(try_parse_layout("gravity-center").gravity == M_GRAVITY_CENTER);
-    assert_truth(try_parse_layout("gravity-vcenter").gravity == M_GRAVITY_VCENTER);
-    assert_truth(try_parse_layout("gravity-hcenter").gravity == M_GRAVITY_HCENTER);
-    assert_truth(try_parse_layout("gravity-fill").gravity == M_GRAVITY_FILL);
-    assert_truth(try_parse_layout("gravity-vfill").gravity == M_GRAVITY_VFILL);
-    assert_truth(try_parse_layout("gravity-hfill").gravity == M_GRAVITY_HFILL);
+    TEST_CASE("gravity-reset", .gravity == M_GRAVITY_NONE);
+    TEST_CASE("gravity-s", .gravity == M_GRAVITY_START);
+    TEST_CASE("gravity-start", .gravity == M_GRAVITY_START);
+    TEST_CASE("gravity-e", .gravity == M_GRAVITY_END);
+    TEST_CASE("gravity-end", .gravity == M_GRAVITY_END);
+    TEST_CASE("gravity-t", .gravity == M_GRAVITY_TOP);
+    TEST_CASE("gravity-top", .gravity == M_GRAVITY_TOP);
+    TEST_CASE("gravity-b", .gravity == M_GRAVITY_BOTTOM);
+    TEST_CASE("gravity-bottom", .gravity == M_GRAVITY_BOTTOM);
+    TEST_CASE("gravity-center", .gravity == M_GRAVITY_CENTER);
+    TEST_CASE("gravity-vcenter", .gravity == M_GRAVITY_VCENTER);
+    TEST_CASE("gravity-hcenter", .gravity == M_GRAVITY_HCENTER);
+    TEST_CASE("gravity-fill", .gravity == M_GRAVITY_FILL);
+    TEST_CASE("gravity-vfill", .gravity == M_GRAVITY_VFILL);
+    TEST_CASE("gravity-hfill", .gravity == M_GRAVITY_HFILL);
 
-    assert_truth(try_parse_layout("g-reset").gravity == M_GRAVITY_NONE);
-    assert_truth(try_parse_layout("g-s").gravity == M_GRAVITY_START);
-    assert_truth(try_parse_layout("g-start").gravity == M_GRAVITY_START);
-    assert_truth(try_parse_layout("g-e").gravity == M_GRAVITY_END);
-    assert_truth(try_parse_layout("g-end").gravity == M_GRAVITY_END);
-    assert_truth(try_parse_layout("g-t").gravity == M_GRAVITY_TOP);
-    assert_truth(try_parse_layout("g-top").gravity == M_GRAVITY_TOP);
-    assert_truth(try_parse_layout("g-b").gravity == M_GRAVITY_BOTTOM);
-    assert_truth(try_parse_layout("g-bottom").gravity == M_GRAVITY_BOTTOM);
-    assert_truth(try_parse_layout("g-center").gravity == M_GRAVITY_CENTER);
-    assert_truth(try_parse_layout("g-vcenter").gravity == M_GRAVITY_VCENTER);
-    assert_truth(try_parse_layout("g-hcenter").gravity == M_GRAVITY_HCENTER);
-    assert_truth(try_parse_layout("g-fill").gravity == M_GRAVITY_FILL);
-    assert_truth(try_parse_layout("g-vfill").gravity == M_GRAVITY_VFILL);
-    assert_truth(try_parse_layout("g-hfill").gravity == M_GRAVITY_HFILL);
+    TEST_CASE("g-reset", .gravity == M_GRAVITY_NONE);
+    TEST_CASE("g-s", .gravity == M_GRAVITY_START);
+    TEST_CASE("g-start", .gravity == M_GRAVITY_START);
+    TEST_CASE("g-e", .gravity == M_GRAVITY_END);
+    TEST_CASE("g-end", .gravity == M_GRAVITY_END);
+    TEST_CASE("g-t", .gravity == M_GRAVITY_TOP);
+    TEST_CASE("g-top", .gravity == M_GRAVITY_TOP);
+    TEST_CASE("g-b", .gravity == M_GRAVITY_BOTTOM);
+    TEST_CASE("g-bottom", .gravity == M_GRAVITY_BOTTOM);
+    TEST_CASE("g-center", .gravity == M_GRAVITY_CENTER);
+    TEST_CASE("g-vcenter", .gravity == M_GRAVITY_VCENTER);
+    TEST_CASE("g-hcenter", .gravity == M_GRAVITY_HCENTER);
+    TEST_CASE("g-fill", .gravity == M_GRAVITY_FILL);
+    TEST_CASE("g-vfill", .gravity == M_GRAVITY_VFILL);
+    TEST_CASE("g-hfill", .gravity == M_GRAVITY_HFILL);
 }
 
 TEST(ui_parse_layout_placement)
 {
-    assert_truth(try_parse_layout("placement-reset").placement == M_GRAVITY_NONE);
-    assert_truth(try_parse_layout("placement-s").placement == M_GRAVITY_START);
-    assert_truth(try_parse_layout("placement-start").placement == M_GRAVITY_START);
-    assert_truth(try_parse_layout("placement-e").placement == M_GRAVITY_END);
-    assert_truth(try_parse_layout("placement-end").placement == M_GRAVITY_END);
-    assert_truth(try_parse_layout("placement-t").placement == M_GRAVITY_TOP);
-    assert_truth(try_parse_layout("placement-top").placement == M_GRAVITY_TOP);
-    assert_truth(try_parse_layout("placement-b").placement == M_GRAVITY_BOTTOM);
-    assert_truth(try_parse_layout("placement-bottom").placement == M_GRAVITY_BOTTOM);
-    assert_truth(try_parse_layout("placement-center").placement == M_GRAVITY_CENTER);
-    assert_truth(try_parse_layout("placement-vcenter").placement == M_GRAVITY_VCENTER);
-    assert_truth(try_parse_layout("placement-hcenter").placement == M_GRAVITY_HCENTER);
-    assert_truth(try_parse_layout("placement-fill").placement == M_GRAVITY_FILL);
-    assert_truth(try_parse_layout("placement-vfill").placement == M_GRAVITY_VFILL);
-    assert_truth(try_parse_layout("placement-hfill").placement == M_GRAVITY_HFILL);
+    TEST_CASE("placement-reset", .placement == M_GRAVITY_NONE);
+    TEST_CASE("placement-s", .placement == M_GRAVITY_START);
+    TEST_CASE("placement-start", .placement == M_GRAVITY_START);
+    TEST_CASE("placement-e", .placement == M_GRAVITY_END);
+    TEST_CASE("placement-end", .placement == M_GRAVITY_END);
+    TEST_CASE("placement-t", .placement == M_GRAVITY_TOP);
+    TEST_CASE("placement-top", .placement == M_GRAVITY_TOP);
+    TEST_CASE("placement-b", .placement == M_GRAVITY_BOTTOM);
+    TEST_CASE("placement-bottom", .placement == M_GRAVITY_BOTTOM);
+    TEST_CASE("placement-center", .placement == M_GRAVITY_CENTER);
+    TEST_CASE("placement-vcenter", .placement == M_GRAVITY_VCENTER);
+    TEST_CASE("placement-hcenter", .placement == M_GRAVITY_HCENTER);
+    TEST_CASE("placement-fill", .placement == M_GRAVITY_FILL);
+    TEST_CASE("placement-vfill", .placement == M_GRAVITY_VFILL);
+    TEST_CASE("placement-hfill", .placement == M_GRAVITY_HFILL);
 
-    assert_truth(try_parse_layout("place-reset").placement == M_GRAVITY_NONE);
-    assert_truth(try_parse_layout("place-s").placement == M_GRAVITY_START);
-    assert_truth(try_parse_layout("place-start").placement == M_GRAVITY_START);
-    assert_truth(try_parse_layout("place-e").placement == M_GRAVITY_END);
-    assert_truth(try_parse_layout("place-end").placement == M_GRAVITY_END);
-    assert_truth(try_parse_layout("place-t").placement == M_GRAVITY_TOP);
-    assert_truth(try_parse_layout("place-top").placement == M_GRAVITY_TOP);
-    assert_truth(try_parse_layout("place-b").placement == M_GRAVITY_BOTTOM);
-    assert_truth(try_parse_layout("place-bottom").placement == M_GRAVITY_BOTTOM);
-    assert_truth(try_parse_layout("place-center").placement == M_GRAVITY_CENTER);
-    assert_truth(try_parse_layout("place-vcenter").placement == M_GRAVITY_VCENTER);
-    assert_truth(try_parse_layout("place-hcenter").placement == M_GRAVITY_HCENTER);
-    assert_truth(try_parse_layout("place-fill").placement == M_GRAVITY_FILL);
-    assert_truth(try_parse_layout("place-vfill").placement == M_GRAVITY_VFILL);
-    assert_truth(try_parse_layout("place-hfill").placement == M_GRAVITY_HFILL);
+    TEST_CASE("place-reset", .placement == M_GRAVITY_NONE);
+    TEST_CASE("place-s", .placement == M_GRAVITY_START);
+    TEST_CASE("place-start", .placement == M_GRAVITY_START);
+    TEST_CASE("place-e", .placement == M_GRAVITY_END);
+    TEST_CASE("place-end", .placement == M_GRAVITY_END);
+    TEST_CASE("place-t", .placement == M_GRAVITY_TOP);
+    TEST_CASE("place-top", .placement == M_GRAVITY_TOP);
+    TEST_CASE("place-b", .placement == M_GRAVITY_BOTTOM);
+    TEST_CASE("place-bottom", .placement == M_GRAVITY_BOTTOM);
+    TEST_CASE("place-center", .placement == M_GRAVITY_CENTER);
+    TEST_CASE("place-vcenter", .placement == M_GRAVITY_VCENTER);
+    TEST_CASE("place-hcenter", .placement == M_GRAVITY_HCENTER);
+    TEST_CASE("place-fill", .placement == M_GRAVITY_FILL);
+    TEST_CASE("place-vfill", .placement == M_GRAVITY_VFILL);
+    TEST_CASE("place-hfill", .placement == M_GRAVITY_HFILL);
 }
 
 TEST(ui_parse_layout_spacing)
 {
-    assert_truth(try_parse_layout("padding-3").padding.start > 2.9);
-    assert_truth(try_parse_layout("padding-3").padding.end > 2.9);
-    assert_truth(try_parse_layout("padding-3").padding.top > 2.9);
-    assert_truth(try_parse_layout("padding-3").padding.bottom > 2.9);
+    TEST_CASE("padding-3", .padding.start > 2.9);
+    TEST_CASE("padding-3", .padding.end > 2.9);
+    TEST_CASE("padding-3", .padding.top > 2.9);
+    TEST_CASE("padding-3", .padding.bottom > 2.9);
 
-    assert_truth(try_parse_layout("p-3").padding.start > 2.9);
-    assert_truth(try_parse_layout("p-3").padding.end > 2.9);
-    assert_truth(try_parse_layout("p-3").padding.top > 2.9);
-    assert_truth(try_parse_layout("p-3").padding.bottom > 2.9);
+    TEST_CASE("p-3", .padding.start > 2.9);
+    TEST_CASE("p-3", .padding.end > 2.9);
+    TEST_CASE("p-3", .padding.top > 2.9);
+    TEST_CASE("p-3", .padding.bottom > 2.9);
 
-    assert_truth(try_parse_layout("padding-start-3").padding.start > 2.9);
-    assert_truth(try_parse_layout("padding-end-3").padding.end > 2.9);
-    assert_truth(try_parse_layout("padding-top-3").padding.top > 2.9);
-    assert_truth(try_parse_layout("padding-bottom-3").padding.bottom > 2.9);
+    TEST_CASE("padding-start-3", .padding.start > 2.9);
+    TEST_CASE("padding-end-3", .padding.end > 2.9);
+    TEST_CASE("padding-top-3", .padding.top > 2.9);
+    TEST_CASE("padding-bottom-3", .padding.bottom > 2.9);
 
-    assert_truth(try_parse_layout("p-s-3").padding.start > 2.9);
-    assert_truth(try_parse_layout("p-e-3").padding.end > 2.9);
-    assert_truth(try_parse_layout("p-t-3").padding.top > 2.9);
-    assert_truth(try_parse_layout("p-b-3").padding.bottom > 2.9);
+    TEST_CASE("p-s-3", .padding.start > 2.9);
+    TEST_CASE("p-e-3", .padding.end > 2.9);
+    TEST_CASE("p-t-3", .padding.top > 2.9);
+    TEST_CASE("p-b-3", .padding.bottom > 2.9);
 
-    assert_truth(try_parse_layout("margin-3").margin.start > 2.9);
-    assert_truth(try_parse_layout("margin-3").margin.end > 2.9);
-    assert_truth(try_parse_layout("margin-3").margin.top > 2.9);
-    assert_truth(try_parse_layout("margin-3").margin.bottom > 2.9);
+    TEST_CASE("margin-3", .margin.start > 2.9);
+    TEST_CASE("margin-3", .margin.end > 2.9);
+    TEST_CASE("margin-3", .margin.top > 2.9);
+    TEST_CASE("margin-3", .margin.bottom > 2.9);
 
-    assert_truth(try_parse_layout("m-3").margin.start > 2.9);
-    assert_truth(try_parse_layout("m-3").margin.end > 2.9);
-    assert_truth(try_parse_layout("m-3").margin.top > 2.9);
-    assert_truth(try_parse_layout("m-3").margin.bottom > 2.9);
+    TEST_CASE("m-3", .margin.start > 2.9);
+    TEST_CASE("m-3", .margin.end > 2.9);
+    TEST_CASE("m-3", .margin.top > 2.9);
+    TEST_CASE("m-3", .margin.bottom > 2.9);
 
-    assert_truth(try_parse_layout("margin-start-3").margin.start > 2.9);
-    assert_truth(try_parse_layout("margin-end-3").margin.end > 2.9);
-    assert_truth(try_parse_layout("margin-top-3").margin.top > 2.9);
-    assert_truth(try_parse_layout("margin-bottom-3").margin.bottom > 2.9);
+    TEST_CASE("margin-start-3", .margin.start > 2.9);
+    TEST_CASE("margin-end-3", .margin.end > 2.9);
+    TEST_CASE("margin-top-3", .margin.top > 2.9);
+    TEST_CASE("margin-bottom-3", .margin.bottom > 2.9);
 
-    assert_truth(try_parse_layout("m-s-3").margin.start > 2.9);
-    assert_truth(try_parse_layout("m-e-3").margin.end > 2.9);
-    assert_truth(try_parse_layout("m-t-3").margin.top > 2.9);
-    assert_truth(try_parse_layout("m-b-3").margin.bottom > 2.9);
+    TEST_CASE("m-s-3", .margin.start > 2.9);
+    TEST_CASE("m-e-3", .margin.end > 2.9);
+    TEST_CASE("m-t-3", .margin.top > 2.9);
+    TEST_CASE("m-b-3", .margin.bottom > 2.9);
 }
 
 TEST(ui_parse_layout_flow)
 {
-    assert_truth(try_parse_layout("ltr").flow == M_FLOW_LEFT_TO_RIGHT);
-    assert_truth(try_parse_layout("rtl").flow == M_FLOW_RIGHT_TO_LEFT);
-    assert_truth(try_parse_layout("ttb").flow == M_FLOW_TOP_TO_BOTTOM);
-    assert_truth(try_parse_layout("btt").flow == M_FLOW_BOTTOM_TO_TOP);
+    TEST_CASE("ltr", .flow == M_FLOW_LEFT_TO_RIGHT);
+    TEST_CASE("rtl", .flow == M_FLOW_RIGHT_TO_LEFT);
+    TEST_CASE("ttb", .flow == M_FLOW_TOP_TO_BOTTOM);
+    TEST_CASE("btt", .flow == M_FLOW_BOTTOM_TO_TOP);
 }

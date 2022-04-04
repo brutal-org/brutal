@@ -1,15 +1,27 @@
-#include <brutal/debug.h>
+#include <brutal/io.h>
 #include <brutal/task.h>
 #include <brutal/text.h>
+#include <brutal/time.h>
 #include "test/test.h"
 
-static size_t _len = 0;
+static int _len = 0;
 static Test _tests[1024] = {};
 
 void test_register(Test test)
 {
     _tests[_len] = test;
     _len++;
+}
+
+bool test_case_begin(Str name)
+{
+    io_print$("\t{fg-black}: ", name);
+    return true;
+}
+
+void test_case_end(void)
+{
+    io_print$("{fg-green}\n", " ok");
 }
 
 bool test_run(Test test)
@@ -34,15 +46,20 @@ bool test_run(Test test)
         if (test.flags & TEST_EXPECTED_TO_FAIL)
         {
             pass = result != TASK_EXIT_SUCCESS;
+
+            if (pass)
+            {
+                io_print$("{fg-yellow}\n", "(expected to fail)");
+            }
         }
 
         if (pass)
         {
-            log$("[ {fg-green} ] {}", "PASS", test.name);
+            io_print$("{fg-white bg-green} {fg-light-green}{fg-white}:{}: {fg-white}\n", " PASS ", io_dirname(test.loc.file), io_filename(test.loc.file), test.loc.line, test.name);
         }
         else
         {
-            log$("[ {fg-red} ] {}", "FAIL", test.name);
+            io_print$("{fg-white bg-red bold} {fg-light-red}{fg-white}:{}: {fg-white}\n", " FAIL ", io_dirname(test.loc.file), io_filename(test.loc.file), test.loc.line, test.name);
         }
 
         return pass;
@@ -54,7 +71,7 @@ int test_run_by_pattern(Str pattern)
     int pass_count = 0;
     int fail_count = 0;
 
-    for (size_t i = 0; i < _len; i++)
+    for (int i = 0; i < _len; i++)
     {
         if (glob_match_str(pattern, str$(_tests[i].name)))
         {
@@ -77,10 +94,9 @@ int test_run_all(void)
     int pass_count = 0;
     int fail_count = 0;
 
-    log$("Running {} tests...", _len);
-    log$("");
+    io_print$("\nRunning {fg-blue} tests...\n\n", _len);
 
-    for (size_t i = 0; i < _len; i++)
+    for (int i = 0; i < _len; i++)
     {
         Test test = _tests[i];
 
@@ -94,9 +110,14 @@ int test_run_all(void)
         }
     }
 
-    log$("");
-    log$("{} tests run, {} pass, {} fail", _len, pass_count, fail_count);
-    log$("");
+    if (pass_count == _len)
+    {
+        io_print$("\n\t🤘 all {} tests passed - {fg-black}\n\n", _len, nice(tick_now()));
+    }
+    else
+    {
+        io_print$("\n\t{fg-red} fail {fg-green} pass {} total - {fg-black}\n\n", fail_count, pass_count, _len, witty(tick_now()));
+    }
 
     return fail_count != 0 ? TASK_EXIT_FAILURE : TASK_EXIT_SUCCESS;
 }

@@ -12,8 +12,6 @@ TEST(ds_range_alloc_used_start)
 
     USizeRange higher_half = (USizeRange){0x1000, 0x4000};
 
-    range_alloc_dump(&alloc);
-
     assert_equal(alloc.len, 1);
     assert_truth(range_eq(alloc.data[0], higher_half));
 
@@ -30,8 +28,6 @@ TEST(ds_range_alloc_used_center)
 
     USizeRange lower_half = (USizeRange){0x0, 0x2000};
     USizeRange higher_half = (USizeRange){0x3000, 0x2000};
-
-    range_alloc_dump(&alloc);
 
     assert_equal(alloc.len, 2);
     assert_truth(range_eq(alloc.data[0], lower_half));
@@ -50,8 +46,6 @@ TEST(ds_range_alloc_used_end)
 
     USizeRange lower_half = (USizeRange){0x0, 0x4000};
 
-    range_alloc_dump(&alloc);
-
     assert_equal(alloc.len, 1);
     assert_truth(range_eq(alloc.data[0], lower_half));
 
@@ -67,8 +61,6 @@ TEST(ds_range_alloc_unused_begin)
     range_alloc_unused(&alloc, (USizeRange){0x1000, 0x1000});
 
     USizeRange final_range = (USizeRange){0x0, 0x2000};
-
-    range_alloc_dump(&alloc);
 
     assert_equal(alloc.len, 1);
     assert_truth(range_eq(alloc.data[0], final_range));
@@ -87,8 +79,6 @@ TEST(ds_range_alloc_unused_middle)
 
     USizeRange final_range = (USizeRange){0x0, 0x3000};
 
-    range_alloc_dump(&alloc);
-
     assert_equal(alloc.len, 1);
     assert_truth(range_eq(alloc.data[0], final_range));
 
@@ -105,8 +95,6 @@ TEST(ds_range_alloc_unused_end)
     range_alloc_unused(&alloc, (USizeRange){0x2000, 0x1000});
 
     USizeRange final_range = (USizeRange){0x0, 0x3000};
-
-    range_alloc_dump(&alloc);
 
     assert_equal(alloc.len, 1);
     assert_truth(range_eq(alloc.data[0], final_range));

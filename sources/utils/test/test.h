@@ -14,6 +14,7 @@ typedef struct
 {
     enum test_flags flags;
     Str name;
+    Loc loc;
     TestFunc *func;
 } Test;
 
@@ -22,6 +23,10 @@ void test_alloc_begin_test(void);
 void test_alloc_end_test(void);
 
 Alloc *test_alloc(void);
+
+bool test_case_begin(Str name);
+
+void test_case_end(void);
 
 void test_register(Test test);
 
@@ -34,6 +39,7 @@ void test_register(Test test);
         test_register((Test){                                                   \
             flags,                                                              \
             str$(#name),                                                        \
+            loc$(),                                                             \
             TEST_FUNCTION_NAME(name),                                           \
         });                                                                     \
     }                                                                           \

@@ -102,7 +102,6 @@ static char *_witty[] = {
     "You should try to fix it yourself",
     "You should write some documentation",
     "You should write some tests",
-    "You're a wizard Harry.",
     "You're not a real hacker",
     "You've been pwned",
     "You've been terminated",
@@ -111,4 +110,33 @@ static char *_witty[] = {
 Str witty(int seed)
 {
     return str$(_witty[seed % array_len$(_witty)]);
+}
+
+static char const *_nice[] = {
+    "Nice comment unavailable :(",
+
+    "Your are a legend",
+    "Nice work",
+    "Great job",
+    "You are a hero",
+    "*hug*",
+    "You are the best",
+    "Keep up the good work",
+    "This is why BRUTAL is called the unix utopia",
+    "*hug you real hard*",
+    "Congratulation",
+    "No time to RIIR!",
+    "No pain no gain",
+    "What if we kissy during the test succeeding?",
+    "That's the spirit",
+    "That's the way to do it",
+    "Well hello friends",
+    "Let's gooooo",
+    "Let's gooooooooooooo",
+    "EPIC WIN",
+};
+
+Str nice(int seed)
+{
+    return str$(_nice[seed % array_len$(_nice)]);
 }

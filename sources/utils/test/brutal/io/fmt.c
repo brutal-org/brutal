@@ -2,11 +2,12 @@
 #include <brutal/text.h>
 #include "test/test.h"
 
-#define SIMPLE_FMT_TEST(FORMAT, ARG1, EXPECTED) \
-    assert_str_equal(str$(EXPECTED), str_fmt$(test_alloc(), str$(FORMAT), ARG1))
-
-#define TEST_CASE(EXPECTED, FORMAT, ...) \
-    assert_str_equal(str$(EXPECTED), str_fmt$(test_alloc(), str$(FORMAT), __VA_ARGS__))
+#define TEST_CASE(EXPECTED, FORMAT, ...)                                                     \
+    if (test_case_begin(str$(EXPECTED)))                                                     \
+    {                                                                                        \
+        assert_str_equal(str$(EXPECTED), str_fmt$(test_alloc(), str$(FORMAT), __VA_ARGS__)); \
+        test_case_end();                                                                     \
+    }
 
 TEST(io_fmt)
 {
