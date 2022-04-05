@@ -30,15 +30,19 @@ After building the binutils you can build BRUTAL by running:
 
 ## On macOS
 
-If you use [homebrew package manager](https://brew.sh), you can obtain the dependencies by running `brew install qemu nasm xorriso llvm binutils wget`.
+If you use [Homebrew package manager](https://brew.sh), you can obtain the dependencies by running `brew install qemu nasm xorriso llvm binutils wget pkg-config sdl2`.
 
-LLVM on homebrew is keg by default, you also need to set the following environment variables
+LLVM on Homebrew is keg by default, you also need to set the following environment variables:
 
 ```sh
 export PATH="/usr/local/opt/llvm/bin:$PATH"
 export LDFLAGS="-L/usr/local/opt/llvm/lib"
 export CPPFLAGS="-I/usr/local/opt/llvm/include"
 ```
+
+Then build BRUTAL by running:
+
+`make all`
 
 ## Note About Windows
 
