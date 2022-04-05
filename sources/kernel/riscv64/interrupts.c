@@ -64,7 +64,7 @@ void interrupt_error_handler(Regs const *regs, int int_no)
     dump_register(regs);
 
     log_unlock("");
-    log_unlock(" - \"{}\"", witty(regs->sp + regs->ra));
+    log_unlock(" - \"{}\"", txt_witty(regs->sp + regs->ra));
 
     log_unlock("");
     log_unlock("------------------------------------------------------------");

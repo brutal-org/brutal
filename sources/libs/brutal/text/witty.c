@@ -107,7 +107,7 @@ static char *_witty[] = {
     "You've been terminated",
 };
 
-Str witty(int seed)
+Str txt_witty(int seed)
 {
     return str$(_witty[seed % array_len$(_witty)]);
 }
@@ -136,7 +136,7 @@ static char const *_nice[] = {
     "EPIC WIN",
 };
 
-Str nice(int seed)
+Str txt_nice(int seed)
 {
     return str$(_nice[seed % array_len$(_nice)]);
 }

@@ -9,6 +9,7 @@
 
 typedef enum
 {
+    ANY_BOOL,
     ANY_INT,
     ANY_UINT,
     ANY_FLOAT,
@@ -22,6 +23,7 @@ typedef struct
 
     union
     {
+        bool bool_;
         int64_t int_;
         uint64_t uint_;
 #ifndef __freestanding__
@@ -35,6 +37,11 @@ typedef struct
 static inline bool any_is(Any any, AnyType type)
 {
     return any.type == type;
+}
+
+static inline Any any_bool(bool value)
+{
+    return (Any){.type = ANY_BOOL, .bool_ = value};
 }
 
 static inline Any any_int(int64_t i)
@@ -77,6 +84,7 @@ static inline Any any_ptr(void *p)
 
 #define any$(EXPR)                    \
     _Generic((EXPR),                  \
+        bool: any_bool,               \
         _MatchSigned(any_int),        \
         _MatchUnsigned(any_uint),     \
         _MatchFloat(any_float),       \

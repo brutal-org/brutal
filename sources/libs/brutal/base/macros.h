@@ -1,8 +1,8 @@
 #pragma once
 
-#define __concat_impl$(LHS, RHS) LHS##RHS
+#define __concat$(LHS, RHS) LHS##RHS
 
-#define concat$(LHS, RHS) __concat_impl$(LHS, RHS)
+#define concat$(LHS, RHS) __concat$(LHS, RHS)
 
 // Align the nearest _lower_ aligned address
 // ex: 8 with align = 8 -> 8
@@ -55,3 +55,9 @@
         double: EXPR
 
 // clang-format on
+
+#define var$(NAME) concat$(NAME, __LINE__)
+
+#define defer$(BEGIN, END) for (int var$(__i) = (BEGIN, 0); !var$(__i); (var$(__i) += 1, END))
+
+#define cond_defer$(BEGIN, END) for (int var$(__i) = BEGIN; var$(__i); (var$(__i) -= 1, END))

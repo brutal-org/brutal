@@ -2,6 +2,6 @@
 
 #include <brutal/text/str.h>
 
-Str witty(int seed);
+Str txt_witty(int seed);
 
-Str nice(int seed);
+Str txt_nice(int seed);

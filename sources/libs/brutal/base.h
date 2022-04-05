@@ -1,5 +1,6 @@
 #pragma once
 
+#include <brutal/base/any.h>
 #include <brutal/base/attributes.h>
 #include <brutal/base/banned.h>
 #include <brutal/base/cast.h>
@@ -9,6 +10,7 @@
 #include <brutal/base/error.h>
 #include <brutal/base/iter.h>
 #include <brutal/base/keywords.h>
+#include <brutal/base/loc.h>
 #include <brutal/base/macros.h>
 #include <brutal/base/range.h>
 #include <brutal/base/result.h>

@@ -34,7 +34,7 @@ typedef struct
     uint8_t const *buf;
 } Str;
 
-#define nullstr str$("")
+#define nullstr str_const$("")
 
 #define is_nullstr(S) (S.len == 0)
 
