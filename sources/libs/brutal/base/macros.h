@@ -56,6 +56,10 @@
 
 // clang-format on
 
+#define __stringify$(SYM) #SYM
+
+#define stringify$(SYM) __stringify$(SYM)
+
 #define var$(NAME) concat$(NAME, __LINE__)
 
 #define defer$(BEGIN, END) for (int var$(__i) = (BEGIN, 0); !var$(__i); (var$(__i) += 1, END))
