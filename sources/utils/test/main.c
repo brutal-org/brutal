@@ -3,7 +3,6 @@
 #include <brutal/task.h>
 #include <brutal/text.h>
 #include <brutal/time.h>
-#include <unistd.h>
 #include "test/test.h"
 
 static int _len = 0;

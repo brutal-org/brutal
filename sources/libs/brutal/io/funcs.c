@@ -181,6 +181,7 @@ IoResult io_vprintf(IoWriter writer, Str format, va_list va)
         else if (scan_curr(&scan) == '%')
         {
             Fmt fmt = {};
+
             switch (fmt_parse_printf(&scan, &fmt))
             {
             default:
