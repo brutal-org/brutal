@@ -1,4 +1,5 @@
 #include <brutal/math/rand.h>
+#include <embed/crypto.h>
 
 void m_rand_init(MRand *self, uint32_t seed)
 {
@@ -33,4 +34,39 @@ uint16_t m_rand_next_u16(MRand *self)
 uint8_t m_rand_next_u8(MRand *self)
 {
     return m_rand_next_u32(self);
+}
+
+/* --- Entropy Source ------------------------------------------------------- */
+
+size_t m_entropy(void *buf, size_t len)
+{
+    return embed_crypto_entropy(buf, len);
+}
+
+uint8_t m_entropy8(void)
+{
+    uint8_t buf;
+    embed_crypto_entropy(&buf, sizeof(buf));
+    return buf;
+}
+
+uint16_t m_entropy16(void)
+{
+    uint16_t buf;
+    embed_crypto_entropy(&buf, sizeof(buf));
+    return buf;
+}
+
+uint32_t m_entropy32(void)
+{
+    uint32_t buf;
+    embed_crypto_entropy(&buf, sizeof(buf));
+    return buf;
+}
+
+uint64_t m_entropy64(void)
+{
+    uint64_t buf;
+    embed_crypto_entropy(&buf, sizeof(buf));
+    return buf;
 }
