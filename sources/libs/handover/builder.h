@@ -1,8 +1,8 @@
 #pragma once
 
-#include <bal/boot/handover.h>
 #include <brutal/ds.h>
 #include <brutal/text.h>
+#include <handover/handover.h>
 
 typedef struct
 {
@@ -20,7 +20,7 @@ size_t handover_builder_finalize(Ho2Builder *self, uint8_t *buf);
 
 void handover_builder_record(Ho2Builder *self, HandoverRecord entry);
 
-void handover_builder_count(Ho2Builder *self);
+size_t handover_builder_count(Ho2Builder *self);
 
 void handover_builder_reserve(Ho2Builder *self, size_t size);
 

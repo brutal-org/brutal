@@ -48,9 +48,9 @@ typedef struct
 
         struct
         {
-            uint32_t car;
-            uint32_t cdr;
-        };
+            uint32_t name;
+            uint32_t meta;
+        } file;
 
         uint64_t more;
     };
@@ -192,7 +192,7 @@ static inline HandoverRecord *handover_file(Handover *self, char const *name)
     for (uint32_t i = 0; i < self->count; ++i)
     {
         HandoverRecord *record = handover_record(self, i);
-        char const *ho_name = handover_string(self, record->car);
+        char const *ho_name = handover_string(self, record->file.name);
 
         if (record->type == HANDOVER_FILE && !handover_streq(name, ho_name))
         {
@@ -280,6 +280,12 @@ static inline bool handover_dump(Handover *self, void (*print)(void *ctx, const 
             print(ctx, "    height: %u\n", record->fb.height);
             print(ctx, "    pitch: %u\n", record->fb.pitch);
             print(ctx, "    format: %u\n", record->fb.format);
+            break;
+
+        case HANDOVER_FILE:
+            print(ctx, "  file:\n");
+            print(ctx, "    name: '%s'\n", handover_string(self, record->file.name));
+            print(ctx, "    meta: '%s'\n", handover_string(self, record->file.meta));
             break;
 
         default:
