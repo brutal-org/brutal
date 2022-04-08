@@ -39,6 +39,11 @@ static inline bool any_is(Any any, AnyType type)
     return any.type == type;
 }
 
+static inline Any any_any(Any any)
+{
+    return any;
+}
+
 static inline Any any_bool(bool value)
 {
     return (Any){.type = ANY_BOOL, .bool_ = value};
@@ -82,30 +87,35 @@ static inline Any any_ptr(void *p)
 
 #ifndef __freestanding__
 
-#define any$(EXPR)                    \
-    _Generic((EXPR),                  \
-        bool: any_bool,               \
-        _MatchSigned(any_int),        \
-        _MatchUnsigned(any_uint),     \
-        _MatchFloat(any_float),       \
-                                      \
-        char*: any_cstr,              \
-        char const*: any_cstr,        \
-        Str: any_str,                 \
-        void*: any_ptr                \
+#define any$(EXPR)                \
+    _Generic((EXPR),              \
+        Any: any_any,             \
+        bool: any_bool,           \
+        _MatchSigned(any_int),    \
+        _MatchUnsigned(any_uint), \
+        _MatchFloat(any_float),   \
+                                  \
+        char*: any_cstr,          \
+        char const*: any_cstr,    \
+        Str: any_str,             \
+                                  \
+        default: any_ptr          \
     )(EXPR)
 
 #else
 
-#define any$(EXPR)                    \
-    _Generic((EXPR),                  \
-        _MatchSigned(any_int),        \
-        _MatchUnsigned(any_uint),     \
-                                      \
-        char*: any_cstr,              \
-        char const*: any_cstr,        \
-        Str: any_str,                 \
-        void*: any_ptr                \
+#define any$(EXPR)                \
+    _Generic((EXPR),              \
+        Any: any_any,             \
+        bool: any_bool,           \
+        _MatchSigned(any_int),    \
+        _MatchUnsigned(any_uint), \
+                                  \
+        char*: any_cstr,          \
+        char const*: any_cstr,    \
+        Str: any_str,             \
+                                  \
+        default: any_ptr          \
     )(EXPR)
 
 #endif
