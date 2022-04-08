@@ -1,8 +1,6 @@
 #pragma once
 
-#define __concat$(LHS, RHS) LHS##RHS
 
-#define concat$(LHS, RHS) __concat$(LHS, RHS)
 
 // Align the nearest _lower_ aligned address
 // ex: 8 with align = 8 -> 8
@@ -55,6 +53,10 @@
         double: EXPR
 
 // clang-format on
+
+#define __concat$(LHS, RHS) LHS##RHS
+
+#define concat$(LHS, RHS) __concat$(LHS, RHS)
 
 #define __stringify$(SYM) #SYM
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <brutal/base/count.h>
+#include <brutal/base/keywords.h>
 #include <brutal/base/macros.h>
 #include <brutal/base/map.h>
 #include <brutal/base/std.h>
@@ -37,6 +38,100 @@ typedef struct
 static inline bool any_is(Any any, AnyType type)
 {
     return any.type == type;
+}
+
+static inline bool any_true(Any any)
+{
+    switch (any.type)
+    {
+    case ANY_BOOL:
+        return any.bool_;
+
+    case ANY_INT:
+        return any.int_ != 0;
+
+    case ANY_UINT:
+        return any.uint_ != 0;
+
+    case ANY_FLOAT:
+        return any.float_ != 0.0;
+
+    case ANY_STR:
+        return !str_empty(any.str_);
+
+    case ANY_PTR:
+        return any.ptr_ != nullptr;
+
+    default:
+        return false;
+    }
+}
+
+static inline bool any_false(Any any)
+{
+    return !any_true(any);
+}
+
+static inline bool any_as_double(Any any, double *n)
+{
+    switch (any.type)
+    {
+    case ANY_BOOL:
+        *n = any.bool_ ? 1.0 : 0.0;
+        return true;
+
+    case ANY_INT:
+        *n = any.int_;
+        return true;
+
+    case ANY_UINT:
+        *n = any.uint_;
+        return true;
+
+    case ANY_FLOAT:
+        *n = any.float_;
+        return true;
+
+    default:
+        return false;
+    }
+}
+
+static inline bool any_eq(Any lhs, Any rhs)
+{
+    if (lhs.type != rhs.type)
+    {
+        return false;
+    }
+
+    switch (lhs.type)
+    {
+    case ANY_BOOL:
+        return lhs.bool_ == rhs.bool_;
+
+    case ANY_INT:
+        return lhs.int_ == rhs.int_;
+
+    case ANY_UINT:
+        return lhs.uint_ == rhs.uint_;
+
+    case ANY_FLOAT:
+        return lhs.float_ == rhs.float_;
+
+    case ANY_STR:
+        return str_eq(lhs.str_, rhs.str_);
+
+    case ANY_PTR:
+        return lhs.ptr_ == rhs.ptr_;
+
+    default:
+        return false;
+    }
+}
+
+static inline bool any_not_eq(Any lhs, Any rhs)
+{
+    return !any_eq(lhs, rhs);
 }
 
 static inline Any any_any(Any any)
