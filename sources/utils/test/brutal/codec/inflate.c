@@ -1,8 +1,8 @@
-#include <brutal/alloc/global.h>
 #include <brutal/codec/deflate/inflate.h>
-#include "test/test.h"
+#include <brutal/debug.h>
+#include <brutal/tests.h>
 
-TEST(inflate_uncompressed)
+test$(inflate_uncompressed)
 {
     uint8_t out_storage[512];
     const uint8_t in_storage[] = {1, 11, 0, 244, 255, 'H', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd'};
@@ -10,10 +10,10 @@ TEST(inflate_uncompressed)
     size_t size = UNWRAP(deflate_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
     // A single uncompressed block has 5 extra bytes
-    assert_equal(size, sizeof(in_storage) - 5);
+    expect_equal$(size, sizeof(in_storage) - 5);
 }
 
-TEST(inflate_empty)
+test$(inflate_empty)
 {
     uint8_t out_storage[512];
     /* Empty buffer, fixed, 6 bits of padding in the second byte set to 1 */
@@ -22,10 +22,10 @@ TEST(inflate_empty)
 
     size_t size = UNWRAP(deflate_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
-    assert_equal(size, 0u);
+    expect_equal$(size, 0u);
 }
 
-TEST(inflate_empty_no_literals)
+test$(inflate_empty_no_literals)
 {
     uint8_t out_storage[512];
 
@@ -43,10 +43,10 @@ TEST(inflate_empty_no_literals)
 
     size_t size = UNWRAP(deflate_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
-    assert_equal(size, 0u);
+    expect_equal$(size, 0u);
 }
 
-TEST(inflate_rle)
+test$(inflate_rle)
 {
     uint8_t out_storage[512];
     /* 256 zero bytes compressed using RLE (only one distance code) */
@@ -57,10 +57,10 @@ TEST(inflate_rle)
     size_t size = UNWRAP(deflate_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
     // Should be 256
-    assert_equal(size, 256u);
+    expect_equal$(size, 256u);
 }
 
-TEST(inflate_huffman)
+test$(inflate_huffman)
 {
     uint8_t out_storage[512];
     /* 256 zero bytes compressed using Huffman only (no match or distance codes) */
@@ -74,10 +74,10 @@ TEST(inflate_huffman)
     size_t size = UNWRAP(deflate_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
     // Should be 256
-    assert_equal(size, 256u);
+    expect_equal$(size, 256u);
 }
 
-TEST(inflate_max_matchlen)
+test$(inflate_max_matchlen)
 {
     uint8_t out_storage[512];
     /* 259 zero bytes compressed using literal/length code 285 (len 258) */
@@ -88,5 +88,5 @@ TEST(inflate_max_matchlen)
     size_t size = UNWRAP(deflate_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
     // Should be 259
-    assert_equal(size, 259u);
+    expect_equal$(size, 259u);
 }

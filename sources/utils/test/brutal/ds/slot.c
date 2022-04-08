@@ -1,11 +1,10 @@
-#include <brutal/alloc.h>
 #include <brutal/ds.h>
-#include "test/test.h"
+#include <brutal/tests.h>
 
-TEST(slot_acquire_release)
+test$(slot_acquire_release)
 {
     Slot(int) slot;
-    slot_init(&slot, test_alloc());
+    slot_init(&slot, test_use_alloc());
 
     slot_alloc(&slot);
 

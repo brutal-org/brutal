@@ -33,7 +33,7 @@ IoResult cli_fmt(IoWriter writer, Str format, AnyVa args)
             skip_fmt = false;
             written += TRY(IoResult, io_write_byte(writer, '}'));
         }
-        else if (scan_curr(&scan) == '[' && !skip_fmt)
+        else if (scan_skip(&scan, '[') && !skip_fmt)
         {
             scan_eat(&scan, isspace);
 

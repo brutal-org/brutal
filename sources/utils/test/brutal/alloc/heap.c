@@ -1,157 +1,118 @@
-#include <brutal/alloc.h>
-#include "test/test.h"
+#include <brutal/tests.h>
 
-static HeapAlloc _heap;
-static bool _init = false;
-
-static Alloc *heap(void)
+test$(heap_traits)
 {
-
-    if (!_init)
-    {
-        heap_alloc_init(&_heap, NODE_DEFAULT);
-        _init = true;
-    }
-
-    return base$(&_heap);
+    Alloc *alloc = test_use_alloc();
+    expect_not_null$(alloc);
+    expect_not_null$(alloc->acquire);
+    expect_not_null$(alloc->release);
+    expect_not_null$(alloc->resize);
 }
 
-TEST(heap)
+test$(heap_malloc)
 {
-    Alloc *alloc = heap();
-    assert_not_null(alloc);
-    assert_not_null(alloc->acquire);
-    assert_not_null(alloc->release);
-    assert_not_null(alloc->resize);
+    void *v = alloc_malloc(test_use_alloc(), 0x100);
+    expect_not_null$(v);
 }
 
-TEST(heap_malloc)
+test$(heap_free)
 {
-    void *v = alloc_malloc(heap(), 0x100);
-
-    assert_not_null(v);
+    void *v = alloc_malloc(test_use_alloc(), 0x100);
+    expect_not_null$(v);
+    alloc_free(test_use_alloc(), v);
 }
 
-TEST(heap_free)
+test$(heap_calloc)
 {
-    void *v = alloc_malloc(heap(), 0x100);
+    uint8_t *v = (uint8_t *)alloc_calloc(test_use_alloc(), 10, 10); // should return
 
-    assert_not_null(v);
-
-    alloc_free(heap(), v);
-}
-
-TEST(heap_calloc)
-{
-    uint8_t *v = (uint8_t *)alloc_calloc(heap(), 10, 10); // should return
-
-    assert_not_null(v);
+    expect_not_null$(v);
     for (size_t i = 0; i < 100; i++)
     {
-        assert_equal(v[i], 0);
+        expect_equal$(v[i], 0);
     }
 
-    alloc_free(heap(), v);
+    alloc_free(test_use_alloc(), v);
 }
 
-TEST(heap_resize)
+test$(heap_resize)
 {
+    uint8_t *v = (uint8_t *)alloc_malloc(test_use_alloc(), 0x50);
 
-    uint8_t *v = (uint8_t *)alloc_malloc(heap(), 0x50);
+    v = (uint8_t *)alloc_resize(test_use_alloc(), v, 0x1000);
 
-    v = (uint8_t *)alloc_resize(heap(), v, 0x1000);
-
-    assert_not_null(v);
+    expect_not_null$(v);
     mem_set(v, 1, 0x1000);
 
-    alloc_free(heap(), v);
+    alloc_free(test_use_alloc(), v);
 }
 
-TEST(heap_resize_lower)
+test$(heap_resize_lower)
 {
 
-    uint8_t *v = (uint8_t *)alloc_malloc(heap(), 0x1000);
+    uint8_t *v = (uint8_t *)alloc_malloc(test_use_alloc(), 0x1000);
 
-    v = (uint8_t *)alloc_resize(heap(), v, 0x50);
+    v = (uint8_t *)alloc_resize(test_use_alloc(), v, 0x50);
 
-    assert_not_null(v);
+    expect_not_null$(v);
 
-    alloc_free(heap(), v);
+    alloc_free(test_use_alloc(), v);
 }
 
-TEST(heap_malloc_zero)
+test$(heap_malloc_zero)
 {
-    void *v = alloc_malloc(heap(), 0);
+    void *v = alloc_malloc(test_use_alloc(), 0);
 
-    assert_not_null(v);
+    expect_not_null$(v);
 
-    alloc_free(heap(), v);
+    alloc_free(test_use_alloc(), v);
 }
 
-TEST(heap_resize_zero)
+test$(heap_resize_zero)
 {
-    void *v = alloc_malloc(heap(), 0x100);
+    void *v = alloc_malloc(test_use_alloc(), 0x100);
 
-    assert_not_null(v);
+    expect_not_null$(v);
 
-    v = alloc_resize(heap(), v, 0);
+    v = alloc_resize(test_use_alloc(), v, 0);
 
-    assert_equal(v, nullptr);
+    expect_null$(v);
 }
 
-TEST(heap_free_null)
+test$(heap_free_null)
 {
-    alloc_free(heap(), nullptr);
+    alloc_free(test_use_alloc(), nullptr);
 }
 
-TEST(heap_resize_null)
+test$(heap_resize_null)
 {
-    void *v = alloc_resize(heap(), nullptr, 10);
+    void *v = alloc_resize(test_use_alloc(), nullptr, 10);
 
-    assert_not_null(v);
+    expect_not_null$(v);
 
-    alloc_free(heap(), v);
+    alloc_free(test_use_alloc(), v);
 }
 
-TEST_WITH_FLAGS(heap_free_invalid_addr, TEST_EXPECTED_TO_FAIL)
+test$(heap_malloc_realloc_stress_test)
 {
-    uint8_t *v = (uint8_t *)alloc_malloc(heap(), 0x1000);
-
-    assert_not_null(v);
-
-    v = v + 0x100;
-
-    alloc_free(heap(), v);
-}
-
-TEST_WITH_FLAGS(heap_malloc_too_big_size, TEST_EXPECTED_TO_FAIL)
-{
-    // it's around 1152921 petabytes so I don't think it should succeed
-    uint8_t *v = (uint8_t *)alloc_malloc(heap(), 0x1000000000000000);
-
-    (void)v;
-}
-
-// up to 44M of usage
-TEST(heap_malloc_realloc_stress_test)
-{
+    // up to 44M of usage
     void *v[512];
 
     for (size_t i = 2; i < 512; i++)
     {
-        v[i] = alloc_malloc(heap(), i);
-        assert_not_null(v[i]);
+        v[i] = alloc_malloc(test_use_alloc(), i);
+        expect_not_null$(v[i]);
     }
 
     for (size_t i = 2; i < 512; i++)
     {
-        v[i] = alloc_resize(heap(), v[i], i * i);
-        assert_not_null(v[i]);
+        v[i] = alloc_resize(test_use_alloc(), v[i], i * i);
+        expect_not_null$(v[i]);
         mem_set(v[i], 0, i * i - 1);
     }
 
     for (size_t i = 2; i < 512; i++)
     {
-        alloc_free(heap(), v[i]);
+        alloc_free(test_use_alloc(), v[i]);
     }
 }

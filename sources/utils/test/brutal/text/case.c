@@ -1,19 +1,17 @@
-#include <brutal/alloc.h>
+#include <brutal/tests.h>
 #include <brutal/text.h>
-#include "test/test.h"
 
 static void TEST_CASE(Case c, char const *input, char const *expected)
 {
-    if (test_case_begin(str$(expected)))
+    test_case$(expected)
     {
-        Buf transformed = case_change(c, str$(input), test_alloc());
-        assert_str_equal(buf_str(&transformed), str$(expected));
+        Buf transformed = case_change(c, str$(input), test_use_alloc());
+        expect_str_equal$(buf_str(&transformed), str$(expected));
         buf_deinit(&transformed);
-        test_case_end();
     }
 }
 
-TEST(change_case)
+test$(change_case)
 {
     TEST_CASE(CASE_NO, "noCase", "no case");
     TEST_CASE(CASE_NO, "no_case", "no case");

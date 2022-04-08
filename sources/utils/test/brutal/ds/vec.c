@@ -1,8 +1,7 @@
-#include <brutal/alloc.h>
 #include <brutal/ds.h>
-#include "test/test.h"
+#include <brutal/tests.h>
 
-TEST(vec)
+test$(vec)
 {
     Vec(int) vec;
 
@@ -10,19 +9,19 @@ TEST(vec)
     vec_deinit(&vec);
 }
 
-TEST(vec_push)
+test$(vec_push)
 {
     Vec(int) vec;
 
     vec_init(&vec, alloc_global());
     vec_push(&vec, 10);
 
-    assert_equal(vec.data[0], 10);
-    assert_equal(vec.len, 1);
+    expect_equal$(vec.data[0], 10);
+    expect_equal$(vec.len, 1);
     vec_deinit(&vec);
 }
 
-TEST(vec_foreach_indexed_test)
+test$(vec_foreach_indexed_test)
 {
     Vec(int) vec;
 
@@ -36,8 +35,8 @@ TEST(vec_foreach_indexed_test)
     int i2 = 0;
     vec_foreach_idx(i, v, &vec)
     {
-        assert_equal(i, i2);
-        assert_equal(*v, i2);
+        expect_equal$(i, i2);
+        expect_equal$(*v, i2);
         i2++;
     }
 

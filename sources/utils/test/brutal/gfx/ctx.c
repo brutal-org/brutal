@@ -1,14 +1,14 @@
 #include <brutal/alloc.h>
 #include <brutal/codec/tga/tga.h>
 #include <brutal/io.h>
-#include "test/test.h"
+#include <brutal/tests.h>
 
 /*
-TEST(gfx_draw_rectangle)
+test$(gfx_draw_rectangle)
 {
     Gfx canvas;
 
-    gfx_init(&canvas, test_alloc(), 512, 512, GFX_FMT_RGBA8888);
+    gfx_init(&canvas, test_use_alloc(), 512, 512, GFX_FMT_RGBA8888);
     gfx_begin(&canvas);
 
     gfx_fill_style(&canvas, gfx_paint_fill(GFX_BLACK));

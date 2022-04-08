@@ -1,122 +1,63 @@
-#include <brutal/base.h>
-#include <cc/lex/pproc.h>
+#include <brutal/tests.h>
+#include <cc/lex.h>
 #include <cc/parse.h>
-#include "test/cc/cc.h"
-#include "test/test.h"
 
-TEST(empty_preproc_test)
+void cproc_test_case(char const *expected, char const *input)
 {
-    Str from = str$("");
-    ctx_lex_proc(processed, from);
+    Scan scan = {};
+    scan_init(&scan, str$(input));
+    Lex lexed_input = clex(&scan, test_use_alloc());
+    expect$(!scan.has_error);
 
-    assert_lex_eq(&processed, str$(""));
+    Lex prepoc_output = cproc_file(&lexed_input, str$("test.c"), test_use_alloc());
+    expect$(!lexed_input.has_error);
+
+    Buf buf = lex_collect(&prepoc_output, test_use_alloc());
+    expect_str_equal$(buf_str(&buf), str$(expected));
 }
 
-TEST(null_preprocessing_directive)
+void cproc_failling_test_case(char const *input)
 {
-    Str from = str$("#\n#   \n#  \n");
-    ctx_lex_proc(processed, from);
+    Scan scan = {};
+    scan_init(&scan, str$(input));
+    Lex lexed_input = clex(&scan, test_use_alloc());
+    expect$(!scan.has_error);
 
-    assert_lex_eq(&processed, str$(""));
+    cproc_file(&lexed_input, str$("test.c"), test_use_alloc());
+    expect$(lexed_input.has_error);
 }
 
-TEST_WITH_FLAGS(directive_invalid_position, TEST_EXPECTED_TO_FAIL)
+test$(cproc_simple)
 {
-    Str from = str$("  #\n"
-                    " #   \n"
-                    "     #  \n");
-    ctx_lex_proc(processed, from);
-
-    assert_lex_eq(&processed, str$(""));
+    cproc_test_case("", "");
+    cproc_test_case("abc", "abc");
+    cproc_test_case("123", "123");
 }
 
-TEST(macro_parsing)
+test$(cproc_stringizing)
 {
-    Str from = str$("#define mac owo\n");
-    ctx_lex_proc(processed, from);
+    cproc_test_case("", "#\n#   \n#  \n");
+    cproc_test_case("char const* v = \"abc\"\n", "char const* v = #abc\n");
 
-    assert_lex_eq(&processed, str$(""));
+    cproc_failling_test_case("#\n#   \"abc\"\n#  \n");
+    cproc_failling_test_case("  #\n #   \n     #  \n");
 }
 
-TEST(macro_parsing_args)
+test$(cproc_concat)
 {
-    Str from = str$("#define mac(owo, urrs) owo + urrs\n");
-    ctx_lex_proc(processed, from);
-
-    assert_lex_eq(&processed, str$(""));
+    cproc_test_case("ab", "a##b");
+    cproc_failling_test_case("-##>");
 }
 
-TEST(macro_gen)
+test$(cproc_macros)
 {
-    Str from = str$("#define mac owo\n"
-                    "mac");
-    ctx_lex_proc(processed, from);
-
-    assert_lex_eq(&processed, str$("owo"));
+    cproc_test_case("", "#define foo bar\n");
+    cproc_test_case("bar", "#define foo bar\nfoo\n");
+    cproc_test_case("b", "#define c b\n#define b a\n#define a z\nc");
 }
 
-TEST(macro_gen_with_arg)
+test$(cproc_function_like_macros)
 {
-    Str from = str$("#define mac(owo) owo\n"
-                    "mac(hello)");
-    ctx_lex_proc(processed, from);
-
-    assert_lex_eq(&processed, str$("hello"));
-}
-
-TEST(macro_gen_rec)
-{
-    Str from = str$("#define testa testb\n"
-                    "#define testb testa\n"
-                    "#define testc testb\n"
-                    "testc");
-    ctx_lex_proc(processed, from);
-
-    assert_lex_eq(&processed, str$("testb"));
-}
-
-TEST(concatenation)
-{
-    Str from = str$("#define testa(aa, bb) aa ## bb\n"
-                    "testa(10,10)");
-    ctx_lex_proc(processed, from);
-
-    assert_lex_eq(&processed, str$("1010"));
-}
-
-TEST(concatenation_rec)
-{
-    Str from = str$("#define testb(aa, bb) aa ## bb\n"
-                    "#define testa(aa, bb) aa ## testb(bb, aa)\n"
-                    "testa(10,20)");
-    ctx_lex_proc(processed, from);
-
-    assert_lex_eq(&processed, str$("102010"));
-}
-
-TEST(concatenation_in_one_token)
-{
-    Str from = str$("#define testa(aa, bb) aa ## bb\n"
-                    "testa(-,>)");
-    ctx_lex_proc(processed, from);
-
-    assert_lex_eq(&processed, str$("->"));
-}
-
-TEST_WITH_FLAGS(concatenation_should_form_one_token, TEST_EXPECTED_TO_FAIL)
-{
-    Str from = str$("#define testa(aa, bb) aa ## bb\n"
-                    "testa(@,>)");
-    ctx_lex_proc(processed, from);
-
-    assert_lex_eq(&processed, str$("@>"));
-}
-
-TEST(concatenation_hell)
-{
-    Str from = str$("#define testa(aa, bb) aa #### bb\n"
-                    "testa(-,>)");
-    ctx_lex_proc(processed, from);
-
-    assert_lex_eq(&processed, str$("->"));
+    cproc_test_case("", "#define add(a, b) a + b\n");
+    cproc_test_case("bazz", "#define foo(bar) bar\nfoo(bazz)\n");
 }

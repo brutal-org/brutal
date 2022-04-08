@@ -1,8 +1,8 @@
-#include <brutal/alloc/global.h>
 #include <brutal/codec/gzip/gzip.h>
-#include "test/test.h"
+#include <brutal/debug.h>
+#include <brutal/tests.h>
 
-TEST(gzip_empty_raw)
+test$(gzip_empty_raw)
 {
     uint8_t out_storage[512];
     // Empty buffer, uncompressed
@@ -13,10 +13,10 @@ TEST(gzip_empty_raw)
 
     size_t size = UNWRAP(gzip_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
-    assert_equal(size, 0u);
+    expect_equal$(size, 0u);
 }
 
-TEST(gzip_empty_fixed)
+test$(gzip_empty_fixed)
 {
     uint8_t out_storage[512];
     // Empty buffer, fixed Huffman
@@ -26,10 +26,10 @@ TEST(gzip_empty_fixed)
 
     size_t size = UNWRAP(gzip_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
-    assert_equal(size, 0u);
+    expect_equal$(size, 0u);
 }
 
-TEST(gzip_empty_dynamic)
+test$(gzip_empty_dynamic)
 {
     uint8_t out_storage[512];
     // Empty buffer, dynamic Huffman
@@ -40,10 +40,10 @@ TEST(gzip_empty_dynamic)
 
     size_t size = UNWRAP(gzip_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
-    assert_equal(size, 0u);
+    expect_equal$(size, 0u);
 }
 
-TEST(gzip_onebyte_raw)
+test$(gzip_onebyte_raw)
 {
     uint8_t out_storage[512];
     // One byte 00, uncompressed
@@ -54,11 +54,11 @@ TEST(gzip_onebyte_raw)
 
     size_t size = UNWRAP(gzip_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
-    assert_equal(size, 1u);
-    assert_equal(out_storage[0], 0u);
+    expect_equal$(size, 1u);
+    expect_equal$(out_storage[0], 0u);
 }
 
-TEST(gzip_onebyte_fixed)
+test$(gzip_onebyte_fixed)
 {
     uint8_t out_storage[512];
     // One byte 00, fixed Huffman
@@ -69,11 +69,11 @@ TEST(gzip_onebyte_fixed)
 
     size_t size = UNWRAP(gzip_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
-    assert_equal(size, 1u);
-    assert_equal(out_storage[0], 0u);
+    expect_equal$(size, 1u);
+    expect_equal$(out_storage[0], 0u);
 }
 
-TEST(gzip_onebyte_dynamic)
+test$(gzip_onebyte_dynamic)
 {
     uint8_t out_storage[512];
     // One byte 00, dynamic Huffman
@@ -84,11 +84,11 @@ TEST(gzip_onebyte_dynamic)
 
     size_t size = UNWRAP(gzip_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
-    assert_equal(size, 1u);
-    assert_equal(out_storage[0], 0u);
+    expect_equal$(size, 1u);
+    expect_equal$(out_storage[0], 0u);
 }
 
-TEST(gzip_fhcrc)
+test$(gzip_fhcrc)
 {
     uint8_t out_storage[512];
     // One byte 00, uncompressed, fhcrc
@@ -99,11 +99,11 @@ TEST(gzip_fhcrc)
 
     size_t size = UNWRAP(gzip_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
-    assert_equal(size, 1u);
-    assert_equal(out_storage[0], 0u);
+    expect_equal$(size, 1u);
+    expect_equal$(out_storage[0], 0u);
 }
 
-TEST(gzip_fextra)
+test$(gzip_fextra)
 {
     uint8_t out_storage[512];
     // One byte 00, uncompressed, fextra
@@ -114,11 +114,11 @@ TEST(gzip_fextra)
 
     size_t size = UNWRAP(gzip_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
-    assert_equal(size, 1u);
-    assert_equal(out_storage[0], 0u);
+    expect_equal$(size, 1u);
+    expect_equal$(out_storage[0], 0u);
 }
 
-TEST(gzip_fname)
+test$(gzip_fname)
 {
     uint8_t out_storage[512];
     // One byte 00, uncompressed, fname
@@ -129,11 +129,11 @@ TEST(gzip_fname)
 
     size_t size = UNWRAP(gzip_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
-    assert_equal(size, 1u);
-    assert_equal(out_storage[0], 0u);
+    expect_equal$(size, 1u);
+    expect_equal$(out_storage[0], 0u);
 }
 
-TEST(gzip_fcomment)
+test$(gzip_fcomment)
 {
     uint8_t out_storage[512];
     // One byte 00, uncompressed, fcomment
@@ -144,6 +144,6 @@ TEST(gzip_fcomment)
 
     size_t size = UNWRAP(gzip_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
-    assert_equal(size, 1u);
-    assert_equal(out_storage[0], 0u);
+    expect_equal$(size, 1u);
+    expect_equal$(out_storage[0], 0u);
 }

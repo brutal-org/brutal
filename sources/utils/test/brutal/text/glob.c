@@ -1,23 +1,29 @@
+#include <brutal/tests.h>
 #include <brutal/text.h>
-#include "test/test.h"
 
 static void expect_match(char const *pattern, char const *input)
 {
-    if (!glob_match_str(str$(pattern), str$(input)))
+    test_case$(pattern)
     {
-        panic$("String '{}' was expected to match '{}'", input, pattern);
+        if (!glob_match_str(str$(pattern), str$(input)))
+        {
+            test_fail$("String '{}' was expected to match '{}'", input, pattern);
+        }
     }
 }
 
 static void expect_mismatch(char const *pattern, char const *input)
 {
-    if (glob_match_str(str$(pattern), str$(input)))
+    test_case$(pattern)
     {
-        panic$("String '{}' was expected to mismatch '{}'", input, pattern);
+        if (glob_match_str(str$(pattern), str$(input)))
+        {
+            test_fail$("String '{}' was expected to mismatch '{}'", input, pattern);
+        }
     }
 }
 
-TEST(text_glob_match)
+test$(text_glob_match)
 {
     expect_match("", "");
     expect_match("a", "a");

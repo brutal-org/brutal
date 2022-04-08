@@ -54,7 +54,7 @@ bool cli_pase_color_name(Scan *scan, CliIndex *index)
 
 void cli_parse_color(Scan *scan, CliColor *color)
 {
-    if (scan_skip_word(scan, str$("bright-")))
+    if (scan_skip_word(scan, str$("light-")))
     {
         color->type = CLI_BRIGHT;
         cli_pase_color_name(scan, &color->index);

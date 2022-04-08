@@ -1,15 +1,14 @@
 #include <brutal/alloc.h>
+#include <brutal/tests.h>
 #include <brutal/text.h>
-#include "test/test.h"
 
-#define TEST_CASE(EXPECTED, FORMAT, ...)                                                       \
-    if (test_case_begin(str$(EXPECTED)))                                                       \
-    {                                                                                          \
-        assert_str_equal(str$(EXPECTED), str_printf(test_alloc(), str$(FORMAT), __VA_ARGS__)); \
-        test_case_end();                                                                       \
+#define TEST_CASE(EXPECTED, FORMAT, ...)                                                            \
+    test_case$(EXPECTED)                                                                            \
+    {                                                                                               \
+        expect_str_equal$(str$(EXPECTED), str_printf(test_use_alloc(), str$(FORMAT), __VA_ARGS__)); \
     }
 
-TEST(io_printf)
+test$(io_printf)
 {
     TEST_CASE("hello world", "hello world", str$("world"));
     TEST_CASE("hello world", "hello %s", "world");

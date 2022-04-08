@@ -1,12 +1,5 @@
+#include <brutal/tests.h>
 #include <brutal/ui.h>
-#include "test/test.h"
-
-#define TEST_CASE(STR, EXPECTED)                      \
-    if (test_case_begin(str$(STR ": " #EXPECTED)))    \
-    {                                                 \
-        assert_truth(try_parse_layout(STR) EXPECTED); \
-        test_case_end();                              \
-    }
 
 static UiLayout try_parse_layout(char const *str)
 {
@@ -15,12 +8,18 @@ static UiLayout try_parse_layout(char const *str)
 
     UiLayout layout = {};
     ui_parse_layout(&layout, &scan);
-    assert_truth(!scan_dump_error(&scan, io_chan_err()));
+    expect$(!scan_dump_error(&scan, io_chan_err()));
 
     return layout;
 }
 
-TEST(ui_parse_layout_dock)
+#define TEST_CASE(STR, EXPECTED)                      \
+    test_case$(STR ": " #EXPECTED)                    \
+    {                                                 \
+        assert_truth(try_parse_layout(STR) EXPECTED); \
+    }
+
+test$(ui_parse_layout_dock)
 {
     TEST_CASE("dock", .type == UI_LAYOUT_DOCK);
     TEST_CASE("dock-start", .dock == M_DOCK_START);
@@ -35,7 +34,7 @@ TEST(ui_parse_layout_dock)
     TEST_CASE("dock-none", .dock == M_DOCK_NONE);
 }
 
-TEST(ui_parse_layout_flex)
+test$(ui_parse_layout_flex)
 {
     TEST_CASE("flex", .type == UI_LAYOUT_FLEX);
 
@@ -45,12 +44,12 @@ TEST(ui_parse_layout_flex)
     TEST_CASE("gaps-y-3", .gaps.y > 2.9);
 }
 
-TEST(ui_parse_layout_grid)
+test$(ui_parse_layout_grid)
 {
     TEST_CASE("grid", .type == UI_LAYOUT_GRID);
 }
 
-TEST(ui_parse_layout_min_max)
+test$(ui_parse_layout_min_max)
 {
     TEST_CASE("min-width-3", .size.min.width > 2.9);
     TEST_CASE("min-height-3", .size.min.height > 2.9);
@@ -68,7 +67,7 @@ TEST(ui_parse_layout_min_max)
     TEST_CASE("max-y-3", .size.max.height > 2.9);
 }
 
-TEST(ui_parse_layout_grivity)
+test$(ui_parse_layout_grivity)
 {
     TEST_CASE("gravity-reset", .gravity == M_GRAVITY_NONE);
     TEST_CASE("gravity-s", .gravity == M_GRAVITY_START);
@@ -103,7 +102,7 @@ TEST(ui_parse_layout_grivity)
     TEST_CASE("g-hfill", .gravity == M_GRAVITY_HFILL);
 }
 
-TEST(ui_parse_layout_placement)
+test$(ui_parse_layout_placement)
 {
     TEST_CASE("placement-reset", .placement == M_GRAVITY_NONE);
     TEST_CASE("placement-s", .placement == M_GRAVITY_START);
@@ -138,7 +137,7 @@ TEST(ui_parse_layout_placement)
     TEST_CASE("place-hfill", .placement == M_GRAVITY_HFILL);
 }
 
-TEST(ui_parse_layout_spacing)
+test$(ui_parse_layout_spacing)
 {
     TEST_CASE("padding-3", .padding.start > 2.9);
     TEST_CASE("padding-3", .padding.end > 2.9);
@@ -181,7 +180,7 @@ TEST(ui_parse_layout_spacing)
     TEST_CASE("m-b-3", .margin.bottom > 2.9);
 }
 
-TEST(ui_parse_layout_flow)
+test$(ui_parse_layout_flow)
 {
     TEST_CASE("ltr", .flow == M_FLOW_LEFT_TO_RIGHT);
     TEST_CASE("rtl", .flow == M_FLOW_RIGHT_TO_LEFT);

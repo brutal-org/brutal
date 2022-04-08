@@ -1,8 +1,8 @@
-#include <brutal/alloc/global.h>
 #include <brutal/codec/zlib/zlib.h>
-#include "test/test.h"
+#include <brutal/debug.h>
+#include <brutal/tests.h>
 
-TEST(zlib_empty_raw)
+test$(zlib_empty_raw)
 {
     uint8_t out_storage[512];
     // Empty buffer, uncompressed
@@ -12,10 +12,10 @@ TEST(zlib_empty_raw)
 
     size_t size = UNWRAP(zlib_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
-    assert_equal(size, 0u);
+    expect_equal$(size, 0u);
 }
 
-TEST(zlib_empty_fixed)
+test$(zlib_empty_fixed)
 {
     uint8_t out_storage[512];
     // Empty buffer, fixed Huffman
@@ -24,10 +24,10 @@ TEST(zlib_empty_fixed)
 
     size_t size = UNWRAP(zlib_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
-    assert_equal(size, 0u);
+    expect_equal$(size, 0u);
 }
 
-TEST(zlib_empty_dynamic)
+test$(zlib_empty_dynamic)
 {
     uint8_t out_storage[512];
     // Empty buffer, dynamic Huffman
@@ -37,10 +37,10 @@ TEST(zlib_empty_dynamic)
 
     size_t size = UNWRAP(zlib_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
-    assert_equal(size, 0u);
+    expect_equal$(size, 0u);
 }
 
-TEST(zlib_onebyte_raw)
+test$(zlib_onebyte_raw)
 {
     uint8_t out_storage[512];
     // One byte 00, uncompressed
@@ -50,10 +50,10 @@ TEST(zlib_onebyte_raw)
 
     size_t size = UNWRAP(zlib_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
-    assert_equal(size, 1u);
+    expect_equal$(size, 1u);
 }
 
-TEST(zlib_onebyte_fixed)
+test$(zlib_onebyte_fixed)
 {
     uint8_t out_storage[512];
     // One byte 00, fixed Huffman
@@ -62,10 +62,10 @@ TEST(zlib_onebyte_fixed)
 
     size_t size = UNWRAP(zlib_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
-    assert_equal(size, 1u);
+    expect_equal$(size, 1u);
 }
 
-TEST(zlib_onebyte_dynamic)
+test$(zlib_onebyte_dynamic)
 {
     uint8_t out_storage[512];
     // One byte 00, dynamic Huffman
@@ -75,10 +75,10 @@ TEST(zlib_onebyte_dynamic)
 
     size_t size = UNWRAP(zlib_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
-    assert_equal(size, 1u);
+    expect_equal$(size, 1u);
 }
 
-TEST(zlib_zeroes)
+test$(zlib_zeroes)
 {
     uint8_t out_storage[512];
     // 256 zero bytes, to test unrolling in Adler-32
@@ -88,5 +88,5 @@ TEST(zlib_zeroes)
 
     size_t size = UNWRAP(zlib_decompress_data(in_storage, sizeof(in_storage), out_storage, sizeof(out_storage)));
 
-    assert_equal(size, 256u);
+    expect_equal$(size, 256u);
 }
