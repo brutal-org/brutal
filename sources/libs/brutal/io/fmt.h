@@ -59,6 +59,7 @@ typedef struct
     long min_width;
     char fill;
     bool prefix;
+    bool prefix_plus;
 } Fmt;
 
 Fmt fmt_parse(Scan *scan);

@@ -83,7 +83,7 @@ static FmtType fmt_parse_type(char c)
     }
 }
 
-static void fmt_parse_min_width(Fmt *fmt, Scan *scan)
+static bool fmt_parse_precision(Fmt *fmt, Scan *scan)
 {
     if (scan_skip(scan, '0'))
     {
@@ -94,7 +94,20 @@ static void fmt_parse_min_width(Fmt *fmt, Scan *scan)
         fmt->fill = ' ';
     }
 
-    scan_next_int(scan, &fmt->min_width);
+    bool any = false;
+
+    if (scan_next_int(scan, &fmt->min_width))
+    {
+        any = true;
+    }
+
+    if (!scan_skip(scan, '.'))
+    {
+        return any;
+    }
+
+    scan_next_int(scan, &fmt->precison);
+    return true;
 }
 
 Fmt fmt_parse(Scan *scan)
@@ -114,15 +127,15 @@ Fmt fmt_parse(Scan *scan)
             scan_next(scan);
             fmt.prefix = true;
         }
-        else if (scan_curr(scan) >= '0' && scan_curr(scan) <= '9')
+        else if (scan_skip(scan, '+'))
         {
-            fmt_parse_min_width(&fmt, scan);
+            fmt.prefix_plus = true;
         }
         else if (scan_skip_word(scan, str$("case-")))
         {
             fmt.casing = case_parse(scan);
         }
-        else
+        else if (!fmt_parse_precision(&fmt, scan))
         {
             fmt.type = fmt_parse_type(scan_next(scan));
         }
@@ -201,20 +214,13 @@ FmtPrintfType fmt_parse_printf(Scan *scan, Fmt *fmt)
         }
         else if (scan_skip(scan, '+'))
         {
-        }
-        else if (scan_skip(scan, ' '))
-        {
-            fmt->fill = ' ';
+            fmt->prefix_plus = true;
         }
         else if (scan_skip(scan, '#'))
         {
             fmt->prefix = true;
         }
-        else if (scan_skip(scan, '0'))
-        {
-            fmt->fill = '0';
-        }
-        else if (!scan_next_int(scan, &fmt->min_width))
+        else if (!fmt_parse_precision(fmt, scan))
         {
             return fmt_parse_printf_type(scan, fmt);
         }
@@ -231,6 +237,10 @@ IoResult fmt_signed(Fmt self, IoWriter writer, int64_t value)
     {
         written += TRY(IoResult, io_write_byte(writer, '-'));
         value *= -1;
+    }
+    else if (self.prefix_plus)
+    {
+        written += TRY(IoResult, io_write_byte(writer, '+'));
     }
 
     written += TRY(IoResult, fmt_unsigned(self, writer, value));
