@@ -53,7 +53,9 @@ IoResult cli_fmt(IoWriter writer, Str format, AnyVa args)
 
                 if (current < args.len)
                 {
+                    cli_style_apply(writer, style);
                     written += TRY(IoResult, fmt_any(fmt, writer, args.buf[current]));
+                    cli_style_reset(writer);
                 }
                 else
                 {
