@@ -1,6 +1,7 @@
 #pragma once
 
 #include <brutal/io/buf.h>
+#include <brutal/parse/scan.h>
 
 typedef enum
 {
@@ -66,3 +67,5 @@ Buf case_to_sponge(Str str, Alloc *alloc);
 Buf case_change(Case c, Str str, Alloc *alloc);
 
 Str case_change_str(Case c, Str str, Alloc *alloc);
+
+Case case_parse(Scan *scan);

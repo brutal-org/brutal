@@ -391,6 +391,88 @@ Buf case_change(Case c, Str str, Alloc *alloc)
     }
 }
 
+Case case_parse(Scan *scan)
+{
+    if (scan_skip_word(scan, str$("default")))
+    {
+        return CASE_DEFAULT;
+    }
+    else if (scan_skip_word(scan, str$("camel")))
+    {
+        return CASE_CAMEL;
+    }
+    else if (scan_skip_word(scan, str$("capital")))
+    {
+        return CASE_CAPITAL;
+    }
+    else if (scan_skip_word(scan, str$("constant")))
+    {
+        return CASE_CONSTANT;
+    }
+    else if (scan_skip_word(scan, str$("dot")))
+    {
+        return CASE_DOT;
+    }
+    else if (scan_skip_word(scan, str$("header")))
+    {
+        return CASE_HEADER;
+    }
+    else if (scan_skip_word(scan, str$("no")))
+    {
+        return CASE_NO;
+    }
+    else if (scan_skip_word(scan, str$("param")))
+    {
+        return CASE_PARAM;
+    }
+    else if (scan_skip_word(scan, str$("pascal")))
+    {
+        return CASE_PASCAL;
+    }
+    else if (scan_skip_word(scan, str$("path")))
+    {
+        return CASE_PATH;
+    }
+    else if (scan_skip_word(scan, str$("sentence")))
+    {
+        return CASE_SENTENCE;
+    }
+    else if (scan_skip_word(scan, str$("snake")))
+    {
+        return CASE_SNAKE;
+    }
+    else if (scan_skip_word(scan, str$("title")))
+    {
+        return CASE_TITLE;
+    }
+    else if (scan_skip_word(scan, str$("swap")))
+    {
+        return CASE_SWAP;
+    }
+    else if (scan_skip_word(scan, str$("lower")))
+    {
+        return CASE_LOWER;
+    }
+    else if (scan_skip_word(scan, str$("lower-first")))
+    {
+        return CASE_LOWER_FIRST;
+    }
+    else if (scan_skip_word(scan, str$("upper")))
+    {
+        return CASE_UPPER;
+    }
+    else if (scan_skip_word(scan, str$("upper-first")))
+    {
+        return CASE_UPPER_FIRST;
+    }
+    else if (scan_skip_word(scan, str$("sponge")))
+    {
+        return CASE_SPONGE;
+    }
+
+    return CASE_DEFAULT;
+}
+
 Str case_change_str(Case c, Str str, Alloc *alloc)
 {
     Buf buf = case_change(c, str, alloc);

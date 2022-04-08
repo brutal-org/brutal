@@ -50,86 +50,6 @@ static char fmt_prefix(Fmt self)
     }
 }
 
-static void fmt_parse_case(Fmt *fmt, Scan *scan)
-{
-    if (scan_skip_word(scan, str$("default")))
-    {
-        fmt->casing = CASE_DEFAULT;
-    }
-    else if (scan_skip_word(scan, str$("camel")))
-    {
-        fmt->casing = CASE_CAMEL;
-    }
-    else if (scan_skip_word(scan, str$("capital")))
-    {
-        fmt->casing = CASE_CAPITAL;
-    }
-    else if (scan_skip_word(scan, str$("constant")))
-    {
-        fmt->casing = CASE_CONSTANT;
-    }
-    else if (scan_skip_word(scan, str$("dot")))
-    {
-        fmt->casing = CASE_DOT;
-    }
-    else if (scan_skip_word(scan, str$("header")))
-    {
-        fmt->casing = CASE_HEADER;
-    }
-    else if (scan_skip_word(scan, str$("no")))
-    {
-        fmt->casing = CASE_NO;
-    }
-    else if (scan_skip_word(scan, str$("param")))
-    {
-        fmt->casing = CASE_PARAM;
-    }
-    else if (scan_skip_word(scan, str$("pascal")))
-    {
-        fmt->casing = CASE_PASCAL;
-    }
-    else if (scan_skip_word(scan, str$("path")))
-    {
-        fmt->casing = CASE_PATH;
-    }
-    else if (scan_skip_word(scan, str$("sentence")))
-    {
-        fmt->casing = CASE_SENTENCE;
-    }
-    else if (scan_skip_word(scan, str$("snake")))
-    {
-        fmt->casing = CASE_SNAKE;
-    }
-    else if (scan_skip_word(scan, str$("title")))
-    {
-        fmt->casing = CASE_TITLE;
-    }
-    else if (scan_skip_word(scan, str$("swap")))
-    {
-        fmt->casing = CASE_SWAP;
-    }
-    else if (scan_skip_word(scan, str$("lower")))
-    {
-        fmt->casing = CASE_LOWER;
-    }
-    else if (scan_skip_word(scan, str$("lower-first")))
-    {
-        fmt->casing = CASE_LOWER_FIRST;
-    }
-    else if (scan_skip_word(scan, str$("upper")))
-    {
-        fmt->casing = CASE_UPPER;
-    }
-    else if (scan_skip_word(scan, str$("upper-first")))
-    {
-        fmt->casing = CASE_UPPER_FIRST;
-    }
-    else if (scan_skip_word(scan, str$("sponge")))
-    {
-        fmt->casing = CASE_SPONGE;
-    }
-}
-
 static FmtType fmt_parse_type(char c)
 {
     switch (c)
@@ -200,7 +120,7 @@ Fmt fmt_parse(Scan *scan)
         }
         else if (scan_skip_word(scan, str$("case-")))
         {
-            fmt_parse_case(&fmt, scan);
+            fmt.casing = case_parse(scan);
         }
         else
         {
