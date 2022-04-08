@@ -52,23 +52,7 @@ typedef enum
 
 typedef struct
 {
-    FmtColorTypes type;
-    bool bright;
-} FmtColor;
-
-typedef struct
-{
-    bool has_style;
-    bool bold;
-    bool underline;
-    FmtColor fg_color;
-    FmtColor bg_color;
-} FmtStyle;
-
-typedef struct
-{
     FmtType type;
-    FmtStyle style;
     Case casing;
 
     long precison;

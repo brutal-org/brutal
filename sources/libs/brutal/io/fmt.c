@@ -50,65 +50,6 @@ static char fmt_prefix(Fmt self)
     }
 }
 
-const char *color_table[] = {
-    [FMT_COL_NONE] = "none",
-    [FMT_BLACK] = "black",
-    [FMT_RED] = "red",
-    [FMT_WHITE] = "white",
-    [FMT_GREEN] = "green",
-    [FMT_BLUE] = "blue",
-    [FMT_YELLOW] = "yellow",
-    [FMT_MAGENTA] = "magenta",
-    [FMT_CYAN] = "cyan",
-    [FMT_GRAY] = "gray",
-    [FMT_BLACK_GRAY] = "dark-gray",
-};
-
-static FmtColor fmt_parse_color(Scan *scan)
-{
-    FmtColor col = {};
-    if (scan_skip_word(scan, str$("light-")))
-    {
-        col.bright = true;
-    }
-
-    for (size_t i = 0; i < sizeof(color_table) / sizeof(color_table[0]); i++)
-    {
-        if (scan_skip_word(scan, str$(color_table[i])))
-        {
-            col.type = (FmtColorTypes)i;
-            break;
-        }
-    }
-
-    return col;
-}
-
-static bool fmt_parse_style(Fmt *fmt, Scan *scan)
-{
-    if (scan_skip_word(scan, str$("underline")))
-    {
-        fmt->style.underline = true;
-        return true;
-    }
-    else if (scan_skip_word(scan, str$("bold")))
-    {
-        fmt->style.bold = true;
-        return true;
-    }
-    else if (scan_skip_word(scan, str$("bg-")))
-    {
-        fmt->style.bg_color = fmt_parse_color(scan);
-        return true;
-    }
-    else if (scan_skip_word(scan, str$("fg-")))
-    {
-        fmt->style.fg_color = fmt_parse_color(scan);
-        return true;
-    }
-    return false;
-}
-
 static void fmt_parse_case(Fmt *fmt, Scan *scan)
 {
     if (scan_skip_word(scan, str$("default")))
@@ -252,10 +193,6 @@ Fmt fmt_parse(Scan *scan)
         {
             scan_next(scan);
             fmt.prefix = true;
-        }
-        else if (fmt_parse_style(&fmt, scan))
-        {
-            fmt.style.has_style = true;
         }
         else if (scan_curr(scan) >= '0' && scan_curr(scan) <= '9')
         {
@@ -532,102 +469,9 @@ IoResult fmt_string(Fmt self, IoWriter writer, Str value)
     }
 }
 
-// FIXME: maybe put it in a specific header later.
-#define ANSI_ESC_BRIGHT 60
-#define ANSI_ESC_FG 30
-#define ANSI_ESC_BG 40
-
-static int fmt_color_id(FmtColor color)
-{
-    int offset = 0;
-
-    if (color.bright)
-    {
-        offset += ANSI_ESC_BRIGHT;
-    }
-
-    switch (color.type)
-    {
-    case FMT_BLACK:
-        return 0 + offset;
-
-    case FMT_RED:
-        return 1 + offset;
-
-    case FMT_GREEN:
-        return 2 + offset;
-
-    case FMT_YELLOW:
-        return 3 + offset;
-
-    case FMT_BLUE:
-        return 4 + offset;
-
-    case FMT_MAGENTA:
-        return 5 + offset;
-
-    case FMT_CYAN:
-        return 6 + offset;
-
-    case FMT_WHITE:
-        return 7 + ANSI_ESC_BRIGHT; // always bright
-
-    case FMT_GRAY:
-        return 7 + offset;
-
-    case FMT_BLACK_GRAY:
-        return 0 + ANSI_ESC_BRIGHT; // always bright
-
-    case FMT_COL_NONE:
-    default:
-        return -1;
-    }
-}
-
-static IoResult fmt_start_style(IoWriter writer, FmtStyle style)
-{
-    size_t written = 0;
-    if (style.bold)
-    {
-        written += TRY(IoResult, io_write_str(writer, str$("\033[1m")));
-    }
-    if (style.underline)
-    {
-        written += TRY(IoResult, io_write_str(writer, str$("\033[4m")));
-    }
-
-    int fg_id = fmt_color_id(style.fg_color);
-    if (fg_id != -1)
-    {
-        written += TRY(IoResult, io_write_str(writer, str$("\033[")));
-        written += TRY(IoResult, fmt_signed((Fmt){}, writer, fg_id + ANSI_ESC_FG));
-        written += TRY(IoResult, io_write_str(writer, str$("m")));
-    }
-
-    int bg_id = fmt_color_id(style.bg_color);
-    if (bg_id != -1)
-    {
-        written += TRY(IoResult, io_write_str(writer, str$("\033[")));
-        written += TRY(IoResult, fmt_signed((Fmt){}, writer, bg_id + ANSI_ESC_BG));
-        written += TRY(IoResult, io_write_str(writer, str$("m")));
-    }
-
-    return OK(IoResult, written);
-}
-
-static IoResult fmt_end_style(IoWriter writer)
-{
-    return io_write_str(writer, str$("\033[0m"));
-}
-
 IoResult fmt_any(Fmt self, IoWriter writer, Any value)
 {
     size_t res = 0;
-
-    if (self.style.has_style)
-    {
-        res = TRY(IoResult, fmt_start_style(writer, self.style));
-    }
 
     switch (value.type)
     {
@@ -684,11 +528,6 @@ IoResult fmt_any(Fmt self, IoWriter writer, Any value)
         res += TRY(IoResult, io_write_str(writer, str$("<unknown>")));
         break;
     }
-    }
-
-    if (self.style.has_style)
-    {
-        res += TRY(IoResult, fmt_end_style(writer));
     }
 
     return OK(IoResult, res);
