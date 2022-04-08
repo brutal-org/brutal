@@ -79,7 +79,7 @@ size_t utf8_rune_len(Rune rune)
 
 static bool utf8_valid(Str str)
 {
-    return !is_nullstr(str) && str.len >= utf8_byte_len(str.buf[0]);
+    return !str_empty(str) && str.len >= utf8_byte_len(str.buf[0]);
 }
 
 Rune utf8_to_rune(Str str)

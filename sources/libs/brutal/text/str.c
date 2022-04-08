@@ -19,7 +19,7 @@ Str str_concat(Str const lhs, Str const rhs, Alloc *alloc)
 
 Str str_dup(Str const str, Alloc *alloc)
 {
-    if (is_nullstr(str))
+    if (str_empty(str))
     {
         return str_make_from_cstr("");
     }

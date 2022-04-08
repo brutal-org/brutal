@@ -69,7 +69,7 @@ static Str parse_ident(Scan *scan)
 {
     Str name = scan_skip_until(scan, is_ident);
 
-    if (is_nullstr(name))
+    if (str_empty(name))
     {
         scan_throw(scan, str$("invalid ident"), name);
     }

@@ -36,7 +36,10 @@ typedef struct
 
 #define nullstr str_const$("")
 
-#define is_nullstr(S) (S.len == 0)
+static inline bool str_empty(Str str)
+{
+    return str.len == 0;
+}
 
 Str str_dup(Str const str, Alloc *alloc);
 
@@ -90,8 +93,8 @@ static inline Str str_make_from_str_fix128(StrFix128 const *str_fix) { return (S
 // clang-format off
 
 // Create a new instance of a non owning string.
-#define str$(literal)                                \
-    _Generic((literal),                              \
+#define str$(EXPR)                                   \
+    _Generic((EXPR),                                 \
         Str              : str_forward,              \
         InlineStr *      : str_make_from_inline_str, \
         char*            : str_make_from_cstr,       \
@@ -108,7 +111,7 @@ static inline Str str_make_from_str_fix128(StrFix128 const *str_fix) { return (S
         StrFix64 const*  : str_make_from_str_fix64,  \
         StrFix128*       : str_make_from_str_fix128, \
         StrFix128 const* : str_make_from_str_fix128  \
-    )(literal)
+    )(EXPR)
 
 #define str_const$(STR)  (Str){sizeof(STR) - 1, ((uint8_t const*)(STR))}
 
@@ -118,10 +121,10 @@ static inline Str str_make_from_str_fix128(StrFix128 const *str_fix) { return (S
     (Str) { (n), (uint8_t const *)(str) }
 
 // Create a new instance of a fix size string.
-#define str_fix$(T, str) (                              \
+#define str_fix$(T, STR) (                              \
     {                                                   \
         T dst_str = {};                                 \
-        Str src_str = str$(str);                        \
+        Str src_str = str$(STR);                        \
         mem_cpy(dst_str.buf, src_str.buf, src_str.len); \
         dst_str.len = src_str.len;                      \
         dst_str;                                        \
