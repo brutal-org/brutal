@@ -82,6 +82,17 @@ LexemeType lex_next_type(Lex *self)
     return lex_next(self).type;
 }
 
+Buf lex_collect(Lex *self, Alloc *alloc)
+{
+    Buf buf = {};
+    buf_init(&buf, 128, alloc);
+    vec_foreach(lexeme, &self->lexemes)
+    {
+        buf_write(&buf, lexeme->str.buf, lexeme->str.len);
+    }
+    return buf;
+}
+
 bool lex_skip_type(Lex *lex, LexemeType type)
 {
     if (lex_curr_type(lex) == type)

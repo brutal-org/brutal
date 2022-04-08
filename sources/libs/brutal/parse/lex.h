@@ -1,6 +1,7 @@
 #pragma once
 
 #include <brutal/ds/vec.h>
+#include <brutal/io/buf.h>
 #include <brutal/parse/lexeme.h>
 #include <brutal/parse/scan.h>
 
@@ -52,6 +53,8 @@ LexemeType lex_peek_type(Lex *self, int offset);
 LexemeType lex_curr_type(Lex *self);
 
 LexemeType lex_next_type(Lex *self);
+
+Buf lex_collect(Lex *self, Alloc *alloc);
 
 bool lex_skip_type(Lex *lex, LexemeType type);
 
