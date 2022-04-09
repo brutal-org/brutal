@@ -53,8 +53,10 @@ static inline bool any_true(Any any)
     case ANY_UINT:
         return any.uint_ != 0;
 
+#ifndef __freestanding__
     case ANY_FLOAT:
         return any.float_ != 0.0;
+#endif
 
     case ANY_STR:
         return !str_empty(any.str_);
@@ -88,9 +90,11 @@ static inline bool any_as_double(Any any, double *n)
         *n = any.uint_;
         return true;
 
+#ifndef __freestanding__
     case ANY_FLOAT:
         *n = any.float_;
         return true;
+#endif
 
     default:
         return false;
@@ -115,8 +119,12 @@ static inline bool any_eq(Any lhs, Any rhs)
     case ANY_UINT:
         return lhs.uint_ == rhs.uint_;
 
+#ifndef __freestanding__
+
     case ANY_FLOAT:
         return lhs.float_ == rhs.float_;
+
+#endif
 
     case ANY_STR:
         return str_eq(lhs.str_, rhs.str_);
