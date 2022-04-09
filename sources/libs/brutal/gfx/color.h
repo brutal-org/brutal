@@ -4,7 +4,7 @@
 
 typedef struct
 {
-    uint8_t r, g, b, a;
+    long r, g, b, a;
 } GfxColor;
 
 #define gfx_rgba(R, G, B, A) ((GfxColor){(R), (G), (B), (A)})
@@ -178,7 +178,7 @@ static inline GfxColor gfx_blend(GfxColor fg, GfxColor bg)
     }
     else
     {
-        int d = 255 * (bg.a + fg.a) - bg.a * fg.a;
+        long d = 255 * (bg.a + fg.a) - bg.a * fg.a;
 
         return (GfxColor){
             (bg.r * bg.a * (255 - fg.a) + 255 * fg.a * fg.r) / d,
