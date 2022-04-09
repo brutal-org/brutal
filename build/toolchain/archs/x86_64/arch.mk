@@ -17,3 +17,7 @@ QEMU_ARGS= \
 		-smp 4 \
 		-m 256M \
 		-rtc base=localtime
+
+ifeq ($(KVM), yes)
+	QEMU_ARGS += -enable-kvm
+endif
