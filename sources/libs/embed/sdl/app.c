@@ -113,7 +113,7 @@ void embed_app_pump(UiApp *self)
 
     while (SDL_PollEvent(&e) != 0 && self->alive)
     {
-        uint32_t handle;
+        uint32_t handle = 0;
         UiEvent event = sdl_event_to_ui_event(e, &handle);
 
         switch (e.type)

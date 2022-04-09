@@ -16,19 +16,21 @@ Str cli_spinner(CliSpinner spinner)
     return spinner.frames[frame % n];
 }
 
+Str CLI_SPINNER_DOTS_FRAMES[] = {
+    str_const$("⠋"),
+    str_const$("⠙"),
+    str_const$("⠹"),
+    str_const$("⠸"),
+    str_const$("⠼"),
+    str_const$("⠴"),
+    str_const$("⠦"),
+    str_const$("⠧"),
+    str_const$("⠇"),
+    str_const$("⠏"),
+    nullstr,
+};
+
 CliSpinner const CLI_SPINNER_DOTS = {
     .interval = 80,
-    .frames = (Str[]){
-        str_const$("⠋"),
-        str_const$("⠙"),
-        str_const$("⠹"),
-        str_const$("⠸"),
-        str_const$("⠼"),
-        str_const$("⠴"),
-        str_const$("⠦"),
-        str_const$("⠧"),
-        str_const$("⠇"),
-        str_const$("⠏"),
-        nullstr,
-    },
+    .frames = CLI_SPINNER_DOTS_FRAMES,
 };
