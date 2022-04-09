@@ -178,14 +178,13 @@ static inline GfxColor gfx_blend(GfxColor fg, GfxColor bg)
     }
     else
     {
-        int d = 255 * (bg.a + fg.a) - bg.a * fg.a;
+        uint16_t d = 255u * (bg.a + fg.a) - bg.a * fg.a;
 
-        return (GfxColor){
-            (bg.r * bg.a * (255 - fg.a) + 255 * fg.a * fg.r) / d,
-            (bg.g * bg.a * (255 - fg.a) + 255 * fg.a * fg.g) / d,
-            (bg.b * bg.a * (255 - fg.a) + 255 * fg.a * fg.b) / d,
-            d / 255,
-        };
+        return gfx_rgba(
+            (bg.r * bg.a * (255u - fg.a) + 255u * fg.a * fg.r) / d,
+            (bg.g * bg.a * (255u - fg.a) + 255u * fg.a * fg.g) / d,
+            (bg.b * bg.a * (255u - fg.a) + 255u * fg.a * fg.b) / d,
+            d / 255u);
     }
 }
 

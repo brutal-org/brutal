@@ -94,25 +94,25 @@ static inline GfxColor gfx_fmt_load(GfxFmt self, const void *src)
     case GFX_FMT_GS8:
     {
         GfxFmtGS8 p = *((GfxFmtGS8 const *)src);
-        return (GfxColor){p.v, p.v, p.v, 0};
+        return gfx_rgba(p.v, p.v, p.v, 0);
     }
 
     case GFX_FMT_RGB888:
     {
         GfxFmtRGB888 p = *((GfxFmtRGB888 const *)src);
-        return (GfxColor){p.r, p.g, p.b, 0};
+        return gfx_rgba(p.r, p.g, p.b, 0);
     }
 
     case GFX_FMT_RGBA8888:
     {
         GfxFmtRGBA8888 p = *((GfxFmtRGBA8888 const *)src);
-        return (GfxColor){p.r, p.g, p.b, p.a};
+        return gfx_rgba(p.r, p.g, p.b, p.a);
     }
 
     case GFX_FMT_BGRA8888:
     {
         GfxFmtBGRA8888 p = *((GfxFmtBGRA8888 const *)src);
-        return (GfxColor){p.r, p.g, p.b, p.a};
+        return gfx_rgba(p.r, p.g, p.b, p.a);
     }
 
     default:
