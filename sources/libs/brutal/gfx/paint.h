@@ -91,7 +91,7 @@ static inline bool gfx_paint_is_constant(GfxPaint paint)
     }
 }
 
-static inline GfxColor gfx_paint_sample(GfxPaint paint, float x, float y)
+static inline GfxColor gfx_paint_sample(GfxPaint const paint, float x, float y)
 {
     UNUSED(y);
 
@@ -105,26 +105,26 @@ static inline GfxColor gfx_paint_sample(GfxPaint paint, float x, float y)
 
     case GFX_PAINT_GRADIENT:
     {
-        GfxGradient gradient = paint.gradient_;
+        GfxGradient const* gradient = &paint.gradient_;
 
-        if (gradient.len == 0)
+        if (gradient->len == 0)
         {
             return GFX_MAGENTA;
         }
-        else if (gradient.len == 1 || x <= gradient.stops[0].loc)
+        else if (gradient->len == 1 || x <= gradient->stops[0].loc)
         {
-            return gradient.stops[0].color;
+            return gradient->stops[0].color;
         }
-        else if (x >= gradient.stops[gradient.len - 1].loc)
+        else if (x >= gradient->stops[gradient->len - 1].loc)
         {
-            return gradient.stops[gradient.len - 1].color;
+            return gradient->stops[gradient->len - 1].color;
         }
         else
         {
-            for (size_t i = 0; i + 1 < gradient.len; i++)
+            for (size_t i = 0; i + 1 < gradient->len; i++)
             {
-                GfxGradientStop a = gradient.stops[i];
-                GfxGradientStop b = gradient.stops[i + 1];
+                GfxGradientStop a = gradient->stops[i];
+                GfxGradientStop b = gradient->stops[i + 1];
 
                 if (a.loc <= x && x < b.loc)
                 {
