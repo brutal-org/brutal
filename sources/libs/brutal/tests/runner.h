@@ -6,6 +6,7 @@
 
 #define TEST_NONE (0)
 #define TEST_EXPECTED_TO_FAIL (1 << 0)
+#define TEST_DISABLED (1 << 1)
 
 typedef uint64_t TestFlags;
 
@@ -53,6 +54,7 @@ typedef struct TestCtx
     int counter_total;
     int counter_passed;
     int counter_failed;
+    int counter_skipped;
 
     Test *current_test;
     TestCase *current_case;
@@ -68,7 +70,7 @@ void test_deinit(TestCtx *self);
 
 void test_begin_suite(TestCtx *self);
 
-void test_end_suite(TestCtx *self);
+bool test_end_suite(TestCtx *self);
 
 void test_run_test(TestCtx *self, Test *test);
 

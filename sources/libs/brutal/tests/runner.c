@@ -44,18 +44,32 @@ void test_begin_suite(TestCtx *self)
     self->seed = m_entropy64();
 }
 
-void test_end_suite(TestCtx *self)
+bool test_end_suite(TestCtx *self)
 {
     cli_clear_display_after_cursor(io_chan_err());
 
-    if (self->counter_passed == self->counter_total)
+    cli_fmt$(io_chan_err(), "\n");
+
+    if (self->counter_failed)
     {
-        cli_fmt$(io_chan_err(), "\n 🤘 all {} tests passed - [fg-light-black]{}\n\n", self->counter_passed, txt_nice(tick_now()));
+        cli_fmt$(io_chan_err(), " ❌ [fg-red]{} failled - [fg-light-black]{}\n", self->counter_failed, txt_witty(tick_now()));
+        cli_fmt$(io_chan_err(), "    [fg-green]{} passed\n", self->counter_passed);
     }
     else
     {
-        cli_fmt$(io_chan_err(), "\n ❌ [fg-red]{} fail [fg-green]{} pass {} total - [fg-light-black]{}\n\n", self->counter_failed, self->counter_passed, self->counter_total, txt_witty(tick_now()));
+        cli_fmt$(io_chan_err(), " 🤘 [fg-green]{} passed - [fg-light-black]{}\n", self->counter_passed, txt_nice(tick_now()));
     }
+
+    if (self->counter_skipped)
+    {
+        cli_fmt$(io_chan_err(), "    [fg-yellow]{} skipped\n", self->counter_skipped);
+    }
+
+    cli_fmt$(io_chan_err(), "    []{} total\n", self->counter_total);
+
+    cli_fmt$(io_chan_err(), "\n");
+
+    return self->counter_failed == 0;
 }
 
 void test_passed(TestCtx *self, Test *test)
@@ -82,10 +96,18 @@ void test_failed(TestCtx *self, Test *test)
 
 void test_run_test(TestCtx *self, Test *test)
 {
+    self->counter_total++;
+
+    if (test->flags & TEST_DISABLED)
+    {
+        self->counter_skipped++;
+        cli_clear_display_after_cursor(io_chan_err());
+        cli_fmt$(io_chan_err(), "[fg-white bg-yellow bold]{} [fg-white]{}\n", " SKIP ", test->name);
+        return;
+    }
+
     self->current_test = test;
     self->current_case = nullptr;
-
-    self->counter_total++;
 
     test_progress(self);
     test->state = (test->flags & TEST_EXPECTED_TO_FAIL) ? TEST_FAIL : TEST_PASS;

@@ -16,8 +16,8 @@ int main(int argc, char const *argv[])
         test_run_all(&ctx);
     }
 
-    test_end_suite(&ctx);
+    bool success = test_end_suite(&ctx);
     test_deinit(&ctx);
 
-    return 0;
+    return success ? 0 : 1;
 }

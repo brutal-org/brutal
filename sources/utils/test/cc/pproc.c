@@ -1,3 +1,4 @@
+#include <brutal/debug.h>
 #include <brutal/tests.h>
 #include <cc/lex.h>
 #include <cc/parse.h>
@@ -34,7 +35,7 @@ test$(cproc_simple)
     cproc_test_case("123", "123");
 }
 
-test$(cproc_stringizing)
+test$(cproc_stringizing, TEST_DISABLED)
 {
     cproc_test_case("", "#\n#   \n#  \n");
     cproc_test_case("char const* v = \"abc\"\n", "char const* v = #abc\n");
@@ -43,13 +44,13 @@ test$(cproc_stringizing)
     cproc_failling_test_case("  #\n #   \n     #  \n");
 }
 
-test$(cproc_concat)
+test$(cproc_concat, TEST_DISABLED)
 {
     cproc_test_case("ab", "a##b");
     cproc_failling_test_case("-##>");
 }
 
-test$(cproc_macros)
+test$(cproc_macros, TEST_DISABLED)
 {
     cproc_test_case("", "#define foo bar\n");
     cproc_test_case("bar", "#define foo bar\nfoo\n");
