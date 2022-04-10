@@ -191,11 +191,11 @@ void gfx_fill(Gfx *self, GfxFillRule rule)
     bool constant_col = gfx_paint_is_constant(gfx_peek(self)->fill);
     GfxColor const_color = gfx_paint_sample(gfx_peek(self)->fill, 0, 0);
     vec_reserve(&self->active, self->path.len / 2);
-    for (int y = m_rectf_top(rbound); y < m_rectf_bottom(rbound); y++)
+    for (int y = m_rectf_top(rbound); y < ceilf(m_rectf_bottom(rbound)); y++)
     {
-        mem_set(self->scanline + (int)m_rectf_start(rbound), 0, sizeof(*self->scanline) * ceilf(rbound.width));
+        mem_set(self->scanline + (int)m_rectf_start(rbound), 0, sizeof(*self->scanline) * ceilf(rbound.width + 1));
 
-        for (float yy = (y); yy < y + 1; yy += 1.0f / RAST_AA)
+        for (float yy = y; yy < y + 1; yy += 1.0f / RAST_AA)
         {
             vec_clear(&self->active);
 
@@ -223,18 +223,17 @@ void gfx_fill(Gfx *self, GfxFillRule rule)
                 {
                     GfxActiveEdge start_edge = vec_at(&self->active, i);
                     GfxActiveEdge end_edge = vec_at(&self->active, i + 1);
-                    Range(float) v = {.base = start_edge.x, .size = end_edge.x - start_edge.x};
-                    Range(float) v2 = {.base = rbound.x, .size = rbound.width};
 
-                    r += start_edge.winding;
-
-                    if (!range_colide(v, v2))
+                    if (start_edge.x > m_rectf_end(rbound) ||
+                        end_edge.x < m_rectf_start(rbound))
                     {
                         continue;
                     }
 
-                    float begin = v.base;
-                    float end = v.base + v.size;
+                    r += start_edge.winding;
+
+                    float begin = start_edge.x;
+                    float end = end_edge.x;
 
                     if ((rule == GFX_FILL_EVENODD && r % 2) || (rule == GFX_FILL_NONZERO && r != 0))
                     {

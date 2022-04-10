@@ -37,8 +37,6 @@ void sched_start(Task *task, uintptr_t ip, uintptr_t sp, BrTaskArgs args)
 
     assert_truth(!task->started);
 
-    log$("Starting task {}", task->id);
-
     context_start(task->context, ip, sp, range_end(task->stack), args, task->flags);
     task->started = true;
     sched_enqueue(task);

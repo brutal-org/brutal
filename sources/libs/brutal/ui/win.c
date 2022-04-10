@@ -10,6 +10,7 @@
 UiWin *ui_win_create(UiApp *app, MRectf bound, UiWinType type)
 {
     UiWin *self = alloc_make(alloc_global(), UiWin);
+
     self->type = type;
     self->app = app;
 
