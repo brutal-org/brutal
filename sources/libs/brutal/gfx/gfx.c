@@ -242,6 +242,7 @@ void gfx_fill(Gfx *self, GfxFillRule rule)
                         {
                             self->scanline[(int)x] += 1.0;
                         }
+
                         for (float x = floorf(end); x < end; x += 1.0f / RAST_AA)
                         {
                             self->scanline[(int)x] += 1.0;
@@ -406,6 +407,8 @@ void gfx_arc_to(Gfx *self, float rx, float ry, float angle, int flags, MVec2f po
 
 void gfx_rect(Gfx *self, MRectf rect, float radius)
 {
+    radius = m_clamp(radius, 0, m_min(rect.width, rect.height) / 2);
+
     if (radius <= 0.5)
     {
         gfx_move_to(self, m_vec2f(rect.x + radius, rect.y));
