@@ -1,4 +1,10 @@
 
+ifneq ("$(QEMU_KVM)","no")
+	ifneq ("$(wildcard /dev/kvm)","")
+		QEMU_ARGS += -enable-kvm
+	endif
+endif
+
 # x86 use the loader
 
 IMAGE_ROOT = $(BINDIR_LOADER)/image
