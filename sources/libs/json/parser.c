@@ -37,7 +37,7 @@ static Str parse_str(Scan *scan)
 {
     json_skip_space_and_comment(scan);
     scan_expect(scan, '"');
-    Str name = scan_skip_until(scan, is_closing_string);
+    Str name = scan_eat_match(scan, is_closing_string);
     scan_expect(scan, '"');
     json_skip_space_and_comment(scan);
 

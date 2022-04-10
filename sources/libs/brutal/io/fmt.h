@@ -35,28 +35,15 @@ typedef enum
     FMT_PRINTF_STRING,
 } FmtPrintfType;
 
-typedef enum
-{
-    FMT_COL_NONE,
-    FMT_BLACK,
-    FMT_WHITE,
-    FMT_RED,
-    FMT_GREEN,
-    FMT_BLUE,
-    FMT_YELLOW,
-    FMT_MAGENTA,
-    FMT_CYAN,
-    FMT_GRAY,
-    FMT_BLACK_GRAY,
-} FmtColorTypes;
-
 typedef struct
 {
     FmtType type;
     Case casing;
 
-    long precison;
-    long min_width;
+    long width;
+#define FMT_PRECISION_DEFAULT (-1)
+    long precision;
+
     char fill;
     bool prefix;
     bool prefix_plus;

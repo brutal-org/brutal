@@ -6,7 +6,6 @@
 #include <brutal/tests/runner.h>
 #include <brutal/text.h>
 #include <brutal/time.h>
-#include <unistd.h>
 
 static Vec(Test) _tests = {};
 static bool _tests_init = false;
@@ -62,6 +61,7 @@ void test_end_suite(TestCtx *self)
 void test_passed(TestCtx *self, Test *test)
 {
     UNUSED(self);
+    cli_clear_display_after_cursor(io_chan_err());
     cli_fmt$(io_chan_err(), "[fg-white bg-green bold]{} [fg-white]{}\n", " PASS ", test->name);
 }
 
@@ -74,6 +74,7 @@ void test_failed(TestCtx *self, Test *test)
     }
     else if (test->state == TEST_PASS)
     {
+        cli_clear_display_after_cursor(io_chan_err());
         cli_fmt$(io_chan_err(), "[fg-white bg-red bold]{} [fg-red]{}\n", " FAIL ", test->name);
         test->state = TEST_FAIL;
     }
@@ -165,21 +166,28 @@ void test_progress(TestCtx *self)
     cli_fmt$(io_chan_err(), "\n");
     cli_cursor_horizontal(io_chan_err(), 0);
     cli_cursor_prevline(io_chan_err(), 2);
-
-    usleep(10000);
 }
 
-void test_fail(MAYBE_UNUSED TestCtx *self, Loc loc, Str msg, AnyVa args)
-{
-    cli_fmt$(io_chan_err(), "{}:{}: ", loc.file, loc.line);
-    cli_fmt(io_chan_err(), msg, args);
-    io_write_byte$(io_chan_err(), '\n');
-}
-
-void test_expect(MAYBE_UNUSED TestCtx *self, Loc loc, Any lhs, Any rhs, char const *op)
+void test_fail(TestCtx *self, Loc loc, Str msg, AnyVa args)
 {
     test_failed(self, self->current_test);
-    cli_fmt$(io_chan_err(), "{}:{}: Expected {} {} {}\n", loc.file, loc.line, lhs, op, rhs);
+
+    if (!(self->current_test->flags & TEST_EXPECTED_TO_FAIL))
+    {
+        cli_fmt$(io_chan_err(), "{}:{}: ", loc.file, loc.line);
+        cli_fmt(io_chan_err(), msg, args);
+        io_write_byte$(io_chan_err(), '\n');
+    }
+}
+
+void test_expect(TestCtx *self, Loc loc, Any lhs, Any rhs, char const *op)
+{
+    test_failed(self, self->current_test);
+
+    if (!(self->current_test->flags & TEST_EXPECTED_TO_FAIL))
+    {
+        cli_fmt$(io_chan_err(), "{}:{}: Expected {} {} {}\n", loc.file, loc.line, lhs, op, rhs);
+    }
 }
 
 void *test_use(TestCtx *self, uint64_t id, void *args, TestHookCtor *ctor, TestHookDtor *dtor)

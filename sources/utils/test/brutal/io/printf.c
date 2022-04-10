@@ -29,6 +29,8 @@ test$(io_printf)
     TEST_CASE("012", "%.3d", 12);
     TEST_CASE("123", "%.3d", 123);
 
+    TEST_CASE("    5", "%5d", 5);
+    TEST_CASE("    5", "%5u", 5);
     TEST_CASE("  000", "%5.3d", 0);
     TEST_CASE("  001", "%5.3d", 1);
     TEST_CASE("  012", "%5.3d", 12);
@@ -48,29 +50,5 @@ test$(io_printf)
     TEST_CASE("00001", "%05d", 1);
     TEST_CASE("00012", "%05d", 12);
     TEST_CASE("00123", "%05d", 123);
-
-    TEST_CASE("0.000000", "%f", 0.f);
-    TEST_CASE("1.000000", "%f", 1.f);
-    TEST_CASE("12.000000", "%f", 12.f);
-    TEST_CASE("123.000000", "%f", 123.f);
-
-    TEST_CASE("0.000", "%.3f", 0.f);
-    TEST_CASE("1.000", "%.3f", 1.f);
-    TEST_CASE("12.000", "%.3f", 12.f);
-    TEST_CASE("123.000", "%.3f", 123.f);
-
-    TEST_CASE("  0.000", "%7.3f", 0.f);
-    TEST_CASE("  1.000", "%7.3f", 1.f);
-    TEST_CASE(" 12.000", "%7.3f", 12.f);
-    TEST_CASE("123.000", "%7.3f", 123.f);
-
-    TEST_CASE("000.000", "%07.3f", 0.f);
-    TEST_CASE("001.000", "%07.3f", 1.f);
-    TEST_CASE("012.000", "%07.3f", 12.f);
-    TEST_CASE("123.000", "%07.3f", 123.f);
-
-    TEST_CASE("0000000", "%07.f", 0.f);
-    TEST_CASE("0000001", "%07.f", 1.f);
-    TEST_CASE("0000012", "%07.f", 12.f);
-    TEST_CASE("0000123", "%07.f", 123.f);
+    TEST_CASE("0x123", "%#05x", 0x123);
 }

@@ -89,14 +89,10 @@ static bool fmt_parse_precision(Fmt *fmt, Scan *scan)
     {
         fmt->fill = '0';
     }
-    else
-    {
-        fmt->fill = ' ';
-    }
 
     bool any = false;
 
-    if (scan_next_int(scan, &fmt->min_width))
+    if (scan_next_int(scan, &fmt->width))
     {
         any = true;
     }
@@ -106,14 +102,20 @@ static bool fmt_parse_precision(Fmt *fmt, Scan *scan)
         return any;
     }
 
-    scan_next_int(scan, &fmt->precison);
+    if (!scan_next_int(scan, &fmt->precision))
+    {
+        fmt->precision = 0;
+    }
+
     return true;
 }
 
 Fmt fmt_parse(Scan *scan)
 {
     Fmt fmt = {};
-    fmt.precison = 6;
+    fmt.precision = FMT_PRECISION_DEFAULT;
+    fmt.width = 0;
+    fmt.fill = ' ';
 
     scan_skip(scan, '{');
 
@@ -203,7 +205,9 @@ FmtPrintfType fmt_parse_printf_type(Scan *scan, Fmt *fmt)
 FmtPrintfType fmt_parse_printf(Scan *scan, Fmt *fmt)
 {
     *fmt = (Fmt){};
-    fmt->precison = 3;
+    fmt->precision = FMT_PRECISION_DEFAULT;
+    fmt->width = 1;
+    fmt->fill = ' ';
 
     scan_skip(scan, '%');
 
@@ -229,66 +233,105 @@ FmtPrintfType fmt_parse_printf(Scan *scan, Fmt *fmt)
     return FMT_PRINTF_INT;
 }
 
+static void reverse(uint8_t *str, size_t len)
+{
+    for (size_t i = 0; i < len / 2; i++)
+    {
+        swap$(&str[i], &str[len - i - 1]);
+    }
+}
+
 IoResult fmt_signed(Fmt self, IoWriter writer, int64_t value)
 {
-    size_t written = 0;
+    int i = 0;
+    uint8_t buf[128 * 8] = {};
+    bool negative = false;
 
     if (value < 0)
     {
-        written += TRY(IoResult, io_write_byte(writer, '-'));
-        value *= -1;
-    }
-    else if (self.prefix_plus)
-    {
-        written += TRY(IoResult, io_write_byte(writer, '+'));
+        negative = true;
+        value = -value;
     }
 
-    written += TRY(IoResult, fmt_unsigned(self, writer, value));
-
-    return OK(IoResult, written);
-}
-
-static void reverse(uint8_t *str, size_t len)
-{
-    for (uint8_t *p1 = str, *p2 = str + len - 1; p2 > p1; ++p1, --p2)
+    if (self.precision == FMT_PRECISION_DEFAULT)
     {
-        *p1 ^= *p2;
-        *p2 ^= *p1;
-        *p1 ^= *p2;
+        self.precision = 1;
     }
-}
-
-IoResult fmt_unsigned(Fmt self, IoWriter writer, uint64_t value)
-{
-    uint8_t buf[sizeof(uint64_t) * 8] = {};
-    int i = 0;
-
-    if (value == 0)
+    else
     {
-        buf[0] = '0';
-        i++;
+        self.fill = ' ';
     }
 
     while (value != 0)
     {
-        buf[i] = fmt_digit(self, value % fmt_base(self));
+        buf[i++] = fmt_digit(self, value % fmt_base(self));
         value /= fmt_base(self);
-        i++;
     }
 
-    if (self.min_width != 0)
+    while (i < self.precision)
     {
-        while (i < self.min_width)
-        {
-            buf[i] = self.fill;
-            i++;
-        }
+        buf[i++] = '0';
     }
 
     if (self.prefix)
     {
         buf[i++] = fmt_prefix(self);
         buf[i++] = '0';
+    }
+
+    if (negative)
+    {
+        buf[i++] = '-';
+    }
+    else if (self.prefix_plus)
+    {
+        buf[i++] = '+';
+    }
+
+    while (i < self.width)
+    {
+        buf[i++] = self.fill;
+    }
+
+    reverse(buf, i);
+
+    return io_write(writer, buf, i);
+}
+
+IoResult fmt_unsigned(Fmt self, IoWriter writer, uint64_t value)
+{
+    int i = 0;
+    uint8_t buf[128 * 8] = {};
+
+    if (self.precision == FMT_PRECISION_DEFAULT)
+    {
+        self.precision = 1;
+    }
+    else
+    {
+        self.fill = ' ';
+    }
+
+    while (value != 0)
+    {
+        buf[i++] = fmt_digit(self, value % fmt_base(self));
+        value /= fmt_base(self);
+    }
+
+    while (i < self.precision)
+    {
+        buf[i++] = '0';
+    }
+
+    if (self.prefix)
+    {
+        buf[i++] = fmt_prefix(self);
+        buf[i++] = '0';
+    }
+
+    while (i < self.width)
+    {
+        buf[i++] = self.fill;
     }
 
     reverse(buf, i);
@@ -300,6 +343,11 @@ IoResult fmt_unsigned(Fmt self, IoWriter writer, uint64_t value)
 
 IoResult fmt_float(Fmt self, IoWriter writer, double value)
 {
+    if (self.precision == FMT_PRECISION_DEFAULT)
+    {
+        self.precision = 6;
+    }
+
     if (isnan(value))
     {
         return io_write_str(writer, str$("nan"));
@@ -321,7 +369,7 @@ IoResult fmt_float(Fmt self, IoWriter writer, double value)
 
     written += TRY(IoResult, fmt_unsigned(self, writer, (uint64_t)value));
 
-    if (self.precison == 0)
+    if (self.precision == 0)
     {
         return OK(IoResult, written);
     }
@@ -330,7 +378,7 @@ IoResult fmt_float(Fmt self, IoWriter writer, double value)
 
     value -= (uint64_t)value;
 
-    for (int i = 0; i < self.precison; i++)
+    for (int i = 0; i < self.precision; i++)
     {
         value *= fmt_base(self);
         written += TRY(IoResult, io_write_byte(writer, fmt_digit(self, (uint64_t)value)));

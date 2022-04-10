@@ -86,13 +86,13 @@ static UiLayoutKeyword from_string(Str str)
 static UiLayoutKeyword next_keyword(Scan *scan)
 {
     scan_begin(scan);
-    scan_skip_until(scan, isalpha);
+    scan_eat_match(scan, isalpha);
     return from_string(scan_end(scan));
 }
 
 static void eat_whitespace(Scan *scan)
 {
-    scan_skip_until(scan, isblank);
+    scan_eat_match(scan, isblank);
 }
 
 static MVec2f parse_vec(Scan *scan, MVec2f vec)

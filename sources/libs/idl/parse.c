@@ -67,7 +67,7 @@ static IdlType idl_parse_type(Scan *scan, Alloc *alloc);
 
 static Str parse_ident(Scan *scan)
 {
-    Str name = scan_skip_until(scan, is_ident);
+    Str name = scan_eat_match(scan, is_ident);
 
     if (str_empty(name))
     {
@@ -301,7 +301,7 @@ static int is_path(int chr)
 
 Str idl_parse_cinclude(Scan *scan)
 {
-    return scan_skip_until(scan, is_path);
+    return scan_eat_match(scan, is_path);
 }
 
 IdlModule idl_parse_module(Scan *scan, Alloc *alloc)

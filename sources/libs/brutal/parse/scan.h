@@ -106,13 +106,15 @@ bool scan_skip_word(Scan *self, Str word);
 
 bool scan_skip_any(Scan *self, Str chars);
 
-Str scan_skip_until(Scan *self, ScanMatch *match);
+bool scan_skip_match(Scan *self, ScanMatch *match);
 
 bool scan_skip_space(Scan *self);
 
 bool scan_eat(Scan *self, ScanMatch *match);
 
 bool scan_eat_any(Scan *self, Str chars);
+
+Str scan_eat_match(Scan *self, ScanMatch *match);
 
 void scan_begin(Scan *self);
 

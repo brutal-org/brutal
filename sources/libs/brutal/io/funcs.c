@@ -181,8 +181,9 @@ IoResult io_vprintf(IoWriter writer, Str format, va_list va)
         else if (scan_curr(&scan) == '%')
         {
             Fmt fmt = {};
+            FmtPrintfType type = fmt_parse_printf(&scan, &fmt);
 
-            switch (fmt_parse_printf(&scan, &fmt))
+            switch (type)
             {
             default:
             case FMT_PRINTF_INT:
@@ -214,6 +215,7 @@ IoResult io_vprintf(IoWriter writer, Str format, va_list va)
                 written += TRY(IoResult, fmt_float(fmt, writer, va_arg(va, double)));
                 break;
 #endif
+
             case FMT_PRINTF_STRING:
                 written += TRY(IoResult, fmt_string(fmt, writer, str$(va_arg(va, char const *))));
                 break;

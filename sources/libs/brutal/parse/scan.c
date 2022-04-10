@@ -110,32 +110,15 @@ bool scan_skip_space(Scan *self)
     return scan_eat(self, isspace);
 }
 
-Str scan_skip_until(Scan *self, int (*callback)(int))
-{
-    int start = self->head;
-    int len = 0;
-
-    while (callback(scan_curr(self)) && !scan_ended(self))
-    {
-        len++;
-        scan_next(self);
-    }
-
-    return str_n$(len, (char *)self->buf + start);
-}
-
 bool scan_skip(Scan *self, char c)
 {
-    if (scan_curr(self) == c)
-    {
-        scan_next(self);
-
-        return true;
-    }
-    else
+    if (scan_curr(self) != c)
     {
         return false;
     }
+
+    scan_next(self);
+    return true;
 }
 
 bool scan_skip_word(Scan *self, Str word)
@@ -166,6 +149,17 @@ bool scan_skip_any(Scan *self, Str chars)
     return false;
 }
 
+bool scan_skip_match(Scan *self, ScanMatch *match)
+{
+    if (!match(scan_curr(self)))
+    {
+        return false;
+    }
+
+    scan_next(self);
+    return true;
+}
+
 bool scan_eat(Scan *self, ScanMatch *match)
 {
     bool result = false;
@@ -189,6 +183,20 @@ bool scan_eat_any(Scan *self, Str chars)
     }
 
     return result;
+}
+
+Str scan_eat_match(Scan *self, int (*callback)(int))
+{
+    int start = self->head;
+    int len = 0;
+
+    while (callback(scan_curr(self)) && !scan_ended(self))
+    {
+        len++;
+        scan_next(self);
+    }
+
+    return str_n$(len, (char *)self->buf + start);
 }
 
 void scan_begin(Scan *self)

@@ -36,9 +36,10 @@ bool scan_next_uint(Scan *self, unsigned long *value)
     return true;
 }
 
-bool scan_next_int(Scan *self, long *value)
+bool scan_next_int(Scan *self, long *result)
 {
-    *value = 0;
+    long value = 0;
+
     bool is_number = false;
     bool is_negative = false;
 
@@ -57,8 +58,8 @@ bool scan_next_int(Scan *self, long *value)
         if (v >= '0' && v <= '9')
         {
             is_number = true;
-            *value *= 10;
-            *value += v - '0';
+            value *= 10;
+            value += v - '0';
             scan_next(self);
         }
         else
@@ -69,7 +70,12 @@ bool scan_next_int(Scan *self, long *value)
 
     if (is_negative)
     {
-        *value *= -1;
+        value *= -1;
+    }
+
+    if (is_number)
+    {
+        *result = value;
     }
 
     return is_number;
