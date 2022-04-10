@@ -44,6 +44,6 @@ BENCH(rounded_rect_fill_gradient)
 
     };
 
-    gfx_fill_style(gfx, gfx_paint_gradient(grad));
+    gfx_fill_style(gfx, gfx_paint_gradient(&grad));
     gfx_fill_rect(gfx, m_rectf(10, 10, 512, 512), 32);
 }

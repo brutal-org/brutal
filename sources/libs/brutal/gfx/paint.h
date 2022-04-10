@@ -35,7 +35,7 @@ typedef struct
     {
         GfxColor fill_;
 
-        GfxGradient gradient_;
+        GfxGradient *gradient_;
 
         struct
         {
@@ -60,7 +60,7 @@ static inline GfxPaint gfx_paint_fill(GfxColor color)
     };
 }
 
-static inline GfxPaint gfx_paint_gradient(GfxGradient grad)
+static inline GfxPaint gfx_paint_gradient(GfxGradient *grad)
 {
     return (GfxPaint){
         .type = GFX_PAINT_GRADIENT,
@@ -105,26 +105,26 @@ static inline GfxColor gfx_paint_sample(GfxPaint paint, float x, float y)
 
     case GFX_PAINT_GRADIENT:
     {
-        GfxGradient gradient = paint.gradient_;
+        GfxGradient *gradient = paint.gradient_;
 
-        if (gradient.len == 0)
+        if (gradient->len == 0)
         {
             return GFX_MAGENTA;
         }
-        else if (gradient.len == 1 || x <= gradient.stops[0].loc)
+        else if (gradient->len == 1 || x <= gradient->stops[0].loc)
         {
-            return gradient.stops[0].color;
+            return gradient->stops[0].color;
         }
-        else if (x >= gradient.stops[gradient.len - 1].loc)
+        else if (x >= gradient->stops[gradient->len - 1].loc)
         {
-            return gradient.stops[gradient.len - 1].color;
+            return gradient->stops[gradient->len - 1].color;
         }
         else
         {
-            for (size_t i = 0; i + 1 < gradient.len; i++)
+            for (size_t i = 0; i + 1 < gradient->len; i++)
             {
-                GfxGradientStop a = gradient.stops[i];
-                GfxGradientStop b = gradient.stops[i + 1];
+                GfxGradientStop a = gradient->stops[i];
+                GfxGradientStop b = gradient->stops[i + 1];
 
                 if (a.loc <= x && x < b.loc)
                 {
