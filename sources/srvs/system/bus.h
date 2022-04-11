@@ -5,12 +5,12 @@
 
 typedef struct
 {
-    Handover *handover;
+    IpcObject base;
     Vec(Unit) units;
     Vec(IpcCap) caps;
 } Bus;
 
-void bus_init(Bus *self, Handover *handover, Alloc *alloc);
+void bus_init(Bus *self, Alloc *alloc);
 
 void bus_deinit(Bus *self);
 

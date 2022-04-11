@@ -170,9 +170,11 @@ int ipc_component_main(IpcComponent *self)
     pci_init(&pci, &acpi, alloc_global());
     pci_iter(&pci, iter_pci, &pci);
 
-    IpcCap pci_cap = pci_bus_provide(self, &pci_bus_vtable, &pci);
+    IpcObject obj = {};
+    ipc_object_init(&obj, ipc_self(), alloc_global());
 
-    system_server_expose_rpc(self, system_server, &pci_cap, alloc_global());
+    IpcCap cap = pci_bus_provide(&obj, &pci_bus_vtable);
+    system_server_expose_rpc(self, system_server, &cap, alloc_global());
 
     return ipc_component_run(self);
 }

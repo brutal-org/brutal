@@ -23,24 +23,28 @@ static EventSinkVTable _input_sink_vtable = {
 
 void embed_win_init(UiWin *self, MRectf bound)
 {
-    IpcCap server = ipc_component_require(ipc_component_self(), IPC_WINDOW_SERVER_PROTO);
+    EmbedWin *embed = &self->embed;
+    ipc_object_init(base$(embed), ipc_self(), alloc_global());
+    event_sink_provide(base$(embed), &_input_sink_vtable);
+
+    IpcCap server = ipc_component_require(ipc_self(), IPC_WINDOW_SERVER_PROTO);
 
     WindowClientProps props = {
         .bound = bound,
         .type = self->type,
     };
 
-    window_server_create_rpc(ipc_component_self(), server, &props, &self->embed.wm_client, alloc_global());
+    window_server_create_rpc(ipc_self(), server, &props, &embed->handle, alloc_global());
 
     BalFb surface;
-    window_client_surface_rpc(ipc_component_self(), self->embed.wm_client, &surface, alloc_global());
+    window_client_surface_rpc(ipc_self(), embed->handle, &surface, alloc_global());
     bal_fb_map(&surface);
 
     self->embed.surface = surface;
 
-    self->embed.input_sink = event_sink_provide(ipc_component_self(), &_input_sink_vtable, self);
     bool success = false;
-    window_client_listen_rpc(ipc_component_self(), self->embed.wm_client, &self->embed.input_sink, &success, alloc_global());
+    IpcCap cap = ipc_object_cap(base$(embed), IPC_EVENT_SINK_PROTO);
+    window_client_listen_rpc(ipc_self(), embed->handle, &cap, &success, alloc_global());
 }
 
 void embed_win_deinit(UiWin *self)
@@ -48,19 +52,19 @@ void embed_win_deinit(UiWin *self)
     bal_fb_deinit(&self->embed.surface);
 
     bool resp;
-    window_client_close_rpc(ipc_component_self(), self->embed.wm_client, &resp, alloc_global());
+    window_client_close_rpc(ipc_self(), self->embed.handle, &resp, alloc_global());
 }
 
 void embed_win_show(UiWin *self)
 {
     bool resp = false;
-    window_client_show_rpc(ipc_component_self(), self->embed.wm_client, &resp, alloc_global());
+    window_client_show_rpc(ipc_self(), self->embed.handle, &resp, alloc_global());
 }
 
 void embed_win_hide(UiWin *self)
 {
     bool resp = false;
-    window_client_hide_rpc(ipc_component_self(), self->embed.wm_client, &resp, alloc_global());
+    window_client_hide_rpc(ipc_self(), self->embed.handle, &resp, alloc_global());
 }
 
 bool embed_win_visible(UiWin *self)
@@ -73,7 +77,7 @@ bool embed_win_visible(UiWin *self)
 void embed_win_flip(UiWin *self, MRectf rect)
 {
     bool resp = false;
-    window_client_flip_rpc(ipc_component_self(), self->embed.wm_client, &rect, &resp, alloc_global());
+    window_client_flip_rpc(ipc_self(), self->embed.handle, &rect, &resp, alloc_global());
 }
 
 GfxBuf embed_win_gfx(UiWin *self)

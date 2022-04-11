@@ -8,10 +8,10 @@
 
 typedef struct
 {
-    UiWinType type;
+    IpcObject base;
+    IpcCap handle; // to the object on the client side
 
-    IpcCap wm_client;
-    IpcCap event_sink;
+    UiWinType type;
 
     bool visible;
     MRectf bound;

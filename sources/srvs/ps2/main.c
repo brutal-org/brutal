@@ -12,13 +12,13 @@
 void ps2_keyboard_callback(UiEvent ev, IpcCap *input_sink)
 {
     bool handled = false;
-    event_sink_dispatch_rpc(ipc_component_self(), *input_sink, &ev, &handled, alloc_global());
+    event_sink_dispatch_rpc(ipc_self(), *input_sink, &ev, &handled, alloc_global());
 }
 
 void ps2_mouse_callback(UiEvent ev, IpcCap *input_sink)
 {
     bool handled = false;
-    event_sink_dispatch_rpc(ipc_component_self(), *input_sink, &ev, &handled, alloc_global());
+    event_sink_dispatch_rpc(ipc_self(), *input_sink, &ev, &handled, alloc_global());
 }
 
 int ipc_component_main(IpcComponent *self)

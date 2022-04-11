@@ -55,7 +55,7 @@ static WindowError window_client_surface_handler(void *self, void *, BalFb *resp
 static WindowError window_client_listen_handler(void *self, IpcCap const *req, bool *resp, Alloc *)
 {
     WmClient *client = self;
-    client->event_sink = *req;
+    client->handle = *req;
     *resp = true;
     return IPC_SUCCESS;
 }
@@ -76,6 +76,8 @@ WmClient *wm_client_create(struct _WmServer *server, MRectf bound, UiWinType typ
 {
     WmClient *self = alloc_make(alloc_global(), WmClient);
 
+    ipc_object_init(base$(self), ipc_self(), alloc_global());
+
     self->server = server;
     self->bound = bound;
     self->type = type;
@@ -84,17 +86,16 @@ WmClient *wm_client_create(struct _WmServer *server, MRectf bound, UiWinType typ
     bal_fb_init(&self->backbuffer, bound.width, bound.height, GFX_FMT_RGBA8888);
     bal_fb_map(&self->backbuffer);
 
-    self->wm_client = window_client_provide(ipc_component_self(), &_window_client_vtable, self);
+    window_client_provide(base$(self), &_window_client_vtable);
 
     return self;
 }
 
 void wm_client_destroy(WmClient *self)
 {
-    ipc_component_revoke(ipc_component_self(), self->wm_client);
-
     bal_fb_deinit(&self->backbuffer);
     gfx_surface_deinit(&self->frontbuffer);
+    ipc_object_deinit(base$(self));
     alloc_free(alloc_global(), self);
 }
 
@@ -149,5 +150,5 @@ void wm_client_dispatch(WmClient *self, UiEvent event)
     }
 
     bool resp;
-    event_sink_dispatch_rpc(ipc_component_self(), self->event_sink, &event, &resp, alloc_global());
+    event_sink_dispatch_rpc(ipc_self(), self->handle, &event, &resp, alloc_global());
 }

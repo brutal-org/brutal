@@ -1,0 +1,11 @@
+{
+    "name": "device",
+    "consume": [
+        "system.Server"
+    ],
+    "rights": [
+        "irq",
+        "pio",
+        "log"
+    ]
+}

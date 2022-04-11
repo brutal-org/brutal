@@ -14,9 +14,9 @@ CType idl_cgen_dispatch_type(Alloc *alloc)
     CType ctype = ctype_func(ctype_void(), alloc);
 
     ctype_member(&ctype, str$("ipc"), ctype_ident_ptr(str$("IpcComponent"), alloc));
+    ctype_member(&ctype, str$("object"), ctype_ident_ptr(str$("IpcObject"), alloc));
     ctype_member(&ctype, str$("req"), ctype_ident_ptr(str$("BrMsg"), alloc));
     ctype_member(&ctype, str$("vtable"), ctype_ptr(ctype_void(), alloc));
-    ctype_member(&ctype, str$("ctx"), ctype_ptr(ctype_void(), alloc));
 
     return ctype;
 }
@@ -31,8 +31,8 @@ void idl_cgen_dispatch_case(CStmt *block, IdlMethod method, IdlIface const iface
     CExpr call_handler = cexpr_call(alloc, cexpr_ident(str$("ipc_hook_handle")));
 
     cexpr_member(&call_handler, cexpr_ident(str$("ipc")));
+    cexpr_member(&call_handler, cexpr_ident(str$("object")));
     cexpr_member(&call_handler, idl_cgen_dispatch_handler(method, iface, alloc));
-    cexpr_member(&call_handler, cexpr_ident(str$("ctx")));
     cexpr_member(&call_handler, cexpr_ident(str$("req")));
     cexpr_member(&call_handler, idl_cgen_binding(method, iface, alloc));
 

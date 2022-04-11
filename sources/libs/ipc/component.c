@@ -4,16 +4,17 @@
 
 typedef struct
 {
-    IpcComponent *self;
+    IpcComponent *component;
+    IpcObject *object;
+    IpcProvider provider;
     BrMsg msg;
-    IpcProvider *provider;
 } BrRequestCtx;
 
 static void *handle_request(BrRequestCtx *ctx)
 {
     BrMsg msg = ctx->msg;
-    IpcProvider *provider = ctx->provider;
-    provider->handler(ctx->self, &msg, provider->vtable, provider->ctx);
+    IpcProvider provider = ctx->provider;
+    provider.handler(ctx->component, ctx->object, &msg, provider.vtable);
     return nullptr;
 }
 
@@ -48,21 +49,12 @@ static bool dispatch_to_pending(IpcComponent *self, BrMsg msg)
     return false;
 }
 
-static bool dispatch_to_provider(IpcComponent *self, BrMsg msg)
+static bool dispatch_to_object(IpcComponent *self, BrMsg msg)
 {
-    vec_foreach_v(provider, &self->providers)
+    vec_foreach_v(object, &self->objects)
     {
-        if (provider->port == msg.to.port &&
-            provider->proto == msg.prot)
+        if (ipc_object_dispatch(object, self, msg))
         {
-            fiber_start_and_forget(
-                (FiberFn *)handle_request,
-                &(BrRequestCtx){
-                    .self = self,
-                    .msg = msg,
-                    .provider = provider,
-                });
-
             return true;
         }
     }
@@ -106,7 +98,7 @@ void ipc_component_pump(IpcComponent *self, BrDeadline deadline)
     if (result == BR_SUCCESS)
     {
         if (!(dispatch_to_pending(self, ipc.msg) ||
-              dispatch_to_provider(self, ipc.msg) ||
+              dispatch_to_object(self, ipc.msg) ||
               dispatch_to_binding(self, ipc.msg)))
         {
             log$("Unhandled message: {}:{} on port {}", ipc.msg.prot, ipc.msg.type, ipc.msg.to.port);
@@ -127,7 +119,7 @@ static void *ipc_component_dispatch(IpcComponent *self)
 
 static IpcComponent *_instance = nullptr;
 
-IpcComponent *ipc_component_self(void)
+IpcComponent *ipc_self(void)
 {
     assert_not_null(_instance);
     return _instance;
@@ -143,18 +135,18 @@ void ipc_component_init(IpcComponent *self, Alloc *alloc)
     self->dispatcher = fiber_start((FiberFn *)ipc_component_dispatch, self);
     self->dispatcher->state = FIBER_IDLE;
 
-    vec_init(&self->pendings, alloc);
-    vec_init(&self->providers, alloc);
-    vec_init(&self->capabilities, alloc);
     vec_init(&self->bindings, alloc);
+    vec_init(&self->pendings, alloc);
+    vec_init(&self->objects, alloc);
+    vec_init(&self->consumes, alloc);
 
     _instance = self;
 }
 
 void ipc_component_deinit(IpcComponent *self)
 {
-    vec_deinit(&self->capabilities);
-    vec_deinit(&self->providers);
+    vec_deinit(&self->consumes);
+    vec_deinit(&self->objects);
     vec_deinit(&self->pendings);
     vec_deinit(&self->bindings);
 }
@@ -163,26 +155,13 @@ void ipc_component_inject(IpcComponent *self, IpcCap const *caps, int count)
 {
     for (int i = 0; i < count; i++)
     {
-        vec_push(&self->capabilities, caps[i]);
+        vec_push(&self->consumes, caps[i]);
     }
-}
-
-Iter ipc_component_query(IpcComponent *self, uint32_t proto, IterFn *iter, void *ctx)
-{
-    vec_foreach(cap, &self->capabilities)
-    {
-        if (cap->proto == proto && iter(cap, ctx) == ITER_STOP)
-        {
-            return ITER_STOP;
-        }
-    }
-
-    return ITER_CONTINUE;
 }
 
 IpcCap ipc_component_require(IpcComponent *self, uint32_t proto)
 {
-    vec_foreach(cap, &self->capabilities)
+    vec_foreach(cap, &self->consumes)
     {
         if (cap->proto == proto)
         {
@@ -193,40 +172,14 @@ IpcCap ipc_component_require(IpcComponent *self, uint32_t proto)
     panic$("No capability found for proto: {}", proto);
 }
 
-IpcCap ipc_component_provide(IpcComponent *self, uint32_t proto, IpcHandler *fn, void *vtable, void *ctx)
+void ipc_component_attach(IpcComponent *self, IpcObject *obj)
 {
-    static uint64_t port_id = 0;
-    IpcProvider *provider = alloc_make(self->alloc, IpcProvider);
-
-    provider->proto = proto;
-    provider->port = port_id++;
-    provider->handler = fn;
-    provider->vtable = vtable;
-    provider->ctx = ctx;
-
-    vec_push(&self->providers, provider);
-
-    return (IpcCap){
-        .addr = (BrAddr){
-            bal_self_id(),
-            provider->port,
-        },
-        .proto = proto,
-    };
+    vec_push(&self->objects, obj);
 }
 
-void ipc_component_revoke(IpcComponent *self, IpcCap cap)
+void ipc_component_detach(IpcComponent *self, IpcObject *obj)
 {
-    for (int i = 0; i < vec_len(&self->providers); i++)
-    {
-        IpcProvider *provider = vec_at(&self->providers, i);
-
-        if (provider->port == cap.addr.port)
-        {
-            vec_splice(&self->providers, i, 1);
-            return;
-        }
-    }
+    vec_remove(&self->objects, obj);
 }
 
 void ipc_component_bind(IpcComponent *self, BrEvent event, IpcEventHandler *fn, void *ctx)
@@ -258,24 +211,6 @@ void ipc_component_unbind(IpcComponent *self, BrEvent event, void *ctx)
 
             vec_splice(&self->bindings, i, 1);
             return;
-        }
-    }
-}
-
-void ipc_component_unbind_all(IpcComponent *self, void *ctx)
-{
-    for (int i = 0; i < vec_len(&self->bindings); i++)
-    {
-        IpcBinding *binding = vec_at(&self->bindings, i);
-
-        if (binding->ctx == ctx)
-        {
-            br_unbind(&(BrUnbindArgs){
-                .event = binding->event,
-            });
-
-            vec_splice(&self->bindings, i, 1);
-            i--;
         }
     }
 }
@@ -346,4 +281,74 @@ void ipc_component_exit(IpcComponent *self, int value)
 {
     self->result = value;
     self->running = false;
+}
+
+/* --- Object --------------------------------------------------------------- */
+
+void ipc_object_init(IpcObject *self, IpcComponent *component, Alloc *alloc)
+{
+    static uint64_t port_id = 0;
+    self->port = port_id++;
+
+    self->component = component;
+    vec_init(&self->providers, alloc);
+
+    ipc_component_attach(component, self);
+}
+
+void ipc_object_deinit(IpcObject *self)
+{
+    ipc_component_detach(self->component, self);
+
+    vec_deinit(&self->providers);
+}
+
+IpcCap ipc_object_provide(IpcObject *self, uint32_t proto, IpcHandler *fn, void *vtable)
+{
+    IpcProvider provider = {};
+
+    provider.proto = proto;
+    provider.handler = fn;
+    provider.vtable = vtable;
+
+    vec_push(&self->providers, provider);
+    return ipc_object_cap(self, proto);
+}
+
+bool ipc_object_dispatch(IpcObject *self, IpcComponent *component, BrMsg msg)
+{
+    if (self->port != msg.to.port)
+    {
+        return false;
+    }
+
+    vec_foreach_v(provider, &self->providers)
+    {
+        if (provider.proto == msg.prot)
+        {
+            fiber_start_and_forget(
+                (FiberFn *)handle_request,
+                &(BrRequestCtx){
+                    .component = component,
+                    .object = self,
+                    .provider = provider,
+                    .msg = msg,
+                });
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
+IpcCap ipc_object_cap(IpcObject *self, IpcProto proto)
+{
+    return (IpcCap){
+        .proto = proto,
+        .addr = (BrAddr){
+            .id = bal_self_id(),
+            .port = self->port,
+        },
+    };
 }

@@ -6,6 +6,8 @@
 
 typedef struct _WmServer
 {
+    IpcObject base;
+
     IpcCap window_server;
     IpcCap input_sink;
     Fiber *render_fiber;

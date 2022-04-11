@@ -27,7 +27,7 @@ WindowError window_server_create_handler(void *self, WindowClientProps const *re
 
     WmClient *client = wm_client_create(server, req->bound, req->type);
     vec_push(&server->clients, client);
-    *resp = client->wm_client;
+    *resp = ipc_object_cap(base$(client), IPC_WINDOW_CLIENT_PROTO);
 
     return IPC_SUCCESS;
 }
@@ -59,23 +59,23 @@ static void *wm_render_fiber(void *ctx)
 
 void wm_server_init(WmServer *self, WmDisplay *display)
 {
+    ipc_object_init(base$(self), ipc_self(), alloc_global());
+
     self->display = display;
     self->mouse = m_vec2f(0, 0);
     gfx_dirty_init(&self->display_dirty, alloc_global());
     vec_init(&self->clients, alloc_global());
 
-    self->window_server = window_server_provide(ipc_component_self(), &_window_server_vtable, self);
-    self->input_sink = event_sink_provide(ipc_component_self(), &_input_sink_vtable, self);
+    self->window_server = window_server_provide(base$(self), &_window_server_vtable);
+    self->input_sink = event_sink_provide(base$(self), &_input_sink_vtable);
     self->render_fiber = fiber_start(wm_render_fiber, self);
 }
 
 void wm_server_deinit(WmServer *self)
 {
-    ipc_component_revoke(ipc_component_self(), self->window_server);
-    ipc_component_revoke(ipc_component_self(), self->input_sink);
-
     vec_deinit(&self->clients);
     gfx_dirty_deinit(&self->display_dirty);
+    ipc_object_deinit(base$(self));
 }
 
 void wm_server_dispatch(WmServer *self, UiEvent event)
@@ -190,8 +190,8 @@ void wm_server_render(WmServer *self)
 
 void wm_server_expose(WmServer *self, IpcCap bus_server)
 {
-    system_server_expose_rpc(ipc_component_self(), bus_server, &self->input_sink, alloc_global());
-    system_server_expose_rpc(ipc_component_self(), bus_server, &self->window_server, alloc_global());
+    system_server_expose_rpc(ipc_self(), bus_server, &self->input_sink, alloc_global());
+    system_server_expose_rpc(ipc_self(), bus_server, &self->window_server, alloc_global());
 }
 
 WmClient *wm_server_client_at(WmServer *self, MVec2f vec)

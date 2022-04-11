@@ -18,7 +18,7 @@ typedef struct
 } IdlBinding;
 
 int ipc_hook_call(
-    IpcComponent *self,
+    IpcComponent *component,
     IpcCap to,
     IdlBinding binding,
     void const *req,
@@ -26,10 +26,9 @@ int ipc_hook_call(
     Alloc *alloc);
 
 void ipc_hook_handle(
-    IpcComponent *self,
-
+    IpcComponent *component,
+    IpcObject *object,
     IdlHandlerFn handler,
-    void *ctx,
 
     BrMsg *msg,
     IdlBinding binding,

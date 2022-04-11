@@ -1,10 +1,12 @@
 #pragma once
 
 #include <bal/hw.h>
+#include <ipc/ipc.h>
 
 struct _EmbedWin
 {
-    IpcCap wm_client;
-    IpcCap input_sink;
+    IpcObject base;
+    IpcCap handle; // to the object on the server side
+
     BalFb surface;
 };

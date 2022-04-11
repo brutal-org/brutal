@@ -172,5 +172,5 @@ void ps2_mouse_init(Ps2Mouse *self, Ps2Controller *controller, Ps2MouseCallback 
         .irq = 12,
     };
 
-    ipc_component_bind(ipc_component_self(), self->interrupt_handle, (IpcEventHandler *)ps2_mouse_interrupt_handle, self);
+    ipc_component_bind(ipc_self(), self->interrupt_handle, (IpcEventHandler *)ps2_mouse_interrupt_handle, self);
 }

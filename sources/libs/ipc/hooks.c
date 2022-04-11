@@ -5,7 +5,7 @@
 #include <ipc/ipc.h>
 
 int ipc_hook_call(
-    IpcComponent *self,
+    IpcComponent *component,
     IpcCap to,
     IdlBinding binding,
     void const *req,
@@ -37,7 +37,7 @@ int ipc_hook_call(
         }
     }
 
-    ipc_component_request(self, to, &req_msg, resp != nullptr ? &resp_msg : nullptr);
+    ipc_component_request(component, to, &req_msg, resp != nullptr ? &resp_msg : nullptr);
 
     // Error handeling
 
@@ -75,10 +75,9 @@ int ipc_hook_call(
 }
 
 void ipc_hook_handle(
-    IpcComponent *self,
-
+    IpcComponent *component,
+    IpcObject *object,
     IdlHandlerFn handler,
-    void *ctx,
 
     BrMsg *msg,
     IdlBinding binding,
@@ -108,7 +107,7 @@ void ipc_hook_handle(
         bal_mem_deinit(&msg_mem);
     }
 
-    int result = handler(ctx, req, resp, base$(&heap));
+    int result = handler(object, req, resp, base$(&heap));
 
     if (result != IPC_SUCCESS)
     {
@@ -116,7 +115,7 @@ void ipc_hook_handle(
         resp_msg.prot = binding.proto;
         resp_msg.type = BR_MSG_ERROR;
         resp_msg.args[0] = result;
-        ipc_component_respond(self, msg, &resp_msg);
+        ipc_component_respond(component, msg, &resp_msg);
     }
     else if (resp != nullptr)
     {
@@ -138,7 +137,7 @@ void ipc_hook_handle(
             resp_msg.flags |= BR_MSG_HND(i + 1);
         }
 
-        ipc_component_respond(self, msg, &resp_msg);
+        ipc_component_respond(component, msg, &resp_msg);
 
         ipc_pack_deinit(&pack);
     }

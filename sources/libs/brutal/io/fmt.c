@@ -74,8 +74,8 @@ static FmtType fmt_parse_type(char c)
     case 'p':
         return FMT_POINTER;
 
-    case 'x':
     case 'X':
+    case 'x':
         return FMT_HEXADECIMAL;
 
     default:
@@ -124,9 +124,8 @@ Fmt fmt_parse(Scan *scan)
     {
         scan_skip_space(scan);
 
-        if (scan_curr(scan) == '#')
+        if (scan_skip(scan, '#'))
         {
-            scan_next(scan);
             fmt.prefix = true;
         }
         else if (scan_skip(scan, '+'))

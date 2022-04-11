@@ -15,7 +15,7 @@ int ipc_component_main(IpcComponent *self)
     };
 
     PciAddr ahci_device;
-    if (pci_bus_query_rpc(self, pci_bus, &id, &ahci_device, alloc_global()) == PCI_NOT_FOUND)
+    if (pci_bus_query_rpc(self, pci_bus, &id, &ahci_device, alloc_global()) != IPC_SUCCESS)
     {
         log$("No AHCI controller found!");
         return 0;

@@ -1,11 +1,7 @@
 #include <brutal/alloc.h>
-#include <brutal/debug.h>
 #include <protos/boot.h>
-#include <protos/event.h>
 #include <protos/hw.h>
-#include <protos/pci.h>
 #include <protos/system.h>
-#include <protos/window.h>
 #include "system/bus.h"
 
 /* --- System Server Protocol ----------------------------------------------- */
@@ -37,10 +33,16 @@ static SystemServerVTable _system_server_vtable = {
 
 /* --- Boot Info Protocol --------------------------------------------------- */
 
+typedef struct
+{
+    IpcObject base;
+    Handover *handover;
+} BootInfo;
+
 static BootError boot_info_rsdp_handler(void *self, void *, uintptr_t *resp, Alloc *)
 {
-    Handover *handover = self;
-    *resp = handover->rsdp;
+    BootInfo *infos = self;
+    *resp = infos->handover->rsdp;
     return IPC_SUCCESS;
 }
 
@@ -50,10 +52,16 @@ static BootInfoVTable _bus_info_vtable = {
 
 /* --- Hw Display Protocol -------------------------------------------------- */
 
+typedef struct
+{
+    IpcObject base;
+    Handover *handover;
+} BootDisplay;
+
 HwError hw_display_surface_handler(void *self, void *, BalFb *resp, Alloc *)
 {
-    Handover *handover = self;
-    HandoverFramebuffer const *framebuffer = &handover->framebuffer;
+    BootInfo *display = self;
+    HandoverFramebuffer const *framebuffer = &display->handover->framebuffer;
 
     size_t fb_size = align_up$(framebuffer->height * framebuffer->pitch, MEM_PAGE_SIZE);
 
@@ -77,23 +85,8 @@ static HwDisplayVTable _hw_display_vtable = {
 
 /* --- Entry Point ---------------------------------------------------------- */
 
-int br_main(Handover *handover)
+void bootstrap_components(Bus *bus, Handover *handover)
 {
-    Bus bus = {};
-    bus_init(&bus, handover, alloc_global());
-
-    IpcComponent self = {};
-    ipc_component_init(&self, alloc_global());
-
-    IpcCap system_server_cap = system_server_provide(&self, &_system_server_vtable, &bus);
-    bus_expose(&bus, system_server_cap);
-
-    IpcCap boot_info_cap = boot_info_provide(&self, &_bus_info_vtable, handover);
-    bus_expose(&bus, boot_info_cap);
-
-    IpcCap hw_display_cap = hw_display_provide(&self, &_hw_display_vtable, handover);
-    bus_expose(&bus, hw_display_cap);
-
     for (size_t i = 0; i < handover->modules.size; i++)
     {
         HandoverModule *mod = &handover->modules.module[i];
@@ -108,8 +101,36 @@ int br_main(Handover *handover)
         log$("Mounting component '{}'...", name);
         Unit unit = {};
         unit_init_from_module(&unit, *mod, alloc_global());
-        bus_activate(&bus, &unit);
+        bus_activate(bus, &unit);
     }
+}
+
+int br_main(Handover *handover)
+{
+    IpcComponent self = {};
+    ipc_component_init(&self, alloc_global());
+
+    Bus bus = {};
+    bus_init(&bus, alloc_global());
+
+    IpcCap system_server_cap = system_server_provide(base$(&bus), &_system_server_vtable);
+    bus_expose(&bus, system_server_cap);
+
+    BootInfo boot_info = {};
+    boot_info.handover = handover;
+    ipc_object_init(base$(&boot_info), ipc_self(), alloc_global());
+
+    IpcCap boot_info_cap = boot_info_provide(base$(&boot_info), &_bus_info_vtable);
+    bus_expose(&bus, boot_info_cap);
+
+    BootDisplay boot_display = {};
+    boot_display.handover = handover;
+    ipc_object_init(base$(&boot_display), ipc_self(), alloc_global());
+
+    IpcCap hw_display_cap = hw_display_provide(base$(&boot_display), &_hw_display_vtable);
+    bus_expose(&bus, hw_display_cap);
+
+    bootstrap_components(&bus, handover);
 
     return ipc_component_run(&self);
 }

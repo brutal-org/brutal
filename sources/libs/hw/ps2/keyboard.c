@@ -67,5 +67,5 @@ void ps2_keyboard_init(Ps2Keyboard *self, Ps2Controller *controller, Ps2Keyboard
         .irq = 1,
     };
 
-    ipc_component_bind(ipc_component_self(), self->interrupt_handle, (IpcEventHandler *)ps2_keyboard_interrupt_handle, self);
+    ipc_component_bind(ipc_self(), self->interrupt_handle, (IpcEventHandler *)ps2_keyboard_interrupt_handle, self);
 }

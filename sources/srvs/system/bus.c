@@ -2,11 +2,12 @@
 #include <brutal/debug.h>
 #include "system/bus.h"
 
-void bus_init(Bus *bus, Handover *handover, Alloc *alloc)
+void bus_init(Bus *bus, Alloc *alloc)
 {
     *bus = (Bus){};
 
-    bus->handover = handover;
+    ipc_object_init(base$(bus), ipc_self(), alloc);
+
     vec_init(&bus->caps, alloc);
     vec_init(&bus->units, alloc);
 }
@@ -15,6 +16,8 @@ void bus_deinit(Bus *bus)
 {
     vec_deinit(&bus->caps);
     vec_deinit(&bus->units);
+
+    ipc_object_deinit(base$(bus));
 }
 
 void bus_expose(Bus *self, IpcCap cap)
