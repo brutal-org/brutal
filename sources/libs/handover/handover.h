@@ -58,7 +58,7 @@ typedef struct
 
 typedef struct
 {
-    uint32_t magic, agent, len, count;
+    uint32_t magic, agent, size, count;
     HandoverRecord records[];
 } Handover;
 

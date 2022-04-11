@@ -1,3 +1,4 @@
+#include <brutal/debug.h>
 #include <handover/builder.h>
 
 void handover_builder_init(Ho2Builder *self, Alloc *alloc)
@@ -19,11 +20,25 @@ size_t handover_builder_size(Ho2Builder *self)
            buf_used(&self->strings);
 }
 
-/* TODO:
-size_t handover_builder_finalize(Ho2Builder *self, uint8_t *buf)
+void handover_builder_finalize(Ho2Builder *self, uint8_t *buf)
 {
+    Handover *handover = (Handover *)buf;
+
+    handover->magic = HANDOVER_MAGIC;
+    handover->agent = self->agent;
+    handover->size = handover_builder_size(self);
+    handover->count = vec_len(&self->entries);
+
+    buf += sizeof(Handover);
+
+    for (int i = 0; i < vec_len(&self->entries); i++)
+    {
+        *((HandoverRecord *)buf) = self->entries.data[i];
+        buf += sizeof(HandoverRecord);
+    }
+
+    mem_cpy(buf, self->strings.data, buf_used(&self->strings));
 }
-*/
 
 void handover_builder_record(Ho2Builder *self, HandoverRecord record)
 {
@@ -46,4 +61,10 @@ size_t handover_builder_string(Ho2Builder *self, Str str)
     buf_write(&self->strings, str.buf, str.len);
     buf_push(&self->strings, '\0');
     return offset;
+}
+
+void handover_builder_agent(Ho2Builder *self, Str agent)
+{
+    assert_equal(self->agent, 0);
+    self->agent = handover_builder_string(self, agent);
 }
