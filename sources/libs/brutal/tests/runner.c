@@ -218,6 +218,7 @@ void *test_use(TestCtx *self, uint64_t id, void *args, TestHookCtor *ctor, TestH
     {
         if (r->id == id)
         {
+            assert_not_null(r->data);
             return r->data;
         }
     }
@@ -225,10 +226,12 @@ void *test_use(TestCtx *self, uint64_t id, void *args, TestHookCtor *ctor, TestH
     TestHook hook = {
         .id = id,
         .dtor = dtor,
-        .data = ctor(args),
     };
 
     vec_push(&self->hooks, hook);
+    int index = vec_len(&self->hooks) - 1;
+    void *data = ctor(args);
+    vec_at(&self->hooks, index).data = data;
 
-    return hook.data;
+    return data;
 }

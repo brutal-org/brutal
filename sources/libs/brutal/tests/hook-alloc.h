@@ -8,14 +8,14 @@
 
 #define TEST_ALLOC_HOOK (0x6db7d2746425cc3f)
 
-MAYBE_UNUSED static void *__test_use_alloc_ctor(void *)
+static void *__test_use_alloc_ctor(void *)
 {
     HeapAlloc *alloc = alloc_make(alloc_global(), HeapAlloc);
     heap_alloc_init(alloc, NODE_DEFAULT);
     return alloc;
 }
 
-MAYBE_UNUSED static void __test_use_alloc_dtor(void *alloc)
+static void __test_use_alloc_dtor(void *alloc)
 {
     heap_alloc_deinit(alloc);
     alloc_free(alloc_global(), alloc);

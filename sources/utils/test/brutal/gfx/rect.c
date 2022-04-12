@@ -1,21 +1,22 @@
+#include <brutal/gfx.h>
+#include <brutal/tests.h>
 #include <brutal/ui.h>
-#include "../bench.h"
 
-BENCH(rect_fill)
+test$(gfx_fill_rect)
 {
-    gfx_fill_style(gfx, gfx_paint_fill(UI_COLOR_BASE02));
+    gfx_fill_style(test_use_gfx(), gfx_paint_fill(UI_COLOR_BASE02));
 
-    gfx_fill_rect(gfx, m_rectf(10, 10, 512, 50), 0);
+    gfx_fill_rect(test_use_gfx(), m_rectf(10, 10, 512, 50), 0);
 }
 
-BENCH(rounded_rect_fill)
+test$(gfx_fill_rect_rounded)
 {
-    gfx_fill_style(gfx, gfx_paint_fill(UI_COLOR_BASE02));
+    gfx_fill_style(test_use_gfx(), gfx_paint_fill(UI_COLOR_BASE02));
 
-    gfx_fill_rect(gfx, m_rectf(10, 10, 512, 50), 32);
+    gfx_fill_rect(test_use_gfx(), m_rectf(10, 10, 512, 50), 32);
 }
 
-BENCH(rounded_rect_fill_gradient)
+test$(gfx_fill_rect_gradient)
 {
     GfxGradient grad = {
         .len = 5,
@@ -44,6 +45,6 @@ BENCH(rounded_rect_fill_gradient)
 
     };
 
-    gfx_fill_style(gfx, gfx_paint_gradient(&grad));
-    gfx_fill_rect(gfx, m_rectf(10, 10, 512, 512), 32);
+    gfx_fill_style(test_use_gfx(), gfx_paint_gradient(&grad));
+    gfx_fill_rect(test_use_gfx(), m_rectf(10, 10, 512, 512), 32);
 }
