@@ -14,6 +14,8 @@ KERNEL_SRC += \
 	$(wildcard sources/kernel/*.c) \
 	$(wildcard sources/kernel/$(ARCH)/*.c) \
 	$(wildcard sources/kernel/$(ARCH)/*.s) \
+	$(wildcard sources/kernel/$(ARCH)/*/*.c) \
+	$(wildcard sources/kernel/$(ARCH)/*/*.s) \
 	$(wildcard sources/libs/embed/$(ARCH)/*.c) \
 	$(wildcard sources/libs/embed/$(ARCH)/*.s) \
 	$(wildcard sources/libs/embed/kernel/*.c) \

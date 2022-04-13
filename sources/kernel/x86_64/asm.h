@@ -235,11 +235,16 @@ enum msr_registers
     MSR_FS_BASE = 0xC0000100,
     MSR_GS_BASE = 0xC0000101,
     MSR_KERN_GS_BASE = 0xc0000102,
+    MSR_VM_CR = 0xc0010114,
+
+    MSR_SVM_HOST_SAVE_ADDR = 0xc0010117,
+    MSR_SVM_LOCK_KEY = 0xc0010118,
 };
 
 enum msr_efer_reg
 {
     EFER_ENABLE_SYSCALL = 1,
+    EFER_ENABLE_SVME = 1 << 12,
 };
 
 enum msr_star_reg
@@ -251,6 +256,13 @@ enum msr_star_reg
 enum msr_syscall_flag_reg
 {
     SYSCALL_FLAG_TURN_OFF_INTERRUPT = (1 << 9)
+};
+
+enum msr_vm_cr_reg
+{
+    VM_CR_SVM_LOCK = (1 << 3),
+    VM_CR_SVME_DISABLE = (1 << 4),
+
 };
 
 static inline uint64_t asm_read_msr(enum msr_registers msr)

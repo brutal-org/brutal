@@ -14,6 +14,7 @@ USER_ASFLAGS=-f elf64
 
 QEMU_ARGS= \
 		-M q35 \
+		-cpu max \
 		-smp 4 \
 		-m 256M \
 		-rtc base=localtime

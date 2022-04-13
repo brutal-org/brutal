@@ -57,18 +57,22 @@ GdtTssEntry gdt_entry_tss(uintptr_t tss_addr)
     };
 }
 
+void gdt_structure_init(Gdt* gdt)
+{
+    gdt->entries[0] = gdt_entry_null();
+
+    gdt->entries[GDT_KERNEL_CODE] = gdt_entry_simple(GDT_PRESENT | GDT_SEGMENT | GDT_READWRITE | GDT_EXECUTABLE, GDT_LONG_MODE_GRANULARITY);
+    gdt->entries[GDT_KERNEL_DATA] = gdt_entry_simple(GDT_PRESENT | GDT_SEGMENT | GDT_READWRITE, 0);
+
+    gdt->entries[GDT_USER_DATA] = gdt_entry_simple(GDT_PRESENT | GDT_SEGMENT | GDT_READWRITE | GDT_USER, 0);
+    gdt->entries[GDT_USER_CODE] = gdt_entry_simple(GDT_PRESENT | GDT_SEGMENT | GDT_READWRITE | GDT_EXECUTABLE | GDT_USER, GDT_LONG_MODE_GRANULARITY);
+
+    gdt->tss = gdt_entry_tss((uintptr_t)&_tss);
+}
+
 void gdt_initialize(void)
 {
-    _gdt.entries[0] = gdt_entry_null();
-
-    _gdt.entries[GDT_KERNEL_CODE] = gdt_entry_simple(GDT_PRESENT | GDT_SEGMENT | GDT_READWRITE | GDT_EXECUTABLE, GDT_LONG_MODE_GRANULARITY);
-    _gdt.entries[GDT_KERNEL_DATA] = gdt_entry_simple(GDT_PRESENT | GDT_SEGMENT | GDT_READWRITE, 0);
-
-    _gdt.entries[GDT_USER_DATA] = gdt_entry_simple(GDT_PRESENT | GDT_SEGMENT | GDT_READWRITE | GDT_USER, 0);
-    _gdt.entries[GDT_USER_CODE] = gdt_entry_simple(GDT_PRESENT | GDT_SEGMENT | GDT_READWRITE | GDT_EXECUTABLE | GDT_USER, GDT_LONG_MODE_GRANULARITY);
-
-    _gdt.tss = gdt_entry_tss((uintptr_t)&_tss);
-
+    gdt_structure_init(&_gdt);
     gdt_update((uintptr_t)&_gdt_desc);
 }
 

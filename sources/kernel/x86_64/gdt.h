@@ -80,6 +80,8 @@ GdtTssEntry gdt_entry_tss(uintptr_t tss);
 
 void gdt_update(uint64_t descriptor);
 
+void gdt_structure_init(Gdt* gdt);
+
 void gdt_initialize(void);
 
 void gdt_load_tss(Tss *tss);
