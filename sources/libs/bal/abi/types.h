@@ -91,13 +91,13 @@ typedef enum
 
 // Memory Objects
 
-#define BR_MEM_READABLE ((BrMemoryFlags)(1 << 0))
-#define BR_MEM_WRITABLE ((BrMemoryFlags)(1 << 1))
-#define BR_MEM_EXECUTABLE ((BrMemoryFlags)(1 << 2))
-#define BR_MEM_USER ((BrMemoryFlags)(1 << 3))
-#define BR_MEM_LOWER ((BrMemoryFlags)(1 << 4))
-#define BR_MEM_DMA ((BrMemoryFlags)(1 << 5))
-#define BR_MEM_GLOBAL ((BrMemoryFlags)(1 << 6))
+#define BR_MEM_READABLE (1 << 0)
+#define BR_MEM_WRITABLE (1 << 1)
+#define BR_MEM_EXECUTABLE (1 << 2)
+#define BR_MEM_USER (1 << 3)
+#define BR_MEM_LOWER (1 << 4)
+#define BR_MEM_DMA (1 << 5)
+#define BR_MEM_GLOBAL (1 << 6)
 
 typedef uint64_t BrMemoryFlags;
 

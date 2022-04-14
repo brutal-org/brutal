@@ -31,7 +31,7 @@ void space_switch(Space *self);
 
 typedef Result(BrResult, VmmRange) SpaceResult;
 
-SpaceResult space_map(Space *self, Memory *memory, size_t offset, size_t size, uintptr_t vaddr);
+SpaceResult space_map(Space *self, Memory *memory, size_t offset, size_t size, uintptr_t vaddr, BrMemoryFlags flags);
 
 SpaceResult space_unmap(Space *self, VmmRange range);
 

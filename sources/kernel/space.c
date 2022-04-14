@@ -4,7 +4,7 @@
 
 /* --- Memory Mappings ------------------------------------------------------ */
 
-static void space_mmap_create(Space *space, Memory *object, size_t offset, VmmRange vmm)
+static void space_mmap_create(Space *space, Memory *object, size_t offset, VmmRange vmm, BrMemoryFlags flags)
 {
     memory_ref(object);
 
@@ -18,7 +18,7 @@ static void space_mmap_create(Space *space, Memory *object, size_t offset, VmmRa
 
     PmmRange pmm = {memory_base(object) + offset, vmm.size};
 
-    vmm_map(space->vmm, vmm, pmm, BR_MEM_USER | BR_MEM_WRITABLE);
+    vmm_map(space->vmm, vmm, pmm, BR_MEM_USER | flags);
     vmm_flush(space->vmm, vmm);
 }
 
@@ -79,7 +79,7 @@ void space_switch(Space *self)
     vmm_space_switch(self->vmm);
 }
 
-SpaceResult space_map(Space *self, Memory *memory, size_t offset, size_t size, uintptr_t vaddr)
+SpaceResult space_map(Space *self, Memory *memory, size_t offset, size_t size, uintptr_t vaddr, BrMemoryFlags flags)
 {
     if (size == 0)
     {
@@ -110,7 +110,7 @@ SpaceResult space_map(Space *self, Memory *memory, size_t offset, size_t size, u
         range_alloc_used(&self->alloc, range$(USizeRange, range));
     }
 
-    space_mmap_create(self, memory, offset, range);
+    space_mmap_create(self, memory, offset, range, flags);
 
     return OK(SpaceResult, range);
 }

@@ -62,7 +62,7 @@ BrResult sys_map(BrMapArgs *args)
         return BR_BAD_HANDLE;
     }
 
-    SpaceResult map_result = space_map(space, memory, args->offset, args->size, args->vaddr);
+    SpaceResult map_result = space_map(space, memory, args->offset, args->size, args->vaddr, args->flags);
 
     if (!map_result.succ)
     {
