@@ -31,7 +31,7 @@ static void elf_load_program(Task *task, Elf64Header const *elf_header, Memory *
         if (!(prog_header->flags & ELF_PROGRAM_HEADER_WRITABLE) &&
             prog_header->file_size == prog_header->memory_size)
         {
-            UNWRAP(space_map(task->space, elf_obj, prog_header->file_offset, size, prog_header->virtual_address));
+            UNWRAP(space_map(task->space, elf_obj, prog_header->file_offset, size, prog_header->virtual_address, BR_MEM_USER));
         }
         else
         {
@@ -42,7 +42,7 @@ static void elf_load_program(Task *task, Elf64Header const *elf_header, Memory *
             mem_cpy(ptr, (uint8_t *)elf_header + prog_header->file_offset, prog_header->file_size);
 
             Memory *prog_obj = memory_heap(heap);
-            UNWRAP(space_map(task->space, prog_obj, 0, 0, prog_header->virtual_address));
+            UNWRAP(space_map(task->space, prog_obj, 0, 0, prog_header->virtual_address, BR_MEM_USER | BR_MEM_WRITABLE));
             memory_deref(prog_obj);
         }
 
@@ -54,7 +54,7 @@ void init_stack(Task *task)
 {
     HeapRange heap = UNWRAP(heap_alloc(KERNEL_STACK_SIZE));
     Memory *obj = memory_heap(heap);
-    space_map(task->space, obj, 0, 0, USER_STACK_BASE - KERNEL_STACK_SIZE);
+    space_map(task->space, obj, 0, 0, USER_STACK_BASE - KERNEL_STACK_SIZE, BR_MEM_USER | BR_MEM_WRITABLE);
     memory_deref(obj);
 }
 
@@ -63,7 +63,7 @@ static uintptr_t init_pass(Task *task, Handover const *handover)
     HeapRange heap = UNWRAP(heap_alloc(align_up$(sizeof(Handover), MEM_PAGE_SIZE)));
     mem_cpy((void *)heap.base, handover, sizeof(Handover));
     Memory *obj = memory_heap(heap);
-    uintptr_t addr = UNWRAP(space_map(task->space, obj, 0, 0, 0)).base;
+    uintptr_t addr = UNWRAP(space_map(task->space, obj, 0, 0, 0, BR_MEM_USER | BR_MEM_WRITABLE)).base;
     memory_deref(obj);
 
     return addr;
