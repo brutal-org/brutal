@@ -89,7 +89,7 @@ static void vmm_load_memory_map(VmmSpace target, HandoverMmap const *memory_map)
             log$("Mapping ({x} - {x}) to kernel", entry.base, entry.base + entry.size);
 
             VmmRange vrange = {mmap_phys_to_kernel(entry_range.base), entry_range.size};
-            vmm_map(target, vrange, entry_range, BR_MEM_WRITABLE);
+            vmm_map(target, vrange, entry_range, BR_MEM_WRITABLE | BR_MEM_GLOBAL);
         }
 
         if (entry.base >= GiB(4)) // The bottom 4Gio are already mapped
@@ -97,7 +97,7 @@ static void vmm_load_memory_map(VmmSpace target, HandoverMmap const *memory_map)
             log$("Mapping ({x} - {x}) to IO", entry.base, entry.base + entry.size);
 
             VmmRange vrange = {mmap_phys_to_io(entry_range.base), entry_range.size};
-            vmm_map(target, vrange, entry_range, BR_MEM_WRITABLE);
+            vmm_map(target, vrange, entry_range, BR_MEM_WRITABLE | BR_MEM_GLOBAL);
         }
     }
 }
@@ -110,6 +110,9 @@ void vmm_initialize(Handover const *handover)
     mem_set(_kpml, 0, MEM_PAGE_SIZE);
 
     vmm_load_memory_map(_kpml, &handover->mmap);
+
+    asm_write_cr4(asm_read_cr4() | CR4_PAGE_GLOBAL_ENABLE);
+
     vmm_space_switch(_kpml);
 
     log$("Loaded kernel memory map!");
@@ -180,7 +183,7 @@ VmmSpace vmm_kernel_space(void)
 
 static VmmResult vmm_map_page(Pml *pml4, uintptr_t virtual_page, uintptr_t physical_page, BrMemoryFlags flags)
 {
-    VmmRange pml3_range = TRY(VmmResult, vmm_get_pml_or_alloc(pml4, PML4_GET_INDEX(virtual_page), flags | BR_MEM_WRITABLE | BR_MEM_USER));
+    VmmRange pml3_range = TRY(VmmResult, vmm_get_pml_or_alloc(pml4, PML4_GET_INDEX(virtual_page), (flags | BR_MEM_WRITABLE | BR_MEM_USER) & ~(BR_MEM_GLOBAL))); // global is not available for pml3/4
     Pml *pml3 = (Pml *)(pml3_range.base);
 
     VmmRange pml2_range = TRY(VmmResult, vmm_get_pml_or_alloc(pml3, PML3_GET_INDEX(virtual_page), flags | BR_MEM_WRITABLE | BR_MEM_USER));

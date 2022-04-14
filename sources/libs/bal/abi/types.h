@@ -97,6 +97,7 @@ typedef enum
 #define BR_MEM_USER ((BrMemoryFlags)(1 << 3))
 #define BR_MEM_LOWER ((BrMemoryFlags)(1 << 4))
 #define BR_MEM_DMA ((BrMemoryFlags)(1 << 5))
+#define BR_MEM_GLOBAL ((BrMemoryFlags)(1 << 6))
 
 typedef uint64_t BrMemoryFlags;
 

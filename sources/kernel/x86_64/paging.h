@@ -41,7 +41,7 @@ static inline PmlEntry pml_make_entry(uintptr_t physical, size_t flags)
         .accessed = false,
         .dirty = false,
         .huge_page = false,
-        .global_page = false,
+        .global_page = (flags & BR_MEM_GLOBAL) != 0,
         ._available = 0,
     };
 }
