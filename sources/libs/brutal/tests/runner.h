@@ -41,6 +41,7 @@ typedef void TestHookDtor(void *self);
 
 typedef struct
 {
+    int ref;
     uint64_t id;
     void *data;
     TestHookDtor *dtor;
@@ -88,7 +89,11 @@ void test_fail(TestCtx *self, Loc loc, Str msg, AnyVa args);
 
 void test_expect(TestCtx *self, Loc loc, Any lhs, Any rhs, char const *op);
 
-void *test_use(TestCtx *self, uint64_t id, void *args, TestHookCtor *ctor, TestHookDtor *dtor);
+void *test_hook_use(TestCtx *self, uint64_t id, void *args, TestHookCtor *ctor, TestHookDtor *dtor);
+
+void test_hook_ref(TestCtx *self, uint64_t id);
+
+void test_hook_deref(TestCtx *self, uint64_t id);
 
 #define test_case$(NAME)                                                            \
     static TestCase var$(__test_case) = {.name = str_const$(#NAME), .loc = loc$()}; \

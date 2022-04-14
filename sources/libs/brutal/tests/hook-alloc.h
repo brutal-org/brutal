@@ -23,7 +23,7 @@ static void __test_use_alloc_dtor(void *alloc)
 
 MAYBE_UNUSED static inline Alloc *test_use_alloc(void)
 {
-    return test_use(
+    return test_hook_use(
         test_self(),
         TEST_ALLOC_HOOK,
         nullptr,

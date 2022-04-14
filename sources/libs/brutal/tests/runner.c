@@ -125,7 +125,12 @@ void test_run_test(TestCtx *self, Test *test)
 
     vec_foreach(r, &self->hooks)
     {
-        r->dtor(r->data);
+        if (r->ref == 0)
+        {
+            r->dtor(r->data);
+            r->data = nullptr;
+            r->ref = -1;
+        }
     }
 
     vec_clear(&self->hooks);
@@ -212,7 +217,7 @@ void test_expect(TestCtx *self, Loc loc, Any lhs, Any rhs, char const *op)
     }
 }
 
-void *test_use(TestCtx *self, uint64_t id, void *args, TestHookCtor *ctor, TestHookDtor *dtor)
+void *test_hook_use(TestCtx *self, uint64_t id, void *args, TestHookCtor *ctor, TestHookDtor *dtor)
 {
     vec_foreach(r, &self->hooks)
     {
@@ -226,12 +231,44 @@ void *test_use(TestCtx *self, uint64_t id, void *args, TestHookCtor *ctor, TestH
     TestHook hook = {
         .id = id,
         .dtor = dtor,
+        .data = ctor(args),
     };
 
     vec_push(&self->hooks, hook);
-    int index = vec_len(&self->hooks) - 1;
-    void *data = ctor(args);
-    vec_at(&self->hooks, index).data = data;
 
-    return data;
+    return hook.data;
+}
+
+void test_hook_ref(TestCtx *self, uint64_t id)
+{
+    vec_foreach(r, &self->hooks)
+    {
+        if (r->id == id)
+        {
+            r->ref++;
+            return;
+        }
+    }
+
+    panic$("test_hook_ref: hook not found");
+}
+
+void test_hook_deref(TestCtx *self, uint64_t id)
+{
+    vec_foreach(r, &self->hooks)
+    {
+        if (r->id == id)
+        {
+            r->ref--;
+            if (r->ref == 0)
+            {
+                r->dtor(r->data);
+                r->data = nullptr;
+                r->ref = -1;
+            }
+            return;
+        }
+    }
+
+    panic$("test_hook_deref: hook not found");
 }
