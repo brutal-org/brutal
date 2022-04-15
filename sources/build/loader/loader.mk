@@ -1,5 +1,3 @@
-ifeq ($(TOOLCHAIN), llvm)
-
 LOADER_CC=clang$(LLVM_VERSION)
 ifeq (, $(shell which $(LOADER_CC) 2> /dev/null))
 	LOADER_CC=clang
@@ -78,5 +76,3 @@ $(BINDIR_LOADER)/%.c.o: sources/%.c
 $(BINDIR_LOADER)/libs/%.c.o: sources/libs/%.c
 	@$(MKCWD)
 	$(LOADER_CC) -c -o $@ $< $(LOADER_CFLAGS)
-
-endif
