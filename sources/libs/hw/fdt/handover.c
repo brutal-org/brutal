@@ -7,8 +7,8 @@ static void fdt_populate_mmap_usable(FdtHeader *header, Handover *self)
     FdtProp root_len_size = fdt_lookup_props(root_node, str$("#size-cells"));
 
     // TODO: for the moment we only support 32bit address size
-    int addr_size = load_be(*(be_uint32_t *)root_addr_size.value.buf);
-    int len_size = load_be(*(be_uint32_t *)root_len_size.value.buf);
+    int addr_size = be_load$(*(be_uint32_t *)root_addr_size.value.buf);
+    int len_size = be_load$(*(be_uint32_t *)root_len_size.value.buf);
 
     // getting /memory@*/reg
     FdtProp memory_reg_prop = fdt_lookup_props(fdt_lookup_node(header, str$("/memory@")), str$("reg"));

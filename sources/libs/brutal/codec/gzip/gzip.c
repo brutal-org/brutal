@@ -81,7 +81,7 @@ IoResult gzip_decompress_stream(IoWriter writer, IoReader reader)
     {
         le_uint16_t value;
         TRY(IoResult, io_read(reader, (uint8_t *)&value, 2));
-        uint16_t xlen = load_le(value);
+        uint16_t xlen = le_load$(value);
         TRY(IoResult, io_skip(reader, xlen));
     }
 
@@ -110,7 +110,7 @@ IoResult gzip_decompress_stream(IoWriter writer, IoReader reader)
     {
         le_uint16_t value;
         TRY(IoResult, io_read(reader, (uint8_t *)&value, 2));
-        uint16_t hcrc = load_le(value);
+        uint16_t hcrc = le_load$(value);
         UNUSED(hcrc);
         // TODO: Header CRC32C
     }
@@ -125,7 +125,7 @@ IoResult gzip_decompress_stream(IoWriter writer, IoReader reader)
     // Get CRC-32 checksum of original data
     le_uint32_t value;
     TRY(IoResult, io_read(reader, (uint8_t *)&value, 4));
-    uint32_t crc32 = load_le(value);
+    uint32_t crc32 = le_load$(value);
 
     uint32_t computed_crc32 = crc32_get(&crc);
     if (crc32 != computed_crc32)
@@ -135,7 +135,7 @@ IoResult gzip_decompress_stream(IoWriter writer, IoReader reader)
 
     // Get the stored size of the uncompressed data
     TRY(IoResult, io_read(reader, (uint8_t *)&value, 4));
-    uint32_t data_length = load_le(value);
+    uint32_t data_length = le_load$(value);
 
     if (data_length != decompressed)
     {
@@ -190,12 +190,12 @@ IoResult gzip_compress_stream(IoWriter writer, IoReader reader)
 
     // Write CRC-32 checksum of original data
     le_uint32_t value;
-    store_le(crc32_get(&crc), &value);
+    le_store$(crc32_get(&crc), &value);
     TRY(IoResult, io_write(writer, (uint8_t *)&value, 4));
 
     // Write size of original data
     size_t count = crc32_count(&crc);
-    store_le(count, &value);
+    le_store$(count, &value);
     TRY(IoResult, io_write(writer, (uint8_t *)&value, 4));
 
     return OK(IoResult, compressed);

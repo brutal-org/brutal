@@ -4,9 +4,9 @@
 #include <brutal/base/macros.h>
 #include <brutal/base/std.h>
 
-// x+0 is for removing the const qualifier
+// x + 0 is for removing the const qualifier
 
-#define bswap(VALUE) (                       \
+#define bswap$(VALUE) (                      \
     {                                        \
         typeof(VALUE + 0) _v = (VALUE);      \
         typeof(VALUE + 0) _result = 0;       \
@@ -22,15 +22,15 @@
     })
 
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#    define swap_little_endian(VALUE) (VALUE)
+#    define swap_little_endian$(VALUE) (VALUE)
 #else
-#    define swap_little_endian(VALUE) bswap(VALUE)
+#    define swap_little_endian$(VALUE) bswap$(VALUE)
 #endif
 
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#    define swap_big_endian(VALUE) bswap(VALUE)
+#    define swap_big_endian$(VALUE) bswap$(VALUE)
 #else
-#    define swap_big_endian(VALUE) (VALUE)
+#    define swap_big_endian$(VALUE) (VALUE)
 #endif
 
 #define BigEndian(T) \
@@ -80,12 +80,12 @@ static_assert(sizeof(le_int16_t) == sizeof(int16_t), "le and native are expected
 static_assert(sizeof(le_int32_t) == sizeof(int32_t), "le and native are expected to be of the same size");
 static_assert(sizeof(le_int64_t) == sizeof(int64_t), "le and native are expected to be of the same size");
 
-#define store_be(VALUE, DEST) ({ (DEST)->_be_data = swap_big_endian((typeof((DEST)->_be_data))VALUE); })
-#define load_be(VALUE) swap_big_endian((VALUE)._be_data)
+#define be_store$(VALUE, DEST) ({ (DEST)->_be_data = swap_big_endian$((typeof((DEST)->_be_data))VALUE); })
+#define be_load$(VALUE) swap_big_endian$((VALUE)._be_data)
 #define be$(T, VALUE) \
-    ((T){swap_big_endian(VALUE)})
+    ((T){swap_big_endian$(VALUE)})
 
-#define store_le(VALUE, DEST) ({ (DEST)->_le_data = swap_little_endian((typeof((DEST)->_le_data))VALUE); })
-#define load_le(VALUE) swap_little_endian((VALUE)._le_data)
+#define le_store$(VALUE, DEST) ({ (DEST)->_le_data = swap_little_endian$((typeof((DEST)->_le_data))VALUE); })
+#define le_load$(VALUE) swap_little_endian$((VALUE)._le_data)
 #define le$(T, VALUE) \
-    ((T){swap_little_endian(VALUE)})
+    ((T){swap_little_endian$(VALUE)})

@@ -64,7 +64,7 @@ IoResult zlib_decompress_stream(IoWriter writer, IoReader reader)
     // Get Adler-32 checksum of original data
     be_uint32_t value;
     TRY(IoResult, io_read(reader, (uint8_t *)&value, 4));
-    uint32_t adler32 = load_be(value);
+    uint32_t adler32 = be_load$(value);
 
     if (adler32 != adler32_get(&adler))
     {

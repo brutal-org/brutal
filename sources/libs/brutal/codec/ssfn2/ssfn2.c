@@ -40,8 +40,8 @@ static MaybeError ssfn2_read_point(IoRSeek rseek, SSFN2FontHeader *header, MVec2
     TRY(MaybeError, io_read_byte$(rseek, &y));
 
     MVec2f point = m_vec2f_add(pos, m_vec2f(x, y));
-    point = m_vec2f_sub(point, m_vec2f(0, load_le(header->baseline)));
-    point = m_vec2f_div_v(point, load_le(header->baseline));
+    point = m_vec2f_sub(point, m_vec2f(0, le_load$(header->baseline)));
+    point = m_vec2f_div_v(point, le_load$(header->baseline));
     point = m_vec2f_mul_v(point, 16);
 
     *result = point;
@@ -52,8 +52,8 @@ static MaybeError ssfn2_load_fragment(IoRSeek rseek, SSFN2Font *font, MVec2f pos
 {
     // Add font start offset
     offset += font->font_start;
-    uint32_t fragments_offs = font->font_start + load_le(font->header.fragments_offs);
-    uint32_t characters_offs = font->font_start + load_le(font->header.characters_offs);
+    uint32_t fragments_offs = font->font_start + le_load$(font->header.fragments_offs);
+    uint32_t characters_offs = font->font_start + le_load$(font->header.characters_offs);
 
     if (offset < fragments_offs || offset >= characters_offs)
     {
@@ -164,11 +164,11 @@ static MaybeError ssfn2_load_mapping(IoRSeek rseek, SSFN2Font *font, Rune rune, 
     // Initialize glyph
     font->glyphs[rune] = (SSFN2Glyph){
         .present = true,
-        .bound = m_vec2f((glyph_data[1] / (float)load_le(header->baseline)) * 16.0f,
-                         (glyph_data[2] / (float)load_le(header->baseline) * 16.0f)),
+        .bound = m_vec2f((glyph_data[1] / (float)le_load$(header->baseline)) * 16.0f,
+                         (glyph_data[2] / (float)le_load$(header->baseline) * 16.0f)),
 
-        .advance = m_vec2f((glyph_data[3] / (float)load_le(header->baseline)) * 16.0f,
-                           (glyph_data[4] / (float)load_le(header->baseline) * 16.0f)),
+        .advance = m_vec2f((glyph_data[3] / (float)le_load$(header->baseline)) * 16.0f,
+                           (glyph_data[4] / (float)le_load$(header->baseline) * 16.0f)),
     };
 
     gfx_path_init(&font->glyphs[rune].path, alloc);
@@ -209,10 +209,10 @@ static MaybeError ssfn2_load_mapping(IoRSeek rseek, SSFN2Font *font, Rune rune, 
 
 static MaybeError ssfn2_load_mappings(IoRSeek rseek, SSFN2Font *font, SSFN2CommonHeader *common_header, Alloc *alloc)
 {
-    size_t char_offs = load_le(font->header.characters_offs);
-    size_t lig_offs = load_le(font->header.ligature_offs);
-    size_t kern_offs = load_le(font->header.kerning_offs);
-    size_t size = load_le(common_header->size);
+    size_t char_offs = le_load$(font->header.characters_offs);
+    size_t lig_offs = le_load$(font->header.ligature_offs);
+    size_t kern_offs = le_load$(font->header.kerning_offs);
+    size_t size = le_load$(common_header->size);
 
     size_t end = lig_offs ? lig_offs : kern_offs ? kern_offs
                                                  : size - 4;
@@ -299,7 +299,7 @@ static MaybeError ssfn2_load_internal(IoRSeek rseek, SSFN2Collection *collection
     size_t start = TRY(MaybeError, io_tell$(rseek));
     SSFN2CommonHeader common_header;
     TRY(MaybeError, io_read$(rseek, (uint8_t *)&common_header, sizeof(SSFN2CommonHeader)));
-    size_t size = load_le(common_header.size);
+    size_t size = le_load$(common_header.size);
 
     if (str_eq(str_n$(4, (char const *)common_header.magic), SSFN2_COLLECTION))
     {
@@ -374,7 +374,7 @@ SSFN2Font *gfx_font_ssfn2_select(void *ctx, GfxFontStyle style)
         if (style.weight == font->weight)
             match++;
 
-        uint8_t type = load_le(font->header.type);
+        uint8_t type = le_load$(font->header.type);
         if (style.italic == ((SSFN2_TYPE_STYLE(type) & SSFN2_STYLE_ITALIC) > 0))
             match++;
 
@@ -400,7 +400,7 @@ GfxFontMetrics gfx_font_ssfn2_metrics(void *ctx, GfxFontStyle style)
         .captop = 10 * style.scale,
         .descend = 3 * style.scale,
         .line_descend = 4 * style.scale,
-        .advance = load_le(font->header.width) * style.scale,
+        .advance = le_load$(font->header.width) * style.scale,
     };
 }
 

@@ -31,9 +31,9 @@ GfxBuf tga_decode_in_memory(void *addr, size_t size)
     void *buf = header + 1;
 
     return (GfxBuf){
-        .width = load_le(header->width),
-        .height = load_le(header->height),
-        .pitch = load_le(header->width) * (load_le(header->bits_per_pixel) / 8),
+        .width = le_load$(header->width),
+        .height = le_load$(header->height),
+        .pitch = le_load$(header->width) * (le_load$(header->bits_per_pixel) / 8),
         .fmt = GFX_FMT_RGBA8888,
         .buf = buf,
     };

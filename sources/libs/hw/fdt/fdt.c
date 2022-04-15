@@ -13,7 +13,7 @@ static FdtTok *fdt_node_end(FdtTokBegin *fdt, FdtHeader *header)
 
     for (FdtTok *cur = fdt_node_begin(fdt); cur < fdt_tok_end(header); cur = fdt_tok_next(cur))
     {
-        cur_type = load_be(*cur);
+        cur_type = be_load$(*cur);
         if (depth < 0 || cur_type == FDT_END)
         {
             return (cur);
@@ -42,29 +42,29 @@ static FdtNode fdt_tok2node(FdtTokBegin *raw_node, FdtHeader *header)
 
 static FdtProp fdt_tok2prop(FdtTokProp *raw_prop, FdtHeader *header)
 {
-    Str node_name = str$((char const *)((uintptr_t)header + load_be(header->strings_offset) + load_be(raw_prop->name_offset)));
+    Str node_name = str$((char const *)((uintptr_t)header + be_load$(header->strings_offset) + be_load$(raw_prop->name_offset)));
 
     return (FdtProp){
         .name = node_name,
-        .value = slice$(VoidSlice, raw_prop->value, load_be(raw_prop->len)),
+        .value = slice$(VoidSlice, raw_prop->value, be_load$(raw_prop->len)),
     };
 }
 FdtHeader *fdt_from_data(void *raw_data)
 {
     FdtHeader *header = (FdtHeader *)raw_data;
 
-    assert_equal(load_be(header->magic), FDT_MAGIC);
+    assert_equal(be_load$(header->magic), FDT_MAGIC);
     return header;
 }
 
 FdtTok *fdt_tok_begin(FdtHeader *fdt)
 {
-    return (FdtTok *)((uintptr_t)fdt + load_be(fdt->structure_offset));
+    return (FdtTok *)((uintptr_t)fdt + be_load$(fdt->structure_offset));
 }
 
 FdtTok *fdt_tok_next(FdtTok *tok)
 {
-    uint32_t cur_type = load_be(*tok);
+    uint32_t cur_type = be_load$(*tok);
     if (cur_type == FDT_BEGIN_NODE)
     {
         FdtTokBegin *node = (FdtTokBegin *)tok;
@@ -73,7 +73,7 @@ FdtTok *fdt_tok_next(FdtTok *tok)
     else if (cur_type == FDT_PROP)
     {
         FdtTokProp *node = (FdtTokProp *)tok;
-        tok += (align_up$(load_be(node->len), 4) / 4);
+        tok += (align_up$(be_load$(node->len), 4) / 4);
         tok += 2;
     }
     tok++;
@@ -84,7 +84,7 @@ FdtTok *fdt_tok_next(FdtTok *tok)
 FdtTok *fdt_tok_end(FdtHeader *fdt)
 {
     FdtTok *tok = fdt_tok_begin(fdt);
-    tok += (load_be(fdt->structure_size) / 4) + 1;
+    tok += (be_load$(fdt->structure_size) / 4) + 1;
     return tok;
 }
 
@@ -105,7 +105,7 @@ Iter fdt_node_childs(FdtNode node, IterFn fn, void *ctx)
 
     for (FdtTok *cur = node.begin; cur < node.end; cur = fdt_tok_next(cur))
     {
-        cur_type = load_be(*cur);
+        cur_type = be_load$(*cur);
         if (cur_type == FDT_BEGIN_NODE)
         {
             FdtTokBegin *raw_node = (FdtTokBegin *)cur;
@@ -136,7 +136,7 @@ Iter fdt_node_props(FdtNode node, IterFn fn, void *ctx)
 
     for (FdtTok *cur = node.begin; cur < node.end; cur = fdt_tok_next(cur))
     {
-        cur_type = load_be(*cur);
+        cur_type = be_load$(*cur);
         if (cur_type == FDT_BEGIN_NODE)
         {
             depth++;
@@ -257,7 +257,7 @@ static void fdt_dump_props_value(FdtProp *prop, Emit *out)
         be_uint32_t *val = ((be_uint32_t *)prop->value.buf);
         for (unsigned int i = 0; i < prop->value.len / sizeof(uint32_t); i++)
         {
-            emit_fmt$(out, "- as uint32_t: {#x} \n", load_be(val[i]));
+            emit_fmt$(out, "- as uint32_t: {#x} \n", be_load$(val[i]));
         }
     }
     if (prop->value.len % sizeof(uint64_t) == 0)
@@ -265,7 +265,7 @@ static void fdt_dump_props_value(FdtProp *prop, Emit *out)
         be_uint64_t *val = ((be_uint64_t *)prop->value.buf);
         for (unsigned int i = 0; i < prop->value.len / sizeof(uint64_t); i++)
         {
-            emit_fmt$(out, "- as uint64_t: {#x}\n", load_be(val[i]));
+            emit_fmt$(out, "- as uint64_t: {#x}\n", be_load$(val[i]));
         }
     }
     if (prop->value.len > 2)
@@ -325,11 +325,11 @@ void fdt_dump(FdtHeader *fdt, Emit *out, bool dump_values)
     emit_deident(out);
 
     emit_fmt$(out, "fdt reserved memory:\n");
-    FdtReservationEntry *entry = ((void *)fdt) + load_be(fdt->memory_reservation_offset);
+    FdtReservationEntry *entry = ((void *)fdt) + be_load$(fdt->memory_reservation_offset);
     emit_ident(out);
-    while (load_be(entry->size) != 0 || load_be(entry->address) != 0)
+    while (be_load$(entry->size) != 0 || be_load$(entry->address) != 0)
     {
-        emit_fmt$(out, "- [{#x}] - [{#x}] \n", load_be(entry->address), load_be(entry->address) + load_be(entry->size));
+        emit_fmt$(out, "- [{#x}] - [{#x}] \n", be_load$(entry->address), be_load$(entry->address) + be_load$(entry->size));
         entry++;
     }
     emit_deident(out);
@@ -339,5 +339,5 @@ USizeRange fdt_reg_get_range(FdtProp prop, MAYBE_UNUSED uintptr_t addr_size, MAY
 {
     be_uint64_t *reg = (be_uint64_t *)prop.value.buf;
     assert_not_null(reg);
-    return (USizeRange){.base = load_be(*reg), .size = load_be(*(reg + 1))};
+    return (USizeRange){.base = be_load$(*reg), .size = be_load$(*(reg + 1))};
 }
