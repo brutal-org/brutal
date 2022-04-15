@@ -95,8 +95,11 @@ void test_hook_ref(TestCtx *self, uint64_t id);
 
 void test_hook_deref(TestCtx *self, uint64_t id);
 
-#define test_case$(NAME)                                                            \
-    static TestCase var$(__test_case) = {.name = str_const$(#NAME), .loc = loc$()}; \
+#define test_case$(NAME)                  \
+    static TestCase var$(__test_case) = { \
+        .name = str_const$(#NAME),        \
+        .loc = loc_const$(),              \
+    };                                    \
     cond_defer$(test_begin_case(test_self(), &var$(__test_case)), test_end_case(test_self()))
 
 #define test_fail$(MSG, ...) test_fail(test_self(), loc$(), str$(MSG), any_va$(__VA_ARGS__))
@@ -117,7 +120,7 @@ void test_hook_deref(TestCtx *self, uint64_t id);
         test_register((Test){                                                      \
             .flags = TEST_NONE MAP(__test_flag$, __VA_ARGS__) IFE(__VA_ARGS__)(0), \
             .name = str$(#NAME),                                                   \
-            .loc = loc$(),                                                         \
+            .loc = loc_const$(),                                                   \
             .fn = __test_fn$(NAME),                                                \
         });                                                                        \
     }                                                                              \

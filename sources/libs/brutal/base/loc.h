@@ -9,5 +9,17 @@ typedef struct
     Str file;
 } Loc;
 
-#define loc$() \
-    (Loc) { __LINE__, str_const$(__func__), str_const$(__FILE__), }
+#define loc$()                        \
+    (Loc const)                       \
+    {                                 \
+        .line = __LINE__,             \
+        .func = str_const$(__func__), \
+        .file = str_const$(__FILE__), \
+    }
+
+#define loc_const$()                  \
+    {                                 \
+        .line = __LINE__,             \
+        .func = str_const$(__func__), \
+        .file = str_const$(__FILE__), \
+    }
