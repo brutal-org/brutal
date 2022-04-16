@@ -1,5 +1,5 @@
 #pragma once
-#include <brutal/base.h>
+#include <brutal-base>
 typedef enum
 {
     SVM_INTERCEPT_INTR, // physical maskable interrupt
@@ -115,7 +115,11 @@ typedef struct PACKED
     // 80
     uint64_t exit_info_2;
     // 88
-    uint64_t exit_int_info;
+    uint8_t vector;
+    uint8_t type : 3;
+    bool ev : 1;
+    uint32_t mbz : 20;
+    uint32_t error_code;
     // 90
     bool np_enable : 1;
     bool enable_secure_encrypted_virtualization : 1;
@@ -174,17 +178,17 @@ typedef struct PACKED
     uint8_t available[32];
 } SvmVMCBControl;
 
-typedef struct PACKED {
+typedef struct PACKED
+{
     uint16_t selector;
     uint16_t attrib;
     uint32_t limit;
     uint64_t base;
 } VMCB_Segment;
 
-
 // offset 0x400
 
-typedef struct
+typedef struct PACKED
 {
     // 0
     VMCB_Segment es;
@@ -198,7 +202,7 @@ typedef struct
     VMCB_Segment idtr;
     VMCB_Segment tr;
     // A0
-    uint8_t _reserved1[2603];
+    uint8_t _reserved1[43];
     // cb
     uint8_t cpl;
     // cc

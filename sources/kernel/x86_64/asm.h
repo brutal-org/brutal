@@ -227,9 +227,11 @@ static inline uint64_t asm_read_rflag(void)
 enum msr_registers
 {
     MSR_APIC = 0x1B,
+    MSR_PAT = 0x277,
     MSR_EFER = 0xC0000080,
     MSR_STAR = 0xC0000081,
     MSR_LSTAR = 0xC0000082,
+
     MSR_COMPAT_STAR = 0xC0000083,
     MSR_SYSCALL_FLAG_MASK = 0xC0000084,
     MSR_FS_BASE = 0xC0000100,
