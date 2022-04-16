@@ -1,5 +1,5 @@
-#include <brutal/tests.h>
-#include <brutal/ui.h>
+#include <brutal-test>
+#include <brutal-ui>
 
 static UiLayout try_parse_layout(char const *str)
 {

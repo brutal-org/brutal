@@ -1,7 +1,7 @@
-#include <brutal/debug.h>
 #include <efi/lib.h>
 #include <efi/srvs/bs.h>
 #include <embed/mem.h>
+#include <brutal-debug>
 
 Error embed_mem_acquire(size_t size, void **out_result, MAYBE_UNUSED enum embed_mem_flag flags)
 {

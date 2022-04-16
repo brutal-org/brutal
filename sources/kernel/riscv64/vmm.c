@@ -1,10 +1,10 @@
-#include <brutal/debug.h>
-#include <brutal/sync.h>
+#include "kernel/vmm.h"
+#include <brutal-debug>
+#include <brutal-sync>
 #include "kernel/heap.h"
 #include "kernel/mmap.h"
 #include "kernel/riscv64/asm.h"
 #include "kernel/riscv64/paging.h"
-#include "kernel/vmm.h"
 
 static int _levels = DEFAULT_PAGING_DEPTH;
 static Lock _lock = {};

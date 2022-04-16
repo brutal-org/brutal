@@ -1,4 +1,4 @@
-#include <brutal/debug.h>
+#include <brutal-debug>
 #include <cc/trans.h>
 
 static void cc_trans_op_fix(Emit *emit, COp op)

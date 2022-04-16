@@ -1,7 +1,7 @@
 #include <bal/abi.h>
 #include <bal/hw/io.h>
-#include <brutal/debug.h>
-#include <brutal/mem.h>
+#include <brutal-debug>
+#include <brutal-mem>
 
 BalIo bal_io_mem(BalMem *mem)
 {

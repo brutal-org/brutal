@@ -1,6 +1,6 @@
-#include <brutal/alloc.h>
-#include <brutal/debug.h>
 #include "kernel/channel.h"
+#include <brutal-alloc>
+#include <brutal-debug>
 #include "kernel/kernel.h"
 #include "kernel/sched.h"
 

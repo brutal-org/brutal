@@ -8,9 +8,8 @@ LIBS_SRC = \
 	$(wildcard sources/libs/ipc/*/*.c) \
 	$(wildcard sources/libs/bal/*.c) \
 	$(wildcard sources/libs/bal/*/*.c) \
-	$(wildcard sources/libs/brutal/*.c) \
-	$(wildcard sources/libs/brutal/*/*.c) \
-	$(wildcard sources/libs/brutal/*/*/*.c) \
+	$(wildcard sources/libs/brutal-*/*.c) \
+	$(wildcard sources/libs/codec-*/*.c) \
 	$(wildcard sources/libs/cc/*.c) \
 	$(wildcard sources/libs/cc/*/*.c) \
 	$(wildcard sources/libs/cc/*/*/*.c) \
@@ -34,11 +33,11 @@ LIBS_BIN=$(BINDIR_USER)/libbrutal.a
 
 DEPENDENCIES += $(LIBS_OBJ:.o=.d)
 
-$(BINDIR_USER)/%.c.o: $(GENDIR)/%.c | $(GENERATED_HDR)
+$(BINDIR_USER)/%.c.o: $(GENDIR)/%.c | $(GENERATED_HDR) $(GENERATED_MOD)
 	@$(MKCWD)
 	$(USER_CC) -c -o $@ $< $(USER_UCFLAGS)
 
-$(BINDIR_USER)/%.c.o: sources/%.c | $(GENERATED_HDR)
+$(BINDIR_USER)/%.c.o: sources/%.c | $(GENERATED_HDR) $(GENERATED_MOD)
 	@$(MKCWD)
 	$(USER_CC) -c -o $@ $< $(USER_UCFLAGS)
 

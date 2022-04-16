@@ -1,6 +1,6 @@
 #include <bal/abi.h>
-#include <brutal/debug.h>
 #include <embed/log.h>
+#include <brutal-debug>
 #include "kernel/arch.h"
 #include "kernel/domain.h"
 #include "kernel/event.h"

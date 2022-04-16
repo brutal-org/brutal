@@ -1,6 +1,6 @@
-#include <brutal/gfx.h>
-#include <brutal/tests.h>
-#include <brutal/ui.h>
+#include <brutal-gfx>
+#include <brutal-test>
+#include <brutal-ui>
 
 test$(gfx_basic_text)
 {

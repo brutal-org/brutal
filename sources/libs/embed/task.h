@@ -1,13 +1,13 @@
 #pragma once
 
-#include <brutal/task/task.h>
+#include <brutal-task/task.h>
 
-TaskId embed_task_self(void);
+int embed_task_self(void);
 
-TaskId embed_task_fork(void);
+int embed_task_fork(void);
 
-int embed_task_wait(TaskId handle);
+int embed_task_wait(int handle);
 
-void embed_task_exit(TaskId handle, int result);
+void embed_task_exit(int handle, int result);
 
-void embed_task_abort(TaskId handle);
+void embed_task_abort(int handle);

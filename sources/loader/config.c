@@ -1,6 +1,6 @@
-#include <brutal/alloc.h>
-#include <brutal/debug.h>
 #include <json/parser.h>
+#include <brutal-alloc>
+#include <brutal-debug>
 #include "loader/config.h"
 
 LoaderEntry config_entry_parse(Json json)

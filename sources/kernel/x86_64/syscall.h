@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/base.h>
+#include <brutal-base>
 
 void syscall_initialize(void);
 

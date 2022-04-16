@@ -1,4 +1,4 @@
-#include <brutal/tests.h>
+#include <brutal-test>
 #include <json/objects.h>
 #include <json/parser.h>
 

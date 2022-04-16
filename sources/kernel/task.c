@@ -1,10 +1,10 @@
-#include <brutal/alloc.h>
-#include <brutal/debug.h>
+#include "kernel/task.h"
+#include <brutal-alloc>
+#include <brutal-debug>
 #include "kernel/cpu.h"
 #include "kernel/event.h"
 #include "kernel/kernel.h"
 #include "kernel/sched.h"
-#include "kernel/task.h"
 
 Task *task_self(void)
 {

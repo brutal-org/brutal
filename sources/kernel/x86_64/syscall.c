@@ -1,4 +1,5 @@
-#include <brutal/debug.h>
+#include "kernel/x86_64/syscall.h"
+#include <brutal-debug>
 #include "kernel/heap.h"
 #include "kernel/kernel.h"
 #include "kernel/syscalls.h"
@@ -6,7 +7,6 @@
 #include "kernel/x86_64/cpu.h"
 #include "kernel/x86_64/gdt.h"
 #include "kernel/x86_64/interrupts.h"
-#include "kernel/x86_64/syscall.h"
 
 extern void __syscall(void);
 

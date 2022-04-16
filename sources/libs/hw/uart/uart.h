@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/io.h>
+#include <brutal-io>
 
 typedef struct
 {

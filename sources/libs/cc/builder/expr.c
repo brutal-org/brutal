@@ -1,5 +1,5 @@
-#include <brutal/debug.h>
 #include <cc/builder/expr.h>
+#include <brutal-debug>
 
 CExpr cexpr_empty(void)
 {

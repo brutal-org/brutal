@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/ds.h>
+#include <brutal-ds>
 
 typedef enum
 {

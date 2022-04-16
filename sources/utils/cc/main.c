@@ -1,6 +1,5 @@
-#include <brutal/alloc.h>
-#include <brutal/debug.h>
-#include <brutal/io.h>
+#include <brutal-debug>
+#include <brutal-fmt>
 #include <cc/dump.h>
 #include <cc/lex/pproc.h>
 #include <cc/parse.h>

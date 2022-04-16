@@ -1,7 +1,7 @@
 #include <SDL.h>
-#include <brutal/debug.h>
 #include <embed/app.h>
 #include <embed/win.h>
+#include <brutal-debug>
 
 void embed_app_init(MAYBE_UNUSED UiApp *self)
 {

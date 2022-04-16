@@ -1,12 +1,12 @@
 #pragma once
 
 #include <acpi/base.h>
-#include <brutal/ds.h>
 #include <pci/addr.h>
 #include <pci/capabilities.h>
 #include <pci/config.h>
 #include <pci/group.h>
 #include <protos/pci.h>
+#include <brutal-ds>
 
 typedef struct
 {

@@ -1,4 +1,4 @@
-#include <brutal/tests.h>
+#include <brutal-test>
 
 int main(int argc, char const *argv[])
 {

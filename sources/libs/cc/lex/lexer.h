@@ -1,7 +1,7 @@
 #pragma once
 
-#include <brutal/parse.h>
 #include <cc/lex/lexemes.h>
+#include <brutal-parse>
 
 // clang-format off
 

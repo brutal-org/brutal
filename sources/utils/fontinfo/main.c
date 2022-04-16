@@ -1,7 +1,5 @@
-#include <brutal/alloc.h>
-#include <brutal/codec/ssfn2/ssfn2.h>
-#include <brutal/debug.h>
-#include <brutal/io.h>
+#include <brutal-debug>
+#include <codec-ssfn2>
 
 int main(int argc, char const *argv[])
 {

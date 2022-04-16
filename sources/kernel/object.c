@@ -1,5 +1,5 @@
-#include <brutal/alloc.h>
 #include "kernel/object.h"
+#include <brutal-alloc>
 
 static _Atomic BrHandle _id = 1;
 static _Atomic bool _init = false;

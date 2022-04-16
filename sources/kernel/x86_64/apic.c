@@ -1,7 +1,7 @@
 #include <acpi/madt.h>
 #include <acpi/rsdt.h>
-#include <brutal/debug.h>
-#include <brutal/mem.h>
+#include <brutal-debug>
+#include <brutal-mem>
 #include "kernel/mmap.h"
 #include "kernel/x86_64/apic.h"
 #include "kernel/x86_64/asm.h"
@@ -28,25 +28,25 @@ void lapic_eoi(void)
     lapic_write(LAPIC_REG_EOI, 0);
 }
 
-void lapic_send_ipi(CpuId cpu_id, uint32_t interrupt_id)
+void lapic_send_ipi(int cpu_id, uint32_t interrupt_id)
 {
     lapic_write(LAPIC_REG_ICR1, (uint64_t)cpu_id << LAPIC_ICR_CPUID_OFFSET);
     lapic_write(LAPIC_REG_ICR0, interrupt_id | LAPIC_ICR_CLEAR_INIT_LEVEL);
 }
 
-void lapic_send_init(CpuId cpu_id)
+void lapic_send_init(int cpu_id)
 {
     lapic_write(LAPIC_REG_ICR1, (uint64_t)cpu_id << LAPIC_ICR_CPUID_OFFSET);
     lapic_write(LAPIC_REG_ICR0, LAPIC_ICR_DEST_INIT);
 }
 
-void lapic_send_sipi(CpuId cpu_id, uintptr_t entry)
+void lapic_send_sipi(int cpu_id, uintptr_t entry)
 {
     lapic_write(LAPIC_REG_ICR1, (uint64_t)cpu_id << LAPIC_ICR_CPUID_OFFSET);
     lapic_write(LAPIC_REG_ICR0, LAPIC_ICR_DEST_SEND_IPI | (entry / 4096));
 }
 
-CpuId lapic_current_cpu(void)
+int lapic_current_cpu(void)
 {
     if (lapic_base == 0)
     {
@@ -177,7 +177,7 @@ static void ioapic_create_redirect(
 
 typedef struct
 {
-    CpuId id;
+    int id;
     uint8_t irq;
     bool enable;
 } IrqRedirectCtx;
@@ -201,7 +201,7 @@ static Iter iso_iterate(AcpiMadtIsoRecord *record, IrqRedirectCtx *ctx)
     return ITER_CONTINUE;
 }
 
-static void ioapic_redirect_irq_to_cpu(Acpi *acpi, CpuId id, uint8_t irq, bool enable)
+static void ioapic_redirect_irq_to_cpu(Acpi *acpi, int id, uint8_t irq, bool enable)
 {
     log$(" - Setting ipi {#p} redirection for cpu: {}", irq, id);
 

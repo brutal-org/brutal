@@ -32,7 +32,8 @@ BASE_CFLAGS += \
 	-Isources/srvs \
 	-Isources/utils \
 	-Isources/ \
-	-Ibin/generated
+	-Ibin/generated \
+	-Ibin/generated/headers
 
 USER_CFLAGS_INC := \
 	-Isources/libs/stdc-ansi \
@@ -41,6 +42,7 @@ USER_CFLAGS_INC := \
 	-Isources/libs/stdc-posix
 
 CACHEDIR=.cache/
+GENDIR=bin/generated
 BINDIR_LOADER=bin/$(CONFIG)/$(ARCH)-loader-$(TOOLCHAIN)
 BINDIR_USER=bin/$(CONFIG)/$(ARCH)-brutal-$(TOOLCHAIN)
 BINDIR_KERNEL=bin/$(CONFIG)/$(ARCH)-kernel-$(TOOLCHAIN)
@@ -54,6 +56,7 @@ include build/toolchain/archs/$(ARCH)/arch.mk
 -include build/toolchain/archs/$(HOST_ARCH)/host.mk
 include build/toolchain/$(TOOLCHAIN)/build.mk
 
+include sources/libs/.build.mk
 include sources/build/kernel/build.mk
 include sources/build/host/build.mk
 include sources/protos/.build.mk

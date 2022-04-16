@@ -1,7 +1,7 @@
-#include <brutal/alloc.h>
-#include <brutal/debug.h>
 #include <bvm/eval.h>
 #include <bvm/obj.h>
+#include <brutal-alloc>
+#include <brutal-debug>
 
 int main(int argc, char const *argv[])
 {

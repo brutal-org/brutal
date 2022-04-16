@@ -1,10 +1,10 @@
-#include <brutal/debug.h>
-#include <brutal/ds.h>
-#include <brutal/mem.h>
-#include <brutal/sync.h>
+#include "kernel/pmm.h"
+#include <brutal-debug>
+#include <brutal-ds>
+#include <brutal-mem>
+#include <brutal-sync>
 #include "kernel/arch.h"
 #include "kernel/mmap.h"
-#include "kernel/pmm.h"
 
 // #define TRACE_PMM
 

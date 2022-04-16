@@ -1,5 +1,5 @@
-#include <brutal/mem.h>
 #include <uart/uart.h>
+#include <brutal-mem>
 
 void uart_putc(Uart *dev, uint8_t data)
 {

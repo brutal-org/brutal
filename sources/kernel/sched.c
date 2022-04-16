@@ -1,8 +1,8 @@
-#include <brutal/alloc.h>
-#include <brutal/debug.h>
+#include "kernel/sched.h"
+#include <brutal-alloc>
+#include <brutal-debug>
 #include "kernel/arch.h"
 #include "kernel/cpu.h"
-#include "kernel/sched.h"
 
 static Lock _lock = {};
 static Vec(Task *) _tasks = {};

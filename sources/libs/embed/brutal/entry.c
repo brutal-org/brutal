@@ -1,9 +1,9 @@
 #include <bal/abi.h>
 #include <bal/boot.h>
-#include <brutal/alloc.h>
-#include <brutal/debug.h>
-#include <brutal/fibers.h>
 #include <ipc/ipc.h>
+#include <brutal-alloc>
+#include <brutal-debug>
+#include <brutal-fibers>
 
 WEAK int main(int, char **)
 {

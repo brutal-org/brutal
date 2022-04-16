@@ -1,8 +1,8 @@
-#include <brutal/debug.h>
+#include "kernel/tasking.h"
+#include <brutal-debug>
 #include "kernel/arch.h"
 #include "kernel/sched.h"
 #include "kernel/task.h"
-#include "kernel/tasking.h"
 
 static void idle(void)
 {

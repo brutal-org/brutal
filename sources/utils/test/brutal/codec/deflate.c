@@ -1,6 +1,5 @@
-#include <brutal/codec/deflate/deflate.h>
-#include <brutal/debug.h>
-#include <brutal/tests.h>
+#include <brutal-test>
+#include <codec-deflate>
 
 test$(deflate_uncompressed)
 {

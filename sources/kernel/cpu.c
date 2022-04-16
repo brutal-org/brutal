@@ -1,5 +1,5 @@
-#include <brutal/debug.h>
 #include "kernel/cpu.h"
+#include <brutal-debug>
 
 void cpu_begin_interrupt(void)
 {

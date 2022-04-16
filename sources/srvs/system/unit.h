@@ -2,8 +2,8 @@
 
 #include <bal/boot.h>
 #include <bal/hw.h>
-#include <brutal/ds.h>
 #include <ipc/ipc.h>
+#include <brutal-ds>
 
 typedef enum
 {

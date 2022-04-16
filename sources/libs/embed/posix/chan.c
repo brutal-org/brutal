@@ -1,7 +1,7 @@
-#include <brutal/debug.h>
 #include <embed/chan.h>
 #include <embed/posix/err.h>
 #include <unistd.h>
+#include <brutal-debug>
 
 IoResult embed_chan_read(IoChan channel, uint8_t *data, size_t size)
 {

@@ -2,8 +2,8 @@
 
 #include <ahci/device.h>
 #include <ahci/hba.h>
-#include <brutal/ds.h>
 #include <pci/pci.h>
+#include <brutal-ds>
 
 typedef struct
 {

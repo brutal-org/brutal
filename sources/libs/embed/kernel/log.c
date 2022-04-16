@@ -1,5 +1,5 @@
-#include <brutal/sync.h>
 #include <embed/log.h>
+#include <brutal-sync>
 #include "kernel/arch.h"
 
 static Lock _lock;

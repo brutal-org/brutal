@@ -1,9 +1,9 @@
-#include <brutal/alloc.h>
-#include <brutal/debug/assert.h>
-#include <brutal/text/utf16.h>
 #include <efi/lib.h>
 #include <efi/protos.h>
 #include <embed/file.h>
+#include <brutal-alloc>
+#include <brutal-debug/assert.h>
+#include <brutal-text/utf16.h>
 
 static EFILoadedImage *_image_loader = nullptr;
 static EFISimpleFileSystemProtocol *_rootfs = nullptr;
@@ -152,7 +152,7 @@ IoResult embed_file_write(IoFile *self, uint8_t const *data, size_t size)
 
 IoResult embed_file_seek(IoFile *self, IoSeek seek)
 {
-    EfiFileProtocol* proto = self->embed.proto;
+    EfiFileProtocol *proto = self->embed.proto;
 
     uint64_t current = 0;
     EfiStatus status = proto->get_position(proto, &current);

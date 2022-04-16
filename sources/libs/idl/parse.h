@@ -1,7 +1,8 @@
 #pragma once
 
-#include <brutal/parse.h>
 #include <idl/ast.h>
+#include <brutal-parse>
+
 
 IdlModule idl_parse_module(Scan *scan, Alloc *alloc);
 

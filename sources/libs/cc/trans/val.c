@@ -1,4 +1,4 @@
-#include <brutal/debug.h>
+#include <brutal-debug>
 #include <cc/trans.h>
 
 void cc_trans_value(Emit *emit, CVal value)

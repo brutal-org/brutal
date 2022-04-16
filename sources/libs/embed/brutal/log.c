@@ -1,8 +1,8 @@
 #include <bal/abi.h>
-#include <brutal/alloc/global.h>
-#include <brutal/io/buf.h>
-#include <brutal/sync.h>
 #include <embed/log.h>
+#include <brutal-alloc/global.h>
+#include <brutal-io/buf.h>
+#include <brutal-sync>
 
 static bool _initialized = false;
 static Lock _lock;

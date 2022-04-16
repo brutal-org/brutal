@@ -1,8 +1,8 @@
 #pragma once
 
-#include <brutal/io.h>
 #include <cc/ast/unit.h>
 #include <json/objects.h>
+#include <brutal-io>
 
 Json cdump_value(CVal value, Alloc *alloc);
 

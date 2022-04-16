@@ -1,7 +1,7 @@
 #pragma once
 
-#include <brutal/ds.h>
 #include <cc/lex/lexer.h>
+#include <brutal-ds>
 
 typedef Vec(Lexemes) MacroArgsCodes;
 

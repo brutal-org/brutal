@@ -1,6 +1,6 @@
-#include <brutal/debug.h>
-#include <brutal/sync.h>
 #include <embed/mem.h>
+#include <brutal-debug>
+#include <brutal-sync>
 #include "kernel/heap.h"
 
 static Lock _lock;

@@ -1,5 +1,5 @@
-#include <brutal/alloc.h>
 #include <protos/window.h>
+#include <brutal-alloc>
 #include "window/client.h"
 #include "window/server.h"
 

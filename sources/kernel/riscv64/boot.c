@@ -1,15 +1,15 @@
 #include <bal/boot.h>
-#include <brutal/alloc.h>
-#include <brutal/debug.h>
-#include <brutal/ds.h>
 #include <fdt/fdt.h>
 #include <fdt/handover.h>
+#include <brutal-alloc>
+#include <brutal-debug>
+#include <brutal-ds>
 #include "kernel/arch.h"
-#include "kernel/vmm.h"
 #include "kernel/pmm.h"
 #include "kernel/riscv64/arch.h"
 #include "kernel/riscv64/interrupts.h"
 #include "kernel/riscv64/uart8250.h"
+#include "kernel/vmm.h"
 
 static Uart *_uart = NULL;
 static Handover _handover = {};

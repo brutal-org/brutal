@@ -1,10 +1,10 @@
 #include <bal/abi.h>
-#include <brutal/alloc.h>
-#include <brutal/debug.h>
-#include <brutal/io.h>
 #include <efi/lib.h>
 #include <efi/srvs.h>
 #include <elf/elf.h>
+#include <brutal-alloc>
+#include <brutal-debug>
+#include <brutal-io>
 #include "loader/memory.h"
 #include "loader/protocol.h"
 

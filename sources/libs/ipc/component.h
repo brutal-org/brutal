@@ -1,11 +1,11 @@
 #pragma once
 
 #include <bal/abi.h>
-#include <brutal/ds.h>
-#include <brutal/fibers.h>
 #include <ipc/capability.h>
 #include <ipc/pack.h>
 #include <ipc/unpack.h>
+#include <brutal-ds>
+#include <brutal-fibers>
 
 typedef struct _IpcPending IpcPending;
 typedef struct _IpcComponent IpcComponent;

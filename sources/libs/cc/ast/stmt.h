@@ -1,8 +1,8 @@
 #pragma once
 
-#include <brutal/base.h>
-#include <brutal/ds.h>
 #include <cc/ast/expr.h>
+#include <brutal-base>
+#include <brutal-ds>
 typedef enum
 {
     CSTMT_INVALID,

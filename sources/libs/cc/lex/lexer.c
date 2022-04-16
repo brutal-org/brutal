@@ -1,5 +1,5 @@
-#include <brutal/debug.h>
 #include <cc/lex/lexer.h>
+#include <brutal-debug>
 
 struct
 {

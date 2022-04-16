@@ -1,5 +1,5 @@
-#include <brutal/debug.h>
-#include <brutal/text.h>
+#include <brutal-debug>
+#include <brutal-text>
 
 struct _UbsanSrc
 {

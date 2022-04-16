@@ -1,10 +1,11 @@
 #include <acpi/hpet.h>
 #include <acpi/rsdt.h>
-#include <brutal/debug.h>
-#include <brutal/mem.h>
-#include "brutal/mem/volatile.h"
-#include "kernel/mmap.h"
+#include <brutal-debug>
+#include <brutal-mem>
+
 #include "kernel/x86_64/hpet.h"
+
+#include "kernel/mmap.h"
 
 static uintptr_t _base = 0;
 static uint64_t _clock = 0;

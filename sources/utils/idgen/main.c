@@ -1,8 +1,8 @@
-#include <brutal/io.h>
-#include <brutal/math.h>
+#include <brutal-fmt>
+#include <brutal-math>
 
 int main(int, char const *[])
 {
-    io_print$("{#016x}\n", m_entropy64());
+    fmt_print$("{#016x}\n", m_entropy64());
     return 0;
 }

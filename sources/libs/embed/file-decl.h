@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/base.h>
+#include <brutal-base>
 
 #if defined(SYSTEM_EFI)
 #    include <embed/efi/file.h>

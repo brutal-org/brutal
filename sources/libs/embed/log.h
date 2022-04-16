@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/io.h>
+#include <brutal-io>
 
 void embed_log_lock(void);
 

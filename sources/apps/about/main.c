@@ -1,5 +1,5 @@
-#include <brutal/io.h>
-#include <brutal/ui.h>
+#include <brutal-io>
+#include <brutal-ui>
 
 UiView *about_informations(void)
 {

@@ -1,6 +1,5 @@
-#include <brutal/codec/gzip/gzip.h>
-#include <brutal/debug.h>
-#include <brutal/tests.h>
+#include <brutal-test>
+#include <codec-gzip>
 
 test$(gzip_empty_raw)
 {

@@ -1,10 +1,10 @@
 #pragma once
 
 #include <bal/hw.h>
-#include <brutal/gfx.h>
-#include <brutal/math.h>
-#include <brutal/ui.h>
 #include <ipc/ipc.h>
+#include <brutal-gfx>
+#include <brutal-math>
+#include <brutal-ui>
 
 typedef struct
 {

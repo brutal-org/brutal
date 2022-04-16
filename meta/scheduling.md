@@ -61,7 +61,7 @@ So in brutal we have (this may change over time) a scheduler state for each task
 ```c
 struct TaskSchedule
 {
-    CpuId cpu;
+    int cpu;
     int tick_start;
     int tick_end;
     bool is_currently_executed;

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <brutal/ds.h>
 #include <bvm/eval/instr.h>
 #include <bvm/obj/val.h>
+#include <brutal-ds>
 
 struct _BvmLocal;
 struct _BvmFrame;

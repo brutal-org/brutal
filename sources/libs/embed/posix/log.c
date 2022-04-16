@@ -1,10 +1,10 @@
-#include <brutal/base.h>
 #include <embed/log.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <brutal-base>
 
 void embed_log_lock(void)
 {

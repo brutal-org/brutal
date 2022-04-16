@@ -1,8 +1,8 @@
 #pragma once
 
-#include <brutal/base.h>
 #include <virtio/device.h>
 #include <virtio/virtqueue.h>
+#include <brutal-base>
 
 typedef struct
 {

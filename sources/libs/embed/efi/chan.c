@@ -1,9 +1,9 @@
-#include <brutal/alloc.h>
-#include <brutal/debug.h>
-#include <brutal/text.h>
 #include <efi/lib.h>
 #include <efi/protos.h>
 #include <embed/chan.h>
+#include <brutal-alloc>
+#include <brutal-debug>
+#include <brutal-text>
 
 IoResult embed_chan_read(IoChan channel, uint8_t *data, size_t size)
 {

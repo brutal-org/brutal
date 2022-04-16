@@ -1,7 +1,5 @@
-#include <brutal/alloc.h>
-#include <brutal/codec/gzip/gzip.h>
-#include <brutal/debug.h>
-#include <brutal/io.h>
+#include <brutal-debug>
+#include <codec-gzip>
 
 int main(int argc, char const *argv[])
 {

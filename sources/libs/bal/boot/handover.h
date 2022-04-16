@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/text.h>
+#include <brutal-text>
 
 // "handover" in ascii
 #define HANDOVER_TAG 0x68616e646f766572

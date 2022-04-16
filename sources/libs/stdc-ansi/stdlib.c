@@ -1,12 +1,12 @@
-#include <brutal/alloc.h>
-#include <brutal/debug.h>
-#include <brutal/math.h>
-#include <brutal/mem.h>
-#include <brutal/parse.h>
 #include <embed/log.h>
 #include <embed/task.h>
 #include <stdlib.h>
 #include <string.h>
+#include <brutal-alloc>
+#include <brutal-debug>
+#include <brutal-math>
+#include <brutal-mem>
+#include <brutal-parse>
 
 /* --- 7.22 - General utilities --------------------------------------------- */
 

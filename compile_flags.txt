@@ -17,5 +17,6 @@
 -Isources/libs/stdc-posix
 -Isources/libs/stdc-ext
 -Ibin/generated
+-Ibin/generated/headers
 -Ithirdparty
 -I/usr/include/SDL2

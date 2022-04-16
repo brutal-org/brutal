@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/base.h>
+#include <brutal-base>
 #ifndef __kernel__
 #    include <bal/hw.h>
 #endif

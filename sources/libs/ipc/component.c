@@ -1,6 +1,6 @@
 #include <bal/abi.h>
-#include <brutal/debug.h>
 #include <ipc/component.h>
+#include <brutal-debug>
 
 typedef struct
 {

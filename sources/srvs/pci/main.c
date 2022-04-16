@@ -1,12 +1,12 @@
 #include <acpi/base.h>
 #include <bal/abi.h>
 #include <bal/boot.h>
-#include <brutal/alloc.h>
-#include <brutal/debug.h>
 #include <pci/pci.h>
 #include <protos/boot.h>
 #include <protos/pci.h>
 #include <protos/system.h>
+#include <brutal-alloc>
+#include <brutal-debug>
 
 typedef struct
 {

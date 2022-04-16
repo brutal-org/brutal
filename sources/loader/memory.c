@@ -1,8 +1,8 @@
-#include <brutal/debug.h>
-#include <brutal/mem.h>
 #include <efi/lib.h>
 #include <efi/srvs/bs.h>
 #include <embed/mem.h>
+#include <brutal-debug>
+#include <brutal-mem>
 #include "loader/memory.h"
 
 uint64_t kernel_module_phys_alloc_page(size_t count)

@@ -1,4 +1,5 @@
-#include <brutal/debug.h>
+#include <brutal-debug>
+#include <brutal-fmt>
 #include <fdt/fdt.h>
 
 static FdtTok *fdt_node_begin(FdtTokBegin *fdt)
@@ -250,14 +251,14 @@ FdtProp fdt_lookup_props(FdtNode node, Str name)
     return ctx.res;
 }
 
-static void fdt_dump_props_value(FdtProp *prop, Emit *out)
+static void fdt_dump_props_value(FdtProp *prop, Emit *emit)
 {
     if (prop->value.len % sizeof(uint32_t) == 0)
     {
         be_uint32_t *val = ((be_uint32_t *)prop->value.buf);
         for (unsigned int i = 0; i < prop->value.len / sizeof(uint32_t); i++)
         {
-            emit_fmt$(out, "- as uint32_t: {#x} \n", be_load$(val[i]));
+            emit_fmt$(emit, "- as uint32_t: {#x} \n", be_load$(val[i]));
         }
     }
     if (prop->value.len % sizeof(uint64_t) == 0)
@@ -265,74 +266,74 @@ static void fdt_dump_props_value(FdtProp *prop, Emit *out)
         be_uint64_t *val = ((be_uint64_t *)prop->value.buf);
         for (unsigned int i = 0; i < prop->value.len / sizeof(uint64_t); i++)
         {
-            emit_fmt$(out, "- as uint64_t: {#x}\n", be_load$(val[i]));
+            emit_fmt$(emit, "- as uint64_t: {#x}\n", be_load$(val[i]));
         }
     }
     if (prop->value.len > 2)
     {
         Str as_string = str_n$(prop->value.len, (char *)prop->value.buf);
-        emit_fmt$(out, "- as string: {} \n", as_string);
+        emit_fmt$(emit, "- as string: {} \n", as_string);
     }
 
-    emit_fmt$(out, "- as data: ");
+    emit_fmt$(emit, "- as data: ");
     for (unsigned int i = 0; i < prop->value.len; i++)
     {
-        emit_fmt$(out, "{#x} ", ((uint8_t *)prop->value.buf)[i]);
+        emit_fmt$(emit, "{#x} ", ((uint8_t *)prop->value.buf)[i]);
     }
-    emit_fmt$(out, "\n");
+    emit_fmt$(emit, "\n");
 }
 
 typedef struct
 {
-    Emit *out;
+    Emit *emit;
     bool dump_values;
 } IterDumpCtx;
 
 static Iter fdt_dump_props_iter(FdtProp *prop, IterDumpCtx *ctx)
 {
-    emit_fmt$(ctx->out, "- prop: {}\n", prop->name);
-    emit_ident(ctx->out);
+    emit_fmt$(ctx->emit, "- prop: {}\n", prop->name);
+    emit_ident(ctx->emit);
     if (ctx->dump_values)
     {
-        fdt_dump_props_value(prop, ctx->out);
+        fdt_dump_props_value(prop, ctx->emit);
     }
-    emit_deident(ctx->out);
+    emit_deident(ctx->emit);
     return ITER_CONTINUE;
 }
 
 static Iter fdt_dump_node_iter(FdtNode *node, IterDumpCtx *ctx)
 {
-    emit_fmt$(ctx->out, "node: {}\n", node->name);
-    emit_ident(ctx->out);
+    emit_fmt$(ctx->emit, "node: {}\n", node->name);
+    emit_ident(ctx->emit);
     fdt_node_props(*node, (IterFn *)fdt_dump_props_iter, ctx);
     fdt_node_childs(*node, (IterFn *)fdt_dump_node_iter, ctx);
-    emit_deident(ctx->out);
+    emit_deident(ctx->emit);
     return ITER_CONTINUE;
 }
 
-void fdt_dump(FdtHeader *fdt, Emit *out, bool dump_values)
+void fdt_dump(FdtHeader *fdt, Emit *emit, bool dump_values)
 {
     FdtNode root = fdt_node_root(fdt);
     IterDumpCtx ctx = {
-        .out = out,
+        .emit = emit,
         .dump_values = dump_values,
     };
 
-    emit_fmt$(out, "fdt-dump:\n");
-    emit_ident(out);
+    emit_fmt$(emit, "fdt-dump:\n");
+    emit_ident(emit);
     fdt_node_childs(root, (IterFn *)fdt_dump_node_iter, &ctx);
 
-    emit_deident(out);
+    emit_deident(emit);
 
-    emit_fmt$(out, "fdt reserved memory:\n");
+    emit_fmt$(emit, "fdt reserved memory:\n");
     FdtReservationEntry *entry = ((void *)fdt) + be_load$(fdt->memory_reservation_offset);
-    emit_ident(out);
+    emit_ident(emit);
     while (be_load$(entry->size) != 0 || be_load$(entry->address) != 0)
     {
-        emit_fmt$(out, "- [{#x}] - [{#x}] \n", be_load$(entry->address), be_load$(entry->address) + be_load$(entry->size));
+        emit_fmt$(emit, "- [{#x}] - [{#x}] \n", be_load$(entry->address), be_load$(entry->address) + be_load$(entry->size));
         entry++;
     }
-    emit_deident(out);
+    emit_deident(emit);
 }
 
 USizeRange fdt_reg_get_range(FdtProp prop, MAYBE_UNUSED uintptr_t addr_size, MAYBE_UNUSED uintptr_t len_size)

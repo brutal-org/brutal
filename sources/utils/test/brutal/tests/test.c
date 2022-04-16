@@ -1,4 +1,4 @@
-#include <brutal/tests.h>
+#include <brutal-test>
 
 test$(should_run)
 {

@@ -1,5 +1,3 @@
-GENDIR=bin/generated
-
 PROTOS:= \
 	$(wildcard sources/protos/*.idl) \
 	$(wildcard sources/protos/*/*.idl)
@@ -19,3 +17,5 @@ $(GENDIR)/%.h: sources/%.idl $(IDL_HOST_BIN)
 $(GENDIR)/%.c: sources/%.idl $(IDL_HOST_BIN)
 	@$(MKCWD)
 	$(IDL_HOST_BIN) $< --source > $@
+
+

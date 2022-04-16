@@ -1,6 +1,6 @@
-#include <brutal/debug.h>
-#include <brutal/mem.h>
 #include <ipc/pack.h>
+#include <brutal-debug>
+#include <brutal-mem>
 
 void ipc_pack_init(IpcPack *self)
 {

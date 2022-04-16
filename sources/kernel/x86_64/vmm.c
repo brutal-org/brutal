@@ -1,8 +1,8 @@
-#include <brutal/debug.h>
-#include <brutal/sync.h>
+#include "kernel/vmm.h"
+#include <brutal-debug>
+#include <brutal-sync>
 #include "kernel/heap.h"
 #include "kernel/mmap.h"
-#include "kernel/vmm.h"
 #include "kernel/x86_64/asm.h"
 #include "kernel/x86_64/paging.h"
 

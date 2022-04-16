@@ -1,4 +1,4 @@
-#include <brutal/text.h>
+#include <brutal-fmt>
 #include <cc/builder.h>
 #include <idl/cgen.h>
 
@@ -9,7 +9,7 @@ void idl_cgen_iface_source(CUnit *unit, IdlModule const module, IdlIface const i
         CType type = idl_cgen_method_type(method, module, alloc);
         CStmt body = idl_cgen_method_body(method, iface, alloc);
 
-        cunit_decl(unit, cdecl_func(str_fmt$(alloc, "{}_rpc", method.name), type, body));
+        cunit_decl(unit, cdecl_func(fmt_str$(alloc, "{}_rpc", method.name), type, body));
     }
 
     cunit_decl(unit, idl_cgen_dispatch_func(iface, alloc));
@@ -21,7 +21,7 @@ CUnit idl_cgen_source(IdlModule const module, Alloc *alloc)
     CUnit unit = cunit(alloc);
 
     idl_cgen_includes(&unit, module, alloc);
-    cunit_include(&unit, false, str_fmt$(alloc, "{case-snake}.h", module.name));
+    cunit_include(&unit, false, fmt_str$(alloc, "{case-snake}.h", module.name));
 
     vec_foreach_v(alias, &module.aliases)
     {

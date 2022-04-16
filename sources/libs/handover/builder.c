@@ -1,5 +1,5 @@
-#include <brutal/debug.h>
 #include <handover/builder.h>
+#include <brutal-debug>
 
 void handover_builder_init(Ho2Builder *self, Alloc *alloc)
 {

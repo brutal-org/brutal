@@ -1,4 +1,4 @@
-#include <brutal/debug.h>
+#include <brutal-debug>
 #include <json/emit.h>
 
 void json_emit_string(Str str, Emit *emit)

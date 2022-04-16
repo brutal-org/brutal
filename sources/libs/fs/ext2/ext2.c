@@ -1,8 +1,8 @@
-#include <brutal/debug.h>
-#include <brutal/math.h>
 #include <fs/ext2/block.h>
 #include <fs/ext2/cache.h>
 #include <fs/ext2/ext2.h>
+#include <brutal-debug>
+#include <brutal-math>
 
 static FsResult ext2_group(Ext2Fs *self, Ext2GroupBlockDescTable *group, uint64_t group_id, bool write)
 {

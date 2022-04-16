@@ -1,7 +1,7 @@
-#include <brutal/alloc.h>
-#include <brutal/debug.h>
-#include <brutal/ds.h>
 #include "kernel/event.h"
+#include <brutal-alloc>
+#include <brutal-debug>
+#include <brutal-ds>
 
 static RwLock _lock = {};
 static Vec(EventBinding) _bindings = {};

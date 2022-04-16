@@ -1,6 +1,6 @@
 #include "kernel/riscv64/uart8250.h"
-#include <brutal/base.h>
-#include <brutal/mem.h>
+#include <brutal-base>
+#include <brutal-mem>
 
 static Uart _self;
 

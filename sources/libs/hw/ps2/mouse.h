@@ -1,8 +1,8 @@
 #pragma once
 
-#include <brutal/base.h>
-#include <brutal/ui.h>
 #include <hw/ps2/controller.h>
+#include <brutal-base>
+#include <brutal-ui>
 
 typedef void (*Ps2MouseCallback)(UiEvent ev, void *ctx);
 

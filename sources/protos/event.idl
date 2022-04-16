@@ -1,7 +1,7 @@
 module event;
 
 import base, math;
-include brutal/ui.h;
+include brutal-ui;
 
 type Event = __ctype(UiEvent);
 

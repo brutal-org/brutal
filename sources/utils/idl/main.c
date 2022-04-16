@@ -1,12 +1,12 @@
-#include <brutal/alloc.h>
-#include <brutal/debug.h>
-#include <brutal/io.h>
 #include <cc/trans.h>
 #include <idl/cgen.h>
 #include <idl/json.h>
 #include <idl/parse.h>
 #include <idl/sema.h>
 #include <json/emit.h>
+#include <brutal-alloc>
+#include <brutal-debug>
+#include <brutal-io>
 
 int main(int argc, char const *argv[])
 {

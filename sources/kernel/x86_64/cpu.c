@@ -1,5 +1,5 @@
-#include <brutal/debug.h>
 #include "kernel/cpu.h"
+#include <brutal-debug>
 #include "kernel/heap.h"
 #include "kernel/kernel.h"
 #include "kernel/x86_64/apic.h"
@@ -9,7 +9,7 @@
 static size_t _len = 0;
 static CpuImpl _cpus[MAX_CPU_COUNT] = {};
 
-CpuImpl *cpu_impl(CpuId id)
+CpuImpl *cpu_impl(int id)
 {
     return &_cpus[id];
 }
@@ -19,7 +19,7 @@ CpuImpl *cpu_impl_self(void)
     return &_cpus[cpu_self_id()];
 }
 
-void cpu_found(CpuId id, int lapic)
+void cpu_found(int id, int lapic)
 {
     _len++;
 
@@ -49,7 +49,7 @@ void cpu_initialize(void)
     gdt_load_tss(&cpu_impl_self()->tss);
 }
 
-CpuId cpu_self_id(void)
+int cpu_self_id(void)
 {
     return lapic_current_cpu();
 }
@@ -59,12 +59,12 @@ Cpu *cpu_self(void)
     return &cpu_impl_self()->base;
 }
 
-Cpu *cpu(CpuId id)
+Cpu *cpu(int id)
 {
     return &cpu_impl(id)->base;
 }
 
-void cpu_resched_other(CpuId cpu)
+void cpu_resched_other(int cpu)
 {
     lapic_send_ipi(cpu, IPI_RESCHED);
 }

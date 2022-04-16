@@ -1,7 +1,7 @@
-#include <brutal/alloc.h>
 #include <embed/win.h>
 #include <protos/event.h>
 #include <protos/window.h>
+#include <brutal-alloc>
 
 /* --- Event Sink Protocol -------------------------------------------------- */
 

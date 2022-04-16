@@ -30,30 +30,30 @@ LOADER_LDFLAGS= \
 
 LOADER_SRC = \
 	sources/libs/bal/boot/handover.c \
-	sources/libs/brutal/io/buf.c \
-	sources/libs/brutal/io/emit.c \
-	sources/libs/brutal/io/file.c \
-	sources/libs/brutal/io/fmt.c \
-	sources/libs/brutal/io/funcs.c \
-	sources/libs/brutal/io/base.c \
-	sources/libs/brutal/io/chan.c \
-	sources/libs/brutal/parse/lex.c \
-	sources/libs/brutal/parse/nums.c \
-	sources/libs/brutal/parse/scan.c \
+	sources/libs/brutal-io/buf.c \
+	sources/libs/brutal-io/emit.c \
+	sources/libs/brutal-io/file.c \
+	sources/libs/brutal-io/funcs.c \
+	sources/libs/brutal-io/base.c \
+	sources/libs/brutal-io/chan.c \
+	sources/libs/brutal-parse/lex.c \
+	sources/libs/brutal-parse/nums.c \
+	sources/libs/brutal-parse/scan.c \
 	sources/libs/hw/fdt/fdt.c \
 	sources/libs/stdc-ansi/ctype.c \
 	sources/libs/stdc-ansi/string.c \
 	$(wildcard sources/loader/*.c) \
 	$(wildcard sources/libs/json/parser.c) \
 	$(wildcard sources/libs/json/objects.c) \
-	$(wildcard sources/libs/brutal/alloc/*.c) \
-	$(wildcard sources/libs/brutal/ds/*.c) \
-	$(wildcard sources/libs/brutal/hash/*.c) \
+	$(wildcard sources/libs/brutal-alloc/*.c) \
+	$(wildcard sources/libs/brutal-ds/*.c) \
+	$(wildcard sources/libs/brutal-hash/*.c) \
 	$(wildcard sources/libs/embed/efi/*.c) \
 	$(wildcard sources/libs/embed/$(ARCH)/*.c) \
-	$(wildcard sources/libs/brutal/debug/*.c) \
-	$(wildcard sources/libs/brutal/mem/*.c) \
-	$(wildcard sources/libs/brutal/text/*.c) \
+	$(wildcard sources/libs/brutal-debug/*.c) \
+	$(wildcard sources/libs/brutal-mem/*.c) \
+	$(wildcard sources/libs/brutal-text/*.c) \
+	$(wildcard sources/libs/brutal-fmt/*.c) \
 	$(wildcard sources/libs/elf/elf.c) \
 	$(wildcard sources/libs/hw/efi/*/*.c) \
 	$(wildcard sources/libs/hw/efi/*.c)
@@ -69,10 +69,10 @@ $(LOADER): $(LOADER_OBJS)
 	@$(MKCWD)
 	$(LOADER_LD) -o $@ $^ $(LOADER_LDFLAGS)
 
-$(BINDIR_LOADER)/%.c.o: sources/%.c
+$(BINDIR_LOADER)/%.c.o: sources/%.c | $(GENERATED_MOD)
 	@$(MKCWD)
 	$(LOADER_CC) -c -o $@ $< $(LOADER_CFLAGS)
 
-$(BINDIR_LOADER)/libs/%.c.o: sources/libs/%.c
+$(BINDIR_LOADER)/libs/%.c.o: sources/libs/%.c | $(GENERATED_MOD)
 	@$(MKCWD)
 	$(LOADER_CC) -c -o $@ $< $(LOADER_CFLAGS)

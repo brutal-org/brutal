@@ -11,8 +11,8 @@ typedef struct
 
 CpuImpl *cpu_impl_self(void);
 
-CpuImpl *cpu_impl(CpuId id);
+CpuImpl *cpu_impl(int id);
 
-void cpu_found(CpuId id, int lapic);
+void cpu_found(int id, int lapic);
 
 void cpu_initialize(void); // init cpu_context for current cpu

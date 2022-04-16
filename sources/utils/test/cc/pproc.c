@@ -1,5 +1,5 @@
-#include <brutal/debug.h>
-#include <brutal/tests.h>
+#include <brutal-debug>
+#include <brutal-test>
 #include <cc/lex.h>
 #include <cc/parse.h>
 

@@ -1,5 +1,5 @@
-#include <brutal/debug.h>
 #include <cc/builder/stmt.h>
+#include <brutal-debug>
 
 CStmt cstmt_empty(void)
 {

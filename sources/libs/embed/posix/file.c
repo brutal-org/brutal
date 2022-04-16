@@ -1,6 +1,3 @@
-#include <brutal/alloc.h>
-#include <brutal/debug.h>
-#include <brutal/text/utf8.h>
 #include <embed/file.h>
 #include <embed/posix/err.h>
 #include <fcntl.h>
@@ -8,6 +5,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <brutal-alloc>
+#include <brutal-debug>
+#include <brutal-text/utf8.h>
 
 int embed_flags2posix_flags(FileInitFlags flags)
 {

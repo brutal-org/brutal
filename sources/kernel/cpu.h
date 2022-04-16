@@ -1,11 +1,10 @@
 #pragma once
 
-#include <brutal/task/types.h>
 #include "kernel/task.h"
 
 typedef struct
 {
-    CpuId id;
+    int id;
     bool present;
 
     bool retain_enable;
@@ -16,15 +15,15 @@ typedef struct
     Task *next;
 } Cpu;
 
-Cpu *cpu(CpuId id);
+Cpu *cpu(int id);
 
 int cpu_count(void);
 
 Cpu *cpu_self(void);
 
-CpuId cpu_self_id(void);
+int cpu_self_id(void);
 
-void cpu_resched_other(CpuId cpu);
+void cpu_resched_other(int cpu);
 
 void cpu_begin_interrupt(void);
 

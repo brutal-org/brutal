@@ -1,7 +1,7 @@
-#include <brutal/alloc.h>
-#include <brutal/debug.h>
-#include <brutal/io.h>
 #include <efi/lib.h>
+#include <brutal-alloc>
+#include <brutal-debug>
+#include <brutal-io>
 
 static bool _init = false;
 static EFIHandle _handle;

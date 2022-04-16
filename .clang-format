@@ -15,12 +15,12 @@ BreakInheritanceList: AfterColon
 IndentPPDirectives: AfterHash
 ForEachMacros: ["__dummy_foreach"]
 SpaceBeforeParens: ControlStatementsExceptForEachMacros
-IncludeBlocks: Merge
+IncludeBlocks: Regroup
 IncludeCategories:
-  - Regex:           '<([:alnum:.\/-_])+>'
+  - Regex:           '<[[:alnum:].\/-]+>'
     Priority:        0
     SortPriority:    0
-  - Regex:           '"([:alnum:.\/-_])+"'
+  - Regex:           '"[[:alnum:].\/-]+"'
     Priority:        10
     SortPriority:    10
 ...

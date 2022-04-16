@@ -1,4 +1,4 @@
-#include <brutal/io.h>
+#include <brutal-fmt>
 
 int main(int argc, char const *argv[])
 {
@@ -9,6 +9,6 @@ int main(int argc, char const *argv[])
         name = str$(argv[1]);
     }
 
-    io_print$("Hello, {}!\n", name);
+    fmt_print$("Hello, {}!\n", name);
     return 0;
 }

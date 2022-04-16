@@ -1,6 +1,5 @@
-#include <brutal/debug.h>
-#include <brutal/io.h>
-#include <brutal/text.h>
+#include <brutal-debug>
+#include <brutal-fmt>
 #include <idl/ast/builder.h>
 #include <idl/parse.h>
 
@@ -60,7 +59,7 @@ static bool expect_separator(Scan *scan, char sep)
 
 static int is_ident(int chr)
 {
-    return chr == '_' || isalnum(chr);
+    return chr == '-' || chr == '_' || isalnum(chr);
 }
 
 static IdlType idl_parse_type(Scan *scan, Alloc *alloc);
@@ -362,7 +361,7 @@ IdlModule idl_parse_module(Scan *scan, Alloc *alloc)
 IoResult idl_import_module(Str name, IdlModule *module, Alloc *alloc)
 {
     IoFile source_file;
-    TRY(IoResult, io_file_view(&source_file, str_fmt$(alloc, "sources/protos/{}.idl", name)));
+    TRY(IoResult, io_file_view(&source_file, fmt_str$(alloc, "sources/protos/{}.idl", name)));
 
     Buf source_buf;
     buf_init(&source_buf, 512, alloc);

@@ -1,5 +1,5 @@
-#include <brutal/debug.h>
 #include <embed/file.h>
+#include <brutal-debug>
 
 MaybeError embed_file_open(IoFile *, Str, FileInitFlags)
 {

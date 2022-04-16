@@ -1,6 +1,6 @@
-#include <brutal/alloc.h>
-#include <brutal/debug.h>
-#include <brutal/ds.h>
+#include <brutal-alloc>
+#include <brutal-debug>
+#include <brutal-ds>
 #include <fs/block.h>
 #include <fs/ext2/ext2.h>
 /*

@@ -1,6 +1,5 @@
-#include <brutal/codec/zlib/zlib.h>
-#include <brutal/debug.h>
-#include <brutal/tests.h>
+#include <brutal-test>
+#include <codec-zlib>
 
 test$(zlib_empty_raw)
 {

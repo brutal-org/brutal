@@ -1,8 +1,8 @@
-#include <brutal/debug.h>
+#include "kernel/x86_64/idt.h"
+#include <brutal-debug>
 #include "kernel/arch.h"
 #include "kernel/x86_64/apic.h"
 #include "kernel/x86_64/gdt.h"
-#include "kernel/x86_64/idt.h"
 
 extern uintptr_t __interrupt_vector[256];
 

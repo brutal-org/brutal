@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/ui/app.h>
+#include <brutal-ui/app.h>
 
 void embed_app_init(UiApp *self);
 

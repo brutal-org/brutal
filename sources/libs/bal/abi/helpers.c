@@ -1,5 +1,5 @@
 #include <bal/abi/helpers.h>
-#include <brutal/debug/log.h>
+#include <brutal-debug/log.h>
 
 char const *br_syscall_to_string(BrSyscall syscall)
 {

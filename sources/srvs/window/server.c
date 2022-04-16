@@ -1,7 +1,7 @@
-#include <brutal/alloc.h>
-#include <brutal/gfx.h>
 #include <protos/system.h>
 #include <protos/window.h>
+#include <brutal-alloc>
+#include <brutal-gfx>
 #include "window/server.h"
 
 /* --- Input Sink Protocol -------------------------------------------------- */

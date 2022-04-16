@@ -1,6 +1,6 @@
-#include <brutal/alloc.h>
-#include <brutal/io.h>
 #include <json/parser.h>
+#include <brutal-alloc>
+#include <brutal-io>
 
 static bool json_skip_comment(Scan *scan)
 {

@@ -1,8 +1,8 @@
-#include <brutal/debug.h>
 #include <embed/mem.h>
 #include <embed/posix/err.h>
 #include <string.h>
 #include <sys/mman.h>
+#include <brutal-debug>
 
 void embed_mem_lock(void)
 {

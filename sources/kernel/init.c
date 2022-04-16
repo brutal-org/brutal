@@ -1,7 +1,7 @@
-#include <brutal/alloc.h>
-#include <brutal/debug.h>
-#include "kernel/heap.h"
 #include "kernel/init.h"
+#include <brutal-alloc>
+#include <brutal-debug>
+#include "kernel/heap.h"
 #include "kernel/kernel.h"
 #include "kernel/mmap.h"
 #include "kernel/sched.h"

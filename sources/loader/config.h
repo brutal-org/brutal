@@ -1,7 +1,7 @@
 #pragma once
 
-#include <brutal/ds.h>
-#include <brutal/text.h>
+#include <brutal-ds>
+#include <brutal-text>
 
 typedef struct
 {

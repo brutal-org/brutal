@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/base.h>
+#include <brutal-base>
 
 #if defined(__x86_64__)
 #    define EMBED_HAS_MEMSET 1

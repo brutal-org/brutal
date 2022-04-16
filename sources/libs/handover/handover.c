@@ -1,6 +1,6 @@
 #include <bal/boot/handover.h>
-#include <brutal/debug.h>
-#include <brutal/mem.h>
+#include <brutal-debug>
+#include <brutal-mem>
 
 void handover_mmap_append(HandoverMmap *self, HandoverMmapEntry entry)
 {

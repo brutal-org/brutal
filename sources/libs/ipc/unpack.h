@@ -1,8 +1,8 @@
 #pragma once
 
-#include <brutal/ds.h>
-#include <brutal/math.h>
 #include <ipc/capability.h>
+#include <brutal-ds>
+#include <brutal-math>
 
 typedef struct
 {

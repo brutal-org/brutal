@@ -1,11 +1,7 @@
-#include <brutal/debug.h>
-#include <brutal/sync.h>
-#include <brutal/task/types.h>
-#include <brutal/time.h>
-#include "kernel/context.h"
-#include "kernel/cpu.h"
-#include "kernel/event.h"
-#include "kernel/sched.h"
+#include <brutal-debug>
+#include <brutal-sync>
+#include <brutal-time>
+
 #include "kernel/x86_64/apic.h"
 #include "kernel/x86_64/asm.h"
 #include "kernel/x86_64/cmos.h"
@@ -14,6 +10,11 @@
 #include "kernel/x86_64/simd.h"
 #include "kernel/x86_64/smp.h"
 #include "kernel/x86_64/syscall.h"
+
+#include "kernel/context.h"
+#include "kernel/cpu.h"
+#include "kernel/event.h"
+#include "kernel/sched.h"
 
 static char *_exception_messages[32] = {
     "DivisionByZero",

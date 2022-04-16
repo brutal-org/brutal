@@ -1,7 +1,7 @@
 #include <acpi/mcfg.h>
 #include <acpi/rsdt.h>
-#include <brutal/debug.h>
 #include <pci/addr.h>
+#include <brutal-debug>
 #include "config.h"
 #include "pci.h"
 

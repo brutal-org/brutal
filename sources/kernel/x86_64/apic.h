@@ -66,13 +66,13 @@ void lapic_enable_spurious(void);
 
 void lapic_eoi(void);
 
-void lapic_send_ipi(CpuId cpu_id, uint32_t interrupt_id);
+void lapic_send_ipi(int cpu_id, uint32_t interrupt_id);
 
-void lapic_send_init(CpuId cpu_id);
+void lapic_send_init(int cpu_id);
 
-void lapic_send_sipi(CpuId cpu_id, uintptr_t entry);
+void lapic_send_sipi(int cpu_id, uintptr_t entry);
 
-CpuId lapic_current_cpu(void);
+int lapic_current_cpu(void);
 
 /* --- IoApic --------------------------------------------------------------- */
 

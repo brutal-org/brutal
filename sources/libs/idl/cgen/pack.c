@@ -1,5 +1,5 @@
-#include <brutal/debug.h>
-#include <brutal/text.h>
+#include <brutal-debug>
+#include <brutal-fmt>
 #include <cc/builder.h>
 #include <idl/cgen.h>
 
@@ -11,7 +11,7 @@ Str idl_cgen_pack_name(IdlAlias alias, Alloc *alloc)
         return vec_at(&attr.args, 0);
     }
 
-    return str_fmt$(alloc, "ipc_pack_{case-snake}", alias.name);
+    return fmt_str$(alloc, "ipc_pack_{case-snake}", alias.name);
 }
 
 CExpr idl_cgen_pack_ref(IdlAlias alias, Alloc *alloc)
