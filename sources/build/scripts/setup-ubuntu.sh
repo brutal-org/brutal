@@ -5,8 +5,9 @@ set -e
 sudo apt update
 
 # LLVM/CLANG
-sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
-sudo apt install -y clang-12 llvm-12 lld
+wget https://apt.llvm.org/llvm.sh
+chmod +x llvm.sh
+sudo ./llvm.sh 13 all
 
 # GCC/binutils
 sudo add-apt-repository ppa:ubuntu-toolchain-r/test

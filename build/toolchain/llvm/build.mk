@@ -5,7 +5,7 @@ BASE_CFLAGS += \
 
 # --- Host compiler ---------------------------------------------------------- #
 
-LLVM_VERSION ?=-12
+LLVM_VERSION ?=-13
 
 HOST_CC=clang$(LLVM_VERSION)
 ifeq (, $(shell which $(HOST_CC) 2> /dev/null))
@@ -16,15 +16,16 @@ HOST_CFLAGS= \
 	$(BASE_CFLAGS) \
 	`pkg-config sdl2 --cflags`
 
-HOST_LD=ld.lld
+HOST_LD=ld.lld$(LLVM_VERSION)
+ifeq (, $(shell which $(HOST_AR) 2> /dev/null))
+	HOST_LD=ld.lld
+endif
+
 HOST_LDFLAGS= \
 	`pkg-config sdl2 --libs` \
 	-lm
 
 HOST_AR=llvm-ar$(LLVM_VERSION)
-ifeq (, $(shell which $(HOST_AR) 2> /dev/null))
-	HOST_AR=llvm-ar
-endif
 
 HOST_ARFLAGS=rcs
 
@@ -61,7 +62,11 @@ USER_UCFLAGS= \
 	$(USER_CFLAGS) \
 	-nostdlib
 
-USER_LD=ld.lld
+USER_LD=ld.lld$(LLVM_VERSION)
+ifeq (, $(shell which $(HOST_AR) 2> /dev/null))
+	USER_LD=ld.lld
+endif
+
 USER_KLDFLAGS= \
 	-Tsources/build/boards/$(ARCH)-$(BOARD)/link.ld \
 	-z max-page-size=0x1000 \

@@ -2,6 +2,8 @@
 
 #include <brutal-io/rbits.h>
 
+#include "errors.h"
+
 typedef struct
 {
     uint16_t counts[16];   // Number of codes with a given length

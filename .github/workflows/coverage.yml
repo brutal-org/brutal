@@ -22,8 +22,8 @@ jobs:
             - name: Run Tests
               run: |
                   TOOLCHAIN=llvm ./brutal.sh --coverage test
-                  llvm-profdata-12 merge -sparse `find . -name "*.profraw"` -o coverage.profdata
-                  llvm-cov-12 show ./bin/devel/x86_64-host-llvm/test -instr-profile=coverage.profdata -format=text > coverage.txt
+                  llvm-profdata-13 merge -sparse `find . -name "*.profraw"` -o coverage.profdata
+                  llvm-cov-13 show ./bin/devel/x86_64-host-llvm/test -instr-profile=coverage.profdata -format=text > coverage.txt
 
             - name: Upload test coverage
               uses: codecov/codecov-action@v2

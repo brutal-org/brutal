@@ -10,7 +10,7 @@ On Arch Linux this can be done by doing `pacman -S make nasm`
 
 ## With LLVM
 
-Before trying to build BRUTAL with LLVM you need to install `lld` and `clang-12`.
+Before trying to build BRUTAL with LLVM you need to install `lld` and `clang-13`.
 
 On Arch Linux this can be done by doing `pacman -S lld clang`.
 
@@ -18,7 +18,7 @@ Build BRUTAL via the LLVM toolchain:
 
 `make all`
 
-> On some distros you might want to change the llvm version using `LLVM_VERSION=-12` or any other version.
+> On some distros you might want to change the llvm version using `LLVM_VERSION=-13` or any other version.
 
 ## With GNU
 
