@@ -206,6 +206,31 @@ static VmmResult vmm_map_page(Pml *pml4, uintptr_t virtual_page, uintptr_t physi
     return OK(VmmResult, range);
 }
 
+static VmmResult vmm_update_page(Pml *pml4, uintptr_t virtual_page, BrMemoryFlags flags)
+{
+    VmmRange pml3_range = TRY(VmmResult, vmm_get_pml(pml4, PML4_GET_INDEX(virtual_page))); // global is not available for pml3/4
+    Pml *pml3 = (Pml *)(pml3_range.base);
+
+    VmmRange pml2_range = TRY(VmmResult, vmm_get_pml(pml3, PML3_GET_INDEX(virtual_page)));
+    Pml *pml2 = (Pml *)(pml2_range.base);
+
+    VmmRange pml1_range = TRY(VmmResult, vmm_get_pml(pml2, PML2_GET_INDEX(virtual_page)));
+    Pml *pml1 = (Pml *)(pml1_range.base);
+
+    PmlEntry *entry = &pml1->entries[PML1_GET_INDEX(virtual_page)];
+
+    if (!entry->present)
+    {
+        panic$("{#x} is is not mapped", virtual_page);
+    }
+
+    *entry = pml_make_entry(entry->physical << 12, flags);
+
+    VmmRange range = {virtual_page, MEM_PAGE_SIZE};
+
+    return OK(VmmResult, range);
+}
+
 static VmmResult vmm_unmap_page(Pml *pml4, uintptr_t virtual_page)
 {
     VmmRange pml3_range = TRY(VmmResult, vmm_get_pml(pml4, PML4_GET_INDEX(virtual_page)));
@@ -224,6 +249,22 @@ static VmmResult vmm_unmap_page(Pml *pml4, uintptr_t virtual_page)
 
     VmmRange range = {virtual_page, MEM_PAGE_SIZE};
     return OK(VmmResult, range);
+}
+
+VmmResult vmm_update_flags(VmmSpace space, VmmRange virtual_range, BrMemoryFlags flags)
+{
+    assert_truth(mem_is_range_page_aligned(virtual_range));
+
+    LOCK_RETAINER(&_lock);
+    for (size_t i = 0; i < (virtual_range.size / MEM_PAGE_SIZE); i++)
+    {
+        TRY(VmmResult, vmm_update_page(
+                           (Pml *)space,
+                           i * MEM_PAGE_SIZE + virtual_range.base,
+                           flags));
+    }
+
+    return OK(VmmResult, virtual_range);
 }
 
 VmmResult vmm_map(VmmSpace space, VmmRange virtual_range, PmmRange physical_range, BrMemoryFlags flags)

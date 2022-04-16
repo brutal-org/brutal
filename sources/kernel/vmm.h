@@ -23,6 +23,8 @@ VmmSpace vmm_kernel_space(void);
 
 VmmResult vmm_map(VmmSpace space, VmmRange virtual_range, PmmRange physical_range, BrMemoryFlags flags);
 
+VmmResult vmm_update_flags(VmmSpace space, VmmRange virtual_range, BrMemoryFlags flags);
+
 VmmResult vmm_unmap(VmmSpace space, VmmRange virtual_range);
 
 PmmResult vmm_virt2phys(VmmSpace space, VmmRange virtual_range);
