@@ -26,6 +26,9 @@ HOST_LDFLAGS= \
 	-lm
 
 HOST_AR=llvm-ar$(LLVM_VERSION)
+ifeq (, $(shell which $(HOST_AR) 2> /dev/null))
+	HOST_AR=llvm-ar
+endif
 
 HOST_ARFLAGS=rcs
 
