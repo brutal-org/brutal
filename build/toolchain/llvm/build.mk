@@ -17,7 +17,7 @@ HOST_CFLAGS= \
 	`pkg-config sdl2 --cflags`
 
 HOST_LD=ld.lld$(LLVM_VERSION)
-ifeq (, $(shell which $(HOST_AR) 2> /dev/null))
+ifeq (, $(shell which $(HOST_LD) 2> /dev/null))
 	HOST_LD=ld.lld
 endif
 
@@ -66,7 +66,7 @@ USER_UCFLAGS= \
 	-nostdlib
 
 USER_LD=ld.lld$(LLVM_VERSION)
-ifeq (, $(shell which $(HOST_AR) 2> /dev/null))
+ifeq (, $(shell which $(USER_LD) 2> /dev/null))
 	USER_LD=ld.lld
 endif
 
