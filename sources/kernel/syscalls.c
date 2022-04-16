@@ -1,6 +1,7 @@
 #include <bal/abi.h>
-#include <embed/log.h>
 #include <brutal-debug>
+#include <embed/log.h>
+
 #include "kernel/arch.h"
 #include "kernel/domain.h"
 #include "kernel/event.h"
@@ -37,6 +38,12 @@ BrResult sys_now(BrNowArgs *args)
 BrResult sys_map(BrMapArgs *args)
 {
     Space *space = nullptr;
+
+    if (args->flags & (BR_MEM_WRITE_THROUGHT | BR_MEM_GLOBAL) &&
+        !(task_self()->rights & BR_RIGHT_DMA))
+    {
+        return BR_NOT_PERMITTED;
+    }
 
     if (args->space == BR_HANDLE_SELF)
     {
