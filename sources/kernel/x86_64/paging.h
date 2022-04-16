@@ -10,7 +10,7 @@ typedef union PACKED
         bool present : 1;
         bool read_write : 1;
         bool user : 1;
-        bool caching : 1;
+        bool page_write_through : 1;
         bool caching_disable : 1;
         bool accessed : 1;
         bool dirty : 1;
@@ -36,7 +36,7 @@ static inline PmlEntry pml_make_entry(uintptr_t physical, size_t flags)
         .user = (flags & BR_MEM_USER) != 0,
         .read_write = (flags & BR_MEM_WRITABLE) != 0,
         .present = true,
-        .caching = false,
+        .page_write_through = (flags & BR_MEM_NOWCACHE) != 0,
         .caching_disable = false,
         .accessed = false,
         .dirty = false,
