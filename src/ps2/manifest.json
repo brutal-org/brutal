@@ -1,0 +1,17 @@
+{
+    "type": "component",
+    "id": "ps2",
+    "version": "main",
+    "available": [
+        "target"
+    ],
+    "consume": [
+        "system.Server",
+        "event.Sink"
+    ],
+    "rights": [
+        "irq",
+        "pio",
+        "log"
+    ]
+}

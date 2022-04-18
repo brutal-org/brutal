@@ -1,0 +1,19 @@
+{
+    "type": "component",
+    "id": "demo",
+    "version": "main",
+    "available": [
+        "host",
+        "target"
+    ],
+    "import": {
+        "brutal-ui": "main"
+    },
+    "consume": [
+        "system.Server",
+        "window.Server"
+    ],
+    "rights": [
+        "log"
+    ]
+}

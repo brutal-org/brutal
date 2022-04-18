@@ -1,0 +1,8 @@
+{
+    "type": "component",
+    "id": "bvm",
+    "version": "main",
+    "available": [
+        "host"
+    ]
+}

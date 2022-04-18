@@ -44,7 +44,7 @@ USER_CFLAGS_INC := \
 CACHEDIR=.cache/
 GENDIR=bin/generated
 BINDIR_LOADER=bin/$(CONFIG)/$(ARCH)-loader-$(TOOLCHAIN)
-BINDIR_USER=bin/$(CONFIG)/$(ARCH)-brutal-$(TOOLCHAIN)
+BINDIR_TARGET=bin/$(CONFIG)/$(ARCH)-brutal-$(TOOLCHAIN)
 BINDIR_KERNEL=bin/$(CONFIG)/$(ARCH)-kernel-$(TOOLCHAIN)
 BINDIR_HOST=bin/$(CONFIG)/$(HOST_ARCH)-host-$(TOOLCHAIN)
 
@@ -71,7 +71,7 @@ all: $(ALL)
 .PHONY: clean
 clean:
 	rm -rf $(BINDIR_LOADER)
-	rm -rf $(BINDIR_USER)
+	rm -rf $(BINDIR_TARGET)
 	rm -rf $(BINDIR_KERNEL)
 	rm -rf $(BINDIR_HOST)
 

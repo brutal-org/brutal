@@ -25,23 +25,23 @@ LIBS_SRC = \
 	$(wildcard sources/libs/ubsan/*.c)
 
 LIBS_OBJ = \
-	$(patsubst sources/%, $(BINDIR_USER)/%.o, $(LIBS_SRC)) \
-	$(patsubst $(GENDIR)/%, $(BINDIR_USER)/%.o, $(GENERATED_SRC))
+	$(patsubst sources/%, $(BINDIR_TARGET)/%.o, $(LIBS_SRC)) \
+	$(patsubst $(GENDIR)/%, $(BINDIR_TARGET)/%.o, $(GENERATED_SRC))
 
 
-LIBS_BIN=$(BINDIR_USER)/libbrutal.a
+LIBS_BIN=$(BINDIR_TARGET)/libbrutal.a
 
 DEPENDENCIES += $(LIBS_OBJ:.o=.d)
 
-$(BINDIR_USER)/%.c.o: $(GENDIR)/%.c | $(GENERATED_HDR) $(GENERATED_MOD)
+$(BINDIR_TARGET)/%.c.o: $(GENDIR)/%.c | $(GENERATED_HDR) $(GENERATED_MOD)
 	@$(MKCWD)
 	$(USER_CC) -c -o $@ $< $(USER_UCFLAGS)
 
-$(BINDIR_USER)/%.c.o: sources/%.c | $(GENERATED_HDR) $(GENERATED_MOD)
+$(BINDIR_TARGET)/%.c.o: sources/%.c | $(GENERATED_HDR) $(GENERATED_MOD)
 	@$(MKCWD)
 	$(USER_CC) -c -o $@ $< $(USER_UCFLAGS)
 
-$(BINDIR_USER)/%.s.o: sources/%.s
+$(BINDIR_TARGET)/%.s.o: sources/%.s
 	@$(MKCWD)
 	$(USER_AS) -o $@ $< $(USER_ASFLAGS)
 
@@ -51,26 +51,19 @@ $(LIBS_BIN): $(LIBS_OBJ)
 
 define BIN_TEMPLATE
 
-$(1)_NAME = $$(shell echo $(1) | tr A-Z a-z)
+$(1)_SRC = $$(wildcard $$($(1)_PATH)/*.c)
+$(1)_OBJ = $$(patsubst sources/%,$(BINDIR_TARGET)/%.o, $$($(1)_SRC))
+$(1)_BIN = $(BINDIR_TARGET)/$$($(1)_NAME)/$$($(1)_NAME)
 
-$(1)_PKG = sources/$$(PKG_$(1)_PATH)
+$(1)_JSON = $(BINDIR_TARGET)/$$($(1)_NAME).json
 
-$(1)_SRC = $$(wildcard $$($(1)_PKG)/*.c)
-
-$(1)_OBJ = $$(patsubst sources/%,$(BINDIR_USER)/%.o, $$($(1)_SRC))
-
-$(1)_BIN = $(BINDIR_USER)/$$($(1)_NAME)
-
-$(1)_JSON = $(BINDIR_USER)/$$($(1)_NAME).json
+ALL+=$$($(1)_BIN)
 
 DEPENDENCIES += $$($(1)_OBJ:.o=.d)
 
-PKGS+=$$($(1)_BIN)
-ALL+=$$($(1)_BIN)
-
-$$($(1)_JSON): $$($(1)_PKG)/manifest.json $$(IDL_HOST_BIN) ./sources/build/scripts/manifest-builder.py
+$$($(1)_JSON): $$($(1)_PATH)/manifest.json $$(IDL_HOST_BIN) ./sources/build/scripts/manifest-builder.py
 	@$$(MKCWD)
-	./sources/build/scripts/manifest-builder.py $$($(1)_PKG)/manifest.json > $$@
+	./sources/build/scripts/manifest-builder.py $$($(1)_PATH)/manifest.json > $$@
 
 $$($(1)_BIN): $$($(1)_OBJ) $(LIBS_BIN) $$($(1)_JSON)
 	@$$(MKCWD)
@@ -80,17 +73,9 @@ $$($(1)_BIN): $$($(1)_OBJ) $(LIBS_BIN) $$($(1)_JSON)
         --set-section-flags .brutal.manifest=readonly,contents \
         $$@
 
-
-target-$$($(1)_NAME)-dump:
-	@echo "$$($(1)_BIN)"
-	@echo "$$($(1)_SRC)"
-	@echo "$$($(1)_OBJ)"
-
 endef
 
-USER_PKGS:=$(APPS) $(SRVS)
-
 list-user:
-	@echo $(USER_PKGS)
+	@echo $(TARGET_PKGS)
 
-$(foreach bin, $(USER_PKGS), $(eval $(call BIN_TEMPLATE,$(bin))))
+$(foreach bin, $(TARGET_PKGS), $(eval $(call BIN_TEMPLATE,$(bin))))

@@ -1,0 +1,8 @@
+{
+    "type": "component",
+    "id": "idl",
+    "version": "main",
+    "available": [
+        "host"
+    ]
+}

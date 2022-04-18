@@ -1,0 +1,8 @@
+{
+    "type": "component",
+    "id": "gunzip",
+    "version": "main",
+    "available": [
+        "host"
+    ]
+}

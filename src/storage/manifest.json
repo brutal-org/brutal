@@ -1,0 +1,8 @@
+{
+    "type": "component",
+    "id": "storage",
+    "version": "main",
+    "available": [
+        "target"
+    ]
+}

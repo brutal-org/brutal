@@ -1,3 +1,0 @@
-PKG_IDL_PATH=utils/idl
-
-UTILS+=IDL

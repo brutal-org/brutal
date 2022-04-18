@@ -1,0 +1,8 @@
+{
+    "type": "component",
+    "id": "gzip",
+    "version": "main",
+    "available": [
+        "host"
+    ]
+}

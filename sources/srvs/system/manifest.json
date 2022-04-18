@@ -1,5 +1,0 @@
-{
-    "name": "system",
-    "bootstrap": true,
-    "rights": ["irq", "dma", "pio", "log", "task"]
-}

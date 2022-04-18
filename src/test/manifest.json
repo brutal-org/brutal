@@ -1,0 +1,8 @@
+{
+    "type": "component",
+    "id": "test",
+    "version": "main",
+    "available": [
+        "host"
+    ]
+}

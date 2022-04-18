@@ -1,0 +1,8 @@
+{
+    "type": "component",
+    "id": "fontinfo",
+    "version": "main",
+    "available": [
+        "host"
+    ]
+}

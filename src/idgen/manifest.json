@@ -1,0 +1,8 @@
+{
+    "type": "component",
+    "id": "idgen",
+    "version": "main",
+    "available": [
+        "host"
+    ]
+}

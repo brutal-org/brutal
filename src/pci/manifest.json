@@ -1,0 +1,17 @@
+{
+    "type": "component",
+    "id": "pci",
+    "version": "main",
+    "available": [
+        "target"
+    ],
+    "consume": [
+        "system.Server",
+        "boot.Info"
+    ],
+    "rights": [
+        "irq",
+        "dma",
+        "log"
+    ]
+}

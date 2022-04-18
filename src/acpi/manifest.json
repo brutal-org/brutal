@@ -1,0 +1,17 @@
+{
+    "type": "component",
+    "id": "acpi",
+    "version": "main",
+    "available": [
+        "target"
+    ],
+    "consume": [
+        "system.Server",
+        "boot.Info"
+    ],
+    "rights": [
+        "irq",
+        "dma",
+        "log"
+    ]
+}

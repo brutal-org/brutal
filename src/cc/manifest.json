@@ -1,0 +1,8 @@
+{
+    "type": "component",
+    "id": "cc",
+    "version": "main",
+    "available": [
+        "host"
+    ]
+}

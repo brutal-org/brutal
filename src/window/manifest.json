@@ -1,0 +1,15 @@
+{
+    "type": "component",
+    "id": "window",
+    "version": "main",
+    "available": [
+        "target"
+    ],
+    "consume": [
+        "system.Server",
+        "hw.Display"
+    ],
+    "rights": [
+        "log"
+    ]
+}

@@ -1,0 +1,8 @@
+{
+    "type": "component",
+    "id": "fstools",
+    "version": "main",
+    "available": [
+        "host"
+    ]
+}

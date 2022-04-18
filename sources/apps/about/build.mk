@@ -1,4 +1,0 @@
-PKG_ABOUT_PATH=apps/about
-
-APPS+=ABOUT
-

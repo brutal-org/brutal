@@ -1,0 +1,16 @@
+{
+    "type": "component",
+    "id": "panel",
+    "version": "main",
+    "available": [
+        "host",
+        "target"
+    ],
+    "consume": [
+        "system.Server",
+        "window.Server"
+    ],
+    "rights": [
+        "log"
+    ]
+}

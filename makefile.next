@@ -1,0 +1,137 @@
+# = Context ================================================================== #
+
+.SUFFIXES:
+.DELETE_ON_ERROR:
+.DEFAULT_GOAL:=all
+SHELL:=/bin/bash
+
+# - Utilities ---------------------------------------------------------------- #
+
+MKCWD=@mkdir -p $(@D)
+DIR2H:=src/build/dir2h.py
+META2MK:=src/build/meta2mk.py
+
+# - Directories -------------------------------------------------------------- #
+
+SRCDIR:=src
+BINDIR:=bin
+HNDDIR:=$(BINDIR)/__headers__
+
+# - Toolchains --------------------------------------------------------------- #
+
+CFLAGS:= \
+    -std=gnu2x \
+    -Wall \
+    -Wextra \
+    -Werror \
+    -I$(SRCDIR) \
+    -I$(HNDDIR)
+
+# = Packages ================================================================= #
+
+PACKAGES:=$(shell ls $(SRCDIR))
+
+# - Manifests ---------------------------------------------------------------- #
+
+MANIFESTS:=$(patsubst $(SRCDIR)/%/manifest.json,$(BINDIR)/%/manifest.json,$(wildcard $(SRCDIR)/*/manifest.json))
+
+.SECONDARY: $(MANIFESTS)
+$(BINDIR)/%/manifest.json: $(SRCDIR)/%/manifest.json
+	$(MKCWD)
+	cat $^ > $@
+
+
+$(BINDIR)/%/build.mk: $(SRCDIR)/%/manifest.json
+	$(MKCWD)
+	$(META2MK) -m $^ > $@
+
+include $(patsubst $(BINDIR)/%/manifest.json,$(BINDIR)/%/build.mk,$(MANIFESTS))
+
+# - Headers ------------------------------------------------------------------ #
+
+HEADERS:=$(patsubst %,$(HNDDIR)/%,$(PACKAGES))
+
+.SECONDARY: $(HEADERS)
+$(HNDDIR)/%: $(SRCDIR)/%
+	$(MKCWD)
+	$(DIR2H) -d $< --prefix $(shell basename $<) > $@
+
+define PACKAGES_TEMPLATE
+
+# - Kernel Rules ------------------------------------------------------------- #
+
+$(BINDIR)/$($(1)_NAME)/kernel/%.c.o:
+    $(MKCWD)
+    $(KERNEL_CC) -c -o $@ $< $(KERNEL_CFLAGS)
+
+$(BINDIR)/$($(1)_NAME)/kernel/%.s.o:
+    $(MKCWD)
+    $(KERNEL_AS) -o $@ $< $(KERNEL_ASFLAGS)
+
+
+$(BINDIR)/$($(1)_NAME)/kernel/$($(1)_NAME):
+    $(MKCWD)
+    $(KERNEL_LD) -o $@ $^ $(KERNEL_LDFLAGS)
+
+# - Loader Rules ------------------------------------------------------------- #
+
+$(BINDIR)/$($(1)_NAME)/loader/%.c.o:
+    $(MKCWD)
+    $(LOADER_CC) -c -o $@ $< $(LOADER_CFLAGS)
+
+$(BINDIR)/$($(1)_NAME)/loader/%.s.o:
+    $(MKCWD)
+    $(LOADER_AS) -o $@ $< $(LOADER_ASFLAGS)
+
+$(BINDIR)/$($(1)_NAME)/loader/$($(1)_NAME):
+    $(MKCWD)
+    $(LOADER_LD) -o $@ $^ $(LOADER_LDFLAGS)
+
+# - Host Rules --------------------------------------------------------------- #
+
+$(BINDIR)/$($(1)_NAME)/host/%.c.o:
+    $(MKCWD)
+    $(HOST_CC) -c -o $@ $< $(HOST_CFLAGS)
+
+$(BINDIR)/$($(1)_NAME)/host/%.s.o:
+    $(MKCWD)
+    $(HOST_AS) -o $@ $< $(HOST_ASFLAGS)
+
+$(BINDIR)/$($(1)_NAME)/host/$($(1)_NAME):
+    $(MKCWD)
+    $(HOST_LD) -o $@ $^ $(HOST_LDFLAGS)
+
+
+# - Target Rules ------------------------------------------------------------- #
+
+$(BINDIR)/$($(1)_NAME)/target/%.c.o:
+    $(MKCWD)
+    $(TARGET_CC) -c -o $@ $< $(TARGET_CFLAGS)
+
+$(BINDIR)/$($(1)_NAME)/target/%.s.o:
+    $(MKCWD)
+    $(TARGET_AS) -o $@ $< $(TARGET_ASFLAGS)
+
+$(BINDIR)/$($(1)_NAME)/target/$($(1)_NAME):
+    $(MKCWD)
+    $(TARGET_LD) -o $@ $^ $(TARGET_LDFLAGS)
+
+endef
+
+$(foreach pkg,$(ALL_PKGS),$(info $(call PACKAGES_TEMPLATE,$(pkg))))
+
+# = Phony Rules ============================================================== #
+
+.PHONY: all
+all: $(HEADERS)
+
+.PHONY: clean
+clean:
+	rm -rf $(BINDIR)
+
+.PHONY: dump
+dump:
+	@echo CFLAGS: $(CFLAGS)
+	@echo MANIFESTS: $(MANIFESTS)
+	@echo HEADERS: $(HEADERS)
+

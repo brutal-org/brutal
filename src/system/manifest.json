@@ -1,0 +1,16 @@
+{
+    "type": "component",
+    "id": "system",
+    "version": "main",
+    "available": [
+        "target"
+    ],
+    "bootstrap": true,
+    "rights": [
+        "irq",
+        "dma",
+        "pio",
+        "log",
+        "task"
+    ]
+}

@@ -41,16 +41,10 @@ DEPENDENCIES += $(LIBS_HOST_OBJ:.o=.d)
 
 define HOST_TEMPLATE
 
-$(1)_NAME = $$(shell echo $(1) | tr A-Z a-z)
-
-$(1)_HOST_SRC = \
-	$$(wildcard sources/$$(PKG_$(1)_PATH)/*.c) \
-	$$(wildcard sources/$$(PKG_$(1)_PATH)/*/*.c) \
-	$$(wildcard sources/$$(PKG_$(1)_PATH)/*/*/*.c)
-
+$(1)_HOST_SRC = $$(wildcard sources/$$($(1)_PATH)/*.c)
 $(1)_HOST_OBJ = $$(patsubst sources/%,$(BINDIR_HOST)/%.o, $$($(1)_HOST_SRC))
-
 $(1)_HOST_BIN  = $(BINDIR_HOST)/$$($(1)_NAME)
+
 ALL+=$$($(1)_HOST_BIN)
 HOST_NAMES+=$$($(1)_NAME)
 
@@ -60,14 +54,7 @@ $$($(1)_HOST_BIN): $$($(1)_HOST_OBJ) $(LIBS_HOST_BIN)
 	@$$(MKCWD)
 	$(HOST_CC) -o $$@ $$^ $(HOST_LDFLAGS) $(HOST_CFLAGS)
 
-host-$$($(1)_NAME)-dump:
-	@echo "$$($(1)_HOST_BIN)"
-	@echo "$$($(1)_HOST_OBJ)"
-	@echo "$$($(1)_HOST_SRC)"
-
 endef
-
-HOST_PKGS=$(APPS) $(UTILS)
 
 list-host:
 	@echo $(HOST_NAMES)

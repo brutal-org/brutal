@@ -1,0 +1,17 @@
+{
+    "type": "component",
+    "id": "ahci",
+    "version": "main",
+    "available": [
+        "target"
+    ],
+    "consume": [
+        "system.Server",
+        "pci.Bus"
+    ],
+    "rights": [
+        "irq",
+        "dma",
+        "log"
+    ]
+}
