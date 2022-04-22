@@ -39,6 +39,10 @@
                 {
                     "name": "panel",
                     "path": "/pkgs/panel"
+                },
+                {
+                    "name": "bios",
+                    "path": "/boot/bios.bin"
                 }
             ]
         }

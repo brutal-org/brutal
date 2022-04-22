@@ -1,13 +1,5 @@
 #include <brutal-debug>
-#include "kernel/arch.h"
-#include "kernel/event.h"
-#include "kernel/init.h"
-#include "kernel/kernel.h"
-#include "kernel/mmap.h"
-#include "kernel/pmm.h"
-#include "kernel/sched.h"
-#include "kernel/tasking.h"
-#include "kernel/vmm.h"
+
 #include "kernel/x86_64/apic.h"
 #include "kernel/x86_64/asm.h"
 #include "kernel/x86_64/com.h"
@@ -18,7 +10,18 @@
 #include "kernel/x86_64/pic.h"
 #include "kernel/x86_64/simd.h"
 #include "kernel/x86_64/smp.h"
+#include "kernel/x86_64/svm/svm.h"
 #include "kernel/x86_64/syscall.h"
+
+#include "kernel/arch.h"
+#include "kernel/event.h"
+#include "kernel/init.h"
+#include "kernel/kernel.h"
+#include "kernel/mmap.h"
+#include "kernel/pmm.h"
+#include "kernel/sched.h"
+#include "kernel/tasking.h"
+#include "kernel/vmm.h"
 
 static atomic_int _ready = 0;
 
@@ -58,6 +61,15 @@ void arch_entry_main(Handover *handover, uint64_t magic)
     cpu_retain_enable();
     cpu_enable_interrupts();
 
+    if (!svm_is_available())
+    {
+        log$("svm is not available");
+    }
+    Str name = str$("bios");
+
+    HandoverModule const *elf_module = handover_find_module(handover, name);
+
+    svm_enter((void *)mmap_phys_to_io(elf_module->addr), elf_module->size);
     init_start(handover);
 
     sched_stop(task_self(), 0);
