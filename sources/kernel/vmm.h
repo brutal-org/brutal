@@ -1,6 +1,7 @@
 #pragma once
 
 #include <bal/abi.h>
+
 #include "kernel/pmm.h"
 
 typedef void *VmmSpace;
@@ -12,6 +13,8 @@ typedef Result(BrResult, VmmRange) VmmResult;
 void vmm_initialize(Handover const *handover);
 
 VmmSpace vmm_space_create(void);
+
+VmmSpace vmm_empty_space_create(void);
 
 VmmSpace vmm_kernel_space(void);
 

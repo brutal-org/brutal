@@ -1,10 +1,12 @@
 #include "kernel/vmm.h"
 #include <brutal-debug>
 #include <brutal-sync>
-#include "kernel/heap.h"
-#include "kernel/mmap.h"
+
 #include "kernel/x86_64/asm.h"
 #include "kernel/x86_64/paging.h"
+
+#include "kernel/heap.h"
+#include "kernel/mmap.h"
 
 static Lock _lock;
 static Pml *_kpml;
@@ -118,27 +120,29 @@ void vmm_initialize(Handover const *handover)
     log$("Loaded kernel memory map!");
 }
 
-VmmSpace vmm_space_create(void)
+VmmSpace vmm_empty_space_create(void)
 {
     LOCK_RETAINER(&_lock);
 
     HeapRange heap_result = UNWRAP(heap_alloc(MEM_PAGE_SIZE));
-
     VmmSpace vmm_address_space = (VmmSpace)heap_result.base;
+
     mem_set(vmm_address_space, 0, MEM_PAGE_SIZE);
 
-    Pml *pml_table = (Pml *)vmm_address_space;
+    return vmm_address_space;
+}
 
-    for (size_t i = 0; i < 255; i++)
-    {
-        pml_table->entries[i]._raw = 0;
-    }
+VmmSpace vmm_space_create(void)
+{
+    VmmSpace vmm_address_space = vmm_empty_space_create();
+    LOCK_RETAINER(&_lock);
+
+    Pml *pml_table = (Pml *)vmm_address_space;
 
     for (size_t i = 255; i < 512; i++)
     {
         pml_table->entries[i] = _kpml->entries[i];
     }
-
     return vmm_address_space;
 }
 
@@ -181,7 +185,7 @@ VmmSpace vmm_kernel_space(void)
     return (VmmSpace)_kpml;
 }
 
-static VmmResult vmm_map_page(Pml *pml4, uintptr_t virtual_page, uintptr_t physical_page, BrMemoryFlags flags)
+static VmmResult vmm_map_page(Pml *pml4, uintptr_t virtual_page, uintptr_t physical_page, BrMemoryFlags flags, bool check_remap)
 {
     VmmRange pml3_range = TRY(VmmResult, vmm_get_pml_or_alloc(pml4, PML4_GET_INDEX(virtual_page), (flags | BR_MEM_WRITABLE | BR_MEM_USER) & ~(BR_MEM_GLOBAL))); // global is not available for pml3/4
     Pml *pml3 = (Pml *)(pml3_range.base);
@@ -194,7 +198,7 @@ static VmmResult vmm_map_page(Pml *pml4, uintptr_t virtual_page, uintptr_t physi
 
     PmlEntry *entry = &pml1->entries[PML1_GET_INDEX(virtual_page)];
 
-    if (entry->present)
+    if (entry->present && check_remap)
     {
         panic$("{#x} is already mapped to {#x}", virtual_page, (uintptr_t)PML_GET_ADDR(*entry));
     }
@@ -286,7 +290,7 @@ VmmResult vmm_map(VmmSpace space, VmmRange virtual_range, PmmRange physical_rang
             (Pml *)space,
             i * MEM_PAGE_SIZE + virtual_range.base,
             i * MEM_PAGE_SIZE + physical_range.base,
-            flags);
+            flags, true);
     }
 
     return OK(VmmResult, virtual_range);
