@@ -66,6 +66,11 @@ typedef struct PACKED
     volatile void *hsave;
     volatile SvmVMCBSaveState *vmcb_save;
     volatile SvmVMCBControl *vmcb_ctrl;
+
+    void *io_bitmap;
+    uint8_t *mem;
+
+    VmmSpace *nested_page_tables;
 } SvmCtx;
 
 void owo(void)
@@ -77,7 +82,6 @@ void owo(void)
 
 void svm_enter(void *bios, size_t bios_size)
 {
-    bios_size = 128 * 1024;
     asm volatile("sti");
     svm_enable();
     volatile SvmCtx *ctx = (SvmCtx *)UNWRAP(heap_alloc(sizeof(SvmCtx))).base;
@@ -86,6 +90,9 @@ void svm_enter(void *bios, size_t bios_size)
     ctx->hsave = (void *)(UNWRAP(heap_alloc(4096)).base);
     ctx->phys_vmcb = (void *)mmap_io_to_phys((uintptr_t)ctx->vmcb);
     ctx->svm_save_ctx = (void *)(UNWRAP(heap_alloc(4096)).base + 2048);
+
+    ctx->nested_page_tables = vmm_empty_space_create();
+
     vmm_update_flags(vmm_kernel_space(),
                      (VmmRange){.base = (uintptr_t)ctx->hsave, .size = 0x1000}, BR_MEM_NOWCACHE | BR_MEM_WRITABLE | BR_MEM_READABLE);
     vmm_update_flags(vmm_kernel_space(),
@@ -96,9 +103,9 @@ void svm_enter(void *bios, size_t bios_size)
 
     asm volatile("vmsave %0" ::"a"(mmap_io_to_phys((uintptr_t)ctx->vmcb))
                  : "memory");
+
     ctx->vmcb_save = ctx->vmcb + 0x400;
     ctx->vmcb_ctrl = ctx->vmcb;
-
     ctx->vmcb_ctrl->intercept_exception = (uint32_t)-1;
     ctx->vmcb_ctrl->specific_intercept4 |= (1 << SVM_INTERCEPT_VMRUN);
     /*
@@ -170,14 +177,36 @@ void svm_enter(void *bios, size_t bios_size)
     ctx->vmcb_save->cr0 = (1 << 29) | 1 << 30 | 1 << 4;
     ctx->vmcb_save->efer = (1 << 12);
     ctx->vmcb_ctrl->guest_asid = 1;
-
+    ctx->vmcb_ctrl->np_enable = 1;
     ctx->vmcb_ctrl->v_tpr |= 1;
+    ctx->vmcb_ctrl->specific_intercept3 |= (1 << SVM_INTERCEPT_CPUID);
     asm_write_msr(MSR_SVM_HOST_SAVE_ADDR, mmap_io_to_phys((uint64_t)ctx->hsave));
 
+    const size_t io_size = align_up$(0xffff / 8, 0x1000);
+    ctx->io_bitmap = (void *)UNWRAP(heap_alloc(io_size)).base;
+    mem_set(ctx->io_bitmap, 0xff, io_size);
+
+    ctx->vmcb_ctrl->iopm_phys_addr = mmap_io_to_phys((uintptr_t)ctx->io_bitmap);
+    ctx->vmcb_ctrl->specific_intercept3 |= (1 << SVM_INTERCEPT_IOIO_PROT);
     // fixme: stop doing debug thing
-    vmm_map(vmm_kernel_space(), (VmmRange){.base = 0, .size = align_up$(bios_size, 0x1000)}, (PmmRange){.base = 0, .size = align_up$(bios_size, 0x1000)}, BR_MEM_READABLE | BR_MEM_WRITABLE | BR_MEM_EXECUTABLE | BR_MEM_USER);
+    // size_t first_128m = bios_size - (128 * 1024);
+    uintptr_t base = 0xffc00000;
+
+    vmm_map(ctx->nested_page_tables,
+            (VmmRange){.base = base, .size = align_up$(bios_size, 0x1000)},
+            (PmmRange){.base = mmap_io_to_phys((uintptr_t)bios), .size = align_up$(bios_size, 0x1000)}, BR_MEM_WRITABLE | BR_MEM_USER);
+
+    /// vmm_map(ctx->nested_page_tables, (VmmRange){.base = 0xfffe0000, .size = first_128m}, (PmmRange){.base = mmap_io_to_phys((uintptr_t)bios + first_128m), .size = first_128m}, BR_MEM_READABLE | BR_MEM_WRITABLE | BR_MEM_EXECUTABLE | BR_MEM_USER);
+
+    // vmm_map(ctx->nested_page_tables, (VmmRange){.base = 0xfffe0000, .size = 1024 * 128}, (PmmRange){.base = mmap_io_to_phys((uintptr_t)bios), .size = 1024 * 128}, BR_MEM_READABLE | BR_MEM_WRITABLE | BR_MEM_EXECUTABLE | BR_MEM_USER);
+    //  0x800000ffc00000
+    size_t vmem_size = 67108864 * 8;
+    uintptr_t vmem = UNWRAP(pmm_alloc(vmem_size, true)).base;
+    vmm_map(ctx->nested_page_tables, (VmmRange){.base = 0, .size = vmem_size}, (PmmRange){.base = ((uintptr_t)vmem), .size = vmem_size}, BR_MEM_WRITABLE | BR_MEM_USER);
+
+    ctx->vmcb_ctrl->nested_cr3 = mmap_io_to_phys((uintptr_t)ctx->nested_page_tables);
     vmm_space_switch(vmm_kernel_space());
-    mem_cpy((void *)0, bios, bios_size);
+
     while (true)
     {
         log$("============= SVM START ==============");
@@ -197,15 +226,16 @@ void svm_enter(void *bios, size_t bios_size)
         log$(" - cr3: {#x}", ctx->vmcb_save->cr3);
         log$(" - cr4: {#x}", ctx->vmcb_save->cr4);
         log$(" - cpl: {#x}", ctx->vmcb_save->cpl);
+
+        log$(" - cs: base:{#x} selector:{#x}", ctx->vmcb_save->cs.base, ctx->vmcb_save->cs.selector);
+
+        log$(" - idt: {#x}", ctx->vmcb_save->idtr.base);
         log$(" - efer: {#x}", ctx->vmcb_save->efer);
 
         log$(" - rsp: {#x}", ctx->vmcb_save->rsp);
 
         log$(" - type: {#x}", ctx->vmcb_ctrl->type);
         log$(" - vector: {#x}", ctx->vmcb_ctrl->vector);
-        while (true)
-        {
-        }
     }
     while (true)
     {
