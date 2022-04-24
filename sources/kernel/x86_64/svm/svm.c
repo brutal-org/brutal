@@ -20,12 +20,19 @@ bool svm_is_available(void)
 {
     if (!cpuid_svm())
     {
+        log$("host don't have svm");
         return false;
     }
     if ((asm_read_msr(MSR_VM_CR) & ((uint64_t)VM_CR_SVME_DISABLE)) == 0)
     {
+        if (!cpuid_svm_np())
+        {
+            log$("host don't have nested paging support !");
+            return false;
+        }
         return true;
     }
+    log$("host have svm but can't enable it (maybe you should change it in the bios ?)");
 
     // maybe we will add more checks later
     return false;

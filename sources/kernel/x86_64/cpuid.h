@@ -19,6 +19,7 @@ enum cpuid_leaf
     CPUID_EXTENDED_FEATURE_IDENTIFIER = 7,
     CPUID_PROC_EXTENDED_STATE_ENUMERATION = 13,
     CPUID_FEATURE_IDENTIFIER_EXT = 0x80000001,
+    CPUID_SVM_FEATURE_IDENTIFICATION = 0x8000000A,
 };
 
 enum cpuid_feature_bits
@@ -72,4 +73,9 @@ static inline size_t cpuid_xsave_size(void)
 static inline size_t cpuid_svm(void)
 {
     return cpuid(CPUID_FEATURE_IDENTIFIER_EXT, 0).ecx & CPUID_SVM_SUPPORT;
+}
+
+static inline size_t cpuid_svm_np(void)
+{
+    return cpuid(CPUID_SVM_FEATURE_IDENTIFICATION, 0).edx & CPUID_SVM_NESTED_PAGING;
 }
