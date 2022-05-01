@@ -1,15 +1,5 @@
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
+![Banner](meta/shared/cover.png)
 
-<p align="center">
-  <img width="256" src="meta/shared/logo.png">
-</p>
-
-<br/>
-<br/>
 <br/>
 
 <p align="center">
@@ -17,10 +7,6 @@
   Inspired by brutalist design <b>BRUTAL</b> combines the ideals of UNIX from the 1970s<br> with modern technology and engineering.
 </p>
 
-<br/>
-<br/>
-<br/>
-<br/>
 <br/>
 
 # BRUTAL
