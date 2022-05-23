@@ -17,7 +17,8 @@ if __name__ == "__main__":
     for root, dirs, files in os.walk(args.directory):
         for file in files:
             if file.endswith(".h"):
-                h_files.append(os.path.join(args.prefix, file))
+                final_path = os.path.relpath(os.path.join(root, file), args.directory)
+                h_files.append(os.path.join(args.prefix, final_path))
 
     # Create the header file
     stdout.write("#pragma once\n")
