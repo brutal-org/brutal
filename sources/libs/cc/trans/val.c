@@ -5,11 +5,11 @@ void ctrans_value(Emit *emit, CVal value)
 {
     switch (value.type)
     {
-    case CVAL_SIGNED:
+    case CVAL_INT:
         emit_fmt$(emit, "{}", value.signed_);
         break;
 
-    case CVAL_UNSIGNED:
+    case CVAL_UINT:
         emit_fmt$(emit, "{}", value.unsigned_);
         break;
 
@@ -18,7 +18,7 @@ void ctrans_value(Emit *emit, CVal value)
         break;
 
     case CVAL_STRING:
-        emit_fmt(emit, "\"{}\"", value.str_);
+        emit_fmt$(emit, "\"{}\"", value.str_);
         break;
 
     default:

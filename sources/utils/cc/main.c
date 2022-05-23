@@ -4,19 +4,9 @@
 #include <cc/lex/pproc.h>
 #include <cc/parse.h>
 #include <cc/sema.h>
-#include <cc/sema/checks.h>
 #include <cc/trans.h>
+#include <cc>
 #include <json/emit.h>
-
-typedef struct
-{
-    int line_number_start; // the number of the line at the start
-    int line_number_end;   // the number of the line at the end
-    int line_start;        // the starting character index  aligned by a line
-    int line_end;          // the last character index aligned by a line
-    int line_len;          // the length of the line(s)
-    bool is_multiline;     // if the range is represented by multiple or a single line
-} SrcFilePosInfo;
 
 // FIXME: this will be moved in an other file later.
 SrcFilePosInfo report_info(SrcRef ref, Str src)
@@ -46,9 +36,9 @@ SrcFilePosInfo report_info(SrcRef ref, Str src)
 
     return (SrcFilePosInfo){
         .is_multiline = is_multiline,
-        .line_len = line_len,
-        .line_end = line_end,
-        .line_start = line_start,
+        .char_line_len = line_len,
+        .char_line_end = line_end,
+        .char_line_start = line_start,
         .line_number_end = line_number_end,
         .line_number_start = line_number_start,
     };
@@ -56,16 +46,16 @@ SrcFilePosInfo report_info(SrcRef ref, Str src)
 
 void report_csema_line(Emit *out, Str src, SrcFilePosInfo info, bool only_first_line)
 {
-    Str line = str_sub(src, info.line_start, info.line_start + info.line_len);
-    emit_fmt(out, "{3d fg-blue} {fg-blue} ", info.line_number_start, "|");
+    Str line = str_sub(src, info.char_line_start, info.char_line_start + info.char_line_len);
+    emit_fmt$(out, "{3d fg-blue} {fg-blue} ", info.line_number_start, "|");
 
     if (info.is_multiline && !only_first_line)
     {
-        emit_fmt(out, "{fg-red} ", "/");
+        emit_fmt$(out, "{fg-red} ", "/");
     }
 
     int line_number = info.line_number_start;
-    for (int i = 0; i < info.line_len; i++)
+    for (int i = 0; i < info.char_line_len; i++)
     {
         if (line.buf[i] == '\n')
         {
@@ -74,105 +64,105 @@ void report_csema_line(Emit *out, Str src, SrcFilePosInfo info, bool only_first_
                 break;
             }
             line_number++;
-            emit_fmt(out, "\n{3d fg-blue} {fg-blue} ", line_number, "|");
+            emit_fmt$(out, "\n{3d fg-blue} {fg-blue} ", line_number, "|");
 
             if (info.is_multiline)
             {
-                emit_fmt(out, "{fg-red} ", "|");
+                emit_fmt$(out, "{fg-red} ", "|");
             }
         }
         else
         {
-            emit_fmt(out, "{}", line.buf[i]);
+            emit_fmt$(out, "{}", line.buf[i]);
         }
     }
 }
 
-void report_csema_dump(CSemaReport report, Emit *out, Scan *source, Str filename)
+void report_csema_dump(ParseReport report, Emit *out, Scan *source, Str filename)
 {
-    SrcRef src_ref = report.info.cref;
+    SrcRef src_ref = report.info.ref;
     int begin = src_ref.begin;
     int end = src_ref.end;
 
-    if (report.level == CSEMA_WARN)
+    if (report.level == PARSE_WARN)
     {
-        emit_fmt(out, "\n! warn: {red}\n", report.info.msg);
+        emit_fmt$(out, "\n! warn: {red}\n", report.info.msg);
     }
-    else if (report.level == CSEMA_ERR)
+    else if (report.level == PARSE_ERR)
     {
-        emit_fmt(out, "\n!! {fg-red bold}({fg-red}): {bold}\n", "error", report.pass, report.info.msg);
+        emit_fmt$(out, "\n!! {fg-red bold}({fg-red}): {bold}\n", "error", report.report_user_id, report.info.msg);
     }
 
     Str src = str_n$(source->size, (char *)source->buf);
     SrcFilePosInfo info = report_info(src_ref, src);
     // number of line from begin
-    emit_fmt(out, "-> {fg-blue}:{}:{} \n", filename, info.line_number_start, begin - info.line_start);
+    emit_fmt$(out, "-> {fg-blue}:{}:{} \n", filename, info.line_number_start, begin - info.char_line_start);
 
     report_csema_line(out, src, info, false);
 
     if (!info.is_multiline)
     {
-        emit_fmt(out, "\n    : ");
+        emit_fmt$(out, "\n    : ");
 
-        for (int i = info.line_start; i < info.line_len + info.line_start; i++)
+        for (int i = info.char_line_start; i < info.char_line_len + info.char_line_start; i++)
         {
             if (i > begin && i <= end)
             {
-                emit_fmt(out, "{fg-red}", "^");
+                emit_fmt$(out, "{fg-red}", "^");
             }
             else
             {
-                emit_fmt(out, " ");
+                emit_fmt$(out, " ");
             }
         }
-        emit_fmt(out, " {fg-red}", report.info.msg);
+        emit_fmt$(out, " {fg-red}", report.info.msg);
     }
 
     vec_foreach(v, &report.comments)
     {
 
-        bool is_comment_inline = v->cref.begin >= info.line_start && v->cref.end <= (info.line_len + info.line_start);
+        bool is_comment_inline = v->ref.begin >= info.char_line_start && v->ref.end <= (info.char_line_len + info.char_line_start);
 
         if (!info.is_multiline && is_comment_inline)
         {
-            emit_fmt(out, "\n    : ");
+            emit_fmt$(out, "\n    : ");
 
-            for (int i = info.line_start; i < m_min(info.line_len + info.line_start, v->cref.end + 2); i++)
+            for (int i = info.char_line_start; i < m_min(info.char_line_len + info.char_line_start, v->ref.end + 2); i++)
             {
-                if (i > v->cref.begin && i <= v->cref.end)
+                if (i > v->ref.begin && i <= v->ref.end)
                 {
-                    emit_fmt(out, "{fg-blue}", "-");
+                    emit_fmt$(out, "{fg-blue}", "-");
                 }
                 else
                 {
-                    emit_fmt(out, " ");
+                    emit_fmt$(out, " ");
                 }
             }
         }
         else
         {
-            emit_fmt(out, "\n");
-            SrcFilePosInfo info2 = report_info(v->cref, src);
+            emit_fmt$(out, "\n");
+            SrcFilePosInfo info2 = report_info(v->ref, src);
             report_csema_line(out, src, info2, true);
 
-            emit_fmt(out, "\n    : ");
-            for (int i = info2.line_start; i < m_min(info2.line_len + info2.line_start, v->cref.end + 2); i++)
+            emit_fmt$(out, "\n    : ");
+            for (int i = info2.char_line_start; i < m_min(info2.char_line_len + info2.char_line_start, v->ref.end + 2); i++)
             {
-                if (i > v->cref.begin && i <= v->cref.end)
+                if (i > v->ref.begin && i <= v->ref.end)
                 {
-                    emit_fmt(out, "{fg-blue}", "-");
+                    emit_fmt$(out, "{fg-blue}", "-");
                 }
                 else
                 {
-                    emit_fmt(out, " ");
+                    emit_fmt$(out, " ");
                 }
             }
-            emit_fmt(out, " ");
+            emit_fmt$(out, " ");
         }
-        emit_fmt(out, "{fg-blue}", v->msg);
+        emit_fmt$(out, "{fg-blue}", v->msg);
     }
 
-    emit_fmt(out, "\n");
+    emit_fmt$(out, "\n");
 }
 
 int main(int argc, char const *argv[])
@@ -207,18 +197,18 @@ int main(int argc, char const *argv[])
 
     CUnit unit = cparse_unit(&processed, base$(&heap));
     CSema sema;
-    csema_init(&sema, base$(&heap));
+   // csema_init(&sema, base$(&heap));
 
-    unit = csema_unit(&sema, unit, base$(&heap));
+   // unit = csema_unit(&sema, unit, base$(&heap));
 
-    do_sema_checks(&unit, &sema);
+   // do_sema_checks(&unit, &sema);
 
     Emit emit;
     emit_init(&emit, io_chan_out());
 
     parse_reports_dump(&sema.reports, &scan, &emit, str$(argv[1]));
 
-    emit_fmt(&emit, "\n");
+    emit_fmt$(&emit, "\n");
 
     emit_fmt$(&emit, "--- BEGIN OG CODE ---\n");
     emit_fmt$(&emit, "{}\n", buf_str(&source_buf));
@@ -238,10 +228,10 @@ int main(int argc, char const *argv[])
 
     emit_ident_size(&emit, 4);
 
-    emit_fmt(&emit, "--- BEGIN CODE ---\n");
+    emit_fmt$(&emit, "--- BEGIN CODE ---\n");
     ctrans_unit(&emit, unit);
-    emit_fmt(&emit, "--- END CODE ---\n");
-    emit_fmt(&emit, "\n");
+    emit_fmt$(&emit, "--- END CODE ---\n");
+    emit_fmt$(&emit, "\n");
 
     heap_alloc_deinit(&heap);
 

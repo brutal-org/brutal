@@ -166,7 +166,7 @@ bool lex_ok(Lex *self)
     return !self->has_error;
 }
 
-SrcRef clex_src_ref(Lex *lex, int begin, int end)
+SrcRef lex_src_ref(Lex *lex, int begin, int end)
 {
     Lexeme first = lex->lexemes.data[begin];
     Lexeme last = lex->lexemes.data[end];

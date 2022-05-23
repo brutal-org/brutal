@@ -1,4 +1,4 @@
-#include <brutal/parse/ref.h>
+#include "ref.h"
 
 void scan_srcref_info(SrcRef ref, SrcFilePosInfo *info, Str const src)
 {

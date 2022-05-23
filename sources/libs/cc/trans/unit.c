@@ -43,14 +43,14 @@ static void ctrans_define(Emit *emit, CDefine define)
 
         emit_fmt$(emit, ")");
     }
-    emit_fmt(emit, " ");
+    emit_fmt$(emit, " ");
     ctrans_expr(emit, define.expression);
-    emit_fmt(emit, "\n");
+    emit_fmt$(emit, "\n");
 }
 
 void ctrans_unit(Emit *emit, CUnit unit)
 {
-    CUnitType prev_type = CUNIT_NONE;
+    CUnitType prev_type = CUNIT_INVALID;
 
     vec_foreach_v(entry, &unit.units)
     {

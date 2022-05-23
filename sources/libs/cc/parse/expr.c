@@ -1,7 +1,7 @@
-#include <cc/builder.h>
-#include <cc/parse/parser.h>
 #include <brutal-debug>
 #include <brutal-parse>
+#include <cc/builder.h>
+#include <cc/parse/parser.h>
 
 static COp lexeme_to_cop[CLEX_COUNT] = {
     [CLEX_PLUSPLUS] = COP_INC,
@@ -110,7 +110,7 @@ static CExpr cparse_primary_expr(Lex *lex, CUnit *context, Alloc *alloc)
         lex_throw(lex, str$("Unexpect token!"));
         return with_cref$(cexpr_empty(), begin, lex);
     }
-    return with_cref$(cexpr_constant(cval$(0)), begin, lex);
+    return with_cref$(cexpr_constant(cval_uint(0)), begin, lex);
 }
 
 static void cparse_func_call_args(Lex *lex, CExpr *target, CUnit *context, Alloc *alloc)

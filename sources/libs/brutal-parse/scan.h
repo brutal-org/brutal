@@ -111,8 +111,6 @@ bool scan_skip_match(Scan *self, ScanMatch *match);
 
 bool scan_skip_any_nc(Scan *self, Str chars);
 
-Str scan_skip_until(Scan *self, ScanMatch *match);
-
 bool scan_skip_space(Scan *self);
 
 bool scan_eat(Scan *self, ScanMatch *match);

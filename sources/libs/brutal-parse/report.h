@@ -1,10 +1,11 @@
 
 #pragma once
 
-#include <brutal/io/emit.h>
-#include <brutal/parse/lex.h>
-#include <brutal/parse/scan.h>
+#include <brutal-ds>
+#include <brutal-io>
 
+#include "ref.h"
+#include "scan.h"
 typedef enum
 {
     PARSE_REPORT_NONE,
@@ -43,14 +44,14 @@ void parse_report_comment_impl(ParseReports *self, int report_id, SrcRef ref, St
 void parse_report_dump(ParseReport report, Emit *out, Scan const *source, Str filename);
 int parse_reports_dump(ParseReports *self, Scan const *scan, Emit *out, Str buf_id);
 
-#define parse_report$(SELF, LEVEL, ID, REF, FMT, ...)                                      \
-    ({                                                                                     \
-        Str _report_str = str_fmt_impl((SELF)->alloc, str$(FMT), PRINT_ARGS(__VA_ARGS__)); \
-        parse_report_impl((SELF), (ID), (LEVEL), (REF), _report_str);                      \
+#define parse_report$(SELF, LEVEL, ID, REF, FMT, ...)                              \
+    ({                                                                             \
+        Str _report_str = fmt_str((SELF)->alloc, str$(FMT), any_va$(__VA_ARGS__)); \
+        parse_report_impl((SELF), (ID), (LEVEL), (REF), _report_str);              \
     })
 
-#define parse_comment$(SELF, REPORT, REF, FMT, ...)                                        \
-    ({                                                                                     \
-        Str _report_str = str_fmt_impl((SELF)->alloc, str$(FMT), PRINT_ARGS(__VA_ARGS__)); \
-        parse_report_comment_impl((SELF), (REPORT), (REF), _report_str);                   \
+#define parse_comment$(SELF, REPORT, REF, FMT, ...)                                \
+    ({                                                                             \
+        Str _report_str = fmt_str((SELF)->alloc, str$(FMT), any_va$(__VA_ARGS__)); \
+        parse_report_comment_impl((SELF), (REPORT), (REF), _report_str);           \
     })

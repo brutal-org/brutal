@@ -32,7 +32,7 @@ static CVal cparse_cval_integer(Lex *lex)
 
 static CVal cparse_cval_float(Lex *lex)
 {
-    float value = 0;
+    double value = 0;
 
     str_to_float(lex_curr(lex).str, &value);
     lex_skip_type(lex, CLEX_NUMBER);

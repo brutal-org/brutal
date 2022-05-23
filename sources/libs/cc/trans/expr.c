@@ -1,6 +1,8 @@
 #include <brutal-debug>
 #include <cc/trans.h>
 
+#include "cc/builder.h"
+
 static void ctrans_op_fix(Emit *emit, COp op)
 {
     emit_fmt$(emit, "{}", cop_to_str(op));
@@ -60,7 +62,7 @@ static void ctrans_expr_pre(Emit *emit, CExpr expr, int parent_pre)
 
     case CEXPR_CALL:
         ctrans_expr_pre(emit, *expr.call_.expr, pre);
-        emit_fmt(emit, "(");
+        emit_fmt$(emit, "(");
         bool first = true;
         vec_foreach_v(v, &expr.call_.args)
         {
@@ -79,24 +81,24 @@ static void ctrans_expr_pre(Emit *emit, CExpr expr, int parent_pre)
         break;
 
     case CEXPR_CAST:
-        emit_fmt(emit, "(");
+        emit_fmt$(emit, "(");
         ctrans_type(emit, expr.cast_.type);
-        emit_fmt(emit, ")");
+        emit_fmt$(emit, ")");
         ctrans_expr_pre(emit, *expr.cast_.expr, pre);
         break;
 
     case CEXPR_TERNARY:
         ctrans_expr_pre(emit, *expr.ternary_.expr_cond, pre);
-        emit_fmt(emit, " ? ");
+        emit_fmt$(emit, " ? ");
         ctrans_expr_pre(emit, *expr.ternary_.expr_true, pre);
-        emit_fmt(emit, " : ");
+        emit_fmt$(emit, " : ");
         ctrans_expr_pre(emit, *expr.ternary_.expr_false, pre);
         break;
 
     case CEXPR_INITIALIZER:
-        emit_fmt(emit, "(");
+        emit_fmt$(emit, "(");
         ctrans_type(emit, expr.initializer_.type);
-        emit_fmt(emit, ")");
+        emit_fmt$(emit, ")");
 
         emit_fmt$(emit, "{{\n");
         emit_ident(emit);
@@ -104,7 +106,7 @@ static void ctrans_expr_pre(Emit *emit, CExpr expr, int parent_pre)
         vec_foreach_v(v, &expr.initializer_.initializer)
         {
             ctrans_expr_pre(emit, v, CEXPR_MAX_PRECEDENCE);
-            emit_fmt(emit, ",\n");
+            emit_fmt$(emit, ",\n");
         }
 
         emit_deident(emit);
@@ -112,7 +114,7 @@ static void ctrans_expr_pre(Emit *emit, CExpr expr, int parent_pre)
         break;
 
     case CEXPR_LAMBDA:
-        emit_fmt(emit, "[]");
+        emit_fmt$(emit, "[]");
         ctrans_func_params(emit, expr.lambda_.type);
         ctrans_stmt(emit, *expr.lambda_.body);
         break;

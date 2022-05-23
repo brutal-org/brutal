@@ -9,7 +9,6 @@ CUnit cparse_unit(Lex *lex, Alloc *alloc)
     while (!lex_ended(lex))
     {
         CDecl decl = cparse_decl(lex, &unit, alloc);
-        decl.global = true;
         cunit_decl(&unit, decl);
 
         if (decl.type != CDECL_FUNC)

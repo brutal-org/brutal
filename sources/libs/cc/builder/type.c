@@ -1,5 +1,5 @@
-#include <cc/builder/type.h>
 #include <brutal-debug>
+#include <cc/builder/type.h>
 
 const char *ctype_type_to_str[CTYPE_COUNT] = {
     [CTYPE_INVALID] = "<invalid>",
@@ -54,6 +54,13 @@ CType ctype_tail(void)
 {
     return (CType){
         .type = CTYPE_TAIL,
+    };
+}
+
+CType ctype_error(void)
+{
+    return (CType){
+        .type = CTYPE_INVALID,
     };
 }
 

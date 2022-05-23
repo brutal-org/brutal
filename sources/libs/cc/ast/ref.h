@@ -1,8 +1,7 @@
 #pragma once
 
-#include <brutal/ds.h>
-#include <brutal/parse/lex.h>
-#include <brutal/parse/lexeme.h>
+#include <brutal-ds>
+#include <brutal-parse>
 
 /**
  * @brief Change element to have a SrcRef with begin = begin and end = lex.head

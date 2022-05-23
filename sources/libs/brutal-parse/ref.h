@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/text.h>
+#include <brutal-text>
 #include <stdint.h>
 
 typedef struct

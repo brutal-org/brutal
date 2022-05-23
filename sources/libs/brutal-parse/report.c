@@ -1,5 +1,6 @@
-#include <brutal/debug.h>
-#include <brutal/parse/report.h>
+#include <brutal-debug>
+
+#include "report.h"
 
 void parse_reports_init(ParseReports *self, Alloc *alloc)
 {
@@ -45,11 +46,11 @@ static void parse_report_line(Emit *out, Str src, SrcFilePosInfo info, bool only
 {
     Str line = str_sub(src, info.char_line_start, info.char_line_end);
 
-    emit_fmt(out, "{3d fg-blue} {fg-blue} ", info.line_number_start, "|");
+    emit_fmt$(out, "{3d fg-blue} {fg-blue} ", info.line_number_start, "|");
 
     if (info.is_multiline && !only_first_line)
     {
-        emit_fmt(out, "{fg-red} ", "/");
+        emit_fmt$(out, "{fg-red} ", "/");
     }
 
     int line_number = info.line_number_start;
@@ -62,11 +63,11 @@ static void parse_report_line(Emit *out, Str src, SrcFilePosInfo info, bool only
                 break;
             }
             line_number++;
-            emit_fmt(out, "\n{3d fg-blue} {fg-blue} ", line_number, "|");
+            emit_fmt$(out, "\n{3d fg-blue} {fg-blue} ", line_number, "|");
 
             if (info.is_multiline)
             {
-                emit_fmt(out, "{fg-red} ", "|");
+                emit_fmt$(out, "{fg-red} ", "|");
             }
         }
         else
@@ -76,7 +77,7 @@ static void parse_report_line(Emit *out, Str src, SrcFilePosInfo info, bool only
             {
                 lined = ' ';
             }
-            emit_fmt(out, "{}", lined);
+            emit_fmt$(out, "{}", lined);
         }
     }
 }
@@ -89,37 +90,37 @@ void parse_report_dump(ParseReport report, Emit *out, Scan const *source, Str fi
 
     if (report.level == PARSE_WARN)
     {
-        emit_fmt(out, "\n! warn: {fg-red}\n", report.info.msg);
+        emit_fmt$(out, "\n! warn: {fg-red}\n", report.info.msg);
     }
     else if (report.level == PARSE_ERR)
     {
-        emit_fmt(out, "\n!! {fg-red bold}({fg-red}): {bold}\n", "error", report.report_user_id, report.info.msg);
+        emit_fmt$(out, "\n!! {fg-red bold}({fg-red}): {bold}\n", "error", report.report_user_id, report.info.msg);
     }
 
     Str src = str_n$(source->size, (char *)source->buf);
     SrcFilePosInfo info;
     scan_srcref_info(src_ref, &info, src);
     // number of line from begin
-    emit_fmt(out, "-> {fg-blue}:{}:{} \n", filename, info.line_number_start, begin - info.char_line_start);
+    emit_fmt$(out, "-> {fg-blue}:{}:{} \n", filename, info.line_number_start, begin - info.char_line_start);
 
     parse_report_line(out, src, info, false);
 
     if (!info.is_multiline)
     {
-        emit_fmt(out, "\n    :");
+        emit_fmt$(out, "\n    :");
 
         for (int i = info.char_line_start; i < info.char_line_end; i++)
         {
             if (i > begin && i <= end)
             {
-                emit_fmt(out, "{fg-red}", "^");
+                emit_fmt$(out, "{fg-red}", "^");
             }
             else
             {
-                emit_fmt(out, " ");
+                emit_fmt$(out, " ");
             }
         }
-        emit_fmt(out, " {fg-red}", report.info.msg);
+        emit_fmt$(out, " {fg-red}", report.info.msg);
     }
 
     vec_foreach(v, &report.comments)
@@ -135,29 +136,29 @@ void parse_report_dump(ParseReport report, Emit *out, Scan const *source, Str fi
         // if the comment is somewhere else in the code, we need to print the line
         if (info.is_multiline || !is_comment_inline)
         {
-            emit_fmt(out, "\n");
+            emit_fmt$(out, "\n");
             scan_srcref_info(v->ref, &subinfo, src);
             parse_report_line(out, src, subinfo, true);
         }
 
-        emit_fmt(out, "\n    :");
+        emit_fmt$(out, "\n    :");
 
         for (int i = subinfo.char_line_start; i < m_min(subinfo.char_line_end, v->ref.end + 2); i++)
         {
             if (i > v->ref.begin && i <= v->ref.end)
             {
-                emit_fmt(out, "{fg-blue}", "-");
+                emit_fmt$(out, "{fg-blue}", "-");
             }
             else
             {
-                emit_fmt(out, " ");
+                emit_fmt$(out, " ");
             }
         }
 
-        emit_fmt(out, " {fg-blue}", v->msg);
+        emit_fmt$(out, " {fg-blue}", v->msg);
     }
 
-    emit_fmt(out, "\n");
+    emit_fmt$(out, "\n");
 }
 
 int parse_reports_dump(ParseReports *self, Scan const *scan, Emit *out, Str buf_id)

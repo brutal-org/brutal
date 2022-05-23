@@ -1,4 +1,4 @@
-#include <brutal/debug.h>
+#include <brutal-debug>
 #include <cc/builder.h>
 #include <cc/sema/sema.h>
 

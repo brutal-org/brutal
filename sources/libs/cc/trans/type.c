@@ -4,7 +4,7 @@
 static void ctrans_member(Emit *emit, CTypeMember type)
 {
     ctrans_type_start(emit, type.type);
-    emit_fmt(emit, " {}", type.name);
+    emit_fmt$(emit, " {}", type.name);
     ctrans_type_end(emit, type.type);
 }
 
@@ -14,7 +14,7 @@ static void ctrans_constant(Emit *emit, CTypeConst member)
 
     if (member.value.type != CVAL_INVALID)
     {
-        emit_fmt(emit, " = ");
+        emit_fmt$(emit, " = ");
         ctrans_value(emit, member.value);
     }
 }
@@ -47,19 +47,19 @@ void ctrans_type_start(Emit *emit, CType type)
 {
     if (type.type == CTYPE_NAME)
     {
-        emit_fmt(emit, type.name);
+        emit_fmt$(emit, type.name);
         ctrans_type_attr(emit, type.attr);
     }
     else if (type.type == CTYPE_PTR)
     {
         ctrans_type_start(emit, *type.ptr_.subtype);
-        emit_fmt(emit, "*");
+        emit_fmt$(emit, "*");
         ctrans_type_attr(emit, type.attr);
     }
     else if (type.type == CTYPE_PARENT)
     {
         ctrans_type_start(emit, *type.ptr_.subtype);
-        emit_fmt(emit, "(");
+        emit_fmt$(emit, "(");
     }
     else if (type.type == CTYPE_FUNC)
     {
@@ -83,13 +83,13 @@ void ctrans_type_start(Emit *emit, CType type)
         }
 
         ctrans_type_attr(emit, type.attr);
-        emit_fmt(emit, "\n{{\n");
+        emit_fmt$(emit, "\n{{\n");
         emit_ident(emit);
 
         vec_foreach_v(v, &type.struct_.members)
         {
             ctrans_member(emit, v);
-            emit_fmt(emit, ";\n");
+            emit_fmt$(emit, ";\n");
         }
 
         emit_deident(emit);
@@ -110,7 +110,7 @@ void ctrans_type_start(Emit *emit, CType type)
         vec_foreach_v(v, &type.enum_.constants)
         {
             ctrans_constant(emit, v);
-            emit_fmt(emit, ",\n");
+            emit_fmt$(emit, ",\n");
         }
 
         emit_deident(emit);
@@ -125,7 +125,7 @@ void ctrans_type_start(Emit *emit, CType type)
     }
     else
     {
-        emit_fmt(emit, ctype_to_str(type));
+        emit_fmt$(emit, ctype_to_str(type));
     }
 }
 
@@ -154,7 +154,7 @@ void ctrans_type_end(Emit *emit, CType type)
     }
     else if (type.type == CTYPE_PARENT)
     {
-        emit_fmt(emit, ")");
+        emit_fmt$(emit, ")");
         ctrans_type_end(emit, *type.ptr_.subtype);
     }
     else if (type.type == CTYPE_FUNC)

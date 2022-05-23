@@ -2,6 +2,7 @@
 
 #include <brutal-text>
 
+#include "ref.h"
 #define LEXEME_EOF (-1)
 #define LEXEME_INVALID (-2)
 

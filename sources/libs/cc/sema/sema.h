@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/parse/report.h>
+#include <brutal-parse>
 #include <cc/sema/scope.h>
 
 typedef struct
@@ -32,14 +32,15 @@ bool csema_lookup_current_scope(CSema *self, Str name, CDecl *decl);
 
 CType csema_scope_return_type(CSema *self);
 
-#define csema_report$(SELF, LEVEL, REF, FMT, ...)                                                 \
-    ({                                                                                            \
-        Str _report_str = str_fmt_impl((SELF)->alloc, str$(FMT), PRINT_ARGS(__VA_ARGS__));        \
-        parse_report_impl(&(SELF)->reports, (SELF)->current_pass, LEVEL, (REF).ref, _report_str); \
+#define csema_report$(SELF, LEVEL, REF, FMT, ...)                                                             \
+    ({                                                                                                        \
+        Str _report_str = fmt_str((SELF)->alloc, str$(FMT), any_va$(__VA_ARGS__));                            \
+        int _id = parse_report_impl(&(SELF)->reports, (SELF)->current_pass, (LEVEL), (REF).ref, _report_str); \
+        _id;                                                                                                  \
     })
 
-#define csema_comment$(SELF, REPORT, REF, FMT, ...)                                        \
-    ({                                                                                     \
-        Str _report_str = str_fmt_impl((SELF)->alloc, str$(FMT), PRINT_ARGS(__VA_ARGS__)); \
-        parse_report_comment_impl(&(SELF)->reports, REPORT, (REF).ref, _report_str);       \
+#define csema_comment$(SELF, REPORT, REF, FMT, ...)                                    \
+    ({                                                                                 \
+        Str _report_str = fmt_str((SELF)->alloc, str$(FMT), any_va$(__VA_ARGS__));     \
+        parse_report_comment_impl(&(SELF)->reports, (REPORT), (REF).ref, _report_str); \
     })

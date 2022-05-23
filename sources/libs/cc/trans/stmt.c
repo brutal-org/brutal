@@ -50,7 +50,7 @@ void ctrans_stmt(Emit *emit, CStmt stmt)
         emit_fmt$(emit, "if (");
 
         ctrans_expr(emit, stmt.if_.expr);
-        emit_fmt(emit, ")\n");
+        emit_fmt$(emit, ")\n");
 
         if (stmt.if_.stmt_true->type != CSTMT_BLOCK)
         {
@@ -80,23 +80,23 @@ void ctrans_stmt(Emit *emit, CStmt stmt)
         return;
 
     case CSTMT_FOR:
-        emit_fmt(emit, "for (");
+        emit_fmt$(emit, "for (");
         ctrans_stmt(emit, *stmt.for_.init_stmt);
 
-        emit_fmt(emit, "; ");
+        emit_fmt$(emit, "; ");
         ctrans_expr(emit, stmt.for_.cond_expr);
 
-        emit_fmt(emit, "; ");
+        emit_fmt$(emit, "; ");
         ctrans_expr(emit, stmt.for_.iter_expr);
 
-        emit_fmt(emit, ")\n");
+        emit_fmt$(emit, ")\n");
         ctrans_stmt(emit, *stmt.for_.stmt);
         return;
 
     case CSTMT_WHILE:
-        emit_fmt(emit, "while (");
+        emit_fmt$(emit, "while (");
         ctrans_expr(emit, stmt.while_.expr);
-        emit_fmt(emit, ") \n");
+        emit_fmt$(emit, ") \n");
 
         ctrans_stmt(emit, *stmt.while_.stmt);
         return;
@@ -106,20 +106,20 @@ void ctrans_stmt(Emit *emit, CStmt stmt)
 
         ctrans_stmt(emit, *stmt.do_.stmt);
 
-        emit_fmt(emit, "while (");
+        emit_fmt$(emit, "while (");
         ctrans_expr(emit, stmt.do_.expr);
-        emit_fmt(emit, ") \n");
+        emit_fmt$(emit, ") \n");
         return;
 
     case CSTMT_SWITCH:
-        emit_fmt(emit, "switch (");
+        emit_fmt$(emit, "switch (");
         ctrans_expr(emit, stmt.while_.expr);
-        emit_fmt(emit, ")\n");
+        emit_fmt$(emit, ")\n");
         ctrans_stmt(emit, *stmt.while_.stmt);
         return;
 
     case CSTMT_RETURN:
-        emit_fmt(emit, "return ");
+        emit_fmt$(emit, "return ");
         ctrans_expr(emit, stmt.return_.expr);
         return;
 
@@ -140,9 +140,9 @@ void ctrans_stmt(Emit *emit, CStmt stmt)
         return;
 
     case CSTMT_CASE:
-        emit_fmt(emit, "case ");
+        emit_fmt$(emit, "case ");
         ctrans_expr(emit, stmt.case_.expr);
-        emit_fmt(emit, ":");
+        emit_fmt$(emit, ":");
         return;
 
     case CSTMT_DEFAULT:

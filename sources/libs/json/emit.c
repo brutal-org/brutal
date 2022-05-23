@@ -76,7 +76,7 @@ void json_emit(Json const json, Emit *emit)
             emit_fmt$(emit, "\n");
 
             json_emit_str(k, emit);
-            emit_fmt(emit, ": ");
+            emit_fmt$(emit, ": ");
             json_emit(v, emit);
 
             first = false;

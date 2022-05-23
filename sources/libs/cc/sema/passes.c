@@ -1,3 +1,4 @@
+#include <brutal-fmt>
 #include <cc/sema/passes.h>
 #include <cc/trans.h>
 
@@ -28,8 +29,9 @@ void cpass_scope_propagation(CSema *ctx, int what, void *node)
     }
 }
 
-void cpass_types_propagation(CSema *ctx, int what, void *node)
+void cpass_types_propagation(MAYBE_UNUSED CSema *ctx, MAYBE_UNUSED int what, MAYBE_UNUSED void *node)
 {
+
     if (what & CVISIT_BEGIN)
     {
     }
