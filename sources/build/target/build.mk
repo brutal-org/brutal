@@ -10,6 +10,9 @@ LIBS_SRC = \
 	$(wildcard sources/libs/bal/*/*.c) \
 	$(wildcard sources/libs/brutal-*/*.c) \
 	$(wildcard sources/libs/codec-*/*.c) \
+	$(wildcard sources/libs/udfore/*.c) \
+	$(wildcard sources/libs/udfore/*/*.c) \
+	$(wildcard sources/libs/udfore/*/*/*.c) \
 	$(wildcard sources/libs/cc/*.c) \
 	$(wildcard sources/libs/cc/*/*.c) \
 	$(wildcard sources/libs/cc/*/*/*.c) \

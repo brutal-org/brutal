@@ -1,0 +1,3 @@
+PKG_UDFORE_PATH=utils/udfore
+
+UTILS+=UDFORE

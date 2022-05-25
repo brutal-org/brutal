@@ -5,6 +5,9 @@ LIBS_HOST_SRC = \
 	$(wildcard sources/libs/embed/$(HOST_ARCH)/*.c) \
 	$(wildcard sources/libs/brutal-*/*.c) \
 	$(wildcard sources/libs/codec-*/*.c) \
+	$(wildcard sources/libs/udfore/*.c) \
+	$(wildcard sources/libs/udfore/*/*.c) \
+	$(wildcard sources/libs/udfore/*/*/*.c) \
 	$(wildcard sources/libs/cc/*.c) \
 	$(wildcard sources/libs/cc/*/*.c) \
 	$(wildcard sources/libs/cc/*/*/*.c) \
