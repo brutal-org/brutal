@@ -17,12 +17,12 @@ void ud_ast_deinit(UdAst *self)
 
 UdAstPtr ud_ast_push(UdAst *self, UdAstNode node, UdAstInfo info)
 {
-    UdAstPtr r = vec_len(&self->nodes);
+    int r = vec_len(&self->nodes);
 
     vec_push(&self->nodes, node);
     vec_push(&self->infos, info);
 
-    return r;
+    return ud_ast_ptr_node$(r);
 }
 
 UdAstPtr ud_ast_push_no_info(UdAst *self, UdAstNode node)
@@ -38,44 +38,46 @@ UdAstPtr ud_ast_push_no_info(UdAst *self, UdAstNode node)
 
 UdAstPtr ud_ast_push_data(UdAst *self, UdAstData data)
 {
-    UdAstPtr r = vec_len(&self->nodes);
+    int r = vec_len(&self->nodes);
 
     vec_push(&self->datas, data);
 
-    return r;
+    return ud_ast_ptr_data$(r);
 }
 
 UdAstNode *ud_ast_node(UdAst *self, UdAstPtr ptr)
 {
-    return &self->nodes.data[ptr];
+    assert_falsity((bool)ptr.is_data);
+    return &self->nodes.data[ptr.index];
 }
 
 UdAstInfo *ud_ast_info(UdAst *self, UdAstPtr ptr)
 {
-    return &self->infos.data[ptr];
+    assert_falsity((bool)ptr.is_data);
+    return &self->infos.data[ptr.index];
 }
 
 UdAstPtr ud_ast_push_list(UdAst *self, UdAstPtr list_node, int list_type, UdAstPtr pushed_index)
 {
     UdAstNode *current = ud_ast_node(self, list_node);
-    int current_id = list_node;
+    UdAstPtr current_id = list_node;
 
-    assert_not_equal(pushed_index, 0);
+    assert_not_equal((int)pushed_index.index, 0);
 
     while (true)
     {
         assert_equal(current->type, list_type);
 
-        if (current->left == 0)
+        if (current->left.index == 0)
         {
             current->left = pushed_index;
             return pushed_index;
         }
-        else if (current->right == 0)
+        else if (current->right.index == 0)
         {
             UdAstNode next = {
                 .type = list_type,
-                .right = 0,
+                .right = ud_ast_ptr_null$(),
                 .left = pushed_index,
             };
 
@@ -96,5 +98,6 @@ UdAstPtr ud_ast_push_list(UdAst *self, UdAstPtr list_node, int list_type, UdAstP
 
 UdAstData *ud_ast_data(UdAst *self, UdAstPtr ptr)
 {
-    return &self->datas.data[ptr];
+    assert_truth((bool)ptr.is_data);
+    return &self->datas.data[ptr.index];
 }

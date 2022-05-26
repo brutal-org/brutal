@@ -2,7 +2,32 @@
 #pragma once
 #include <brutal-ds>
 
-typedef int UdAstPtr;
+// this is used because this will be extracted and put in an other library
+// and the library don't know if the child is a value or a node, making dumping way more complicated than it need to be
+// There is not really a difference in performance, because the parser of a language already know depending on
+// the node if it is a value or not. This is only for the AST lib, and for error cheking (you don't want to read
+// a data node as a ast node).
+
+typedef struct
+{
+    bool is_data : 1; // FALSE = node TRUE = data
+    int index : 31;
+} UdAstPtr;
+
+#define ud_ast_ptr_node$(idx) \
+    ((UdAstPtr){.is_data = false, .index = (idx)})
+
+#define ud_ast_ptr_data$(idx) \
+    ((UdAstPtr){.is_data = true, .index = (idx)})
+
+#define ud_ast_ptr_null$() \
+    ((UdAstPtr){.is_data = false, .index = 0})
+
+#define is_ud_ast_null$(ptr) \
+    ((ptr).index == 0 && (ptr).is_data == false)
+
+#define ud_ast_root$() \
+    (ud_ast_ptr_node$(0))
 
 typedef struct
 {
@@ -24,12 +49,26 @@ typedef struct
 
 typedef Vec(UdAstInfo) UdAstInfos;
 
-typedef union
+typedef enum
 {
-    // int data_type;
-    Str string;
-    int integer;
-    float floating;
+    UD_AST_DATA_NULL,
+    UD_AST_DATA_BOOL,
+    UD_AST_DATA_CHAR,
+    UD_AST_DATA_STR,
+    UD_AST_DATA_INTEGER,
+    UD_AST_DATA_FLOATING,
+} UdAstDataTypes;
+
+typedef struct
+{
+    char data_type;
+    union
+    {
+        bool boolean;
+        Str string;
+        int integer;
+        float floating;
+    };
 } UdAstData;
 
 typedef Vec(UdAstData) UdAstDatas;
@@ -46,7 +85,7 @@ typedef struct
 } UdAst;
 
 // note: the root must not have parent.
-#define UD_AST_ROOT ((UdAstPtr)0)
+#define UD_AST_ROOT (ud_ast_ptr_node$(0))
 
 void ud_ast_init(UdAst *self, Alloc *alloc);
 
