@@ -1,8 +1,9 @@
+#include <brutal-debug>
+#include <brutal-mem>
 #include <efi/lib.h>
 #include <efi/srvs/bs.h>
 #include <embed/mem.h>
-#include <brutal-debug>
-#include <brutal-mem>
+
 #include "loader/memory.h"
 
 uint64_t kernel_module_phys_alloc_page(size_t count)
@@ -106,16 +107,37 @@ VmmSpace memory_create(void)
 {
     VmmSpace self = (Pages *)loader_phys_alloc_page(1);
 
-    memory_map_range(
-        self,
-        (VmmRange){.base = MMAP_IO_BASE + PAGE_SIZE, .size = GiB(4) - PAGE_SIZE},
-        (PmmRange){.base = PAGE_SIZE, .size = GiB(4) - PAGE_SIZE});
+    size_t desc_count = 0;
+    size_t desc_size = 0;
+    EFIMemoryDescriptor *desc = efi_mmap_snapshot(&desc_count, &desc_size);
 
-    // Map the bootloader to make sure we don't die when we switch to the kernel's vmm
-    memory_map_range(
-        self,
-        (VmmRange){.base = PAGE_SIZE, .size = MiB(512) - PAGE_SIZE},
-        (PmmRange){.base = PAGE_SIZE, .size = MiB(512) - PAGE_SIZE});
+    for (size_t i = 0; i < desc_count; i++)
+    {
+        desc = (EFIMemoryDescriptor *)((void *)desc + desc_size);
+
+        uint64_t base = desc->physical_start;
+        uint64_t size = desc->num_pages << 12;
+
+        memory_map_range(self,
+                         (VmmRange){
+                             .base = base,
+                             .size = size,
+                         },
+                         (PmmRange){
+                             .base = base,
+                             .size = size,
+                         });
+
+        memory_map_range(self,
+                         (VmmRange){
+                             .base = base + MMAP_IO_BASE,
+                             .size = size,
+                         },
+                         (PmmRange){
+                             .base = base,
+                             .size = size,
+                         });
+    }
 
     return self;
 }
