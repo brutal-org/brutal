@@ -3,6 +3,7 @@
 #include <brutal-ds>
 #include <brutal-mem>
 #include <brutal-sync>
+
 #include "kernel/arch.h"
 #include "kernel/mmap.h"
 
@@ -50,6 +51,11 @@ static void pmm_bitmap_init(HandoverMmap const *memory_map)
         if (entry.type == HANDOVER_MMAP_FREE &&
             entry.size > bitmap_size)
         {
+            // don't use the first 4 pages
+            if (range_colide(entry, ((PmmRange){.base = 0, .size = 0x4000})))
+            {
+                continue;
+            }
             log$("Allocated memory bitmap at {x}-{x}", entry.base, entry.base + bitmap_size - 1);
 
             bits_init(&_bitmap, (void *)mmap_phys_to_io(entry.base), bitmap_size);
@@ -82,6 +88,7 @@ static void pmm_mmap_load(HandoverMmap const *memory_map)
         }
     }
 
+    pmm_used((PmmRange){.base = _usable_range.base, .size = 0x4000});
     log$("Available Memory: {}KiB", _available_memory / KiB(1));
     log$("Used Memory: {}KiB", _used_memory / KiB(1));
 }
