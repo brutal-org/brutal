@@ -1,17 +1,19 @@
-#include <embed/mem.h>
 #include <brutal-debug>
 #include <brutal-mem>
+#include <embed/mem.h>
+
+#include "kernel/x86_64/apic.h"
+#include "kernel/x86_64/asm.h"
+#include "kernel/x86_64/cpu.h"
+#include "kernel/x86_64/hpet.h"
+#include "kernel/x86_64/smp.h"
+
 #include "kernel/arch.h"
 #include "kernel/heap.h"
 #include "kernel/kernel.h"
 #include "kernel/mmap.h"
 #include "kernel/pmm.h"
 #include "kernel/vmm.h"
-#include "kernel/x86_64/apic.h"
-#include "kernel/x86_64/asm.h"
-#include "kernel/x86_64/cpu.h"
-#include "kernel/x86_64/hpet.h"
-#include "kernel/x86_64/smp.h"
 
 static atomic_bool _ready = false;
 
@@ -33,16 +35,20 @@ static void smp_trampoline_map(void)
 
     uint64_t trampoline_len = smp_trampoline_size();
 
+    VmmRange target_range = (VmmRange){
+        .base = (0x0),
+        .size = trampoline_len + TRAMPOLINE_VIRTUAL_START, /* map under the trampoline for cpu cpu magic value (see smp_initialize_cpu_contex) */
+    };
+
     vmm_map(vmm_kernel_space(),
-            (VmmRange){
-                .base = (0x0),
-                .size = trampoline_len + TRAMPOLINE_VIRTUAL_START, /* map under the trampoline for cpu cpu magic value (see smp_initialize_cpu_contex) */
-            },
+            target_range,
             (PmmRange){
                 .base = (0x0),
                 .size = trampoline_len + TRAMPOLINE_VIRTUAL_START,
             },
             BR_MEM_WRITABLE);
+
+    vmm_flush(vmm_kernel_space(), target_range);
 
     mem_cpy((void *)TRAMPOLINE_VIRTUAL_START, (void *)&trampoline_start, trampoline_len);
 }
@@ -67,11 +73,12 @@ void smp_entry_other(void)
 static void smp_initialize_cpu_context(void)
 {
     // Load future cpu page table
-    volatile_write64(SMP_INIT_PAGE_TABLE, asm_read_cr3());
+
+    volatile_write32(SMP_INIT_PAGE_TABLE, asm_read_cr3());
 
     // Load future cpu stack
-    uint8_t *cpu_stack = (uint8_t *)UNWRAP(heap_alloc(KERNEL_STACK_SIZE)).base;
-    volatile_write64(SMP_INIT_STACK, (uint64_t)(cpu_stack + KERNEL_STACK_SIZE));
+    uint8_t *cpu_stack = (uint8_t *)(UNWRAP(heap_alloc_lower(KERNEL_STACK_SIZE)).base);
+    volatile_write64(SMP_INIT_STACK, (uint64_t)((uintptr_t)cpu_stack + KERNEL_STACK_SIZE));
 
     asm volatile(
         "sgdt 0x530\n"

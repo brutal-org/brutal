@@ -1,10 +1,12 @@
 #include "kernel/vmm.h"
 #include <brutal-debug>
 #include <brutal-sync>
-#include "kernel/heap.h"
-#include "kernel/mmap.h"
+
 #include "kernel/x86_64/asm.h"
 #include "kernel/x86_64/paging.h"
+
+#include "kernel/heap.h"
+#include "kernel/mmap.h"
 
 static Lock _lock;
 static Pml *_kpml;
@@ -104,7 +106,7 @@ static void vmm_load_memory_map(VmmSpace target, HandoverMmap const *memory_map)
 
 void vmm_initialize(Handover const *handover)
 {
-    HeapRange heap_result = UNWRAP(heap_alloc(MEM_PAGE_SIZE));
+    HeapRange heap_result = UNWRAP(heap_alloc_lower(MEM_PAGE_SIZE));
 
     _kpml = (Pml *)heap_result.base;
     mem_set(_kpml, 0, MEM_PAGE_SIZE);
