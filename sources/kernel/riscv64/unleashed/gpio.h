@@ -8,7 +8,7 @@ enum gpio_registers
     GPIO_INPUT_ENABLE = 4,
     GPIO_OUTPUT_ENABLE = 8,
     GPIO_OUTPUT_VAL = 12,
-    GPIO_INTERNAL_PU_ENABLE = 16, // internall pull up
+    GPIO_INTERNAL_PU_ENABLE = 16, // internal pull up
     GPIO_PIN_DRIVE_STENGTH = 20,
     GPIO_RISE_INT_ENABLE = 24,
     GPIO_RISE_INT_PENDING = 28,

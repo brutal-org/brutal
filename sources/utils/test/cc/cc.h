@@ -3,7 +3,7 @@
 #include <cc/parse.h>
 #include <brutal-io>
 
-// FIXME: get ride of thoses ugly macros.
+// FIXME: get ride of those ugly macros.
 
 #define ctx_lex(lexer_name, str)                     \
     Scan _scan = {};                                 \

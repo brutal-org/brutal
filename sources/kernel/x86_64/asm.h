@@ -205,7 +205,7 @@ enum rflags_bit
     RFLAGS_RESERVED4_ZERO = 1 << 15, // reserved, must be 0
     RFLAGS_RESUME = 1 << 16,
     RFLAGS_VIRTUAL_8086 = 1 << 17,     // good ol' time
-    RFLAGS_ALIGNEMENT_CHECK = 1 << 18, // check each memory alignement
+    RFLAGS_Alignment_CHECK = 1 << 18, // check each memory alignment
     RFLAGS_ACCESS_CONTROL = 1 << 18,
     RFLAGS_VIRTUAL_INTERRUPT = 1 << 19,         // same as INTERRUPT_ENABLE for virtual interrupts
     RFLAGS_VIRTUAL_INTERRUPT_PENDING = 1 << 20, //

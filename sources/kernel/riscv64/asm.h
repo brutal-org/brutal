@@ -8,7 +8,7 @@ enum csr_regs
     CSR_SISA = 0x101,    // supervisor extension
     CSR_SIE = 0x104,     // supervisor interrupt enable
     CSR_STVEC = 0x105,   // supervisor trap vector
-    CSR_SEPC = 0x141,    // supervisor trap programm counter
+    CSR_SEPC = 0x141,    // supervisor trap program counter
     CSR_SCAUSE = 0x142,  // supervisor trap cause
     CSR_STVAL = 0x143,   // supervisor trap value
     CSR_SIP = 0x144,     // supervisor interrupt pending
