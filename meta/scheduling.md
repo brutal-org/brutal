@@ -2,7 +2,7 @@
 
 ## The Context
 
-For an os, scheduling is very important, its need to be optimized, fast, and responsive. We needed a scheduler that support multiple CPU. We also needed a scheduler that did the least task switch possible. For exemple, in a system with 4 cpu and 4 task we may have:
+For an os, scheduling is very important, its need to be optimized, fast, and responsive. We needed a scheduler that support multiple CPU. We also needed a scheduler that did the least task switch possible. For example, in a system with 4 cpu and 4 task we may have:
 
 | cpu    | 1   | 2   | 3   | 4   |
 | ------ | --- | --- | --- | --- |
@@ -83,7 +83,7 @@ That's why we have 2 part of the scheduler:
 
 ## When The Number Of Running Processes Is Lower Than The Number Of Cpu
 
-If the number of processes is lower than the number of cpu we don't need to switch context. But if we have 1 process that started running and it does not execute code we need to assign him a cpu. That's why we have 'idle cpu'. Lazy cpu are cpu that don't do anything for the moment. For exemple if we have 3 process and 5 core, we have 2 idle cpu. So if a cpu is idle and there is a process waiting to run, we give the process to the idle cpu. For cpu that are already running a process we just put the same process as the next process.
+If the number of processes is lower than the number of cpu we don't need to switch context. But if we have 1 process that started running and it does not execute code we need to assign him a cpu. That's why we have 'idle cpu'. Lazy cpu are cpu that don't do anything for the moment. For example if we have 3 process and 5 core, we have 2 idle cpu. So if a cpu is idle and there is a process waiting to run, we give the process to the idle cpu. For cpu that are already running a process we just put the same process as the next process.
 
 ## When The Number Of Running Processes Is Higher Than The Number Of Cpu
 
@@ -97,7 +97,7 @@ size_t schedule_count = m_min(cpu_count(), running - cpu_count());
 
 We can't switch higher than the cpu_count (we can't switch for 6 process using 5 cpu) and we can't switch more process than there is cpu (we can't switch for 1 process for 5 cpu).
 
-For each `schedule_count` we get the process that has run the longest and replace it with the process that waited the longest. But we can still have the case where we have a idle cpu. For exemple if a process is deleted or sleeping so when we get the most waiting process, we check if there is no idle cpu. If there is one, put the most waiting process in the idle cpu. If there is not replace the most running process with the most waiting process.
+For each `schedule_count` we get the process that has run the longest and replace it with the process that waited the longest. But we can still have the case where we have a idle cpu. For example if a process is deleted or sleeping so when we get the most waiting process, we check if there is no idle cpu. If there is one, put the most waiting process in the idle cpu. If there is not replace the most running process with the most waiting process.
 
 ## CPU Cache Is Important
 

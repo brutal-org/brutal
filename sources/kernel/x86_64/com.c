@@ -64,7 +64,7 @@ void com_initialize(enum com_port port)
     com_write_reg(port, COM_BAUD_RATE_LOW, 115200 / 9600);
     com_write_reg(port, COM_BAUD_RATE_HIGH, 0);
 
-    // we want 8bit caracters + clear dlab
+    // we want 8bit characters + clear dlab
     com_write_reg(port, COM_LINE_CONTROL, COM_DATA_SIZE_8);
 
     // turn on communication + redirect UART interrupt into ICU

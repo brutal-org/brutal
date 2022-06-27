@@ -30,7 +30,7 @@
 <br>
 
 - **BRUTAL** is an operating system built from scratch in modern C.
-- **BRUTAL** is built on top of a capabilty based micro-kernel.
+- **BRUTAL** is built on top of a capability based micro-kernel.
 - **BRUTAL** targets x86_64, i686, RISC-V and ARM.
 - **BRUTAL** exposes its features to developers through clean APIs.
 - **BRUTAL** features a rich and modern C library complete with fibers, custom allocators, generic data structures, and more...
