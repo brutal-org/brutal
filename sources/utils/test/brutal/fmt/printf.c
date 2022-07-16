@@ -50,4 +50,6 @@ test$(fmt_printf)
     TEST_CASE("00012", "%05d", 12);
     TEST_CASE("00123", "%05d", 123);
     TEST_CASE("0x123", "%#05x", 0x123);
+    TEST_CASE("0x123", "%#05x", 0x123);
+    TEST_CASE("0x123", "%#010x", 0x123);
 }

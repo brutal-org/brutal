@@ -1,15 +1,7 @@
 #include <bal/abi.h>
+#include <brutal-alloc>
+#include <brutal-sync>
 #include <embed/mem.h>
-
-void embed_mem_lock(void)
-{
-    // NO-OP
-}
-
-void embed_mem_unlock(void)
-{
-    // NO-OP
-}
 
 Error embed_mem_acquire(size_t size, void **out_result, MAYBE_UNUSED enum embed_mem_flag flags)
 {
@@ -62,4 +54,40 @@ Error embed_mem_release(void *addr, size_t size)
     });
 
     return br_result_to_error(result);
+}
+
+static HeapAlloc _heap;
+
+static Alloc *ensure_heap(void)
+{
+    static bool init = false;
+    if (!init)
+    {
+        heap_alloc_init(&_heap, NODE_DEFAULT);
+        init = true;
+    }
+    return (Alloc *)&_heap;
+}
+
+void embed_heap_lock(void)
+{
+}
+
+void embed_heap_unlock(void)
+{
+}
+
+void *embed_heap_acquire(size_t size)
+{
+    return alloc_acquire(ensure_heap(), size);
+}
+
+void *embed_heap_resize(void *ptr, size_t size)
+{
+    return alloc_resize(ensure_heap(), ptr, size);
+}
+
+void embed_heap_release(void *ptr)
+{
+    alloc_release(ensure_heap(), ptr);
 }

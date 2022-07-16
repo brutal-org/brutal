@@ -157,14 +157,16 @@ void *heap_alloc_acquire(HeapAlloc *alloc, size_t req_size)
         // CASE 2: It's a brand new block.
         if (maj->first == nullptr)
         {
-            maj->first = (HeapMinor *)((uintptr_t)maj + MAJOR_BLOCK_HEADER_SIZE);
+            HeapMinor *min = (HeapMinor *)((uintptr_t)maj + MAJOR_BLOCK_HEADER_SIZE);
 
-            maj->first->magic = ALLOC_HEAP_MAGIC;
-            maj->first->prev = nullptr;
-            maj->first->next = nullptr;
-            maj->first->block = maj;
-            maj->first->size = size;
-            maj->first->req_size = req_size;
+            min->magic = ALLOC_HEAP_MAGIC;
+            min->prev = nullptr;
+            min->next = nullptr;
+            min->block = maj;
+            min->size = size;
+            min->req_size = req_size;
+
+            maj->first = min;
             maj->usage += size + MINOR_BLOCK_HEADER_SIZE;
 
             return (void *)((uintptr_t)(maj->first) + MINOR_BLOCK_HEADER_SIZE);
@@ -182,7 +184,6 @@ void *heap_alloc_acquire(HeapAlloc *alloc, size_t req_size)
                 maj->first->prev = (HeapMinor *)((uintptr_t)maj + MAJOR_BLOCK_HEADER_SIZE);
                 maj->first->prev->next = maj->first;
                 maj->first = maj->first->prev;
-
                 maj->first->magic = ALLOC_HEAP_MAGIC;
                 maj->first->prev = nullptr;
                 maj->first->block = maj;
@@ -306,7 +307,6 @@ void heap_alloc_release(HeapAlloc *alloc, void *ptr)
     }
 
     HeapMajor *maj = min->block;
-
     maj->usage -= (min->size + MINOR_BLOCK_HEADER_SIZE);
     min->magic = ALLOC_HEAP_DEAD;
 

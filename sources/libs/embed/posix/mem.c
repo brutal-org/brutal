@@ -1,8 +1,9 @@
+#include <brutal-debug>
 #include <embed/mem.h>
 #include <embed/posix/err.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/mman.h>
-#include <brutal-debug>
 
 void embed_mem_lock(void)
 {
@@ -34,4 +35,29 @@ Error embed_mem_release(void *addr, size_t size)
     }
 
     return ERR_SUCCESS;
+}
+
+void embed_heap_lock(void)
+{
+    // no-op
+}
+
+void embed_heap_unlock(void)
+{
+    // no-op
+}
+
+void *embed_heap_acquire(size_t size)
+{
+    return calloc(1, size);
+}
+
+void *embed_heap_resize(void *ptr, size_t size)
+{
+    return realloc(ptr, size);
+}
+
+void embed_heap_release(void *ptr)
+{
+    free(ptr);
 }

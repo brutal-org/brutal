@@ -7,7 +7,7 @@
 struct _Gfx;
 
 /**
-    ```
+
                                                             <- line_ascend
        _____       _             _                          <- ascend
       / ____|     | |           | |                         <- captop
@@ -19,7 +19,7 @@ struct _Gfx;
                                                 |___/       <- descend
      | ---- |                                               ...advance
                                                             <- line_descend
-    ```
+
 */
 typedef struct
 {

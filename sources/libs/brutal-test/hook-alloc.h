@@ -1,6 +1,7 @@
 #pragma once
 
 #include <brutal-alloc>
+#include <brutal-debug>
 
 #include "runner.h"
 

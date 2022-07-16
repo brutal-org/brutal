@@ -325,6 +325,11 @@ IoResult fmt_unsigned(Fmt self, IoWriter writer, uint64_t value)
         buf[i++] = '0';
     }
 
+    if (self.prefix_plus)
+    {
+        buf[i++] = '+';
+    }
+
     while (i < self.width)
     {
         buf[i++] = self.fill;
