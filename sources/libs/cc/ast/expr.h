@@ -97,11 +97,13 @@ typedef struct
 
 struct _CExpr
 {
+    SrcRef ref;
     CExprType type;
     CType sema_type;
+
     union
     {
-        CVal constant_; /* instead of Cval holding sema_type the cexpr holds it */
+        CVal constant_;
         Str ident_;
 
         struct
@@ -149,13 +151,3 @@ struct _CExpr
         } lambda_;
     };
 };
-
-COp str_to_cop(Str str);
-
-Str cop_to_str(COp type);
-
-Str cexpr_type_to_str(CExprType type);
-
-int cop_pre(COp cop);
-
-int cexpr_pre(CExpr *expr);

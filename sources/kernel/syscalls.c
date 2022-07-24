@@ -518,9 +518,9 @@ BrResult syscall_dispatch(BrSyscall syscall, BrArg args)
     {
         log$("Syscall: Task({}): {}({#p}) -> {}",
              task_self()->id,
-             str$(br_syscall_to_string(syscall)),
+             str$(br_syscall_to_str(syscall)),
              args,
-             str$(br_result_to_string(result)));
+             str$(br_result_to_str(result)));
     }
 
     task_end_syscall();

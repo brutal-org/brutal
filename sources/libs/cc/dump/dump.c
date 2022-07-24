@@ -1,37 +1,63 @@
-#include <cc/dump.h>
-#include <json/objects.h>
 #include <brutal-debug>
+#include <cc/builder.h>
+#include <cc/dump.h>
+
+Json cval_to_json(CVal val)
+{
+    switch (val.type)
+    {
+    case CVAL_INVALID:
+        return json_null();
+
+    case CVAL_CHAR:
+        return json_number((char)val.signed_);
+
+    case CVAL_SHORT:
+        return json_number((short)val.signed_);
+
+    case CVAL_INT:
+        return json_number((int)val.signed_);
+
+    case CVAL_LONG:
+        return json_number((long)val.signed_);
+
+    case CVAL_LONGLONG:
+        return json_number((long long)val.signed_);
+
+    case CVAL_UCHAR:
+        return json_number((unsigned char)val.unsigned_);
+
+    case CVAL_USHORT:
+        return json_number((unsigned short)val.unsigned_);
+
+    case CVAL_UINT:
+        return json_number((unsigned int)val.unsigned_);
+
+    case CVAL_ULONG:
+        return json_number((unsigned long)val.unsigned_);
+
+    case CVAL_ULONGLONG:
+        return json_number((unsigned long long)val.unsigned_);
+
+    case CVAL_FLOAT:
+        return json_number((float)val.float_);
+
+    case CVAL_DOUBLE:
+        return json_number((double)val.float_);
+
+    case CVAL_STRING:
+        return json_str(val.str_);
+
+    default:
+        panic$("invalid cval type");
+    }
+}
 
 Json cdump_value(CVal value, Alloc *alloc)
 {
-    Json json = json_object(alloc);
-    json_put(&json, str$("type"), json_str(cval_type_to_str(value.type)));
-
-    switch (value.type)
-    {
-    case CVAL_SIGNED:
-    {
-        json_put(&json, str$("value"), json_number(value.signed_));
-        break;
-    }
-    case CVAL_UNSIGNED:
-    {
-        json_put(&json, str$("value"), json_number(value.unsigned_));
-        break;
-    }
-    case CVAL_FLOAT:
-    {
-        json_put(&json, str$("value"), json_str(str$("float are not supported for the moment")));
-        break;
-    }
-    case CVAL_STRING:
-    {
-        json_put(&json, str$("value"), json_str(value.string_));
-        break;
-    }
-    default:
-        panic$("unknown value type {}", value.type);
-    }
+    Json json = json_object_with_type(str$("CVal"), alloc);
+    json_put(&json, str$("type"), json_str(cval_to_str(value)));
+    json_put(&json, str$("value"), cval_to_json(value));
     return json;
 }
 
@@ -44,104 +70,56 @@ Json cdump_member(CTypeMembers const *members, Alloc *alloc)
         Json member_json = json_object(alloc);
         json_put(&member_json, str$("name"), json_str(member.name));
         json_put(&member_json, str$("type"), cdump_type(member.type, alloc));
+        json_append(&json, member_json);
     }
     return json;
 }
 
 Json cdump_type(CType type, Alloc *alloc)
 {
+    Json json = json_object_with_type(str$("CType"), alloc);
+    json_put(&json, str$("repr"), json_str(ctype_to_str(type)));
+
     switch (type.type)
     {
-    case CTYPE_INVALID:
-    {
-        return json_str(str$("<invalid>"));
-    }
-    case CTYPE_TAIL:
-    {
-        return json_str(str$("<tail>"));
-    }
-    case CTYPE_ERROR:
-    {
-        return json_str(str$("<error>"));
-    }
-    case CTYPE_VOID:
-    {
-        return json_str(str$("void"));
-    }
-    case CTYPE_AUTO:
-    {
-        return json_str(str$("auto"));
-    }
-    case CTYPE_BOOL:
-    {
-        return json_str(str$("Bool"));
-    }
     case CTYPE_PTR:
-    {
-        Json json = json_object(alloc);
-        json_put(&json, str$("ptr"), cdump_type(*type.ptr_.subtype, alloc));
-        return json;
-    }
+        json_put(&json, str$("subtype"), cdump_type(*type.ptr_.subtype, alloc));
+        break;
+
     case CTYPE_PARENT:
-    {
-        Json json = json_object(alloc);
-        json_put(&json, str$("parent"), cdump_type(*type.parent_.subtype, alloc));
-        return json;
-    }
+        json_put(&json, str$("subtype"), cdump_type(*type.parent_.subtype, alloc));
+        break;
+
     case CTYPE_ARRAY:
-    {
-        Json json = json_object(alloc);
-        json_put(&json, str$("array"), cdump_type(*type.array_.subtype, alloc));
+        json_put(&json, str$("subtype"), cdump_type(*type.array_.subtype, alloc));
         if (type.array_.size != CTYPE_ARRAY_UNBOUNDED)
         {
             json_put(&json, str$("size"), json_number(type.array_.size));
         }
-        return json;
-    }
-    case CTYPE_SIGNED:
-    {
-        return json_str(str$("signed"));
-    }
-    case CTYPE_UNSIGNED:
-    {
-        return json_str(str$("unsigned"));
-    }
-    case CTYPE_FLOAT:
-    {
-        return json_str(str$("float"));
-    }
+        break;
+
     case CTYPE_STRUCT:
-    {
-        Json json = json_object(alloc);
-        json_put(&json, str$("struct"), cdump_member(&type.struct_.members, alloc));
-        return json;
-    }
+        json_put(&json, str$("members"), cdump_member(&type.struct_.members, alloc));
+        break;
+
     case CTYPE_UNION:
-    {
-        Json json = json_object(alloc);
-        json_put(&json, str$("union"), cdump_member(&type.struct_.members, alloc));
-        return json;
-    }
-    case CTYPE_ENUM:
-    {
-        return json_str(str$("enum"));
-    }
+        json_put(&json, str$("members"), cdump_member(&type.struct_.members, alloc));
+        break;
+
     case CTYPE_FUNC:
-    {
-        Json json = json_object(alloc);
-        json_put(&json, str$("func"), cdump_type(*type.func_.ret, alloc));
+        json_put(&json, str$("ret"), cdump_type(*type.func_.ret, alloc));
         json_put(&json, str$("args"), cdump_member(&type.func_.params, alloc));
-        return json;
-    }
+        break;
+
     case CTYPE_NAME:
-    {
-        Json json = json_object(alloc);
         json_put(&json, str$("name"), json_str(type.name));
-        return json;
-    }
+        break;
+
     default:
-        panic$("unknown ctype type {}", type.type);
+        break;
     }
+
+    return json;
 }
 
 Json cdump_expr(CExpr expr, Alloc *alloc)
@@ -247,7 +225,7 @@ Json cdump_stmt(CStmt stmt, Alloc *alloc)
     case CSTMT_DEFAULT:
     case CSTMT_BREAK:
     {
-        return json_str(cstmt_type_to_str(stmt.type));
+        return json_str(cstmt_to_str(stmt.type));
     }
     case CSTMT_DECL:
     {
@@ -339,6 +317,7 @@ Json cdump_stmt(CStmt stmt, Alloc *alloc)
 Json cdump_decl(CDecl decl, Alloc *alloc)
 {
     Json json = json_object(alloc);
+
     if (decl.sema_type.type != CTYPE_INVALID)
     {
         json_put(&json, str$("sema-type"), cdump_type(decl.sema_type, alloc));
@@ -363,7 +342,7 @@ Json cdump_decl(CDecl decl, Alloc *alloc)
     }
     else if (decl.type == CDECL_EMPTY)
     {
-        json_put(&json, str$("empty"), json_str(str$("empty")));
+        json_put(&json, str$("nil"), json_str(str$("nil")));
     }
     else
     {
@@ -375,12 +354,13 @@ Json cdump_decl(CDecl decl, Alloc *alloc)
 Json cdump_unit(CUnit unit, Alloc *alloc)
 {
     Json json = json_object(alloc);
-    /* todo: add file info and more here */
     Json units = json_array(alloc);
+
     vec_foreach_v(entry, &unit.units)
     {
         switch (entry.type)
         {
+
         case CUNIT_INCLUDE:
         {
             Json include = json_object(alloc);
@@ -389,6 +369,7 @@ Json cdump_unit(CUnit unit, Alloc *alloc)
             json_append(&units, include);
             break;
         }
+
         case CUNIT_PRAGMA:
         {
             Json pragma = json_object(alloc);
@@ -396,11 +377,13 @@ Json cdump_unit(CUnit unit, Alloc *alloc)
             json_append(&units, pragma);
             break;
         }
+
         case CUNIT_DECLARATION:
         {
             json_append(&units, cdump_decl(entry._decl, alloc));
             break;
         }
+
         case CUNIT_DEFINE:
         {
             Json def = json_object(alloc);

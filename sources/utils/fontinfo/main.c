@@ -27,9 +27,9 @@ int main(int argc, char const *argv[])
     vec_foreach(font, &ssfn_coll)
     {
         log$("");
-        log$("[{}] Name: {}", idx, font->stringtable.font_name);
-        log$("[{}] Family: {}", idx, font->stringtable.family_name);
-        log$("[{}] Subfamily: {}", idx, font->stringtable.subfamily_name);
+        log$("[{}] Name: {}", idx, font->strtable.font_name);
+        log$("[{}] Family: {}", idx, font->strtable.family_name);
+        log$("[{}] Subfamily: {}", idx, font->strtable.subfamily_name);
 
         idx++;
     }

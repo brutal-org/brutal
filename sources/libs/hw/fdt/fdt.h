@@ -7,12 +7,12 @@ typedef struct PACKED
     be_uint32_t magic;
     be_uint32_t size;
     be_uint32_t structure_offset;
-    be_uint32_t strings_offset;
+    be_uint32_t strs_offset;
     be_uint32_t memory_reservation_offset;
     be_uint32_t version;
     be_uint32_t last_comp_version;
     be_uint32_t boot_cpuid_phys;
-    be_uint32_t strings_size;
+    be_uint32_t strs_size;
     be_uint32_t structure_size;
 } FdtHeader;
 

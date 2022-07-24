@@ -1,6 +1,6 @@
-#include <json/parser.h>
 #include <brutal-alloc>
 #include <brutal-io>
+#include <json/parser.h>
 
 static bool json_skip_comment(Scan *scan)
 {
@@ -28,7 +28,7 @@ static void json_skip_space_and_comment(Scan *scan)
         ;
 }
 
-static int is_closing_string(int c)
+static int is_closing_str(int c)
 {
     return c != '"';
 }
@@ -37,7 +37,7 @@ static Str parse_str(Scan *scan)
 {
     json_skip_space_and_comment(scan);
     scan_expect(scan, '"');
-    Str name = scan_eat_match(scan, is_closing_string);
+    Str name = scan_eat_match(scan, is_closing_str);
     scan_expect(scan, '"');
     json_skip_space_and_comment(scan);
 
@@ -108,7 +108,7 @@ Json json_parse(Scan *scan, Alloc *alloc)
 {
     json_skip_space_and_comment(scan);
 
-    if (scan_curr(scan) == '"') // string
+    if (scan_curr(scan) == '"')
     {
         return json_str(parse_str(scan));
     }

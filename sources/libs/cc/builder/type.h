@@ -2,6 +2,12 @@
 
 #include <cc/ast/type.h>
 
+Str ctype_to_str(CType type);
+
+CType ctype_to_unsigned(CType type);
+
+/* --- Builders ------------------------------------------------------------- */
+
 CType ctype_error(void);
 
 CType ctype_tail(void);
@@ -18,11 +24,29 @@ CType ctype_parent(CType subtype, Alloc *alloc);
 
 CType ctype_array(CType subtype, int size, Alloc *alloc);
 
-CType ctype_signed(int precision);
+CType ctype_char(void);
 
-CType ctype_unsigned(int precision);
+CType ctype_short(void);
 
-CType ctype_float(int precision);
+CType ctype_int(void);
+
+CType ctype_long(void);
+
+CType ctype_longlong(void);
+
+CType ctype_uchar(void);
+
+CType ctype_ushort(void);
+
+CType ctype_uint(void);
+
+CType ctype_ulong(void);
+
+CType ctype_ulonglong(void);
+
+CType ctype_float(void);
+
+CType ctype_double(void);
 
 CType ctype_struct(Alloc *alloc);
 

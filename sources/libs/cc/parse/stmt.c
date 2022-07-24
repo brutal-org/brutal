@@ -3,6 +3,7 @@
 
 CStmt cparse_stmt(Lex *lex, CUnit *context, Alloc *alloc)
 {
+    int begin = lex->head;
     if (cparse_skip_separator(lex, CLEX_LBRACE))
     {
         CStmt block = cstmt_block(alloc);
@@ -14,7 +15,7 @@ CStmt cparse_stmt(Lex *lex, CUnit *context, Alloc *alloc)
             cparse_skip_separator(lex, CLEX_SEMICOLON);
         }
 
-        return block;
+        return with_cref$(block, begin, lex);
     }
     else if (cparse_skip_separator(lex, CLEX_IF))
     {
@@ -31,7 +32,7 @@ CStmt cparse_stmt(Lex *lex, CUnit *context, Alloc *alloc)
 
         CStmt stmt_false = cparse_stmt(lex, context, alloc);
 
-        return cstmt_if_else(expr, stmt_true, stmt_false, alloc);
+        return with_cref$(cstmt_if_else(expr, stmt_true, stmt_false, alloc), begin, lex);
     }
     else if (cparse_skip_separator(lex, CLEX_FOR))
     {
@@ -51,7 +52,7 @@ CStmt cparse_stmt(Lex *lex, CUnit *context, Alloc *alloc)
 
         CStmt stmt = cparse_stmt(lex, context, alloc);
 
-        return cstmt_for(init_stmt, cond_expr, iter_expr, stmt, alloc);
+        return with_cref$(cstmt_for(init_stmt, cond_expr, iter_expr, stmt, alloc), begin, lex);
     }
     else if (cparse_skip_separator(lex, CLEX_WHILE))
     {
@@ -63,7 +64,7 @@ CStmt cparse_stmt(Lex *lex, CUnit *context, Alloc *alloc)
 
         CStmt stmt = cparse_stmt(lex, context, alloc);
 
-        return cstmt_while(expr, stmt, alloc);
+        return with_cref$(cstmt_while(expr, stmt, alloc), begin, lex);
     }
     else if (cparse_skip_separator(lex, CLEX_DO))
     {
@@ -77,7 +78,7 @@ CStmt cparse_stmt(Lex *lex, CUnit *context, Alloc *alloc)
 
         cparse_expect_separator(lex, CLEX_RPARENT);
 
-        return cstmt_do(expr, stmt, alloc);
+        return with_cref$(cstmt_do(expr, stmt, alloc), begin, lex);
     }
     else if (cparse_skip_separator(lex, CLEX_SWITCH))
     {
@@ -89,12 +90,12 @@ CStmt cparse_stmt(Lex *lex, CUnit *context, Alloc *alloc)
 
         CStmt stmt = cparse_stmt(lex, context, alloc);
 
-        return cstmt_switch(expr, stmt, alloc);
+        return with_cref$(cstmt_switch(expr, stmt, alloc), begin, lex);
     }
     else if (cparse_skip_separator(lex, CLEX_RETURN))
     {
         CExpr expr = cparse_expr(lex, CEXPR_MAX_PRECEDENCE, context, alloc);
-        return cstmt_return(expr);
+        return with_cref$(cstmt_return(expr), begin, lex);
     }
     else if (cparse_skip_separator(lex, CLEX_GOTO))
     {
@@ -102,33 +103,30 @@ CStmt cparse_stmt(Lex *lex, CUnit *context, Alloc *alloc)
         {
             Str label = lex_curr(lex).str;
             lex_next(lex);
-            return cstmt_goto(label);
+            return with_cref$(cstmt_goto(label), begin, lex);
         }
         else
         {
             lex_expect(lex, CLEX_IDENT);
-            return cstmt_empty();
+            return with_cref$(cstmt_empty(), begin, lex);
         }
     }
     else if (cparse_skip_separator(lex, CLEX_CASE))
     {
         CExpr expr = cparse_expr(lex, CEXPR_MAX_PRECEDENCE, context, alloc);
-        return cstmt_case(expr);
+        return with_cref$(cstmt_case(expr), begin, lex);
     }
-    else if (cparse_is_separator(lex, CLEX_IDENT))
+    else if (cunit_contains_decl(context, lex_curr(lex).str))
     {
-        Str ident = lex_curr(lex).str;
-        if (cunit_contains_type(context, ident))
-        {
-            return cstmt_decl(cparse_decl(lex, context, alloc), alloc);
-        }
-        else
-        {
-            return cstmt_expr(cparse_expr(lex, CEXPR_MAX_PRECEDENCE, context, alloc));
-        }
+        return with_cref$(cstmt_expr(cparse_expr(lex, CEXPR_MAX_PRECEDENCE, context, alloc)), begin, lex);
     }
+    else if (is_cparse_type(lex, context))
+    {
+        return with_cref$(cstmt_decl(cparse_decl(lex, context, alloc), alloc), begin, lex);
+    }
+
     else
     {
-        return cstmt_expr(cparse_expr(lex, CEXPR_MAX_PRECEDENCE, context, alloc));
+        return with_cref$(cstmt_expr(cparse_expr(lex, CEXPR_MAX_PRECEDENCE, context, alloc)), begin, lex);
     }
 }

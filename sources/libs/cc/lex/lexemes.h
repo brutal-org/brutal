@@ -6,7 +6,7 @@
     LEXEME(COMMENT)             \
     LEXEME(NEWLINE)             \
     LEXEME(IDENT)               \
-    LEXEME(INTEGER)             \
+    LEXEME(NUMBER)              \
     LEXEME(AUTO)                \
     LEXEME(BREAK)               \
     LEXEME(CASE)                \

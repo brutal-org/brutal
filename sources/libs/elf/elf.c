@@ -8,7 +8,7 @@ bool elf_validate(Elf64Header const *header)
            header->ident.magics[3] == 'F';
 }
 
-Str elf_string(Elf64Header const *header, size_t offset)
+Str elf_str(Elf64Header const *header, size_t offset)
 {
     Elf64SectionHeader const *strings = elf_section_by_index(header, header->strings_section_index);
 
@@ -57,7 +57,7 @@ Elf64SectionHeader const *elf_section_by_name(Elf64Header const *header, Str nam
 
     for (size_t i = 0; i < header->sections_count; i++)
     {
-        Str section_name = elf_string(header, section->name);
+        Str section_name = elf_str(header, section->name);
 
         if (str_eq(section_name, name))
         {

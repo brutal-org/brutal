@@ -3,6 +3,10 @@
 #include <cc/ast/decl.h>
 #include <cc/ast/stmt.h>
 
+Str cstmt_to_str(CStmtType type);
+
+/* --- Types --------------------------------------------------------------- */
+
 CStmt cstmt_empty(void);
 
 CStmt cstmt_decl(CDecl decl, Alloc *alloc);

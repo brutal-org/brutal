@@ -1,17 +1,66 @@
-#include <cc/builder/type.h>
 #include <brutal-debug>
+#include <cc/builder/type.h>
 
-CType ctype_error(void)
+const char *ctype_type_to_str[CTYPE_COUNT] = {
+    [CTYPE_INVALID] = "<invalid>",
+    [CTYPE_TAIL] = "<tail>",
+
+    [CTYPE_VOID] = "void",
+    [CTYPE_AUTO] = "auto",
+    [CTYPE_BOOL] = "bool",
+    [CTYPE_PTR] = "",
+    [CTYPE_ARRAY] = "",
+
+    [CTYPE_CHAR] = "char",
+    [CTYPE_SHORT] = "short",
+    [CTYPE_INT] = "int",
+    [CTYPE_LONG] = "long",
+    [CTYPE_LONGLONG] = "long long",
+    [CTYPE_UCHAR] = "unsigned char",
+    [CTYPE_USHORT] = "unsigned short",
+    [CTYPE_UINT] = "unsigned int",
+    [CTYPE_ULONG] = "unsigned long",
+    [CTYPE_ULONGLONG] = "unsigned long long",
+    [CTYPE_FLOAT] = "float",
+    [CTYPE_DOUBLE] = "double",
+
+    [CTYPE_STRUCT] = "struct",
+    [CTYPE_UNION] = "union",
+    [CTYPE_ENUM] = "enum",
+};
+
+Str ctype_to_str(CType type)
 {
-    return (CType){
-        .type = CTYPE_ERROR,
-    };
+    if (ctype_type_to_str[type.type])
+    {
+        return str$(ctype_type_to_str[type.type]);
+    }
+    else
+    {
+        return str$("<error>");
+    }
 }
+
+CType ctype_to_unsigned(CType type)
+{
+    assert_truth(type.type >= CTYPE_CHAR && type.type <= CTYPE_ULONGLONG);
+    type.type = type.type + CTYPE_UCHAR - CTYPE_CHAR;
+    return type;
+}
+
+/* --- Builder -------------------------------------------------------------- */
 
 CType ctype_tail(void)
 {
     return (CType){
         .type = CTYPE_TAIL,
+    };
+}
+
+CType ctype_error(void)
+{
+    return (CType){
+        .type = CTYPE_INVALID,
     };
 }
 
@@ -63,27 +112,87 @@ CType ctype_array(CType subtype, int size, Alloc *alloc)
     };
 }
 
-CType ctype_signed(int precision)
+CType ctype_char(void)
 {
     return (CType){
-        .type = CTYPE_SIGNED,
-        .signed_.precision = precision,
+        .type = CTYPE_CHAR,
     };
 }
 
-CType ctype_unsigned(int precision)
+CType ctype_short(void)
 {
     return (CType){
-        .type = CTYPE_UNSIGNED,
-        .unsigned_.precision = precision,
+        .type = CTYPE_SHORT,
     };
 }
 
-CType ctype_float(int precision)
+CType ctype_int(void)
+{
+    return (CType){
+        .type = CTYPE_INT,
+    };
+}
+
+CType ctype_long(void)
+{
+    return (CType){
+        .type = CTYPE_LONG,
+    };
+}
+
+CType ctype_longlong(void)
+{
+    return (CType){
+        .type = CTYPE_LONGLONG,
+    };
+}
+
+CType ctype_uchar(void)
+{
+    return (CType){
+        .type = CTYPE_UCHAR,
+    };
+}
+
+CType ctype_ushort(void)
+{
+    return (CType){
+        .type = CTYPE_USHORT,
+    };
+}
+
+CType ctype_uint(void)
+{
+    return (CType){
+        .type = CTYPE_UINT,
+    };
+}
+
+CType ctype_ulong(void)
+{
+    return (CType){
+        .type = CTYPE_ULONG,
+    };
+}
+
+CType ctype_ulonglong(void)
+{
+    return (CType){
+        .type = CTYPE_ULONGLONG,
+    };
+}
+
+CType ctype_float(void)
 {
     return (CType){
         .type = CTYPE_FLOAT,
-        .float_.precision = precision,
+    };
+}
+
+CType ctype_double(void)
+{
+    return (CType){
+        .type = CTYPE_DOUBLE,
     };
 }
 
@@ -217,6 +326,6 @@ void ctype_append(CType *type, CType tail)
         break;
 
     default:
-        panic$("ctype_append on type {}", ctype_to_str(type->type));
+        panic$("ctype_append on type {}", ctype_to_str(*type));
     }
 }

@@ -5,12 +5,14 @@
 typedef enum
 {
     JSON_NULL,
+
     JSON_TRUE,
     JSON_FALSE,
     JSON_ARRAY,
     JSON_OBJECT,
     JSON_STRING,
     JSON_NUMBER,
+
     JSON_ERROR
 } JsonType;
 
@@ -27,7 +29,7 @@ struct _Json
     {
         JsonObj object;
         JsonArr array;
-        Str string;
+        Str str;
         long number;
     };
 };

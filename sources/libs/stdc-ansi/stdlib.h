@@ -91,7 +91,7 @@ int at_quick_exit(void (*func)(void));
 
 _Noreturn void exit(int status);
 
-_Noreturn void _Exit(int status);
+_Noreturn void _exit(int status);
 
 char *getenv(char const *name);
 

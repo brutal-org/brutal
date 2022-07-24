@@ -27,7 +27,7 @@ CProcMacro *cproc_define(CProc *ctx, Str name, Str value)
     Scan scan = {};
 
     scan_init(&scan, value);
-    Lex source = clex(&scan, ctx->alloc);
+    Lex source = clex(&scan, ctx->alloc, 0);
 
     cproc_macro_code(&macro, &source);
 
@@ -224,7 +224,7 @@ static void cproc_gen_concatenation(Lex *out, Lex *macro_source, CProc *ctx)
 
                 Scan scanner;
                 scan_init(&scanner, final.str);
-                Lex concatenated = clex(&scanner, ctx->alloc);
+                Lex concatenated = clex(&scanner, ctx->alloc, 0);
                 log$(final.str);
                 if (concatenated.lexemes.len > 1)
                 {

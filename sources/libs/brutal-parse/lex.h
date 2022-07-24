@@ -36,6 +36,8 @@ typedef Str LexToStrFn(LexemeType type);
 
 Lex lex(Scan *scan, LexFn *fn, Alloc *alloc);
 
+Lex lex_tu(Scan *scan, LexFn *fn, Alloc *alloc, int translation_unit);
+
 Lex lex_from_lexeme(Lexemes *from);
 
 void lex_deinit(Lex *self);
@@ -65,3 +67,5 @@ void lex_throw(Lex *self, Str message);
 bool lex_expect(Lex *self, LexemeType type);
 
 bool lex_ok(Lex *self);
+
+SrcRef lex_src_ref(Lex *lex, int begin, int end);

@@ -3,6 +3,18 @@
 #include <cc/ast/expr.h>
 #include <cc/ast/stmt.h>
 
+COp str_to_cop(Str str);
+
+Str cop_to_str(COp type);
+
+Str cexpr_to_str(CExprType type);
+
+int cop_pre(COp cop);
+
+int cexpr_pre(CExpr *expr);
+
+/* --- Builder -------------------------------------------------------------- */
+
 CExpr cexpr_infix(CExpr left, COp type, CExpr right, Alloc *alloc);
 
 CExpr cexpr_empty(void);
