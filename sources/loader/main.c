@@ -1,9 +1,10 @@
-#include <efi/lib.h>
-#include <efi/srvs.h>
-#include <efi/tty.h>
 #include <brutal-alloc>
 #include <brutal-debug>
 #include <brutal-io>
+#include <efi/lib.h>
+#include <efi/srvs.h>
+#include <efi/tty.h>
+
 #include "loader/config.h"
 #include "loader/memory.h"
 #include "loader/protocol.h"

@@ -1,10 +1,11 @@
 #include <bal/abi.h>
-#include <efi/lib.h>
-#include <efi/srvs.h>
-#include <elf/elf.h>
 #include <brutal-alloc>
 #include <brutal-debug>
 #include <brutal-io>
+#include <efi/lib.h>
+#include <efi/srvs.h>
+#include <elf/elf.h>
+
 #include "loader/memory.h"
 #include "loader/protocol.h"
 
@@ -202,14 +203,16 @@ void efi_load_elf(Elf64Header const *elf_header, void *base, VmmSpace vmm)
 
             mem_cpy(mem_phys_segment, file_segment, prog_header->file_size);
             mem_set(mem_phys_segment + prog_header->file_size, 0, prog_header->memory_size - prog_header->file_size);
-            memory_map_range(vmm, (VmmRange){
-                                      .base = prog_header->virtual_address,
-                                      .size = align_up$(prog_header->memory_size, PAGE_SIZE),
-                                  },
-                             (PmmRange){
-                                 .base = (uintptr_t)mem_phys_segment,
-                                 .size = align_up$(prog_header->memory_size, PAGE_SIZE),
-                             });
+            memory_map_range(
+                vmm,
+                (VmmRange){
+                    .base = prog_header->virtual_address,
+                    .size = align_up$(prog_header->memory_size, PAGE_SIZE),
+                },
+                (PmmRange){
+                    .base = (uintptr_t)mem_phys_segment,
+                    .size = align_up$(prog_header->memory_size, PAGE_SIZE),
+                });
         }
         else
         {

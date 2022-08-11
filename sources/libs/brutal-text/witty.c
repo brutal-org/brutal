@@ -92,6 +92,7 @@ static char *_witty[] = {
     "What happened happened and couldn’t have happened any other way.",
     "What if everything was a dream?",
     "What if we kissed during the kernel panic?",
+    "Paging hell is a real place where you will be sent",
     "You can't fix the core dump, you know",
     "You can't handle the truth!",
     "You don't want to know",

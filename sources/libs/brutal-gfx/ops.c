@@ -92,6 +92,8 @@ static inline void gfx_ops_clear_common(GfxBuf self, GfxColor color, int const s
 
 FLATTEN void gfx_ops_clear(GfxBuf self, GfxColor color)
 {
+    // This code might look redundant, but it let the compiler know the pixel size at compile time.
+
     size_t size = gfx_fmt_size(self.fmt);
 
     switch (size)
@@ -139,6 +141,8 @@ static inline void gfx_ops_rect_common(GfxBuf self, MRectf rect, GfxColor color,
 
 FLATTEN void gfx_ops_rect(GfxBuf self, MRectf rect, GfxColor color)
 {
+    // This code might look redundant, but it let the compiler know the pixel size at compile time.
+
     size_t size = gfx_fmt_size(self.fmt);
 
     switch (size)

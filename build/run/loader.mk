@@ -30,7 +30,7 @@ run: $(LOADER) $(PKGS) $(KERNEL) $(CACHEDIR)/OVMF.fd
 		-serial mon:stdio \
 		-no-reboot \
 		-no-shutdown \
-		-no-reboot -no-shutdown\
+		-no-reboot -no-shutdown \
 		-bios $(CACHEDIR)/OVMF.fd \
 		-drive file=fat:rw:$(IMAGE_ROOT),media=disk,format=raw
 

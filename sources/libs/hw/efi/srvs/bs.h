@@ -169,7 +169,9 @@ typedef struct
     EFI_LOCATE_PROTOCOL locate_protocol;
     EFI_INSTALL_MULTIPLE_PROTOCOL_INTERFACES install_multiple_protocol_interfaces;
     EFI_UNINSTALL_MULTIPLE_PROTOCOL_INTERFACES uninstall_multiple_protocol_interfaces;
+
     EFI_CALCULATE_CRC32 calculate_crc32;
+
     EFI_COPY_MEM copy_mem;
     EFI_SET_MEM set_mem;
     EFI_CREATE_EVENT_EX create_event_ex;
