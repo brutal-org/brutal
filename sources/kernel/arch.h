@@ -3,11 +3,12 @@
 #include <bal/abi.h>
 #include <bal/boot.h>
 #include <brutal-io>
+
 #include "kernel/tasking.h"
 
 IoWriter arch_debug(void);
 
-void arch_entry_main();
+void arch_entry_main(Handover *handover, uint64_t magic);
 
 void arch_entry_other(void);
 

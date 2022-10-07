@@ -481,26 +481,26 @@ BrResult sys_out(BrIoArgs *args)
     return BR_SUCCESS;
 }
 
-typedef BrResult BrSyscallFn();
+typedef BrResult BrSyscallFn(void *args);
 
 BrSyscallFn *syscalls[BR_SYSCALL_COUNT] = {
-    [BR_SC_LOG] = sys_log,
-    [BR_SC_NOW] = sys_now,
-    [BR_SC_MAP] = sys_map,
-    [BR_SC_UNMAP] = sys_unmap,
-    [BR_SC_CREATE] = sys_create,
-    [BR_SC_DUP] = sys_dup,
-    [BR_SC_START] = sys_start,
-    [BR_SC_EXIT] = sys_exit,
-    [BR_SC_IPC] = sys_ipc,
-    [BR_SC_DROP] = sys_drop,
-    [BR_SC_CLOSE] = sys_close,
-    [BR_SC_BIND] = sys_bind,
-    [BR_SC_UNBIND] = sys_unbind,
-    [BR_SC_ACK] = sys_ack,
-    [BR_SC_INSPECT] = sys_inspect,
-    [BR_SC_IN] = sys_in,
-    [BR_SC_OUT] = sys_out,
+    [BR_SC_LOG] = (BrSyscallFn *)sys_log,
+    [BR_SC_NOW] = (BrSyscallFn *)sys_now,
+    [BR_SC_MAP] = (BrSyscallFn *)sys_map,
+    [BR_SC_UNMAP] = (BrSyscallFn *)sys_unmap,
+    [BR_SC_CREATE] = (BrSyscallFn *)sys_create,
+    [BR_SC_DUP] = (BrSyscallFn *)sys_dup,
+    [BR_SC_START] = (BrSyscallFn *)sys_start,
+    [BR_SC_EXIT] = (BrSyscallFn *)sys_exit,
+    [BR_SC_IPC] = (BrSyscallFn *)sys_ipc,
+    [BR_SC_DROP] = (BrSyscallFn *)sys_drop,
+    [BR_SC_CLOSE] = (BrSyscallFn *)sys_close,
+    [BR_SC_BIND] = (BrSyscallFn *)sys_bind,
+    [BR_SC_UNBIND] = (BrSyscallFn *)sys_unbind,
+    [BR_SC_ACK] = (BrSyscallFn *)sys_ack,
+    [BR_SC_INSPECT] = (BrSyscallFn *)sys_inspect,
+    [BR_SC_IN] = (BrSyscallFn *)sys_in,
+    [BR_SC_OUT] = (BrSyscallFn *)sys_out,
 };
 
 BrResult syscall_dispatch(BrSyscall syscall, BrArg args)
@@ -512,7 +512,7 @@ BrResult syscall_dispatch(BrSyscall syscall, BrArg args)
 
     task_begin_syscall();
 
-    BrResult result = syscalls[syscall](args);
+    BrResult result = syscalls[syscall]((void *)args);
 
     if (result != BR_SUCCESS && result != BR_TIMEOUT)
     {
