@@ -1,6 +1,6 @@
+#include <brutal-input/keyboard.h>
 #include <hw/ps2/keyboard.h>
 #include <ipc/ipc.h>
-#include <brutal-input/keyboard.h>
 
 static void ps2_keyboard_handle_code(Ps2Keyboard *ps2, uint8_t packet)
 {
@@ -8,11 +8,11 @@ static void ps2_keyboard_handle_code(Ps2Keyboard *ps2, uint8_t packet)
     {
         ps2->kb_escaped = false;
         KbKey key = (KbKey)((packet & 0x7f) + 0x80);
-        UiEvent ev = {
+        InputEvent ev = {
             .keyboard = {
                 .key = key,
             },
-            .type = packet & 0x80 ? UI_EVENT_KEYBOARD_UP : UI_EVENT_KEYBOARD_DOWN,
+            .type = packet & 0x80 ? INPUT_EVENT_KEYBOARD_UP : INPUT_EVENT_KEYBOARD_DOWN,
         };
 
         ps2->callback(ev, ps2->ctx);
@@ -25,11 +25,11 @@ static void ps2_keyboard_handle_code(Ps2Keyboard *ps2, uint8_t packet)
     {
         KbKey key = (KbKey)((packet & 0x7f));
 
-        UiEvent ev = {
+        InputEvent ev = {
             .keyboard = {
                 .key = key,
             },
-            .type = packet & 0x80 ? UI_EVENT_KEYBOARD_UP : UI_EVENT_KEYBOARD_DOWN,
+            .type = packet & 0x80 ? INPUT_EVENT_KEYBOARD_UP : INPUT_EVENT_KEYBOARD_DOWN,
         };
 
         ps2->callback(ev, ps2->ctx);

@@ -1,7 +1,8 @@
+#include <brutal-alloc>
 #include <protos/boot.h>
 #include <protos/hw.h>
 #include <protos/system.h>
-#include <brutal-alloc>
+
 #include "system/bus.h"
 
 /* --- System Server Protocol ----------------------------------------------- */
@@ -72,7 +73,7 @@ HwError hw_display_surface_handler(void *self, void *, BalFb *resp, Alloc *)
         framebuffer->width,
         framebuffer->height,
         framebuffer->pitch,
-        GFX_FMT_BGRA8888);
+        BAL_FB_FMT_BGRA8888);
 
     return IPC_SUCCESS;
 }

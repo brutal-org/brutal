@@ -1,10 +1,10 @@
 #pragma once
 
-#include <hw/ps2/controller.h>
 #include <brutal-base>
-#include <brutal-ui>
+#include <brutal-input>
+#include <hw/ps2/controller.h>
 
-typedef void (*Ps2MouseCallback)(UiEvent ev, void *ctx);
+typedef void (*Ps2MouseCallback)(InputEvent ev, void *ctx);
 
 typedef struct
 {
@@ -15,7 +15,7 @@ typedef struct
     Ps2MouseCallback callback;
     void *ctx;
     Ps2Controller *controller;
-    UiMouseEvent prev;
+    InputMouseEvent prev;
 } Ps2Mouse;
 
 typedef enum

@@ -35,14 +35,6 @@
 - **BRUTAL** exposes its features to developers through clean APIs.
 - **BRUTAL** features a rich and modern C library complete with fibers, custom allocators, generic data structures, and more...
 
-## Screenshots
-
-<p align="center">
-<img src="meta/screenshots/2022-03-26.png" />
-<br>
-BRUTAL running in QEMU 6.2
-</p>
-
 ## Build Instructions
 
 BRUTAL is pretty easy to to build from source using GNUMake, NASM and LLVM.

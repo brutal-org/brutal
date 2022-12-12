@@ -1,18 +1,18 @@
 #include <bal/hw/fb.h>
 
-MaybeError bal_fb_init(BalFb *self, int width, int height, GfxFmt fmt)
+MaybeError bal_fb_init(BalFb *self, int width, int height, BalFbFmt fmt)
 {
     *self = (BalFb){
         .width = width,
         .height = height,
-        .pitch = gfx_fmt_size(fmt) * width,
+        .pitch = bal_fb_fmt_size(fmt) * width,
         .fmt = fmt,
     };
 
     return bal_mem_init(&self->mem, self->pitch * height);
 }
 
-MaybeError bal_fb_init_mobj(BalFb *self, BrHandle handle, int width, int height, int pitch, GfxFmt fmt)
+MaybeError bal_fb_init_mobj(BalFb *self, BrHandle handle, int width, int height, int pitch, BalFbFmt fmt)
 {
     *self = (BalFb){
         .width = width,
@@ -24,7 +24,7 @@ MaybeError bal_fb_init_mobj(BalFb *self, BrHandle handle, int width, int height,
     return bal_mem_init_mobj(&self->mem, handle);
 }
 
-MaybeError bal_fb_init_pmm(BalFb *self, uintptr_t addr, size_t size, int width, int height, int pitch, GfxFmt fmt)
+MaybeError bal_fb_init_pmm(BalFb *self, uintptr_t addr, size_t size, int width, int height, int pitch, BalFbFmt fmt)
 {
     *self = (BalFb){
         .width = width,
@@ -61,17 +61,6 @@ BrResult bal_fb_map(BalFb *self)
 BrResult bal_fb_unmap(BalFb *self)
 {
     return bal_mem_unmap(&self->mem);
-}
-
-GfxBuf bal_fb_buf(BalFb *self)
-{
-    return (GfxBuf){
-        .width = self->width,
-        .height = self->height,
-        .pitch = self->pitch,
-        .fmt = self->fmt,
-        .buf = self->mem.buf,
-    };
 }
 
 void bal_fb_pack(IpcPack *pack, const BalFb *self)

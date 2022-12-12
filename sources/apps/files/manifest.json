@@ -1,5 +1,0 @@
-{
-    "name": "files",
-    "consume": ["system.Server", "window.Server"],
-    "rights": ["log"]
-}

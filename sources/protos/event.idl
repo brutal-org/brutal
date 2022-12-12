@@ -1,9 +1,9 @@
 module event;
 
 import base, math;
-include brutal-ui;
+include brutal-input;
 
-type Event = __ctype(UiEvent);
+type Event = __ctype(InputEvent);
 
 interface Sink
 {

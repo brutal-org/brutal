@@ -1,9 +1,9 @@
 #pragma once
 
+#include <brutal-input>
 #include <hw/ps2/controller.h>
-#include <brutal-ui>
 
-typedef void (*Ps2KeyboardCallback)(UiEvent ev, void *context);
+typedef void (*Ps2KeyboardCallback)(InputEvent ev, void *context);
 
 typedef struct
 {

@@ -2,18 +2,18 @@
 #include <bal/hw.h>
 #include <brutal-alloc>
 #include <brutal-debug>
-#include <brutal-ui>
+#include <brutal-input>
 #include <hw/ps2/ps2.h>
 #include <ipc/ipc.h>
 #include <protos/event.h>
 
-void ps2_keyboard_callback(UiEvent ev, IpcCap *input_sink)
+void ps2_keyboard_callback(InputEvent ev, IpcCap *input_sink)
 {
     bool handled = false;
     event_sink_dispatch_rpc(ipc_self(), *input_sink, &ev, &handled, alloc_global());
 }
 
-void ps2_mouse_callback(UiEvent ev, IpcCap *input_sink)
+void ps2_mouse_callback(InputEvent ev, IpcCap *input_sink)
 {
     bool handled = false;
     event_sink_dispatch_rpc(ipc_self(), *input_sink, &ev, &handled, alloc_global());
