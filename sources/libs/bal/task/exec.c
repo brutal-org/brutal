@@ -1,7 +1,7 @@
 #include <bal/abi.h>
 #include <bal/task/task.h>
-#include <elf/elf.h>
 #include <brutal-debug>
+#include <elf/elf.h>
 
 static void bal_exec_load(BrHandle space, Elf64Header const *elf_header, BrHandle elf_memory)
 {
@@ -130,7 +130,7 @@ static uintptr_t bal_exec_stack(BrHandle space, IpcCap *caps, size_t count, BrTa
     return sp;
 }
 
-BrResult bal_TaskExec(BalTask *task, BalMem *elf, BrRight rights, IpcCap *caps, size_t count)
+BrResult bal_task_exec(BalTask *task, BalMem *elf, BrRight rights, IpcCap *caps, size_t count)
 {
     BrCreateArgs space = {
         .type = BR_OBJECT_SPACE,

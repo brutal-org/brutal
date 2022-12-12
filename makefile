@@ -23,7 +23,6 @@ BASE_CFLAGS += \
 	-Wall \
 	-Wextra \
 	-Werror \
-	-Wundef \
 	-Wshadow \
 	-Wvla \
 	-Isources/libs/ \

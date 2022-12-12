@@ -1,7 +1,8 @@
 #include <bal/task.h>
+#include <brutal-debug>
 #include <elf/elf.h>
 #include <json/parser.h>
-#include <brutal-debug>
+
 #include "system/unit.h"
 
 void unit_init(Unit *self, Str name, BalMem payload, Alloc *alloc)
@@ -95,7 +96,7 @@ void unit_start(Unit *self)
     BalTask elf_task;
     bal_task_init(&elf_task, self->name);
 
-    bal_TaskExec(
+    bal_task_exec(
         &elf_task,
         &self->payload,
         self->rights,
