@@ -1,7 +1,9 @@
 #pragma once
 
-#include <brutal-input>
 #include <brutal-math>
+
+#include "keyboard.h"
+#include "mouse.h"
 
 enum
 {
