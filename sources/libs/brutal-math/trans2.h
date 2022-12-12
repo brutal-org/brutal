@@ -1,5 +1,6 @@
 #pragma once
 
+#include <brutal-base/std.h>
 #include <math.h>
 
 #include "vec2.h"
