@@ -2,11 +2,11 @@
 
 #include <locale/local_t.h>
 
-void *memccpy(void *restrict s1, void const *restrict s2, int c, size_t n);
+void *memccpy(void *STDC_RESTRICT s1, void const *STDC_RESTRICT s2, int c, size_t n);
 
-char *stpcpy(char *restrict s1, char const *restrict s2);
+char *stpcpy(char *STDC_RESTRICT s1, char const *STDC_RESTRICT s2);
 
-char *stpncpy(char *restrict s1, char const *restrict s2, size_t n);
+char *stpncpy(char *STDC_RESTRICT s1, char const *STDC_RESTRICT s2, size_t n);
 
 int strcoll_l(char const *, char const *, locale_t);
 
@@ -22,6 +22,6 @@ size_t strnlen(char const *, size_t);
 
 char *strsignal(int);
 
-char *strtok_r(char *restrict s1, char const *restrict s2, char **restrict rest);
+char *strtok_r(char *STDC_RESTRICT s1, char const *STDC_RESTRICT s2, char **STDC_RESTRICT rest);
 
-size_t strxfrm_l(char *restrict s1, char const *restrict s2, size_t, locale_t);
+size_t strxfrm_l(char *STDC_RESTRICT s1, char const *STDC_RESTRICT s2, size_t, locale_t);

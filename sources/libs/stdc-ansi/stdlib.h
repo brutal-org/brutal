@@ -1,8 +1,12 @@
 #pragma once
 
-#include <stddef.h>
+#include <stdc-base/prelude.h>
 
 /* --- 7.22 - General utilities --------------------------------------------- */
+
+#include <stddef.h>
+
+STDC_BEGIN_HEADER
 
 #ifndef NULL
 #    define NULL ((void *)0)
@@ -43,25 +47,25 @@ long atol(char const *nptr);
 
 long long atoll(char const *nptr);
 
-long int strtol(char const *restrict nptr, char **restrict endptr, int base);
+long int strtol(char const *STDC_RESTRICT nptr, char **STDC_RESTRICT endptr, int base);
 
-long long int strtoll(char const *restrict nptr, char **restrict endptr, int base);
+long long int strtoll(char const *STDC_RESTRICT nptr, char **STDC_RESTRICT endptr, int base);
 
-unsigned long int strtoul(char const *restrict nptr, char **restrict endptr, int base);
+unsigned long int strtoul(char const *STDC_RESTRICT nptr, char **STDC_RESTRICT endptr, int base);
 
-unsigned long long int strtoull(char const *restrict nptr, char **restrict endptr, int base);
+unsigned long long int strtoull(char const *STDC_RESTRICT nptr, char **STDC_RESTRICT endptr, int base);
 
-double strtod(char const *restrict nptr, char **restrict endptr);
+double strtod(char const *STDC_RESTRICT nptr, char **STDC_RESTRICT endptr);
 
-float strtof(char const *restrict nptr, char **restrict endptr);
+float strtof(char const *STDC_RESTRICT nptr, char **STDC_RESTRICT endptr);
 
-long double strtold(char const *restrict nptr, char **restrict endptr);
+long double strtold(char const *STDC_RESTRICT nptr, char **STDC_RESTRICT endptr);
 
-int strfromd(char *restrict s, size_t n, char const *restrict format, double fp);
+int strfromd(char *STDC_RESTRICT s, size_t n, char const *STDC_RESTRICT format, double fp);
 
-int strfromf(char *restrict s, size_t n, char const *restrict format, float p);
+int strfromf(char *STDC_RESTRICT s, size_t n, char const *STDC_RESTRICT format, float p);
 
-int strfroml(char *restricts, size_t n, char const *restrict format, long double fp);
+int strfroml(char *restricts, size_t n, char const *STDC_RESTRICT format, long double fp);
 
 /* --- 7.22.2 - Pseudo-random sequence generation functions ----------------- */
 
@@ -130,10 +134,12 @@ lldiv_t lldiv(long long number, long long denom);
 
 int mblen(char const *s, size_t n);
 
-int mbtowc(wchar_t *restrict pwc, char const *restrict s, size_t n);
+int mbtowc(wchar_t *STDC_RESTRICT pwc, char const *STDC_RESTRICT s, size_t n);
 
 int wctomb(char *s, wchar_t wc);
 
-size_t mbstowcs(wchar_t *restrict pwcs, char const *restrict s, size_t n);
+size_t mbstowcs(wchar_t *STDC_RESTRICT pwcs, char const *STDC_RESTRICT s, size_t n);
 
-size_t mcstombs(char *restrict s, wchar_t const *restrict pwcs, size_t n);
+size_t mcstombs(char *STDC_RESTRICT s, wchar_t const *STDC_RESTRICT pwcs, size_t n);
+
+STDC_END_HEADER

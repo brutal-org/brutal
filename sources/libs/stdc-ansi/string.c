@@ -2,13 +2,13 @@
 
 /* --- 7.24 - String handling ----------------------------------------------- */
 
-#include <string.h>
 #include <brutal-alloc>
 #include <brutal-mem>
+#include <string.h>
 
 /* --- 7.24.2 - Copying functions ------------------------------------------- */
 
-void *memcpy(void *restrict s1, void const *restrict s2, size_t n)
+void *memcpy(void *STDC_RESTRICT s1, void const *STDC_RESTRICT s2, size_t n)
 {
     return mem_cpy(s1, s2, n);
 }
@@ -36,7 +36,7 @@ void *memmove(void *s1, void const *s2, size_t n)
     return s1;
 }
 
-char *strcpy(char *restrict s1, char const *restrict s2)
+char *strcpy(char *STDC_RESTRICT s1, char const *STDC_RESTRICT s2)
 {
     size_t i = 0;
 
@@ -49,7 +49,7 @@ char *strcpy(char *restrict s1, char const *restrict s2)
     return s1;
 }
 
-char *strncpy(char *restrict s1, char const *restrict s2, size_t n)
+char *strncpy(char *STDC_RESTRICT s1, char const *STDC_RESTRICT s2, size_t n)
 {
     size_t i = 0;
 
@@ -64,7 +64,7 @@ char *strncpy(char *restrict s1, char const *restrict s2, size_t n)
 
 /* --- 7.24.3 - Concatenation functions ------------------------------------- */
 
-char *strcat(char *restrict s1, char const *restrict s2)
+char *strcat(char *STDC_RESTRICT s1, char const *STDC_RESTRICT s2)
 {
     size_t l2 = strlen(s2);
     s1 = s1 + strlen(s1); // append to the last
@@ -79,7 +79,7 @@ char *strcat(char *restrict s1, char const *restrict s2)
     return s1;
 }
 
-char *strncat(char *restrict s1, char const *restrict s2, size_t n)
+char *strncat(char *STDC_RESTRICT s1, char const *STDC_RESTRICT s2, size_t n)
 {
     size_t l2 = strlen(s2);
     size_t i = 0;
@@ -141,7 +141,7 @@ int strncmp(char const *s1, char const *s2, size_t n)
     return (int)*s1 - (int)*s2;
 }
 
-// size_t strxfrm(char *restrict s1, char const *restrict s2, size_t n) {}
+// size_t strxfrm(char *STDC_RESTRICT s1, char const *STDC_RESTRICT s2, size_t n) {}
 
 /* --- 7.24.5 - Search functions -------------------------------------------- */
 
@@ -185,7 +185,7 @@ char *strrchr(char const *s, int c)
 
 // char *strstr(char const *s1,  char const *s2) {}
 
-// char *strtok(char *restrict s1,  char const *restrict s2) {}
+// char *strtok(char *STDC_RESTRICT s1,  char const *STDC_RESTRICT s2) {}
 
 /* --- 7.24.6 - Miscellaneous functions ------------------------------------- */
 

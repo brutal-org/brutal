@@ -1,6 +1,10 @@
 #pragma once
 
+#include <stdc-base/prelude.h>
+
 /* --- 7.11 - Localization -------------------------------------------------- */
+
+STDC_BEGIN_HEADER
 
 struct lconv
 {
@@ -44,5 +48,7 @@ char *setlocale(int category, char const *locale);
 /* --- 7.11.2 - Numeric formatting convention inquiry ----------------------- */
 
 struct lconv *localeconv(void);
+
+STDC_END_HEADER
 
 #include_next <locale.h>

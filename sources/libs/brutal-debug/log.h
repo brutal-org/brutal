@@ -11,7 +11,8 @@ typedef enum
 /* --- Locked log functions ------------------------------------------------- */
 
 void log_impl(LogLevel level, Loc loc, Str fmt, AnyVa args);
-noreturn void panic_impl(LogLevel level, Loc loc, Str fmt, AnyVa args);
+
+_Noreturn void panic_impl(LogLevel level, Loc loc, Str fmt, AnyVa args);
 
 #define panic$(fmt, ...) \
     panic_impl(LOG_PANIC, loc$(), str$(fmt), any_va$(__VA_ARGS__));

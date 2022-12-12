@@ -25,7 +25,7 @@ void log_impl(LogLevel level, Loc loc, Str fmt, AnyVa args)
     embed_log_unlock();
 }
 
-noreturn void panic_impl(LogLevel level, Loc loc, Str fmt, AnyVa args)
+_Noreturn void panic_impl(LogLevel level, Loc loc, Str fmt, AnyVa args)
 {
     log_unlock_impl(level, loc, fmt, args);
     embed_log_panic();
