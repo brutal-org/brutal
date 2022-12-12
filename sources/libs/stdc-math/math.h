@@ -1,6 +1,9 @@
 #pragma once
 
 #include <float.h>
+#include <stdc-base/prelude.h>
+
+STDC_BEGIN_HEADER
 
 #ifndef NAN
 #    define NAN (0.0 / 0.0)
@@ -362,3 +365,5 @@ long double fminl(long double x, long double y);
 double fma(double, double, double);
 float fmaf(float, float, float);
 long double fmal(long double, long double, long double);
+
+STDC_END_HEADER
