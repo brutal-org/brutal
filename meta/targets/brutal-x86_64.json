@@ -5,8 +5,9 @@
         "toolchain": "clang",
         "arch": "x86_64",
         "bits": "64",
-        "sys": "munix",
+        "sys": "brutal",
         "abi": "sysv",
+        "loader": "brutal-loader",
         "encoding": "utf8",
         "freestanding": false,
         "host": false
@@ -20,6 +21,7 @@
             "args": [
                 "-target",
                 "x86_64-none-elf",
+                "-D__brutal__",
                 "-ffreestanding",
                 "-mno-80387",
                 "-mno-mmx",
@@ -36,6 +38,7 @@
             "args": [
                 "-target",
                 "x86_64-none-elf",
+                 "-D__brutal__",
                 "-ffreestanding",
                 "-mno-80387",
                 "-mno-mmx",
@@ -70,11 +73,9 @@
             ]
         },
         "as": {
-            "cmd": "clang",
+            "cmd": "nasm",
             "args": [
-                "-target",
-                "x86_64-none-elf",
-                "-c"
+                "-f elf64"
             ]
         }
     }

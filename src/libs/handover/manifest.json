@@ -1,0 +1,11 @@
+{
+    "id": "handover",
+    "type": "lib", 
+    "requires" : [
+        "brutal-debug",
+        "brutal-mem",
+        "brutal-ds", 
+        "brutal-io"
+
+    ]
+}

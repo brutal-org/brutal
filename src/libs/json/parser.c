@@ -1,6 +1,8 @@
 #include <json/parser.h>
-#include <brutal-alloc>
-#include <brutal-io>
+#include <brutal-alloc/global.h>
+#include <brutal-parse/nums.h>
+#include <brutal-io/funcs.h>
+#include <brutal-io/file.h>
 
 static bool json_skip_comment(Scan *scan)
 {

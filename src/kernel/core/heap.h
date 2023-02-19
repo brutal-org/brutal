@@ -2,7 +2,7 @@
 
 #include <bal/abi.h>
 
-"kernel/core/pmm.h"
+#include "kernel/core/pmm.h"
 
 typedef USizeRange HeapRange;
 

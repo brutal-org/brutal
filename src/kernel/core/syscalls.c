@@ -3,14 +3,14 @@
 #include <brutal-io/funcs.h>
 #include <embed/log.h>
 
-#include "kernel/arch.h"
-"kernel/core/domain.h"
-"kernel/core/event.h"
-"kernel/core/init.h"
-"kernel/core/memory.h"
-"kernel/core/sched.h"
-"kernel/core/syscalls.h"
-"kernel/core/task.h"
+#include "kernel/core/arch.h"
+#include "kernel/core/domain.h"
+#include "kernel/core/event.h"
+#include "kernel/core/init.h"
+#include "kernel/core/memory.h"
+#include "kernel/core/sched.h"
+#include "kernel/core/syscalls.h"
+#include "kernel/core/task.h"
 
 BrResult sys_log(BrLogArgs *args)
 {

@@ -3,8 +3,6 @@
     "type": "lib",
     "description": "Brutal math utility library",
     "requires": [
-        "libc",
-        "brutal-ds",
         "embed"
     ]
 }

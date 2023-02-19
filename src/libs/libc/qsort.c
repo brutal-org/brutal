@@ -2,6 +2,17 @@
 
 #include <stdlib.h>
 #include <string.h>
+void memswap(void *block1, void *block2, size_t n)
+{
+    char *p1 = block1;
+    char *p2 = block2;
+    while (n--)
+    {
+        char c = *p1;
+        *p1++ = *p2;
+        *p2++ = c;
+    }
+}
 
 void qsort(void *base, size_t nmemb, size_t size, int (*compar)(void const *, void const *))
 {

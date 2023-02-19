@@ -1,12 +1,11 @@
 #pragma once
 
 #include <bal/abi.h>
-#include <brutal-text/utf8.h>
 #include <brutal-time/types.h>
 
-"kernel/core/channel.h"
-"kernel/core/context.h"
-"kernel/core/space.h"
+#include "kernel/core/channel.h"
+#include "kernel/core/context.h"
+#include "kernel/core/space.h"
 
 typedef bool BlockerFn(void *context);
 

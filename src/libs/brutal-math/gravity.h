@@ -2,6 +2,7 @@
 
 #include "flow.h"
 #include "rect.h"
+#include <brutal-base/std.h>
 
 #define M_GRAVITY_NONE (0)
 

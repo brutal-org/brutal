@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal-text>
+#include <brutal-base/str.h>
 
 Str io_dirname(Str path);
 

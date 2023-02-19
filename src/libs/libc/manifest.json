@@ -1,0 +1,13 @@
+{
+    "id": "libc",
+    "type": "lib",
+    "description": "C standard library implementation",
+    "requires": [
+        "brutal-alloc",
+        "brutal-debug",
+        "brutal-math",
+        "brutal-mem",
+        "brutal-parse",
+        "embed"
+    ]
+}

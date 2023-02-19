@@ -1,7 +1,7 @@
-#include <brutal-fmt>
+#include <brutal-fmt/funcs.h>
 #include <embed/debug.h>
 
-"kernel/core/cpu.h"
+#include "kernel/core/cpu.h"
 
 void embed_log_prefix(IoWriter writer)
 {

@@ -1,0 +1,23 @@
+{
+    "id": "loader-brutal",
+    "description": "brutal bootloader",
+    "type": "exe",
+    "requires": [
+        "json",
+        "brutal-parse",
+        "brutal-ds",
+        "brutal-alloc",
+        "brutal-io",
+        "brutal-alloc",
+        "brutal-mem"
+
+    ],
+    "enableif": {
+        "loader": [
+            "brutal-loader"
+        ]
+    },
+    "provides": [
+        "loader"
+    ]
+}

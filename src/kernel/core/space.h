@@ -1,7 +1,7 @@
 #pragma once
 
-"kernel/core/memory.h"
-"kernel/core/vmm.h"
+#include "kernel/core/memory.h"
+#include "kernel/core/vmm.h"
 #include <brutal-ds/range.h>
 
 typedef struct

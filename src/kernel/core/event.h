@@ -1,8 +1,8 @@
 #pragma once
 
 #include <bal/abi.h>
-"kernel/core/domain.h"
-"kernel/core/task.h"
+#include "kernel/core/domain.h"
+#include "kernel/core/task.h"
 
 typedef struct
 {

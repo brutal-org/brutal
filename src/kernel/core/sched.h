@@ -1,7 +1,7 @@
 #pragma once
 
-"kernel/core/cpu.h"
-"kernel/core/task.h"
+#include "kernel/core/cpu.h"
+#include "kernel/core/task.h"
 
 void sched_initialize(void);
 

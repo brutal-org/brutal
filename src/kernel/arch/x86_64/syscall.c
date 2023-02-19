@@ -1,8 +1,8 @@
 #include "kernel/arch/x86_64/syscall.h"
 #include <brutal-debug/log.h>
-"kernel/core/heap.h"
-"kernel/core/kernel.h"
-"kernel/core/syscalls.h"
+#include "kernel/core/heap.h"
+#include "kernel/core/kernel.h"
+#include "kernel/core/syscalls.h"
 #include "kernel/arch/x86_64/asm.h"
 #include "kernel/arch/x86_64/cpu.h"
 #include "kernel/arch/x86_64/gdt.h"

@@ -1,7 +1,9 @@
-#include <brutal-alloc>
-#include <brutal-ds>
-#include <brutal-fmt>
-#include <brutal-io>
+#include <brutal-alloc/global.h>
+#include <brutal-ds/map.h>
+#include <brutal-fmt/funcs.h>
+#include <brutal-text/str.h>
+#include <brutal-mem/funcs.h>
+#include <brutal-base/str.h>
 
 #include "scan.h"
 

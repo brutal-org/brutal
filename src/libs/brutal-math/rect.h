@@ -1,4 +1,5 @@
 #pragma once
+#include <brutal-base/clamp.h>
 
 
 #include <stdbool.h>

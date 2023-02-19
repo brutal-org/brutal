@@ -1,0 +1,8 @@
+{
+    "id": "acpi",
+    "type": "lib",
+    "description": "Hardware ACPI utility library",
+    "requires": [
+        "brutal-debug"
+    ]
+}

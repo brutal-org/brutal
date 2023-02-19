@@ -1,0 +1,10 @@
+{
+    "id": "brutal-sync",
+    "type": "lib",
+    "description": "Brutal locking utility library",
+    "requires": [
+        "embed",
+        "brutal-debug"
+
+    ]
+}

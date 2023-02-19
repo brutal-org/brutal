@@ -1,4 +1,4 @@
-"kernel/core/pmm.h"
+#include "kernel/core/pmm.h"
 #include <brutal-debug/assert.h>
 #include <brutal-mem/funcs.h>
 #include <brutal-sync/lock.h>
@@ -7,8 +7,8 @@
 
 #include <brutal-ds/bits.h>
 #include <brutal-mem/units.h>
-#include "kernel/arch.h"
-"kernel/core/mmap.h"
+#include "kernel/core/arch.h"
+#include "kernel/core/mmap.h"
 
 // #define TRACE_PMM
 

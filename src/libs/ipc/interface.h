@@ -1,7 +1,6 @@
 #pragma once
 
 #include <ipc/ipc.h>
-#include <brutal-text>
 
 Str ipc_interface_str(IpcProto proto);
 

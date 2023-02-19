@@ -1,4 +1,5 @@
 #include "utf8.h"
+#include <brutal-mem/funcs.h>
 
 StrFix8 utf8_from_rune(Rune rune)
 {

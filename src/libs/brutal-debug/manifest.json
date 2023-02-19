@@ -3,6 +3,8 @@
     "type": "lib",
     "description": "Brutal debugging utility library",
     "requires": [
-        "brutal-base"
+        "brutal-base",
+        "brutal-fmt",
+        "embed"
     ]
 }

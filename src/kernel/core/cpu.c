@@ -1,4 +1,4 @@
-"kernel/core/cpu.h"
+#include "kernel/core/cpu.h"
 #include <brutal-debug/assert.h>
 
 void cpu_begin_interrupt(void)

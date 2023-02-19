@@ -1,5 +1,5 @@
-#include <brutal-io>
-#include <brutal-parse>
+#include <brutal-io/buf.h>
+#include <brutal-parse/scan.h>
 
 uint16_t *utf16_str_to_cstr(Str str, Alloc *alloc)
 {

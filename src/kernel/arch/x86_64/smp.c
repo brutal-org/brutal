@@ -10,12 +10,12 @@
 #include "kernel/arch/x86_64/hpet.h"
 #include "kernel/arch/x86_64/smp.h"
 
-#include "kernel/arch.h"
-"kernel/core/heap.h"
-"kernel/core/kernel.h"
-"kernel/core/mmap.h"
-"kernel/core/pmm.h"
-"kernel/core/vmm.h"
+#include "kernel/core/arch.h"
+#include "kernel/core/heap.h"
+#include "kernel/core/kernel.h"
+#include "kernel/core/mmap.h"
+#include "kernel/core/pmm.h"
+#include "kernel/core/vmm.h"
 
 static atomic_bool _ready = false;
 

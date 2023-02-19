@@ -1,8 +1,8 @@
 #pragma once
 
-"kernel/core/domain.h"
-"kernel/core/heap.h"
-"kernel/core/pmm.h"
+#include "kernel/core/domain.h"
+#include "kernel/core/heap.h"
+#include "kernel/core/pmm.h"
 
 typedef enum
 {

@@ -5,7 +5,7 @@
 
 #include "kernel/arch/x86_64/hpet.h"
 
-"kernel/core/mmap.h"
+#include "kernel/core/mmap.h"
 
 static uintptr_t _base = 0;
 static uint64_t _clock = 0;

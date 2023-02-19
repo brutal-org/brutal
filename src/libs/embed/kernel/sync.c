@@ -1,4 +1,4 @@
-"kernel/core/cpu.h"
+#include "kernel/core/cpu.h"
 
 void embed_sync_enter(void) { cpu_retain_interrupts(); }
 

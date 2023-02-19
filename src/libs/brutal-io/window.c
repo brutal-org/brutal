@@ -1,5 +1,6 @@
-#include <brutal-debug>
-#include <brutal-math>
+#include <brutal-debug/assert.h>
+#include <brutal-base/clamp.h>
+#include <brutal-mem/funcs.h>
 
 #include "funcs.h"
 #include "window.h"

@@ -1,6 +1,6 @@
 #include <embed/log.h>
-#include <brutal-sync>
-#include "kernel/arch.h"
+#include <brutal-sync/lock.h>
+#include "kernel/core/arch.h"
 
 static Lock _lock;
 

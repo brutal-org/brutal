@@ -1,0 +1,12 @@
+{
+    "id": "ipc",
+    "type": "lib",
+    "description": "Brutal inter-process-communication library",
+    "requires": [
+        "brutal-ds",
+        "brutal-fibers",
+        "brutal-debug",
+        "brutal-alloc",
+        "brutal-mem"
+    ]
+}

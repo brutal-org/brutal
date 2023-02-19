@@ -6,9 +6,7 @@
         "brutal-ds",
         "brutal-text",
         "brutal-debug",
-        "libc",
-        "brutal-fmt",
-        "brutal-io",
-        "brutal-alloc"
+        "brutal-alloc",
+        "brutal-mem"
     ]
 }

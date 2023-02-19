@@ -1,6 +1,11 @@
 #pragma once
 
+#include <stdc-base/prelude.h>
 #include <locale/local_t.h>
+#include <brutal-base/attributes.h>
+#include <brutal-base/std.h>
+
+
 
 void *memccpy(void *STDC_RESTRICT s1, void const *STDC_RESTRICT s2, int c, size_t n);
 

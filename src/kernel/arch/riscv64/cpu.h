@@ -1,6 +1,6 @@
 #pragma once
 
-"kernel/core/cpu.h"
+#include "kernel/core/cpu.h"
 
 #define MAX_CPU_COUNT 255
 

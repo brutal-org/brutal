@@ -1,5 +1,6 @@
-#include <brutal-math>
-
+#include <brutal-mem/funcs.h>
+#include <brutal-base/attributes.h>
+#include <brutal-base/clamp.h>
 #include "funcs.h"
 
 /* --- Read Functions ------------------------------------------------------- */

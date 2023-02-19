@@ -4,8 +4,8 @@
 #include <ipc/capability.h>
 #include <ipc/pack.h>
 #include <ipc/unpack.h>
-#include <brutal-ds>
-#include <brutal-fibers>
+#include <brutal-ds/vec.h>
+#include <brutal-fibers/fibers.h>
 
 typedef struct _IpcPending IpcPending;
 typedef struct _IpcComponent IpcComponent;

@@ -1,4 +1,4 @@
-"kernel/core/object.h"
+#include "kernel/core/object.h"
 #include <brutal-alloc/global.h>
 #include <brutal-sync/rwlock.h>
 

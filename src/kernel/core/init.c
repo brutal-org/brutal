@@ -3,11 +3,11 @@
 #include <brutal-mem/funcs.h>
 #include <brutal-mem/const.h>
 
-"kernel/core/heap.h"
-"kernel/core/init.h"
-"kernel/core/kernel.h"
-"kernel/core/mmap.h"
-"kernel/core/sched.h"
+#include "kernel/core/heap.h"
+#include "kernel/core/init.h"
+#include "kernel/core/kernel.h"
+#include "kernel/core/mmap.h"
+#include "kernel/core/sched.h"
 
 static bool elf_supported(Elf64Header const *header, size_t data_size)
 {

@@ -1,8 +1,9 @@
-#include <brutal-debug>
-#include <brutal-sync>
+#include <brutal-debug/assert.h>
+#include <brutal-sync/rwlock.h>
 #include <embed/mem.h>
+#include <brutal-alloc/heap.h>
 
-"kernel/core/heap.h"
+#include "kernel/core/heap.h"
 
 static Lock _lock;
 

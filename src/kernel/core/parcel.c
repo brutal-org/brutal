@@ -1,4 +1,4 @@
-"kernel/core/parcel.h"
+#include "kernel/core/parcel.h"
 
 BrResult parcel_pack(Parcel *self, BrMsg const *msg, Domain *domain)
 {

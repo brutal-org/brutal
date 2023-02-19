@@ -1,4 +1,4 @@
-"kernel/core/memory.h"
+#include "kernel/core/memory.h"
 #include <brutal-alloc/global.h>
 #include <brutal-debug/assert.h>
 

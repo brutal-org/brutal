@@ -1,6 +1,8 @@
 #include <ipc/pack.h>
-#include <brutal-debug>
-#include <brutal-mem>
+#include <brutal-debug/assert.h>
+#include <brutal-mem/pages.h>
+#include <brutal-mem/const.h>
+#include <brutal-mem/funcs.h>
 
 void ipc_pack_init(IpcPack *self)
 {
@@ -36,7 +38,6 @@ void ipc_pack_ensure(IpcPack *self, size_t cap)
     };
 
     assert_br_success(br_create(&memory));
-
     BrMapArgs memmap = {
         .space = BR_HANDLE_SELF,
         .memory = memory.handle,

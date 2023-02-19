@@ -1,7 +1,10 @@
 #pragma once
 
 #include <string.h>
-#include <brutal-base>
+#include <brutal-base/std.h>
+#include <brutal-base/vaopt.h>
+#include <brutal-base/keywords.h>
+
 
 typedef struct
 {

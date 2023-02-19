@@ -1,7 +1,7 @@
 "kernel/core/cpu.h"
 #include <brutal-debug>
-"kernel/core/heap.h"
-"kernel/core/kernel.h"
+#include "kernel/core/heap.h"
+#include "kernel/core/kernel.h"
 #include "kernel/arch/riscv64/cpu.h"
 
 static CpuImpl _cpus[MAX_CPU_COUNT] = {};

@@ -1,4 +1,5 @@
-#include <brutal-math>
+#include <brutal-base/clamp.h>
+#include <brutal-mem/funcs.h>
 
 #include "mem.h"
 

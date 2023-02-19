@@ -1,0 +1,22 @@
+{
+    "id": "arch-x86_64",
+    "description": "The Brutal Microkernel x86-64 architecture support",
+    "type": "lib",
+    "requires": [
+        "embed", 
+        "brutal-mem",
+        "brutal-debug",
+        "brutal-sync",
+        "brutal-base",
+        "bal",
+        "brutal-time",
+        "acpi",
+        "brutal-alloc"
+    ],
+    "provides": [
+        "kernel-arch"
+    ],
+    "enableIf": {
+        "arch": ["x86_64"]
+    }
+}

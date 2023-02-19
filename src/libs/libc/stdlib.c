@@ -1,8 +1,11 @@
-#include <brutal-alloc>
-#include <brutal-debug>
-#include <brutal-math>
-#include <brutal-mem>
-#include <brutal-parse>
+#include <brutal-alloc/global.h>
+#include <brutal-debug/assert.h>
+#include <brutal-math/funcs.h>
+#include <brutal-math/rand.h>
+
+
+#include <brutal-mem/funcs.h>
+#include <brutal-parse/nums.h>
 #include <embed/log.h>
 #include <embed/task.h>
 #include <stdlib.h>
@@ -12,12 +15,17 @@
 
 /* --- 7.22.1 - Numeric conversion functions -------------------------------- */
 
+#ifndef __freestanding__
+
+
+
 double atof(char const *nptr)
 {
     double res = 0;
     str_to_float(str$(nptr), &res);
     return res;
 }
+#endif
 
 int atoi(char const *nptr)
 {

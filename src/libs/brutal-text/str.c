@@ -1,5 +1,5 @@
 #include <ctype.h>
-
+#include <brutal-mem/funcs.h>
 #include "str.h"
 
 Str str_concat(Str const lhs, Str const rhs, Alloc *alloc)

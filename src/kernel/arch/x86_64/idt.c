@@ -1,5 +1,5 @@
 #include "kernel/arch/x86_64/idt.h"
-#include "kernel/arch.h"
+#include "kernel/core/arch.h"
 #include "kernel/arch/x86_64/apic.h"
 #include "kernel/arch/x86_64/gdt.h"
 

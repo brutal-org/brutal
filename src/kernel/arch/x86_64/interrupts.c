@@ -11,10 +11,10 @@
 #include "kernel/arch/x86_64/smp.h"
 #include "kernel/arch/x86_64/syscall.h"
 
-"kernel/core/context.h"
-"kernel/core/cpu.h"
-"kernel/core/event.h"
-"kernel/core/sched.h"
+#include "kernel/core/context.h"
+#include "kernel/core/cpu.h"
+#include "kernel/core/event.h"
+#include "kernel/core/sched.h"
 
 static char *_exception_messages[32] = {
     "DivisionByZero",

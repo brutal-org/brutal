@@ -1,5 +1,5 @@
-#include "kernel/arch.h"
-"kernel/core/cpu.h"
+#include "kernel/core/arch.h"
+#include "kernel/core/cpu.h"
 #include "kernel/arch/x86_64/apic.h"
 #include "kernel/arch/x86_64/asm.h"
 #include <brutal-time/convert.h>

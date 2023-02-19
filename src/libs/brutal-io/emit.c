@@ -1,5 +1,5 @@
-#include <brutal-debug>
-#include <brutal-fmt>
+#include <brutal-debug/assert.h>
+#include <brutal-fmt/funcs.h>
 
 #include "emit.h"
 #include "funcs.h"

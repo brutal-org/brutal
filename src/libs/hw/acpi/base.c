@@ -1,6 +1,6 @@
 #include <acpi/base.h>
 #include <acpi/rsdt.h>
-#include <brutal-debug>
+#include <brutal-debug/assert.h>
 
 #ifdef __kernel__
 

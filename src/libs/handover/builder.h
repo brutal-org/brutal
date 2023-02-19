@@ -1,8 +1,8 @@
 #pragma once
 
 #include <handover/handover.h>
-#include <brutal-ds>
-#include <brutal-text>
+#include <brutal-ds/vec.h>
+#include <brutal-io/buf.h>
 
 typedef struct
 {

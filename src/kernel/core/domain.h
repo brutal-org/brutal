@@ -1,6 +1,6 @@
 #pragma once
 
-"kernel/core/object.h"
+#include "kernel/core/object.h"
 #include <brutal-sync/rwlock.h>
 
 typedef struct

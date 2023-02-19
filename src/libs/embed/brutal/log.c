@@ -2,7 +2,7 @@
 #include <embed/log.h>
 #include <brutal-alloc/global.h>
 #include <brutal-io/buf.h>
-#include <brutal-sync>
+#include <brutal-sync/lock.h>
 
 static bool _initialized = false;
 static Lock _lock;

@@ -1,7 +1,7 @@
 "kernel/core/heap.h"
 #include <brutal-sync>
-"kernel/core/mmap.h"
-"kernel/core/pmm.h"
+#include "kernel/core/mmap.h"
+#include "kernel/core/pmm.h"
 
 static Lock _lock;
 

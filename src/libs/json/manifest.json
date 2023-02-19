@@ -1,0 +1,11 @@
+{
+    "id": "json",
+    "type": "lib",
+    "description": "JSON writing and reading utility library",
+    "requires": [
+        "brutal-ds",
+        "brutal-debug",
+        "brutal-parse",
+        "brutal-io"
+    ]
+}

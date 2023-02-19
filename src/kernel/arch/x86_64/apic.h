@@ -1,7 +1,7 @@
 #pragma once
 
 #include <acpi/base.h>
-"kernel/core/cpu.h"
+#include "kernel/core/cpu.h"
 
 /* --- LApic ---------------------------------------------------------------- */
 

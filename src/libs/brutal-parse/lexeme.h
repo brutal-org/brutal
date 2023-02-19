@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal-text>
+#include <brutal-base/str.h>
 
 #define LEXEME_EOF (-1)
 #define LEXEME_INVALID (-2)

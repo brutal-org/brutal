@@ -1,7 +1,7 @@
-"kernel/core/cpu.h"
+#include "kernel/core/cpu.h"
 #include <brutal-debug/assert.h>
-"kernel/core/heap.h"
-"kernel/core/kernel.h"
+#include "kernel/core/heap.h"
+#include "kernel/core/kernel.h"
 #include "kernel/arch/x86_64/apic.h"
 #include "kernel/arch/x86_64/asm.h"
 #include "kernel/arch/x86_64/cpu.h"

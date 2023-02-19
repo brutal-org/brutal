@@ -1,7 +1,11 @@
 #include <bal/abi.h>
-#include <brutal-alloc>
-#include <brutal-debug>
-#include <brutal-io>
+#include <brutal-alloc/global.h>
+#include <brutal-debug/assert.h>
+#include <brutal-io/file.h>
+#include <brutal-io/funcs.h>
+#include <brutal-mem/funcs.h>
+
+
 #include <efi/lib.h>
 #include <efi/srvs.h>
 #include <elf/elf.h>

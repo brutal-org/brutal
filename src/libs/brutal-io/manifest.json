@@ -8,7 +8,6 @@
         "brutal-math",
         "brutal-alloc",
         "embed",
-        "brutal-fmt",
         "brutal-text"
     ]
 }

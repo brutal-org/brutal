@@ -1,9 +1,9 @@
-"kernel/core/core/channel.h"
+#include "kernel/core/channel.h"
 #include <brutal-alloc/pool.h>
 #include <brutal-alloc/global.h>
 #include <brutal-debug/log.h>
-"kernel/core/kernel.h"
-"kernel/core/sched.h"
+#include "kernel/core/kernel.h"
+#include "kernel/core/sched.h"
 
 Channel *channel_create(void)
 {

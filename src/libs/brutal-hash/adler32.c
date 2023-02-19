@@ -1,5 +1,5 @@
 #include "adler32.h"
-#include <brutal-io/funcs.h>
+#include <brutal-io/traits.h>
 
 #define A32_BASE 65521
 
@@ -17,7 +17,8 @@ static IoResult adler32_write_impl(Adler32 *self, uint8_t const *data, size_t si
         self->s1 = (self->s1 + data[n]) % A32_BASE;
         self->s2 = (self->s2 + self->s1) % A32_BASE;
     }
-    return io_write(self->underlying, data, size);
+
+    return self->underlying.write(self->underlying.context, data, size);
 }
 
 IoWriter adler32_writer(Adler32 *self)

@@ -1,6 +1,7 @@
-#include <brutal-alloc>
-#include <brutal-debug>
-#include <brutal-io>
+#include <brutal-alloc/global.h>
+#include <brutal-debug/assert.h>
+#include <brutal-io/traits.h>
+
 #include <efi/lib.h>
 #include <efi/srvs.h>
 #include <efi/tty.h>

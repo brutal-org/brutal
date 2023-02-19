@@ -1,6 +1,8 @@
 #pragma once
 
-#include <brutal-ds>
+#include <brutal-ds/vec.h>
+
+#include <brutal-io/buf.h>
 
 #include "lexeme.h"
 #include "scan.h"

@@ -1,4 +1,4 @@
-"kernel/core/vmm.h"
+#include "kernel/core/vmm.h"
 #include <brutal-debug/assert.h>
 #include <brutal-sync/lock.h>
 #include <brutal-mem/funcs.h>
@@ -8,8 +8,8 @@
 #include "kernel/arch/x86_64/asm.h"
 #include "kernel/arch/x86_64/paging.h"
 
-"kernel/core/heap.h"
-"kernel/core/mmap.h"
+#include "kernel/core/heap.h"
+#include "kernel/core/mmap.h"
 
 static Lock _lock;
 static Pml *_kpml;

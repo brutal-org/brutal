@@ -4,7 +4,7 @@
 #include <bal/boot.h>
 #include <brutal-io/traits.h>
 
-"kernel/core/tasking.h"
+#include "kernel/core/tasking.h"
 
 IoWriter arch_debug(void);
 

@@ -5,11 +5,11 @@
 #include <brutal-debug>
 #include <brutal-ds>
 #include "kernel/arch.h"
-"kernel/core/pmm.h"
+#include "kernel/core/pmm.h"
 #include "kernel/arch/riscv64/arch.h"
 #include "kernel/arch/riscv64/interrupts.h"
 #include "kernel/arch/riscv64/uart8250.h"
-"kernel/core/vmm.h"
+#include "kernel/core/vmm.h"
 
 static Uart *_uart = NULL;
 static Handover _handover = {};

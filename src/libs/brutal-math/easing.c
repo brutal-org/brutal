@@ -1,5 +1,5 @@
-#include <math.h>
 
+#include <math.h>
 #include "easing.h"
 
 double m_easing_linear(double p)

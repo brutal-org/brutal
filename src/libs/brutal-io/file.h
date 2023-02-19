@@ -1,6 +1,5 @@
 #pragma once
 
-#ifndef __kernel__
 
 #    include <embed/file-decl.h>
 
@@ -70,4 +69,3 @@ IoWSeek io_file_wseek(IoFile *self);
 
 MaybeError io_file_close(IoFile *self);
 
-#endif

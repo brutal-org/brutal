@@ -1,4 +1,4 @@
-"kernel/core/event.h"
+#include "kernel/core/event.h"
 #include <brutal-alloc/global.h>
 #include <brutal-debug/log.h>
 
