@@ -1,5 +1,7 @@
-#include <brutal-debug>
-#include <brutal-mem>
+#include <brutal-debug/log.h>
+#include <brutal-mem/const.h>
+#include <brutal-mem/funcs.h>
+#include <brutal-mem/volatile.h>
 #include <embed/mem.h>
 
 #include "kernel/x86_64/apic.h"

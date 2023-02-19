@@ -1,6 +1,6 @@
 #include "kernel/context.h"
-#include <brutal-alloc>
-#include <brutal-debug>
+#include <brutal-alloc/global.h>
+#include <brutal-debug/log.h>
 #include "kernel/x86_64/asm.h"
 #include "kernel/x86_64/gdt.h"
 #include "kernel/x86_64/simd.h"

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal-time>
+#include <brutal-time/types.h>
 
 #define CMOS_ADDRESS 0x70
 #define CMOS_DATA 0x71

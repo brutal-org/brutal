@@ -1,7 +1,8 @@
-#include <brutal-debug>
 #include <embed/sync.h>
-
+#include <brutal-base/std.h>
+#include <brutal-sync/lock.h>
 #include "rwlock.h"
+#include <brutal-debug/assert.h>
 
 void rwlock_acquire_read(RwLock *self)
 {

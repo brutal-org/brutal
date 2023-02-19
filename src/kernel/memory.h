@@ -1,7 +1,5 @@
 #pragma once
 
-#include <brutal-ds>
-#include <brutal-sync>
 #include "kernel/domain.h"
 #include "kernel/heap.h"
 #include "kernel/pmm.h"

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal-base>
+#include <brutal-base/std.h>
 
 static inline void asm_cli(void) { asm volatile("cli"); }
 

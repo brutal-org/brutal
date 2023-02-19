@@ -1,7 +1,8 @@
 #pragma once
 
 #include <bal/abi.h>
-#include <brutal-mem>
+#include <brutal-base/attributes.h>
+#include <brutal-mem/const.h>
 
 typedef union PACKED
 {

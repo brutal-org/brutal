@@ -1,5 +1,7 @@
-#include <brutal-alloc>
-#include <brutal-debug>
+#include <brutal-alloc/global.h>
+#include <brutal-debug/assert.h>
+#include <brutal-mem/funcs.h>
+#include <brutal-mem/const.h>
 
 #include "kernel/heap.h"
 #include "kernel/init.h"

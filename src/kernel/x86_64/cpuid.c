@@ -1,5 +1,5 @@
 #include "kernel/x86_64/cpuid.h"
-#include <brutal-debug>
+#include <brutal-debug/log.h>
 
 CpuidResult cpuid(uint32_t leaf, uint32_t subleaf)
 {

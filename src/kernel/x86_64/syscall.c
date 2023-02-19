@@ -1,5 +1,5 @@
 #include "kernel/x86_64/syscall.h"
-#include <brutal-debug>
+#include <brutal-debug/log.h>
 #include "kernel/heap.h"
 #include "kernel/kernel.h"
 #include "kernel/syscalls.h"

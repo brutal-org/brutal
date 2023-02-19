@@ -1,6 +1,5 @@
 #include "kernel/domain.h"
-#include <brutal-alloc>
-#include <brutal-debug>
+#include <brutal-alloc/global.h>
 
 void domain_destroy(Domain *self)
 {

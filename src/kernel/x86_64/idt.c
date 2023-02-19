@@ -1,5 +1,4 @@
 #include "kernel/x86_64/idt.h"
-#include <brutal-debug>
 #include "kernel/arch.h"
 #include "kernel/x86_64/apic.h"
 #include "kernel/x86_64/gdt.h"

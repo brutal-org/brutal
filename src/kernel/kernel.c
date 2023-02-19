@@ -1,4 +1,4 @@
-#include <brutal-debug>
+#include <brutal-debug/log.h>
 
 void kernel_splash(void)
 {

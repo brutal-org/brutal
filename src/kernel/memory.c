@@ -1,6 +1,6 @@
 #include "kernel/memory.h"
-#include <brutal-alloc>
-#include <brutal-debug>
+#include <brutal-alloc/global.h>
+#include <brutal-debug/assert.h>
 
 void memory_destroy(Memory *self)
 {

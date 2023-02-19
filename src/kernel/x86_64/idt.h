@@ -1,6 +1,9 @@
 #pragma once
 
-#include <brutal-base>
+#include <brutal-base/std.h>
+#include <brutal-base/attributes.h>
+
+
 
 enum
 {

@@ -2,6 +2,7 @@
 #include "kernel/cpu.h"
 #include "kernel/x86_64/apic.h"
 #include "kernel/x86_64/asm.h"
+#include <brutal-time/convert.h>
 #include "kernel/x86_64/cmos.h"
 #include "kernel/x86_64/com.h"
 #include "kernel/x86_64/smp.h"

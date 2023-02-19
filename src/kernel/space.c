@@ -1,6 +1,6 @@
 #include "kernel/space.h"
-#include <brutal-alloc>
-#include <brutal-debug>
+#include <brutal-alloc/global.h>
+#include <brutal-debug/log.h>
 
 /* --- Memory Mappings ------------------------------------------------------ */
 

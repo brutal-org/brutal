@@ -1,5 +1,6 @@
 #include <bal/abi.h>
-#include <brutal-debug>
+#include <brutal-debug/log.h>
+#include <brutal-io/funcs.h>
 #include <embed/log.h>
 
 #include "kernel/arch.h"

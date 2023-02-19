@@ -1,6 +1,6 @@
-#include <brutal-debug>
-#include <brutal-sync>
-#include <brutal-time>
+#include <brutal-debug/log.h>
+#include <brutal-sync/rwlock.h>
+#include <brutal-time/types.h>
 
 #include "kernel/x86_64/apic.h"
 #include "kernel/x86_64/asm.h"

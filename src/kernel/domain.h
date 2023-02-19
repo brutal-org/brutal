@@ -1,6 +1,7 @@
 #pragma once
 
 #include "kernel/object.h"
+#include <brutal-sync/rwlock.h>
 
 typedef struct
 {

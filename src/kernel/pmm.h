@@ -2,7 +2,6 @@
 
 #include <bal/abi.h>
 #include <bal/boot.h>
-#include <brutal-ds>
 
 #define PMM_USED (true)
 #define PMM_UNUSED (false)

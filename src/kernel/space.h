@@ -2,6 +2,7 @@
 
 #include "kernel/memory.h"
 #include "kernel/vmm.h"
+#include <brutal-ds/range.h>
 
 typedef struct
 {
