@@ -1,0 +1,11 @@
+{
+    "id": "brutal-alloc",
+    "type": "lib",
+    "description": "Brutal memory allocation",
+    "requires": [
+        "embed",
+        "brutal-debug",
+        "brutal-base",
+        "brutal-mem"
+    ]
+}

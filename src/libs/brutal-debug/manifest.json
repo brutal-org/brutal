@@ -1,0 +1,8 @@
+{
+    "id": "brutal-debug",
+    "type": "lib",
+    "description": "Brutal debugging utility library",
+    "requires": [
+        "brutal-base"
+    ]
+}

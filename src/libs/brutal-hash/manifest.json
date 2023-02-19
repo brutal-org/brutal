@@ -1,0 +1,9 @@
+{
+    "id": "brutal-hash",
+    "type": "lib",
+    "description": "Brutal hashing utility library",
+    "requires": [
+        "brutal-base",
+        "brutal-io"
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "id": "brutal-fibers",
+    "type": "lib",
+    "description": "Brutal fibers/coroutines utility library",
+    "requires": [
+        "brutal-alloc",
+        "brutal-time",
+        "brutal-base"
+    ]
+}

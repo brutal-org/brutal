@@ -1,0 +1,7 @@
+{
+    "id": "brutal-base",
+    "type": "lib",
+    "description": "Brutal base and utility library",
+    "requires": [
+    ]
+}

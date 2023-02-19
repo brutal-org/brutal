@@ -1,0 +1,12 @@
+{
+    "id": "brutal-ds",
+    "type": "lib",
+    "description": "Brutal data structures utility library",
+    "requires": [
+        "brutal-mem",
+        "brutal-debug",
+        "brutal-base",
+        "brutal-hash",
+        "brutal-alloc"
+    ]
+}

@@ -6,6 +6,7 @@
 *.ko
 *.obj
 *.elf
+.osdk/
 
 # Linker output
 *.ilk

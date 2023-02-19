@@ -1,0 +1,10 @@
+{
+    "id": "brutal-input",
+    "type": "lib",
+    "description": "Brutal user input utility library",
+    "requires": [
+        "brutal-math",
+        "brutal-base",
+        "brutal-text"
+    ]
+}

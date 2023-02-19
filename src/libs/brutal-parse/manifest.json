@@ -1,0 +1,14 @@
+{
+    "id": "brutal-parse",
+    "type": "lib",
+    "description": "Brutal parsing utility library",
+    "requires": [
+        "brutal-ds",
+        "brutal-text",
+        "brutal-debug",
+        "libc",
+        "brutal-fmt",
+        "brutal-io",
+        "brutal-alloc"
+    ]
+}
