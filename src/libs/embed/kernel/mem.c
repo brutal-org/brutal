@@ -2,7 +2,7 @@
 #include <brutal-sync>
 #include <embed/mem.h>
 
-#include "kernel/heap.h"
+"kernel/core/heap.h"
 
 static Lock _lock;
 
