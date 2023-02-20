@@ -12,11 +12,6 @@
         "brutal-mem"
 
     ],
-    "enableif": {
-        "loader": [
-            "brutal-loader"
-        ]
-    },
     "provides": [
         "loader"
     ]

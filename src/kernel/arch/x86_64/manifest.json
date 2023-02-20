@@ -8,7 +8,7 @@
         "brutal-debug",
         "brutal-sync",
         "brutal-base",
-        "bal",
+        "bal-handover",
         "brutal-time",
         "acpi",
         "brutal-alloc"

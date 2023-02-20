@@ -30,7 +30,7 @@
                 "-mno-sse2",
                 "-mno-red-zone",
                 "-mcmodel=kernel",
-                "-fbuiltin", 
+                "-fbuiltin",  
                 "-nostdlib", 
                 "-nostdlib++",
                 "-D__freestanding__"
@@ -53,7 +53,7 @@
                 "-mno-sse2",
                 "-mno-red-zone",
                 "-mcmodel=kernel",
-                "-fbuiltin", 
+                "-fbuiltin",  
                 "-nostdlib", 
                 "-nostdlib++",
                 "-D__freestanding__"

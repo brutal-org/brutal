@@ -2,6 +2,9 @@
     "id": "libc",
     "type": "lib",
     "description": "C standard library implementation",
+    "props": {
+        "cpp-root-include": true
+    },
     "requires": [
         "brutal-alloc",
         "brutal-debug",

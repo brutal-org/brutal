@@ -1,0 +1,7 @@
+{
+    "id": "bal-handover",
+    "type": "lib",
+    "description": "Brutal kernel abstraction layer handover",
+    "requires": [
+    ]
+}

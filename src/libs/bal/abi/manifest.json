@@ -1,0 +1,8 @@
+{
+    "id": "bal-abi",
+    "type": "lib",
+    "description": "Brutal kernel abstraction layer ABI",
+    "requires": [
+        "brutal-debug"
+    ]
+}
