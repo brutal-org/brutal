@@ -3,7 +3,7 @@
     "description": "The Brutal Microkernel x86-64 architecture support",
     "type": "lib",
     "requires": [
-        "embed", 
+        "embed-system", 
         "brutal-mem",
         "brutal-debug",
         "brutal-sync",

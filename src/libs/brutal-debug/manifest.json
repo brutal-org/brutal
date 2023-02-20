@@ -5,6 +5,5 @@
     "requires": [
         "brutal-base",
         "brutal-fmt",
-        "embed"
-    ]
+        "embed-system"
 }

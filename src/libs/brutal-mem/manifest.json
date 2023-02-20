@@ -3,6 +3,6 @@
     "type": "lib",
     "description": "Brutal memory utility library",
     "requires": [
-        "embed"
+        "embed-arch"
     ]
 }

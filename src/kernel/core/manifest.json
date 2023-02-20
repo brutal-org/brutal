@@ -3,15 +3,16 @@
     "description": "The Brutal Microkernel core",
     "type": "exe",
     "requires": [
+
+        "brutal-debug",
         "kernel-arch",
         "bal",
         "brutal-base",
         "brutal-alloc",
-        "brutal-debug",
         "brutal-sync",
         "brutal-mem",
         "elf",
-        "embed",
+        "embed-system",
         "brutal-ds",
         "brutal-io",
         "handover",

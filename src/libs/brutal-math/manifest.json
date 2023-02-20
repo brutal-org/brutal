@@ -3,6 +3,6 @@
     "type": "lib",
     "description": "Brutal math utility library",
     "requires": [
-        "embed"
+        "embed-system"
     ]
 }

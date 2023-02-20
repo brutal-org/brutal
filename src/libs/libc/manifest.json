@@ -8,6 +8,6 @@
         "brutal-math",
         "brutal-mem",
         "brutal-parse",
-        "embed"
+        "embed-system"
     ]
 }

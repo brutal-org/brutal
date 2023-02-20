@@ -1,10 +1,10 @@
 {
-    "id": "embed-kernel",
+    "id": "embed-x86-64",
     "type": "lib",
     "description": "Embed utility library",
     "requires": [
     ],
     "provides": [
-        "embed-system"
+        "embed-arch"
     ]
 }

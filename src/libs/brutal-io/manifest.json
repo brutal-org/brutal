@@ -7,7 +7,7 @@
         "brutal-base",
         "brutal-math",
         "brutal-alloc",
-        "embed",
+        "embed-system",
         "brutal-text"
     ]
 }

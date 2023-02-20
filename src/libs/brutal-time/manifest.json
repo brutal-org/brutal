@@ -3,6 +3,6 @@
     "type": "lib",
     "description": "Brutal time utility library",
     "requires": [
-        "embed"
+        "embed-system"
     ]
 }
