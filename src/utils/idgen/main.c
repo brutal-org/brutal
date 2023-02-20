@@ -1,5 +1,5 @@
-#include <brutal-fmt>
-#include <brutal-math>
+#include <brutal/fmt>
+#include <brutal/math>
 
 int main(int, char const *[])
 {

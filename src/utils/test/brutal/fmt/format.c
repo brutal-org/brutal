@@ -1,5 +1,5 @@
-#include <brutal-fmt>
-#include <brutal-test>
+#include <brutal/fmt>
+#include <brutal/test>
 
 #define TEST_CASE(EXPECTED, FORMAT, ...)                                                          \
     test_case$(EXPECTED)                                                                          \

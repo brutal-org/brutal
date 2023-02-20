@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal-io>
+#include <brutal/io>
 
 typedef struct PACKED
 {

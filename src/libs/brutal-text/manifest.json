@@ -1,9 +1,0 @@
-{
-    "id": "brutal-text",
-    "type": "lib",
-    "description": "Brutal text interaction utility library",
-    "requires": [
-        "brutal-alloc",
-        "brutal-mem"
-    ]
-}

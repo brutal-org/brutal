@@ -3,6 +3,6 @@
     "type": "lib",
     "description": "Hardware ACPI utility library",
     "requires": [
-        "brutal-debug"
+        "brutal"
     ]
 }

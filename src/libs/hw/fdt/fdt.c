@@ -1,5 +1,5 @@
-#include <brutal-debug>
-#include <brutal-fmt>
+#include <brutal/debug>
+#include <brutal/fmt>
 #include <fdt/fdt.h>
 
 static FdtTok *fdt_node_begin(FdtTokBegin *fdt)

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal-input>
+#include <brutal/input>
 #include <hw/ps2/controller.h>
 
 typedef void (*Ps2KeyboardCallback)(InputEvent ev, void *context);

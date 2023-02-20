@@ -1,5 +1,5 @@
 #include <bvm/obj/val.h>
-#include <brutal-debug>
+#include <brutal/debug>
 
 BvmVal bvm_val_nil(void)
 {

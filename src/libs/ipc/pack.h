@@ -1,7 +1,7 @@
 #pragma once
 
 #include <ipc/capability.h>
-#include <brutal-base/slice.h>
+#include <brutal/base/slice.h>
 
 typedef struct
 {

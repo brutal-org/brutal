@@ -1,8 +1,8 @@
 #pragma once
 
-#include <brutal-base/keywords.h>
-#include <brutal-base/str.h>
-#include <brutal-base/attributes.h>
+#include <brutal/base/keywords.h>
+#include <brutal/base/str.h>
+#include <brutal/base/attributes.h>
 
 #define ELF_HEADER_MAGIC "\177ELF"
 

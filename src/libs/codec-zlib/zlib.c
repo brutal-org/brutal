@@ -1,4 +1,4 @@
-#include <brutal-hash>
+#include <brutal/hash>
 #include <codec-deflate>
 
 #include "zlib.h"

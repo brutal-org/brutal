@@ -1,4 +1,4 @@
-#include <brutal-test>
+#include <brutal/test>
 #include <codec-gzip>
 
 test$(gzip_empty_raw)

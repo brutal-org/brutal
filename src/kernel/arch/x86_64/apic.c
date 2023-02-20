@@ -1,7 +1,7 @@
 #include <acpi/madt.h>
-#include <brutal-debug/assert.h>
+#include <brutal/debug/assert.h>
 #include <acpi/rsdt.h>
-#include <brutal-mem/volatile.h>
+#include <brutal/mem/volatile.h>
 #include "kernel/core/mmap.h"
 #include "kernel/arch/x86_64/apic.h"
 #include "kernel/arch/x86_64/asm.h"

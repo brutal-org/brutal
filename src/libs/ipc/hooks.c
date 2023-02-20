@@ -1,8 +1,8 @@
 #include <bal/hw.h>
 #include <ipc/hooks.h>
 #include <ipc/ipc.h>
-#include <brutal-alloc/heap.h>
-#include <brutal-debug/assert.h>
+#include <brutal/alloc/heap.h>
+#include <brutal/debug/assert.h>
 
 int ipc_hook_call(
     IpcComponent *component,

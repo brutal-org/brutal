@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal-base>
+#include <brutal/base>
 
 #define BVM_FOREACH_OP \
     ITER(NOP)          \

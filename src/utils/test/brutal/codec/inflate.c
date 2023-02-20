@@ -1,4 +1,4 @@
-#include <brutal-test>
+#include <brutal/test>
 #include <codec-deflate>
 
 test$(inflate_uncompressed)

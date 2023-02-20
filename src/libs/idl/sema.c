@@ -1,6 +1,6 @@
-#include <brutal-debug>
-#include <brutal-fmt>
-#include <brutal-hash>
+#include <brutal/debug>
+#include <brutal/fmt>
+#include <brutal/hash>
 #include <idl/ast.h>
 #include <idl/ast/builder.h>
 #include <idl/parse.h>

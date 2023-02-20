@@ -1,5 +1,5 @@
-#include <brutal-fmt>
-#include <brutal-test>
+#include <brutal/fmt>
+#include <brutal/test>
 
 static void TEST_CASE(Case c, char const *input, char const *expected)
 {

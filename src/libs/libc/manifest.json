@@ -6,11 +6,7 @@
         "cpp-root-include": true
     },
     "requires": [
-        "brutal-alloc",
-        "brutal-debug",
-        "brutal-math",
-        "brutal-mem",
-        "brutal-parse",
+        "brutal",
         "embed-system"
     ]
 }

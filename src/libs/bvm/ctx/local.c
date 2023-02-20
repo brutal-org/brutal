@@ -1,6 +1,6 @@
 #include <bvm/ctx/local.h>
 #include <bvm/obj/func.h>
-#include <brutal-debug>
+#include <brutal/debug>
 
 void bvm_local_init(BvmLocal *self, Alloc *alloc)
 {

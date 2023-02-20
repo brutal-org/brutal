@@ -5,8 +5,8 @@
 #include <protos/boot.h>
 #include <protos/pci.h>
 #include <protos/system.h>
-#include <brutal-alloc>
-#include <brutal-debug>
+#include <brutal/alloc>
+#include <brutal/debug>
 
 typedef struct
 {

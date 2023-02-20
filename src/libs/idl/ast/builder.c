@@ -1,6 +1,6 @@
 #include <idl/ast/builder.h>
 #include <ipc/ipc.h>
-#include <brutal-hash>
+#include <brutal/hash>
 
 /* --- Types ---------------------------------------------------------------- */
 

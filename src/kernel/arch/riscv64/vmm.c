@@ -1,6 +1,6 @@
 "kernel/core/vmm.h"
-#include <brutal-debug>
-#include <brutal-sync>
+#include <brutal/debug>
+#include <brutal/sync>
 #include "kernel/core/heap.h"
 #include "kernel/core/mmap.h"
 #include "kernel/arch/riscv64/asm.h"

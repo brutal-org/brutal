@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal-ds/ring.h>
+#include <brutal/ds/ring.h>
 #include "kernel/core/parcel.h"
 
 typedef struct

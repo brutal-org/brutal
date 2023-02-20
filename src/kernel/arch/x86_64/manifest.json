@@ -4,14 +4,9 @@
     "type": "lib",
     "requires": [
         "embed-system", 
-        "brutal-mem",
-        "brutal-debug",
-        "brutal-sync",
-        "brutal-base",
+        "brutal",
         "bal-handover",
-        "brutal-time",
-        "acpi",
-        "brutal-alloc"
+        "acpi"
     ],
     "provides": [
         "kernel-arch"

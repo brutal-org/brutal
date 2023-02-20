@@ -1,6 +1,6 @@
 #include <handover/builder.h>
-#include <brutal-debug/assert.h>
-#include <brutal-mem/funcs.h>
+#include <brutal/debug/assert.h>
+#include <brutal/mem/funcs.h>
 
 void handover_builder_init(Ho2Builder *self, Alloc *alloc)
 {

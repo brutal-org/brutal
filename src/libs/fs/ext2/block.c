@@ -1,6 +1,6 @@
 #include <fs/ext2/block.h>
 #include <fs/ext2/ext2.h>
-#include <brutal-debug>
+#include <brutal/debug>
 
 Ext2FsBlockResult ext2_acquire_blocks(Ext2Fs *self, size_t off, size_t count, FsBlockFlags flags)
 {

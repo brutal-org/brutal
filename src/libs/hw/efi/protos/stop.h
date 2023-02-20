@@ -1,8 +1,8 @@
 #pragma once
 
 #include <efi/types.h>
-#include <brutal-base/vaopt.h>
-#include <brutal-base/keywords.h>
+#include <brutal/base/vaopt.h>
+#include <brutal/base/keywords.h>
 
 
 #define EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL_GUID                                           \

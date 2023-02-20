@@ -1,6 +1,6 @@
-#include <brutal-alloc>
-#include <brutal-debug>
-#include <brutal-hash>
+#include <brutal/alloc>
+#include <brutal/debug>
+#include <brutal/hash>
 #include <codec-deflate>
 
 #include "gzip.h"

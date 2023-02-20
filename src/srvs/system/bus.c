@@ -1,5 +1,5 @@
 #include <bal/task.h>
-#include <brutal-debug>
+#include <brutal/debug>
 #include "system/bus.h"
 
 void bus_init(Bus *bus, Alloc *alloc)

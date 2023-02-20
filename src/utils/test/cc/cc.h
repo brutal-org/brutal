@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cc/parse.h>
-#include <brutal-io>
+#include <brutal/io>
 
 // FIXME: get ride of those ugly macros.
 

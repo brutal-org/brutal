@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal-io>
+#include <brutal/io>
 
 /**
   @brief Decompress a gzip deflate stream

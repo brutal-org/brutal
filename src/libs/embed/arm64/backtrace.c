@@ -1,5 +1,5 @@
 #include <embed/debug.h>
-#include <brutal-base/attributes.h>
+#include <brutal/base/attributes.h>
 
 struct _StackFrame
 {

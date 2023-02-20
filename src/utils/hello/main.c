@@ -1,4 +1,4 @@
-#include <brutal-fmt>
+#include <brutal/fmt>
 
 int main(int argc, char const *argv[])
 {

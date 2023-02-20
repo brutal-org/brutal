@@ -1,8 +1,0 @@
-{
-    "id": "brutal-math",
-    "type": "lib",
-    "description": "Brutal math utility library",
-    "requires": [
-        "embed-system"
-    ]
-}

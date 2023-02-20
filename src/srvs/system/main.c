@@ -1,4 +1,4 @@
-#include <brutal-alloc>
+#include <brutal/alloc>
 #include <protos/boot.h>
 #include <protos/hw.h>
 #include <protos/system.h>

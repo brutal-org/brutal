@@ -1,6 +1,6 @@
 #include "kernel/arch/x86_64/cmos.h"
-#include <brutal-sync/lock.h>
-#include <brutal-base/macros.h>
+#include <brutal/sync/lock.h>
+#include <brutal/base/macros.h>
 #include "kernel/arch/x86_64/asm.h"
 
 static Lock _lock;

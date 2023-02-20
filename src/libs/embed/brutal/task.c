@@ -1,6 +1,6 @@
 #include <bal/abi.h>
 #include <embed/task.h>
-#include <brutal-debug>
+#include <brutal/debug>
 
 int embed_task_self(void)
 {

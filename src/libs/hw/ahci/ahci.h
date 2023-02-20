@@ -3,7 +3,7 @@
 #include <ahci/device.h>
 #include <ahci/hba.h>
 #include <pci/pci.h>
-#include <brutal-ds>
+#include <brutal/ds>
 
 typedef struct
 {

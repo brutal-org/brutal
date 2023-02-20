@@ -1,4 +1,4 @@
-#include <brutal-debug>
+#include <brutal/debug>
 
 #include "constants.h"
 #include "errors.h"

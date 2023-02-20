@@ -1,4 +1,4 @@
-#include <brutal-test>
+#include <brutal/test>
 
 test$(heap_traits)
 {

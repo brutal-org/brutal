@@ -1,5 +1,5 @@
 #include "kernel/core/tasking.h"
-#include <brutal-debug/assert.h>
+#include <brutal/debug/assert.h>
 #include "kernel/core/arch.h"
 #include "kernel/core/sched.h"
 #include "kernel/core/task.h"

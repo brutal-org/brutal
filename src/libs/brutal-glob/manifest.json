@@ -1,8 +1,0 @@
-{
-    "id": "brutal-glob",
-    "type": "lib",
-    "description": "Brutal text 'regex' utility library",
-    "requires": [
-        "brutal-parse"
-    ]
-}

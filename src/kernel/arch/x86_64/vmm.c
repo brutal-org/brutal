@@ -1,9 +1,9 @@
 #include "kernel/core/vmm.h"
-#include <brutal-debug/assert.h>
-#include <brutal-sync/lock.h>
-#include <brutal-mem/funcs.h>
-#include <brutal-mem/units.h>
-#include <brutal-mem/pages.h>
+#include <brutal/debug/assert.h>
+#include <brutal/sync/lock.h>
+#include <brutal/mem/funcs.h>
+#include <brutal/mem/units.h>
+#include <brutal/mem/pages.h>
 
 #include "kernel/arch/x86_64/asm.h"
 #include "kernel/arch/x86_64/paging.h"

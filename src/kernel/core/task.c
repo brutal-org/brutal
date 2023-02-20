@@ -1,6 +1,6 @@
 #include "kernel/core/task.h"
-#include <brutal-alloc/global.h>
-#include <brutal-debug/log.h>
+#include <brutal/alloc/global.h>
+#include <brutal/debug/log.h>
 #include "kernel/core/cpu.h"
 #include "kernel/core/event.h"
 #include "kernel/core/kernel.h"

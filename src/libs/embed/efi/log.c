@@ -1,7 +1,7 @@
 #include <efi/lib.h>
 #include <embed/log.h>
-#include <brutal-alloc/global.h>
-#include <brutal-text/utf16.h>
+#include <brutal/alloc/global.h>
+#include <brutal/text/utf16.h>
 
 static IoResult embed_log_write(MAYBE_UNUSED void *context, uint8_t const *data, size_t size)
 {

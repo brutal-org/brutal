@@ -1,5 +1,5 @@
 #include <fs/ext2/structure.h>
-#include <brutal-debug>
+#include <brutal/debug>
 
 static void ext2_dump_ro_features(Ext2SuperBlock *superblock)
 {

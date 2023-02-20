@@ -1,4 +1,4 @@
-#include <brutal-test>
+#include <brutal/test>
 #include <codec-zlib>
 
 test$(zlib_empty_raw)

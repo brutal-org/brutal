@@ -1,8 +1,8 @@
 #pragma once
 
 #include <bal/abi/types.h>
-#include <brutal-base/error.h>
-#include <brutal-debug/log.h>
+#include <brutal/base/error.h>
+#include <brutal/debug/log.h>
 
 static inline char const *br_syscall_to_string(BrSyscall syscall)
 {

@@ -1,4 +1,4 @@
-#include <brutal-test>
+#include <brutal/test>
 
 test$(endian_be_load$_store$16)
 {

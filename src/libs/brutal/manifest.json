@@ -1,0 +1,8 @@
+{
+    "id": "brutal",
+    "type": "lib",
+    "description": "Brutal utility library",
+    "requires": [
+        "embed-system"
+    ]
+}

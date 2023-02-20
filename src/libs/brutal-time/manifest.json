@@ -1,8 +1,0 @@
-{
-    "id": "brutal-time",
-    "type": "lib",
-    "description": "Brutal time utility library",
-    "requires": [
-        "embed-system"
-    ]
-}

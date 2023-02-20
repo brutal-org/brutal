@@ -5,9 +5,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <brutal-alloc>
-#include <brutal-debug>
-#include <brutal-text/utf8.h>
+#include <brutal/alloc>
+#include <brutal/debug>
+#include <brutal/text/utf8.h>
 
 int embed_flags2posix_flags(FileInitFlags flags)
 {

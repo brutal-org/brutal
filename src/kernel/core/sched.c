@@ -1,6 +1,6 @@
 #include "kernel/core/sched.h"
-#include <brutal-alloc/global.h>
-#include <brutal-debug/assert.h>
+#include <brutal/alloc/global.h>
+#include <brutal/debug/assert.h>
 #include "kernel/core/arch.h"
 #include "kernel/core/cpu.h"
 

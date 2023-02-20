@@ -1,7 +1,7 @@
 #include "kernel/core/heap.h"
-#include <brutal-debug/log.h>
-#include <brutal-sync/lock.h>
-#include <brutal-mem/const.h>
+#include <brutal/debug/log.h>
+#include <brutal/sync/lock.h>
+#include <brutal/mem/const.h>
 
 #include "kernel/core/mmap.h"
 #include "kernel/core/pmm.h"

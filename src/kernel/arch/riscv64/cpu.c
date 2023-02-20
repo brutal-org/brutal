@@ -1,5 +1,5 @@
 "kernel/core/cpu.h"
-#include <brutal-debug>
+#include <brutal/debug>
 #include "kernel/core/heap.h"
 #include "kernel/core/kernel.h"
 #include "kernel/arch/riscv64/cpu.h"

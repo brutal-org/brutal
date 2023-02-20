@@ -2,7 +2,7 @@
 
 #include <bvm/eval/instr.h>
 #include <bvm/obj/val.h>
-#include <brutal-ds>
+#include <brutal/ds>
 
 typedef struct
 {

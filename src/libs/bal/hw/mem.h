@@ -3,7 +3,7 @@
 #include <bal/abi.h>
 #include <ipc/pack.h>
 #include <ipc/unpack.h>
-#include <brutal-base/std.h>
+#include <brutal/base/std.h>
 
 
 typedef struct

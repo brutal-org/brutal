@@ -1,6 +1,6 @@
 #include <embed/time.h>
 #include <time.h>
-#include <brutal-base>
+#include <brutal/base>
 
 Tick embed_time_current_tick(void)
 {

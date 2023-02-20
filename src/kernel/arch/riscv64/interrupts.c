@@ -1,6 +1,6 @@
 #include "kernel/arch/riscv64/interrupts.h"
-#include <brutal-debug>
-#include <brutal-text>
+#include <brutal/debug>
+#include <brutal/text>
 #include "kernel/arch/riscv64/asm.h"
 
 extern void interrupt_common(void);

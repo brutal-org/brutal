@@ -1,4 +1,4 @@
-#include <brutal-debug>
+#include <brutal/debug>
 #include <embed/mem.h>
 #include <embed/posix/err.h>
 #include <stdlib.h>

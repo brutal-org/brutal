@@ -1,7 +1,7 @@
 #include <embed/posix/err.h>
 #include <errno.h>
 #include <string.h>
-#include <brutal-debug>
+#include <brutal/debug>
 
 Error error_from_errno(void)
 {

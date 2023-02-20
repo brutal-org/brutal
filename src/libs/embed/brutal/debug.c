@@ -1,4 +1,4 @@
-#include <brutal-fmt>
+#include <brutal/fmt>
 #include <embed/debug.h>
 #include <embed/task.h>
 

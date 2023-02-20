@@ -2,8 +2,8 @@
 
 #include <stdc-base/prelude.h>
 #include <locale/local_t.h>
-#include <brutal-base/attributes.h>
-#include <brutal-base/std.h>
+#include <brutal/base/attributes.h>
+#include <brutal/base/std.h>
 
 
 

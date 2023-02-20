@@ -1,9 +1,9 @@
 #include <efi/lib.h>
 #include <efi/protos.h>
 #include <embed/file.h>
-#include <brutal-alloc>
-#include <brutal-debug/assert.h>
-#include <brutal-text/utf16.h>
+#include <brutal/alloc>
+#include <brutal/debug/assert.h>
+#include <brutal/text/utf16.h>
 
 static EFILoadedImage *_image_loader = nullptr;
 static EFISimpleFileSystemProtocol *_rootfs = nullptr;

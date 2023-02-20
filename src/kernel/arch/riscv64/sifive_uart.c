@@ -1,5 +1,5 @@
 #include "kernel/arch/riscv64/sifive_uart.h"
-#include <brutal-mem>
+#include <brutal/mem>
 
 static Uart _self;
 

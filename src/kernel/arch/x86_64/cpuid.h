@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal-base/std.h>
+#include <brutal/base/std.h>
 
 // doc: https://www.amd.com/system/files/TechDocs/25481.pdf
 

@@ -1,7 +1,7 @@
-#include <brutal-debug/assert.h>
-#include <brutal-sync/rwlock.h>
+#include <brutal/debug/assert.h>
+#include <brutal/sync/rwlock.h>
 #include <embed/mem.h>
-#include <brutal-alloc/heap.h>
+#include <brutal/alloc/heap.h>
 
 #include "kernel/core/heap.h"
 

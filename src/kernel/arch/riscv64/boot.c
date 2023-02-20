@@ -1,9 +1,9 @@
 #include <bal/boot.h>
 #include <fdt/fdt.h>
 #include <fdt/handover.h>
-#include <brutal-alloc>
-#include <brutal-debug>
-#include <brutal-ds>
+#include <brutal/alloc>
+#include <brutal/debug>
+#include <brutal/ds>
 #include "kernel/arch.h"
 #include "kernel/core/pmm.h"
 #include "kernel/arch/riscv64/arch.h"

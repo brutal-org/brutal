@@ -1,7 +1,7 @@
 #include "kernel/core/channel.h"
-#include <brutal-alloc/pool.h>
-#include <brutal-alloc/global.h>
-#include <brutal-debug/log.h>
+#include <brutal/alloc/pool.h>
+#include <brutal/alloc/global.h>
+#include <brutal/debug/log.h>
 #include "kernel/core/kernel.h"
 #include "kernel/core/sched.h"
 

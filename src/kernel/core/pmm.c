@@ -1,12 +1,12 @@
 #include "kernel/core/pmm.h"
-#include <brutal-debug/assert.h>
-#include <brutal-mem/funcs.h>
-#include <brutal-sync/lock.h>
-#include <brutal-mem/const.h>
-#include <brutal-mem/pages.h>
+#include <brutal/debug/assert.h>
+#include <brutal/mem/funcs.h>
+#include <brutal/sync/lock.h>
+#include <brutal/mem/const.h>
+#include <brutal/mem/pages.h>
 
-#include <brutal-ds/bits.h>
-#include <brutal-mem/units.h>
+#include <brutal/ds/bits.h>
+#include <brutal/mem/units.h>
 #include "kernel/core/arch.h"
 #include "kernel/core/mmap.h"
 

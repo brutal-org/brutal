@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal-base/defs.h>
+#include <brutal/base/defs.h>
 #if defined(SYSTEM_EFI)
 #    include <embed/efi/file.h>
 #elif defined(SYSTEM_POSIX)

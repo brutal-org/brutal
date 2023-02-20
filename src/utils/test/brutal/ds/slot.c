@@ -1,5 +1,5 @@
-#include <brutal-ds>
-#include <brutal-test>
+#include <brutal/ds>
+#include <brutal/test>
 
 test$(slot_acquire_release)
 {

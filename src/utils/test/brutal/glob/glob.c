@@ -1,5 +1,5 @@
-#include <brutal-glob>
-#include <brutal-test>
+#include <brutal/glob>
+#include <brutal/test>
 
 static void expect_match(char const *pattern, char const *input)
 {

@@ -1,4 +1,4 @@
-#include <brutal-input/keyboard.h>
+#include <brutal/input/keyboard.h>
 #include <hw/ps2/keyboard.h>
 #include <ipc/ipc.h>
 

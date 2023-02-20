@@ -1,5 +1,5 @@
-#include <brutal-ds>
-#include <brutal-test>
+#include <brutal/ds>
+#include <brutal/test>
 
 test$(vec_init_deinit)
 {

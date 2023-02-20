@@ -1,6 +1,6 @@
 "kernel/core/context.h"
-#include <brutal-alloc>
-#include <brutal-debug>
+#include <brutal/alloc>
+#include <brutal/debug>
 
 Context *context_create(void)
 {

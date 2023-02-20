@@ -1,7 +1,7 @@
 #pragma once
 
 #include "kernel/core/object.h"
-#include <brutal-sync/rwlock.h>
+#include <brutal/sync/rwlock.h>
 
 typedef struct
 {

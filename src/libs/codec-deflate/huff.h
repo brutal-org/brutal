@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal-io/rbits.h>
+#include <brutal/io/rbits.h>
 
 #include "errors.h"
 

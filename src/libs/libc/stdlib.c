@@ -1,11 +1,11 @@
-#include <brutal-alloc/global.h>
-#include <brutal-debug/assert.h>
-#include <brutal-math/funcs.h>
-#include <brutal-math/rand.h>
+#include <brutal/alloc/global.h>
+#include <brutal/debug/assert.h>
+#include <brutal/math/funcs.h>
+#include <brutal/math/rand.h>
 
 
-#include <brutal-mem/funcs.h>
-#include <brutal-parse/nums.h>
+#include <brutal/mem/funcs.h>
+#include <brutal/parse/nums.h>
 #include <embed/log.h>
 #include <embed/task.h>
 #include <stdlib.h>

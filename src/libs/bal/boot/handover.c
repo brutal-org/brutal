@@ -1,6 +1,6 @@
-#include <brutal-base/std.h>
-#include <brutal-debug/log.h>
-#include <brutal-mem/const.h>
+#include <brutal/base/std.h>
+#include <brutal/debug/log.h>
+#include <brutal/mem/const.h>
 #include <bal/boot/handover.h>
 
 

@@ -1,5 +1,5 @@
-#include <brutal-io/wbits.h>
-#include <brutal-test>
+#include <brutal/io/wbits.h>
+#include <brutal/test>
 
 test$(bitwriter_write_aligned)
 {

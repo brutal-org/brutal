@@ -1,6 +1,6 @@
 #include "kernel/core/object.h"
-#include <brutal-alloc/global.h>
-#include <brutal-sync/rwlock.h>
+#include <brutal/alloc/global.h>
+#include <brutal/sync/rwlock.h>
 
 static _Atomic BrHandle _id = 1;
 static _Atomic bool _init = false;

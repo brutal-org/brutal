@@ -1,7 +1,7 @@
 #include <acpi/hpet.h>
 #include <acpi/rsdt.h>
-#include <brutal-debug/log.h>
-#include <brutal-mem/volatile.h>
+#include <brutal/debug/log.h>
+#include <brutal/mem/volatile.h>
 
 #include "kernel/arch/x86_64/hpet.h"
 

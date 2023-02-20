@@ -1,5 +1,5 @@
 "kernel/core/heap.h"
-#include <brutal-sync>
+#include <brutal/sync>
 #include "kernel/core/mmap.h"
 #include "kernel/core/pmm.h"
 

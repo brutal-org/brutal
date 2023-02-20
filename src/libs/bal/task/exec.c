@@ -1,11 +1,11 @@
 #include <bal/abi.h>
 #include <bal/task/task.h>
 
-#include <brutal-debug/log.h>
-#include <brutal-debug/assert.h>
+#include <brutal/debug/log.h>
+#include <brutal/debug/assert.h>
 
-#include <brutal-mem/funcs.h>
-#include <brutal-mem/const.h>
+#include <brutal/mem/funcs.h>
+#include <brutal/mem/const.h>
 
 #include <elf/elf.h>
 

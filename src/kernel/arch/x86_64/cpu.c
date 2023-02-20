@@ -1,5 +1,5 @@
 #include "kernel/core/cpu.h"
-#include <brutal-debug/assert.h>
+#include <brutal/debug/assert.h>
 #include "kernel/core/heap.h"
 #include "kernel/core/kernel.h"
 #include "kernel/arch/x86_64/apic.h"

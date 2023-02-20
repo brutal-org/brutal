@@ -1,8 +1,8 @@
 #pragma once
 
-#include <brutal-base/std.h>
-#include <brutal-base/str.h>
-#include <brutal-base/attributes.h>
+#include <brutal/base/std.h>
+#include <brutal/base/str.h>
+#include <brutal/base/attributes.h>
 
 
 typedef struct PACKED

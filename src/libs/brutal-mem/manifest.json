@@ -1,8 +1,0 @@
-{
-    "id": "brutal-mem",
-    "type": "lib",
-    "description": "Brutal memory utility library",
-    "requires": [
-        "embed-arch"
-    ]
-}

@@ -4,13 +4,7 @@
     "type": "exe",
     "requires": [
         "json",
-        "brutal-parse",
-        "brutal-ds",
-        "brutal-alloc",
-        "brutal-io",
-        "brutal-alloc",
-        "brutal-mem"
-
+        "brutal"
     ],
     "provides": [
         "loader"

@@ -1,5 +1,5 @@
-#include <brutal-debug>
-#include <brutal-fmt>
+#include <brutal/debug>
+#include <brutal/fmt>
 #include <cc/builder.h>
 #include <idl/cgen.h>
 

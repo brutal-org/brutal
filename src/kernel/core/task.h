@@ -1,7 +1,7 @@
 #pragma once
 
 #include <bal/abi.h>
-#include <brutal-time/types.h>
+#include <brutal/time/types.h>
 
 #include "kernel/core/channel.h"
 #include "kernel/core/context.h"

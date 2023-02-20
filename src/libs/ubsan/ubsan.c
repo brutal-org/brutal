@@ -1,5 +1,5 @@
-#include <brutal-debug>
-#include <brutal-text>
+#include <brutal/debug>
+#include <brutal/text>
 
 struct _UbsanSrc
 {

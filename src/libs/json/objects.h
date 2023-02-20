@@ -1,7 +1,7 @@
 #pragma once
 
-#include <brutal-ds/map.h>
-#include <brutal-ds/vec.h>
+#include <brutal/ds/map.h>
+#include <brutal/ds/vec.h>
 
 
 typedef enum

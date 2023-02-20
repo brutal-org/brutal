@@ -1,7 +1,7 @@
 #pragma once
 
-#include <brutal-base/std.h>
-#include <brutal-base/range.h>
+#include <brutal/base/std.h>
+#include <brutal/base/range.h>
 
 typedef uintptr_t Pages;
 typedef Pages *VmmSpace;

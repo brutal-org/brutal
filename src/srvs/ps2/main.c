@@ -1,8 +1,8 @@
 #include <bal/abi.h>
 #include <bal/hw.h>
-#include <brutal-alloc>
-#include <brutal-debug>
-#include <brutal-input>
+#include <brutal/alloc>
+#include <brutal/debug>
+#include <brutal/input>
 #include <hw/ps2/ps2.h>
 #include <ipc/ipc.h>
 #include <protos/event.h>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal-base/attributes.h>
+#include <brutal/base/attributes.h>
 #include "kernel/arch/x86_64/interrupts.h"
 
 struct _Context

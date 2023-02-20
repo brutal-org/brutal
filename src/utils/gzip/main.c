@@ -1,4 +1,4 @@
-#include <brutal-debug>
+#include <brutal/debug>
 #include <codec-gzip>
 
 int main(int argc, char const *argv[])

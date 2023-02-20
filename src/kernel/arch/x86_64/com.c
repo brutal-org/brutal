@@ -1,4 +1,4 @@
-#include <brutal-base/macros.h>
+#include <brutal/base/macros.h>
 #include "kernel/arch/x86_64/com.h"
 
 #include "kernel/arch/x86_64/asm.h"

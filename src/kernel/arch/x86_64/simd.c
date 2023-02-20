@@ -1,6 +1,6 @@
-#include <brutal-debug/assert.h>
-#include <brutal-mem/const.h>
-#include <brutal-mem/funcs.h>
+#include <brutal/debug/assert.h>
+#include <brutal/mem/const.h>
+#include <brutal/mem/funcs.h>
 
 #include "kernel/arch/x86_64/asm.h"
 #include "kernel/arch/x86_64/cpuid.h"

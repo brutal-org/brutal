@@ -1,4 +1,4 @@
-#include <brutal-fmt/funcs.h>
+#include <brutal/fmt/funcs.h>
 #include <embed/debug.h>
 
 #include "kernel/core/cpu.h"

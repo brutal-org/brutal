@@ -1,6 +1,6 @@
 #include <bal/abi.h>
-#include <brutal-alloc>
-#include <brutal-sync>
+#include <brutal/alloc>
+#include <brutal/sync>
 #include <embed/mem.h>
 
 Error embed_mem_acquire(size_t size, void **out_result, MAYBE_UNUSED enum embed_mem_flag flags)

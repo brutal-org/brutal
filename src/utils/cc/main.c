@@ -1,5 +1,5 @@
-#include <brutal-debug>
-#include <brutal-fmt>
+#include <brutal/debug>
+#include <brutal/fmt>
 #include <cc/dump.h>
 #include <cc/lex/pproc.h>
 #include <cc/parse.h>

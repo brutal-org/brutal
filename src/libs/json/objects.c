@@ -1,5 +1,5 @@
 #include <json/objects.h>
-#include <brutal-debug/assert.h>
+#include <brutal/debug/assert.h>
 
 bool json_is(Json const json, JsonType type)
 {

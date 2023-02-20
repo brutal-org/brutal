@@ -1,8 +1,8 @@
 #include <ipc/pack.h>
-#include <brutal-debug/assert.h>
-#include <brutal-mem/pages.h>
-#include <brutal-mem/const.h>
-#include <brutal-mem/funcs.h>
+#include <brutal/debug/assert.h>
+#include <brutal/mem/pages.h>
+#include <brutal/mem/const.h>
+#include <brutal/mem/funcs.h>
 
 void ipc_pack_init(IpcPack *self)
 {

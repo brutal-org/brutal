@@ -6,7 +6,7 @@
 #include <pci/config.h>
 #include <pci/group.h>
 #include <protos/pci.h>
-#include <brutal-ds>
+#include <brutal/ds>
 
 typedef struct
 {

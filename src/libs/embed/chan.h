@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal-io/chan.h>
+#include <brutal/io/chan.h>
 
 IoResult embed_chan_read(IoChan channel, uint8_t *data, size_t size);
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <brutal-base>
-#include <brutal-input>
+#include <brutal/base>
+#include <brutal/input>
 #include <hw/ps2/controller.h>
 
 typedef void (*Ps2MouseCallback)(InputEvent ev, void *ctx);

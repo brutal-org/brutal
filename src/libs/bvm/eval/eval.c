@@ -3,7 +3,7 @@
 #include <bvm/obj/obj.h>
 #include <bvm/obj/val.h>
 #include <math.h>
-#include <brutal-debug>
+#include <brutal/debug>
 
 BvmVal bvm_call(BvmLocal *local, BvmGlobal *global, BvmFunc *func, int argc, Alloc *alloc)
 {

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <brutal-base/range.h>
-#include <brutal-base/str.h>
+#include <brutal/base/range.h>
+#include <brutal/base/str.h>
 
 // "handover" in ascii
 #define HANDOVER_TAG 0x68616e646f766572

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <brutal-base/range.h>
-#include <brutal-base/str.h>
+#include <brutal/base/range.h>
+#include <brutal/base/str.h>
 
 /* --- Syscalls IDs --------------------------------------------------------- */
 

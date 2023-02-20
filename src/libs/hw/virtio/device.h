@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal-base>
+#include <brutal/base>
 
 #define VIRTIO_STATUS_ACKNOWLEDGE (1 << 0)      // Indicates that the guest OS has found the device and recognized it as a valid virtio device.
 #define VIRTIO_STATUS_DRIVER_AVAILABLE (1 << 1) // Indicates that the guest OS knows how to drive the device.

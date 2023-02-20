@@ -1,9 +1,9 @@
 #include <bal/abi.h>
-#include <brutal-alloc/global.h>
-#include <brutal-debug/assert.h>
-#include <brutal-io/file.h>
-#include <brutal-io/funcs.h>
-#include <brutal-mem/funcs.h>
+#include <brutal/alloc/global.h>
+#include <brutal/debug/assert.h>
+#include <brutal/io/file.h>
+#include <brutal/io/funcs.h>
+#include <brutal/mem/funcs.h>
 
 
 #include <efi/lib.h>

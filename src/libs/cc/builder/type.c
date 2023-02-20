@@ -1,5 +1,5 @@
 #include <cc/builder/type.h>
-#include <brutal-debug>
+#include <brutal/debug>
 
 CType ctype_error(void)
 {
