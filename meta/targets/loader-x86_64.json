@@ -1,12 +1,12 @@
 {
-    "id": "kernel-x86_64",
+    "id": "loader-x86_64",
     "type": "target",
     "props": {
         "toolchain": "clang",
         "arch": "x86_64",
         "bits": "64",
-        "sys": "kernel",
-        "abi": "sysv",
+        "sys": "uefi",
+        "abi": "microsoft",
         "loader": "brutal-loader",
         "encoding": "utf8",
         "freestanding": true,
@@ -20,18 +20,26 @@
             ],
             "args": [
                 "-target",
-                "x86_64-elf","-nostdlibinc", "-Isrc/libs/libc", "-Isrc/libs/libc-math",
+                "x86_64-unknown-windows",
+                "-nostdlibinc",
+                "-Isrc/libs/libc",
+                "-Isrc/libs/libc-math",
                 "-ffreestanding",
                 "-fno-stack-protector",
                 "-mno-80387",
                 "-mno-mmx",
-                "-mno-3dnow", "-D__brutal__", "-D__kernel__", "-D__x86_64__",
+                "-mno-3dnow",
+                "-D__freestanding__",
+                "-D__efi__",
+                "-D__loader__",
+                "-D__x86_64__",
                 "-mno-sse",
                 "-mno-sse2",
+                "-fshort-wchar",
                 "-mno-red-zone",
                 "-mcmodel=kernel",
-                "-fbuiltin",  
-                "-nostdlib", 
+                "-fbuiltin",
+                "-nostdlib",
                 "-nostdlib++",
                 "-D__freestanding__"
             ]
@@ -43,18 +51,26 @@
             ],
             "args": [
                 "-target",
-                "x86_64-elf","-nostdlibinc", "-Isrc/libs/libc", "-Isrc/libs/libc-math",
+                "x86_64-unknown-windows",
+                "-nostdlibinc",
+                "-Isrc/libs/libc",
+                "-Isrc/libs/libc-math",
                 "-ffreestanding",
                 "-fno-stack-protector",
                 "-mno-80387",
-                "-mno-mmx", "-D__brutal__", "-D__kernel__", "-D__x86_64__",
+                "-mno-mmx",
                 "-mno-3dnow",
+                "-D__freestanding__",
+                "-D__efi__",
+                "-D__loader__",
+                "-D__x86_64__",
                 "-mno-sse",
                 "-mno-sse2",
+                "-fshort-wchar",
                 "-mno-red-zone",
                 "-mcmodel=kernel",
-                "-fbuiltin",  
-                "-nostdlib", 
+                "-fbuiltin",
+                "-nostdlib",
                 "-nostdlib++",
                 "-D__freestanding__"
             ]
@@ -62,18 +78,14 @@
         "ld": {
             "cmd": [
                 "@latest",
-                "ld.lld"
+                "clang"
             ],
             "args": [
-                "-m",
-                "elf_x86_64",
-                "-Tmeta/targets/kernel-x86_64.ld",
-                "-z",
-                "max-page-size=0x1000",
-                "-nostdlib"
-            ],
-            "files": [
-                "meta/targets/kernel-x86_64.ld"
+                "-target x86_64-unknown-windows ",
+                "-nostdlib ",
+                "-Wl,-entry:efi_main ",
+                "-Wl,-subsystem:efi_application ",
+                "-fuse-ld=lld-link"
             ]
         },
         "ar": {

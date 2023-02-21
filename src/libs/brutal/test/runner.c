@@ -1,9 +1,22 @@
-#include <brutal/alloc>
-#include <brutal/cli>
-#include <brutal/debug>
-#include <brutal/glob>
-#include <brutal/math>
-#include <brutal/time>
+#include <brutal/alloc/global.h>
+#include <brutal/cli/fmt.h>
+#include <brutal/cli/style.h>
+#include <brutal/cli/clear.h>
+#include <brutal/io/funcs.h>
+#include <brutal/text/witty.h>
+
+#include <brutal/io/chan.h>
+#include <brutal/debug/assert.h>
+#include <brutal/glob/glob.h>
+#include <brutal/math/angle.h>
+#include <brutal/cli/cursor.h>
+#include <brutal/cli/spinners.h>
+
+
+#include <brutal/math/rand.h>
+
+
+#include <brutal/time/query.h>
 
 #include "runner.h"
 

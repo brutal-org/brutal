@@ -1,6 +1,7 @@
 #pragma once
 
-#include <brutal/ds>
+#include <brutal/ds/vec.h>
+#include <brutal/base/loc.h>
 
 /* --- Tests ---------------------------------------------------------------- */
 

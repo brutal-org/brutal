@@ -1,5 +1,6 @@
 #include <cc/builder/type.h>
-#include <brutal/debug>
+#include <brutal/debug/assert.h>
+#include <brutal/alloc/base.h>
 
 CType ctype_error(void)
 {

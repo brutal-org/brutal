@@ -1,5 +1,6 @@
 #include <cc/parse/parser.h>
-#include <brutal/debug>
+#include <brutal/debug/assert.h>
+#include <brutal/parse/nums.h>
 
 void cparse_func_params(Lex *lex, CType *type, Alloc *alloc)
 {

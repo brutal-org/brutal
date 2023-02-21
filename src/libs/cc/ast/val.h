@@ -1,6 +1,6 @@
 #pragma once
 
-#include <brutal/base>
+#include <brutal/base/str.h>
 
 typedef int CSigned;
 typedef unsigned int CUnsigned;

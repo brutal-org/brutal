@@ -1,6 +1,7 @@
 #include <cc/lex/pproc.h>
 #include <cc/parse/parser.h>
-#include <brutal/debug>
+#include <brutal/debug/assert.h>
+#include <brutal/text/str.h>
 
 CProcMacro cproc_macro_init(CProc *ctx, Str name)
 {

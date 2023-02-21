@@ -4,7 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <brutal/base>
+#include <brutal/base/result.h>
+#include <brutal/base/attributes.h>
+
 
 void embed_log_lock(void)
 {

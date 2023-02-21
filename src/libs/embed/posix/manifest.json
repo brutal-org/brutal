@@ -1,5 +1,5 @@
 {
-    "id": "embed-kernel",
+    "id": "embed-posix",
     "type": "lib",
     "description": "Embed utility library",
     "requires": [
@@ -8,6 +8,6 @@
         "embed-system"
     ],
     "enableIf": {
-        "sys": ["kernel"]
+        "sys": ["linux", "darwin"]
     }
 }

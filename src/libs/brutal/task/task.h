@@ -1,6 +1,10 @@
 #pragma once
 
-#include <brutal/text>
+#include <brutal/text/str.h>
+#include <brutal/base/result.h>
+#include <brutal/base/error.h>
+
+
 
 #define TASK_THIS (0)
 

@@ -1,6 +1,6 @@
 #include <cc/builder.h>
 #include <idl/cgen.h>
-#include <brutal/io>
+#include <brutal/io/funcs.h>
 
 CType idl_cgen_handler_type(IdlMethod method, IdlModule const module, Alloc *alloc)
 {

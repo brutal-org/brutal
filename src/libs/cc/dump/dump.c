@@ -1,6 +1,6 @@
 #include <cc/dump.h>
 #include <json/objects.h>
-#include <brutal/debug>
+#include <brutal/debug/assert.h>
 
 Json cdump_value(CVal value, Alloc *alloc)
 {

@@ -2,7 +2,7 @@
 
 #include <cc/ast/type.h>
 #include <cc/ast/val.h>
-#include <brutal/base>
+#include <brutal/base/str.h>
 
 #define CEXPR_MAX_PRECEDENCE (16)
 

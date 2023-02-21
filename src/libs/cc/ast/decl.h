@@ -3,7 +3,7 @@
 #include <cc/ast/expr.h>
 #include <cc/ast/stmt.h>
 #include <cc/ast/type.h>
-#include <brutal/base>
+#include <brutal/base/str.h>
 
 typedef enum
 {

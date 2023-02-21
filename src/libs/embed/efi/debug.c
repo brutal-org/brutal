@@ -1,4 +1,4 @@
-#include <brutal/fmt>
+#include <brutal/fmt/funcs.h>
 #include <embed/debug.h>
 
 void embed_log_prefix(IoWriter writer)

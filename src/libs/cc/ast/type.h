@@ -1,7 +1,9 @@
 #pragma once
 
 #include <cc/ast/val.h>
-#include <brutal/ds>
+#include <brutal/ds/vec.h>
+#include <brutal/base/slice.h>
+
 
 typedef enum
 {

@@ -1,6 +1,8 @@
 #include <idl/ast/builder.h>
 #include <ipc/ipc.h>
-#include <brutal/hash>
+#include <brutal/hash/fnv.h>
+#include <brutal/mem/funcs.h>
+#include <brutal/alloc/base.h>
 
 /* --- Types ---------------------------------------------------------------- */
 

@@ -1,7 +1,7 @@
 #include <efi/lib.h>
 #include <efi/protos.h>
 #include <embed/file.h>
-#include <brutal/alloc>
+#include <brutal/alloc/global.h>
 #include <brutal/debug/assert.h>
 #include <brutal/text/utf16.h>
 

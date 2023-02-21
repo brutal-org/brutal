@@ -1,4 +1,6 @@
 #include <cc/parse/parser.h>
+#include <brutal/parse/nums.h>
+
 
 static CVal cparse_cval_char(Lex *lex)
 {

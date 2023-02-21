@@ -1,5 +1,6 @@
 #pragma once
 
+#include <brutal/base/attributes.h>
 #include <cc/ast.h>
 #include <idl/ast.h>
 

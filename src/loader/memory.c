@@ -1,5 +1,5 @@
-#include <brutal/debug>
-#include <brutal/mem>
+#include <brutal/debug/assert.h>
+#include <brutal/mem/funcs.h>
 #include <efi/lib.h>
 #include <efi/srvs/bs.h>
 #include <embed/mem.h>

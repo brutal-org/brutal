@@ -1,5 +1,6 @@
 #include <cc/builder.h>
 #include <cc/sema/sema.h>
+#include <brutal/text/str.h>
 void csema_init(CSema *self, Alloc *alloc)
 {
     *self = (CSema){};

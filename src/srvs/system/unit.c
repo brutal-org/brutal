@@ -1,5 +1,5 @@
 #include <bal/task.h>
-#include <brutal/debug>
+#include <brutal/debug/assert.h>
 #include <elf/elf.h>
 #include <json/parser.h>
 

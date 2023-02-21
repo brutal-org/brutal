@@ -3,10 +3,16 @@
 #include <idl/json.h>
 #include <idl/parse.h>
 #include <idl/sema.h>
+#include <brutal/io/chan.h>
 #include <json/emit.h>
-#include <brutal/alloc>
-#include <brutal/debug>
-#include <brutal/io>
+#include <brutal/alloc/global.h>
+#include <brutal/alloc/heap.h>
+
+
+#include <brutal/debug/assert.h>
+#include <brutal/io/funcs.h>
+#include <brutal/io/file.h>
+
 
 int main(int argc, char const *argv[])
 {

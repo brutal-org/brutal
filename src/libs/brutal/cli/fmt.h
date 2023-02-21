@@ -1,7 +1,8 @@
 #pragma once
 
-#include <brutal/io/traits.h>
+#include <brutal/io/funcs.h>
 #include <brutal/base/any.h>
+#include <brutal/base/str.h>
 
 IoResult cli_fmt(IoWriter writer, Str format, AnyVa args);
 

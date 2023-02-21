@@ -3,6 +3,29 @@
     "type": "lib",
     "description": "Brutal utility library",
     "requires": [
-        "embed-system"
+        "embed-system",
+        "embed-arch",
+        "libc-math"
+    ],
+    "subdirs": [
+        "time",
+        "text",
+        "test",
+        "task",
+        "sync",
+        "parse",
+        "mem",
+        "math",
+        "io",
+        "input", 
+        "hash",
+        "glob",
+        "fmt",
+        "fibers",
+        "ds",
+        "debug",
+        "cli",
+        "base",
+        "alloc"
     ]
 }

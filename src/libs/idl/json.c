@@ -1,5 +1,5 @@
 #include <idl/json.h>
-#include <brutal/debug>
+#include <brutal/debug/assert.h>
 
 Json idl_jgen_ctype(IdlCtype ctype_, Alloc *alloc)
 {

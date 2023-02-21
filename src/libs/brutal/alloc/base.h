@@ -3,6 +3,8 @@
 #include <brutal/base/defs.h>
 #include <brutal/base/std.h>
 #include <brutal/mem/units.h>
+#include <brutal/mem/funcs.h>
+
 
 typedef struct _Alloc Alloc;
 

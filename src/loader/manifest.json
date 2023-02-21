@@ -4,7 +4,13 @@
     "type": "exe",
     "requires": [
         "json",
-        "brutal"
+        "brutal",
+        "embed-system",
+        "embed-arch",
+        "elf",
+        "efi",
+        "libc",
+        "handover"
     ],
     "provides": [
         "loader"

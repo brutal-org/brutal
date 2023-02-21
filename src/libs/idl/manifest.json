@@ -1,0 +1,14 @@
+{
+    "id": "bid",
+    "description": "Brutal IDL library",
+    "type": "lib",
+    "requires": [
+       "brutal",
+       "cc-lib",
+       "libc"
+    ],
+    "subdirs": [
+       "ast",
+       "cgen"
+    ]
+}

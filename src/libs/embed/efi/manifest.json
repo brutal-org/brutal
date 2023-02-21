@@ -1,13 +1,13 @@
 {
-    "id": "embed-kernel",
+    "id": "embed-uefi",
     "type": "lib",
     "description": "Embed utility library",
-    "requires": [
-    ],
+
     "provides": [
-        "embed-system"
+        "embed-system", 
+        "brutal"
     ],
     "enableIf": {
-        "sys": ["kernel"]
+        "sys": ["uefi"]
     }
 }

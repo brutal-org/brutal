@@ -1,6 +1,7 @@
 #include <cc/builder.h>
 #include <cc/sema/visit.h>
-#include <brutal/debug>
+#include <brutal/debug/assert.h>
+
 
 CType csema_value_type(MAYBE_UNUSED CSema *sema, CVal value, Alloc *alloc)
 {

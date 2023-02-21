@@ -1,4 +1,4 @@
-#include <brutal/fmt>
+#include <brutal/fmt/funcs.h>
 #include <cc/builder.h>
 #include <idl/cgen.h>
 
