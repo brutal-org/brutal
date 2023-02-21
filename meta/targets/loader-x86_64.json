@@ -1,0 +1,107 @@
+{
+    "id": "loader-x86_64",
+    "type": "target",
+    "props": {
+        "toolchain": "clang",
+        "arch": "x86_64",
+        "bits": "64",
+        "sys": "uefi",
+        "abi": "microsoft",
+        "loader": "brutal-loader",
+        "encoding": "utf8",
+        "freestanding": true,
+        "host": false
+    },
+    "tools": {
+        "cc": {
+            "cmd": [
+                "@latest",
+                "clang"
+            ],
+            "args": [
+                "-target",
+                "x86_64-unknown-windows",
+                "-nostdlibinc",
+                "-Isrc/libs/libc",
+                "-Isrc/libs/libc-math",
+                "-ffreestanding",
+                "-fno-stack-protector",
+                "-mno-80387",
+                "-mno-mmx",
+                "-mno-3dnow",
+                "-D__freestanding__",
+                "-D__efi__",
+                "-D__loader__",
+                "-D__x86_64__",
+                "-mno-sse",
+                "-mno-sse2",
+                "-fshort-wchar",
+                "-mno-red-zone",
+                "-mcmodel=kernel",
+                "-fbuiltin",
+                "-nostdlib",
+                "-nostdlib++",
+                "-D__freestanding__"
+            ]
+        },
+        "cxx": {
+            "cmd": [
+                "@latest",
+                "clang++"
+            ],
+            "args": [
+                "-target",
+                "x86_64-unknown-windows",
+                "-nostdlibinc",
+                "-Isrc/libs/libc",
+                "-Isrc/libs/libc-math",
+                "-ffreestanding",
+                "-fno-stack-protector",
+                "-mno-80387",
+                "-mno-mmx",
+                "-mno-3dnow",
+                "-D__freestanding__",
+                "-D__efi__",
+                "-D__loader__",
+                "-D__x86_64__",
+                "-mno-sse",
+                "-mno-sse2",
+                "-fshort-wchar",
+                "-mno-red-zone",
+                "-mcmodel=kernel",
+                "-fbuiltin",
+                "-nostdlib",
+                "-nostdlib++",
+                "-D__freestanding__"
+            ]
+        },
+        "ld": {
+            "cmd": [
+                "@latest",
+                "clang"
+            ],
+            "args": [
+                "-target x86_64-unknown-windows ",
+                "-nostdlib ",
+                "-Wl,-entry:efi_main ",
+                "-Wl,-subsystem:efi_application ",
+                "-fuse-ld=lld-link"
+            ]
+        },
+        "ar": {
+            "cmd": [
+                "@latest",
+                "llvm-ar"
+            ],
+            "args": [
+                "rcs"
+            ]
+        },
+        "as": {
+            "cmd": "nasm",
+            "args": [
+                "-f elf64"
+            ]
+        }
+    }
+}

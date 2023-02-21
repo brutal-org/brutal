@@ -1,0 +1,14 @@
+{
+    "id": "core",
+    "description": "The Brutal Microkernel core",
+    "type": "exe",
+    "requires": [
+        "brutal",
+        "kernel-arch",
+        "bal-handover",
+        "elf",
+        "embed-system",
+        "handover",
+        "libc"
+    ]
+}

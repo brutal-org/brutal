@@ -1,0 +1,13 @@
+{
+    "id": "libc",
+    "type": "lib",
+    "description": "C standard library implementation",
+    "props": {
+        "cpp-root-include": true
+    },
+    "requires": [
+        "libc-math",
+        "brutal",
+        "embed-system"
+    ]
+}

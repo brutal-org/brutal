@@ -1,0 +1,7 @@
+{
+    "id": "handover",
+    "type": "lib", 
+    "requires" : [
+        "brutal"
+    ]
+}

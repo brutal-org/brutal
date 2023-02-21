@@ -1,0 +1,9 @@
+{
+
+    "id": "idl",
+    "description": "brutal IDL tool",
+    "type": "exe",
+    "requires": [
+        "bid"
+    ]
+}

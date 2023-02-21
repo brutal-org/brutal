@@ -1,0 +1,7 @@
+{
+    "id": "elf",
+    "type": "lib",
+    "description": "Brutal elf utility library",
+    "requires": [
+    ]
+}

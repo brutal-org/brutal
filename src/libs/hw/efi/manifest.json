@@ -1,0 +1,8 @@
+{
+    "id": "efi", 
+    "description": "UEFI interaction library",
+    "type": "lib",
+    "requires": [
+        "brutal"
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "id": "system",
+    "description": "base brutal system server",
+    "requires": [
+        "bal",
+        "brutal",
+        "protos"
+    ],
+    "type": "exe"
+}

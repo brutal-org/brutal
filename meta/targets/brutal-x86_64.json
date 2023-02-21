@@ -1,0 +1,82 @@
+{
+    "id": "brutal-x86_64",
+    "type": "target",
+    "props": {
+        "toolchain": "clang",
+        "arch": "x86_64",
+        "bits": "64",
+        "sys": "brutal",
+        "abi": "sysv",
+        "loader": "brutal-loader",
+        "encoding": "utf8",
+        "freestanding": false,
+        "host": false
+    },
+    "tools": {
+        "cc": {
+            "cmd": [
+                "@latest",
+                "clang"
+            ],
+            "args": [
+                "-target",
+                "x86_64-none-elf",
+                "-D__brutal__",
+                "-ffreestanding",
+                "-mno-80387",
+                "-mno-mmx",
+                "-mno-3dnow",
+                "-mno-sse",
+                "-mno-sse2"
+            ]
+        },
+        "cxx": {
+            "cmd": [
+                "@latest",
+                "clang++"
+            ],
+            "args": [
+                "-target",
+                "x86_64-none-elf",
+                 "-D__brutal__",
+                "-ffreestanding",
+                "-mno-80387",
+                "-mno-mmx",
+                "-mno-3dnow",
+                "-mno-sse",
+                "-mno-sse2"
+            ]
+        },
+        "ld": {
+            "cmd": [
+                "@latest",
+                "ld.lld"
+            ],
+            "args": [
+                "-m",
+                "elf_x86_64",
+                "-Tmeta/targets/brutal-x86_64.ld",
+                "-z",
+                "max-page-size=0x1000"
+            ],
+            "files": [
+                "meta/targets/brutal-x86_64.ld"
+            ]
+        },
+        "ar": {
+            "cmd": [
+                "@latest",
+                "llvm-ar"
+            ],
+            "args": [
+                "rcs"
+            ]
+        },
+        "as": {
+            "cmd": "nasm",
+            "args": [
+                "-f elf64"
+            ]
+        }
+    }
+}

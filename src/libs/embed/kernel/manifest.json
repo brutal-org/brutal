@@ -1,0 +1,13 @@
+{
+    "id": "embed-kernel",
+    "type": "lib",
+    "description": "Embed utility library",
+    "requires": [
+    ],
+    "provides": [
+        "embed-system"
+    ],
+    "enableIf": {
+        "sys": ["kernel"]
+    }
+}

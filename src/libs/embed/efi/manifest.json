@@ -1,0 +1,13 @@
+{
+    "id": "embed-uefi",
+    "type": "lib",
+    "description": "Embed utility library",
+
+    "provides": [
+        "embed-system", 
+        "brutal"
+    ],
+    "enableIf": {
+        "sys": ["uefi"]
+    }
+}

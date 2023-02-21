@@ -1,0 +1,7 @@
+{
+    "id": "asan",
+    "type": "lib",
+    "description": "Address sanitization library",
+    "requires": [
+    ]
+}

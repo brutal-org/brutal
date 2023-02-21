@@ -1,0 +1,18 @@
+{
+    "id": "cc-lib",
+    "description": "Brutal C language library",
+    "type": "lib",
+    "requires": [
+        "brutal",
+        "json"
+    ],
+    "subdirs": [
+        "ast",
+        "builder",
+        "dump",
+        "lex",
+        "parse",
+        "sema",
+        "trans"
+    ]
+}

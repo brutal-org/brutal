@@ -1,0 +1,9 @@
+{
+    "id": "libc-math",
+    "type": "lib",
+    "description": "C standard library math part implementation",
+    "props": {
+        "cpp-root-include": "true"
+    }
+    
+}

@@ -1,0 +1,8 @@
+{
+    "id": "ipc",
+    "type": "lib",
+    "description": "Brutal inter-process-communication library",
+    "requires": [
+        "brutal"
+    ]
+}

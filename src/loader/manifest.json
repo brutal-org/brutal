@@ -1,0 +1,18 @@
+{
+    "id": "loader-brutal",
+    "description": "brutal bootloader",
+    "type": "exe",
+    "requires": [
+        "json",
+        "brutal",
+        "embed-system",
+        "embed-arch",
+        "elf",
+        "efi",
+        "libc",
+        "handover"
+    ],
+    "provides": [
+        "loader"
+    ]
+}

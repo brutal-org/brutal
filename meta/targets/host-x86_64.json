@@ -1,0 +1,64 @@
+{
+    "id": "host-x86_64",
+    "type": "target",
+    "props": {
+        "toolchain": "clang",
+        "arch": "x86_64",
+        "bits": "64",
+        "sys": [
+            "@uname",
+            "sysname"
+        ],
+        "abi": "sysv",
+        "encoding": "utf8",
+        "freestanding": false,
+        "host": true
+    },
+    "tools": {
+        "cc": {
+            "cmd": [
+                "@latest",
+                "clang"
+            ],
+            "args": [
+                "-std=gnu2x",
+                "-D__linux__"
+            ]
+        },
+        "cxx": {
+            "cmd": [
+                "@latest",
+                "clang++"
+            ],
+            "args": [
+                "-std=gnu2x",
+                 "-D__linux__"
+            ]
+        },
+        "ld": {
+            "cmd": [
+                "@latest",
+                "clang"
+            ],
+            "args": [
+            ],
+            "files": [
+            ]
+        },
+        "ar": {
+            "cmd": [
+                "@latest",
+                "llvm-ar"
+            ],
+            "args": [
+                "rcs"
+            ]
+        },
+        "as": {
+            "cmd": "nasm",
+            "args": [
+                "-f elf64"
+            ]
+        }
+    }
+}
