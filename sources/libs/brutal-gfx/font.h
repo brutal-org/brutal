@@ -112,3 +112,7 @@ void gfx_font_render_str(GfxFont font, GfxFontStyle style, struct _Gfx *gfx, MVe
 extern uint8_t gfx_font_builtin_data[256 * 16];
 
 GfxFont gfx_font_builtin(void);
+
+/* --- Load SSFN2 Font ------------------------------------------------------ */
+
+GfxFont gfx_font_load_ssfn2(IoReader reader);

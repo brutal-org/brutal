@@ -1,4 +1,5 @@
 #include <brutal-time>
+#include <codec-ssfn2>
 #include <embed/app.h>
 
 #include "app.h"
@@ -17,7 +18,17 @@ void ui_app_init(UiApp *self)
     vec_init(&self->windows, alloc_global());
     embed_app_init(self);
     self->alive = true;
+
+#ifdef __brutal__
     self->font = gfx_font_builtin();
+#else
+    static SSFN2Collection ssfn_coll;
+    IoFile font_file;
+    io_file_view(&font_file, str$("sysroot/pkgs/font-inter/Inter.sfnc.gz"));
+    ssfn2_load(io_file_rseek(&font_file), &ssfn_coll, alloc_global());
+    self->font = ssfn2_font(&ssfn_coll);
+#endif
+
     ui_palette_init(&self->palette);
     _instance = self;
 }

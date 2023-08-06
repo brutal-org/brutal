@@ -201,10 +201,11 @@ void gfx_fill(Gfx *self, GfxFillRule rule)
 
             vec_foreach_v(edge, &self->path)
             {
-                if (m_edge_min_y(edge) <= yy && m_edge_max_y(edge) > yy)
+                AutoType sample = yy + (1.0f / RAST_AA / 2);
+                if (m_edge_min_y(edge) <= sample && m_edge_max_y(edge) > sample)
                 {
                     GfxActiveEdge active;
-                    active.x = edge.sx + (yy - edge.sy) / (edge.ey - edge.sy) * (edge.ex - edge.sx);
+                    active.x = edge.sx + (sample - edge.sy) / (edge.ey - edge.sy) * (edge.ex - edge.sx);
 
                     active.winding = edge.sy > edge.ey ? 1 : -1;
 
