@@ -9,7 +9,7 @@ HOST_ARCH?=$(shell uname -m)
 BOARD?=pc
 BOOTLOADER?=loader
 CONFIG?=devel
-TOOLCHAIN?=llvm
+TOOLCHAIN?=gnu
 
 include sources/build/configs/$(CONFIG).mk
 include sources/build/boards/$(ARCH)-$(BOARD)/build.mk
