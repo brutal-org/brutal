@@ -35,9 +35,7 @@ If you use [Homebrew package manager](https://brew.sh), you can obtain the depen
 LLVM on Homebrew is keg by default, you also need to set the following environment variables:
 
 ```sh
-export PATH="/usr/local/opt/llvm/bin:$PATH"
-export LDFLAGS="-L/usr/local/opt/llvm/lib"
-export CPPFLAGS="-I/usr/local/opt/llvm/include"
+export PATH=$(brew --prefix llvm)/bin:$PATH
 ```
 
 Then build BRUTAL by running:
