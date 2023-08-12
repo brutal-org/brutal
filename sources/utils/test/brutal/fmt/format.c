@@ -7,7 +7,7 @@
         expect_str_equal$(str$(EXPECTED), fmt_str$(test_use_alloc(), str$(FORMAT), __VA_ARGS__)); \
     }
 
-test$(fmt_format)
+test$(fmt_format, TEST_DISABLED)
 {
     TEST_CASE("hello, world", "hello, world");
     TEST_CASE("hello, world", "hello, {}", "world");

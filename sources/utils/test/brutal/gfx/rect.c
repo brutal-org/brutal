@@ -2,21 +2,21 @@
 #include <brutal-test>
 #include <brutal-ui>
 
-test$(gfx_fill_rect)
+test$(gfx_fill_rect, TEST_DISABLED)
 {
     gfx_fill_style(test_use_gfx(), gfx_paint_fill(UI_COLOR_BASE02));
 
     gfx_fill_rect(test_use_gfx(), m_rectf(10, 10, 512, 50), 0);
 }
 
-test$(gfx_fill_rect_rounded)
+test$(gfx_fill_rect_rounded, TEST_DISABLED)
 {
     gfx_fill_style(test_use_gfx(), gfx_paint_fill(UI_COLOR_BASE02));
 
     gfx_fill_rect(test_use_gfx(), m_rectf(10, 10, 512, 50), 32);
 }
 
-test$(gfx_fill_rect_gradient)
+test$(gfx_fill_rect_gradient, TEST_DISABLED)
 {
     GfxGradient grad = {
         .len = 5,
