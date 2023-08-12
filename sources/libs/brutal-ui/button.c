@@ -8,7 +8,7 @@ void ui_button_repaint(UiView *self, Gfx *gfx)
 {
     if (self->flags & UI_VIEW_ENABLED)
     {
-        gfx_fill_style(gfx, gfx_paint_fill(UI_COLOR_BLUE));
+        gfx_fill_style(gfx, gfx_paint_fill(UI_COLOR_BASE01));
     }
     else
     {

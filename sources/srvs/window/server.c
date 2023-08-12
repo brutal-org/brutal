@@ -144,7 +144,7 @@ static void wm_server_render_clients(WmServer *self, Gfx *gfx)
         }
 
         gfx_stroke_style(gfx, (GfxStroke){.pos = GFX_STOKE_INSIDE, .width = 1});
-        gfx_fill_style(gfx, gfx_paint_fill(UI_COLOR_BASE02));
+        gfx_fill_style(gfx, gfx_paint_fill(UI_COLOR_BASE01));
         gfx_stroke(gfx);
     }
 }
@@ -168,7 +168,7 @@ void wm_server_render(WmServer *self)
         gfx_push(gfx);
         gfx_clip(gfx, dirty);
 
-        gfx_clear(gfx, GFX_GAINSBORO);
+        gfx_clear(gfx, gfx_hex(0x09090b));
 
         wm_server_render_clients(self, gfx);
         wm_server_render_cursor(self, gfx);
