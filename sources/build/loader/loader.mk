@@ -8,8 +8,10 @@ ifeq (, $(shell which $(LOADER_LD) 2> /dev/null))
 	LOADER_LD=clang
 endif
 
+NO_WARN_BASE_CFLAGS = $(filter-out $(WARN_CFLAGS), $(BASE_CFLAGS))
+
 LOADER_CFLAGS= \
-	$(BASE_CFLAGS) \
+	$(NO_WARN_BASE_CFLAGS) \
 	$(USER_CFLAGS_INC) \
 	-ffreestanding \
 	-D__x86_64__ \

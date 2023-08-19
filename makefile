@@ -19,10 +19,11 @@ include sources/build/boards/$(ARCH)-$(BOARD)/build.mk
 export LC_ALL=C
 
 ifeq '$(TOOLCHAIN)' 'gnu'
-BASE_CFLAGS += \
+WARN_CFLAGS += \
 	-Wno-error=analyzer-out-of-bounds \
 	-Wno-error=analyzer-use-of-uninitialized-value \
 	-Wno-error=maybe-uninitialized
+BASE_CFLAGS += $(WARN_CFLAGS)
 endif
 
 BASE_CFLAGS += \
@@ -62,7 +63,6 @@ include $(wildcard sources/utils/*/build.mk)
 include build/toolchain/archs/$(ARCH)/arch.mk
 -include build/toolchain/archs/$(HOST_ARCH)/host.mk
 include build/toolchain/$(TOOLCHAIN)/build.mk
-
 include sources/libs/.build.mk
 include sources/build/kernel/build.mk
 include sources/build/host/build.mk
