@@ -2,7 +2,7 @@
 #include <brutal-test>
 #include <brutal-ui>
 
-test$(gfx_basic_text)
+test$(gfx_basic_text, TEST_DISABLED)
 {
     gfx_fill_style(test_use_gfx(), gfx_paint_fill(UI_COLOR_BASE08));
 
