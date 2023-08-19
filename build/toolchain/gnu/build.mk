@@ -1,4 +1,5 @@
 export PATH := $(shell build/toolchain/gnu/use.sh):$(PATH)
+include build/configs/versions.mk
 
 # --- Host compiler ---------------------------------------------------------- #
 
@@ -54,13 +55,13 @@ USER_KLDFLAGS= \
 	-Tsources/build/boards/$(ARCH)-$(BOARD)/link.ld \
 	-z max-page-size=0x1000 \
 	$(ARCH_LDFLAGS) \
-	build/toolchain/gnu/local/lib/gcc/$(ARCH)-elf/11.1.0/libgcc.a
+	build/toolchain/gnu/local/lib/gcc/$(ARCH)-elf/$(GCC_RELEASE_VERSION)/libgcc.a
 
 USER_ULDFLAGS= \
 	-Tsources/build/target/$(ARCH)-link.ld \
 	-z max-page-size=0x1000 \
 	$(ARCH_LDFLAGS) \
-	build/toolchain/gnu/local/lib/gcc/$(ARCH)-elf/11.1.0/libgcc.a
+	build/toolchain/gnu/local/lib/gcc/$(ARCH)-elf/$(GCC_RELEASE_VERSION)/libgcc.a
 
 USER_OBJCOPY=$(ARCH)-elf-objcopy
 

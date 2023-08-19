@@ -11,11 +11,19 @@ BOOTLOADER?=loader
 CONFIG?=devel
 TOOLCHAIN?=llvm
 
+include build/configs/versions.mk
 include sources/build/configs/$(CONFIG).mk
 include sources/build/boards/$(ARCH)-$(BOARD)/build.mk
 
 
 export LC_ALL=C
+
+ifeq '$(TOOLCHAIN)' 'gnu'
+BASE_CFLAGS += \
+	-Wno-error=analyzer-out-of-bounds \
+	-Wno-error=analyzer-use-of-uninitialized-value \
+	-Wno-error=maybe-uninitialized
+endif
 
 BASE_CFLAGS += \
 	-MD \
