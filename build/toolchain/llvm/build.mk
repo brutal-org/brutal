@@ -5,7 +5,7 @@ BASE_CFLAGS += \
 
 # --- Host compiler ---------------------------------------------------------- #
 
-LLVM_VERSION ?=-13
+LLVM_VERSION ?=-17
 
 HOST_CC=clang$(LLVM_VERSION)
 ifeq (, $(shell which $(HOST_CC) 2> /dev/null))
