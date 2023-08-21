@@ -14,19 +14,21 @@ fi
 
 TARGET=$1-elf
 
-BINUTILS_VERSION=2.36
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+source "$DIR/../../configs/versions.mk"
+
 BINUTILS_DIRECTORY="binutils-$BINUTILS_VERSION"
 BINUTILS_FILENAME="$BINUTILS_DIRECTORY.tar.gz"
 BINUTILS_URL="http://ftp.gnu.org/gnu/binutils/$BINUTILS_FILENAME"
 
-GCC_VERSION=11.1.0
-GCC_DIRECTORY="gcc-$GCC_VERSION"
-GCC_FILENAME="gcc-$GCC_VERSION.tar.gz"
-GCC_URL="http://ftp.gnu.org/gnu/gcc/$GCC_DIRECTORY/$GCC_FILENAME"
+GCC_REMOTE_DIRECTORY="LATEST-$GCC_VERSION"
+GCC_DIRECTORY=gcc-${GCC_VERSION}-${GCC_SNAPSHOT}
+GCC_FILENAME="gcc-$GCC_VERSION-$GCC_SNAPSHOT.tar.xz"
+GCC_URL="http://gcc.gnu.org/pub/gcc/snapshots/$GCC_REMOTE_DIRECTORY/$GCC_FILENAME"
 
 # ---------------------------------------------------------------------------- #
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 PREFIX="$DIR/local"
 
@@ -72,6 +74,7 @@ pushd tarballs
         echo "Download gcc prerequisites..."
 
         pushd $GCC_DIRECTORY
+	    patch -Np1 -i ../../prerequisites.patch
             ./contrib/download_prerequisites
         popd
     else

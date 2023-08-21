@@ -3,9 +3,9 @@ BASE_CFLAGS += \
 	-Wignored-attributes \
 	-Wunknown-attributes
 
-# --- Host compiler ---------------------------------------------------------- #
+include build/configs/versions.mk
 
-LLVM_VERSION ?=-13
+# --- Host compiler ---------------------------------------------------------- #
 
 HOST_CC=clang$(LLVM_VERSION)
 ifeq (, $(shell which $(HOST_CC) 2> /dev/null))

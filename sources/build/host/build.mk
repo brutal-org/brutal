@@ -25,9 +25,11 @@ LIBS_HOST_OBJ = \
 
 LIBS_HOST_BIN=$(BINDIR_HOST)/libbrutal.a
 
+NO_WARN_HOST_CFLAGS = $(filter-out $(WARN_CFLAGS), $(HOST_CFLAGS))
+
 $(BINDIR_HOST)/%.c.o: sources/%.c | $(GENERATED_MOD)
 	@$(MKCWD)
-	$(HOST_CC) -c -o $@ $< $(HOST_CFLAGS)
+	$(HOST_CC) -c -o $@ $< $(NO_WARN_HOST_CFLAGS)
 
 $(BINDIR_HOST)/%.s.o: sources/%.s
 	@$(MKCWD)
@@ -58,7 +60,7 @@ DEPENDENCIES += $$($(1)_HOST_OBJ:.o=.d)
 
 $$($(1)_HOST_BIN): $$($(1)_HOST_OBJ) $(LIBS_HOST_BIN)
 	@$$(MKCWD)
-	$(HOST_CC) -o $$@ $$^ $(HOST_LDFLAGS) $(HOST_CFLAGS)
+	$(HOST_CC) -o $$@ $$^ $(HOST_LDFLAGS) $(NO_WARN_HOST_CFLAGS)
 
 host-$$($(1)_NAME)-dump:
 	@echo "$$($(1)_HOST_BIN)"

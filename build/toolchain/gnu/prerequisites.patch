@@ -1,0 +1,59 @@
+diff -burN gcc-13-20230805/contrib/download_prerequisites gcc-13-20230805-new/contrib/download_prerequisites
+--- gcc-13-20230805/contrib/download_prerequisites	2023-08-06 00:32:07.000000000 +0200
++++ gcc-13-20230805-new/contrib/download_prerequisites	2023-08-07 08:13:03.899890670 +0200
+@@ -27,12 +27,13 @@
+ # remember to also update the files `contrib/prerequisites.sha512` and
+ # `contrib/prerequisites.md5` with the new checksums.
+ 
+-gmp='gmp-6.2.1.tar.bz2'
+-mpfr='mpfr-4.1.0.tar.bz2'
+-mpc='mpc-1.2.1.tar.gz'
+-isl='isl-0.24.tar.bz2'
++gmp='gmp-6.3.0.tar.bz2'
++mpfr='mpfr-4.2.0.tar.bz2'
++mpc='mpc-1.3.1.tar.gz'
++isl='isl-0.26.tar.bz2'
+ 
+-base_url='http://gcc.gnu.org/pub/gcc/infrastructure/'
++base_url='https://ftp.gnu.org/gnu/'
++isl_url='https://libisl.sourceforge.io/'
+ 
+ echo_archives() {
+     echo "${gmp}"
+@@ -223,8 +224,10 @@
+ do
+     if [ ${force} -gt 0 ]; then rm -f "${directory}/${ar}"; fi
+     [ -e "${directory}/${ar}" ]                                               \
+-        || ( cd "${directory}" && ${fetch} --no-verbose "${base_url}${ar}" )  \
+-        || die "Cannot download ${ar} from ${base_url}"
++    || if [ $ar != ${isl} ];
++    then ( cd "${directory}" && ${fetch} --no-verbose "${base_url}${ar%%-*[0-9].tar.*}/${ar}" || die "Cannot download ${ar} from ${base_url}${ar%%-*[0-9].tar.*}" );
++    else ( cd "${directory}" && ${fetch} --no-verbose  "${isl_url}${ar}" || die "Cannot download ${ar} from  ${isl_url}" );
++    fi
+ done
+ unset ar
+ 
+diff -burN gcc-13-20230805/contrib/prerequisites.md5 gcc-13-20230805-new/contrib/prerequisites.md5
+--- gcc-13-20230805/contrib/prerequisites.md5	2023-08-06 00:32:07.000000000 +0200
++++ gcc-13-20230805-new/contrib/prerequisites.md5	2023-08-07 07:45:00.779920812 +0200
+@@ -1,4 +1,4 @@
+-28971fc21cf028042d4897f02fd355ea  gmp-6.2.1.tar.bz2
+-44b892bc5a45bafb4294d134e13aad1d  mpfr-4.1.0.tar.bz2
+-9f16c976c25bb0f76b50be749cd7a3a8  mpc-1.2.1.tar.gz
+-dd2f7b78e118c25bd96134a52aae7f4d  isl-0.24.tar.bz2
++c1cd6ef33085e9cb818b9b08371f9000  gmp-6.3.0.tar.bz2
++f8c66d737283fd35f9fe433fb419b05f  mpfr-4.2.0.tar.bz2
++5c9bc658c9fd0f940e8e3e0f09530c62  mpc-1.3.1.tar.gz
++da50c85e9841db36d48a492bbe836863  isl-0.26.tar.bz2
+diff -burN gcc-13-20230805/contrib/prerequisites.sha512 gcc-13-20230805-new/contrib/prerequisites.sha512
+--- gcc-13-20230805/contrib/prerequisites.sha512	2023-08-06 00:32:07.000000000 +0200
++++ gcc-13-20230805-new/contrib/prerequisites.sha512	2023-08-07 07:44:42.329921142 +0200
+@@ -1,4 +1,4 @@
+-8904334a3bcc5c896ececabc75cda9dec642e401fb5397c4992c4fabea5e962c9ce8bd44e8e4233c34e55c8010cc28db0545f5f750cbdbb5f00af538dc763be9  gmp-6.2.1.tar.bz2
+-410208ee0d48474c1c10d3d4a59decd2dfa187064183b09358ec4c4666e34d74383128436b404123b831e585d81a9176b24c7ced9d913967c5fce35d4040a0b4  mpfr-4.1.0.tar.bz2
+-3279f813ab37f47fdcc800e4ac5f306417d07f539593ca715876e43e04896e1d5bceccfb288ef2908a3f24b760747d0dbd0392a24b9b341bc3e12082e5c836ee  mpc-1.2.1.tar.gz
+-aab3bddbda96b801d0f56d2869f943157aad52a6f6e6a61745edd740234c635c38231af20bc3f1a08d416a5e973a90e18249078ed8e4ae2f1d5de57658738e95  isl-0.24.tar.bz2
++3b684c9bcb9ede2b7e54d0ba4c9764bfa17c20d4f3000017c553b6f1e135b536949580ff37341680c25dc236cfe0ba1db8cfdfe619ce013656189ef0871b89f8  gmp-6.3.0.tar.bz2
++cb2a9314b94e34a4ea49ce2619802e9420c982e55258a4bc423f802740632646a3d420e7fcf373b19618385b8b2b412abfa127e8f473053863424cac233893c0  mpfr-4.2.0.tar.bz2
++4bab4ef6076f8c5dfdc99d810b51108ced61ea2942ba0c1c932d624360a5473df20d32b300fc76f2ba4aa2a97e1f275c9fd494a1ba9f07c4cb2ad7ceaeb1ae97  mpc-1.3.1.tar.gz
++492deba2cbfc693efb41621861a0679390becf2777e32111aceef8db1d38d772385dfd83cee14a41c930f9904549334e4d6dc2c5fce0c69e0bef9c8cf031d6b5  isl-0.26.tar.bz2
