@@ -56,12 +56,12 @@ int main(int argc, char const *argv[])
     else if (str_eq(str$("--source"), str$(argv[2])))
     {
         CUnit unit = idl_cgen_source(module, base$(&heap));
-        cc_trans_unit(&emit, unit);
+        ctrans_unit(&emit, unit);
     }
     else if (str_eq(str$("--header"), str$(argv[2])))
     {
         CUnit unit = idl_cgen_header(module, base$(&heap));
-        cc_trans_unit(&emit, unit);
+        ctrans_unit(&emit, unit);
     }
     else
     {

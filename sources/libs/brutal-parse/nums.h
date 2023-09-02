@@ -16,12 +16,12 @@ bool scan_next_double(Scan *self, double *value);
 
 #endif
 
-bool str_to_uint(Str string, unsigned long *value);
+bool str_to_uint(Str str, unsigned long *value);
 
-bool str_to_int(Str string, long *value);
+bool str_to_int(Str str, long *value);
 
 #ifndef __freestanding__
 
-bool str_to_float(Str string, double *value);
+bool str_to_float(Str str, double *value);
 
 #endif

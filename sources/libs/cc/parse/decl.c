@@ -17,8 +17,10 @@ void cparse_func_params(Lex *lex, CType *type, Alloc *alloc)
 
 CType cparse_declarator_postfix(Lex *lex, CType type, Alloc *alloc)
 {
+    int begin = lex->head;
     if (cparse_skip_separator(lex, CLEX_LPARENT))
     {
+
         CType func = ctype_func(ctype_tail(), alloc);
 
         cparse_func_params(lex, &func, alloc);
@@ -26,7 +28,7 @@ CType cparse_declarator_postfix(Lex *lex, CType type, Alloc *alloc)
         CType ret = cparse_declarator_postfix(lex, type, alloc);
         ctype_append(&func, ret);
 
-        return func;
+        return with_cref$(func, begin, lex);
     }
     else if (cparse_skip_separator(lex, CLEX_LBRACKET))
     {
@@ -34,7 +36,7 @@ CType cparse_declarator_postfix(Lex *lex, CType type, Alloc *alloc)
 
         long size = CTYPE_ARRAY_UNBOUNDED;
 
-        if (lex_curr_type(lex) == CLEX_INTEGER)
+        if (lex_curr_type(lex) == CLEX_NUMBER)
         {
             str_to_int(lex_next(lex).str, &size);
         }
@@ -43,7 +45,7 @@ CType cparse_declarator_postfix(Lex *lex, CType type, Alloc *alloc)
 
         CType inner = cparse_declarator_postfix(lex, type, alloc);
 
-        return ctype_array(inner, size, alloc);
+        return with_cref$(ctype_array(inner, size, alloc), begin, lex);
     }
     else
     {
@@ -96,11 +98,13 @@ CDeclarator cparse_declarator_prefix(Lex *lex, CType type, Alloc *alloc)
 
 CDeclarator cparse_declarator(Lex *lex, Alloc *alloc)
 {
+    int begin = lex->head;
     CType type = cparse_type(lex, alloc);
     cparse_whitespace(lex);
     CDeclarator decl = cparse_declarator_prefix(lex, type, alloc);
 
     decl.type = cparse_declarator_postfix(lex, decl.type, alloc);
+    decl.type = with_cref$(decl.type, begin, lex);
     return decl;
 }
 
@@ -151,17 +155,18 @@ CDeclAttr cparse_decl_attr(Lex *lex)
 
 CDecl cparse_decl(Lex *lex, CUnit *context, Alloc *alloc)
 {
+    int begin = lex->head;
     if (cparse_is_separator(lex, CLEX_SEMICOLON))
     {
         cparse_skip_separator(lex, CLEX_SEMICOLON);
-        return cdecl_empty();
+        return with_cref$(cdecl_empty(), begin, lex);
     }
     else if (lex_skip_type(lex, CLEX_TYPEDEF))
     {
         cparse_whitespace(lex);
         CDeclarator declarator = cparse_declarator(lex, alloc);
 
-        return cdecl_type(declarator.name, declarator.type);
+        return with_cref$(cdecl_type(declarator.name, declarator.type), begin, lex);
     }
     else
     {
@@ -174,12 +179,12 @@ CDecl cparse_decl(Lex *lex, CUnit *context, Alloc *alloc)
             if (cparse_is_separator(lex, CLEX_LBRACE))
             {
                 CStmt body = cparse_stmt(lex, context, alloc);
-                return cdecl_attrib(cdecl_func(decl.name, decl.type, body), attr);
+                return with_cref$(cdecl_attrib(cdecl_func(decl.name, decl.type, body), attr), begin, lex);
             }
             else
             {
                 cparse_expect_separator(lex, CLEX_SEMICOLON);
-                return cdecl_attrib(cdecl_func(decl.name, decl.type, cstmt_empty()), attr);
+                return with_cref$(cdecl_attrib(cdecl_func(decl.name, decl.type, cstmt_empty()), attr), begin, lex);
             }
         }
         else
@@ -187,12 +192,12 @@ CDecl cparse_decl(Lex *lex, CUnit *context, Alloc *alloc)
             if (cparse_skip_separator(lex, CLEX_EQUAL))
             {
                 CExpr init = cparse_expr(lex, CEXPR_MAX_PRECEDENCE, context, alloc);
-                return cdecl_var(decl.name, decl.type, init);
+                return with_cref$(cdecl_var(decl.name, decl.type, init), begin, lex);
             }
             else
             {
                 cparse_expect_separator(lex, CLEX_SEMICOLON);
-                return cdecl_attrib(cdecl_var(decl.name, decl.type, cexpr_empty()), attr);
+                return with_cref$(cdecl_attrib(cdecl_var(decl.name, decl.type, cexpr_empty()), attr), begin, lex);
             }
         }
     }

@@ -1,7 +1,7 @@
 #include <bal/abi/helpers.h>
 #include <brutal-debug/log.h>
 
-char const *br_syscall_to_string(BrSyscall syscall)
+char const *br_syscall_to_str(BrSyscall syscall)
 {
     static char const *SYSCALL_NAMES[] = {
 #define ITER(SYSCALL) #SYSCALL,
@@ -17,7 +17,7 @@ char const *br_syscall_to_string(BrSyscall syscall)
     return SYSCALL_NAMES[syscall];
 }
 
-char const *br_result_to_string(BrResult result)
+char const *br_result_to_str(BrResult result)
 {
     static char const *RESULT_NAMES[] = {
 #define ITER(RESULT) #RESULT,

@@ -4,7 +4,7 @@
 
 #include "ssfn2.h"
 
-static MaybeError ssfn2_load_string(IoReader reader, char *dst)
+static MaybeError ssfn2_load_str(IoReader reader, char *dst)
 {
     for (size_t i = 0; i < SSFN2_MAX_STR_LEN; i++)
     {
@@ -21,14 +21,14 @@ static MaybeError ssfn2_load_string(IoReader reader, char *dst)
     return SUCCESS;
 }
 
-static MaybeError ssfn2_load_stringtable(IoReader reader, SSFN2Font *font)
+static MaybeError ssfn2_load_strtable(IoReader reader, SSFN2Font *font)
 {
-    TRY(MaybeError, ssfn2_load_string(reader, font->stringtable.font_name));
-    TRY(MaybeError, ssfn2_load_string(reader, font->stringtable.family_name));
-    TRY(MaybeError, ssfn2_load_string(reader, font->stringtable.subfamily_name));
-    TRY(MaybeError, ssfn2_load_string(reader, font->stringtable.revision));
-    TRY(MaybeError, ssfn2_load_string(reader, font->stringtable.manufacturer));
-    TRY(MaybeError, ssfn2_load_string(reader, font->stringtable.license));
+    TRY(MaybeError, ssfn2_load_str(reader, font->strtable.font_name));
+    TRY(MaybeError, ssfn2_load_str(reader, font->strtable.family_name));
+    TRY(MaybeError, ssfn2_load_str(reader, font->strtable.subfamily_name));
+    TRY(MaybeError, ssfn2_load_str(reader, font->strtable.revision));
+    TRY(MaybeError, ssfn2_load_str(reader, font->strtable.manufacturer));
+    TRY(MaybeError, ssfn2_load_str(reader, font->strtable.license));
 
     return SUCCESS;
 }
@@ -269,7 +269,7 @@ static void ssfn2_compute_weight(SSFN2Font *font)
 {
     font->weight = GFX_FONT_REGULAR;
 
-    Str subfamily = str$(font->stringtable.subfamily_name);
+    Str subfamily = str$(font->strtable.subfamily_name);
     // Weights
     if (str_first(subfamily, str$("Black")) >= 0)
         font->weight = GFX_FONT_BLACK;
@@ -312,8 +312,9 @@ static MaybeError ssfn2_load_internal(IoRSeek rseek, SSFN2Collection *collection
     {
         SSFN2Font font;
         font.font_start = start;
+
         TRY(MaybeError, io_read$(rseek, (uint8_t *)&font.header, sizeof(SSFN2FontHeader)));
-        TRY(MaybeError, ssfn2_load_stringtable(io_reader$(rseek), &font));
+        TRY(MaybeError, ssfn2_load_strtable(io_reader$(rseek), &font));
 
         font.glyphs = alloc_make_array(alloc, SSFN2Glyph, 0x110000);
 

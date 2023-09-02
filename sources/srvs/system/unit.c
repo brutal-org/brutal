@@ -24,7 +24,7 @@ void unit_init_from_module(Unit *self, HandoverModule mod, Alloc *alloc)
 
     Json manifest_json = json_parse_str(manifest_str, alloc);
 
-    Str unit_name = json_get(manifest_json, str$("name")).string;
+    Str unit_name = json_get(manifest_json, str$("name")).str;
 
     unit_init(self, unit_name, module_mem, alloc);
 
@@ -40,11 +40,11 @@ void unit_init_from_module(Unit *self, HandoverModule mod, Alloc *alloc)
 
     for (int j = 0; j < json_len(rights); j++)
     {
-        BrRight right = br_right_from_str(json_at(rights, j).string);
+        BrRight right = br_right_from_str(json_at(rights, j).str);
 
         if (right == 0)
         {
-            log$("Invalid right: {}", json_at(rights, j).string);
+            log$("Invalid right: {}", json_at(rights, j).str);
         }
 
         self->rights |= right;

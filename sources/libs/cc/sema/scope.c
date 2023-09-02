@@ -3,7 +3,7 @@
 void cscope_init(CScope *self, Alloc *alloc)
 {
     *self = (CScope){};
-    self->expected_result.type = CTYPE_INVALID;
+    self->ret.type = CTYPE_INVALID;
     vec_init(&self->decls, alloc);
 }
 
@@ -12,17 +12,18 @@ void cscope_deinit(CScope *self)
     vec_deinit(&self->decls);
 }
 
-CDecl cscope_lookup(CScope *self, Str name)
+bool cscope_lookup(CScope *self, Str name, CDecl *out_decl)
 {
-
-    vec_foreach(decl, &self->decls)
+    vec_foreach_rev(decl, &self->decls)
     {
         if (str_eq(decl->name, name))
         {
-            return *decl;
+            *out_decl = *decl;
+            return true;
         }
     }
-    return (CDecl){};
+
+    return false;
 }
 
 void cscope_add(CScope *self, CDecl decl)

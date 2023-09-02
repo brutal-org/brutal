@@ -150,6 +150,10 @@ void vec_swap_impl(VecImpl *impl, int idx1, int idx2);
     if ((SELF)->len)           \
         for (typeof((SELF)->data) VAR = vec_begin(SELF); VAR != vec_end(SELF); VAR++)
 
+#define vec_foreach_rev(VAR, SELF) \
+    if ((SELF)->len)               \
+        for (typeof((SELF)->data) VAR = vec_end(SELF) - 1; VAR >= vec_begin(SELF); VAR--)
+
 #define vec_foreach_idx(IDX, VAR, SELF)             \
     if ((SELF)->len)                                \
         for (int IDX = 0; IDX < (SELF)->len; IDX++) \

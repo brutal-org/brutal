@@ -2,6 +2,7 @@
 
 #include <brutal-text>
 
+#include "ref.h"
 #define LEXEME_EOF (-1)
 #define LEXEME_INVALID (-2)
 
@@ -11,6 +12,7 @@ typedef struct
 {
     LexemeType type;
     Str str;
+    SrcRef pos;
 } Lexeme;
 
 #define lexeme$(TYPE, STR) \
