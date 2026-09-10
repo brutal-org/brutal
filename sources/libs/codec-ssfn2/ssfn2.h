@@ -19,7 +19,7 @@ typedef struct
     size_t font_start;
     float weight;
     SSFN2FontHeader header;
-    SSFN2StringTable stringtable;
+    SSFN2StringTable strtable;
     SSFN2Glyph *glyphs; /* glyphs array */
 } SSFN2Font;
 

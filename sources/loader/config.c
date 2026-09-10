@@ -7,8 +7,8 @@ LoaderEntry config_entry_parse(Json json)
 {
     LoaderEntry entry;
 
-    entry.name = json_get(json, str$("name")).string;
-    entry.kernel = json_get(json, str$("kernel")).string;
+    entry.name = json_get(json, str$("name")).str;
+    entry.kernel = json_get(json, str$("kernel")).str;
 
     Json modules;
     if (json_try_get(json, str$("modules"), &modules))
@@ -20,8 +20,8 @@ LoaderEntry config_entry_parse(Json json)
             Json module = json_at(modules, i);
             LoaderModule current_module = {};
 
-            current_module.name = json_get(module, str$("name")).string;
-            current_module.path = json_get(module, str$("path")).string;
+            current_module.name = json_get(module, str$("name")).str;
+            current_module.path = json_get(module, str$("path")).str;
 
             vec_push(&entry.modules, current_module);
 

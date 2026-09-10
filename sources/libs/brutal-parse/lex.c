@@ -4,14 +4,28 @@
 
 Lex lex(Scan *scan, LexFn *fn, Alloc *alloc)
 {
+    return lex_tu(scan, fn, alloc, -1);
+}
+
+Lex lex_tu(Scan *scan, LexFn *fn, Alloc *alloc, int translation_unit)
+{
     Lex self = {};
     vec_init(&self.lexemes, alloc);
 
     while (!scan_ended(scan))
     {
         scan_begin(scan);
+        int begin = scan->head;
 
-        Lexeme l = {fn(scan), scan_end(scan)};
+        Lexeme l = {
+            .type = fn(scan),
+            .str = scan_end(scan),
+            (SrcRef){
+                .translation_unit = translation_unit,
+                .begin = begin,
+                .end = scan->head,
+            },
+        };
 
         if (l.type == LEXEME_INVALID)
         {
@@ -50,6 +64,11 @@ Lexeme lex_peek(Lex *self, int offset)
         return (Lexeme){
             LEXEME_EOF,
             str$(""),
+            (SrcRef){
+                .begin = self->head + offset,
+                .end = self->head + offset,
+                .translation_unit = -1,
+            },
         };
     }
 
@@ -145,4 +164,18 @@ bool lex_expect(Lex *self, LexemeType type)
 bool lex_ok(Lex *self)
 {
     return !self->has_error;
+}
+
+SrcRef lex_src_ref(Lex *lex, int begin, int end)
+{
+    Lexeme first = lex->lexemes.data[begin];
+    Lexeme last = lex->lexemes.data[end];
+
+    SrcRef cref = {
+        .begin = first.pos.begin,
+        .end = last.pos.end,
+        .translation_unit = first.pos.translation_unit,
+    };
+
+    return cref;
 }

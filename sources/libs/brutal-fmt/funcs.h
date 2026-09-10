@@ -1,5 +1,7 @@
 #pragma once
 
+#include <brutal-base>
+
 #include "fmt.h"
 
 IoResult fmt_format(IoWriter writer, Str format, AnyVa args);

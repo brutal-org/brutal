@@ -146,26 +146,26 @@ bool scan_next_double(Scan *self, double *value)
 
 #endif
 
-bool str_to_uint(Str string, unsigned long *value)
+bool str_to_uint(Str str, unsigned long *value)
 {
     Scan scan = {0};
-    scan_init(&scan, string);
+    scan_init(&scan, str);
     return scan_next_uint(&scan, value);
 }
 
-bool str_to_int(Str string, long *value)
+bool str_to_int(Str str, long *value)
 {
     Scan scan = {0};
-    scan_init(&scan, string);
+    scan_init(&scan, str);
     return scan_next_int(&scan, value);
 }
 
 #ifndef __freestanding__
 
-bool str_to_float(Str string, double *value)
+bool str_to_float(Str str, double *value)
 {
     Scan scan = {0};
-    scan_init(&scan, string);
+    scan_init(&scan, str);
     return scan_next_double(&scan, value);
 }
 

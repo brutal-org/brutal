@@ -7,7 +7,7 @@ void idl_cgen_iface_header(CUnit *unit, IdlModule const module, IdlIface const i
     CType vtable = ctype_struct(alloc);
     CType msgtype = ctype_enum(alloc);
 
-    cunit_define(unit, fmt_str$(alloc, "IPC_{case-constant}_PROTO", iface.name), cexpr_constant(cval_unsigned(iface.id)), alloc);
+    cunit_define(unit, fmt_str$(alloc, "IPC_{case-constant}_PROTO", iface.name), cexpr_constant(cval_uint(iface.id)), alloc);
 
     int i = 0;
     vec_foreach_v(method, &iface.methods)
@@ -20,8 +20,8 @@ void idl_cgen_iface_header(CUnit *unit, IdlModule const module, IdlIface const i
         cunit_decl(unit, cdecl_type(name, handler_type));
         cunit_decl(unit, cdecl_func(fmt_str$(alloc, "{}_rpc", method.name), method_type, cstmt_empty()));
 
-        ctype_constant(&msgtype, fmt_str$(alloc, "MSG_{case-constant}_REQ", method.name), cval_unsigned(i++));
-        ctype_constant(&msgtype, fmt_str$(alloc, "MSG_{case-constant}_RESP", method.name), cval_unsigned(i++));
+        ctype_constant(&msgtype, fmt_str$(alloc, "MSG_{case-constant}_REQ", method.name), cval_uint(i++));
+        ctype_constant(&msgtype, fmt_str$(alloc, "MSG_{case-constant}_RESP", method.name), cval_uint(i++));
     }
 
     cunit_decl(unit, cdecl_type(fmt_str$(alloc, "{}Msgs", iface.name), msgtype));

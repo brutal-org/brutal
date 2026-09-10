@@ -1,247 +1,264 @@
-#include <cc/builder.h>
-#include <cc/sema/visit.h>
 #include <brutal-debug>
+#include <cc/builder.h>
+#include <cc/dump.h>
+#include <cc/sema/visit.h>
 
-CType csema_value_type(MAYBE_UNUSED CSema *sema, CVal value, Alloc *alloc)
+bool cvisit_node_is(void *node, int what, int type)
 {
-    /* FIXME: autodetect precision based on architecture */
-    switch (value.type)
+    if (what & CVISIT_DECL)
     {
-    case CVAL_FLOAT:
-        return ctype_float(32);
-    case CVAL_SIGNED:
-        return ctype_signed(32);
-    case CVAL_UNSIGNED:
-        return ctype_unsigned(32);
-    case CVAL_STRING:
-        return ctype_array(ctype_signed(8), value.string_.len, alloc);
-    default:
-        return ctype_void(); /* FIXME: better error handling */
+        return (int)((CDecl *)node)->type == type;
+    }
+    else if (what & CVISIT_EXPR)
+    {
+        return (int)((CExpr *)node)->type == type;
+    }
+    else if (what & CVISIT_STMT)
+    {
+        return (int)((CStmt *)node)->type == type;
+    }
+    else if (what & CVISIT_TYPE)
+    {
+        return (int)((CType *)node)->type == type;
+    }
+    else if (what & CVISIT_UNIT)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
     }
 }
 
-static CType csema_decl_type(CSema *self, Str name)
+void cvisit_before(CVisites passes, CSema *sema, int what, void *node)
 {
-    vec_foreach(scopes, &self->scopes)
+    slice_foreach$(pass, passes)
     {
-        vec_foreach(decls, &scopes->decls)
+        int mask = what | CVISIT_BEGIN;
+        if ((pass->what & mask) == mask)
         {
-            if (str_eq(decls->name, name))
-            {
-                return decls->sema_type;
-            }
+            pass->fn(sema, what, node);
         }
-    }
-    log$("not founded symbol: {}", name);
-    return ctype_void();
-}
-
-static CExpr csema_prefix_expr(CSema *sema, CExpr expr, Alloc *alloc)
-{
-    *expr.prefix_.expr = csema_expr(sema, *expr.prefix_.expr, alloc);
-    switch (expr.prefix_.op)
-    {
-    case COP_REF:
-    {
-        expr.sema_type = ctype_ptr(expr.prefix_.expr->sema_type, alloc);
-        return expr;
-    }
-    case COP_DEREF:
-    {
-        if (!(expr.prefix_.expr->sema_type.type == CTYPE_PTR))
-        {
-            log$("trying to deref a ptr");
-            return expr;
-        }
-        expr.sema_type = *expr.prefix_.expr->sema_type.ptr_.subtype;
-        return expr;
-    }
-
-    case COP_NOT:
-    case COP_DEC:
-    case COP_INC:
-    {
-        expr.sema_type = expr.prefix_.expr->sema_type;
-        return expr;
-    }
-    default:
-    {
-        return expr;
-    }
-    }
-}
-static CExpr csema_postfix_expr(CSema *sema, CExpr expr, Alloc *alloc)
-{
-    *expr.postfix_.expr = csema_expr(sema, *expr.postfix_.expr, alloc);
-    switch (expr.postfix_.op)
-    {
-    case COP_DEC:
-    case COP_INC:
-    {
-        expr.sema_type = expr.postfix_.expr->sema_type;
-        return expr;
-    }
-    default:
-    {
-        return expr;
-    }
     }
 }
 
-static CExpr csema_infix_expr(CSema *sema, CExpr expr, Alloc *alloc)
+void cvisit_after(CVisites passes, CSema *sema, int what, void *node)
 {
-    *expr.infix_.lhs = csema_expr(sema, *expr.infix_.lhs, alloc);
-    *expr.infix_.rhs = csema_expr(sema, *expr.infix_.rhs, alloc);
-
-    switch (expr.infix_.op)
+    slice_foreach_rev$(pass, passes)
     {
-    case COP_INDEX:
-    {
-
-        if (expr.infix_.lhs->sema_type.type == CTYPE_ARRAY)
+        int mask = what | CVISIT_END;
+        if ((pass->what & mask) == mask)
         {
-            expr.sema_type = *expr.infix_.lhs->sema_type.array_.subtype;
+            pass->fn(sema, what, node);
         }
-        else if (expr.infix_.lhs->sema_type.type == CTYPE_PTR)
-        {
-            expr.sema_type = *expr.infix_.lhs->sema_type.ptr_.subtype;
-        }
-        else
-        {
-            log$("trying to index a non array");
-            expr.sema_type = ctype_void();
-        }
-        return expr;
-    }
-    /* for every unsupported basic op like add sub etc... this works */
-    default:
-    {
-        expr.sema_type = expr.infix_.lhs->sema_type;
-        return expr;
-    }
     }
 }
 
-CExpr csema_expr(CSema *sema, CExpr expr, Alloc *alloc)
+void cvisit_decl(CVisites passes, CSema *sema, CDecl *decl)
 {
-    switch (expr.type)
-    {
-    case CEXPR_CONSTANT:
-    {
-        expr.sema_type = csema_value_type(sema, expr.constant_, alloc);
-        return expr;
-    }
-    case CEXPR_IDENT:
-    {
-        expr.sema_type = csema_decl_type(sema, expr.ident_);
-        return expr;
-    }
-    case CEXPR_CAST:
-    {
-        /* don't check for the moment */
-        expr.sema_type = expr.cast_.type;
-        return expr;
-    }
-    case CEXPR_CALL:
-    {
-        *expr.call_.expr = csema_expr(sema, *expr.call_.expr, alloc);
+    cvisit_before(passes, sema, CVISIT_DECL, decl);
 
-        if (expr.call_.expr->sema_type.type != CTYPE_FUNC)
-        {
-            log$("not a function! ");
-            return expr;
-        }
-        /* FIXME: no check for this for the moment */
-        vec_foreach(arg, &expr.call_.args)
-        {
-            *arg = csema_expr(sema, *arg, alloc);
-        }
-        expr.sema_type = *expr.call_.expr->sema_type.func_.ret;
-        return expr;
-    }
-    case CEXPR_LAMBDA:
+    switch (decl->type)
     {
-        expr.sema_type = ctype_void();
-        return expr;
-    }
-    case CEXPR_PREFIX:
-    {
-        return csema_prefix_expr(sema, expr, alloc);
-    }
-    case CEXPR_INFIX:
-    {
-        return csema_infix_expr(sema, expr, alloc);
-    }
-    case CEXPR_POSTFIX:
-    {
-        return csema_postfix_expr(sema, expr, alloc);
-    }
-    default:
-    {
-        log$("unhandled expr type: {}", expr.type);
-        expr.sema_type = ctype_void();
-        return expr;
-    }
-    }
-}
+    case CDECL_EMPTY:
+        break;
 
-CDecl csema_decl(CSema *sema, CDecl decl, Alloc *alloc)
-{
-    if (csema_lookup(sema, decl.name).type != CDECL_NIL)
-    {
-        log$("redefinition of: {}", decl.name);
-        return cdecl_empty();
-    }
-
-    switch (decl.type)
-    {
     case CDECL_TYPE:
-    {
-        decl.sema_type = decl.type_.type;
+        cvisit_type(passes, sema, &decl->type_.type);
         break;
-    }
-    case CDECL_FUNC:
-    {
-        decl.sema_type = decl.func_.type;
-        csema_scope_add(sema, decl); /* we need to add the function to the scope before the body lookup because the body can call the function it self */
 
-        csema_scope_enter_func(sema, decl.func_.type);
-        decl.func_.body = csema_stmt(sema, decl.func_.body, alloc);
-        csema_scope_leave(sema);
-        break;
-    }
     case CDECL_VAR:
-    {
-        decl.sema_type = decl.var_.type;
-        decl.var_.expr = csema_expr(sema, decl.var_.expr, alloc);
-        csema_scope_add(sema, decl);
+        cvisit_type(passes, sema, &decl->var_.type);
+        cvisit_expr(passes, sema, &decl->var_.expr);
         break;
-    }
+
+    case CDECL_FUNC:
+        cvisit_type(passes, sema, &decl->func_.type);
+        cvisit_stmt(passes, sema, &decl->func_.body);
+        break;
+
     default:
-    {
-        decl.sema_type = ctype_void();
-        break;
-    }
+        panic$("Unknow decl type");
     }
 
-    return decl;
+    cvisit_after(passes, sema, CVISIT_DECL, decl);
 }
 
-CUnit csema_unit(CSema *sema, CUnit unit, Alloc *alloc)
+void cvisit_expr(CVisites passes, CSema *sema, CExpr *expr)
 {
-    CUnit result = cunit(alloc);
+    cvisit_before(passes, sema, CVISIT_EXPR, expr);
 
-    csema_scope_enter(sema);
+    switch (expr->type)
+    {
+    case CEXPR_IDENT:
+    case CEXPR_CONSTANT:
+    case CEXPR_EMPTY:
+        break;
 
-    vec_foreach(entry, &unit.units)
+    case CEXPR_POSTFIX:
+    case CEXPR_PREFIX:
+        cvisit_expr(passes, sema, expr->postfix_.expr);
+        break;
+
+    case CEXPR_INFIX:
+        cvisit_expr(passes, sema, expr->infix_.lhs);
+        cvisit_expr(passes, sema, expr->infix_.rhs);
+        break;
+
+    case CEXPR_CALL:
+        cvisit_expr(passes, sema, expr->call_.expr);
+        vec_foreach(arg, &expr->call_.args)
+        {
+            cvisit_expr(passes, sema, arg);
+        }
+        break;
+
+    case CEXPR_CAST:
+        cvisit_type(passes, sema, &expr->cast_.type);
+        cvisit_expr(passes, sema, expr->cast_.expr);
+        break;
+
+    case CEXPR_TERNARY:
+        cvisit_expr(passes, sema, expr->ternary_.expr_cond);
+        cvisit_expr(passes, sema, expr->ternary_.expr_true);
+        cvisit_expr(passes, sema, expr->ternary_.expr_false);
+        break;
+
+    case CEXPR_INITIALIZER:
+        cvisit_type(passes, sema, &expr->initializer_.type);
+
+        vec_foreach(init, &expr->initializer_.initializer)
+        {
+            cvisit_expr(passes, sema, init);
+        }
+        break;
+
+    case CEXPR_LAMBDA:
+        cvisit_type(passes, sema, &expr->lambda_.type);
+        cvisit_stmt(passes, sema, expr->lambda_.body);
+        break;
+
+    default:
+        panic$("Unknow expr type");
+        break;
+    }
+
+    cvisit_after(passes, sema, CVISIT_EXPR, expr);
+}
+
+void cvisit_stmt(CVisites passes, CSema *sema, CStmt *stmt)
+{
+    cvisit_before(passes, sema, CVISIT_STMT, stmt);
+
+    switch (stmt->type)
+    {
+    case CSTMT_DECL:
+        cvisit_decl(passes, sema, stmt->decl_.decl);
+        break;
+
+    case CSTMT_EXPR:
+        cvisit_expr(passes, sema, &stmt->expr_.expr);
+        break;
+
+    case CSTMT_BLOCK:
+        vec_foreach(v, &stmt->block_.stmts)
+        {
+            cvisit_stmt(passes, sema, v);
+        }
+        break;
+
+    case CSTMT_IF:
+        cvisit_expr(passes, sema, &stmt->if_.expr);
+        cvisit_stmt(passes, sema, stmt->if_.stmt_true);
+        cvisit_stmt(passes, sema, stmt->if_.stmt_false);
+        break;
+
+    case CSTMT_FOR:
+        cvisit_stmt(passes, sema, stmt->for_.init_stmt);
+        cvisit_expr(passes, sema, &stmt->for_.cond_expr);
+        cvisit_expr(passes, sema, &stmt->for_.iter_expr);
+
+        cvisit_stmt(passes, sema, stmt->for_.stmt);
+        break;
+
+    case CSTMT_WHILE:
+    case CSTMT_DO:
+    case CSTMT_SWITCH:
+        cvisit_expr(passes, sema, &stmt->while_.expr);
+        cvisit_stmt(passes, sema, stmt->while_.stmt);
+        break;
+
+    case CSTMT_RETURN:
+        cvisit_expr(passes, sema, &stmt->return_.expr);
+        break;
+
+    case CSTMT_CASE:
+        cvisit_expr(passes, sema, &stmt->case_.expr);
+        break;
+
+    default:
+        panic$("Unknow stmt type");
+        break;
+    }
+
+    cvisit_after(passes, sema, CVISIT_STMT, stmt);
+}
+
+void cvisit_type(CVisites passes, CSema *sema, CType *type)
+{
+    cvisit_before(passes, sema, CVISIT_TYPE, type);
+
+    switch (type->type)
+    {
+    case CTYPE_ARRAY:
+    {
+        cvisit_type(passes, sema, type->array_.subtype);
+        break;
+    }
+
+    case CTYPE_PTR:
+    case CTYPE_REF:
+    case CTYPE_PARENT:
+        cvisit_type(passes, sema, type->ref_.subtype);
+        break;
+
+    case CTYPE_STRUCT:
+    case CTYPE_UNION:
+        vec_foreach(member, &type->struct_.members)
+        {
+            cvisit_type(passes, sema, &member->type);
+        }
+        break;
+
+    case CTYPE_FUNC:
+        cvisit_type(passes, sema, type->func_.ret);
+
+        vec_foreach(func_arg, &type->func_.params)
+        {
+            cvisit_type(passes, sema, &func_arg->type);
+        }
+        break;
+
+    default:
+        panic$("Unknow type type");
+        break;
+    }
+
+    cvisit_after(passes, sema, CVISIT_TYPE, type);
+}
+
+void cvisit_unit(CVisites passes, CSema *sema, CUnit *unit)
+{
+    cvisit_before(passes, sema, CVISIT_UNIT, unit);
+
+    vec_foreach(entry, &unit->units)
     {
         if (entry->type == CUNIT_DECLARATION)
         {
-            cunit_decl(&result, csema_decl(sema, entry->_decl, alloc));
+            cvisit_decl(passes, sema, &entry->_decl);
         }
     }
 
-    csema_scope_leave(sema);
-
-    return result;
+    cvisit_after(passes, sema, CVISIT_UNIT, unit);
 }

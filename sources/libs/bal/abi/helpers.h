@@ -2,9 +2,9 @@
 
 #include <bal/abi/types.h>
 
-char const *br_syscall_to_string(BrSyscall syscall);
+char const *br_syscall_to_str(BrSyscall syscall);
 
-char const *br_result_to_string(BrResult result);
+char const *br_result_to_str(BrResult result);
 
 Error br_result_to_error(BrResult result);
 

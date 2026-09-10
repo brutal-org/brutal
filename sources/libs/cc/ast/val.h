@@ -1,31 +1,44 @@
 #pragma once
 
 #include <brutal-base>
+#include <cc/ast/ref.h>
 
-typedef int CSigned;
-typedef unsigned int CUnsigned;
+typedef int64_t CSigned;
+typedef uint64_t CUnsigned;
 
 typedef enum
 {
     CVAL_INVALID,
 
-    CVAL_SIGNED,
-    CVAL_UNSIGNED,
+    CVAL_CHAR,
+    CVAL_SHORT,
+    CVAL_INT,
+    CVAL_LONG,
+    CVAL_LONGLONG,
+
+    CVAL_UCHAR,
+    CVAL_USHORT,
+    CVAL_UINT,
+    CVAL_ULONG,
+    CVAL_ULONGLONG,
+
     CVAL_FLOAT,
+    CVAL_DOUBLE,
+
     CVAL_STRING,
     CVAL_COUNT,
 } CValType;
 
-typedef struct
+typedef struct _CVal
 {
+    SrcRef ref;
     CValType type;
+
     union
     {
         CSigned signed_;
         CUnsigned unsigned_;
         double float_;
-        Str string_;
+        Str str_;
     };
 } CVal;
-
-Str cval_type_to_str(CValType type);

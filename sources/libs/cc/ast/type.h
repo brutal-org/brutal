@@ -8,7 +8,6 @@ typedef enum
     CTYPE_INVALID,
 
     CTYPE_TAIL,
-    CTYPE_ERROR,
 
     CTYPE_VOID,
     CTYPE_AUTO,
@@ -17,9 +16,22 @@ typedef enum
     CTYPE_REF,
     CTYPE_PARENT,
     CTYPE_ARRAY,
-    CTYPE_SIGNED,
-    CTYPE_UNSIGNED,
+
+    CTYPE_CHAR,
+    CTYPE_SHORT,
+    CTYPE_INT,
+    CTYPE_LONG,
+    CTYPE_LONGLONG,
+
+    CTYPE_UCHAR,
+    CTYPE_USHORT,
+    CTYPE_UINT,
+    CTYPE_ULONG,
+    CTYPE_ULONGLONG,
+
     CTYPE_FLOAT,
+    CTYPE_DOUBLE,
+
     CTYPE_STRUCT,
     CTYPE_UNION,
     CTYPE_ENUM,
@@ -45,17 +57,13 @@ typedef Vec(CTypeMember) CTypeMembers;
 
 struct _CType
 {
+    SrcRef ref;
     CTypeType type;
     CTypeAttr attr;
     Str name;
 
     union
     {
-        struct
-        {
-            int precision;
-        } signed_, unsigned_, float_;
-
         struct
         {
             CType *subtype;
@@ -96,7 +104,3 @@ struct _CTypeConst
     Str name;
     CVal value;
 };
-
-typedef Slice(CType) CTypeSlice;
-
-Str ctype_to_str(CTypeType type);

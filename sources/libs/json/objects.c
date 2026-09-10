@@ -109,6 +109,6 @@ Json json_str(Str str)
 {
     return (Json){
         .type = JSON_STRING,
-        .string = str,
+        .str = str,
     };
 }
